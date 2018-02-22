@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
   <string name="geo_location_accuracy_default">Precisão: desconhecida</string>
   <string name="geo_location_accuracy">Precisão: %1$s m</string>
   <string name="nocardspacetitle">
@@ -17,7 +17,7 @@ Sem espaço para armazenamento
   <string name="submitbutton">Submeter</string>
   <string name="geodialog">Autorize o acesso à sua localização</string>
   <string name="settings">Configurações</string>
-  <string name="preferences_settings_section">Configurações</string>
+  <string name="preferences_general_section">Parâmetros gerais</string>
   <string name="aboutlabel">Sobre</string>
   <string name="nogpsstatus">O aplicativo estado do GPS não está instalado neste dispositivo. Por favor, instale-o usando o Google Play Store.</string>
   <string name="otherinstructions">Por favor, insira uma descrição</string>
@@ -161,7 +161,6 @@ Sem espaço para armazenamento
   <string name="status_exported">Exportado</string>
   <!--APK update-->
   <string name="app_update_activity">Actualização do Akvo Flow</string>
-  <string name="app_update">Está disponível uma nova versão do aplicativo Flow. Clique em \'Actualizar\' para descarregar e instalar a nova versão.</string>
   <string name="update">Actualizar</string>
   <string name="not_now">Agora não</string>
   <string name="clicktoinstall">A nova versão do Flow foi descarregada. Você deseja instalá-la agora?</string>
@@ -269,4 +268,10 @@ Sem espaço para armazenamento
     <item quantity="other">%1$d puntos de dados sincronizados</item>
   </plurals>
   <string name="no_gps_status_message">O aplicativo estado do GPS não está instalado neste dispositivo. Deseja instalar-o agora?</string>
+  <string name="data_points_sync_no_data_points">Não ha pontos de dados para sincronizar</string>
+  <string name="app_update_dialog_title">Uma nova versão do aplicativo esá disponível</string>
+  <string name="app_update_dialog_subtitle">Atualize para tirar o máximo proveito do seu aplicativo Flow</string>
+  <string name="error_getting_media">Erro ao obter mídia, tente novamente.</string>
+  <string name="geo_fields_update_title">Atualizar coordenadas GPS?</string>
+  <string name="cascade_error_message">Não é possível carregar o recurso da cascata: %1$s</string>
 </resources>

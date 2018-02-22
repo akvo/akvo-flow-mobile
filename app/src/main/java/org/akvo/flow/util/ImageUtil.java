@@ -20,12 +20,9 @@ package org.akvo.flow.util;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.media.ExifInterface;
+import android.support.media.ExifInterface;
 import android.text.TextUtils;
 import android.util.Base64;
-import android.util.DisplayMetrics;
-import android.view.ViewGroup;
-import android.widget.ImageView;
 
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
@@ -33,7 +30,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.lang.reflect.Field;
 
 import timber.log.Timber;
 
@@ -115,21 +111,17 @@ public class ImageUtil {
 
     }
 
-    public static float[] getLocation(String image) {
+    public static double[] getLocation(String image) {
         try {
             ExifInterface exif = new ExifInterface(image);
-            float[] output = new float[2];
-            if (exif.getLatLong(output)) {
-                return output;
-            }
+            return exif.getLatLong();
         } catch (IOException e) {
-            Timber.e(e.getMessage());
+            Timber.e(e);
         }
-
         return null;
     }
 
-    public static boolean setLocation(String image, double latitude, double longitude) {
+    public static void setLocation(String image, double latitude, double longitude) {
         try {
             ExifInterface exif = new ExifInterface(image);
 
@@ -143,12 +135,42 @@ public class ImageUtil {
             exif.setAttribute(ExifInterface.TAG_GPS_LONGITUDE, lonDMS);
             exif.setAttribute(ExifInterface.TAG_GPS_LONGITUDE_REF, lonRef);
             exif.saveAttributes();
-            return true;
         } catch (IOException e) {
             Timber.e(e.getMessage());
         }
 
-        return false;
+    }
+
+    /**
+     * Compare to images to determine if their content is the same. To state
+     * that the two of them are the same, the datetime contained in their exif
+     * metadata will be compared. If the exif does not contain a datetime, the
+     * MD5 checksum of the images will be compared.
+     *
+     * @param image1 Absolute path to the first image
+     * @param image2 Absolute path to the second image
+     * @return true if their datetime is the same, false otherwise
+     */
+    static boolean compareImages(String image1, String image2) {
+        boolean equals = false;
+        try {
+            ExifInterface exif1 = new ExifInterface(image1);
+            ExifInterface exif2 = new ExifInterface(image2);
+
+            final String datetime1 = exif1.getAttribute(ExifInterface.TAG_DATETIME);
+            final String datetime2 = exif2.getAttribute(ExifInterface.TAG_DATETIME);
+
+            if (!TextUtils.isEmpty(datetime1) && !TextUtils.isEmpty(datetime2)) {
+                equals = datetime1.equals(datetime2);
+            } else {
+                Timber.d("Datetime is null or empty. The MD5 checksum will be compared");
+                equals = FileUtil.compareFilesChecksum(image1, image2);
+            }
+        } catch (IOException e) {
+            Timber.e(e);
+        }
+
+        return equals;
     }
 
     private static boolean saveImage(Bitmap bitmap, String filename) {
@@ -218,68 +240,6 @@ public class ImageUtil {
             }
         }
         return inSampleSize;
-    }
-
-    public static void displayImage(ImageView imageView, String filename) {
-        BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inJustDecodeBounds = true;
-        BitmapFactory.decodeFile(filename, options);
-
-        // Calculate inSampleSize
-        final int[] size = getImageSize(imageView);// [width, height]
-        options.inSampleSize = calculateInSampleSize(options, size[0], size[1]);
-
-        // Decode bitmap with inSampleSize set
-        options.inJustDecodeBounds = false;
-        Bitmap bitmap = BitmapFactory.decodeFile(filename, options);
-
-        if (bitmap != null) {
-            Timber.d("Displaying image with inSampleSize: %d", options.inSampleSize);
-            imageView.setImageBitmap(bitmap);
-        }
-    }
-
-    /**
-     * Size computing algorithm:
-     * 1) Get layout_width and layout_height. If both of them haven't exact value then go to step #2.
-     * 2) Get maxWidth and maxHeight. If both of them are not set then go to step #3.
-     * 3) Get device screen dimensions.
-     */
-    private static int[] getImageSize(ImageView imageView) {
-        DisplayMetrics displayMetrics = imageView.getContext().getResources().getDisplayMetrics();
-
-        ViewGroup.LayoutParams params = imageView.getLayoutParams();
-        int width = params.width; // Get layout width parameter
-        if (width <= 0) width = getFieldValue(imageView, "mMaxWidth"); // Check maxWidth parameter
-        if (width <= 0) width = displayMetrics.widthPixels;
-
-        int height = params.height; // Get layout height parameter
-        if (height <= 0) height = getFieldValue(imageView, "mMaxHeight"); // Check maxHeight parameter
-        if (height <= 0) height = displayMetrics.heightPixels;
-
-        return new int[]{width, height};
-    }
-
-    /**
-     * Access the properties by Reflection.
-     *
-     * @param object
-     * @param fieldName
-     * @return
-     */
-    private static int getFieldValue(Object object, String fieldName) {
-        int value = 0;
-        try {
-            Field field = ImageView.class.getDeclaredField(fieldName);
-            field.setAccessible(true);
-            int fieldValue = (Integer) field.get(object);
-            if (fieldValue > 0 && fieldValue < Integer.MAX_VALUE) {
-                value = fieldValue;
-            }
-        } catch (Exception e) {
-            Timber.e(e.getMessage());
-        }
-        return value;
     }
 
     private static String convertDMS(double coordinate) {

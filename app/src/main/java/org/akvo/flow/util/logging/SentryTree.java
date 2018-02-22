@@ -25,24 +25,28 @@ import android.support.annotation.VisibleForTesting;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.getsentry.raven.android.Raven;
-
 import java.util.Arrays;
 import java.util.List;
 
+import io.sentry.Sentry;
 import timber.log.Timber;
 
 class SentryTree extends Timber.Tree {
 
     private static final List<Class> IGNORED_EXCEPTIONS = Arrays
-            .asList(new Class[] { java.net.ConnectException.class,
-                    javax.net.ssl.SSLHandshakeException.class,
+            .asList(new Class[] {
+                    java.io.EOFException.class,
+                    java.io.InterruptedIOException.class,
+                    java.net.ConnectException.class,
+                    java.net.NoRouteToHostException.class,
+                    java.net.SocketTimeoutException.class,
+                    java.net.SocketException.class,
+                    java.net.UnknownHostException.class,
                     java.security.cert.CertificateNotYetValidException.class,
                     javax.net.ssl.SSLProtocolException.class,
-                    java.net.SocketTimeoutException.class,
-                    java.net.UnknownHostException.class,
-                    java.net.ConnectException.class,
-                    javax.net.ssl.SSLException.class
+                    javax.net.ssl.SSLHandshakeException.class,
+                    javax.net.ssl.SSLException.class,
+                    okhttp3.internal.http2.StreamResetException.class
             });
 
     @Override
@@ -59,9 +63,9 @@ class SentryTree extends Timber.Tree {
     @VisibleForTesting
     void captureException(@NonNull Throwable t, @Nullable String message) {
         if (TextUtils.isEmpty(message)) {
-            Raven.capture(t);
+            Sentry.capture(t);
         } else {
-            Raven.capture(new Throwable(message, t));
+            Sentry.capture(new Throwable(message, t));
         }
     }
 

@@ -44,7 +44,7 @@ public class BarcodeQuestionViewReadOnly extends QuestionView {
 
     private void init() {
         setQuestionView(R.layout.barcode_question_view_multiple);
-        RecyclerView responses = (RecyclerView) findViewById(R.id.responses_recycler_view);
+        RecyclerView responses = (RecyclerView) findViewById(R.id.barcode_responses_recycler_view);
         responses.setLayoutManager(new LinearLayoutManager(getContext()));
         barcodeQuestionAdapter = new BarcodeQuestionAdapter(new ArrayList<String>(), null);
         responses.setAdapter(barcodeQuestionAdapter);

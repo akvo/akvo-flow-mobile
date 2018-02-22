@@ -56,7 +56,7 @@ import org.akvo.flow.injector.component.ViewComponent;
 import org.akvo.flow.presentation.UserDeleteConfirmationDialog;
 import org.akvo.flow.presentation.navigation.CreateUserDialog;
 import org.akvo.flow.presentation.navigation.EditUserDialog;
-import org.akvo.flow.presentation.navigation.FlowNavigation;
+import org.akvo.flow.presentation.navigation.FlowNavigationView;
 import org.akvo.flow.presentation.navigation.SurveyDeleteConfirmationDialog;
 import org.akvo.flow.presentation.navigation.UserOptionsDialog;
 import org.akvo.flow.presentation.navigation.ViewUser;
@@ -79,7 +79,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 public class SurveyActivity extends AppCompatActivity implements RecordListListener,
-        FlowNavigation.DrawerNavigationListener,
+        FlowNavigationView.DrawerNavigationListener,
         SurveyDeleteConfirmationDialog.SurveyDeleteListener, UserOptionsDialog.UserOptionListener,
         UserDeleteConfirmationDialog.UserDeleteListener, EditUserDialog.EditUserListener,
         CreateUserDialog.CreateUserListener {
@@ -97,7 +97,7 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     FloatingActionButton addDataPointFab;
 
     @BindView(R.id.nav_view)
-    FlowNavigation navigationView;
+    FlowNavigationView navigationView;
 
     @Inject
     SurveyDbDataSource mDatabase;
@@ -276,7 +276,7 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
 
     @Override
     public void onBackPressed() {
-        if (mDrawerLayout != null && mDrawerLayout.isDrawerOpen(Gravity.START)) {
+        if (mDrawerLayout.isDrawerOpen(Gravity.START)) {
             mDrawerLayout.closeDrawer(Gravity.START);
         } else {
             super.onBackPressed();

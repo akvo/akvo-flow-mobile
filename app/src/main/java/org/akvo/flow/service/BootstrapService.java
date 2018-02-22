@@ -21,7 +21,6 @@ package org.akvo.flow.service;
 
 import android.app.IntentService;
 import android.content.Intent;
-import android.os.Environment;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -35,12 +34,13 @@ import org.akvo.flow.domain.SurveyMetadata;
 import org.akvo.flow.serialization.form.SurveyMetadataParser;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.FileUtil;
-import org.akvo.flow.util.FileUtil.FileType;
 import org.akvo.flow.util.NotificationHelper;
 import org.akvo.flow.util.StatusUtil;
 import org.akvo.flow.util.SurveyFileNameGenerator;
 import org.akvo.flow.util.SurveyIdGenerator;
 import org.akvo.flow.util.ViewUtil;
+import org.akvo.flow.util.files.FormFileBrowser;
+import org.akvo.flow.util.files.FormResourcesFileBrowser;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -48,9 +48,8 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
@@ -74,7 +73,7 @@ import timber.log.Timber;
  * utility will process them in lexicographical order by file name; Any files
  * with a name starting with . will be skipped (to prevent inadvertent
  * processing of MAC OSX metadata files).
- * 
+ *
  * @author Christopher Fagiani
  */
 public class BootstrapService extends IntentService {
@@ -84,10 +83,17 @@ public class BootstrapService extends IntentService {
     private static final String TAG = "BOOTSTRAP_SERVICE";
 
     @Inject
+    FormFileBrowser formFileBrowser;
+
+    @Inject
+    FormResourcesFileBrowser resourcesFileUtil;
+
+    @Inject
     SurveyDbDataSource databaseAdapter;
 
     private final SurveyIdGenerator surveyIdGenerator = new SurveyIdGenerator();
     private final SurveyFileNameGenerator surveyFileNameGenerator = new SurveyFileNameGenerator();
+    private final ZipFileLister zipFileLister = new ZipFileLister();
     private Handler mHandler;
 
     public BootstrapService() {
@@ -104,7 +110,7 @@ public class BootstrapService extends IntentService {
 
     public void onHandleIntent(Intent intent) {
         isProcessing = true;
-        checkAndInstall();
+        int installed = checkAndInstall();
         isProcessing = false;
     }
 
@@ -115,11 +121,12 @@ public class BootstrapService extends IntentService {
      * multiple zips in the directory) just in case data in a later zip depends
      * on the previous one being there.
      */
-    private void checkAndInstall() {
+    private int checkAndInstall() {
+        int installedFiles = 0;
         try {
-            ArrayList<File> zipFiles = getZipFiles();
+            List<File> zipFiles = zipFileLister.getSortedZipFiles();
             if (zipFiles.isEmpty()) {
-                return;
+                return 0;
             }
 
             String startMessage = getString(R.string.bootstrapstart);
@@ -129,6 +136,7 @@ public class BootstrapService extends IntentService {
                 for (File file : zipFiles) {
                     try {
                         processFile(file);
+                        installedFiles++;
                     } catch (Exception e) {
                         // try to roll back any database changes (if the zip has a rollback file)
                         String newFilename = file.getAbsolutePath();
@@ -147,18 +155,21 @@ public class BootstrapService extends IntentService {
             String errorMessage = getString(R.string.bootstraperror);
             displayErrorNotification(errorMessage);
 
-            Timber.e(e,"Bootstrap error");
+            Timber.e(e, "Bootstrap error");
         }
+        return installedFiles;
     }
 
     private void displayErrorNotification(String errorMessage) {
         //FIXME: why are we repeating the message in title and text?
-        NotificationHelper.displayErrorNotification(errorMessage, errorMessage, this, ConstantUtil.NOTIFICATION_BOOTSTRAP);
+        NotificationHelper.displayErrorNotification(errorMessage, errorMessage, this,
+                ConstantUtil.NOTIFICATION_BOOTSTRAP);
     }
 
     private void displayNotification(String message) {
         //FIXME: why are we repeating the message in title and text?
-        NotificationHelper.displayNotification(message, message, this, ConstantUtil.NOTIFICATION_BOOTSTRAP);
+        NotificationHelper
+                .displayNotification(message, message, this, ConstantUtil.NOTIFICATION_BOOTSTRAP);
     }
 
     /**
@@ -179,10 +190,10 @@ public class BootstrapService extends IntentService {
                 continue;
             }
 
-          if (entryName.endsWith(ConstantUtil.CASCADE_RES_SUFFIX)) {
+            if (entryName.endsWith(ConstantUtil.CASCADE_RES_SUFFIX)) {
                 // Cascade resource
                 FileUtil.extract(new ZipInputStream(zipFile.getInputStream(entry)),
-                        FileUtil.getFilesDir(FileType.RES));
+                        resourcesFileUtil.getExistingAppInternalFolder(getApplicationContext()));
             } else if (entryName.endsWith(ConstantUtil.XML_SUFFIX)) {
                 String filename = surveyFileNameGenerator.generateFileName(entryName);
                 String id = surveyIdGenerator.getSurveyIdFromFilePath(entryName);
@@ -191,14 +202,15 @@ public class BootstrapService extends IntentService {
                 String filename = surveyFileNameGenerator.generateFileName(entryName);
                 String id = surveyIdGenerator.getSurveyIdFromFilePath(entryName);
                 // Help media file
-                File helpDir = new File(FileUtil.getFilesDir(FileType.FORMS), id);
+                File helpDir = new File(formFileBrowser.getExistingAppInternalFolder(getApplicationContext()),
+                        id);
                 if (!helpDir.exists()) {
                     helpDir.mkdir();
                 }
                 FileUtil.copy(zipFile.getInputStream(entry),
                         new FileOutputStream(new File(helpDir, filename)));
-                }
             }
+        }
 
         // now rename the zip file so we don't process it again
         file.renameTo(new File(file.getAbsolutePath() + ConstantUtil.PROCESSED_OK_SUFFIX));
@@ -280,7 +292,7 @@ public class BootstrapService extends IntentService {
             survey.setId(id);
         }
         survey.setName(surveyName);
-        /**
+        /*
          * Resources are always attached to the zip file
          */
         survey.setHelpDownloaded(true);
@@ -290,6 +302,7 @@ public class BootstrapService extends IntentService {
 
     /**
      * Check form app id. Reject the form if it does not belong to the one set up
+     *
      * @param loadedSurvey survey to verify
      */
     private void verifyAppId(@NonNull SurveyMetadata loadedSurvey) {
@@ -297,9 +310,9 @@ public class BootstrapService extends IntentService {
         final String formApp = loadedSurvey.getApp();
         if (!TextUtils.isEmpty(app) && !TextUtils.isEmpty(formApp) && !app.equals(formApp)) {
             ViewUtil.displayToastFromService(getString(R.string.bootstrap_invalid_app), mHandler,
-                                             getApplicationContext());
+                    getApplicationContext());
             throw new IllegalArgumentException("Form belongs to a different instance." +
-                                                   " Expected: " + app + ". Got: " + formApp);
+                    " Expected: " + app + ". Got: " + formApp);
         }
     }
 
@@ -311,7 +324,7 @@ public class BootstrapService extends IntentService {
     @NonNull
     private File generateNewSurveyFile(@NonNull String filename,
             @Nullable String surveyFolderName) {
-        File filesDir = FileUtil.getFilesDir(FileType.FORMS);
+        File filesDir = formFileBrowser.getExistingAppInternalFolder(getApplicationContext());
         if (TextUtils.isEmpty(surveyFolderName)) {
             return new File(filesDir, filename);
         } else {
@@ -340,29 +353,5 @@ public class BootstrapService extends IntentService {
         String entryName = entry.getName();
         String entryPaths[] = entryName == null ? new String[0] : entryName.split(File.separator);
         return entryPaths.length < 2 ? "" : entryPaths[entryPaths.length - 2];
-    }
-
-    /**
-     * returns an ordered list of zip files that exist in the device's bootstrap
-     * directory
-     */
-    private ArrayList<File> getZipFiles() {
-        ArrayList<File> zipFiles = new ArrayList<>();
-        // zip files can only be loaded on the SD card (not internal storage) so
-        // we only need to look there
-        if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())) {
-            File dir = FileUtil.getFilesDir(FileType.INBOX);
-            File[] fileList = dir.listFiles();
-            if (fileList != null) {
-                for (File file : fileList) {
-                    if (file.isFile() && file.getName().toLowerCase()
-                                .endsWith(ConstantUtil.ARCHIVE_SUFFIX)) {
-                        zipFiles.add(file);
-                    }
-                }
-            }
-            Collections.sort(zipFiles);
-        }
-        return zipFiles;
     }
 }

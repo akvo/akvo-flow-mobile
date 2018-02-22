@@ -625,4 +625,8 @@ public class SurveyDbDataSource {
     public long createOrUpdateUser(Long id, String username) {
         return briteSurveyDbAdapter.createOrUpdateUser(id, username);
     }
+
+    public void deleteAllResponses() {
+        surveyDbAdapter.deleteAllResponses();
+    }
 }

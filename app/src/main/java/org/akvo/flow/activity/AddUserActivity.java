@@ -19,8 +19,6 @@
 
 package org.akvo.flow.activity;
 
-import android.content.Context;
-import android.app.Activity;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
@@ -36,13 +34,8 @@ import org.akvo.flow.domain.User;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
 import org.akvo.flow.presentation.BaseActivity;
-import org.akvo.flow.util.logging.LoggingHelper;
-
-import javax.inject.Inject;
-import org.akvo.flow.injector.component.ApplicationComponent;
-import org.akvo.flow.injector.component.DaggerViewComponent;
-import org.akvo.flow.injector.component.ViewComponent;
 import org.akvo.flow.ui.Navigator;
+import org.akvo.flow.util.logging.LoggingHelper;
 
 import javax.inject.Inject;
 
@@ -64,7 +57,7 @@ public class AddUserActivity extends BaseActivity {
 
     @BindView(R.id.device_id)
     EditText deviceIdEt;
-    
+
     @Inject
     LoggingHelper helper;
 

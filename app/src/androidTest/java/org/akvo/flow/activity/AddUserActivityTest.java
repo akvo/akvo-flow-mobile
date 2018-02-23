@@ -20,12 +20,17 @@
 
 package org.akvo.flow.activity;
 
+import android.content.Context;
+import android.support.test.InstrumentationRegistry;
 import android.support.test.espresso.ViewInteraction;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 import android.test.suitebuilder.annotation.MediumTest;
 
 import org.akvo.flow.R;
+import org.akvo.flow.activity.form.data.SurveyInstaller;
+import org.akvo.flow.activity.form.data.SurveyRequisite;
+import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -40,6 +45,7 @@ import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.isEnabled;
 import static android.support.test.espresso.matcher.ViewMatchers.withHint;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
+import static org.akvo.flow.tests.R.raw.all_questions_form;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.core.AllOf.allOf;
 
@@ -50,6 +56,11 @@ public class AddUserActivityTest {
     @Rule
     public ActivityTestRule<AddUserActivity> mActivityTestRule = new ActivityTestRule<>(
             AddUserActivity.class);
+
+    @BeforeClass
+    public static void beforeClass() {
+        SurveyRequisite.resetRequisites(InstrumentationRegistry.getTargetContext());
+    }
 
     @Test
     public void testAddUser() throws Exception {

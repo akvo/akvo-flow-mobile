@@ -102,12 +102,11 @@ public class FlowNavigationView extends NavigationView implements IFlowNavigatio
     }
 
     private void initViews() {
-        View headerView = getHeaderView(0);
-        currentUserTextView = ButterKnife.findById(headerView, R.id.current_user_name);
-        surveyTitleTextView = ButterKnife.findById(headerView, R.id.surveys_title_tv);
-        surveysRecyclerView = ButterKnife.findById(headerView, R.id.surveys_rv);
-        usersRecyclerView = ButterKnife.findById(headerView, R.id.users_rv);
-        userHeader = ButterKnife.findById(headerView, R.id.user_header);
+        currentUserTextView = ButterKnife.findById(this, R.id.current_user_name);
+        surveyTitleTextView = ButterKnife.findById(this, R.id.surveys_title_tv);
+        surveysRecyclerView = ButterKnife.findById(this, R.id.surveys_rv);
+        usersRecyclerView = ButterKnife.findById(this, R.id.users_rv);
+        userHeader = ButterKnife.findById(this, R.id.user_header);
         NavigationMenuView navigationMenuView = (NavigationMenuView) getChildAt(0);
         if (navigationMenuView != null) {
             navigationMenuView.setVerticalScrollBarEnabled(false);
@@ -146,27 +145,29 @@ public class FlowNavigationView extends NavigationView implements IFlowNavigatio
     }
 
     private void setNavigationItemListener() {
-        setNavigationItemSelectedListener(new OnNavigationItemSelectedListener() {
+        ButterKnife.findById(this, R.id.settings_tv).setOnClickListener(new OnClickListener() {
             @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-                switch (menuItem.getItemId()) {
-                    case R.id.settings:
-                        if (drawerNavigationListener != null) {
-                            drawerNavigationListener.navigateToSettings();
-                        }
-                        return true;
-                    case R.id.about:
-                        if (drawerNavigationListener != null) {
-                            drawerNavigationListener.navigateToAbout();
-                        }
-                        return true;
-                    case R.id.help:
-                        if (drawerNavigationListener != null) {
-                            drawerNavigationListener.navigateToHelp();
-                        }
-                        return true;
-                    default:
-                        return false;
+            public void onClick(View v) {
+                if (drawerNavigationListener != null) {
+                    drawerNavigationListener.navigateToSettings();
+                }
+            }
+        });
+
+        ButterKnife.findById(this, R.id.help_tv).setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (drawerNavigationListener != null) {
+                    drawerNavigationListener.navigateToHelp();
+                }
+            }
+        });
+
+        ButterKnife.findById(this, R.id.about_tv).setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (drawerNavigationListener != null) {
+                    drawerNavigationListener.navigateToAbout();
                 }
             }
         });

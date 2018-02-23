@@ -64,6 +64,9 @@ public class AddUserActivity extends BaseActivity {
 
     @BindView(R.id.device_id)
     EditText deviceIdEt;
+    
+    @Inject
+    LoggingHelper helper;
 
     @Inject
     Prefs prefs;

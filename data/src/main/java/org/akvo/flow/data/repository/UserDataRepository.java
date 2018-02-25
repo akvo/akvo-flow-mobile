@@ -95,4 +95,19 @@ public class UserDataRepository implements UserRepository {
     public Observable<Boolean> setSelectedSurvey(long surveyGroupId) {
         return dataSourceFactory.getSharedPreferencesDataSource().setSelectedSurvey(surveyGroupId);
     }
+
+    @Override
+    public Observable<Long> getSelectedUser() {
+        return dataSourceFactory.getSharedPreferencesDataSource().getSelectedUser();
+    }
+
+    @Override
+    public Observable<Boolean> clearSelectedUser() {
+        return dataSourceFactory.getSharedPreferencesDataSource().clearSelectedUser();
+    }
+
+    @Override
+    public Observable<Boolean> setSelectedUser(long userId) {
+        return dataSourceFactory.getSharedPreferencesDataSource().setSelectedUser(userId);
+    }
 }

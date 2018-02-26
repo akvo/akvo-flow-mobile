@@ -35,7 +35,7 @@ import io.reactivex.functions.Function;
 public class CreateUser extends UseCase {
 
     public static final String PARAM_USER_NAME = "user";
-    private static final long INVALID_ID = -1L;
+    private static final Long INVALID_USER_ID = -1L;
 
     private final SurveyRepository surveyRepository;
     private final UserRepository userRepository;
@@ -58,7 +58,7 @@ public class CreateUser extends UseCase {
                 .concatMap(new Function<Long, Observable<Boolean>>() {
                     @Override
                     public Observable<Boolean> apply(final Long userId) {
-                        if (userId == INVALID_ID) {
+                        if (INVALID_USER_ID.equals(userId)) {
                             return Observable.error(new Exception("Error inserting user"));
                         }
                         return userRepository.setSelectedUser(userId);

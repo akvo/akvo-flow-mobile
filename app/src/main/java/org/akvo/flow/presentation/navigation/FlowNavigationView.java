@@ -301,7 +301,6 @@ public class FlowNavigationView extends NavigationView implements IFlowNavigatio
         dialogFragment.show(getSupportFragmentManager(), UserOptionsDialog.TAG);
     }
 
-
     private FragmentManager getSupportFragmentManager() {
         return ((AppCompatActivity) getContext()).getSupportFragmentManager();
     }

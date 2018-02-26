@@ -64,7 +64,7 @@ public class UserDeleteConfirmationDialog extends DialogFragment {
             listener = (UserDeleteListener) getActivity();
         } catch (ClassCastException e) {
             throw new ClassCastException(getTargetFragment().toString()
-                    + " must implement SurveyDeleteListener");
+                    + " must implement UserDeleteListener");
         }
     }
 

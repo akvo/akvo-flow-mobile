@@ -58,7 +58,7 @@ public class DeleteUser extends UseCase {
                 .concatMap(new Function<Long, Observable<Boolean>>() {
                     @Override
                     public Observable<Boolean> apply(Long selectedUserId) {
-                        if (selectedUserId == user.getId()) {
+                        if (selectedUserId.equals(user.getId())) {
                             return userRepository.clearSelectedUser().concatMap(
                                     new Function<Boolean, Observable<Boolean>>() {
                                         @Override

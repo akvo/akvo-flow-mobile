@@ -44,7 +44,7 @@ public class MakeDataPrivate extends UseCase {
 
     @Override
     protected <T> Observable buildUseCaseObservable(Map<String, T> parameters) {
-        return Observable.zip(fileRepository.deleteZipFiles(), fileRepository.moveMediaFiles(),
+        return Observable.zip(fileRepository.moveZipFiles(), fileRepository.moveMediaFiles(),
                 new BiFunction<Boolean, Boolean, Boolean>() {
                     @Override
                     public Boolean apply(Boolean o, Boolean o2) throws Exception {

@@ -21,6 +21,8 @@
 package org.akvo.flow.data.datasource;
 
 import android.content.Context;
+import android.os.Environment;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import java.io.File;
@@ -45,51 +47,54 @@ public class FileDataSource {
         this.fileHelper = fileHelper;
     }
 
-    public Observable<Boolean> deleteZipFiles() {
-        File file = fileHelper.getPublicFolder(DIR_DATA);
-        if (file.exists()) {
-            File[] files = file.listFiles();
-            deleteFiles(files);
-            //noinspection ResultOfMethodCallIgnored
-            file.delete();
-        }
-        return Observable.just(true);
+    public Observable<Boolean> moveZipFiles() {
+        return moveFiles(DIR_DATA);
     }
 
     public Observable<Boolean> moveMediaFiles() {
-        File file = fileHelper.getPublicFolder(DIR_MEDIA);
+        return moveFiles(DIR_MEDIA);
+    }
+
+    private Observable<Boolean> moveFiles(String folderName) {
+        File file = getPublicFolder(folderName);
         if (file.exists()) {
             File[] files = file.listFiles();
-            copyFiles(files);
-            deleteFiles(files);
-            //noinspection ResultOfMethodCallIgnored
-            file.delete();
+            final boolean success = copyFiles(files, folderName);
+            if (success) {
+                //noinspection ResultOfMethodCallIgnored
+                file.delete();
+            }
         }
         return Observable.just(true);
     }
 
-    private void deleteFiles(@Nullable File[] files) {
+    private boolean copyFiles(@Nullable File[] files, String folderName) {
+        boolean copySuccess = true;
         if (files != null) {
             for (File f : files) {
-                //noinspection ResultOfMethodCallIgnored
-                f.delete();
+                File folder = getPrivateDestinationFolder(folderName);
+                boolean success = fileHelper.copyFile(f, folder);
+                if (success) {
+                    //noinspection ResultOfMethodCallIgnored
+                    f.delete();
+                } else {
+                    copySuccess = false;
+                }
             }
         }
+        return copySuccess;
     }
 
-
-    private void copyFiles(@Nullable File[] files) {
-        if (files != null) {
-            File folder = getPrivateMediaFolder();
-            for (File f : files) {
-                fileHelper.copyFile(f, folder);
-            }
-        }
+    @NonNull
+    private File getPublicFolder(String folderName) {
+        String path = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator
+                + folderName;
+        return new File(path);
     }
 
-    private File getPrivateMediaFolder() {
+    private File getPrivateDestinationFolder(String folderName) {
         File folder = new File(
-                context.getFilesDir().getAbsolutePath() + File.separator + DIR_MEDIA);
+                context.getFilesDir().getAbsolutePath() + File.separator + folderName);
         if (!folder.exists()) {
             //noinspection ResultOfMethodCallIgnored
             folder.mkdirs();

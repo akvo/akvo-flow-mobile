@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -46,13 +46,15 @@ public class FileDataRepository implements FileRepository {
     }
 
     @Override
-    public Observable<Boolean> saveResizedImage(String originalImagePath, String resizedImagePath, int imageSize) {
-        return dataSourceFactory.getImageDataSource().saveResizedImage(originalImagePath, resizedImagePath, imageSize);
+    public Observable<Boolean> saveResizedImage(String originalImagePath, String resizedImagePath,
+            int imageSize) {
+        return dataSourceFactory.getImageDataSource()
+                .saveResizedImage(originalImagePath, resizedImagePath, imageSize);
     }
 
     @Override
-    public Observable<Boolean> deleteZipFiles() {
-        return dataSourceFactory.getFileDataSource().deleteZipFiles();
+    public Observable<Boolean> moveZipFiles() {
+        return dataSourceFactory.getFileDataSource().moveZipFiles();
     }
 
     @Override

@@ -20,9 +20,6 @@
 
 package org.akvo.flow.data.datasource;
 
-import android.os.Environment;
-import android.support.annotation.NonNull;
-
 import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
@@ -42,14 +39,8 @@ class FileHelper {
     FileHelper() {
     }
 
-    @NonNull
-    File getPublicFolder(String folderName) {
-        String path = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator
-                + folderName;
-        return new File(path);
-    }
-
-    void copyFile(File originalFile, File destinationFolder) {
+    boolean copyFile(File originalFile, File destinationFolder) {
+        boolean sucess = false;
         InputStream in = null;
         OutputStream out = null;
         try {
@@ -61,13 +52,16 @@ class FileHelper {
                 out.write(buffer, 0, read);
             }
             out.flush();
+            sucess = true;
         } catch (FileNotFoundException e) {
             Timber.e(e);
         } catch (IOException e) {
             Timber.e(e);
+        } finally {
+            close(in);
+            close(out);
         }
-        close(in);
-        close(out);
+        return sucess;
     }
 
     void close(Closeable closeable) {

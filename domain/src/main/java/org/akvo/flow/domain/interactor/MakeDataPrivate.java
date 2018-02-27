@@ -20,8 +20,6 @@
 
 package org.akvo.flow.domain.interactor;
 
-import org.akvo.flow.domain.executor.PostExecutionThread;
-import org.akvo.flow.domain.executor.ThreadExecutor;
 import org.akvo.flow.domain.repository.FileRepository;
 
 import java.util.Map;
@@ -29,21 +27,37 @@ import java.util.Map;
 import javax.inject.Inject;
 
 import io.reactivex.Observable;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.BiFunction;
+import io.reactivex.observers.DisposableObserver;
 
-public class MakeDataPrivate extends UseCase {
+/**
+ * This is a single threaded UseCase to be used with IntentServices whose onHandleIntent method runs
+ * on a worker thread
+ */
+public class MakeDataPrivate {
 
     private final FileRepository fileRepository;
+    private final CompositeDisposable disposables;
 
     @Inject
-    protected MakeDataPrivate(ThreadExecutor threadExecutor,
-            PostExecutionThread postExecutionThread, FileRepository fileRepository) {
-        super(threadExecutor, postExecutionThread);
+    protected MakeDataPrivate(FileRepository fileRepository) {
         this.fileRepository = fileRepository;
+        this.disposables = new CompositeDisposable();
     }
 
-    @Override
-    protected <T> Observable buildUseCaseObservable(Map<String, T> parameters) {
+    public <T> void execute(DisposableObserver<T> observer, Map<String, Object> parameters) {
+        addDisposable(((Observable<T>) buildUseCaseObservable(parameters)).subscribeWith(observer));
+    }
+
+    public void dispose() {
+        if (!disposables.isDisposed()) {
+            disposables.clear();
+        }
+    }
+
+    private <T> Observable buildUseCaseObservable(Map<String, T> parameters) {
         return Observable.zip(fileRepository.moveZipFiles(), fileRepository.moveMediaFiles(),
                 new BiFunction<Boolean, Boolean, Boolean>() {
                     @Override
@@ -51,5 +65,9 @@ public class MakeDataPrivate extends UseCase {
                         return o && o2;
                     }
                 });
+    }
+
+    private void addDisposable(Disposable disposable) {
+        disposables.add(disposable);
     }
 }

@@ -42,6 +42,8 @@ import org.akvo.flow.database.TransmissionStatus;
 import org.akvo.flow.database.UserColumns;
 import org.akvo.flow.domain.FileTransmission;
 import org.akvo.flow.domain.Survey;
+import org.akvo.flow.domain.interactor.DefaultObserver;
+import org.akvo.flow.domain.interactor.MakeDataPrivate;
 import org.akvo.flow.domain.response.FormInstance;
 import org.akvo.flow.domain.response.Response;
 import org.akvo.flow.exception.HttpException;
@@ -124,6 +126,9 @@ public class DataSyncService extends IntentService {
     @Inject
     MediaFileHelper mediaFileHelper;
 
+    @Inject
+    MakeDataPrivate makeDataPrivate;
+
     private SurveyDbDataSource mDatabase;
     private Prefs preferences;
     private ConnectivityStateManager connectivityStateManager;
@@ -141,8 +146,24 @@ public class DataSyncService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
+        makeDataPrivate.execute(new DefaultObserver<Boolean>() {
+            @Override
+            public void onNext(Boolean ignored) {
+                startSyncingData();
+            }
+
+            @Override
+            public void onError(Throwable e) {
+                Timber.e(e);
+                startSyncingData();
+            }
+        }, null);
+
+    }
+
+    private void startSyncingData() {
         try {
-            mDatabase = new SurveyDbDataSource(this, null);
+            mDatabase = new SurveyDbDataSource(getApplicationContext(), null);
             mDatabase.open();
             preferences = new Prefs(getApplicationContext());
             connectivityStateManager = new ConnectivityStateManager(getApplicationContext());

@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2018 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -50,7 +50,7 @@ import timber.log.Timber;
 public class FileUtil {
 
     // Directories stored in the External Storage root (i.e. /sdcard/akvoflow/data)
-    private static final String DIR_DATA = "akvoflow/data/files"; // form responses zip files
+    // form responses zip files
     private static final String DIR_MEDIA = "akvoflow/data/media"; // form responses media files
     private static final String DIR_INBOX = "akvoflow/inbox"; // Bootstrap files
 
@@ -60,7 +60,6 @@ public class FileUtil {
     private static final int BUFFER_SIZE = 2048;
 
     public enum FileType {
-        DATA,
         MEDIA,
         INBOX,
         TMP
@@ -77,9 +76,6 @@ public class FileUtil {
     public static File getFilesDir(FileType type) {
         String path = null;
         switch (type) {
-            case DATA:
-                path = getFilesStorageDir(false) + File.separator + DIR_DATA;
-                break;
             case MEDIA:
                 path = getFilesStorageDir(false) + File.separator + DIR_MEDIA;
                 break;

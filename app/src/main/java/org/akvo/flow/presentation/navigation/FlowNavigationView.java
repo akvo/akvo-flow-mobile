@@ -249,9 +249,9 @@ public class FlowNavigationView extends NavigationView implements IFlowNavigatio
     }
 
     @Override
-    public void displayUser(String userName, List<ViewUser> viewUsers) {
+    public void displayUsers(String selectedUserName, List<ViewUser> viewUsers) {
         usersAdapter.setUsers(viewUsers);
-        currentUserTextView.setText(userName);
+        currentUserTextView.setText(selectedUserName);
     }
 
     @Override
@@ -300,7 +300,6 @@ public class FlowNavigationView extends NavigationView implements IFlowNavigatio
         DialogFragment dialogFragment = UserOptionsDialog.newInstance(viewUser);
         dialogFragment.show(getSupportFragmentManager(), UserOptionsDialog.TAG);
     }
-
 
     private FragmentManager getSupportFragmentManager() {
         return ((AppCompatActivity) getContext()).getSupportFragmentManager();

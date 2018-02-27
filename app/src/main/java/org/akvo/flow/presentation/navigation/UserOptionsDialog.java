@@ -88,8 +88,7 @@ public class UserOptionsDialog extends DialogFragment {
                         }
                         dismiss();
                     }
-                })
-                .setCancelable(true);
+                });
         return builder.create();
     }
 

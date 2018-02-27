@@ -35,7 +35,7 @@ import org.akvo.flow.domain.interactor.SaveImage;
 import org.akvo.flow.domain.interactor.SaveImageSize;
 import org.akvo.flow.domain.interactor.SaveKeepScreenOn;
 import org.akvo.flow.domain.interactor.SaveSelectedSurvey;
-import org.akvo.flow.domain.interactor.SetSelectedUser;
+import org.akvo.flow.domain.interactor.SelectUser;
 import org.akvo.flow.domain.interactor.UseCase;
 
 import javax.inject.Named;
@@ -131,9 +131,9 @@ public class ViewModule {
     }
 
     @Provides
-    @Named("setSelectedUser")
-    UseCase provideSelectedUser(SetSelectedUser selectedUser) {
-        return selectedUser;
+    @Named("selectUser")
+    UseCase provideSelectedUser(SelectUser selectUser) {
+        return selectUser;
     }
 
     @Provides

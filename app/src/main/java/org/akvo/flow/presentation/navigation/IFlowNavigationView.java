@@ -32,7 +32,7 @@ public interface IFlowNavigationView {
 
     void displaySurveys(List<ViewSurvey> surveys, Long selectedSurveyId);
 
-    void displayUser(String userName, List<ViewUser> viewUsers);
+    void displayUsers(String selectedUserName, List<ViewUser> viewUsers);
 
     void onUserLongPress(ViewUser viewUser);
 

@@ -131,7 +131,7 @@ public class FlowNavigationPresenter implements Presenter {
             public void onNext(Pair<User, List<User>> userListPair) {
                 currentUser = userMapper.transform(userListPair.first);
                 String name = currentUser == null ? "" : currentUser.getName();
-                view.displayUser(name, userMapper.transform(userListPair.second));
+                view.displayUsers(name, userMapper.transform(userListPair.second));
             }
         }, null);
     }

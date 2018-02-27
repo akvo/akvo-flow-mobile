@@ -51,7 +51,7 @@ public class FlowNavigationPresenter implements Presenter {
     private final UseCase getUsers;
     private final UseCase editUser;
     private final UseCase deleteUser;
-    private final UseCase setSelectedUser;
+    private final UseCase selectUser;
     private final UseCase createUser;
 
     private final SurveyMapper surveyMapper;
@@ -68,7 +68,7 @@ public class FlowNavigationPresenter implements Presenter {
             @Named("saveSelectedSurvey") UseCase saveSelectedSurvey,
             @Named("getUsers") UseCase getUsers, UserMapper userMapper,
             @Named("editUser") UseCase editUser, @Named("deleteUser") UseCase deleteUser,
-            @Named("selectUser") UseCase setSelectedUser,
+            @Named("selectUser") UseCase selectUser,
             @Named("createUser") UseCase createUser) {
         this.getAllSurveys = getAllSurveys;
         this.surveyMapper = surveyMapper;
@@ -79,7 +79,7 @@ public class FlowNavigationPresenter implements Presenter {
         this.userMapper = userMapper;
         this.editUser = editUser;
         this.deleteUser = deleteUser;
-        this.setSelectedUser = setSelectedUser;
+        this.selectUser = selectUser;
         this.createUser = createUser;
     }
 
@@ -91,7 +91,7 @@ public class FlowNavigationPresenter implements Presenter {
         getUsers.dispose();
         editUser.dispose();
         deleteUser.dispose();
-        setSelectedUser.dispose();
+        selectUser.dispose();
         createUser.dispose();
     }
 
@@ -210,7 +210,7 @@ public class FlowNavigationPresenter implements Presenter {
         } else {
             Map<String, Object> params = new HashMap<>(2);
             params.put(SelectUser.PARAM_USER_ID, item.getId());
-            setSelectedUser.execute(new DefaultObserver<Boolean>() {
+            selectUser.execute(new DefaultObserver<Boolean>() {
                 @Override
                 public void onError(Throwable e) {
                     Timber.e(e);

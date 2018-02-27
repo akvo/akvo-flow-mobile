@@ -30,7 +30,7 @@ import org.akvo.flow.domain.interactor.DeleteSurvey;
 import org.akvo.flow.domain.interactor.DeleteUser;
 import org.akvo.flow.domain.interactor.EditUser;
 import org.akvo.flow.domain.interactor.SaveSelectedSurvey;
-import org.akvo.flow.domain.interactor.SetSelectedUser;
+import org.akvo.flow.domain.interactor.SelectUser;
 import org.akvo.flow.domain.interactor.UseCase;
 import org.akvo.flow.presentation.Presenter;
 
@@ -68,7 +68,7 @@ public class FlowNavigationPresenter implements Presenter {
             @Named("saveSelectedSurvey") UseCase saveSelectedSurvey,
             @Named("getUsers") UseCase getUsers, UserMapper userMapper,
             @Named("editUser") UseCase editUser, @Named("deleteUser") UseCase deleteUser,
-            @Named("setSelectedUser") UseCase setSelectedUser,
+            @Named("selectUser") UseCase setSelectedUser,
             @Named("createUser") UseCase createUser) {
         this.getAllSurveys = getAllSurveys;
         this.surveyMapper = surveyMapper;
@@ -209,7 +209,7 @@ public class FlowNavigationPresenter implements Presenter {
             view.displayAddUser();
         } else {
             Map<String, Object> params = new HashMap<>(2);
-            params.put(SetSelectedUser.PARAM_USER_ID, item.getId());
+            params.put(SelectUser.PARAM_USER_ID, item.getId());
             setSelectedUser.execute(new DefaultObserver<Boolean>() {
                 @Override
                 public void onError(Throwable e) {

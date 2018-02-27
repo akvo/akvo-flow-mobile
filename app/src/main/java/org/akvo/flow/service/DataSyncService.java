@@ -129,9 +129,14 @@ public class DataSyncService extends IntentService {
     @Inject
     MakeDataPrivate makeDataPrivate;
 
-    private SurveyDbDataSource mDatabase;
-    private Prefs preferences;
-    private ConnectivityStateManager connectivityStateManager;
+    @Inject
+    SurveyDbDataSource mDatabase;
+
+    @Inject
+    Prefs preferences;
+
+    @Inject
+    ConnectivityStateManager connectivityStateManager;
 
     public DataSyncService() {
         super(TAG);
@@ -149,29 +154,26 @@ public class DataSyncService extends IntentService {
         makeDataPrivate.execute(new DefaultObserver<Boolean>() {
             @Override
             public void onNext(Boolean ignored) {
-                startSyncingData();
+                exportAndSync();
             }
 
             @Override
             public void onError(Throwable e) {
                 Timber.e(e);
-                startSyncingData();
+                exportAndSync();
             }
         }, null);
 
     }
 
-    private void startSyncingData() {
+    private void exportAndSync() {
         try {
-            mDatabase = new SurveyDbDataSource(getApplicationContext(), null);
             mDatabase.open();
-            preferences = new Prefs(getApplicationContext());
-            connectivityStateManager = new ConnectivityStateManager(getApplicationContext());
-            exportSurveys();// Create zip files, if necessary
+            exportSurveys();
 
             if (connectivityStateManager.isConnectionAvailable(preferences
                     .getBoolean(Prefs.KEY_CELL_UPLOAD, Prefs.DEFAULT_VALUE_CELL_UPLOAD))) {
-                syncFiles();// Sync everything
+                syncFiles();
             }
         } catch (Exception e) {
             Timber.e(e, e.getMessage());
@@ -186,6 +188,9 @@ public class DataSyncService extends IntentService {
     // ============================ EXPORT ============================= //
     // ================================================================= //
 
+    /**
+     * Create zip files, if necessary
+     */
     private void exportSurveys() {
         // First off, ensure surveys marked as 'exported' are indeed found in the external storage.
         // Missing surveys will be set to 'submitted', so the next step re-creates these files too.

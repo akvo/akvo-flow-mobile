@@ -248,9 +248,9 @@ public class FlowNavigationView extends NavigationView implements IFlowNavigatio
     }
 
     @Override
-    public void displayUser(String userName, List<ViewUser> viewUsers) {
+    public void displayUsers(String selectedUserName, List<ViewUser> viewUsers) {
         usersAdapter.setUsers(viewUsers);
-        currentUserTextView.setText(userName);
+        currentUserTextView.setText(selectedUserName);
     }
 
     @Override

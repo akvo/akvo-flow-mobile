@@ -35,11 +35,11 @@ import java.util.List;
 public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder> {
 
     private final List<ViewUser> users = new ArrayList<>();
-    private final ViewUser addUser;
+    private final ViewUser addUserItem;
 
     public UserAdapter(Context context) {
-        addUser = new ViewUser(ViewUser.ADD_USER_ID, context.getString(R.string.new_user));
-        users.add(addUser);
+        addUserItem = new ViewUser(ViewUser.ADD_USER_ID, context.getString(R.string.new_user));
+        users.add(addUserItem);
     }
 
     @Override
@@ -64,7 +64,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
         if (userList != null && !userList.isEmpty()) {
             users.addAll(userList);
         }
-        users.add(addUser);
+        users.add(addUserItem);
         notifyDataSetChanged();
     }
 

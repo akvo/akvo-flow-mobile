@@ -339,7 +339,7 @@ public class ImageDataSource {
     }
 
     /**
-     * Compare to files to determine if their content is the same. To state that
+     * Compare two files to determine if their content is the same. To state that
      * the two of them are the same, the MD5 checksum will be compared. Note
      * that if any of the files does not exist, or if its checksum cannot be
      * computed, false will be returned.

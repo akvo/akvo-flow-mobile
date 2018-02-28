@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -64,7 +64,7 @@ public class UserDeleteConfirmationDialog extends DialogFragment {
             listener = (UserDeleteListener) getActivity();
         } catch (ClassCastException e) {
             throw new ClassCastException(getTargetFragment().toString()
-                    + " must implement SurveyDeleteListener");
+                    + " must implement UserDeleteListener");
         }
     }
 

@@ -4,6 +4,7 @@
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="@color/black_main"
         tools:context="org.akvo.flow.presentation.FullImageActivity">
 
    <include layout="@layout/app_bar_layout"></include>
@@ -12,7 +13,9 @@
             android:layout_marginTop="?actionBarSize"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:scaleType="centerCrop"
+            android:layout_gravity="center"
+            android:scaleType="fitCenter"
+            tools:src="@drawable/logo"
             android:id="@+id/imageView"/>
 
 </android.support.design.widget.CoordinatorLayout>

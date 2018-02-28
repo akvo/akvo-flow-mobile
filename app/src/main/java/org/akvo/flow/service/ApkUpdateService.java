@@ -1,5 +1,5 @@
 /*
-* Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
+* Copyright (C) 2010-2018 Stichting Akvo (Akvo Foundation)
 *
  *  This file is part of Akvo Flow.
  *
@@ -20,6 +20,7 @@
 package org.akvo.flow.service;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.v4.util.Pair;
 
 import com.google.android.gms.gcm.GcmNetworkManager;
@@ -56,6 +57,17 @@ public class ApkUpdateService extends GcmTaskService {
     public static void scheduleFirstTask(Context context) {
         schedulePeriodicTask(context, ConstantUtil.FIRST_REPEAT_INTERVAL_IN_SECONDS,
                 ConstantUtil.FIRST_FLEX_INTERVAL_IN_SECOND);
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        if (intent == null) {
+            // GcmTaskService doesn't check for null intent
+            Timber.w("Invalid GcmTask null intent.");
+            stopSelf();
+            return START_NOT_STICKY;
+        }
+        return super.onStartCommand(intent, flags, startId);
     }
 
     private static void schedulePeriodicTask(Context context, int repeatIntervalInSeconds,

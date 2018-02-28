@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -37,6 +37,8 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import timber.log.Timber;
+
 public class FileChangeTrackingService extends GcmTaskService {
 
     private static final long VERIFY_PERIOD_SECONDS = 30;
@@ -50,6 +52,17 @@ public class FileChangeTrackingService extends GcmTaskService {
         super.onCreate();
         FlowApp application = (FlowApp) getApplicationContext();
         application.getApplicationComponent().inject(this);
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        if (intent == null) {
+            // GcmTaskService doesn't check for null intent
+            Timber.w("Invalid GcmTask null intent.");
+            stopSelf();
+            return START_NOT_STICKY;
+        }
+        return super.onStartCommand(intent, flags, startId);
     }
 
     public static void scheduleVerifier(Context context) {

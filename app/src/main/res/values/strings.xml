@@ -277,7 +277,6 @@
     <string name="user_select_error">Error selecting user</string>
     <string name="add_user_message">The new user will automatically be selected</string>
 
-
     <string name="no_gps_status_message">GPS Status is not installed on this device. Would you like to install it?</string>
     <string name="data_points_sync_no_data_points">No datapoints to sync</string>
 

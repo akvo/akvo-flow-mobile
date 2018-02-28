@@ -30,14 +30,14 @@ import javax.inject.Inject;
 
 import io.reactivex.Observable;
 
-public class SetSelectedUser extends UseCase {
+public class SelectUser extends UseCase {
 
     public static final String PARAM_USER_ID = "user_id";
 
     private final UserRepository userRepository;
 
     @Inject
-    protected SetSelectedUser(ThreadExecutor threadExecutor,
+    protected SelectUser(ThreadExecutor threadExecutor,
             PostExecutionThread postExecutionThread, UserRepository userRepository) {
         super(threadExecutor, postExecutionThread);
         this.userRepository = userRepository;

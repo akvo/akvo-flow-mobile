@@ -305,8 +305,10 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
         }
         activityJustCreated = false;
         // Delete empty responses, if any
-        mDatabase.deleteEmptySurveyInstances();
-        mDatabase.deleteEmptyRecords();
+        if (mDatabase != null) {
+            mDatabase.deleteEmptySurveyInstances();
+            mDatabase.deleteEmptyRecords();
+        }
 
         ViewApkData apkData = apkUpdateStore.getApkData();
         boolean shouldNotifyUpdate = apkUpdateStore.shouldNotifyNewVersion();
@@ -339,7 +341,9 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     @Override
     public void onDestroy() {
         super.onDestroy();
-        mDatabase.close();
+        if (mDatabase != null) {
+            mDatabase.close();
+        }
     }
 
     @Override
@@ -477,7 +481,8 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     }
 
     private void displayForm(String surveyedLocaleId, User user) {
-        Survey registrationForm = mDatabase.getRegistrationForm(mSurveyGroup);
+        Survey registrationForm =
+                mDatabase != null ? mDatabase.getRegistrationForm(mSurveyGroup) : null;
         if (registrationForm == null) {
             Toast.makeText(this, R.string.error_missing_form, Toast.LENGTH_LONG).show();
             return;
@@ -516,8 +521,10 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
 
     @OnClick(R.id.add_data_point_fab)
     void onAddDataPointTap() {
-        addDataPointFab.setEnabled(false);
-        String newLocaleId = mDatabase.createSurveyedLocale(mSurveyGroup.getId());
-        onRecordSelected(newLocaleId);
+        if (mDatabase != null) {
+            addDataPointFab.setEnabled(false);
+            String newLocaleId = mDatabase.createSurveyedLocale(mSurveyGroup.getId());
+            onRecordSelected(newLocaleId);
+        }
     }
 }

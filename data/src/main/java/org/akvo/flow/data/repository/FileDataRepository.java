@@ -23,11 +23,15 @@ package org.akvo.flow.data.repository;
 import android.graphics.Bitmap;
 
 import org.akvo.flow.data.datasource.DataSourceFactory;
+import org.akvo.flow.data.entity.MovedFile;
 import org.akvo.flow.domain.repository.FileRepository;
+
+import java.util.List;
 
 import javax.inject.Inject;
 
 import io.reactivex.Observable;
+import io.reactivex.functions.Function;
 
 public class FileDataRepository implements FileRepository {
 
@@ -53,12 +57,15 @@ public class FileDataRepository implements FileRepository {
     }
 
     @Override
-    public Observable<Boolean> moveZipFiles() {
-        return dataSourceFactory.getFileDataSource().moveZipFiles();
-    }
-
-    @Override
-    public Observable<Boolean> moveMediaFiles() {
-        return dataSourceFactory.getFileDataSource().moveMediaFiles();
+    public Observable<Boolean> moveFiles() {
+        return Observable.merge(dataSourceFactory.getFileDataSource().moveZipFiles(),
+                dataSourceFactory.getFileDataSource().moveMediaFiles())
+                .concatMap(new Function<List<MovedFile>, Observable<Boolean>>() {
+                    @Override
+                    public Observable<Boolean> apply(List<MovedFile> movedFiles) throws Exception {
+                        dataSourceFactory.getDataBaseDataSource().updateTransmissions(movedFiles);
+                        return Observable.just(true);
+                    }
+                });
     }
 }

@@ -24,8 +24,13 @@ import android.content.Context;
 import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
+
+import org.akvo.flow.data.entity.MovedFile;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -47,42 +52,42 @@ public class FileDataSource {
         this.fileHelper = fileHelper;
     }
 
-    public Observable<Boolean> moveZipFiles() {
+    public Observable<List<MovedFile>> moveZipFiles() {
         return moveFiles(DIR_DATA);
     }
 
-    public Observable<Boolean> moveMediaFiles() {
+    public Observable<List<MovedFile>> moveMediaFiles() {
         return moveFiles(DIR_MEDIA);
     }
 
-    private Observable<Boolean> moveFiles(String folderName) {
+    private Observable<List<MovedFile>> moveFiles(String folderName) {
         File file = getPublicFolder(folderName);
+        List<MovedFile> movedFiles = new ArrayList<>();
         if (file.exists()) {
             File[] files = file.listFiles();
-            final boolean success = copyFiles(files, folderName);
-            if (success) {
+            movedFiles = copyFiles(files, folderName);
+            if (files.length == movedFiles.size()) {
                 //noinspection ResultOfMethodCallIgnored
                 file.delete();
             }
         }
-        return Observable.just(true);
+        return Observable.just(movedFiles);
     }
 
-    private boolean copyFiles(@Nullable File[] files, String folderName) {
-        boolean copySuccess = true;
+    private List<MovedFile> copyFiles(@Nullable File[] files, String folderName) {
+        List<MovedFile> movedFiles = new ArrayList<>();
         if (files != null) {
+            File folder = getPrivateDestinationFolder(folderName);
             for (File f : files) {
-                File folder = getPrivateDestinationFolder(folderName);
-                boolean success = fileHelper.copyFile(f, folder);
-                if (success) {
+                String destinationPath = fileHelper.copyFile(f, folder);
+                if (!TextUtils.isEmpty(destinationPath)) {
+                    movedFiles.add(new MovedFile(f.getPath(), destinationPath));
                     //noinspection ResultOfMethodCallIgnored
                     f.delete();
-                } else {
-                    copySuccess = false;
                 }
             }
         }
-        return copySuccess;
+        return movedFiles;
     }
 
     @NonNull

@@ -289,4 +289,11 @@ public class BriteSurveyDbAdapter {
                 + "(SELECT DISTINCT " + SurveyInstanceColumns.RECORD_ID
                 + " FROM " + Tables.SURVEY_INSTANCE + ")");
     }
+
+    public void updateTransmission(String oldPath, String newPath) {
+        ContentValues contentValues = new ContentValues(1);
+        contentValues.put(TransmissionColumns.FILENAME, newPath);
+        String where = TransmissionColumns.FILENAME + " = ? ";
+        briteDatabase.update(Tables.TRANSMISSION, contentValues, where, oldPath);
+    }
 }

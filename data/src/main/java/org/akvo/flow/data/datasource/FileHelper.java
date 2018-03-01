@@ -39,20 +39,21 @@ class FileHelper {
     FileHelper() {
     }
 
-    boolean copyFile(File originalFile, File destinationFolder) {
-        boolean sucess = false;
+    String copyFile(File originalFile, File destinationFolder) {
+        String destinationPath = null;
         InputStream in = null;
         OutputStream out = null;
         try {
             in = new FileInputStream(originalFile);
-            out = new FileOutputStream(new File(destinationFolder, originalFile.getName()));
+            File file = new File(destinationFolder, originalFile.getName());
+            out = new FileOutputStream(file);
             byte[] buffer = new byte[1024];
             int read;
             while ((read = in.read(buffer)) != -1) {
                 out.write(buffer, 0, read);
             }
             out.flush();
-            sucess = true;
+            destinationPath = file.getAbsolutePath();
         } catch (FileNotFoundException e) {
             Timber.e(e);
         } catch (IOException e) {
@@ -61,7 +62,7 @@ class FileHelper {
             close(in);
             close(out);
         }
-        return sucess;
+        return destinationPath;
     }
 
     void close(Closeable closeable) {

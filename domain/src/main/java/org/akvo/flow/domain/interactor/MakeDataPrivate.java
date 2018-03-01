@@ -22,14 +22,11 @@ package org.akvo.flow.domain.interactor;
 
 import org.akvo.flow.domain.repository.FileRepository;
 
-import java.util.Map;
-
 import javax.inject.Inject;
 
 import io.reactivex.Observable;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.BiFunction;
 import io.reactivex.observers.DisposableObserver;
 
 /**
@@ -47,8 +44,9 @@ public class MakeDataPrivate {
         this.disposables = new CompositeDisposable();
     }
 
-    public <T> void execute(DisposableObserver<T> observer, Map<String, Object> parameters) {
-        addDisposable(((Observable<T>) buildUseCaseObservable(parameters)).subscribeWith(observer));
+    @SuppressWarnings("unchecked")
+    public <T> void execute(DisposableObserver<T> observer) {
+        addDisposable(((Observable<T>) buildUseCaseObservable()).subscribeWith(observer));
     }
 
     public void dispose() {
@@ -57,14 +55,8 @@ public class MakeDataPrivate {
         }
     }
 
-    private <T> Observable buildUseCaseObservable(Map<String, T> parameters) {
-        return Observable.zip(fileRepository.moveZipFiles(), fileRepository.moveMediaFiles(),
-                new BiFunction<Boolean, Boolean, Boolean>() {
-                    @Override
-                    public Boolean apply(Boolean o, Boolean o2) throws Exception {
-                        return o && o2;
-                    }
-                });
+    private Observable<Boolean> buildUseCaseObservable() {
+        return fileRepository.moveFiles();
     }
 
     private void addDisposable(Disposable disposable) {

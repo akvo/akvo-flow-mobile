@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -18,17 +18,23 @@
  *
  */
 
-package org.akvo.flow.domain.repository;
+package org.akvo.flow.data.entity;
 
-import android.graphics.Bitmap;
+public class MovedFile {
 
-import io.reactivex.Observable;
+    private final String oldPath;
+    private final String newPath;
 
-public interface FileRepository {
+    public MovedFile(String oldPath, String newPath) {
+        this.oldPath = oldPath;
+        this.newPath = newPath;
+    }
 
-    Observable<Boolean> saveImage(Bitmap bitmap, String fileName, String resizedFilePath);
+    public String getOldPath() {
+        return oldPath;
+    }
 
-    Observable<Boolean> saveResizedImage(String fileName, String resizedFilePath, int imageSize);
-
-    Observable<Boolean> moveFiles();
+    public String getNewPath() {
+        return newPath;
+    }
 }

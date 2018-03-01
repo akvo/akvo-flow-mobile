@@ -151,6 +151,7 @@ public class DataSyncService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
+        makeDataPrivate.dispose();
         makeDataPrivate.execute(new DefaultObserver<Boolean>() {
             @Override
             public void onNext(Boolean ignored) {
@@ -162,8 +163,8 @@ public class DataSyncService extends IntentService {
                 Timber.e(e);
                 exportAndSync();
             }
-        }, null);
-
+        });
+        makeDataPrivate.dispose();
     }
 
     private void exportAndSync() {

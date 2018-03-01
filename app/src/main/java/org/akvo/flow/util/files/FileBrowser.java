@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -40,7 +40,7 @@ public class FileBrowser {
 
     @NonNull
     @SuppressWarnings({ "unchecked", "ResultOfMethodCallIgnored" })
-    File getExistingAppInternalFolder(Context context, String folderName) {
+    public File getExistingAppInternalFolder(Context context, String folderName) {
         File folder = getAppInternalFolder(context, folderName);
         if (!folder.exists()) {
             folder.mkdirs();
@@ -60,8 +60,7 @@ public class FileBrowser {
         return file;
     }
 
-    @NonNull
-    List<File> findAllPossibleFolders(Context context, String folderName) {
+    @NonNull public List<File> findAllPossibleFolders(Context context, String folderName) {
         List<File> folders = new ArrayList<>(3);
         File folder = getAppInternalFolder(context, folderName);
         if (folder.exists()) {

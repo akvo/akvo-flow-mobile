@@ -29,6 +29,7 @@ import org.akvo.flow.domain.interactor.UseCase;
 import org.akvo.flow.presentation.Presenter;
 import org.akvo.flow.util.MediaFileHelper;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -77,6 +78,18 @@ public class PhotoQuestionPresenter implements Presenter {
             }, params);
         } else {
             view.showErrorGettingMedia();
+        }
+    }
+
+    void onFilenameAvailable(String filename, boolean readOnly) {
+        if (!TextUtils.isEmpty(filename)) {
+            File file = new File(filename);
+            if (!file.exists() && readOnly) {
+                // Looks like the image is not present in the filesystem (i.e. remote URL)
+                File localFile = mediaFileHelper.getMediaFile(file.getName());
+                view.updateResponse(localFile.getAbsolutePath());
+            }
+            view.displayLocationInfo();
         }
     }
 }

@@ -46,7 +46,6 @@ import org.akvo.flow.serialization.response.value.MediaValue;
 import org.akvo.flow.ui.Navigator;
 import org.akvo.flow.ui.view.QuestionView;
 import org.akvo.flow.util.ConstantUtil;
-import org.akvo.flow.util.FileUtil;
 import org.akvo.flow.util.ImageUtil;
 import org.akvo.flow.util.image.ImageLoader;
 import org.akvo.flow.util.image.PicassoImageLoader;
@@ -196,6 +195,12 @@ public class PhotoQuestionView extends QuestionView implements
         snackBarManager.displaySnackBar(this, R.string.error_getting_media, getContext());
     }
 
+    @Override
+    public void updateResponse(String localFilePath) {
+        mMedia.setFilename(localFilePath);
+        captureResponse();
+    }
+
     /**
      * restores the file path for the file and turns on the complete icon if the
      * file exists
@@ -203,29 +208,12 @@ public class PhotoQuestionView extends QuestionView implements
     @Override
     public void rehydrate(QuestionResponse resp) {
         super.rehydrate(resp);
-
-        if (resp == null || TextUtils.isEmpty(resp.getValue())) {
-            return;
+        String value = resp == null ? null : resp.getValue();
+        if (!TextUtils.isEmpty(value)) {
+            mMedia = MediaValue.deserialize(value);
+            displayThumbnail();
+            presenter.onFilenameAvailable(mMedia.getFilename(), isReadOnly());
         }
-
-        mMedia = MediaValue.deserialize(resp.getValue());
-
-        displayThumbnail();
-        String filename = mMedia.getFilename();
-        if (TextUtils.isEmpty(filename)) {
-            return;
-        }
-        // We now check whether the file is found in the local filesystem, and update the path if it's not
-        File file = new File(filename);
-        if (!file.exists() && isReadOnly()) {
-            // Looks like the image is not present in the filesystem (i.e. remote URL)
-            // Update response, matching the local path. Note: In the future, media responses should
-            // not leak filesystem paths, for these are not guaranteed to be homogeneous in all devices.
-            file = new File(FileUtil.getFilesDir(FileUtil.FileType.MEDIA), file.getName());
-            mMedia.setFilename(file.getAbsolutePath());
-            captureResponse();
-        }
-        displayLocationInfo();
     }
 
     /**
@@ -274,11 +262,15 @@ public class PhotoQuestionView extends QuestionView implements
             return;
         }
         if (!new File(filename).exists()) {
-            mImageView.setImageResource(R.drawable.blurry_image);
-            mDownloadBtn.setVisibility(VISIBLE);
+            showImageCanBeDownloaded();
         } else {
             displayImage(filename, mImageView);
         }
+    }
+
+    private void showImageCanBeDownloaded() {
+        mImageView.setImageResource(R.drawable.blurry_image);
+        mDownloadBtn.setVisibility(VISIBLE);
     }
 
     private void hideDownloadViews() {
@@ -329,7 +321,8 @@ public class PhotoQuestionView extends QuestionView implements
         displayLocationInfo();
     }
 
-    private void displayLocationInfo() {
+    @Override
+    public void displayLocationInfo() {
         String filename = mMedia != null ? mMedia.getFilename() : null;
         if (TextUtils.isEmpty(filename) || !new File(filename).exists()) {
             mLocationInfo.setVisibility(GONE);

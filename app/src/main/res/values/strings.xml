@@ -278,5 +278,7 @@
     <string name="error_getting_media">Error getting media, please try again.</string>
     <string name="geo_fields_update_title">Update GPS coordinates?</string>
     <string name="cascade_error_message">Cannot load cascade resource: %1$s</string>
+    <string name="preference_publish_data_title">Publish data</string>
+    <string name="preference_publish_data_subtitle">Make data available in the public folder for bulk upload</string>
 
 </resources>

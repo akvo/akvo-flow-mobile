@@ -92,6 +92,19 @@
 
             <View
                     style="@style/PreferenceItemSeparator"/>
+            <TextView
+                    android:id="@+id/preference_publish_data_title"
+                    android:text="@string/preference_publish_data_title"
+                    style="@style/PreferenceTitleStyle"
+                    android:paddingBottom="4dp"/>
+
+            <TextView
+                    android:id="@+id/preference_publish_data_subtitle"
+                    android:text="@string/preference_publish_data_subtitle"
+                    style="@style/PreferenceSubtitleStyle"/>
+
+            <View
+                    style="@style/PreferenceItemSeparator"/>
 
             <TextView
                     android:id="@+id/preference_delete_collected_data_title"

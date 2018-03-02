@@ -26,9 +26,29 @@ import java.util.List;
 
 public interface IFlowNavigationView {
 
-    void display(List<ViewSurvey> surveys, Long selectedSurveyId);
-
     void notifySurveyDeleted(long surveyGroupId);
 
     void selectSurvey(SurveyGroup viewSurveyId);
+
+    void displaySurveys(List<ViewSurvey> surveys, Long selectedSurveyId);
+
+    void displayUsers(String selectedUserName, List<ViewUser> viewUsers);
+
+    void onUserLongPress(ViewUser viewUser);
+
+    void displayAddUser();
+
+    void displaySurveyError();
+
+    void displayUsersError();
+
+    void displayErrorDeleteSurvey();
+
+    void displayErrorSelectSurvey();
+
+    void displayUserEditError();
+
+    void displayUserDeleteError();
+
+    void displayUserSelectError();
 }

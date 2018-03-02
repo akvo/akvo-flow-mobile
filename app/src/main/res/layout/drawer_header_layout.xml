@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -26,8 +25,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="8dp"
                 android:layout_marginRight="16dp"
-                android:tint="@color/white"
-                android:src="@drawable/ic_account_circle_black_48dp"
+                android:src="@drawable/ic_account_circle"
                 android:adjustViewBounds="true"/>
 
         <TextView
@@ -35,10 +33,9 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                tools:text="Valeria"
-                android:text="Valeria"
-                android:drawableTint="@color/white"
-                android:drawableRight="@drawable/ic_action_expand"
+                android:gravity="center_vertical"
+                android:drawableRight="@drawable/ic_expand_more"
+                android:drawableEnd="@drawable/ic_expand_more"
                 android:textColor="@color/white"
                 android:textSize="18sp"/>
 
@@ -51,20 +48,23 @@
             android:textColor="@color/black_disabled"
             android:text="@string/surveys"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"/>
 
     <android.support.v7.widget.RecyclerView
             android:id="@+id/surveys_rv"
             android:layout_marginLeft="30dp"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:layout_marginStart="30dp"/>
 
     <android.support.v7.widget.RecyclerView
             android:id="@+id/users_rv"
             android:visibility="gone"
             android:layout_marginLeft="30dp"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:layout_marginStart="30dp"/>
 
     <View
             android:layout_width="match_parent"

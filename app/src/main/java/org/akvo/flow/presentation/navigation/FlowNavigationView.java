@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -21,9 +21,12 @@
 package org.akvo.flow.presentation.navigation;
 
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -39,6 +42,7 @@ import org.akvo.flow.injector.component.ApplicationComponent;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
 import org.akvo.flow.ui.Navigator;
+import org.akvo.flow.presentation.SnackBarManager;
 
 import java.util.List;
 
@@ -53,13 +57,20 @@ public class FlowNavigationView extends NavigationView implements IFlowNavigatio
     private RecyclerView surveysRecyclerView;
     private RecyclerView usersRecyclerView;
     private DrawerNavigationListener surveyListener;
-    private SurveyAdapter adapter;
+    private SurveyAdapter surveyAdapter;
+    private UserAdapter usersAdapter;
+    private Drawable hideUsersDrawable;
+    private Drawable showUsersDrawable;
+    private View headerView;
 
     @Inject
     FlowNavigationPresenter presenter;
 
     @Inject
     Navigator navigator;
+
+    @Inject
+    SnackBarManager snackBarManager;
 
     public FlowNavigationView(Context context) {
         this(context, null);
@@ -86,7 +97,7 @@ public class FlowNavigationView extends NavigationView implements IFlowNavigatio
     }
 
     private void initViews() {
-        View headerView = getHeaderView(0);
+        headerView = getHeaderView(0);
         currentUserTextView = ButterKnife.findById(headerView, R.id.current_user_name);
         surveyTitleTextView = ButterKnife.findById(headerView, R.id.surveys_title_tv);
         surveysRecyclerView = ButterKnife.findById(headerView, R.id.surveys_rv);
@@ -100,12 +111,28 @@ public class FlowNavigationView extends NavigationView implements IFlowNavigatio
         viewComponent.inject(this);
     }
 
-    protected ApplicationComponent getApplicationComponent() {
+    private ApplicationComponent getApplicationComponent() {
         return ((FlowApp) getContext().getApplicationContext()).getApplicationComponent();
     }
 
     private void initUserList() {
-       //TODO
+        final Context context = getContext();
+        usersRecyclerView.setLayoutManager(new LinearLayoutManager(context));
+        usersAdapter = new UserAdapter(context);
+        usersRecyclerView.setAdapter(usersAdapter);
+        usersRecyclerView.addOnItemTouchListener(new RecyclerItemClickListener(context,
+                new RecyclerItemClickListener.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(View childView, int position) {
+                        presenter.onUserSelected(usersAdapter.getItem(position));
+                    }
+
+                    @Override
+                    public void onItemLongPress(View childView, int position) {
+                        presenter.onUserLongPress(usersAdapter.getItem(position));
+                    }
+                })
+        );
     }
 
     private void setNavigationItemListener() {
@@ -133,8 +160,8 @@ public class FlowNavigationView extends NavigationView implements IFlowNavigatio
     private void initSurveyList() {
         final Context context = getContext();
         surveysRecyclerView.setLayoutManager(new LinearLayoutManager(context));
-        adapter = new SurveyAdapter(context);
-        surveysRecyclerView.setAdapter(adapter);
+        surveyAdapter = new SurveyAdapter(context);
+        surveysRecyclerView.setAdapter(surveyAdapter);
         surveysRecyclerView.addOnItemTouchListener(new RecyclerItemClickListener(context,
                 new RecyclerItemClickListener.OnItemClickListener() {
                     @Override
@@ -144,27 +171,43 @@ public class FlowNavigationView extends NavigationView implements IFlowNavigatio
 
                     @Override
                     public void onItemLongPress(View childView, int position) {
-                        onSurveyItemLongPress(position, adapter);
+                        onSurveyItemLongPress(position, surveyAdapter);
                     }
                 })
         );
     }
 
     private void initCurrentUserText() {
-        currentUserTextView.setOnClickListener(new OnClickListener() {
+        hideUsersDrawable = ContextCompat.getDrawable(getContext(), R.drawable.ic_expand_less);
+        showUsersDrawable = ContextCompat.getDrawable(getContext(), R.drawable.ic_expand_more);
+        headerView.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (surveysRecyclerView.getVisibility() == VISIBLE) {
+                    updateTextViewDrawable(hideUsersDrawable);
                     surveyTitleTextView.setVisibility(GONE);
                     surveysRecyclerView.setVisibility(GONE);
                     usersRecyclerView.setVisibility(VISIBLE);
                 } else {
+                    updateTextViewDrawable(showUsersDrawable);
                     surveyTitleTextView.setVisibility(VISIBLE);
                     surveysRecyclerView.setVisibility(VISIBLE);
                     usersRecyclerView.setVisibility(GONE);
+
                 }
             }
         });
+        headerView.setOnLongClickListener(new OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                presenter.onCurrentUserLongPress();
+                return true;
+            }
+        });
+    }
+
+    private void updateTextViewDrawable(Drawable drawable) {
+        currentUserTextView.setCompoundDrawablesWithIntrinsicBounds(null, null, drawable, null);
     }
 
     private void onSurveyItemLongPress(int position, SurveyAdapter adapter) {
@@ -173,13 +216,12 @@ public class FlowNavigationView extends NavigationView implements IFlowNavigatio
             final long surveyGroupId = viewSurvey.getId();
             DialogFragment dialogFragment = SurveyDeleteConfirmationDialog
                     .newInstance(surveyGroupId);
-            dialogFragment.show(((AppCompatActivity) getContext()).getSupportFragmentManager(),
-                    SurveyDeleteConfirmationDialog.TAG);
+            dialogFragment.show(getSupportFragmentManager(), SurveyDeleteConfirmationDialog.TAG);
         }
     }
 
     private void onSurveyItemTap(int position) {
-        presenter.onSurveyItemTap(adapter.getItem(position));
+        presenter.onSurveyItemTap(surveyAdapter.getItem(position));
     }
 
     public void setSurveyListener(DrawerNavigationListener surveyListener) {
@@ -187,8 +229,8 @@ public class FlowNavigationView extends NavigationView implements IFlowNavigatio
     }
 
     @Override
-    public void display(List<ViewSurvey> surveys, Long selectedSurveyId) {
-        adapter.setSurveys(surveys, selectedSurveyId);
+    public void displaySurveys(List<ViewSurvey> surveys, Long selectedSurveyId) {
+        surveyAdapter.setSurveys(surveys, selectedSurveyId);
     }
 
     @Override
@@ -202,8 +244,65 @@ public class FlowNavigationView extends NavigationView implements IFlowNavigatio
     public void selectSurvey(SurveyGroup surveyGroup) {
         if (surveyListener != null) {
             surveyListener.onSurveySelected(surveyGroup);
-            adapter.updateSelected(surveyGroup.getId());
+            surveyAdapter.updateSelected(surveyGroup.getId());
         }
+    }
+
+    @Override
+    public void displayUsers(String selectedUserName, List<ViewUser> viewUsers) {
+        usersAdapter.setUsers(viewUsers);
+        currentUserTextView.setText(selectedUserName);
+    }
+
+    @Override
+    public void displayAddUser() {
+        CreateUserDialog dialog = new CreateUserDialog();
+        dialog.show(getSupportFragmentManager(), CreateUserDialog.TAG);
+    }
+
+    @Override
+    public void displaySurveyError() {
+        snackBarManager.displaySnackBar(this, R.string.surveys_error, getContext());
+    }
+
+    @Override
+    public void displayUsersError() {
+        snackBarManager.displaySnackBar(this, R.string.users_error, getContext());
+    }
+
+    @Override
+    public void displayErrorDeleteSurvey() {
+        snackBarManager.displaySnackBar(this, R.string.survey_delete_error, getContext());
+    }
+
+    @Override
+    public void displayErrorSelectSurvey() {
+        snackBarManager.displaySnackBar(this, R.string.survey_select_error, getContext());
+    }
+
+    @Override
+    public void displayUserEditError() {
+        snackBarManager.displaySnackBar(this, R.string.user_edit_error, getContext());
+    }
+
+    @Override
+    public void displayUserDeleteError() {
+        snackBarManager.displaySnackBar(this, R.string.user_delete_error, getContext());
+    }
+
+    @Override
+    public void displayUserSelectError() {
+        snackBarManager.displaySnackBar(this, R.string.user_select_error, getContext());
+    }
+
+    @Override
+    public void onUserLongPress(ViewUser viewUser) {
+        DialogFragment dialogFragment = UserOptionsDialog.newInstance(viewUser);
+        dialogFragment.show(getSupportFragmentManager(), UserOptionsDialog.TAG);
+    }
+
+    private FragmentManager getSupportFragmentManager() {
+        return ((AppCompatActivity) getContext()).getSupportFragmentManager();
     }
 
     public void onSurveyDeleteConfirmed(long surveyGroupId) {
@@ -214,6 +313,18 @@ public class FlowNavigationView extends NavigationView implements IFlowNavigatio
     protected void onDetachedFromWindow() {
         presenter.destroy();
         super.onDetachedFromWindow();
+    }
+
+    public void editUser(ViewUser viewUser) {
+        presenter.editUser(viewUser);
+    }
+
+    public void deleteUser(ViewUser viewUser) {
+        presenter.deleteUser(viewUser);
+    }
+
+    public void createUser(String userName) {
+        presenter.createUser(userName);
     }
 
     public interface DrawerNavigationListener {

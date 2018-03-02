@@ -29,6 +29,7 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.GravityCompat;
@@ -55,8 +56,13 @@ import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.User;
 import org.akvo.flow.domain.apkupdate.ApkUpdateStore;
 import org.akvo.flow.domain.apkupdate.ViewApkData;
+import org.akvo.flow.presentation.EditUserDialog;
+import org.akvo.flow.presentation.UserDeleteConfirmationDialog;
+import org.akvo.flow.presentation.navigation.CreateUserDialog;
 import org.akvo.flow.presentation.navigation.FlowNavigationView;
 import org.akvo.flow.presentation.navigation.SurveyDeleteConfirmationDialog;
+import org.akvo.flow.presentation.navigation.UserOptionsDialog;
+import org.akvo.flow.presentation.navigation.ViewUser;
 import org.akvo.flow.service.BootstrapService;
 import org.akvo.flow.service.DataSyncService;
 import org.akvo.flow.service.SurveyDownloadService;
@@ -81,7 +87,9 @@ import static org.akvo.flow.util.ConstantUtil.ACTION_SURVEY_SYNC;
 
 public class SurveyActivity extends AppCompatActivity implements RecordListListener,
         FlowNavigationView.DrawerNavigationListener,
-        SurveyDeleteConfirmationDialog.SurveyDeleteListener {
+        SurveyDeleteConfirmationDialog.SurveyDeleteListener, UserOptionsDialog.UserOptionListener,
+        UserDeleteConfirmationDialog.UserDeleteListener, EditUserDialog.EditUserListener,
+        CreateUserDialog.CreateUserListener {
 
     private static final String DATA_POINTS_FRAGMENT_TAG = "datapoints_fragment";
 
@@ -239,8 +247,10 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
         }
         activityJustCreated = false;
         // Delete empty responses, if any
-        mDatabase.deleteEmptySurveyInstances();
-        mDatabase.deleteEmptyRecords();
+        if (mDatabase != null) {
+            mDatabase.deleteEmptySurveyInstances();
+            mDatabase.deleteEmptyRecords();
+        }
         LocalBroadcastManager.getInstance(this)
                 .registerReceiver(mSurveysSyncReceiver, new IntentFilter(ACTION_SURVEY_SYNC));
 
@@ -265,7 +275,7 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
 
     @Override
     public void onBackPressed() {
-        if (mDrawerLayout != null && mDrawerLayout.isDrawerOpen(Gravity.START)) {
+        if (mDrawerLayout.isDrawerOpen(Gravity.START)) {
             mDrawerLayout.closeDrawer(Gravity.START);
         } else {
             super.onBackPressed();
@@ -281,7 +291,9 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     @Override
     public void onDestroy() {
         super.onDestroy();
-        mDatabase.close();
+        if (mDatabase != null) {
+            mDatabase.close();
+        }
     }
 
     @Override
@@ -356,6 +368,33 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     }
 
     @Override
+    public void onEditUser(ViewUser viewUser) {
+        DialogFragment fragment = EditUserDialog.newInstance(viewUser);
+        fragment.show(getSupportFragmentManager(), EditUserDialog.TAG);
+    }
+
+    @Override
+    public void editUser(ViewUser viewUser) {
+        navigationView.editUser(viewUser);
+    }
+
+    @Override
+    public void onDeleteUser(ViewUser viewUser) {
+        DialogFragment fragment = UserDeleteConfirmationDialog.newInstance(viewUser);
+        fragment.show(getSupportFragmentManager(), UserDeleteConfirmationDialog.TAG);
+    }
+
+    @Override
+    public void onUserDeleteConfirmed(ViewUser viewUser) {
+        navigationView.deleteUser(viewUser);
+    }
+
+    @Override
+    public void createUser(String userName) {
+        navigationView.createUser(userName);
+    }
+
+    @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         mDrawerToggle.onConfigurationChanged(newConfig);
@@ -398,7 +437,8 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     }
 
     private void displayForm(String surveyedLocaleId, User user) {
-        Survey registrationForm = mDatabase.getRegistrationForm(mSurveyGroup);
+        Survey registrationForm =
+                mDatabase != null ? mDatabase.getRegistrationForm(mSurveyGroup) : null;
         if (registrationForm == null) {
             Toast.makeText(this, R.string.error_missing_form, Toast.LENGTH_LONG).show();
             return;
@@ -441,9 +481,11 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
 
     @OnClick(R.id.add_data_point_fab)
     void onAddDataPointTap() {
-        addDataPointFab.setEnabled(false);
-        String newLocaleId = mDatabase.createSurveyedLocale(mSurveyGroup.getId());
-        onRecordSelected(newLocaleId);
+        if (mDatabase != null) {
+            addDataPointFab.setEnabled(false);
+            String newLocaleId = mDatabase.createSurveyedLocale(mSurveyGroup.getId());
+            onRecordSelected(newLocaleId);
+        }
     }
 
     static class SurveySyncBroadcastReceiver extends BroadcastReceiver {

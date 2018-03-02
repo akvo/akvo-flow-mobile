@@ -24,24 +24,28 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
-import android.text.Editable;
+import android.support.v4.app.FragmentActivity;
 import android.text.TextUtils;
-import android.text.TextWatcher;
+import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 
 import org.akvo.flow.R;
 
-//TODO: rotating dialog, the text gets lost
-public class CreateUserDialog extends DialogFragment {
+public class CreateUserDialog extends DialogFragment implements
+        UsernameInputTextWatcher.UsernameWatcherListener {
 
     public static final String TAG = "CreateUserDialog";
+    private static final String USER_NAME_PARAM = "user_name";
 
+    private PositiveButtonHandler positiveButtonHandler;
     private CreateUserListener listener;
     private EditText userNameEt;
 
@@ -51,8 +55,12 @@ public class CreateUserDialog extends DialogFragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        //TODO verify instanceof
-        listener = (CreateUserListener) getActivity();
+        FragmentActivity activity = getActivity();
+        if (activity instanceof CreateUserListener) {
+            listener = (CreateUserListener) activity;
+        } else {
+            throw new IllegalArgumentException("Activity must implement CreateUserListener");
+        }
     }
 
     @Override
@@ -65,38 +73,18 @@ public class CreateUserDialog extends DialogFragment {
     @Override
     public Dialog onCreateDialog(final Bundle savedInstanceState) {
         super.onCreateDialog(savedInstanceState);
-        //TODO: use xml
-        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        LinearLayout main = new LinearLayout(getContext());
-        main.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT));
-        main.setOrientation(LinearLayout.VERTICAL);
+        Context context = getContext();
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        View main = LayoutInflater.from(context).inflate(R.layout.user_name_input_dialog, null);
         builder.setTitle(R.string.add_user);
-        builder.setMessage(R.string.username);
-        userNameEt = new EditText(getActivity());
-        userNameEt.setLayoutParams(new ViewGroup.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-        userNameEt.setSingleLine();
-        userNameEt.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count,
-                    int after) {
-                //EMPTY
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                //EMPTY
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                updatePositiveButton();
-            }
-        });
-        main.addView(userNameEt);
+        builder.setMessage(R.string.add_user_message);
+        userNameEt = (EditText) main.findViewById(R.id.user_name_et);
+        userNameEt.addTextChangedListener(new UsernameInputTextWatcher(this));
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.HONEYCOMB) {
+            userNameEt.setTextColor(Color.WHITE);
+            userNameEt.setHintTextColor(Color.GRAY);
+        }
         builder.setView(main);
-        builder.setCancelable(false);
         builder.setPositiveButton(R.string.okbutton, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
@@ -119,34 +107,42 @@ public class CreateUserDialog extends DialogFragment {
         return builder.create();
     }
 
-    private void updatePositiveButton() {
+    @Nullable
+    @Override
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
+            @Nullable Bundle savedInstanceState) {
+        positiveButtonHandler = new PositiveButtonHandler(this);
+        return super.onCreateView(inflater, container, savedInstanceState);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString(USER_NAME_PARAM, userNameEt.getText().toString());
+    }
+
+    @Override
+    public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
+        super.onViewStateRestored(savedInstanceState);
+        if (savedInstanceState != null) {
+            userNameEt.setText(savedInstanceState.getString(USER_NAME_PARAM));
+        }
+    }
+
+    @Override
+    public void updateTextChanged() {
         String text = userNameEt.getText().toString();
         if (TextUtils.isEmpty(text)) {
-            disablePositiveButton();
+            positiveButtonHandler.disablePositiveButton();
         } else {
-            enablePositiveButton();
+            positiveButtonHandler.enablePositiveButton();
         }
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        updatePositiveButton();
-    }
-
-    private void disablePositiveButton() {
-        Button button = getPositiveButton();
-        button.setEnabled(false);
-    }
-
-    private Button getPositiveButton() {
-        AlertDialog dialog = (AlertDialog) getDialog();
-        return dialog.getButton(AlertDialog.BUTTON_POSITIVE);
-    }
-
-    private void enablePositiveButton() {
-        Button button = getPositiveButton();
-        button.setEnabled(true);
+        updateTextChanged();
     }
 
     public interface CreateUserListener {

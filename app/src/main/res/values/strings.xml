@@ -189,7 +189,7 @@
     <string name="select_user">Select User</string>
     <string name="add_user">Add User</string>
     <string name="new_user">+ User</string>
-    <string name="edit_user">Edit user</string>
+    <string name="edit_user">Edit username</string>
     <string name="delete_user">Delete user</string>
     <string name="empty_user_warning">Username cannot be empty</string>
     <string name="delete_user_confirmation">Are you sure you want to delete this user?</string>
@@ -274,6 +274,7 @@
     <string name="user_edit_error">Error editing user</string>
     <string name="user_delete_error">Error deleting user</string>
     <string name="user_select_error">Error selecting user</string>
+    <string name="add_user_message">The new user will automatically be selected</string>
 
     <string name="no_gps_status_message">GPS Status is not installed on this device. Would you like to install it?</string>
     <string name="data_points_sync_no_data_points">No datapoints to sync</string>

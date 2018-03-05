@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015-2017 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2015-2018 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -19,8 +19,6 @@
 
 package org.akvo.flow.activity;
 
-import android.content.Context;
-import android.app.Activity;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
@@ -37,11 +35,6 @@ import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
 import org.akvo.flow.presentation.BaseActivity;
 import org.akvo.flow.util.logging.LoggingHelper;
-
-import javax.inject.Inject;
-import org.akvo.flow.injector.component.ApplicationComponent;
-import org.akvo.flow.injector.component.DaggerViewComponent;
-import org.akvo.flow.injector.component.ViewComponent;
 
 import javax.inject.Inject;
 

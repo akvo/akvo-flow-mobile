@@ -29,12 +29,14 @@
                 android:id="@+id/media_progress"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
+                android:visibility="gone"
                 android:layout_centerInParent="true" />
 
             <ImageButton
                 android:id="@+id/media_download"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
+                android:visibility="gone"
                 android:layout_centerInParent="true"
                 android:background="@android:color/transparent"
                 android:src="@drawable/download" />

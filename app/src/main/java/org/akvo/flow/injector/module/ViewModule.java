@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2016-2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -36,6 +36,7 @@ import org.akvo.flow.domain.interactor.SaveImageSize;
 import org.akvo.flow.domain.interactor.SaveKeepScreenOn;
 import org.akvo.flow.domain.interactor.SaveSelectedSurvey;
 import org.akvo.flow.domain.interactor.SelectUser;
+import org.akvo.flow.domain.interactor.SaveResizedImage;
 import org.akvo.flow.domain.interactor.UseCase;
 
 import javax.inject.Named;
@@ -140,5 +141,11 @@ public class ViewModule {
     @Named("createUser")
     UseCase provideCreateUser(CreateUser createUser) {
         return createUser;
+    }
+
+    @Provides
+    @Named("saveResizedImage")
+    UseCase provideSaveResizedImage(SaveResizedImage saveResizedImage) {
+        return saveResizedImage;
     }
 }

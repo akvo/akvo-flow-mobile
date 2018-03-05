@@ -23,6 +23,7 @@ import android.animation.LayoutTransition;
 import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -38,6 +39,8 @@ import org.akvo.flow.event.QuestionInteractionListener;
 import org.akvo.flow.event.SurveyListener;
 import org.akvo.flow.ui.view.barcode.BarcodeQuestionViewFactory;
 import org.akvo.flow.ui.view.geolocation.GeoQuestionView;
+import org.akvo.flow.ui.view.media.PhotoQuestionView;
+import org.akvo.flow.ui.view.media.VideoQuestionView;
 import org.akvo.flow.ui.view.option.OptionQuestionFactory;
 import org.akvo.flow.ui.view.signature.SignatureQuestionView;
 import org.akvo.flow.util.ConstantUtil;
@@ -296,11 +299,9 @@ public class QuestionGroupTab extends LinearLayout implements QuestionGroupItera
             } else if (ConstantUtil.FREE_QUESTION_TYPE.equalsIgnoreCase(q.getType())) {
                 questionView = new FreetextQuestionView(context, q, mSurveyListener);
             } else if (ConstantUtil.PHOTO_QUESTION_TYPE.equalsIgnoreCase(q.getType())) {
-                questionView = new MediaQuestionView(context, q, mSurveyListener,
-                        ConstantUtil.PHOTO_QUESTION_TYPE);
+                questionView = new PhotoQuestionView(context, q, mSurveyListener);
             } else if (ConstantUtil.VIDEO_QUESTION_TYPE.equalsIgnoreCase(q.getType())) {
-                questionView = new MediaQuestionView(context, q, mSurveyListener,
-                        ConstantUtil.VIDEO_QUESTION_TYPE);
+                questionView = new VideoQuestionView(context, q, mSurveyListener);
             } else if (ConstantUtil.GEO_QUESTION_TYPE.equalsIgnoreCase(q.getType())) {
                 questionView = new GeoQuestionView(context, q, mSurveyListener);
             } else if (ConstantUtil.SCAN_QUESTION_TYPE.equalsIgnoreCase(q.getType())) {
@@ -418,8 +419,6 @@ public class QuestionGroupTab extends LinearLayout implements QuestionGroupItera
          * Although IDs are auto-incremented numeric values, there might be
          * gaps caused by deleted iterations.
          *
-         * @param questions
-         * @param questionResponses
          */
         void loadIDs(Set<String> questions, Collection<QuestionResponse> questionResponses) {
             Set<Integer> reps = new HashSet<>();
@@ -459,6 +458,7 @@ public class QuestionGroupTab extends LinearLayout implements QuestionGroupItera
             mIDs.remove(repetitionID);
         }
 
+        @NonNull
         @Override
         public Iterator<Integer> iterator() {
             return mIDs.iterator();

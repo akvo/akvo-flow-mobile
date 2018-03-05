@@ -27,21 +27,27 @@ import android.widget.ImageView;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
+import org.akvo.flow.BuildConfig;
+
 import java.io.File;
+
+import timber.log.Timber;
 
 public class PicassoImageLoader implements ImageLoader<PicassoImageTarget> {
 
     private final Picasso requestManager;
 
     public PicassoImageLoader(Context context) {
-        requestManager = new Picasso.Builder(context)
-                .addRequestHandler(new VideoRequestHandler())
-                .addRequestHandler(new Base64RequestHandler())
-                .build();
+        requestManager = getPicassoBuilder(context);
     }
 
     public PicassoImageLoader(Activity activity) {
-        requestManager =  new Picasso.Builder(activity)
+        requestManager = getPicassoBuilder(activity);
+    }
+
+    private Picasso getPicassoBuilder(Context context) {
+        return new Picasso.Builder(context)
+                .loggingEnabled(BuildConfig.DEBUG)
                 .addRequestHandler(new VideoRequestHandler())
                 .addRequestHandler(new Base64RequestHandler())
                 .build();
@@ -58,8 +64,21 @@ public class PicassoImageLoader implements ImageLoader<PicassoImageTarget> {
     }
 
     @Override
-    public void loadVideoThumbnail(String filepath, ImageView imageView) {
-        requestManager.load(VideoRequestHandler.SCHEME_VIDEO + ":" + filepath).into(imageView);
+    public void loadVideoThumbnail(final String filepath, ImageView imageView,
+            final ImageLoaderListener listener) {
+        requestManager.load(VideoRequestHandler.SCHEME_VIDEO + ":" + filepath).into(imageView,
+                new Callback() {
+                    @Override
+                    public void onSuccess() {
+                        listener.onImageReady();
+                    }
+
+                    @Override
+                    public void onError() {
+                        listener.onImageError();
+                        Timber.e("Error getting video: " + filepath);
+                    }
+                });
     }
 
     @Override
@@ -69,7 +88,7 @@ public class PicassoImageLoader implements ImageLoader<PicassoImageTarget> {
                 new Callback() {
                     @Override
                     public void onSuccess() {
-                        listener.onImageReady(null);
+                        listener.onImageReady();
                     }
 
                     @Override

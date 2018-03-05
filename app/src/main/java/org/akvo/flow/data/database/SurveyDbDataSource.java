@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -65,6 +65,7 @@ public class SurveyDbDataSource {
 
     private final SurveyDbAdapter surveyDbAdapter;
     private final BriteSurveyDbAdapter briteSurveyDbAdapter;
+    private final SurveyMapper surveyMapper = new SurveyMapper();
 
     @Inject
     public SurveyDbDataSource(Context context, BriteDatabase briteDatabase) {
@@ -258,14 +259,15 @@ public class SurveyDbDataSource {
      * @param surveys
      * @return
      */
-    public List<Survey> checkSurveyVersions(List<Survey> surveys) {
+    public List<Survey> fetchOutDatedSurveys(List<Survey> surveys) {
         List<Survey> outOfDateSurveys = new ArrayList<>();
         for (int i = 0; i < surveys.size(); i++) {
-            Cursor cursor = surveyDbAdapter.checkSurveyVersion(surveys.get(i).getId(),
-                    surveys.get(i).getVersion() + "");
+            Survey survey = surveys.get(i);
+            Cursor cursor = briteSurveyDbAdapter.getSurveys(survey.getId(),
+                    survey.getVersion() + "");
 
             if (cursor == null || cursor.getCount() <= 0) {
-                outOfDateSurveys.add(surveys.get(i));
+                outOfDateSurveys.add(survey);
             }
             if (cursor != null) {
                 cursor.close();
@@ -297,11 +299,7 @@ public class SurveyDbDataSource {
         updatedValues.put(SurveyColumns.SURVEY_GROUP_ID, surveyGroupId);
         updatedValues.put(SurveyColumns.HELP_DOWNLOADED, survey.isHelpDownloaded() ? 1 : 0);
 
-        Cursor cursor = surveyDbAdapter.updateSurvey(updatedValues, survey.getId());
-
-        if (cursor != null) {
-            cursor.close();
-        }
+        briteSurveyDbAdapter.updateSurvey(updatedValues, survey.getId());
     }
 
     /**
@@ -312,27 +310,11 @@ public class SurveyDbDataSource {
         Cursor cursor = surveyDbAdapter.getSurvey(surveyId);
         if (cursor != null) {
             if (cursor.moveToFirst()) {
-                survey = getSurvey(cursor);
+                survey = surveyMapper.getSurvey(cursor);
             }
             cursor.close();
         }
 
-        return survey;
-    }
-
-    private static Survey getSurvey(Cursor cursor) {
-        Survey survey = new Survey();
-        survey.setId(cursor.getString(cursor.getColumnIndexOrThrow(SurveyColumns.SURVEY_ID)));
-        survey.setName(cursor.getString(cursor.getColumnIndexOrThrow(SurveyColumns.NAME)));
-        survey.setLocation(cursor.getString(cursor.getColumnIndexOrThrow(SurveyColumns.LOCATION)));
-        survey.setFileName(cursor.getString(cursor.getColumnIndexOrThrow(SurveyColumns.FILENAME)));
-        survey.setType(cursor.getString(cursor.getColumnIndexOrThrow(SurveyColumns.TYPE)));
-        survey.setLanguage(cursor.getString(cursor.getColumnIndexOrThrow(SurveyColumns.LANGUAGE)));
-        survey.setVersion(cursor.getDouble(cursor.getColumnIndexOrThrow(SurveyColumns.VERSION)));
-
-        int helpDownloaded = cursor
-                .getInt(cursor.getColumnIndexOrThrow(SurveyColumns.HELP_DOWNLOADED));
-        survey.setHelpDownloaded(helpDownloaded == 1);
         return survey;
     }
 
@@ -413,17 +395,17 @@ public class SurveyDbDataSource {
             return getSurvey(formId);
         }
         Survey s = null;
-        Cursor c = surveyDbAdapter.getSurveys(sg.getId());
+        Cursor c = briteSurveyDbAdapter.getSurveys(sg.getId());
         if (c != null) {
             if (c.moveToFirst()) {
-                s = getSurvey(c);
+                s = surveyMapper.getSurvey(c);
             }
             c.close();
         }
         return s;
     }
 
-    public static SurveyGroup getSurveyGroup(Cursor cursor) {
+    private SurveyGroup getSurveyGroup(Cursor cursor) {
         long id = cursor.getLong(cursor.getColumnIndexOrThrow(SurveyGroupColumns.SURVEY_GROUP_ID));
         String name = cursor.getString(cursor.getColumnIndexOrThrow(SurveyGroupColumns.NAME));
         String registerSurveyId = cursor
@@ -451,7 +433,7 @@ public class SurveyDbDataSource {
      */
     public List<Survey> getSurveyList(long surveyGroupId) {
         // Reuse getSurveys() method
-        Cursor cursor = surveyDbAdapter.getSurveys(surveyGroupId);
+        Cursor cursor = briteSurveyDbAdapter.getSurveys(surveyGroupId);
 
         ArrayList<Survey> surveys = new ArrayList<>();
 
@@ -459,7 +441,7 @@ public class SurveyDbDataSource {
             if (cursor.getCount() > 0) {
                 cursor.moveToFirst();
                 do {
-                    surveys.add(getSurvey(cursor));
+                    surveys.add(surveyMapper.getSurvey(cursor));
                 } while (cursor.moveToNext());
             }
             cursor.close();
@@ -511,19 +493,19 @@ public class SurveyDbDataSource {
     }
 
     public void markSurveyHelpDownloaded(String sid, boolean b) {
-        surveyDbAdapter.markSurveyHelpDownloaded(sid, b);
+        briteSurveyDbAdapter.markSurveyHelpDownloaded(sid, b);
     }
 
     public String[] getSurveyIds() {
-        return surveyDbAdapter.getSurveyIds();
+        return briteSurveyDbAdapter.getSurveyIds();
     }
 
     public void deleteAllSurveys() {
-        surveyDbAdapter.deleteAllSurveys();
+        briteSurveyDbAdapter.deleteAllSurveys();
     }
 
     public void reinstallTestSurvey() {
-        surveyDbAdapter.reinstallTestSurvey();
+        briteSurveyDbAdapter.reinstallTestSurvey();
     }
 
     public void deleteEmptyRecords() {
@@ -621,7 +603,7 @@ public class SurveyDbDataSource {
     }
 
     public void deleteSurvey(String id) {
-        surveyDbAdapter.deleteSurvey(id);
+        briteSurveyDbAdapter.deleteSurvey(id);
     }
 
     public String createSurveyedLocale(long id) {
@@ -641,7 +623,7 @@ public class SurveyDbDataSource {
     }
 
     public long createOrUpdateUser(Long id, String username) {
-        return surveyDbAdapter.createOrUpdateUser(id, username);
+        return briteSurveyDbAdapter.createOrUpdateUser(id, username);
     }
 
     public void deleteAllResponses() {

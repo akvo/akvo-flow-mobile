@@ -19,19 +19,16 @@
 
 package org.akvo.flow.activity;
 
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.NavigationView;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
@@ -39,7 +36,6 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Gravity;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
@@ -56,9 +52,12 @@ import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.User;
 import org.akvo.flow.domain.apkupdate.ApkUpdateStore;
 import org.akvo.flow.domain.apkupdate.ViewApkData;
-import org.akvo.flow.presentation.navigation.EditUserDialog;
+import org.akvo.flow.injector.component.ApplicationComponent;
+import org.akvo.flow.injector.component.DaggerViewComponent;
+import org.akvo.flow.injector.component.ViewComponent;
 import org.akvo.flow.presentation.UserDeleteConfirmationDialog;
 import org.akvo.flow.presentation.navigation.CreateUserDialog;
+import org.akvo.flow.presentation.navigation.EditUserDialog;
 import org.akvo.flow.presentation.navigation.FlowNavigationView;
 import org.akvo.flow.presentation.navigation.SurveyDeleteConfirmationDialog;
 import org.akvo.flow.presentation.navigation.UserOptionsDialog;
@@ -76,14 +75,11 @@ import org.akvo.flow.util.PlatformUtil;
 import org.akvo.flow.util.StatusUtil;
 import org.akvo.flow.util.ViewUtil;
 
-import java.lang.ref.WeakReference;
+import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import timber.log.Timber;
-
-import static org.akvo.flow.util.ConstantUtil.ACTION_SURVEY_SYNC;
 
 public class SurveyActivity extends AppCompatActivity implements RecordListListener,
         FlowNavigationView.DrawerNavigationListener,
@@ -91,6 +87,7 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
         UserDeleteConfirmationDialog.UserDeleteListener, EditUserDialog.EditUserListener,
         CreateUserDialog.CreateUserListener {
 
+    public static final int NAVIGATION_DRAWER_DELAY_MILLIS = 250;
     private static final String DATA_POINTS_FRAGMENT_TAG = "datapoints_fragment";
 
     @BindView(R.id.toolbar)
@@ -105,44 +102,38 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     @BindView(R.id.nav_view)
     FlowNavigationView navigationView;
 
-    @Nullable
-    private SurveyDbDataSource mDatabase;
+    @Inject
+    SurveyDbDataSource mDatabase;
+
+    @Inject
+    Prefs prefs;
+
+    @Inject
+    Navigator navigator;
+
     private SurveyGroup mSurveyGroup;
 
     private ActionBarDrawerToggle mDrawerToggle;
-    private final Navigator navigator = new Navigator();
-    private Prefs prefs;
     private ApkUpdateStore apkUpdateStore;
     private long selectedSurveyId;
     private boolean activityJustCreated;
-
-    /**
-     * BroadcastReceiver to notify of surveys synchronisation. This should be
-     * fired from {@link SurveyDownloadService}.
-     */
-    private final BroadcastReceiver mSurveysSyncReceiver = new SurveySyncBroadcastReceiver(this);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.survey_activity);
-
+        initializeInjector();
         ButterKnife.bind(this);
 
         initializeToolBar();
 
-        mDatabase = new SurveyDbDataSource(this, null);
         mDatabase.open();
 
-        prefs = new Prefs(getApplicationContext());
-        selectedSurveyId = prefs.getLong(Prefs.KEY_SURVEY_GROUP_ID, SurveyGroup.ID_NONE);
-        if (selectedSurveyId != SurveyGroup.ID_NONE) {
-            mSurveyGroup = mDatabase.getSurveyGroup(selectedSurveyId);
-        }
+        updateSelectedSurvey();
         apkUpdateStore = new ApkUpdateStore(new GsonMapper(), prefs);
 
         initNavigationDrawer();
-
+        selectSurvey();
         initDataPointsFragment(savedInstanceState);
 
         navigateToSetupIfNeeded();
@@ -154,7 +145,73 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
             displaySelectedUser();
         }
         activityJustCreated = true;
+        setNavigationView();
+    }
+
+    private void updateSelectedSurvey() {
+        selectedSurveyId = prefs.getLong(Prefs.KEY_SURVEY_GROUP_ID, SurveyGroup.ID_NONE);
+        if (selectedSurveyId != SurveyGroup.ID_NONE) {
+            mSurveyGroup = mDatabase.getSurveyGroup(selectedSurveyId);
+        }
+    }
+
+    private void setNavigationView() {
         navigationView.setSurveyListener(this);
+        navigationView.setNavigationItemSelectedListener(
+                new NavigationView.OnNavigationItemSelectedListener() {
+                    @Override
+                    public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+                        switch (menuItem.getItemId()) {
+                            case R.id.settings:
+                                navigate(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        navigator.navigateToAppSettings(SurveyActivity.this);
+                                    }
+                                });
+                                return false;
+                            case R.id.about:
+                                navigate(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        navigator.navigateToAbout(SurveyActivity.this);
+                                    }
+                                });
+                                return false;
+                            case R.id.help:
+                                navigate(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        navigator.navigateToHelp(SurveyActivity.this);
+                                    }
+                                });
+                                return false;
+                            default:
+                                return false;
+                        }
+                    }
+
+                    private void navigate(Runnable runnable) {
+                        mDrawerLayout.closeDrawers();
+                        mDrawerLayout.postDelayed(runnable, NAVIGATION_DRAWER_DELAY_MILLIS);
+                    }
+                });
+    }
+
+    private void initializeInjector() {
+        ViewComponent viewComponent =
+                DaggerViewComponent.builder().applicationComponent(getApplicationComponent())
+                        .build();
+        viewComponent.inject(this);
+    }
+
+    /**
+     * Get the Main Application component for dependency injection.
+     *
+     * @return {@link ApplicationComponent}
+     */
+    protected ApplicationComponent getApplicationComponent() {
+        return ((FlowApp) getApplication()).getApplicationComponent();
     }
 
     private void navigateToSetupIfNeeded() {
@@ -180,7 +237,6 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
             @Override
             public void onDrawerClosed(View drawerView) {
                 super.onDrawerClosed(drawerView);
-                supportInvalidateOptionsMenu();
             }
 
             /**
@@ -188,25 +244,25 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
              */
             @Override
             public void onDrawerOpened(View drawerView) {
-                //prevent the back icon from showing
-                super.onDrawerSlide(drawerView, 0);
-                supportInvalidateOptionsMenu();
+                super.onDrawerOpened(drawerView);
             }
 
             @Override
             public void onDrawerSlide(View drawerView, float slideOffset) {
-                //disable drawer animation
-                super.onDrawerSlide(drawerView, 0);
+                super.onDrawerSlide(drawerView, slideOffset);
             }
         };
 
         mDrawerLayout.addDrawerListener(mDrawerToggle);
+        if (mSurveyGroup == null) {
+            mDrawerLayout.openDrawer(GravityCompat.START);
+        }
+    }
 
+    private void selectSurvey() {
         // Automatically select the survey
         if (mSurveyGroup != null) {
             onSurveySelected(mSurveyGroup);
-        } else {
-            mDrawerLayout.openDrawer(GravityCompat.START);
         }
     }
 
@@ -229,6 +285,8 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
             if (resultCode == RESULT_OK) {
                 displaySelectedUser();
                 prefs.setBoolean(Prefs.KEY_SETUP, true);
+                updateSelectedSurvey();
+                updateActivityTitle();
                 // Trigger the delayed services, so the first
                 // backend connections uses the new Device ID
                 startService(new Intent(this, SurveyDownloadService.class));
@@ -251,8 +309,6 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
             mDatabase.deleteEmptySurveyInstances();
             mDatabase.deleteEmptyRecords();
         }
-        LocalBroadcastManager.getInstance(this)
-                .registerReceiver(mSurveysSyncReceiver, new IntentFilter(ACTION_SURVEY_SYNC));
 
         ViewApkData apkData = apkUpdateStore.getApkData();
         boolean shouldNotifyUpdate = apkUpdateStore.shouldNotifyNewVersion();
@@ -280,12 +336,6 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
         } else {
             super.onBackPressed();
         }
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(mSurveysSyncReceiver);
     }
 
     @Override
@@ -338,9 +388,7 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     public void onSurveySelected(SurveyGroup surveyGroup) {
         mSurveyGroup = surveyGroup;
 
-        CharSequence title =
-                mSurveyGroup != null ? mSurveyGroup.getName() : getString(R.string.app_name);
-        setTitle(title);
+        updateActivityTitle();
 
         selectedSurveyId = mSurveyGroup != null ? mSurveyGroup.getId() : SurveyGroup.ID_NONE;
 
@@ -349,10 +397,16 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
         if (f != null) {
             f.refresh(mSurveyGroup);
         }
-        supportInvalidateOptionsMenu();
-
         mDrawerLayout.closeDrawers();
+        invalidateOptionsMenu();
+
         updateAddDataPointFab();
+    }
+
+    private void updateActivityTitle() {
+        CharSequence title =
+                mSurveyGroup != null ? mSurveyGroup.getName() : getString(R.string.app_name);
+        setTitle(title);
     }
 
     @Override
@@ -398,16 +452,6 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         mDrawerToggle.onConfigurationChanged(newConfig);
-    }
-
-    @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
-        boolean showItems =
-                !mDrawerLayout.isDrawerOpen(GravityCompat.START) && mSurveyGroup != null;
-        for (int i = 0; i < menu.size(); i++) {
-            menu.getItem(i).setVisible(showItems);
-        }
-        return super.onPrepareOptionsMenu(menu);
     }
 
     @Override
@@ -475,34 +519,12 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
         }
     }
 
-    private void reloadDrawer() {
-        // TODO:
-    }
-
     @OnClick(R.id.add_data_point_fab)
     void onAddDataPointTap() {
         if (mDatabase != null) {
             addDataPointFab.setEnabled(false);
             String newLocaleId = mDatabase.createSurveyedLocale(mSurveyGroup.getId());
             onRecordSelected(newLocaleId);
-        }
-    }
-
-    static class SurveySyncBroadcastReceiver extends BroadcastReceiver {
-
-        private final WeakReference<SurveyActivity> activityWeakReference;
-
-        SurveySyncBroadcastReceiver(SurveyActivity activity) {
-            this.activityWeakReference = new WeakReference<>(activity);
-        }
-
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            Timber.i("Surveys have been synchronised. Refreshing data...");
-            SurveyActivity surveyActivity = activityWeakReference.get();
-            if (surveyActivity != null) {
-                surveyActivity.reloadDrawer();
-            }
         }
     }
 }

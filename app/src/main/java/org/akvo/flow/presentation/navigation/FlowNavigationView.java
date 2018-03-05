@@ -23,6 +23,7 @@ package org.akvo.flow.presentation.navigation;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
+import android.support.design.internal.NavigationMenuView;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
@@ -61,7 +62,7 @@ public class FlowNavigationView extends NavigationView implements IFlowNavigatio
     private UserAdapter usersAdapter;
     private Drawable hideUsersDrawable;
     private Drawable showUsersDrawable;
-    private View headerView;
+    private View userHeader;
 
     @Inject
     FlowNavigationPresenter presenter;
@@ -97,11 +98,16 @@ public class FlowNavigationView extends NavigationView implements IFlowNavigatio
     }
 
     private void initViews() {
-        headerView = getHeaderView(0);
+        View headerView = getHeaderView(0);
         currentUserTextView = ButterKnife.findById(headerView, R.id.current_user_name);
         surveyTitleTextView = ButterKnife.findById(headerView, R.id.surveys_title_tv);
         surveysRecyclerView = ButterKnife.findById(headerView, R.id.surveys_rv);
         usersRecyclerView = ButterKnife.findById(headerView, R.id.users_rv);
+        userHeader = ButterKnife.findById(headerView, R.id.user_header);
+        NavigationMenuView navigationMenuView = (NavigationMenuView) getChildAt(0);
+        if (navigationMenuView != null) {
+            navigationMenuView.setVerticalScrollBarEnabled(false);
+        }
     }
 
     private void initialiseInjector() {
@@ -180,7 +186,7 @@ public class FlowNavigationView extends NavigationView implements IFlowNavigatio
     private void initCurrentUserText() {
         hideUsersDrawable = ContextCompat.getDrawable(getContext(), R.drawable.ic_expand_less);
         showUsersDrawable = ContextCompat.getDrawable(getContext(), R.drawable.ic_expand_more);
-        headerView.setOnClickListener(new OnClickListener() {
+        userHeader.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (surveysRecyclerView.getVisibility() == VISIBLE) {
@@ -197,7 +203,7 @@ public class FlowNavigationView extends NavigationView implements IFlowNavigatio
                 }
             }
         });
-        headerView.setOnLongClickListener(new OnLongClickListener() {
+        userHeader.setOnLongClickListener(new OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
                 presenter.onCurrentUserLongPress();

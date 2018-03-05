@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2010-2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -25,7 +25,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
-import android.support.annotation.Nullable;
 
 import org.akvo.flow.database.migration.MigrationListener;
 
@@ -217,25 +216,6 @@ public class SurveyDbAdapter {
         return cursor;
     }
 
-    /**
-     * if the ID is populated, this will update a user record. Otherwise, it
-     * will be inserted
-     */
-    public long createOrUpdateUser(Long id, String name) {
-        ContentValues initialValues = new ContentValues();
-        Long idVal = id;
-        initialValues.put(UserColumns.NAME, name);
-        initialValues.put(UserColumns.DELETED, 0);
-
-        if (idVal == null) {
-            idVal = database.insert(Tables.USER, null, initialValues);
-        } else {
-            database.update(Tables.USER, initialValues, UserColumns._ID + "=?",
-                    new String[] { idVal.toString() });
-        }
-        return idVal;
-    }
-
     public Cursor getResponses(long surveyInstanceId) {
         return database.query(Tables.RESPONSE,
                 RESPONSE_COLUMNS,
@@ -307,16 +287,19 @@ public class SurveyDbAdapter {
 
     //TODO: verify method naming
     public Cursor checkSurveyVersion(String surveyId, String surveyVersion) {
+        String selection =
+                SurveyColumns.SURVEY_ID + " = ? and (" + SurveyColumns.VERSION + " >= ? or "
+                        + SurveyColumns.DELETED + " = ?)";
+        String[] selectionArgs = {
+                surveyId,
+                surveyVersion,
+                String.valueOf(1)
+        };
         return database.query(Tables.SURVEY,
                 new String[] {
                         SurveyColumns.SURVEY_ID
                 },
-                SurveyColumns.SURVEY_ID + " = ? and (" + SurveyColumns.VERSION + " >= ? or "
-                        + SurveyColumns.DELETED + " = ?)", new String[] {
-                        surveyId,
-                        surveyVersion,
-                        String.valueOf(1)//ConstantUtil.IS_DELETED
-                }, null, null, null);
+                selection, selectionArgs, null, null, null);
     }
 
     /**
@@ -334,27 +317,6 @@ public class SurveyDbAdapter {
         }
     }
 
-    @Nullable
-    public Cursor updateSurvey(ContentValues updatedValues, String surveyId) {
-        Cursor cursor = database.query(Tables.SURVEY,
-                new String[] {
-                        SurveyColumns._ID
-                }, SurveyColumns.SURVEY_ID + " = ?",
-                new String[] {
-                        surveyId,
-                }, null, null, null);
-        if (cursor != null && cursor.getCount() > 0) {
-            // if we found an item, it's an update, otherwise, it's an insert
-            database.update(Tables.SURVEY, updatedValues, SurveyColumns.SURVEY_ID + " = ?",
-                    new String[] {
-                            surveyId
-                    });
-        } else {
-            database.insert(Tables.SURVEY, null, updatedValues);
-        }
-        return cursor;
-    }
-
     /**
      * Gets a single survey from the db using its survey id
      */
@@ -367,14 +329,6 @@ public class SurveyDbAdapter {
                 new String[] {
                         surveyId
                 }, null, null, null);
-    }
-
-    /**
-     * deletes all the surveys from the database
-     */
-    public void deleteAllSurveys() {
-        database.delete(Tables.SURVEY, null, null);
-        database.delete(Tables.SURVEY_GROUP, null, null);
     }
 
     /**

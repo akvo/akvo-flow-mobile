@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015-2017 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2015-2018 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -19,7 +19,6 @@
 
 package org.akvo.flow.activity;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
@@ -58,7 +57,11 @@ public class AddUserActivity extends BaseActivity {
     @BindView(R.id.device_id)
     EditText deviceIdEt;
 
-    private Prefs prefs;
+    @Inject
+    Prefs prefs;
+
+    @Inject
+    SurveyDbDataSource surveyDbDataSource;
 
     @Inject
     LoggingHelper helper;
@@ -68,9 +71,8 @@ public class AddUserActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.add_user_activity);
-        ButterKnife.bind(this);
         initializeInjector();
-        prefs = new Prefs(getApplicationContext());
+        ButterKnife.bind(this);
         deviceIdEt.setText(prefs.getString(Prefs.KEY_DEVICE_IDENTIFIER, ""));
     }
 
@@ -85,11 +87,9 @@ public class AddUserActivity extends BaseActivity {
     private void saveUserData() {
         String username = nameEt.getText().toString().trim();
         String deviceId = deviceIdEt.getText().toString().trim();
-        Context context = getApplicationContext();
-        SurveyDbDataSource db = new SurveyDbDataSource(context, null);
-        db.open();
-        long uid = db.createOrUpdateUser(null, username);
-        db.close();
+        surveyDbDataSource.open();
+        long uid = surveyDbDataSource.createOrUpdateUser(null, username);
+        surveyDbDataSource.close();
 
         prefs.setString(Prefs.KEY_DEVICE_IDENTIFIER, deviceId);
 

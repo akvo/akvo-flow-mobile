@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2018 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -24,7 +24,6 @@ import android.content.Intent;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
 
 import org.akvo.flow.R;
@@ -35,13 +34,13 @@ import org.akvo.flow.domain.SurveyMetadata;
 import org.akvo.flow.serialization.form.SurveyMetadataParser;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.FileUtil;
-import org.akvo.flow.util.files.FormFileBrowser;
-import org.akvo.flow.util.files.FormResourcesFileBrowser;
 import org.akvo.flow.util.NotificationHelper;
 import org.akvo.flow.util.StatusUtil;
 import org.akvo.flow.util.SurveyFileNameGenerator;
 import org.akvo.flow.util.SurveyIdGenerator;
 import org.akvo.flow.util.ViewUtil;
+import org.akvo.flow.util.files.FormFileBrowser;
+import org.akvo.flow.util.files.FormResourcesFileBrowser;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -58,8 +57,6 @@ import java.util.zip.ZipInputStream;
 import javax.inject.Inject;
 
 import timber.log.Timber;
-
-import static org.akvo.flow.util.ConstantUtil.ACTION_SURVEY_SYNC;
 
 /**
  * Service that will check a well-known location on the device's SD card for a
@@ -83,17 +80,20 @@ public class BootstrapService extends IntentService {
 
     public volatile static boolean isProcessing = false;
 
+    private static final String TAG = "BOOTSTRAP_SERVICE";
+
     @Inject
     FormFileBrowser formFileBrowser;
 
     @Inject
     FormResourcesFileBrowser resourcesFileUtil;
 
-    private static final String TAG = "BOOTSTRAP_SERVICE";
+    @Inject
+    SurveyDbDataSource databaseAdapter;
+
     private final SurveyIdGenerator surveyIdGenerator = new SurveyIdGenerator();
     private final SurveyFileNameGenerator surveyFileNameGenerator = new SurveyFileNameGenerator();
     private final ZipFileLister zipFileLister = new ZipFileLister();
-    private SurveyDbDataSource databaseAdapter;
     private Handler mHandler;
 
     public BootstrapService() {
@@ -112,9 +112,6 @@ public class BootstrapService extends IntentService {
         isProcessing = true;
         int installed = checkAndInstall();
         isProcessing = false;
-        if (installed > 0) {
-            sendBroadcastNotification();
-        }
     }
 
     /**
@@ -134,7 +131,6 @@ public class BootstrapService extends IntentService {
 
             String startMessage = getString(R.string.bootstrapstart);
             displayNotification(startMessage);
-            databaseAdapter = new SurveyDbDataSource(this, null);
             databaseAdapter.open();
             try {
                 for (File file : zipFiles) {
@@ -357,15 +353,5 @@ public class BootstrapService extends IntentService {
         String entryName = entry.getName();
         String entryPaths[] = entryName == null ? new String[0] : entryName.split(File.separator);
         return entryPaths.length < 2 ? "" : entryPaths[entryPaths.length - 2];
-    }
-
-    /**
-     * Dispatch a Broadcast notification to notify of surveys synchronization.
-     * This notification will be received in SurveyHomeActivity, in order to
-     * refresh its data
-     */
-    private void sendBroadcastNotification() {
-        Intent intentBroadcast = new Intent(ACTION_SURVEY_SYNC);
-        LocalBroadcastManager.getInstance(this).sendBroadcast(intentBroadcast);
     }
 }

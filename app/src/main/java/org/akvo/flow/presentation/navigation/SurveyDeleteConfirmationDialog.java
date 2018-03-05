@@ -36,16 +36,16 @@ public class SurveyDeleteConfirmationDialog extends DialogFragment {
 
     public static final String TAG = "SurveyDeleteConfirmationDialog";
 
-    private int surveyGroupId;
+    private ViewSurvey viewSurvey;
     private SurveyDeleteListener listener;
 
     public SurveyDeleteConfirmationDialog() {
     }
 
-    public static SurveyDeleteConfirmationDialog newInstance(long surveyGroupId) {
+    public static SurveyDeleteConfirmationDialog newInstance(ViewSurvey viewSurvey) {
         SurveyDeleteConfirmationDialog fragment = new SurveyDeleteConfirmationDialog();
         Bundle args = new Bundle();
-        args.putLong(SURVEY_GROUP_ID_EXTRA, surveyGroupId);
+        args.putParcelable(SURVEY_GROUP_ID_EXTRA, viewSurvey);
         fragment.setArguments(args);
         return fragment;
     }
@@ -53,7 +53,7 @@ public class SurveyDeleteConfirmationDialog extends DialogFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        surveyGroupId = getArguments().getInt(SURVEY_GROUP_ID_EXTRA);
+        viewSurvey = getArguments().getParcelable(SURVEY_GROUP_ID_EXTRA);
     }
 
     @Override
@@ -78,13 +78,13 @@ public class SurveyDeleteConfirmationDialog extends DialogFragment {
     public Dialog onCreateDialog(final Bundle savedInstanceState) {
         super.onCreateDialog(savedInstanceState);
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        builder.setMessage(R.string.delete_project_text)
-                .setCancelable(true)
-                .setPositiveButton(R.string.okbutton,
+        String name = viewSurvey == null ? getString(R.string.survey) : viewSurvey.getName();
+        builder.setMessage(getString(R.string.delete_survey_dialog_message, name))
+                .setPositiveButton(R.string.delete_button,
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
-                                if (listener != null) {
-                                    listener.onSurveyDeleteConfirmed(surveyGroupId);
+                                if (listener != null && viewSurvey != null) {
+                                    listener.onSurveyDeleteConfirmed(viewSurvey.getId());
                                 }
 
                             }

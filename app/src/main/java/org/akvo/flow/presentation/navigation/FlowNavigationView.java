@@ -213,9 +213,8 @@ public class FlowNavigationView extends NavigationView implements IFlowNavigatio
     private void onSurveyItemLongPress(int position, SurveyAdapter adapter) {
         ViewSurvey viewSurvey = adapter.getItem(position);
         if (viewSurvey != null) {
-            final long surveyGroupId = viewSurvey.getId();
             DialogFragment dialogFragment = SurveyDeleteConfirmationDialog
-                    .newInstance(surveyGroupId);
+                    .newInstance(viewSurvey);
             dialogFragment.show(getSupportFragmentManager(), SurveyDeleteConfirmationDialog.TAG);
         }
     }
@@ -293,6 +292,12 @@ public class FlowNavigationView extends NavigationView implements IFlowNavigatio
     @Override
     public void displayUserSelectError() {
         snackBarManager.displaySnackBar(this, R.string.user_select_error, getContext());
+    }
+
+    @Override
+    public void displayEditUser(ViewUser currentUser) {
+        DialogFragment fragment = EditUserDialog.newInstance(currentUser);
+        fragment.show(getSupportFragmentManager(), EditUserDialog.TAG);
     }
 
     @Override

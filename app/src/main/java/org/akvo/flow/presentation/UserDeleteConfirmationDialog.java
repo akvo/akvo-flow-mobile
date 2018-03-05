@@ -79,9 +79,8 @@ public class UserDeleteConfirmationDialog extends DialogFragment {
     public Dialog onCreateDialog(final Bundle savedInstanceState) {
         super.onCreateDialog(savedInstanceState);
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        builder.setMessage(R.string.delete_user_confirmation)
-                .setCancelable(true)
-                .setPositiveButton(R.string.okbutton,
+        builder.setTitle(R.string.delete_user_confirmation)
+                .setPositiveButton(R.string.delete_button,
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
                                 if (listener != null) {

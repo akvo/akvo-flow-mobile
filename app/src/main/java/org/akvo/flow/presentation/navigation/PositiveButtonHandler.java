@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -25,12 +25,12 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.widget.Button;
 
-public class PositiveButtonHandler {
+class PositiveButtonHandler {
 
     @NonNull
     private final DialogFragment dialogFragment;
 
-    public PositiveButtonHandler(@NonNull DialogFragment dialogFragment) {
+    PositiveButtonHandler(@NonNull DialogFragment dialogFragment) {
         this.dialogFragment = dialogFragment;
     }
 
@@ -39,13 +39,13 @@ public class PositiveButtonHandler {
         button.setEnabled(false);
     }
 
-    private Button getPositiveButton() {
-        AlertDialog dialog = (AlertDialog) dialogFragment.getDialog();
-        return dialog.getButton(AlertDialog.BUTTON_POSITIVE);
-    }
-
     void enablePositiveButton() {
         Button button = getPositiveButton();
         button.setEnabled(true);
+    }
+
+    private Button getPositiveButton() {
+        AlertDialog dialog = (AlertDialog) dialogFragment.getDialog();
+        return dialog.getButton(AlertDialog.BUTTON_POSITIVE);
     }
 }

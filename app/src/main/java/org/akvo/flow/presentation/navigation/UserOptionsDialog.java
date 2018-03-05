@@ -35,6 +35,8 @@ import org.akvo.flow.util.ConstantUtil;
 public class UserOptionsDialog extends DialogFragment {
 
     public static final String TAG = "UserOptionsDialog";
+    
+    private static final int OPTION_EDIT_USER = 0;
 
     private ViewUser viewUser;
     private UserOptionListener listener;
@@ -76,8 +78,8 @@ public class UserOptionsDialog extends DialogFragment {
         builder.setTitle(viewUser.getName())
                 .setItems(R.array.user_options, new DialogInterface.OnClickListener() {
                     @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        if (which == 0) {
+                    public void onClick(DialogInterface dialog, int selectedOption) {
+                        if (selectedOption == OPTION_EDIT_USER) {
                             if (listener != null) {
                                 listener.onEditUser(viewUser);
                             }

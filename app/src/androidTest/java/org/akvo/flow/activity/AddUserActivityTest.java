@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -20,12 +20,15 @@
 
 package org.akvo.flow.activity;
 
+import android.support.test.InstrumentationRegistry;
 import android.support.test.espresso.ViewInteraction;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 import android.test.suitebuilder.annotation.MediumTest;
 
 import org.akvo.flow.R;
+import org.akvo.flow.activity.form.data.SurveyRequisite;
+import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -50,6 +53,11 @@ public class AddUserActivityTest {
     @Rule
     public ActivityTestRule<AddUserActivity> mActivityTestRule = new ActivityTestRule<>(
             AddUserActivity.class);
+
+    @BeforeClass
+    public static void beforeClass() {
+        SurveyRequisite.resetRequisites(InstrumentationRegistry.getTargetContext());
+    }
 
     @Test
     public void testAddUser() throws Exception {

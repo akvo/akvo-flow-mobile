@@ -30,6 +30,7 @@ import org.akvo.flow.injector.PerActivity;
 import org.akvo.flow.injector.module.ViewModule;
 import org.akvo.flow.presentation.AboutActivity;
 import org.akvo.flow.presentation.AppDownloadDialogFragment;
+import org.akvo.flow.presentation.MainActivity;
 import org.akvo.flow.presentation.datapoints.list.DataPointsListFragment;
 import org.akvo.flow.presentation.datapoints.map.DataPointsMapFragment;
 import org.akvo.flow.presentation.help.HelpActivity;
@@ -91,4 +92,6 @@ public interface ViewComponent {
     void inject(SurveyActivity surveyActivity);
 
     void inject(TransmissionHistoryActivity transmissionHistoryActivity);
+
+    void inject(MainActivity mainActivity);
 }

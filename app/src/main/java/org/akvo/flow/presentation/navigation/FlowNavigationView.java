@@ -22,7 +22,6 @@ package org.akvo.flow.presentation.navigation;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
-import android.support.annotation.NonNull;
 import android.support.design.internal.NavigationMenuView;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.DialogFragment;
@@ -32,8 +31,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
-import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.widget.TextView;
 
 import org.akvo.flow.R;
@@ -42,7 +41,6 @@ import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.injector.component.ApplicationComponent;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
-import org.akvo.flow.ui.Navigator;
 import org.akvo.flow.presentation.SnackBarManager;
 
 import java.util.List;
@@ -57,7 +55,7 @@ public class FlowNavigationView extends NavigationView implements IFlowNavigatio
     private TextView surveyTitleTextView;
     private RecyclerView surveysRecyclerView;
     private RecyclerView usersRecyclerView;
-    private DrawerNavigationListener surveyListener;
+    private DrawerNavigationListener drawerNavigationListener;
     private SurveyAdapter surveyAdapter;
     private UserAdapter usersAdapter;
     private Drawable hideUsersDrawable;
@@ -66,9 +64,6 @@ public class FlowNavigationView extends NavigationView implements IFlowNavigatio
 
     @Inject
     FlowNavigationPresenter presenter;
-
-    @Inject
-    Navigator navigator;
 
     @Inject
     SnackBarManager snackBarManager;
@@ -88,22 +83,28 @@ public class FlowNavigationView extends NavigationView implements IFlowNavigatio
 
     private void init() {
         initialiseInjector();
-        initViews();
-        initCurrentUserText();
-        initUserList();
-        initSurveyList();
-        setNavigationItemListener();
         presenter.setView(this);
-        presenter.load();
+        getViewTreeObserver().addOnGlobalLayoutListener(
+                new ViewTreeObserver.OnGlobalLayoutListener() {
+                    @Override
+                    public void onGlobalLayout() {
+                        getViewTreeObserver().removeGlobalOnLayoutListener(this);
+                        initViews();
+                        setNavigationItemListener();
+                        initCurrentUserText();
+                        initUserList();
+                        initSurveyList();
+                        presenter.load();
+                    }
+                });
     }
 
     private void initViews() {
-        View headerView = getHeaderView(0);
-        currentUserTextView = ButterKnife.findById(headerView, R.id.current_user_name);
-        surveyTitleTextView = ButterKnife.findById(headerView, R.id.surveys_title_tv);
-        surveysRecyclerView = ButterKnife.findById(headerView, R.id.surveys_rv);
-        usersRecyclerView = ButterKnife.findById(headerView, R.id.users_rv);
-        userHeader = ButterKnife.findById(headerView, R.id.user_header);
+        currentUserTextView = ButterKnife.findById(this, R.id.current_user_name);
+        surveyTitleTextView = ButterKnife.findById(this, R.id.surveys_title_tv);
+        surveysRecyclerView = ButterKnife.findById(this, R.id.surveys_rv);
+        usersRecyclerView = ButterKnife.findById(this, R.id.users_rv);
+        userHeader = ButterKnife.findById(this, R.id.user_header);
         NavigationMenuView navigationMenuView = (NavigationMenuView) getChildAt(0);
         if (navigationMenuView != null) {
             navigationMenuView.setVerticalScrollBarEnabled(false);
@@ -142,22 +143,29 @@ public class FlowNavigationView extends NavigationView implements IFlowNavigatio
     }
 
     private void setNavigationItemListener() {
-        final Context context = getContext();
-        setNavigationItemSelectedListener(new OnNavigationItemSelectedListener() {
+        ButterKnife.findById(this, R.id.settings_tv).setOnClickListener(new OnClickListener() {
             @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-                switch (menuItem.getItemId()) {
-                    case R.id.settings:
-                        navigator.navigateToAppSettings(context);
-                        return true;
-                    case R.id.about:
-                        navigator.navigateToAbout(context);
-                        return true;
-                    case R.id.help:
-                        navigator.navigateToHelp(context);
-                        return true;
-                    default:
-                        return false;
+            public void onClick(View v) {
+                if (drawerNavigationListener != null) {
+                    drawerNavigationListener.navigateToSettings();
+                }
+            }
+        });
+
+        ButterKnife.findById(this, R.id.help_tv).setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (drawerNavigationListener != null) {
+                    drawerNavigationListener.navigateToHelp();
+                }
+            }
+        });
+
+        ButterKnife.findById(this, R.id.about_tv).setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (drawerNavigationListener != null) {
+                    drawerNavigationListener.navigateToAbout();
                 }
             }
         });
@@ -229,8 +237,8 @@ public class FlowNavigationView extends NavigationView implements IFlowNavigatio
         presenter.onSurveyItemTap(surveyAdapter.getItem(position));
     }
 
-    public void setSurveyListener(DrawerNavigationListener surveyListener) {
-        this.surveyListener = surveyListener;
+    public void setDrawerNavigationListener(DrawerNavigationListener drawerNavigationListener) {
+        this.drawerNavigationListener = drawerNavigationListener;
     }
 
     @Override
@@ -240,15 +248,15 @@ public class FlowNavigationView extends NavigationView implements IFlowNavigatio
 
     @Override
     public void notifySurveyDeleted(long surveyGroupId) {
-        if (surveyListener != null) {
-            surveyListener.onSurveyDeleted(surveyGroupId);
+        if (drawerNavigationListener != null) {
+            drawerNavigationListener.onSurveyDeleted(surveyGroupId);
         }
     }
 
     @Override
     public void selectSurvey(SurveyGroup surveyGroup) {
-        if (surveyListener != null) {
-            surveyListener.onSurveySelected(surveyGroup);
+        if (drawerNavigationListener != null) {
+            drawerNavigationListener.onSurveySelected(surveyGroup);
             surveyAdapter.updateSelected(surveyGroup.getId());
         }
     }
@@ -343,5 +351,11 @@ public class FlowNavigationView extends NavigationView implements IFlowNavigatio
         void onSurveySelected(SurveyGroup surveyGroup);
 
         void onSurveyDeleted(long surveyGroupId);
+
+        void navigateToHelp();
+
+        void navigateToAbout();
+
+        void navigateToSettings();
     }
 }

@@ -24,9 +24,7 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.NavigationView;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.GravityCompat;
@@ -69,7 +67,6 @@ import org.akvo.flow.service.TimeCheckService;
 import org.akvo.flow.ui.Navigator;
 import org.akvo.flow.ui.fragment.DatapointsFragment;
 import org.akvo.flow.ui.fragment.RecordListListener;
-import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.GsonMapper;
 import org.akvo.flow.util.PlatformUtil;
 import org.akvo.flow.util.StatusUtil;
@@ -127,25 +124,37 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
 
         initializeToolBar();
 
-        mDatabase.open();
+        if (!deviceSetUpCompleted()) {
+            navigateToSetUp();
+        } else {
 
-        updateSelectedSurvey();
-        apkUpdateStore = new ApkUpdateStore(new GsonMapper(), prefs);
+            mDatabase.open();
 
-        initNavigationDrawer();
-        selectSurvey();
-        initDataPointsFragment(savedInstanceState);
+            updateSelectedSurvey();
+            apkUpdateStore = new ApkUpdateStore(new GsonMapper(), prefs);
 
-        navigateToSetupIfNeeded();
+            initNavigationDrawer();
+            selectSurvey();
+            initDataPointsFragment(savedInstanceState);
 
-        startServices();
+            startServices();
 
-        //When the app is restarted we need to display the current user
-        if (savedInstanceState == null) {
-            displaySelectedUser();
+            //When the app is restarted we need to display the current user
+            if (savedInstanceState == null) {
+                displaySelectedUser();
+            }
+            activityJustCreated = true;
+            setNavigationView();
         }
-        activityJustCreated = true;
-        setNavigationView();
+    }
+
+    private boolean deviceSetUpCompleted() {
+        return prefs.getBoolean(Prefs.KEY_SETUP, false);
+    }
+
+    private void navigateToSetUp() {
+        navigator.navigateToAddUser(this);
+        finish();
     }
 
     private void updateSelectedSurvey() {
@@ -156,46 +165,7 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     }
 
     private void setNavigationView() {
-        navigationView.setSurveyListener(this);
-        navigationView.setNavigationItemSelectedListener(
-                new NavigationView.OnNavigationItemSelectedListener() {
-                    @Override
-                    public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-                        switch (menuItem.getItemId()) {
-                            case R.id.settings:
-                                navigate(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        navigator.navigateToAppSettings(SurveyActivity.this);
-                                    }
-                                });
-                                return false;
-                            case R.id.about:
-                                navigate(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        navigator.navigateToAbout(SurveyActivity.this);
-                                    }
-                                });
-                                return false;
-                            case R.id.help:
-                                navigate(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        navigator.navigateToHelp(SurveyActivity.this);
-                                    }
-                                });
-                                return false;
-                            default:
-                                return false;
-                        }
-                    }
-
-                    private void navigate(Runnable runnable) {
-                        mDrawerLayout.closeDrawers();
-                        mDrawerLayout.postDelayed(runnable, NAVIGATION_DRAWER_DELAY_MILLIS);
-                    }
-                });
+        navigationView.setDrawerNavigationListener(this);
     }
 
     private void initializeInjector() {
@@ -212,13 +182,6 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
      */
     protected ApplicationComponent getApplicationComponent() {
         return ((FlowApp) getApplication()).getApplicationComponent();
-    }
-
-    private void navigateToSetupIfNeeded() {
-        boolean deviceSetCorrectly = prefs.getBoolean(Prefs.KEY_SETUP, false);
-        if (!deviceSetCorrectly) {
-            navigator.navigateToAddUser(this);
-        }
     }
 
     private void initializeToolBar() {
@@ -278,46 +241,30 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if (requestCode == ConstantUtil.REQUEST_ADD_USER) {
-            if (resultCode == RESULT_OK) {
-                displaySelectedUser();
-                prefs.setBoolean(Prefs.KEY_SETUP, true);
-                updateSelectedSurvey();
-                updateActivityTitle();
-                // Trigger the delayed services, so the first
-                // backend connections uses the new Device ID
-                startService(new Intent(this, SurveyDownloadService.class));
-                startService(new Intent(this, DataSyncService.class));
-            } else if (!prefs.getBoolean(Prefs.KEY_SETUP, false)) {
-                finish();
-            }
-        }
-    }
-
-    @Override
     public void onResume() {
         super.onResume();
-        if (!activityJustCreated) {
-            navigateToSetupIfNeeded();
+        if (isFinishing()) {
+            return;
         }
-        activityJustCreated = false;
-        // Delete empty responses, if any
-        if (mDatabase != null) {
-            mDatabase.deleteEmptySurveyInstances();
-            mDatabase.deleteEmptyRecords();
-        }
+        if (!activityJustCreated && !deviceSetUpCompleted()) {
+            navigateToSetUp();
+        } else {
+            activityJustCreated = false;
+            // Delete empty responses, if any
+            if (mDatabase != null) {
+                mDatabase.deleteEmptySurveyInstances();
+                mDatabase.deleteEmptyRecords();
+            }
 
-        ViewApkData apkData = apkUpdateStore.getApkData();
-        boolean shouldNotifyUpdate = apkUpdateStore.shouldNotifyNewVersion();
-        if (apkData != null && shouldNotifyUpdate && PlatformUtil
-                .isNewerVersion(BuildConfig.VERSION_NAME, apkData.getVersion())) {
-            apkUpdateStore.saveAppUpdateNotifiedTime();
-            navigator.navigateToAppUpdate(this, apkData);
+            ViewApkData apkData = apkUpdateStore.getApkData();
+            boolean shouldNotifyUpdate = apkUpdateStore.shouldNotifyNewVersion();
+            if (apkData != null && shouldNotifyUpdate && PlatformUtil
+                    .isNewerVersion(BuildConfig.VERSION_NAME, apkData.getVersion())) {
+                apkUpdateStore.saveAppUpdateNotifiedTime();
+                navigator.navigateToAppUpdate(this, apkData);
+            }
+            updateAddDataPointFab();
         }
-        updateAddDataPointFab();
     }
 
     private void updateAddDataPointFab() {
@@ -365,11 +312,8 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
                     },
                     null);
         } else {
-            boolean deviceSetUpCompleted = prefs.getBoolean(Prefs.KEY_SETUP, false);
-            if (deviceSetUpCompleted) {
-                startService(new Intent(this, SurveyDownloadService.class));
-                startService(new Intent(this, DataSyncService.class));
-            }
+            startService(new Intent(this, SurveyDownloadService.class));
+            startService(new Intent(this, DataSyncService.class));
             startService(new Intent(this, BootstrapService.class));
             startService(new Intent(this, TimeCheckService.class));
         }
@@ -517,6 +461,41 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
             Toast.makeText(this, getString(R.string.logged_in_as) + " " + user.getName(),
                     Toast.LENGTH_LONG).show();
         }
+    }
+
+    @Override
+    public void navigateToHelp() {
+        navigate(new Runnable() {
+            @Override
+            public void run() {
+                navigator.navigateToHelp(SurveyActivity.this);
+            }
+        });
+    }
+
+    @Override
+    public void navigateToAbout() {
+        navigate(new Runnable() {
+            @Override
+            public void run() {
+                navigator.navigateToAbout(SurveyActivity.this);
+            }
+        });
+    }
+
+    @Override
+    public void navigateToSettings() {
+        navigate(new Runnable() {
+            @Override
+            public void run() {
+                navigator.navigateToAppSettings(SurveyActivity.this);
+            }
+        });
+    }
+
+    private void navigate(Runnable runnable) {
+        mDrawerLayout.closeDrawers();
+        mDrawerLayout.postDelayed(runnable, NAVIGATION_DRAWER_DELAY_MILLIS);
     }
 
     @OnClick(R.id.add_data_point_fab)

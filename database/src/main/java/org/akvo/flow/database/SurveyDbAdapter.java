@@ -95,7 +95,9 @@ public class SurveyDbAdapter {
      * close the db
      */
     public void close() {
-        databaseHelper.close();
+        if (databaseHelper != null) {
+            databaseHelper.close();
+        }
     }
 
     public Cursor getSurveyInstancesByStatus(int status) {

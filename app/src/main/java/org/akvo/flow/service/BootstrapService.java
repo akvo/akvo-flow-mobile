@@ -110,7 +110,7 @@ public class BootstrapService extends IntentService {
 
     public void onHandleIntent(Intent intent) {
         isProcessing = true;
-        int installed = checkAndInstall();
+        checkAndInstall();
         isProcessing = false;
     }
 
@@ -121,12 +121,12 @@ public class BootstrapService extends IntentService {
      * multiple zips in the directory) just in case data in a later zip depends
      * on the previous one being there.
      */
-    private int checkAndInstall() {
+    private void checkAndInstall() {
         int installedFiles = 0;
         try {
             List<File> zipFiles = zipFileLister.getSortedZipFiles();
             if (zipFiles.isEmpty()) {
-                return 0;
+                return;
             }
 
             String startMessage = getString(R.string.bootstrapstart);
@@ -157,7 +157,6 @@ public class BootstrapService extends IntentService {
 
             Timber.e(e, "Bootstrap error");
         }
-        return installedFiles;
     }
 
     private void displayErrorNotification(String errorMessage) {

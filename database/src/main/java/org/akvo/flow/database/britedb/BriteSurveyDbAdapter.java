@@ -309,7 +309,8 @@ public class BriteSurveyDbAdapter {
     }
 
     public Observable<Cursor> getSurveys() {
-        String sqlQuery = "SELECT * FROM " + Tables.SURVEY_GROUP;
+        String sqlQuery =
+                "SELECT * FROM " + Tables.SURVEY_GROUP + " ORDER BY " + SurveyGroupColumns.NAME;
         return briteDatabase
                 .createQuery(Tables.SURVEY_GROUP, sqlQuery)
                 .concatMap(new Function<SqlBrite.Query, Observable<? extends Cursor>>() {
@@ -349,8 +350,8 @@ public class BriteSurveyDbAdapter {
         String sqlQuery = "SELECT "
                 + SurveyColumns.SURVEY_ID
                 + " FROM " + Tables.SURVEY
-                + " WHERE " + SurveyColumns.DELETED + " <> 1";
-        Cursor c =  briteDatabase.query(sqlQuery, "");
+                + " WHERE " + SurveyColumns.DELETED + " <> ?";
+        Cursor c =  briteDatabase.query(sqlQuery, "1");
         if (c != null) {
             String[] ids = new String[c.getCount()];
             if (c.moveToFirst()) {

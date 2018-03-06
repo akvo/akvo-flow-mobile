@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -18,23 +18,22 @@
  *
  */
 
-package org.akvo.flow.data.loader;
+package org.akvo.flow.presentation.navigation;
 
-import android.content.Context;
-import android.database.Cursor;
+import android.support.annotation.NonNull;
 
-import org.akvo.flow.data.loader.base.DataLoader;
-import org.akvo.flow.database.SurveyDbAdapter;
+import org.akvo.flow.domain.SurveyGroup;
 
-public class SurveyGroupLoader extends DataLoader<Cursor> {
+import javax.inject.Inject;
 
-    public SurveyGroupLoader(Context context, SurveyDbAdapter db) {
-        super(context, db);
+public class SurveyGroupMapper {
+
+    @Inject
+    public SurveyGroupMapper() {
     }
 
-    @Override
-    protected Cursor loadData(SurveyDbAdapter database) {
-        return database.getSurveyGroups();
+    public SurveyGroup transform(@NonNull ViewSurvey viewSurvey) {
+        return new SurveyGroup(viewSurvey.getId(), viewSurvey.getName(),
+                viewSurvey.getRegistrationSurveyId(), viewSurvey.isMonitored());
     }
-
 }

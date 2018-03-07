@@ -414,13 +414,6 @@ public class DataPointsListFragment extends Fragment implements LocationListener
                 Toast.LENGTH_SHORT).show();
     }
 
-    private void reloadMenu() {
-        FragmentActivity activity = getActivity();
-        if (activity != null) {
-            activity.supportInvalidateOptionsMenu();
-        }
-    }
-
     @Override
     public void showNonMonitoredMenu() {
         menuRes = R.menu.datapoints_list;
@@ -437,6 +430,13 @@ public class DataPointsListFragment extends Fragment implements LocationListener
     public void hideMenu() {
         menuRes = null;
         reloadMenu();
+    }
+
+    private void reloadMenu() {
+        FragmentActivity activity = getActivity();
+        if (activity != null) {
+            activity.supportInvalidateOptionsMenu();
+        }
     }
 
     @Override

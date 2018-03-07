@@ -74,7 +74,7 @@ public class RecyclerItemClickListener implements RecyclerView.OnItemTouchListen
             if (childView != null) {
                 listener.onItemClick(childView, childViewPosition);
             }
-            return true;
+            return false;
         }
 
         @Override
@@ -86,7 +86,7 @@ public class RecyclerItemClickListener implements RecyclerView.OnItemTouchListen
 
         @Override
         public boolean onDown(MotionEvent event) {
-            return true;
+            return false;
         }
     }
 }

@@ -46,7 +46,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
     public UserViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.navigation_item, parent, false);
-        return new UserViewHolder((TextView) view);
+        return new UserViewHolder(view);
     }
 
     @Override
@@ -76,9 +76,9 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
 
         private final TextView userNameTv;
 
-        UserViewHolder(TextView itemView) {
+        UserViewHolder(View itemView) {
             super(itemView);
-            this.userNameTv = itemView;
+            this.userNameTv = (TextView) itemView.findViewById(R.id.item_text_view);
         }
 
         void setUserName(ViewUser viewUser) {

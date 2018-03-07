@@ -186,7 +186,7 @@ public class DataPointsMapFragment extends SupportMapFragment implements OnInfoW
                     cluster();
                 }
             });
-            centerMap();
+            centerMapOnUserLocation();
         }
     }
 
@@ -221,22 +221,17 @@ public class DataPointsMapFragment extends SupportMapFragment implements OnInfoW
         mClusterManager.cluster();
     }
 
-    /**
-     * Center the map in the given record's coordinates. If no record is provided,
-     * the user's location will be used.
-     */
-    private void centerMap() {
+    private void centerMapOnUserLocation() {
         if (mMap == null) {
-            return; // Not ready yet
+            return;
         }
 
         LatLng position = null;
-        // When multiple points are shown, center the map in user's location
-        LocationManager manager = (LocationManager) getActivity()
+        LocationManager manager = (LocationManager) getActivity().getApplicationContext()
                 .getSystemService(Context.LOCATION_SERVICE);
         Criteria criteria = new Criteria();
         criteria.setAccuracy(Criteria.ACCURACY_FINE);
-        String provider = manager.getBestProvider(criteria, true);
+        String provider = manager == null ? null : manager.getBestProvider(criteria, true);
         if (provider != null) {
             Location location = manager.getLastKnownLocation(provider);
             if (location != null) {

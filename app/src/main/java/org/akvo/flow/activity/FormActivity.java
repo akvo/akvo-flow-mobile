@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010-2017,2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2010-2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -97,13 +97,16 @@ public class FormActivity extends BackActivity implements SurveyListener,
         GeoFieldsResetConfirmDialogFragment.GeoFieldsResetConfirmListener {
 
     @Inject
-    SurveyDbDataSource mDatabase;
-
-    @Inject
     FormFileBrowser formFileBrowser;
 
     @Inject
     MediaFileHelper mediaFileHelper;
+
+    @Inject
+    SurveyDbDataSource mDatabase;
+
+    @Inject
+    Prefs prefs;
 
     private final Navigator navigator = new Navigator();
     private final StorageHelper storageHelper = new StorageHelper();
@@ -128,13 +131,14 @@ public class FormActivity extends BackActivity implements SurveyListener,
     private Survey mSurvey;
 
     private SurveyLanguagesDataSource surveyLanguagesDataSource;
-    private Prefs prefs;
 
     private String[] mLanguages;
     private LanguageMapper languageMapper;
 
     private Map<String, QuestionResponse> mQuestionResponses; // QuestionId - QuestionResponse
     private String surveyId;
+
+    private String imagePath;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -153,7 +157,6 @@ public class FormActivity extends BackActivity implements SurveyListener,
         mDatabase.open();
 
         Context context = getApplicationContext();
-        prefs = new Prefs(context);
         languageMapper = new LanguageMapper(context);
         surveyLanguagesDataSource = new SurveyLanguagesDbDataSource(context,
                 new FlowMigrationListener(prefs, new MigrationLanguageMapper(context)));
@@ -546,9 +549,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
 
         switch (requestCode) {
             case ConstantUtil.PHOTO_ACTIVITY_REQUEST:
-                String imageAbsolutePath = mediaFileHelper.getImageFilePath(prefs
-                        .getInt(Prefs.KEY_MAX_IMG_SIZE, Prefs.DEFAULT_VALUE_IMAGE_SIZE));
-                onMediaAcquired(imageAbsolutePath);
+                onMediaAcquired(imagePath);
                 break;
             case ConstantUtil.VIDEO_ACTIVITY_REQUEST:
                 String videoAbsolutePath = mediaFileHelper.getVideoFilePath(intent);
@@ -693,7 +694,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
      */
     public void onQuestionInteraction(QuestionInteractionEvent event) {
         if (QuestionInteractionEvent.TAKE_PHOTO_EVENT.equals(event.getEventType())) {
-            navigateToTakePhoto(event);
+            takePhoto(event);
         } else if (QuestionInteractionEvent.TAKE_VIDEO_EVENT.equals(event.getEventType())) {
             navigateToTakeVideo(event);
         } else if (QuestionInteractionEvent.SCAN_BARCODE_EVENT.equals(event.getEventType())) {
@@ -787,13 +788,14 @@ public class FormActivity extends BackActivity implements SurveyListener,
         return Uri.fromFile(mediaFileHelper.getVideoTmpFile());
     }
 
-    private void navigateToTakePhoto(QuestionInteractionEvent event) {
+    private void takePhoto(QuestionInteractionEvent event) {
         recordSourceId(event);
-        navigator.navigateToTakePhoto(this, getImageFileUri());
-    }
-
-    private Uri getImageFileUri() {
-        return Uri.fromFile(mediaFileHelper.getImageTmpFile());
+        File imageTmpFile = mediaFileHelper.getImageTmpFile();
+        if (imageTmpFile != null) {
+            imagePath = imageTmpFile.getAbsolutePath();
+            navigator.navigateToTakePhoto(this, Uri.fromFile(imageTmpFile));
+        }
+        //TODO: notify error taking pictures
     }
 
     /*

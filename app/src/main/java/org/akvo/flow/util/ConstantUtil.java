@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010-2017,2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2010-2018 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -133,10 +133,12 @@ public class ConstantUtil {
     public static final String SURVEY_GROUP_EXTRA = "survey_group";
     public static final String SURVEYED_LOCALE_ID_EXTRA = "surveyed_locale_id";
     public static final String RECORD_ID_EXTRA = "record_id";
+    public static final String SURVEY_GROUP_ID_EXTRA = "survey_group_id";
     public static final String IMAGE_URL_EXTRA = "image_url";
     public static final String FORM_TITLE_EXTRA = "title";
     public static final String FORM_SUBTITLE_EXTRA = "subtitle";
     public static final String QUESTION_ID_EXTRA = "question_id";
+    public static final String VIEW_USER_EXTRA = "view_user";
 
     /**
      * settings keys
@@ -232,7 +234,6 @@ public class ConstantUtil {
 
     //broadcasts
     public static final String ACTION_DATA_SYNC = "fieldsurvey.ACTION_DATA_SYNC";
-    public static final String ACTION_SURVEY_SYNC = "fieldsurvey.ACTION_SURVEYS_SYNC";
 
     //apk update
     public static final int REPEAT_INTERVAL_IN_SECONDS = 1 * 60 * 60 * 24; //every 24Hrs

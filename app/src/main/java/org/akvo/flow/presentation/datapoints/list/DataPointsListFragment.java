@@ -79,7 +79,17 @@ import timber.log.Timber;
 public class DataPointsListFragment extends Fragment implements LocationListener,
         OnItemClickListener, OrderByDialogListener, DataPointsListView {
 
+    @Inject
+    DataPointSyncSnackBarManager dataPointSyncSnackBarManager;
+
+    @Inject
+    Navigator navigator;
+
+    @Inject
+    DataPointsListPresenter presenter;
+
     private LocationManager mLocationManager;
+    private WeakLocationListener weakLocationListener;
     private Double mLatitude = null;
     private Double mLongitude = null;
 
@@ -90,25 +100,14 @@ public class DataPointsListFragment extends Fragment implements LocationListener
     private TextView emptySubTitleTv;
     private ImageView emptyIv;
     private ProgressBar progressBar;
-    private WeakLocationListener weakLocationListener;
+    private SearchView searchView;
+    private Integer menuRes = null;
 
     /**
      * BroadcastReceiver to notify of data synchronisation. This should be
      * fired from {@link org.akvo.flow.service.DataSyncService}
      */
     private final BroadcastReceiver dataSyncReceiver = new DataSyncBroadcastReceiver(this);
-
-    @Inject
-    DataPointSyncSnackBarManager dataPointSyncSnackBarManager;
-
-    @Inject
-    Navigator navigator;
-
-    @Inject
-    DataPointsListPresenter presenter;
-
-    private boolean displayMonitoredMenu;
-    private SearchView searchView;
 
     public static DataPointsListFragment newInstance(SurveyGroup surveyGroup) {
         DataPointsListFragment fragment = new DataPointsListFragment();
@@ -305,13 +304,10 @@ public class DataPointsListFragment extends Fragment implements LocationListener
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        if (displayMonitoredMenu) {
-            inflater.inflate(R.menu.datapoints_list_monitored, menu);
-        } else {
-            inflater.inflate(R.menu.datapoints_list, menu);
+        if (menuRes != null) {
+            inflater.inflate(menuRes, menu);
+            setUpSearchView(menu);
         }
-
-        setUpSearchView(menu);
         super.onCreateOptionsMenu(menu, inflater);
     }
 
@@ -419,8 +415,24 @@ public class DataPointsListFragment extends Fragment implements LocationListener
     }
 
     @Override
-    public void displayMenu(boolean monitored) {
-        displayMonitoredMenu = monitored;
+    public void showNonMonitoredMenu() {
+        menuRes = R.menu.datapoints_list;
+        reloadMenu();
+    }
+
+    @Override
+    public void showMonitoredMenu() {
+        menuRes = R.menu.datapoints_list_monitored;
+        reloadMenu();
+    }
+
+    @Override
+    public void hideMenu() {
+        menuRes = null;
+        reloadMenu();
+    }
+
+    private void reloadMenu() {
         FragmentActivity activity = getActivity();
         if (activity != null) {
             activity.supportInvalidateOptionsMenu();
@@ -485,7 +497,7 @@ public class DataPointsListFragment extends Fragment implements LocationListener
         dataPointSyncSnackBarManager.showNoDataPointsToSync(getView());
     }
 
-    //TODO: once we insert data using brite database this will no longer be necessary either
+//TODO: once we insert data using brite database this will no longer be necessary either
     public static class DataSyncBroadcastReceiver extends BroadcastReceiver {
 
         private final WeakReference<DataPointsListFragment> fragmentWeakRef;

@@ -77,8 +77,15 @@ public class DataPointsListPresenter implements Presenter {
 
     void onDataReady(SurveyGroup surveyGroup) {
         this.surveyGroup = surveyGroup;
-        boolean monitored = surveyGroup != null && surveyGroup.isMonitored();
-        view.displayMenu(monitored);
+        if (surveyGroup == null) {
+            view.hideMenu();
+        } else {
+            if (surveyGroup.isMonitored()) {
+                view.showMonitoredMenu();
+            } else {
+                view.showNonMonitoredMenu();
+            }
+        }
     }
 
     void loadDataPoints() {

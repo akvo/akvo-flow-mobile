@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2016-2017 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2016-2018 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -40,6 +40,7 @@ import org.akvo.flow.activity.FormActivity;
 import org.akvo.flow.activity.GeoshapeActivity;
 import org.akvo.flow.activity.MapActivity;
 import org.akvo.flow.activity.RecordActivity;
+import org.akvo.flow.activity.SurveyActivity;
 import org.akvo.flow.activity.TransmissionHistoryActivity;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.apkupdate.ViewApkData;
@@ -57,7 +58,7 @@ import java.io.File;
 
 import javax.inject.Inject;
 
-import static org.akvo.flow.util.ConstantUtil.REQUEST_ADD_USER;
+import timber.log.Timber;
 
 public class Navigator {
 
@@ -81,9 +82,8 @@ public class Navigator {
         context.startActivity(i);
     }
 
-    public void navigateToAddUser(Activity activity) {
-        activity.startActivityForResult(new Intent(activity, AddUserActivity.class),
-                REQUEST_ADD_USER);
+    public void navigateToAddUser(Context context) {
+        context.startActivity(new Intent(context, AddUserActivity.class));
     }
 
     public void navigateToRecordActivity(Context context, String surveyedLocaleId,
@@ -111,8 +111,13 @@ public class Navigator {
 
     public void navigateToTakePhoto(@NonNull Activity activity, Uri uri) {
         Intent i = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
-        i.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, uri);
-        activity.startActivityForResult(i, ConstantUtil.PHOTO_ACTIVITY_REQUEST);
+        if (i.resolveActivity(activity.getPackageManager()) != null) {
+            i.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, uri);
+            activity.startActivityForResult(i, ConstantUtil.PHOTO_ACTIVITY_REQUEST);
+        } else {
+            Timber.e(new Exception("No app found to take pictures"));
+            //TODO: notify user
+        }
     }
 
     public void navigateToTakeVideo(@NonNull Activity activity, Uri uri) {
@@ -304,6 +309,11 @@ public class Navigator {
     public void navigateToVideoView(Context context, String filename) {
         Intent intent = new Intent(Intent.ACTION_VIEW);
         intent.setDataAndType(Uri.fromFile(new File(filename)), "video/mp4");
+        context.startActivity(intent);
+    }
+
+    public void navigateToSurveyActivity(Context context) {
+        Intent intent = new Intent(context, SurveyActivity.class);
         context.startActivity(intent);
     }
 

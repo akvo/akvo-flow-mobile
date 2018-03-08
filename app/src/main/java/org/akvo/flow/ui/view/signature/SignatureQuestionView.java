@@ -24,7 +24,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
@@ -33,13 +32,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import org.akvo.flow.R;
-import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionResponse;
 import org.akvo.flow.domain.response.value.Signature;
 import org.akvo.flow.event.QuestionInteractionEvent;
 import org.akvo.flow.event.SurveyListener;
-import org.akvo.flow.injector.component.ApplicationComponent;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
 import org.akvo.flow.serialization.response.value.SignatureValue;
@@ -56,6 +53,8 @@ import org.akvo.flow.util.image.PicassoImageTarget;
 import java.io.File;
 
 import javax.inject.Inject;
+
+import timber.log.Timber;
 
 import static org.akvo.flow.util.files.SignatureFileBrowser.RESIZED_SUFFIX;
 
@@ -125,10 +124,6 @@ public class SignatureQuestionView extends QuestionView {
         viewComponent.inject(this);
     }
 
-    private ApplicationComponent getApplicationComponent() {
-        return ((FlowApp) getContext().getApplicationContext()).getApplicationComponent();
-    }
-
     @Override
     public void questionComplete(Bundle data) {
         if (data != null) {
@@ -161,13 +156,18 @@ public class SignatureQuestionView extends QuestionView {
             setUpName(name);
             imageLoader.loadFromBase64String(base64ImageString, mImage, new ImageLoaderListener() {
                 @Override
-                public void onImageReady(@Nullable Bitmap bitmap) {
+                public void onImageReady() {
                     mImage.setVisibility(VISIBLE);
                     updateSignButton();
                 }
+
+                @Override
+                public void onImageError() {
+                    Timber.e("Error loading base64 string as image");
+                }
             });
         } else {
-            displayResponse(name, null);
+            resetResponse(name);
         }
 
     }
@@ -176,7 +176,7 @@ public class SignatureQuestionView extends QuestionView {
     public void resetQuestion(boolean fireEvent) {
         super.resetQuestion(fireEvent);
         mSignature = new Signature();
-        displayResponse("", null);
+        resetResponse("");
     }
 
     @Override
@@ -190,9 +190,9 @@ public class SignatureQuestionView extends QuestionView {
         setResponse(questionResponse);
     }
 
-    private void displayResponse(String name, Bitmap imageBitmap) {
+    private void resetResponse(String name) {
         setUpName(name);
-        setUpImage(imageBitmap);
+        setUpImage(null);
         updateSignButton();
     }
 

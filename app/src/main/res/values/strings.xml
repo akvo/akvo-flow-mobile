@@ -98,13 +98,14 @@
     <!--Search-->
     <string name="search_hint">Search Data Point</string>
     <!--Project List (Survey Group) Activity-->
-    <string name="delete_project_text">This will permanently delete this Survey. Click OK to proceed or cancel to abort.</string>
+    <string name="delete_survey_dialog_message">Delete %1$s?</string>
     <!--Survey Activity-->
     <string name="error_responses">Some responses contain errors. You must review the following questions before you can submit:</string>
     <string name="error_question_mandatory">This response is required</string>
     <string name="repeat_answer">Please, repeat answer</string>
     <string name="error_answer_match">Answers do not match</string>
     <string name="error_img_preview">Can\'t load image preview</string>
+    <string name="error_video_preview">Can\'t load video preview</string>
     <string name="use_external_source">Use External Source</string>
     <string name="caddisfly_test">Go to test</string>
     <string name="error_empty_form">Empty forms cannot be submitted. Please, add the corresponding responses first.</string>
@@ -189,16 +190,17 @@
     <string name="select_user">Select User</string>
     <string name="add_user">Add User</string>
     <string name="new_user">+ User</string>
-    <string name="edit_user">Edit user</string>
+    <string name="edit_user">Edit username</string>
     <string name="delete_user">Delete user</string>
     <string name="empty_user_warning">Username cannot be empty</string>
-    <string name="delete_user_confirmation">Are you sure you want to delete this user?</string>
+    <string name="delete_user_confirmation">Delete user?</string>
     <string name="username">Username</string>
     <string name="mustselectuser">Please select a user before continuing</string>
     <string name="surveys">Surveys</string>
     <string name="logged_in_as">Logged in as</string>
     <!--Misc-->
     <string name="okbutton">OK</string>
+    <string name="delete_button">Delete</string>
     <string name="cancelbutton">Cancel</string>
     <string name="savebutton">Save</string>
     <string name="clearbutton">Clear</string>
@@ -267,7 +269,15 @@
         <item quantity="one">%1$d data point synced</item>
         <item quantity="other">%1$d data points synced</item>
     </plurals>
-
+    <string name="surveys_error">Error loading surveys</string>
+    <string name="users_error">Error loading users</string>
+    <string name="survey_delete_error">Error deleting survey</string>
+    <string name="survey_select_error">Error selecting survey</string>
+    <string name="user_edit_error">Error editing user</string>
+    <string name="user_delete_error">Error deleting user</string>
+    <string name="user_select_error">Error selecting user</string>
+    <string name="add_user_message">The new user will automatically be selected</string>
+    <string name="survey">survey</string>
 
     <string name="no_gps_status_message">GPS Status is not installed on this device. Would you like to install it?</string>
     <string name="data_points_sync_no_data_points">No datapoints to sync</string>

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -18,23 +18,13 @@
  *
  */
 
-package org.akvo.flow.data.loader;
+package org.akvo.flow.ui.view.media;
 
-import android.content.Context;
-import android.database.Cursor;
+public interface IPhotoQuestionView {
 
-import org.akvo.flow.data.loader.base.DataLoader;
-import org.akvo.flow.database.SurveyDbAdapter;
+    void showLoading();
 
-public class SurveyGroupLoader extends DataLoader<Cursor> {
+    void displayImage(String mediaFilePath);
 
-    public SurveyGroupLoader(Context context, SurveyDbAdapter db) {
-        super(context, db);
-    }
-
-    @Override
-    protected Cursor loadData(SurveyDbAdapter database) {
-        return database.getSurveyGroups();
-    }
-
+    void showErrorGettingMedia();
 }

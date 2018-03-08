@@ -27,9 +27,13 @@ import org.akvo.flow.data.entity.ApiDataPoint;
 import org.akvo.flow.data.entity.ApiLocaleResult;
 import org.akvo.flow.data.entity.ApiSurveyInstance;
 import org.akvo.flow.data.entity.DataPointMapper;
+import org.akvo.flow.data.entity.SurveyMapper;
 import org.akvo.flow.data.entity.SyncedTimeMapper;
+import org.akvo.flow.data.entity.UserMapper;
 import org.akvo.flow.data.net.FlowRestApi;
 import org.akvo.flow.domain.entity.DataPoint;
+import org.akvo.flow.domain.entity.Survey;
+import org.akvo.flow.domain.entity.User;
 import org.akvo.flow.domain.exception.AssignmentRequiredException;
 import org.akvo.flow.domain.repository.SurveyRepository;
 import org.reactivestreams.Publisher;
@@ -59,15 +63,30 @@ public class SurveyDataRepository implements SurveyRepository {
     private final DataPointMapper dataPointMapper;
     private final SyncedTimeMapper syncedTimeMapper;
     private final FlowRestApi restApi;
+    private final SurveyMapper surveyMapper;
+    private final UserMapper userMapper;
 
     @Inject
     public SurveyDataRepository(DataSourceFactory dataSourceFactory,
-            DataPointMapper dataPointMapper, SyncedTimeMapper syncedTimeMapper,
-            FlowRestApi restApi) {
+            DataPointMapper dataPointMapper, SyncedTimeMapper syncedTimeMapper, FlowRestApi restApi,
+            SurveyMapper surveyMapper, UserMapper userMapper) {
         this.dataSourceFactory = dataSourceFactory;
         this.dataPointMapper = dataPointMapper;
         this.syncedTimeMapper = syncedTimeMapper;
         this.restApi = restApi;
+        this.surveyMapper = surveyMapper;
+        this.userMapper = userMapper;
+    }
+
+    @Override
+    public Observable<List<Survey>> getSurveys() {
+        return dataSourceFactory.getDataBaseDataSource().getSurveys()
+                .map(new Function<Cursor, List<Survey>>() {
+                    @Override
+                    public List<Survey> apply(Cursor cursor) {
+                        return surveyMapper.getSurveys(cursor);
+                    }
+                });
     }
 
     @Override
@@ -229,5 +248,36 @@ public class SurveyDataRepository implements SurveyRepository {
         List<ApiDataPoint> getLastBatch() {
             return lastBatch;
         }
+    }
+
+    @Override
+    public Observable<Boolean> deleteSurvey(long surveyToDeleteId) {
+        return dataSourceFactory.getDataBaseDataSource().deleteSurvey(surveyToDeleteId);
+    }
+
+    @Override
+    public Observable<List<User>> getUsers() {
+        return dataSourceFactory.getDataBaseDataSource().getUsers()
+                .map(new Function<Cursor, List<User>>() {
+                    @Override
+                    public List<User> apply(Cursor cursor) {
+                        return userMapper.getUsers(cursor);
+                    }
+                });
+    }
+
+    @Override
+    public Observable<Boolean> editUser(User user) {
+        return dataSourceFactory.getDataBaseDataSource().editUser(user);
+    }
+
+    @Override
+    public Observable<Boolean> deleteUser(User user) {
+        return dataSourceFactory.getDataBaseDataSource().deleteUser(user);
+    }
+
+    @Override
+    public Observable<Long> createUser(String userName) {
+        return dataSourceFactory.getDataBaseDataSource().createUser(userName);
     }
 }

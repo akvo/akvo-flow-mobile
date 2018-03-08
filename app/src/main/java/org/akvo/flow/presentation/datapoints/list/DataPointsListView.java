@@ -42,8 +42,6 @@ interface DataPointsListView {
 
     void displayData(List<ListDataPoint> mapDataPoints);
 
-    void displayMenu(boolean monitored);
-
     void showErrorMissingLocation();
 
     void showNoSurveySelected();
@@ -55,4 +53,10 @@ interface DataPointsListView {
     void displayNoSearchResultsFound();
 
     void showNoDataPointsToSync();
+
+    void hideMenu();
+
+    void showNonMonitoredMenu();
+
+    void showMonitoredMenu();
 }

@@ -1,5 +1,32 @@
 Akvo FLOW app release notes
 ===========================
+# ver 2.4.6
+Date: 08 March 2018
+
+# New and noteworthy
+* **Split MediaQuestionView into Video and Image** - [#1000](https://github.com/akvo/akvo-flow-mobile/issues/1000) Separated video and photo question types in 2 different views.
+* **Remove SurveySyncBroadcastReceiver** - [#898](https://github.com/akvo/akvo-flow-mobile/issues/898) After the navigation drawer refactor, this class could be removed.
+* **Create user dialog layout** - [#817](https://github.com/akvo/akvo-flow-mobile/issues/817) New layout for creating users.
+* **Create user behaviour** - [#816](https://github.com/akvo/akvo-flow-mobile/issues/816) Improved the logic behind user creation.
+* **Edit user dialog layout** - [#815](https://github.com/akvo/akvo-flow-mobile/issues/815) New layout for editing users.
+* **Rules around deleting a user** - [#814](https://github.com/akvo/akvo-flow-mobile/issues/814) Improved logic for deleting users.
+* **Navigation drawer layout - add divider** - [#809](https://github.com/akvo/akvo-flow-mobile/issues/809) Added divider between the 2 navigation drawer sections.
+* **Navigation drawer refactor** - [#808](https://github.com/akvo/akvo-flow-mobile/issues/808) The navigation drawer logic and layout has been refactored for a cleaner logic and an improved layout.
+* **Improve survey deletion dialog** - [#705](https://github.com/akvo/akvo-flow-mobile/issues/705) Improved logic and layout of survey deletion dialog.
+* **New users layout** - [#670](https://github.com/akvo/akvo-flow-mobile/issues/670) The user header of the navigation drawer layout has been improved.
+
+# Resolved issues
+* **Selecting surveys and users is hard** - [#1031](https://github.com/akvo/akvo-flow-mobile/issues/1031) Increased the clickable area of the survey and user items for easier clicking.
+* **MapFragment centerMap method needs improvement** - [#1028](https://github.com/akvo/akvo-flow-mobile/issues/1028) Refactored a method in map fragment.
+* **When first logging in the menu is not displayed correctly** - [#1027](https://github.com/akvo/akvo-flow-mobile/issues/1027) Fixed the menu not being displayed correctly after the first login.
+* **When Caddislfy result is empty or a String the app crashes with JsonSyntaxException** - [#1024](https://github.com/akvo/akvo-flow-mobile/issues/1024) Fixed a crash related to an unexpected caddisfly answer.
+* **Unable to start gcm Task due to null intent** - [#1021](https://github.com/akvo/akvo-flow-mobile/issues/1021) Fixed crash related to Gcm Tasks.
+* **Improve image resizing to mitigate OOM** - [#1005](https://github.com/akvo/akvo-flow-mobile/issues/1005) Improved the image resizing logic after a picture is taken.
+* **Sync data receiver is not secure** - [#996](https://github.com/akvo/akvo-flow-mobile/issues/996) Secured data sync receiver.
+* **Full photo not shown in full screen** - [#989](https://github.com/akvo/akvo-flow-mobile/issues/989) Fixed the full size photo display.
+* **After deleting everything and logging back in, the old survey is still selected** - [#912](https://github.com/akvo/akvo-flow-mobile/issues/912) After deleting everything, the views are now reset.
+
+---------------
 # ver 2.4.5
 Date: 15 February 2018
 

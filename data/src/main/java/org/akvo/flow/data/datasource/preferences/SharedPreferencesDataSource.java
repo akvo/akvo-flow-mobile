@@ -30,16 +30,19 @@ import io.reactivex.Observable;
 @Singleton
 public class SharedPreferencesDataSource {
 
-    public static final String KEY_CELL_UPLOAD = "data.cellular.upload";
-    public static final String KEY_LOCALE = "pref.locale";
-    public static final String KEY_SCREEN_ON = "screen.keepon";
-    public static final String KEY_DEVICE_IDENTIFIER = "device.identifier";
-    public static final String KEY_MAX_IMG_SIZE = "media.img.maxsize";
+    private static final String KEY_LOCALE = "pref.locale";
+    private static final String KEY_SCREEN_ON = "screen.keepon";
+    private static final String KEY_DEVICE_IDENTIFIER = "device.identifier";
+    private static final String KEY_MAX_IMG_SIZE = "media.img.maxsize";
 
+    private static final String DEFAULT_VALUE_DEVICE_IDENTIFIER = "unset";
+    private static final int DEFAULT_VALUE_IMAGE_SIZE = 0;
+    private static final boolean DEFAULT_VALUE_SCREEN_ON = true;
+    private static final String KEY_CELL_UPLOAD = "data.cellular.upload";
+    private static final String KEY_SURVEY_GROUP_ID = "surveyGroupId";
+    private static final String KEY_USER_ID = "userId";
     private static final boolean DEFAULT_VALUE_CELL_UPLOAD = false;
-    public static final String DEFAULT_VALUE_DEVICE_IDENTIFIER = "unset";
-    public static final int DEFAULT_VALUE_IMAGE_SIZE = 0;
-    public static final boolean DEFAULT_VALUE_SCREEN_ON = true;
+    private static final long INVALID_ID = -1;
 
     private final SharedPreferences preferences;
 
@@ -68,16 +71,33 @@ public class SharedPreferencesDataSource {
         return Observable.just(getString(KEY_DEVICE_IDENTIFIER, DEFAULT_VALUE_DEVICE_IDENTIFIER));
     }
 
-    private int getInt(String key, int defaultValue) {
-        return preferences.getInt(key, defaultValue);
+    public Observable<Long> getSelectedSurvey() {
+        return Observable.just(getLong(KEY_SURVEY_GROUP_ID, INVALID_ID));
+    }
+
+    public Observable<Boolean> setSelectedSurvey(long surveyId) {
+        setLong(KEY_SURVEY_GROUP_ID, surveyId);
+        return Observable.just(true);
+    }
+
+    public Observable<Boolean> clearSelectedSurvey() {
+        return setSelectedSurvey(INVALID_ID);
     }
 
     private boolean getBoolean(String key, boolean defValue) {
         return preferences.getBoolean(key, defValue);
     }
 
-    public void removePreference(String key) {
-        preferences.edit().remove(key).apply();
+    private long getLong(String key, long defValue) {
+        return preferences.getLong(key, defValue);
+    }
+
+    private void setLong(String key, long value) {
+        preferences.edit().putLong(key, value).apply();
+    }
+
+    private int getInt(String key, int defValue) {
+        return preferences.getInt(key, defValue);
     }
 
     private String getString(String key, String defaultValue) {
@@ -113,6 +133,19 @@ public class SharedPreferencesDataSource {
 
     public Observable<Boolean> saveImageSize(Integer size) {
         setInt(KEY_MAX_IMG_SIZE, size);
+        return Observable.just(true);
+    }
+
+    public Observable<Long> getSelectedUser() {
+        return Observable.just(getLong(KEY_USER_ID, INVALID_ID));
+    }
+
+    public Observable<Boolean> clearSelectedUser() {
+        return setSelectedUser(INVALID_ID);
+    }
+
+    public Observable<Boolean> setSelectedUser(long userId) {
+        setLong(KEY_USER_ID, userId);
         return Observable.just(true);
     }
 }

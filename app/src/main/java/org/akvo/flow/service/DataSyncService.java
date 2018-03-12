@@ -119,14 +119,19 @@ public class DataSyncService extends IntentService {
     private static final int FILE_UPLOAD_RETRIES = 2;
 
     @Inject
+    SurveyDbDataSource mDatabase;
+
+    @Inject
+    Prefs preferences;
+
+    @Inject
+    ConnectivityStateManager connectivityStateManager;
+
+    @Inject
     ZipFileBrowser zipFileBrowser;
 
     @Inject
     MediaFileHelper mediaFileHelper;
-
-    private SurveyDbDataSource mDatabase;
-    private Prefs preferences;
-    private ConnectivityStateManager connectivityStateManager;
 
     public DataSyncService() {
         super(TAG);
@@ -142,10 +147,7 @@ public class DataSyncService extends IntentService {
     @Override
     protected void onHandleIntent(Intent intent) {
         try {
-            mDatabase = new SurveyDbDataSource(this, null);
             mDatabase.open();
-            preferences = new Prefs(getApplicationContext());
-            connectivityStateManager = new ConnectivityStateManager(getApplicationContext());
             exportSurveys();// Create zip files, if necessary
 
             if (connectivityStateManager.isConnectionAvailable(preferences

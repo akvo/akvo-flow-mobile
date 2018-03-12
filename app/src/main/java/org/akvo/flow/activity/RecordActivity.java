@@ -55,8 +55,10 @@ public class RecordActivity extends BackActivity implements FormListFragment.Sur
 
     private User mUser;
     private SurveyGroup mSurveyGroup;
-    private SurveyDbDataSource mDatabase;
     private String recordId;
+
+    @Inject
+    SurveyDbDataSource mDatabase;
 
     @Inject
     Navigator navigator;
@@ -70,7 +72,6 @@ public class RecordActivity extends BackActivity implements FormListFragment.Sur
         RecordTabsAdapter recordTabsAdapter = new RecordTabsAdapter(getSupportFragmentManager(),
                 getResources().getStringArray(R.array.record_tabs));
         viewPager.setAdapter(recordTabsAdapter);
-        mDatabase = new SurveyDbDataSource(this, null);
 
         mSurveyGroup = (SurveyGroup) getIntent().getSerializableExtra(
                 ConstantUtil.SURVEY_GROUP_EXTRA);

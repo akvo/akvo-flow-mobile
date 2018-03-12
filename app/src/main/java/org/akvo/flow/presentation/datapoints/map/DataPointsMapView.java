@@ -32,8 +32,6 @@ interface DataPointsMapView {
 
     void displayData(List<MapDataPoint> surveyedLocales);
 
-    void displayMenu(boolean monitored);
-
     void showSyncedResults(int numberOfSyncedItems);
 
     void showErrorAssignmentMissing();
@@ -45,4 +43,10 @@ interface DataPointsMapView {
     void showErrorSync();
 
     void showNoDataPointsToSync();
+
+    void hideMenu();
+
+    void showMonitoredMenu();
+
+    void showNonMonitoredMenu();
 }

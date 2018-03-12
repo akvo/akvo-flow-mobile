@@ -97,13 +97,16 @@ public class FormActivity extends BackActivity implements SurveyListener,
         GeoFieldsResetConfirmDialogFragment.GeoFieldsResetConfirmListener {
 
     @Inject
-    SurveyDbDataSource mDatabase;
-
-    @Inject
     FormFileBrowser formFileBrowser;
 
     @Inject
     MediaFileHelper mediaFileHelper;
+
+    @Inject
+    SurveyDbDataSource mDatabase;
+
+    @Inject
+    Prefs prefs;
 
     private final Navigator navigator = new Navigator();
     private final StorageHelper storageHelper = new StorageHelper();
@@ -128,7 +131,6 @@ public class FormActivity extends BackActivity implements SurveyListener,
     private Survey mSurvey;
 
     private SurveyLanguagesDataSource surveyLanguagesDataSource;
-    private Prefs prefs;
 
     private String[] mLanguages;
     private LanguageMapper languageMapper;
@@ -155,7 +157,6 @@ public class FormActivity extends BackActivity implements SurveyListener,
         mDatabase.open();
 
         Context context = getApplicationContext();
-        prefs = new Prefs(context);
         languageMapper = new LanguageMapper(context);
         surveyLanguagesDataSource = new SurveyLanguagesDbDataSource(context,
                 new FlowMigrationListener(prefs, new MigrationLanguageMapper(context)));

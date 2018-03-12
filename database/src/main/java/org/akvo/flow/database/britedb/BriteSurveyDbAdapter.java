@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -29,17 +29,22 @@ import com.squareup.sqlbrite2.SqlBrite;
 
 import org.akvo.flow.database.RecordColumns;
 import org.akvo.flow.database.ResponseColumns;
+import org.akvo.flow.database.SurveyColumns;
+import org.akvo.flow.database.SurveyGroupColumns;
 import org.akvo.flow.database.SurveyInstanceColumns;
 import org.akvo.flow.database.SyncTimeColumns;
 import org.akvo.flow.database.Tables;
 import org.akvo.flow.database.TransmissionColumns;
 import org.akvo.flow.database.TransmissionStatus;
+import org.akvo.flow.database.UserColumns;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import io.reactivex.Observable;
+import io.reactivex.ObservableSource;
 import io.reactivex.functions.Function;
+import timber.log.Timber;
 
 import static org.akvo.flow.database.Constants.ORDER_BY_DATE;
 import static org.akvo.flow.database.Constants.ORDER_BY_DISTANCE;
@@ -122,6 +127,7 @@ public class BriteSurveyDbAdapter {
 
     /**
      * correct the distance for the shortening at higher latitudes
+     *
      * @param latitude
      * @return
      */
@@ -221,10 +227,8 @@ public class BriteSurveyDbAdapter {
                 iteration = 0;
             }
             values.put(ResponseColumns.ITERATION, iteration + 1);
-            briteDatabase.insert(Tables.RESPONSE, values);
-        } else {
-            briteDatabase.insert(Tables.RESPONSE, values);
         }
+        briteDatabase.insert(Tables.RESPONSE, values);
         if (cursor != null) {
             cursor.close();
         }
@@ -242,7 +246,7 @@ public class BriteSurveyDbAdapter {
     public void deleteResponses(long surveyInstanceId, String questionId) {
         briteDatabase.delete(Tables.RESPONSE,
                 ResponseColumns.SURVEY_INSTANCE_ID + " = ? AND " + ResponseColumns.QUESTION_ID
-                        + " = ?", new String[] { surveyInstanceId + "", questionId });
+                        + " = ?", surveyInstanceId + "", questionId);
     }
 
     private Cursor getLastExistingResponse(long surveyInstanceId, @Nullable String questionId) {
@@ -260,9 +264,7 @@ public class BriteSurveyDbAdapter {
                         + ResponseColumns.QUESTION_ID + " = ? ORDER BY "
                         + ResponseColumns.ITERATION
                         + " DESC LIMIT 1";
-        Cursor cursor = briteDatabase
-                .query(sql, String.valueOf(surveyInstanceId), questionId);
-        return cursor;
+        return briteDatabase.query(sql, String.valueOf(surveyInstanceId), questionId);
     }
 
     public void createTransmission(long surveyInstanceId, String formID, String filename,
@@ -288,5 +290,204 @@ public class BriteSurveyDbAdapter {
                 + " WHERE " + RecordColumns.RECORD_ID + " NOT IN "
                 + "(SELECT DISTINCT " + SurveyInstanceColumns.RECORD_ID
                 + " FROM " + Tables.SURVEY_INSTANCE + ")");
+    }
+
+    public Observable<Boolean> deleteSurveyAndGroup(long surveyGroupId) {
+        deleteSurveyGroup(surveyGroupId);
+        deleteSurvey(surveyGroupId);
+        return Observable.just(true);
+    }
+
+    private void deleteSurvey(long surveyGroupId) {
+        briteDatabase.delete(Tables.SURVEY, SurveyColumns.SURVEY_GROUP_ID + " = ? ",
+                String.valueOf(surveyGroupId));
+    }
+
+    private void deleteSurveyGroup(long surveyGroupId) {
+        briteDatabase.delete(Tables.SURVEY_GROUP, SurveyGroupColumns.SURVEY_GROUP_ID + " = ? ",
+                String.valueOf(surveyGroupId));
+    }
+
+    public Observable<Cursor> getSurveys() {
+        String sqlQuery =
+                "SELECT * FROM " + Tables.SURVEY_GROUP + " ORDER BY " + SurveyGroupColumns.NAME;
+        return briteDatabase
+                .createQuery(Tables.SURVEY_GROUP, sqlQuery)
+                .concatMap(new Function<SqlBrite.Query, Observable<? extends Cursor>>() {
+                    @Override
+                    public Observable<? extends Cursor> apply(SqlBrite.Query query) {
+                        return Observable.just(query.run());
+                    }
+                });
+    }
+
+    public Cursor getSurveys(long surveyGroupId) {
+        String sqlQuery = "SELECT "
+                + SurveyColumns._ID + ", "
+                + SurveyColumns.SURVEY_ID + ", "
+                + SurveyColumns.NAME + ", "
+                + SurveyColumns.FILENAME + ", "
+                + SurveyColumns.TYPE + ", "
+                + SurveyColumns.LANGUAGE + ", "
+                + SurveyColumns.HELP_DOWNLOADED + ", "
+                + SurveyColumns.VERSION + ", "
+                + SurveyColumns.LOCATION
+                + " FROM " + Tables.SURVEY;
+        String whereClause = SurveyColumns.DELETED + " <> 1";
+        String[] whereParams = new String[0];
+        if (surveyGroupId > 0) {
+            whereClause += " AND " + SurveyColumns.SURVEY_GROUP_ID + " = ?";
+            whereParams = new String[] {
+                    String.valueOf(surveyGroupId)
+            };
+        }
+        sqlQuery += " WHERE " + whereClause;
+        return briteDatabase.query(sqlQuery, whereParams);
+    }
+
+    @Nullable
+    public String[] getSurveyIds() {
+        String sqlQuery = "SELECT "
+                + SurveyColumns.SURVEY_ID
+                + " FROM " + Tables.SURVEY
+                + " WHERE " + SurveyColumns.DELETED + " <> ?";
+        Cursor c =  briteDatabase.query(sqlQuery, "1");
+        if (c != null) {
+            String[] ids = new String[c.getCount()];
+            if (c.moveToFirst()) {
+                do {
+                    ids[c.getPosition()] = c
+                            .getString(c.getColumnIndexOrThrow(SurveyColumns.SURVEY_ID));
+                } while (c.moveToNext());
+            }
+            c.close();
+            return ids;
+        }
+        return null;
+    }
+
+    public void addSurveyGroup(ContentValues values) {
+        briteDatabase.insert(Tables.SURVEY_GROUP, values);
+    }
+
+    public Observable<Cursor> getUsers() {
+        String sqlQuery =
+                "SELECT * FROM " + Tables.USER + " WHERE " + UserColumns.DELETED + " <> 1";
+        return briteDatabase
+                .createQuery(Tables.USER, sqlQuery)
+                .concatMap(new Function<SqlBrite.Query, ObservableSource<? extends Cursor>>() {
+                    @Override
+                    public Observable<? extends Cursor> apply(SqlBrite.Query query) {
+                        return Observable.just(query.run());
+                    }
+                });
+    }
+
+    public void updateUser(long id, String name) {
+        ContentValues values = new ContentValues();
+        values.put(UserColumns.NAME, name);
+        briteDatabase.update(Tables.USER, values, UserColumns._ID + "=?", String.valueOf(id));
+    }
+
+    public void deleteUser(long userId) {
+        ContentValues updatedValues = new ContentValues();
+        updatedValues.put(UserColumns.DELETED, 1);
+        briteDatabase.update(Tables.USER, updatedValues, UserColumns._ID + " = ?",
+                String.valueOf(userId));
+    }
+
+    public long createUser(String userName) {
+        ContentValues values = new ContentValues();
+        values.put(UserColumns.NAME, userName);
+        return briteDatabase.insert(Tables.USER, values);
+    }
+
+    /**
+     * reinserts the test survey into the database. For debugging purposes only.
+     * The survey xml must exist in the APK
+     */
+    public void reinstallTestSurvey() {
+        ContentValues values = new ContentValues();
+        values.put(SurveyColumns.SURVEY_ID, "999991");
+        values.put(SurveyColumns.NAME, "Sample Survey");
+        values.put(SurveyColumns.VERSION, 1.0);
+        values.put(SurveyColumns.TYPE, "Survey");
+        values.put(SurveyColumns.LOCATION, "res");
+        values.put(SurveyColumns.FILENAME, "999991.xml");
+        values.put(SurveyColumns.LANGUAGE, "en");
+        briteDatabase.insert(Tables.SURVEY, values);
+    }
+
+    public void updateSurvey(ContentValues updatedValues, String surveyId) {
+        int affectedRows = briteDatabase
+                .update(Tables.SURVEY, updatedValues, SurveyColumns.SURVEY_ID + " = ?", surveyId);
+        if (affectedRows <= 0) {
+            briteDatabase.insert(Tables.SURVEY, updatedValues);
+        }
+    }
+
+    /**
+     * deletes all the surveys from the database
+     */
+    public void deleteAllSurveys() {
+        briteDatabase.delete(Tables.SURVEY, null);
+        briteDatabase.delete(Tables.SURVEY_GROUP, null);
+    }
+
+    public Cursor getSurveys(String surveyId, String surveyVersion) {
+        String sql = "SELECT " + SurveyColumns.SURVEY_ID + " FROM " + Tables.SURVEY + " WHERE " +
+                SurveyColumns.SURVEY_ID + " = ? and (" + SurveyColumns.VERSION + " >= ? or "
+                + SurveyColumns.DELETED + " = ?)";
+        String[] selectionArgs = {
+                surveyId,
+                surveyVersion,
+                String.valueOf(1)
+        };
+        return briteDatabase.query(sql, selectionArgs);
+    }
+
+    /**
+     * updates the survey table by recording the help download flag
+     */
+    public void markSurveyHelpDownloaded(String surveyId, boolean isDownloaded) {
+        ContentValues updatedValues = new ContentValues();
+        updatedValues.put(SurveyColumns.HELP_DOWNLOADED, isDownloaded ? 1 : 0);
+
+        int updatedRows = briteDatabase
+                .update(Tables.SURVEY, updatedValues, SurveyColumns.SURVEY_ID + " = ?", surveyId);
+        if (updatedRows < 1) {
+            Timber.e("Could not update record for Survey %s", surveyId);
+        }
+    }
+
+    /**
+     * marks a survey record identified by the ID passed in as deleted.
+     *
+     * @param surveyId
+     */
+    public void deleteSurvey(String surveyId) {
+        ContentValues updatedValues = new ContentValues();
+        updatedValues.put(SurveyColumns.DELETED, 1);
+        briteDatabase
+                .update(Tables.SURVEY, updatedValues, SurveyColumns.SURVEY_ID + " = ?", surveyId);
+    }
+
+    /**
+     * if the ID is populated, this will update a user record. Otherwise, it
+     * will be inserted
+     */
+    public long createOrUpdateUser(Long id, String name) {
+        ContentValues initialValues = new ContentValues();
+        Long userId = id;
+        initialValues.put(UserColumns.NAME, name);
+        initialValues.put(UserColumns.DELETED, 0);
+
+        if (userId == null) {
+            userId = briteDatabase.insert(Tables.USER, initialValues);
+        } else {
+            briteDatabase
+                    .update(Tables.USER, initialValues, UserColumns._ID + "=?", userId.toString());
+        }
+        return userId;
     }
 }

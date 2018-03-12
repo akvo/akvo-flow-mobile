@@ -40,6 +40,7 @@ import org.akvo.flow.activity.FormActivity;
 import org.akvo.flow.activity.GeoshapeActivity;
 import org.akvo.flow.activity.MapActivity;
 import org.akvo.flow.activity.RecordActivity;
+import org.akvo.flow.activity.SurveyActivity;
 import org.akvo.flow.activity.TransmissionHistoryActivity;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.apkupdate.ViewApkData;
@@ -58,8 +59,6 @@ import java.io.File;
 import javax.inject.Inject;
 
 import timber.log.Timber;
-
-import static org.akvo.flow.util.ConstantUtil.REQUEST_ADD_USER;
 
 public class Navigator {
 
@@ -83,9 +82,8 @@ public class Navigator {
         context.startActivity(i);
     }
 
-    public void navigateToAddUser(Activity activity) {
-        activity.startActivityForResult(new Intent(activity, AddUserActivity.class),
-                REQUEST_ADD_USER);
+    public void navigateToAddUser(Context context) {
+        context.startActivity(new Intent(context, AddUserActivity.class));
     }
 
     public void navigateToRecordActivity(Context context, String surveyedLocaleId,
@@ -311,6 +309,11 @@ public class Navigator {
     public void navigateToVideoView(Context context, String filename) {
         Intent intent = new Intent(Intent.ACTION_VIEW);
         intent.setDataAndType(Uri.fromFile(new File(filename)), "video/mp4");
+        context.startActivity(intent);
+    }
+
+    public void navigateToSurveyActivity(Context context) {
+        Intent intent = new Intent(context, SurveyActivity.class);
         context.startActivity(intent);
     }
 

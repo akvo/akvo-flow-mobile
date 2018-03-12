@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015-2017 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2015-2018 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -19,7 +19,6 @@
 
 package org.akvo.flow.activity;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
@@ -35,6 +34,7 @@ import org.akvo.flow.domain.User;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
 import org.akvo.flow.presentation.BaseActivity;
+import org.akvo.flow.ui.Navigator;
 import org.akvo.flow.util.logging.LoggingHelper;
 
 import javax.inject.Inject;
@@ -58,20 +58,52 @@ public class AddUserActivity extends BaseActivity {
     @BindView(R.id.device_id)
     EditText deviceIdEt;
 
-    private Prefs prefs;
-
     @Inject
     LoggingHelper helper;
+
+    @Inject
+    Prefs prefs;
+
+    @Inject
+    SurveyDbDataSource surveyDbDataSource;
+
+    @Inject
+    Navigator navigator;
+
+    private boolean isJustCreated;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.add_user_activity);
-        ButterKnife.bind(this);
         initializeInjector();
-        prefs = new Prefs(getApplicationContext());
+        ButterKnife.bind(this);
         deviceIdEt.setText(prefs.getString(Prefs.KEY_DEVICE_IDENTIFIER, ""));
+        navigateToSurveyIfNoSetupNeeded();
+        isJustCreated = true;
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (isJustCreated) {
+            isJustCreated = false;
+        } else {
+            navigateToSurveyIfNoSetupNeeded();
+        }
+    }
+
+    private void navigateToSurveyIfNoSetupNeeded() {
+        boolean deviceSetCorrectly = prefs.getBoolean(Prefs.KEY_SETUP, false);
+        if (deviceSetCorrectly) {
+            navigateToSurvey();
+        }
+    }
+
+    private void navigateToSurvey() {
+        navigator.navigateToSurveyActivity(this);
+        finish();
     }
 
     private void initializeInjector() {
@@ -85,19 +117,17 @@ public class AddUserActivity extends BaseActivity {
     private void saveUserData() {
         String username = nameEt.getText().toString().trim();
         String deviceId = deviceIdEt.getText().toString().trim();
-        Context context = getApplicationContext();
-        SurveyDbDataSource db = new SurveyDbDataSource(context, null);
-        db.open();
-        long uid = db.createOrUpdateUser(null, username);
-        db.close();
+        surveyDbDataSource.open();
+        long uid = surveyDbDataSource.createOrUpdateUser(null, username);
+        surveyDbDataSource.close();
 
         prefs.setString(Prefs.KEY_DEVICE_IDENTIFIER, deviceId);
+        prefs.setBoolean(Prefs.KEY_SETUP, true);
 
         // Select the newly created user, and exit the Activity
         FlowApp.getApp().setUser(new User(uid, username));
         helper.initLoginData(username, deviceId);
-        setResult(RESULT_OK);
-        finish();
+        navigateToSurvey();
     }
 
     @OnTextChanged(value = { R.id.username, R.id.device_id }, callback = AFTER_TEXT_CHANGED)

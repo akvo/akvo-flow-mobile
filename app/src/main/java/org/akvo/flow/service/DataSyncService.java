@@ -121,15 +121,6 @@ public class DataSyncService extends IntentService {
     private static final int FILE_UPLOAD_RETRIES = 2;
 
     @Inject
-    ZipFileBrowser zipFileBrowser;
-
-    @Inject
-    MediaFileHelper mediaFileHelper;
-
-    @Inject
-    MakeDataPrivate makeDataPrivate;
-
-    @Inject
     SurveyDbDataSource mDatabase;
 
     @Inject
@@ -137,6 +128,15 @@ public class DataSyncService extends IntentService {
 
     @Inject
     ConnectivityStateManager connectivityStateManager;
+
+    @Inject
+    ZipFileBrowser zipFileBrowser;
+
+    @Inject
+    MediaFileHelper mediaFileHelper;
+
+    @Inject
+    MakeDataPrivate makeDataPrivate;
 
     public DataSyncService() {
         super(TAG);

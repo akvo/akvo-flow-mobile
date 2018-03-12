@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -38,6 +38,7 @@ import org.akvo.flow.database.SurveyInstanceStatus;
 import org.akvo.flow.database.SyncTimeColumns;
 import org.akvo.flow.database.TransmissionStatus;
 import org.akvo.flow.database.britedb.BriteSurveyDbAdapter;
+import org.akvo.flow.domain.entity.User;
 import org.akvo.flow.data.entity.MovedFile;
 
 import java.util.List;
@@ -53,6 +54,14 @@ public class DatabaseDataSource {
     @Inject
     public DatabaseDataSource(BriteDatabase db) {
         this.briteSurveyDbAdapter = new BriteSurveyDbAdapter(db);
+    }
+
+    public Observable<Cursor> getSurveys() {
+        return briteSurveyDbAdapter.getSurveys();
+    }
+
+    public Observable<Boolean> deleteSurvey(long surveyId) {
+        return briteSurveyDbAdapter.deleteSurveyAndGroup(surveyId);
     }
 
     public Observable<Cursor> getDataPoints(@NonNull Long surveyGroupId, @Nullable Double latitude,
@@ -196,5 +205,23 @@ public class DatabaseDataSource {
 
             briteSurveyDbAdapter.syncResponse(surveyInstanceId, values, response.getQuestionId());
         }
+    }
+
+    public Observable<Cursor> getUsers() {
+        return briteSurveyDbAdapter.getUsers();
+    }
+
+    public Observable<Boolean> editUser(User user) {
+        briteSurveyDbAdapter.updateUser(user.getId(), user.getName());
+        return Observable.just(true);
+    }
+
+    public Observable<Boolean> deleteUser(User user) {
+        briteSurveyDbAdapter.deleteUser(user.getId());
+        return Observable.just(true);
+    }
+
+    public Observable<Long> createUser(String userName) {
+        return Observable.just(briteSurveyDbAdapter.createUser(userName));
     }
 }

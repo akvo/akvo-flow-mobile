@@ -280,5 +280,7 @@
     <string name="cascade_error_message">Cannot load cascade resource: %1$s</string>
     <string name="preference_publish_data_title">Publish data</string>
     <string name="preference_publish_data_subtitle">Make data available in the public folder for bulk upload</string>
+    <string name="preference_publish_data_subtitle_published">Data is available for bulk upload</string>
+    <string name="preference_publish_data_time_left">%1$d mins</string>
 
 </resources>

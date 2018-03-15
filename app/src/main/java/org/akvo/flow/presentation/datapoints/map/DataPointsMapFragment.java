@@ -71,19 +71,6 @@ public class DataPointsMapFragment extends SupportMapFragment implements OnInfoW
     private static final int MAP_ZOOM_LEVEL = 10;
     private static final String MAP_OPTIONS = "MapOptions";
 
-    @Nullable
-    private RecordListListener mListener;
-
-    private List<MapDataPoint> mItems;
-
-    private boolean displayMonitoredMenu;
-
-    @Nullable
-    private ProgressBar progressBar;
-
-    @Nullable
-    private GoogleMap mMap;
-
     @Inject
     DataPointSyncSnackBarManager dataPointSyncSnackBarManager;
 
@@ -93,8 +80,20 @@ public class DataPointsMapFragment extends SupportMapFragment implements OnInfoW
     @Inject
     Navigator navigator;
 
+    @Nullable
+    private RecordListListener mListener;
+
+    private List<MapDataPoint> mItems;
+
+    @Nullable
+    private ProgressBar progressBar;
+
+    @Nullable
+    private GoogleMap mMap;
+
     private ClusterManager<MapDataPoint> mClusterManager;
     private boolean activityJustCreated;
+    private Integer menuRes = null;
 
     public static DataPointsMapFragment newInstance(SurveyGroup surveyGroup) {
         DataPointsMapFragment fragment = new DataPointsMapFragment();
@@ -187,7 +186,7 @@ public class DataPointsMapFragment extends SupportMapFragment implements OnInfoW
                     cluster();
                 }
             });
-            centerMap();
+            centerMapOnUserLocation();
         }
     }
 
@@ -222,22 +221,17 @@ public class DataPointsMapFragment extends SupportMapFragment implements OnInfoW
         mClusterManager.cluster();
     }
 
-    /**
-     * Center the map in the given record's coordinates. If no record is provided,
-     * the user's location will be used.
-     */
-    private void centerMap() {
+    private void centerMapOnUserLocation() {
         if (mMap == null) {
-            return; // Not ready yet
+            return;
         }
 
         LatLng position = null;
-        // When multiple points are shown, center the map in user's location
-        LocationManager manager = (LocationManager) getActivity()
+        LocationManager manager = (LocationManager) getActivity().getApplicationContext()
                 .getSystemService(Context.LOCATION_SERVICE);
         Criteria criteria = new Criteria();
         criteria.setAccuracy(Criteria.ACCURACY_FINE);
-        String provider = manager.getBestProvider(criteria, true);
+        String provider = manager == null ? null : manager.getBestProvider(criteria, true);
         if (provider != null) {
             Location location = manager.getLastKnownLocation(provider);
             if (location != null) {
@@ -278,10 +272,8 @@ public class DataPointsMapFragment extends SupportMapFragment implements OnInfoW
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        if (displayMonitoredMenu) {
-            inflater.inflate(R.menu.datapoints_map_monitored, menu);
-        } else {
-            inflater.inflate(R.menu.datapoints_map, menu);
+        if (menuRes != null) {
+            inflater.inflate(menuRes, menu);
         }
         super.onCreateOptionsMenu(menu, inflater);
     }
@@ -327,8 +319,24 @@ public class DataPointsMapFragment extends SupportMapFragment implements OnInfoW
     }
 
     @Override
-    public void displayMenu(boolean monitored) {
-        displayMonitoredMenu = monitored;
+    public void showNonMonitoredMenu() {
+        menuRes = R.menu.datapoints_map;
+        reloadMenu();
+    }
+
+    @Override
+    public void showMonitoredMenu() {
+        menuRes = R.menu.datapoints_map_monitored;
+        reloadMenu();
+    }
+
+    @Override
+    public void hideMenu() {
+        menuRes = null;
+        reloadMenu();
+    }
+
+    private void reloadMenu() {
         FragmentActivity activity = getActivity();
         if (activity != null) {
             activity.supportInvalidateOptionsMenu();

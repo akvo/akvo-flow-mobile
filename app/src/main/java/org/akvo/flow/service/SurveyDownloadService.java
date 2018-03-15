@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2010-2018 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -24,7 +24,6 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.content.LocalBroadcastManager;
 
 import org.akvo.flow.R;
 import org.akvo.flow.api.FlowApi;
@@ -61,8 +60,6 @@ import javax.inject.Inject;
 
 import timber.log.Timber;
 
-import static org.akvo.flow.util.ConstantUtil.ACTION_SURVEY_SYNC;
-
 /**
  * This activity will check for new surveys on the device and install as needed
  *
@@ -75,7 +72,10 @@ public class SurveyDownloadService extends IntentService {
      */
     public static final String EXTRA_SURVEY_ID = "survey";
     public static final String EXTRA_DELETE_SURVEYS = "delete_surveys";
+
     private static final String TEST_SURVEY_ID = "0";
+    private static final String TAG = "SURVEY_DOWNLOAD_SERVICE";
+    private static final String DEFAULT_TYPE = "Survey";
 
     @Inject
     FormFileBrowser formFileBrowser;
@@ -83,12 +83,14 @@ public class SurveyDownloadService extends IntentService {
     @Inject
     FormResourcesFileBrowser resourcesFileUtil;
 
-    private static final String TAG = "SURVEY_DOWNLOAD_SERVICE";
-    private static final String DEFAULT_TYPE = "Survey";
+    @Inject
+    SurveyDbDataSource databaseAdaptor;
 
-    private SurveyDbDataSource databaseAdaptor;
-    private Prefs prefs;
-    private ConnectivityStateManager connectivityStateManager;
+    @Inject
+    Prefs prefs;
+
+    @Inject
+    ConnectivityStateManager connectivityStateManager;
 
     public SurveyDownloadService() {
         super(TAG);
@@ -103,10 +105,7 @@ public class SurveyDownloadService extends IntentService {
 
     public void onHandleIntent(@Nullable Intent intent) {
         try {
-            databaseAdaptor = new SurveyDbDataSource(this, null);
             databaseAdaptor.open();
-            prefs = new Prefs(getApplicationContext());
-            connectivityStateManager = new ConnectivityStateManager(getApplicationContext());
             if (intent != null && intent.hasExtra(EXTRA_SURVEY_ID)) {
                 downloadSurvey(intent);
             } else if (intent != null && intent.getBooleanExtra(EXTRA_DELETE_SURVEYS, false)) {
@@ -118,7 +117,6 @@ public class SurveyDownloadService extends IntentService {
             Timber.e(e, e.getMessage());
         } finally {
             databaseAdaptor.close();
-            sendBroadcastNotification();
         }
     }
 
@@ -163,7 +161,7 @@ public class SurveyDownloadService extends IntentService {
         syncSurveyGroups(surveys);
 
         // Check synced versions, and omit up-to-date surveys
-        surveys = databaseAdaptor.checkSurveyVersions(surveys);
+        surveys = databaseAdaptor.fetchOutDatedSurveys(surveys);
 
         if (!surveys.isEmpty()) {
             int synced = 0, failed = 0;
@@ -404,15 +402,4 @@ public class SurveyDownloadService extends IntentService {
                 ConstantUtil.NOTIFICATION_FORMS_SYNCED, !finished,
                 synced + failed);
     }
-
-    /**
-     * Dispatch a Broadcast notification to notify of surveys synchronization.
-     * This notification will be received in SurveyHomeActivity, in order to
-     * refresh its data
-     */
-    private void sendBroadcastNotification() {
-        Intent intentBroadcast = new Intent(ACTION_SURVEY_SYNC);
-        LocalBroadcastManager.getInstance(this).sendBroadcast(intentBroadcast);
-    }
-
 }

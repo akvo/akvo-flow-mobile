@@ -34,6 +34,7 @@ public class SharedPreferencesDataSource {
     private static final String KEY_SCREEN_ON = "screen.keepon";
     private static final String KEY_DEVICE_IDENTIFIER = "device.identifier";
     private static final String KEY_MAX_IMG_SIZE = "media.img.maxsize";
+    private static final String KEY_DATA_PUBLISH_TIME = "data_publish_time";
 
     private static final String DEFAULT_VALUE_DEVICE_IDENTIFIER = "unset";
     private static final int DEFAULT_VALUE_IMAGE_SIZE = 0;
@@ -42,7 +43,7 @@ public class SharedPreferencesDataSource {
     private static final String KEY_SURVEY_GROUP_ID = "surveyGroupId";
     private static final String KEY_USER_ID = "userId";
     private static final boolean DEFAULT_VALUE_CELL_UPLOAD = false;
-    private static final long INVALID_ID = -1;
+    private static final long LONG_VALUE_UNSET = -1;
 
     private final SharedPreferences preferences;
 
@@ -72,7 +73,7 @@ public class SharedPreferencesDataSource {
     }
 
     public Observable<Long> getSelectedSurvey() {
-        return Observable.just(getLong(KEY_SURVEY_GROUP_ID, INVALID_ID));
+        return Observable.just(getLong(KEY_SURVEY_GROUP_ID, LONG_VALUE_UNSET));
     }
 
     public Observable<Boolean> setSelectedSurvey(long surveyId) {
@@ -81,7 +82,21 @@ public class SharedPreferencesDataSource {
     }
 
     public Observable<Boolean> clearSelectedSurvey() {
-        return setSelectedSurvey(INVALID_ID);
+        return setSelectedSurvey(LONG_VALUE_UNSET);
+    }
+
+    public Observable<Long> getPublishDataTime() {
+        return Observable.just(getLong(KEY_DATA_PUBLISH_TIME, LONG_VALUE_UNSET));
+    }
+
+    public Observable<Boolean> setPublishDataTime() {
+        setLong(KEY_DATA_PUBLISH_TIME, System.currentTimeMillis());
+        return Observable.just(true);
+    }
+
+    public Observable<Boolean> clearPublishDataTime() {
+        setLong(KEY_DATA_PUBLISH_TIME, LONG_VALUE_UNSET);
+        return Observable.just(true);
     }
 
     private boolean getBoolean(String key, boolean defValue) {
@@ -137,11 +152,11 @@ public class SharedPreferencesDataSource {
     }
 
     public Observable<Long> getSelectedUser() {
-        return Observable.just(getLong(KEY_USER_ID, INVALID_ID));
+        return Observable.just(getLong(KEY_USER_ID, LONG_VALUE_UNSET));
     }
 
     public Observable<Boolean> clearSelectedUser() {
-        return setSelectedUser(INVALID_ID);
+        return setSelectedUser(LONG_VALUE_UNSET);
     }
 
     public Observable<Boolean> setSelectedUser(long userId) {

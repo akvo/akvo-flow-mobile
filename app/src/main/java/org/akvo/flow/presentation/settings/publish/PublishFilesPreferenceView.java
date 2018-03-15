@@ -31,12 +31,13 @@ import android.widget.TextView;
 
 import org.akvo.flow.R;
 
+import javax.inject.Inject;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import timber.log.Timber;
 
-public class PublishFilesPreferenceView extends LinearLayout {
+public class PublishFilesPreferenceView extends LinearLayout implements IPublishFilesPreferenceView {
 
     @BindView(R.id.preferenceProgress)
     ProgressBar preferenceProgress;
@@ -53,6 +54,9 @@ public class PublishFilesPreferenceView extends LinearLayout {
     @BindView(R.id.preference_publish_data_subtitle)
     TextView preferencePublishDataSubTitle;
 
+    @Inject
+    PublishFilesPreferencePresenter presenter;
+
     public PublishFilesPreferenceView(Context context) {
         this(context, null);
     }
@@ -66,11 +70,22 @@ public class PublishFilesPreferenceView extends LinearLayout {
         setOrientation(VERTICAL);
         inflate(getContext(), R.layout.preference_publish_data, this);
         ButterKnife.bind(this);
+        presenter.setView(this);
     }
 
     @OnClick(R.id.publish_files_preference)
     void onPublishClick() {
-        Timber.d("onPublishClick");
+        presenter.onPublishClick();
+    }
+
+    @Override
+    protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
+        presenter.load();
+    }
+
+    @Override
+    public void showPublished() {
         setEnabled(false);
         preferenceProgressLayout.setVisibility(VISIBLE);
         Context context = getContext();
@@ -81,5 +96,22 @@ public class PublishFilesPreferenceView extends LinearLayout {
                 .setTextColor(ContextCompat.getColor(context, R.color.black_disabled));
         preferencePublishDataSubTitle.setText(
                 context.getString(R.string.preference_publish_data_subtitle_published));
+    }
+
+    @Override
+    public void showUnPublished() {
+        setEnabled(true);
+        preferenceProgressLayout.setVisibility(GONE);
+        Context context = getContext();
+        preferencePublishDataTitle
+                .setTextColor(ContextCompat.getColor(context, R.color.black_main));
+        preferencePublishDataSubTitle.setText(
+                context.getString(R.string.preference_publish_data_subtitle));
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        presenter.destroy();
     }
 }

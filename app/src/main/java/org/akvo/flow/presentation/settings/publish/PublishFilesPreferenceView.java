@@ -136,18 +136,21 @@ public class PublishFilesPreferenceView extends LinearLayout implements IPublish
 
     @Override
     public void scheduleAlarm() {
+        //TODO: duplicated code to BootReceiver!
         Context context = getContext().getApplicationContext();
-        AlarmManager alarmMgr = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-        Intent intent = new Intent(context, DataTimeoutReceiver.class);
-        PendingIntent alarmIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
+        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        if (alarmManager != null) {
+            Intent intent = new Intent(context, DataTimeoutReceiver.class);
+            PendingIntent alarmIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
 
-        //TODO: change to MAX_PUBLISH_TIME_IN_MS
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            alarmMgr.setExact(AlarmManager.ELAPSED_REALTIME_WAKEUP,
-                    SystemClock.elapsedRealtime() + 90 * 1000, alarmIntent);
-        } else {
-            alarmMgr.set(AlarmManager.ELAPSED_REALTIME_WAKEUP,
-                    SystemClock.elapsedRealtime() + 90 * 1000, alarmIntent);
+            //TODO: change to MAX_PUBLISH_TIME_IN_MS
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                alarmManager.setExact(AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                        SystemClock.elapsedRealtime() + 90 * 1000, alarmIntent);
+            } else {
+                alarmManager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                        SystemClock.elapsedRealtime() + 90 * 1000, alarmIntent);
+            }
         }
 
         enableAlarmBootReceiver(context);

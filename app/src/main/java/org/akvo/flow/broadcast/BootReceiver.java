@@ -34,17 +34,21 @@ public class BootReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         if ("android.intent.action.BOOT_COMPLETED".equals(intent.getAction())) {
             Context appContext = context.getApplicationContext();
-            AlarmManager alarmMgr = (AlarmManager) appContext.getSystemService(Context.ALARM_SERVICE);
-            Intent receiverIntent = new Intent(appContext, DataTimeoutReceiver.class);
-            PendingIntent alarmIntent = PendingIntent.getBroadcast(appContext, 0, receiverIntent, 0);
+            AlarmManager alarmManager = (AlarmManager) appContext
+                    .getSystemService(Context.ALARM_SERVICE);
 
             //TODO: change to MAX_PUBLISH_TIME_IN_MS
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                alarmMgr.setExact(AlarmManager.ELAPSED_REALTIME_WAKEUP,
-                        SystemClock.elapsedRealtime() + 30 * 1000, alarmIntent);
-            } else {
-                alarmMgr.set(AlarmManager.ELAPSED_REALTIME_WAKEUP,
-                        SystemClock.elapsedRealtime() + 30 * 1000, alarmIntent);
+            if (alarmManager != null) {
+                Intent receiverIntent = new Intent(appContext, DataTimeoutReceiver.class);
+                PendingIntent alarmIntent = PendingIntent
+                        .getBroadcast(appContext, 0, receiverIntent, 0);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                    alarmManager.setExact(AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                            SystemClock.elapsedRealtime() + 30 * 1000, alarmIntent);
+                } else {
+                    alarmManager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                            SystemClock.elapsedRealtime() + 30 * 1000, alarmIntent);
+                }
             }
         }
     }

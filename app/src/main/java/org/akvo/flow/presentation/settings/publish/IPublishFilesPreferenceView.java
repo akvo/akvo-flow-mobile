@@ -21,7 +21,8 @@
 package org.akvo.flow.presentation.settings.publish;
 
 public interface IPublishFilesPreferenceView {
-    void showPublished();
+
+    void showPublished(int progress);
 
     void showUnPublished();
 }

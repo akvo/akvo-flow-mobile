@@ -20,16 +20,29 @@
 
 package org.akvo.flow.presentation.settings.publish;
 
+import org.akvo.flow.domain.interactor.DefaultObserver;
+import org.akvo.flow.domain.interactor.UseCase;
 import org.akvo.flow.presentation.Presenter;
 
+import java.util.concurrent.TimeUnit;
+
 import javax.inject.Inject;
+import javax.inject.Named;
+
+import timber.log.Timber;
 
 public class PublishFilesPreferencePresenter implements Presenter {
 
+    private static final long MAX_PUBLISH_TIME_IN_MS = 90 * 60 * 1000;
+    private static final long INVALID_PUBLISH_TIME = -1L;
+
     private IPublishFilesPreferenceView view;
+    private final UseCase getPublishDataTime;
 
     @Inject
-    public PublishFilesPreferencePresenter() {
+    public PublishFilesPreferencePresenter(
+            @Named("getPublishDataTime") UseCase getPublishDataTime) {
+        this.getPublishDataTime = getPublishDataTime;
     }
 
     public void setView(IPublishFilesPreferenceView view) {
@@ -37,7 +50,7 @@ public class PublishFilesPreferencePresenter implements Presenter {
     }
 
     public void onPublishClick() {
-        view.showPublished();
+        view.showPublished(getMaxPublishedTime(MAX_PUBLISH_TIME_IN_MS) - 1);
     }
 
     @Override
@@ -46,6 +59,31 @@ public class PublishFilesPreferencePresenter implements Presenter {
     }
 
     public void load() {
-        //TODO: add logic
+        getPublishDataTime.execute(new DefaultObserver<Long>() {
+            @Override
+            public void onError(Throwable e) {
+                Timber.e(e);
+                view.showUnPublished();
+            }
+
+            @Override
+            public void onNext(Long publishTime) {
+                long timeSincePublished = calculateTimeSincePublished(publishTime);
+                if (timeSincePublished < MAX_PUBLISH_TIME_IN_MS) {
+                    view.showPublished(getMaxPublishedTime(timeSincePublished));
+                } else {
+                    view.showUnPublished();
+                }
+            }
+        }, null);
+    }
+
+    private long calculateTimeSincePublished(Long publishTime) {
+        return publishTime == null || publishTime.equals(INVALID_PUBLISH_TIME) ?
+                MAX_PUBLISH_TIME_IN_MS : System.currentTimeMillis() - publishTime;
+    }
+
+    private int getMaxPublishedTime(long timeSincePublished) {
+        return (int) TimeUnit.MINUTES.convert(timeSincePublished, TimeUnit.MILLISECONDS);
     }
 }

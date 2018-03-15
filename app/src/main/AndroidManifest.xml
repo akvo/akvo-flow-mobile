@@ -99,6 +99,7 @@
                 <action android:name="com.google.android.gms.gcm.ACTION_TASK_READY"/>
             </intent-filter>
         </service>
+        <service android:name=".service.UnPublishDataService"/>
 
         <receiver android:exported="false" android:name=".broadcast.SyncDataReceiver">
             <intent-filter>
@@ -109,6 +110,13 @@
         <receiver android:name=".broadcast.BootStrapReceiver" android:exported="false">
             <intent-filter>
                 <action android:name="org.akvo.flow.BOOTSTRAP_NEEDED"/>
+            </intent-filter>
+        </receiver>
+        <receiver android:exported="false" android:name=".broadcast.DataTimeoutReceiver"/>
+        <receiver android:name=".broadcast.BootReceiver"
+                  android:enabled="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
             </intent-filter>
         </receiver>
 

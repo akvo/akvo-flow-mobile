@@ -51,6 +51,8 @@ public class PublishFilesPreferencePresenter implements Presenter {
 
     public void onPublishClick() {
         view.showPublished(getMaxPublishedTime(MAX_PUBLISH_TIME_IN_MS) - 1);
+        //TODO: actually publish files
+        view.scheduleAlarm();
     }
 
     @Override

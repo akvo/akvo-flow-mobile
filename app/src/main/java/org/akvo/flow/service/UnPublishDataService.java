@@ -18,13 +18,26 @@
  *
  */
 
-package org.akvo.flow.presentation.settings.publish;
+package org.akvo.flow.service;
 
-public interface IPublishFilesPreferenceView {
+import android.app.IntentService;
+import android.content.Intent;
+import android.support.annotation.Nullable;
 
-    void showPublished(int progress);
+import timber.log.Timber;
 
-    void showUnPublished();
+public class UnPublishDataService extends IntentService {
 
-    void scheduleAlarm();
+    private static final String TAG = "UnPublishDataService";
+
+    public UnPublishDataService() {
+        super(TAG);
+    }
+
+    @Override
+    protected void onHandleIntent(@Nullable Intent intent) {
+        Timber.d("Will un publish files");
+        //TODO: un publish files
+        //TODO: reset timer setting??
+    }
 }

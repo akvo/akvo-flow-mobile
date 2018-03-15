@@ -22,9 +22,15 @@ package org.akvo.flow.presentation.settings.publish;
 
 import org.akvo.flow.presentation.Presenter;
 
+import javax.inject.Inject;
+
 public class PublishFilesPreferencePresenter implements Presenter {
 
     private IPublishFilesPreferenceView view;
+
+    @Inject
+    public PublishFilesPreferencePresenter() {
+    }
 
     public void setView(IPublishFilesPreferenceView view) {
         this.view = view;
@@ -40,6 +46,6 @@ public class PublishFilesPreferencePresenter implements Presenter {
     }
 
     public void load() {
-
+        //TODO: add logic
     }
 }

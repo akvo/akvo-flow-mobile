@@ -21,29 +21,32 @@
 package org.akvo.flow.broadcast;
 
 import android.content.BroadcastReceiver;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 
+import org.akvo.flow.app.FlowApp;
+import org.akvo.flow.util.BootReceiverHelper;
 import org.akvo.flow.service.UnPublishDataService;
+
+import javax.inject.Inject;
 
 import timber.log.Timber;
 
 public class DataTimeoutReceiver extends BroadcastReceiver {
 
+    @Inject
+    BootReceiverHelper bootReceiverHelper;
+
     @Override
     public void onReceive(Context context, Intent intent) {
         Timber.d("onReceive");
-        disableBootReceiver(context);
+        initializeInjector(context);
+        bootReceiverHelper.disableBootReceiver();
         context.startService(new Intent(context, UnPublishDataService.class));
     }
 
-    private void disableBootReceiver(Context context) {
-        ComponentName receiver = new ComponentName(context, BootReceiver.class);
-        PackageManager pm = context.getPackageManager();
-        pm.setComponentEnabledSetting(receiver,
-                PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
-                PackageManager.DONT_KILL_APP);
+    private void initializeInjector(Context context) {
+        FlowApp application = (FlowApp) context.getApplicationContext();
+        application.getApplicationComponent().inject(this);
     }
 }

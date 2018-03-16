@@ -20,36 +20,31 @@
 
 package org.akvo.flow.broadcast;
 
-import android.app.AlarmManager;
-import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Build;
-import android.os.SystemClock;
+
+import org.akvo.flow.app.FlowApp;
+import org.akvo.flow.util.AlarmHelper;
+
+import javax.inject.Inject;
 
 public class BootReceiver extends BroadcastReceiver {
 
+    @Inject
+    AlarmHelper alarmHelper;
+
     @Override
     public void onReceive(Context context, Intent intent) {
+        initializeInjector(context);
         if ("android.intent.action.BOOT_COMPLETED".equals(intent.getAction())) {
-            Context appContext = context.getApplicationContext();
-            AlarmManager alarmManager = (AlarmManager) appContext
-                    .getSystemService(Context.ALARM_SERVICE);
-
-            //TODO: change to MAX_PUBLISH_TIME_IN_MS
-            if (alarmManager != null) {
-                Intent receiverIntent = new Intent(appContext, DataTimeoutReceiver.class);
-                PendingIntent alarmIntent = PendingIntent
-                        .getBroadcast(appContext, 0, receiverIntent, 0);
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                    alarmManager.setExact(AlarmManager.ELAPSED_REALTIME_WAKEUP,
-                            SystemClock.elapsedRealtime() + 30 * 1000, alarmIntent);
-                } else {
-                    alarmManager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP,
-                            SystemClock.elapsedRealtime() + 30 * 1000, alarmIntent);
-                }
-            }
+            //TODO: calculate actual time left and if 0 start service directly
+           alarmHelper.scheduleAlarm(90 * 1000);
         }
+    }
+
+    private void initializeInjector(Context context) {
+        FlowApp application = (FlowApp) context.getApplicationContext();
+        application.getApplicationComponent().inject(this);
     }
 }

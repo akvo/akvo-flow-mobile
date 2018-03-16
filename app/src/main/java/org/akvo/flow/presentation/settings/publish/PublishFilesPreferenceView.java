@@ -20,14 +20,7 @@
 
 package org.akvo.flow.presentation.settings.publish;
 
-import android.app.AlarmManager;
-import android.app.PendingIntent;
-import android.content.ComponentName;
 import android.content.Context;
-import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.os.Build;
-import android.os.SystemClock;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
@@ -38,11 +31,11 @@ import android.widget.TextView;
 
 import org.akvo.flow.R;
 import org.akvo.flow.app.FlowApp;
-import org.akvo.flow.broadcast.BootReceiver;
-import org.akvo.flow.broadcast.DataTimeoutReceiver;
 import org.akvo.flow.injector.component.ApplicationComponent;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
+import org.akvo.flow.util.AlarmHelper;
+import org.akvo.flow.util.BootReceiverHelper;
 
 import javax.inject.Inject;
 
@@ -50,7 +43,8 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class PublishFilesPreferenceView extends LinearLayout implements IPublishFilesPreferenceView {
+public class PublishFilesPreferenceView extends LinearLayout
+        implements IPublishFilesPreferenceView {
 
     @BindView(R.id.preferenceProgress)
     ProgressBar progressBar;
@@ -69,6 +63,12 @@ public class PublishFilesPreferenceView extends LinearLayout implements IPublish
 
     @Inject
     PublishFilesPreferencePresenter presenter;
+
+    @Inject
+    AlarmHelper alarmHelper;
+
+    @Inject
+    BootReceiverHelper bootReceiverHelper;
 
     public PublishFilesPreferenceView(Context context) {
         this(context, null);
@@ -136,33 +136,9 @@ public class PublishFilesPreferenceView extends LinearLayout implements IPublish
 
     @Override
     public void scheduleAlarm() {
-        //TODO: duplicated code to BootReceiver!
-        Context context = getContext().getApplicationContext();
-        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-        if (alarmManager != null) {
-            Intent intent = new Intent(context, DataTimeoutReceiver.class);
-            PendingIntent alarmIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
-
-            //TODO: change to MAX_PUBLISH_TIME_IN_MS
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                alarmManager.setExact(AlarmManager.ELAPSED_REALTIME_WAKEUP,
-                        SystemClock.elapsedRealtime() + 90 * 1000, alarmIntent);
-            } else {
-                alarmManager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP,
-                        SystemClock.elapsedRealtime() + 90 * 1000, alarmIntent);
-            }
-        }
-
-        enableAlarmBootReceiver(context);
-    }
-
-    private void enableAlarmBootReceiver(Context context) {
-        ComponentName receiver = new ComponentName(context, BootReceiver.class);
-        PackageManager pm = context.getPackageManager();
-
-        pm.setComponentEnabledSetting(receiver,
-                PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
-                PackageManager.DONT_KILL_APP);
+        //TODO: change to MAX_PUBLISH_TIME_IN_MS
+        alarmHelper.scheduleAlarm(90 * 1000);
+        bootReceiverHelper.enableBootReceiver();
     }
 
     @Override

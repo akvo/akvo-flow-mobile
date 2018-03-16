@@ -25,6 +25,8 @@ import android.content.Context;
 import com.squareup.sqlbrite2.BriteDatabase;
 
 import org.akvo.flow.app.FlowApp;
+import org.akvo.flow.broadcast.BootReceiver;
+import org.akvo.flow.broadcast.DataTimeoutReceiver;
 import org.akvo.flow.domain.executor.PostExecutionThread;
 import org.akvo.flow.domain.executor.ThreadExecutor;
 import org.akvo.flow.domain.repository.FileRepository;
@@ -76,4 +78,8 @@ public interface ApplicationComponent {
     void inject(BootstrapService bootstrapService);
 
     void inject(DataSyncService dataSyncService);
+
+    void inject(DataTimeoutReceiver dataTimeoutReceiver);
+
+    void inject(BootReceiver bootReceiver);
 }

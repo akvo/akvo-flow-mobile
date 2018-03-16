@@ -77,7 +77,7 @@ public class FileDataSource {
     private List<MovedFile> copyFiles(@Nullable File[] files, String folderName) {
         List<MovedFile> movedFiles = new ArrayList<>();
         if (files != null) {
-            File folder = getPrivateDestinationFolder(folderName);
+            File folder = getPrivateFolder(folderName);
             for (File f : files) {
                 String destinationPath = fileHelper.copyFile(f, folder);
                 if (!TextUtils.isEmpty(destinationPath)) {
@@ -97,7 +97,7 @@ public class FileDataSource {
         return new File(path);
     }
 
-    private File getPrivateDestinationFolder(String folderName) {
+    private File getPrivateFolder(String folderName) {
         File folder = new File(
                 context.getFilesDir().getAbsolutePath() + File.separator + folderName);
         if (!folder.exists()) {
@@ -107,4 +107,27 @@ public class FileDataSource {
         return folder;
     }
 
+    public Observable<Boolean> copyPrivateData() {
+        //TODO: error handling will be added in separate issue
+        copyPrivateFileToPublic(DIR_DATA);
+        copyPrivateFileToPublic(DIR_MEDIA);
+        return Observable.just(true);
+    }
+
+    private void copyPrivateFileToPublic(String folderName) {
+        File destinationDataFolder = getPublicFolder(folderName);
+        if (!destinationDataFolder.exists()) {
+            //noinspection ResultOfMethodCallIgnored
+            destinationDataFolder.mkdirs();
+        }
+        File dataFolder = getPrivateFolder(folderName);
+        if (dataFolder.exists()) {
+            File[] files = dataFolder.listFiles();
+            if (files != null) {
+                for (File f : files) {
+                    fileHelper.copyFile(f, destinationDataFolder);
+                }
+            }
+        }
+    }
 }

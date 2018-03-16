@@ -68,4 +68,9 @@ public class FileDataRepository implements FileRepository {
                     }
                 });
     }
+
+    @Override
+    public Observable<Boolean> copyPrivateData() {
+        return dataSourceFactory.getFileDataSource().copyPrivateData();
+    }
 }

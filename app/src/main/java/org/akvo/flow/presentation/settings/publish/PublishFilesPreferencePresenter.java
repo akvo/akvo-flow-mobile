@@ -21,6 +21,7 @@
 package org.akvo.flow.presentation.settings.publish;
 
 import org.akvo.flow.domain.interactor.DefaultObserver;
+import org.akvo.flow.domain.interactor.MakeDataPublic;
 import org.akvo.flow.domain.interactor.UseCase;
 import org.akvo.flow.presentation.Presenter;
 
@@ -37,12 +38,16 @@ public class PublishFilesPreferencePresenter implements Presenter {
     private static final long INVALID_PUBLISH_TIME = -1L;
 
     private IPublishFilesPreferenceView view;
+
     private final UseCase getPublishDataTime;
+    private final MakeDataPublic makeDataPublic ;
 
     @Inject
     public PublishFilesPreferencePresenter(
-            @Named("getPublishDataTime") UseCase getPublishDataTime) {
+            @Named("getPublishDataTime") UseCase getPublishDataTime,
+            MakeDataPublic makeDataPublic) {
         this.getPublishDataTime = getPublishDataTime;
+        this.makeDataPublic = makeDataPublic;
     }
 
     public void setView(IPublishFilesPreferenceView view) {
@@ -50,14 +55,27 @@ public class PublishFilesPreferencePresenter implements Presenter {
     }
 
     public void onPublishClick() {
-        view.showPublished(getMaxPublishedTime(MAX_PUBLISH_TIME_IN_MS) - 1);
-        //TODO: actually publish files
-        view.scheduleAlarm();
+        //TODO: show "loading" until files are published
+        makeDataPublic.execute(new DefaultObserver<Boolean>() {
+            @Override
+            public void onError(Throwable e) {
+                Timber.e(e);
+                //TODO: display error to user (other issue)
+            }
+
+            @Override
+            public void onNext(Boolean published) {
+                //TODO: make sure everything was published
+                view.showPublished(getMaxPublishedTime(MAX_PUBLISH_TIME_IN_MS) - 1);
+                view.scheduleAlarm();
+            }
+        });
     }
 
     @Override
     public void destroy() {
-        //EMPTY
+        getPublishDataTime.dispose();
+        makeDataPublic.dispose();
     }
 
     public void load() {

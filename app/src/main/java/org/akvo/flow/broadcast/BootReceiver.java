@@ -30,6 +30,7 @@ import org.akvo.flow.domain.interactor.UseCase;
 import org.akvo.flow.presentation.settings.publish.PublishedTimeHelper;
 import org.akvo.flow.service.UnPublishDataService;
 import org.akvo.flow.util.AlarmHelper;
+import org.akvo.flow.util.BootReceiverHelper;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -49,6 +50,9 @@ public class BootReceiver extends BroadcastReceiver {
 
     @Inject
     PublishedTimeHelper publishedTimeHelper;
+
+    @Inject
+    BootReceiverHelper bootReceiverHelper;
 
     @Override
     public void onReceive(final Context context, Intent intent) {
@@ -70,6 +74,7 @@ public class BootReceiver extends BroadcastReceiver {
                         int timeLeft = publishedTimeHelper.getMaxPublishedTime(timeSincePublished);
                         alarmHelper.scheduleAlarm(timeLeft);
                     } else {
+                        bootReceiverHelper.disableBootReceiver();
                         appContext.startService(new Intent(appContext, UnPublishDataService.class));
                     }
                 }

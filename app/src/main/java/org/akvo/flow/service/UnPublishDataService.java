@@ -54,9 +54,16 @@ public class UnPublishDataService extends IntentService {
     protected void onHandleIntent(@Nullable Intent intent) {
         Timber.d("Will un publish files");
         unPublishData.execute(new DefaultObserver<Boolean>() {
+
+            @Override
+            public void onNext(Boolean aBoolean) {
+                unPublishData.dispose();
+            }
+
             @Override
             public void onError(Throwable e) {
                 Timber.e(e);
+                unPublishData.dispose();
             }
         });
     }

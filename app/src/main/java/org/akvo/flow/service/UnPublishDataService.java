@@ -38,6 +38,5 @@ public class UnPublishDataService extends IntentService {
     protected void onHandleIntent(@Nullable Intent intent) {
         Timber.d("Will un publish files");
         //TODO: un publish files
-        //TODO: reset timer setting??
     }
 }

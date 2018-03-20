@@ -35,4 +35,6 @@ public interface FileRepository {
     Observable<Boolean> copyPrivateData();
 
     Observable<Boolean> copyFile(String originFilePath, String destinationFilePath);
+
+    Observable<Boolean> unPublishData();
 }

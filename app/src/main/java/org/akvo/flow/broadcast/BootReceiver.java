@@ -25,26 +25,60 @@ import android.content.Context;
 import android.content.Intent;
 
 import org.akvo.flow.app.FlowApp;
+import org.akvo.flow.domain.interactor.DefaultObserver;
+import org.akvo.flow.domain.interactor.UseCase;
+import org.akvo.flow.presentation.settings.publish.PublishedTimeHelper;
+import org.akvo.flow.service.UnPublishDataService;
 import org.akvo.flow.util.AlarmHelper;
 
 import javax.inject.Inject;
+import javax.inject.Named;
+
+import timber.log.Timber;
 
 public class BootReceiver extends BroadcastReceiver {
+
+    public static final String BOOT_ACTION = "android.intent.action.BOOT_COMPLETED";
+
+    @Inject
+    @Named("getPublishDataTime")
+    UseCase getPublishDataTime;
 
     @Inject
     AlarmHelper alarmHelper;
 
+    @Inject
+    PublishedTimeHelper publishedTimeHelper;
+
     @Override
-    public void onReceive(Context context, Intent intent) {
-        initializeInjector(context);
-        if ("android.intent.action.BOOT_COMPLETED".equals(intent.getAction())) {
-            //TODO: calculate actual time left and if 0 start service directly
-           alarmHelper.scheduleAlarm(90 * 1000);
+    public void onReceive(final Context context, Intent intent) {
+        final Context appContext = context.getApplicationContext();
+        initializeInjector(appContext);
+        if (BOOT_ACTION.equals(intent.getAction())) {
+            getPublishDataTime.execute(new DefaultObserver<Long>() {
+                @Override
+                public void onError(Throwable e) {
+                    Timber.e(e);
+                    alarmHelper.scheduleAlarm(PublishedTimeHelper.MAX_PUBLISH_TIME_IN_MS);
+                }
+
+                @Override
+                public void onNext(Long publishTime) {
+                    long timeSincePublished = publishedTimeHelper
+                            .calculateTimeSincePublished(publishTime);
+                    if (timeSincePublished < PublishedTimeHelper.MAX_PUBLISH_TIME_IN_MS) {
+                        int timeLeft = publishedTimeHelper.getMaxPublishedTime(timeSincePublished);
+                        alarmHelper.scheduleAlarm(timeLeft);
+                    } else {
+                        appContext.startService(new Intent(appContext, UnPublishDataService.class));
+                    }
+                }
+            }, null);
         }
     }
 
-    private void initializeInjector(Context context) {
-        FlowApp application = (FlowApp) context.getApplicationContext();
+    private void initializeInjector(Context applicationContext) {
+        FlowApp application = (FlowApp) applicationContext;
         application.getApplicationComponent().inject(this);
     }
 }

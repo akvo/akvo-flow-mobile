@@ -25,8 +25,6 @@ import org.akvo.flow.domain.interactor.MakeDataPublic;
 import org.akvo.flow.domain.interactor.UseCase;
 import org.akvo.flow.presentation.Presenter;
 
-import java.util.concurrent.TimeUnit;
-
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -34,18 +32,17 @@ import timber.log.Timber;
 
 public class PublishFilesPreferencePresenter implements Presenter {
 
-    private static final long MAX_PUBLISH_TIME_IN_MS = 90 * 60 * 1000;
-    private static final long INVALID_PUBLISH_TIME = -1L;
+    private final PublishedTimeHelper publishedTimeHelper;
+    private final UseCase getPublishDataTime;
+    private final MakeDataPublic makeDataPublic;
 
     private IPublishFilesPreferenceView view;
 
-    private final UseCase getPublishDataTime;
-    private final MakeDataPublic makeDataPublic ;
-
     @Inject
-    public PublishFilesPreferencePresenter(
+    public PublishFilesPreferencePresenter(PublishedTimeHelper publishedTimeHelper,
             @Named("getPublishDataTime") UseCase getPublishDataTime,
             MakeDataPublic makeDataPublic) {
+        this.publishedTimeHelper = publishedTimeHelper;
         this.getPublishDataTime = getPublishDataTime;
         this.makeDataPublic = makeDataPublic;
     }
@@ -66,7 +63,9 @@ public class PublishFilesPreferencePresenter implements Presenter {
             @Override
             public void onNext(Boolean published) {
                 //TODO: make sure everything was published
-                view.showPublished(getMaxPublishedTime(MAX_PUBLISH_TIME_IN_MS) - 1);
+                int progress = publishedTimeHelper
+                        .getMaxPublishedTime(PublishedTimeHelper.MAX_PUBLISH_TIME_IN_MS) - 1;
+                view.showPublished(progress);
                 view.scheduleAlarm();
             }
         });
@@ -88,22 +87,14 @@ public class PublishFilesPreferencePresenter implements Presenter {
 
             @Override
             public void onNext(Long publishTime) {
-                long timeSincePublished = calculateTimeSincePublished(publishTime);
-                if (timeSincePublished < MAX_PUBLISH_TIME_IN_MS) {
-                    view.showPublished(getMaxPublishedTime(timeSincePublished));
+                long timeSincePublished = publishedTimeHelper
+                        .calculateTimeSincePublished(publishTime);
+                if (timeSincePublished < PublishedTimeHelper.MAX_PUBLISH_TIME_IN_MS) {
+                    view.showPublished(publishedTimeHelper.getMaxPublishedTime(timeSincePublished));
                 } else {
                     view.showUnPublished();
                 }
             }
         }, null);
-    }
-
-    private long calculateTimeSincePublished(Long publishTime) {
-        return publishTime == null || publishTime.equals(INVALID_PUBLISH_TIME) ?
-                MAX_PUBLISH_TIME_IN_MS : System.currentTimeMillis() - publishTime;
-    }
-
-    private int getMaxPublishedTime(long timeSincePublished) {
-        return (int) TimeUnit.MINUTES.convert(timeSincePublished, TimeUnit.MILLISECONDS);
     }
 }

@@ -66,13 +66,18 @@ public class MediaFileHelper {
         return getNamedMediaFile(IMAGE_SUFFIX).getAbsolutePath();
     }
 
+    @NonNull
+    public String getVideoFilePath() {
+        return getNamedMediaFile(VIDEO_SUFFIX).getAbsolutePath();
+    }
+
     @Nullable
-    public String getVideoFilePath(Intent intent) {
+    public String getAcquiredVideoFilePath(Intent intent) {
         File tmp = getVideoTmpFile();
         if (!tmp.exists()) {
-            tmp = new File(getVideoPathFromIntent(intent));
+            return getVideoPathFromIntent(intent);
         }
-        return renameFile(tmp);
+        return tmp.getAbsolutePath();
     }
 
     @NonNull
@@ -126,16 +131,6 @@ public class MediaFileHelper {
             }
         }
         return videoAbsolutePath;
-    }
-
-    private String renameFile(File temporaryVideoFile) {
-        File videoFile = getNamedMediaFile(VIDEO_SUFFIX);
-
-        if (!temporaryVideoFile.renameTo(videoFile)) {
-            Timber.e("Media file rename failed");
-            return temporaryVideoFile.getAbsolutePath();
-        }
-        return videoFile.getAbsolutePath();
     }
 
     @NonNull

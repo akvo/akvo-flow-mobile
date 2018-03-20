@@ -43,8 +43,8 @@ import org.akvo.flow.ui.fragment.DatapointsFragment;
 import org.akvo.flow.ui.fragment.ResponseListFragment;
 import org.akvo.flow.ui.view.CaddisflyQuestionView;
 import org.akvo.flow.ui.view.CascadeQuestionView;
-import org.akvo.flow.ui.view.media.PhotoQuestionView;
-import org.akvo.flow.ui.view.media.VideoQuestionView;
+import org.akvo.flow.ui.view.media.photo.PhotoQuestionView;
+import org.akvo.flow.ui.view.media.video.VideoQuestionView;
 import org.akvo.flow.ui.view.signature.SignatureQuestionView;
 
 import dagger.Component;

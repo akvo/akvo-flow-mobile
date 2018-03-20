@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -18,21 +18,13 @@
  *
  */
 
-package org.akvo.flow.domain.repository;
+package org.akvo.flow.ui.view.media.video;
 
-import android.graphics.Bitmap;
+public interface IVideoQuestionView {
 
-import io.reactivex.Observable;
+    void showErrorGettingMedia();
 
-public interface FileRepository {
+    void showLoading();
 
-    Observable<Boolean> saveImage(Bitmap bitmap, String fileName, String resizedFilePath);
-
-    Observable<Boolean> saveResizedImage(String fileName, String resizedFilePath, int imageSize);
-
-    Observable<Boolean> moveFiles();
-
-    Observable<Boolean> copyPrivateData();
-
-    Observable<Boolean> copyFile(String originFilePath, String destinationFilePath);
+    void displayThumbnail(String videoFilePath);
 }

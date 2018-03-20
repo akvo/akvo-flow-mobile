@@ -18,7 +18,7 @@
  *
  */
 
-package org.akvo.flow.ui.view.media;
+package org.akvo.flow.ui.view.media.video;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -60,7 +60,7 @@ import butterknife.OnClick;
  *
  * @author Christopher Fagiani
  */
-public class VideoQuestionView extends QuestionView implements MediaSyncTask.DownloadListener {
+public class VideoQuestionView extends QuestionView implements MediaSyncTask.DownloadListener, IVideoQuestionView {
 
     @Inject
     SnackBarManager snackBarManager;
@@ -70,6 +70,9 @@ public class VideoQuestionView extends QuestionView implements MediaSyncTask.Dow
 
     @Inject
     MediaFileHelper mediaFileHelper;
+
+    @Inject
+    VideoQuestionPresenter presenter;
 
     @BindView(R.id.media_btn)
     Button mMediaButton;
@@ -95,6 +98,7 @@ public class VideoQuestionView extends QuestionView implements MediaSyncTask.Dow
         setQuestionView(R.layout.media_question_view);
         initialiseInjector();
         ButterKnife.bind(this);
+        presenter.setView(this);
 
         imageLoader = new PicassoImageLoader(getContext());
         mMediaButton.setText(R.string.takevideo);
@@ -139,6 +143,11 @@ public class VideoQuestionView extends QuestionView implements MediaSyncTask.Dow
         downloadTask.execute();
     }
 
+    @Override
+    public void onDestroy() {
+        presenter.destroy();
+    }
+
     /**
      * display the completion icon and install the response in the question
      * object
@@ -147,15 +156,25 @@ public class VideoQuestionView extends QuestionView implements MediaSyncTask.Dow
     public void questionComplete(Bundle mediaData) {
         String mediaFilePath =
                 mediaData != null ? mediaData.getString(ConstantUtil.MEDIA_FILE_KEY) : null;
-        if (mediaFilePath != null && new File(mediaFilePath).exists()) {
-            filename = mediaFilePath;
+        presenter.onVideoReady(mediaFilePath);
+    }
 
-            captureResponse();
-            displayThumbnail();
+    @Override
+    public void showErrorGettingMedia() {
+        snackBarManager.displaySnackBar(this, R.string.error_getting_media, getContext());
+    }
 
-        } else {
-            snackBarManager.displaySnackBar(this, R.string.error_getting_media, getContext());
-        }
+    @Override
+    public void showLoading() {
+        mDownloadBtn.setVisibility(GONE);
+        mProgressBar.setVisibility(VISIBLE);
+    }
+
+    @Override
+    public void displayThumbnail(String videoFilePath) {
+        filename = videoFilePath;
+        captureResponse();
+        displayThumbnail();
     }
 
     /**

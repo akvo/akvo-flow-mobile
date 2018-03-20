@@ -39,6 +39,7 @@ import org.akvo.flow.service.BootstrapService;
 import org.akvo.flow.service.DataSyncService;
 import org.akvo.flow.service.FileChangeTrackingService;
 import org.akvo.flow.service.SurveyDownloadService;
+import org.akvo.flow.service.UnPublishDataService;
 import org.akvo.flow.util.logging.LoggingHelper;
 
 import javax.inject.Singleton;
@@ -82,4 +83,6 @@ public interface ApplicationComponent {
     void inject(DataTimeoutReceiver dataTimeoutReceiver);
 
     void inject(BootReceiver bootReceiver);
+
+    void inject(UnPublishDataService unPublishDataService);
 }

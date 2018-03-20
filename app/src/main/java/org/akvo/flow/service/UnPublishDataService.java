@@ -24,19 +24,40 @@ import android.app.IntentService;
 import android.content.Intent;
 import android.support.annotation.Nullable;
 
+import org.akvo.flow.app.FlowApp;
+import org.akvo.flow.domain.interactor.DefaultObserver;
+import org.akvo.flow.domain.interactor.UnPublishData;
+
+import javax.inject.Inject;
+
 import timber.log.Timber;
 
 public class UnPublishDataService extends IntentService {
 
     private static final String TAG = "UnPublishDataService";
 
+    @Inject
+    UnPublishData unPublishData;
+
     public UnPublishDataService() {
         super(TAG);
     }
 
     @Override
+    public void onCreate() {
+        super.onCreate();
+        FlowApp application = (FlowApp) getApplicationContext();
+        application.getApplicationComponent().inject(this);
+    }
+
+    @Override
     protected void onHandleIntent(@Nullable Intent intent) {
         Timber.d("Will un publish files");
-        //TODO: un publish files
+        unPublishData.execute(new DefaultObserver<Boolean>() {
+            @Override
+            public void onError(Throwable e) {
+                Timber.e(e);
+            }
+        });
     }
 }

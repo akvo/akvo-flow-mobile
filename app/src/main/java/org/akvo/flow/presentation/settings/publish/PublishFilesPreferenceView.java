@@ -30,6 +30,10 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import org.akvo.flow.R;
+import org.akvo.flow.app.FlowApp;
+import org.akvo.flow.injector.component.ApplicationComponent;
+import org.akvo.flow.injector.component.DaggerViewComponent;
+import org.akvo.flow.injector.component.ViewComponent;
 
 import javax.inject.Inject;
 
@@ -37,22 +41,23 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class PublishFilesPreferenceView extends LinearLayout implements IPublishFilesPreferenceView {
+public class PublishFilesPreferenceView extends LinearLayout
+        implements IPublishFilesPreferenceView {
 
     @BindView(R.id.preferenceProgress)
-    ProgressBar preferenceProgress;
+    ProgressBar progressBar;
 
     @BindView(R.id.preferenceProgressLayout)
-    FrameLayout preferenceProgressLayout;
+    FrameLayout progressLayout;
 
     @BindView(R.id.preferenceProgressText)
-    TextView preferenceProgressText;
+    TextView progressTextView;
 
     @BindView(R.id.preference_publish_data_title)
-    TextView preferencePublishDataTitle;
+    TextView publishDateTitleTextView;
 
     @BindView(R.id.preference_publish_data_subtitle)
-    TextView preferencePublishDataSubTitle;
+    TextView publishDateSubtitleTextView;
 
     @Inject
     PublishFilesPreferencePresenter presenter;
@@ -69,8 +74,20 @@ public class PublishFilesPreferenceView extends LinearLayout implements IPublish
     private void init() {
         setOrientation(VERTICAL);
         inflate(getContext(), R.layout.preference_publish_data, this);
+        initialiseInjector();
         ButterKnife.bind(this);
         presenter.setView(this);
+    }
+
+    private void initialiseInjector() {
+        ViewComponent viewComponent =
+                DaggerViewComponent.builder().applicationComponent(getApplicationComponent())
+                        .build();
+        viewComponent.inject(this);
+    }
+
+    private ApplicationComponent getApplicationComponent() {
+        return ((FlowApp) getContext().getApplicationContext()).getApplicationComponent();
     }
 
     @OnClick(R.id.publish_files_preference)
@@ -87,25 +104,25 @@ public class PublishFilesPreferenceView extends LinearLayout implements IPublish
     @Override
     public void showPublished() {
         setEnabled(false);
-        preferenceProgressLayout.setVisibility(VISIBLE);
+        progressLayout.setVisibility(VISIBLE);
         Context context = getContext();
-        preferenceProgressText.setText(context
+        progressTextView.setText(context
                 .getString(R.string.preference_publish_data_time_left,
-                        preferenceProgress.getProgress()));
-        preferencePublishDataTitle
+                        progressBar.getProgress()));
+        publishDateTitleTextView
                 .setTextColor(ContextCompat.getColor(context, R.color.black_disabled));
-        preferencePublishDataSubTitle.setText(
+        publishDateTitleTextView.setText(
                 context.getString(R.string.preference_publish_data_subtitle_published));
     }
 
     @Override
     public void showUnPublished() {
         setEnabled(true);
-        preferenceProgressLayout.setVisibility(GONE);
+        progressLayout.setVisibility(GONE);
         Context context = getContext();
-        preferencePublishDataTitle
+        publishDateTitleTextView
                 .setTextColor(ContextCompat.getColor(context, R.color.black_main));
-        preferencePublishDataSubTitle.setText(
+        publishDateSubtitleTextView.setText(
                 context.getString(R.string.preference_publish_data_subtitle));
     }
 

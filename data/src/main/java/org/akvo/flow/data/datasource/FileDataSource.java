@@ -72,14 +72,14 @@ public class FileDataSource {
     }
 
     private Observable<List<MovedFile>> moveFiles(String folderName) {
-        File file = getPublicFolder(folderName);
+        File publicFolder = getPublicFolder(folderName);
         List<MovedFile> movedFiles = new ArrayList<>();
-        if (file.exists()) {
-            File[] files = file.listFiles();
+        if (publicFolder.exists()) {
+            File[] files = publicFolder.listFiles();
             movedFiles = copyFiles(files, folderName);
             if (files.length == movedFiles.size()) {
                 //noinspection ResultOfMethodCallIgnored
-                file.delete();
+                publicFolder.delete();
             }
         }
         return Observable.just(movedFiles);

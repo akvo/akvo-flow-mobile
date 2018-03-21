@@ -34,6 +34,10 @@ import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.injector.component.ApplicationComponent;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
+import org.akvo.flow.app.FlowApp;
+import org.akvo.flow.injector.component.ApplicationComponent;
+import org.akvo.flow.injector.component.DaggerViewComponent;
+import org.akvo.flow.injector.component.ViewComponent;
 import org.akvo.flow.util.AlarmHelper;
 import org.akvo.flow.util.BootReceiverHelper;
 
@@ -56,10 +60,10 @@ public class PublishFilesPreferenceView extends LinearLayout
     TextView progressTextView;
 
     @BindView(R.id.preference_publish_data_title)
-    TextView publishDateTitleTextView;
+    TextView publishDataTitleTextView;
 
     @BindView(R.id.preference_publish_data_subtitle)
-    TextView publishDateSubtitleTextView;
+    TextView publishDataSubtitleTextView;
 
     @Inject
     PublishFilesPreferencePresenter presenter;
@@ -117,9 +121,9 @@ public class PublishFilesPreferenceView extends LinearLayout
         Context context = getContext();
         progressTextView.setText(context.getString(R.string.preference_publish_data_time_left,
                 progress));
-        publishDateTitleTextView
+        publishDataTitleTextView
                 .setTextColor(ContextCompat.getColor(context, R.color.black_disabled));
-        publishDateSubtitleTextView
+        publishDataSubtitleTextView
                 .setText(context.getString(R.string.preference_publish_data_subtitle_published));
     }
 
@@ -128,9 +132,9 @@ public class PublishFilesPreferenceView extends LinearLayout
         setEnabled(true);
         progressLayout.setVisibility(GONE);
         Context context = getContext();
-        publishDateTitleTextView
+        publishDataTitleTextView
                 .setTextColor(ContextCompat.getColor(context, R.color.black_main));
-        publishDateSubtitleTextView.setText(
+        publishDataSubtitleTextView.setText(
                 context.getString(R.string.preference_publish_data_subtitle));
     }
 

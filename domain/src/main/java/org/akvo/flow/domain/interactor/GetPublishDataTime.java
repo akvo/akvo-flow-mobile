@@ -25,10 +25,13 @@ import org.akvo.flow.domain.executor.ThreadExecutor;
 import org.akvo.flow.domain.repository.UserRepository;
 
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 
 import io.reactivex.Observable;
+import io.reactivex.ObservableSource;
+import io.reactivex.functions.Function;
 
 public class GetPublishDataTime extends UseCase {
 
@@ -44,6 +47,14 @@ public class GetPublishDataTime extends UseCase {
 
     @Override
     protected <T> Observable buildUseCaseObservable(Map<String, T> parameters) {
-        return userRepository.getPublishDataTime();
+        return userRepository.getPublishDataTime().repeatWhen(
+                new Function<Observable<Object>, ObservableSource<?>>() {
+                    @Override
+                    public ObservableSource<?> apply(Observable<Object> objectObservable)
+                            throws Exception {
+                        return objectObservable.delay(1, TimeUnit.MINUTES);
+                    }
+                });
+
     }
 }

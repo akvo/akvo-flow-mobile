@@ -39,7 +39,8 @@ public class PublishedTimeHelper {
                 System.currentTimeMillis() - publishTime;
     }
 
-    public int getMaxPublishedTime(long timeSincePublished) {
-        return (int) TimeUnit.MINUTES.convert(timeSincePublished, TimeUnit.MILLISECONDS);
+    public int getRemainingPublishedTime(long timeSincePublished) {
+        long timeRemainingInMs = MAX_PUBLISH_TIME_IN_MS - timeSincePublished;
+        return (int) TimeUnit.MINUTES.convert(timeRemainingInMs, TimeUnit.MILLISECONDS);
     }
 }

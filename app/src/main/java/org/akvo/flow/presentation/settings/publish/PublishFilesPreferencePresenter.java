@@ -21,7 +21,6 @@
 package org.akvo.flow.presentation.settings.publish;
 
 import org.akvo.flow.domain.interactor.DefaultObserver;
-import org.akvo.flow.domain.interactor.MakeDataPublic;
 import org.akvo.flow.domain.interactor.UseCase;
 import org.akvo.flow.presentation.Presenter;
 
@@ -34,14 +33,14 @@ public class PublishFilesPreferencePresenter implements Presenter {
 
     private final PublishedTimeHelper publishedTimeHelper;
     private final UseCase getPublishDataTime;
-    private final MakeDataPublic makeDataPublic;
+    private final UseCase makeDataPublic;
 
     private IPublishFilesPreferenceView view;
 
     @Inject
     public PublishFilesPreferencePresenter(PublishedTimeHelper publishedTimeHelper,
             @Named("getPublishDataTime") UseCase getPublishDataTime,
-            MakeDataPublic makeDataPublic) {
+            @Named("makeDataPublic") UseCase makeDataPublic) {
         this.publishedTimeHelper = publishedTimeHelper;
         this.getPublishDataTime = getPublishDataTime;
         this.makeDataPublic = makeDataPublic;
@@ -63,12 +62,10 @@ public class PublishFilesPreferencePresenter implements Presenter {
             @Override
             public void onNext(Boolean published) {
                 //TODO: make sure everything was published
-                int progress = publishedTimeHelper
-                        .getMaxPublishedTime(PublishedTimeHelper.MAX_PUBLISH_TIME_IN_MS) - 1;
-                view.showPublished(progress);
                 view.scheduleAlarm();
+                load();
             }
-        });
+        }, null);
     }
 
     @Override
@@ -81,17 +78,22 @@ public class PublishFilesPreferencePresenter implements Presenter {
         getPublishDataTime.execute(new DefaultObserver<Long>() {
             @Override
             public void onError(Throwable e) {
-                Timber.e(e);
+                getPublishDataTime.dispose();
                 view.showUnPublished();
+                Timber.e(e);
             }
 
             @Override
             public void onNext(Long publishTime) {
                 long timeSincePublished = publishedTimeHelper
                         .calculateTimeSincePublished(publishTime);
+                Timber.d("timeSincePublished: " + timeSincePublished);
                 if (timeSincePublished < PublishedTimeHelper.MAX_PUBLISH_TIME_IN_MS) {
-                    view.showPublished(publishedTimeHelper.getMaxPublishedTime(timeSincePublished));
+                    int remainingTime = publishedTimeHelper.getRemainingPublishedTime(
+                            timeSincePublished);
+                    view.showPublished(remainingTime);
                 } else {
+                    getPublishDataTime.dispose();
                     view.showUnPublished();
                 }
             }

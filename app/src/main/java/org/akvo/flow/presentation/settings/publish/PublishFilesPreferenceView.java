@@ -136,8 +136,7 @@ public class PublishFilesPreferenceView extends LinearLayout
 
     @Override
     public void scheduleAlarm() {
-        //TODO: change to MAX_PUBLISH_TIME_IN_MS
-        alarmHelper.scheduleAlarm(90 * 1000);
+        alarmHelper.scheduleAlarm(PublishedTimeHelper.MAX_PUBLISH_TIME_IN_MS);
         bootReceiverHelper.enableBootReceiver();
     }
 

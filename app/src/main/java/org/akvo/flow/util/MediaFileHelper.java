@@ -49,7 +49,7 @@ public class MediaFileHelper {
     private static final String TEMP_VIDEO_NAME_PREFIX = "video";
     private static final String IMAGE_SUFFIX = ".jpg";
     private static final String VIDEO_SUFFIX = ".mp4";
-    private static final String DIR_MEDIA = "akvoflow/data/media"; // form responses media files
+    private static final String DIR_MEDIA = "akvoflow/data/media";
 
     private final Context context;
     private final DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US);

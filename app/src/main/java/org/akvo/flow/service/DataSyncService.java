@@ -42,6 +42,8 @@ import org.akvo.flow.database.TransmissionStatus;
 import org.akvo.flow.database.UserColumns;
 import org.akvo.flow.domain.FileTransmission;
 import org.akvo.flow.domain.Survey;
+import org.akvo.flow.domain.interactor.DefaultObserver;
+import org.akvo.flow.domain.interactor.MakeDataPrivate;
 import org.akvo.flow.domain.response.FormInstance;
 import org.akvo.flow.domain.response.Response;
 import org.akvo.flow.exception.HttpException;
@@ -133,6 +135,9 @@ public class DataSyncService extends IntentService {
     @Inject
     MediaFileHelper mediaFileHelper;
 
+    @Inject
+    MakeDataPrivate makeDataPrivate;
+
     public DataSyncService() {
         super(TAG);
     }
@@ -146,13 +151,30 @@ public class DataSyncService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
+        makeDataPrivate.dispose();
+        makeDataPrivate.execute(new DefaultObserver<Boolean>() {
+            @Override
+            public void onNext(Boolean ignored) {
+                exportAndSync();
+            }
+
+            @Override
+            public void onError(Throwable e) {
+                Timber.e(e);
+                exportAndSync();
+            }
+        });
+        makeDataPrivate.dispose();
+    }
+
+    private void exportAndSync() {
         try {
             mDatabase.open();
-            exportSurveys();// Create zip files, if necessary
+            exportSurveys();
 
             if (connectivityStateManager.isConnectionAvailable(preferences
                     .getBoolean(Prefs.KEY_CELL_UPLOAD, Prefs.DEFAULT_VALUE_CELL_UPLOAD))) {
-                syncFiles();// Sync everything
+                syncFiles();
             }
         } catch (Exception e) {
             Timber.e(e, e.getMessage());
@@ -167,6 +189,9 @@ public class DataSyncService extends IntentService {
     // ============================ EXPORT ============================= //
     // ================================================================= //
 
+    /**
+     * Create zip files, if necessary
+     */
     private void exportSurveys() {
         // First off, ensure surveys marked as 'exported' are indeed found in the external storage.
         // Missing surveys will be set to 'submitted', so the next step re-creates these files too.

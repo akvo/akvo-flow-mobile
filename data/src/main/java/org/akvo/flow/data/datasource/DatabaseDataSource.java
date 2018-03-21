@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -39,6 +39,7 @@ import org.akvo.flow.database.SyncTimeColumns;
 import org.akvo.flow.database.TransmissionStatus;
 import org.akvo.flow.database.britedb.BriteSurveyDbAdapter;
 import org.akvo.flow.domain.entity.User;
+import org.akvo.flow.data.entity.MovedFile;
 
 import java.util.List;
 
@@ -74,13 +75,6 @@ public class DatabaseDataSource {
 
     }
 
-    private boolean isRequestFiltered(@Nullable Integer orderBy) {
-        return orderBy != null && (orderBy == Constants.ORDER_BY_DISTANCE ||
-                orderBy ==  Constants.ORDER_BY_DATE ||
-                orderBy ==  Constants.ORDER_BY_STATUS ||
-                orderBy ==  Constants.ORDER_BY_NAME);
-    }
-
     public Cursor getSyncedTime(long surveyGroupId) {
         return briteSurveyDbAdapter.getSyncTime(surveyGroupId);
     }
@@ -111,13 +105,35 @@ public class DatabaseDataSource {
         }
     }
 
+
+    public void updateTransmissions(@NonNull List<MovedFile> movedFiles) {
+        BriteDatabase.Transaction transaction = briteSurveyDbAdapter.beginTransaction();
+        try {
+            for (MovedFile file: movedFiles) {
+                briteSurveyDbAdapter.updateTransmission(file.getOldPath(), file.getNewPath());
+            }
+            transaction.markSuccessful();
+        } finally {
+            transaction.end();
+        }
+    }
+
+    private boolean isRequestFiltered(@Nullable Integer orderBy) {
+        return orderBy != null && (orderBy == Constants.ORDER_BY_DISTANCE ||
+                orderBy == Constants.ORDER_BY_DATE ||
+                orderBy == Constants.ORDER_BY_STATUS ||
+                orderBy == Constants.ORDER_BY_NAME);
+    }
+
     /**
      * JSON array responses are ordered to have the latest updated datapoint last so
      * we record it to make the next query using it
-     * @param apiDataPoints
+     *
      */
     private void updateLastUpdatedDateTime(@NonNull List<ApiDataPoint> apiDataPoints) {
-        ApiDataPoint apiDataPoint = apiDataPoints.isEmpty()? null : apiDataPoints.get(apiDataPoints.size() - 1);
+        ApiDataPoint apiDataPoint = apiDataPoints.isEmpty() ?
+                null :
+                apiDataPoints.get(apiDataPoints.size() - 1);
         if (apiDataPoint != null) {
             String syncTime = String.valueOf(apiDataPoint.getLastModified());
             setSyncTime(apiDataPoint.getSurveyGroupId(), syncTime);

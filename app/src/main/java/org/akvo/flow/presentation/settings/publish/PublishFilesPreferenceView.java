@@ -54,10 +54,10 @@ public class PublishFilesPreferenceView extends LinearLayout
     TextView progressTextView;
 
     @BindView(R.id.preference_publish_data_title)
-    TextView publishDateTitleTextView;
+    TextView publishDataTitleTextView;
 
     @BindView(R.id.preference_publish_data_subtitle)
-    TextView publishDateSubtitleTextView;
+    TextView publishDataSubtitleTextView;
 
     @Inject
     PublishFilesPreferencePresenter presenter;
@@ -109,9 +109,9 @@ public class PublishFilesPreferenceView extends LinearLayout
         progressTextView.setText(context
                 .getString(R.string.preference_publish_data_time_left,
                         progressBar.getProgress()));
-        publishDateTitleTextView
+        publishDataTitleTextView
                 .setTextColor(ContextCompat.getColor(context, R.color.black_disabled));
-        publishDateTitleTextView.setText(
+        publishDataSubtitleTextView.setText(
                 context.getString(R.string.preference_publish_data_subtitle_published));
     }
 
@@ -120,9 +120,9 @@ public class PublishFilesPreferenceView extends LinearLayout
         setEnabled(true);
         progressLayout.setVisibility(GONE);
         Context context = getContext();
-        publishDateTitleTextView
+        publishDataTitleTextView
                 .setTextColor(ContextCompat.getColor(context, R.color.black_main));
-        publishDateSubtitleTextView.setText(
+        publishDataSubtitleTextView.setText(
                 context.getString(R.string.preference_publish_data_subtitle));
     }
 

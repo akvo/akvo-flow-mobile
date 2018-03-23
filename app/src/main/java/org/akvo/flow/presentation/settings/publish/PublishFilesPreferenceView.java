@@ -34,6 +34,12 @@ import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.injector.component.ApplicationComponent;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
+import org.akvo.flow.app.FlowApp;
+import org.akvo.flow.injector.component.ApplicationComponent;
+import org.akvo.flow.injector.component.DaggerViewComponent;
+import org.akvo.flow.injector.component.ViewComponent;
+import org.akvo.flow.util.AlarmHelper;
+import org.akvo.flow.util.BootReceiverHelper;
 
 import javax.inject.Inject;
 
@@ -61,6 +67,12 @@ public class PublishFilesPreferenceView extends LinearLayout
 
     @Inject
     PublishFilesPreferencePresenter presenter;
+
+    @Inject
+    AlarmHelper alarmHelper;
+
+    @Inject
+    BootReceiverHelper bootReceiverHelper;
 
     public PublishFilesPreferenceView(Context context) {
         this(context, null);
@@ -102,17 +114,17 @@ public class PublishFilesPreferenceView extends LinearLayout
     }
 
     @Override
-    public void showPublished() {
+    public void showPublished(int progress) {
         setEnabled(false);
         progressLayout.setVisibility(VISIBLE);
+        progressBar.setProgress(progress);
         Context context = getContext();
-        progressTextView.setText(context
-                .getString(R.string.preference_publish_data_time_left,
-                        progressBar.getProgress()));
+        progressTextView.setText(context.getString(R.string.preference_publish_data_time_left,
+                progress));
         publishDataTitleTextView
                 .setTextColor(ContextCompat.getColor(context, R.color.black_disabled));
-        publishDataSubtitleTextView.setText(
-                context.getString(R.string.preference_publish_data_subtitle_published));
+        publishDataSubtitleTextView
+                .setText(context.getString(R.string.preference_publish_data_subtitle_published));
     }
 
     @Override
@@ -124,6 +136,13 @@ public class PublishFilesPreferenceView extends LinearLayout
                 .setTextColor(ContextCompat.getColor(context, R.color.black_main));
         publishDataSubtitleTextView.setText(
                 context.getString(R.string.preference_publish_data_subtitle));
+    }
+
+    @Override
+    public void scheduleAlarm() {
+        //TODO: change to MAX_PUBLISH_TIME_IN_MS
+        alarmHelper.scheduleAlarm(90 * 1000);
+        bootReceiverHelper.enableBootReceiver();
     }
 
     @Override

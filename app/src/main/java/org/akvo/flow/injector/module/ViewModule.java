@@ -26,6 +26,7 @@ import org.akvo.flow.domain.interactor.DeleteSurvey;
 import org.akvo.flow.domain.interactor.DeleteUser;
 import org.akvo.flow.domain.interactor.EditUser;
 import org.akvo.flow.domain.interactor.GetAllSurveys;
+import org.akvo.flow.domain.interactor.GetPublishDataTime;
 import org.akvo.flow.domain.interactor.GetSavedDataPoints;
 import org.akvo.flow.domain.interactor.GetUserSettings;
 import org.akvo.flow.domain.interactor.GetUsers;
@@ -147,5 +148,11 @@ public class ViewModule {
     @Named("saveResizedImage")
     UseCase provideSaveResizedImage(SaveResizedImage saveResizedImage) {
         return saveResizedImage;
+    }
+
+    @Provides
+    @Named("getPublishDataTime")
+    UseCase provideGetPublishDataTime(GetPublishDataTime getPublishDataTime) {
+        return getPublishDataTime;
     }
 }

@@ -110,4 +110,19 @@ public class UserDataRepository implements UserRepository {
     public Observable<Boolean> setSelectedUser(long userId) {
         return dataSourceFactory.getSharedPreferencesDataSource().setSelectedUser(userId);
     }
+
+    @Override
+    public Observable<Long> getPublishDataTime() {
+        return dataSourceFactory.getSharedPreferencesDataSource().getPublishDataTime();
+    }
+
+    @Override
+    public Observable<Boolean> setPublishDataTime() {
+        return dataSourceFactory.getSharedPreferencesDataSource().setPublishDataTime();
+    }
+
+    @Override
+    public Observable<Boolean> clearPublishDataTime() {
+        return dataSourceFactory.getSharedPreferencesDataSource().clearPublishDataTime();
+    }
 }

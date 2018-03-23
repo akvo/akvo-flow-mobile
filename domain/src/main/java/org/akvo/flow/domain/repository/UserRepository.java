@@ -53,4 +53,10 @@ public interface UserRepository {
     Observable<Boolean> clearSelectedUser();
 
     Observable<Boolean> setSelectedUser(long userId);
+
+    Observable<Long> getPublishDataTime();
+
+    Observable<Boolean> setPublishDataTime();
+
+    Observable<Boolean> clearPublishDataTime();
 }

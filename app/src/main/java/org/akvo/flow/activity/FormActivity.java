@@ -552,7 +552,8 @@ public class FormActivity extends BackActivity implements SurveyListener,
                 onMediaAcquired(imagePath);
                 break;
             case ConstantUtil.VIDEO_ACTIVITY_REQUEST:
-                String videoAbsolutePath = mediaFileHelper.getAcquiredVideoFilePath(intent);
+                String videoAbsolutePath = mediaFileHelper
+                        .getAcquiredVideoFilePath(intent);
                 onMediaAcquired(videoAbsolutePath);
                 break;
             case ConstantUtil.EXTERNAL_SOURCE_REQUEST:
@@ -781,11 +782,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
 
     private void navigateToTakeVideo(QuestionInteractionEvent event) {
         recordSourceId(event);
-        navigator.navigateToTakeVideo(this, getVideoFileUri());
-    }
-
-    private Uri getVideoFileUri() {
-        return Uri.fromFile(mediaFileHelper.getVideoTmpFile());
+        navigator.navigateToTakeVideo(this);
     }
 
     private void takePhoto(QuestionInteractionEvent event) {

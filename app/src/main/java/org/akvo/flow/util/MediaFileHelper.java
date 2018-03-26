@@ -73,26 +73,21 @@ public class MediaFileHelper {
 
     @Nullable
     public String getAcquiredVideoFilePath(Intent intent) {
-        File tmp = getVideoTmpFile();
-        if (!tmp.exists()) {
-            return getVideoPathFromIntent(intent);
-        }
-        return tmp.getAbsolutePath();
-    }
-
-    @NonNull
-    public File getVideoTmpFile() {
-        String filename = TEMP_VIDEO_NAME_PREFIX + VIDEO_SUFFIX;
-        return getMediaFile(filename);
+        return getVideoPathFromIntent(intent);
     }
 
     @Nullable
     public File getImageTmpFile() {
+        return getTempMediaFile(TEMP_PHOTO_NAME_PREFIX, IMAGE_SUFFIX);
+    }
+
+    @Nullable
+    private File getTempMediaFile(String prefix, String suffix) {
         String timeStamp = dateFormat.format(new Date());
-        String imageFileName = TEMP_PHOTO_NAME_PREFIX + timeStamp + "_";
+        String imageFileName = prefix + timeStamp + "_";
         File storageDir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
         try {
-            return File.createTempFile(imageFileName, IMAGE_SUFFIX, storageDir);
+            return File.createTempFile(imageFileName, suffix, storageDir);
         } catch (IOException e) {
             Timber.e(e, "Unable to create image file");
         }

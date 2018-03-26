@@ -35,6 +35,8 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import timber.log.Timber;
+
 public class VideoQuestionPresenter implements Presenter {
 
     private final UseCase copyVideo;
@@ -62,7 +64,7 @@ public class VideoQuestionPresenter implements Presenter {
             view.showLoading();
             final String targetVideoFilePath = mediaFileHelper.getVideoFilePath();
             Map<String, Object> params = new HashMap<>(4);
-            params.put(CopyVideo.ORIGIN_FILE_NAME_PARAM,filePath);
+            params.put(CopyVideo.ORIGIN_FILE_NAME_PARAM, filePath);
             params.put(CopyVideo.DESTINATION_FILE_NAME_PARAM, targetVideoFilePath);
             copyVideo.execute(new DefaultObserver<Boolean>() {
                 @Override
@@ -72,6 +74,7 @@ public class VideoQuestionPresenter implements Presenter {
 
                 @Override
                 public void onError(Throwable e) {
+                    Timber.e(e);
                     view.showErrorGettingMedia();
                 }
             }, params);

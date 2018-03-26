@@ -31,4 +31,6 @@ public interface FileRepository {
     Observable<Boolean> saveResizedImage(String fileName, String resizedFilePath, int imageSize);
 
     Observable<Boolean> moveFiles();
+
+    Observable<Boolean> copyPrivateData();
 }

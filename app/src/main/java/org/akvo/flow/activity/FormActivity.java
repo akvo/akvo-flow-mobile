@@ -138,7 +138,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
     private Map<String, QuestionResponse> mQuestionResponses; // QuestionId - QuestionResponse
     private String surveyId;
 
-    private String imagePath;
+    private String mediaPath;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -549,10 +549,11 @@ public class FormActivity extends BackActivity implements SurveyListener,
 
         switch (requestCode) {
             case ConstantUtil.PHOTO_ACTIVITY_REQUEST:
-                onMediaAcquired(imagePath);
+                onMediaAcquired(mediaPath);
                 break;
             case ConstantUtil.VIDEO_ACTIVITY_REQUEST:
-                String videoAbsolutePath = mediaFileHelper.getAcquiredVideoFilePath(intent);
+                String videoAbsolutePath = mediaFileHelper
+                        .getAcquiredVideoFilePath(intent, mediaPath);
                 onMediaAcquired(videoAbsolutePath);
                 break;
             case ConstantUtil.EXTERNAL_SOURCE_REQUEST:
@@ -781,18 +782,20 @@ public class FormActivity extends BackActivity implements SurveyListener,
 
     private void navigateToTakeVideo(QuestionInteractionEvent event) {
         recordSourceId(event);
-        navigator.navigateToTakeVideo(this, getVideoFileUri());
-    }
-
-    private Uri getVideoFileUri() {
-        return Uri.fromFile(mediaFileHelper.getVideoTmpFile());
+        File videoTmpFile = mediaFileHelper.getVideoTmpFile();
+        if (videoTmpFile != null) {
+            mediaPath = videoTmpFile.getAbsolutePath();
+            Uri videoFileUri = Uri.fromFile(videoTmpFile);
+            navigator.navigateToTakeVideo(this, videoFileUri);
+        }
+        //TODO: notify error taking video
     }
 
     private void takePhoto(QuestionInteractionEvent event) {
         recordSourceId(event);
         File imageTmpFile = mediaFileHelper.getImageTmpFile();
         if (imageTmpFile != null) {
-            imagePath = imageTmpFile.getAbsolutePath();
+            mediaPath = imageTmpFile.getAbsolutePath();
             navigator.navigateToTakePhoto(this, Uri.fromFile(imageTmpFile));
         }
         //TODO: notify error taking pictures

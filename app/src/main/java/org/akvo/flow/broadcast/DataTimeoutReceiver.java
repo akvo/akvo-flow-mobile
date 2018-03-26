@@ -25,12 +25,10 @@ import android.content.Context;
 import android.content.Intent;
 
 import org.akvo.flow.app.FlowApp;
-import org.akvo.flow.util.BootReceiverHelper;
 import org.akvo.flow.service.UnPublishDataService;
+import org.akvo.flow.util.BootReceiverHelper;
 
 import javax.inject.Inject;
-
-import timber.log.Timber;
 
 public class DataTimeoutReceiver extends BroadcastReceiver {
 
@@ -39,7 +37,6 @@ public class DataTimeoutReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        Timber.d("onReceive");
         initializeInjector(context);
         bootReceiverHelper.disableBootReceiver();
         context.startService(new Intent(context, UnPublishDataService.class));

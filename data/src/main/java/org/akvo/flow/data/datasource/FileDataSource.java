@@ -42,6 +42,8 @@ public class FileDataSource {
 
     private static final String DIR_DATA = "akvoflow/data/files";
     private static final String DIR_MEDIA = "akvoflow/data/media";
+    private static final String DIR_PUBLISHED_DATA = "akvoflow/published/files";
+    private static final String DIR_PUBLISHED_MEDIA = "akvoflow/published/media";
 
     private final Context context;
     private final FileHelper fileHelper;
@@ -120,18 +122,18 @@ public class FileDataSource {
 
     public Observable<Boolean> copyPrivateData() {
         //TODO: error handling will be added in separate issue
-        copyPrivateFileToPublic(DIR_DATA);
-        copyPrivateFileToPublic(DIR_MEDIA);
+        copyPrivateFileToPublic(DIR_DATA, DIR_PUBLISHED_DATA);
+        copyPrivateFileToPublic(DIR_MEDIA, DIR_PUBLISHED_MEDIA);
         return Observable.just(true);
     }
 
-    private void copyPrivateFileToPublic(String folderName) {
-        File destinationDataFolder = getPublicFolder(folderName);
+    private void copyPrivateFileToPublic(String privateFolderName, String publicFolderName) {
+        File destinationDataFolder = getPublicFolder(publicFolderName);
         if (!destinationDataFolder.exists()) {
             //noinspection ResultOfMethodCallIgnored
             destinationDataFolder.mkdirs();
         }
-        File dataFolder = getPrivateFolder(folderName);
+        File dataFolder = getPrivateFolder(privateFolderName);
         if (dataFolder.exists()) {
             File[] files = dataFolder.listFiles();
             if (files != null) {
@@ -143,8 +145,8 @@ public class FileDataSource {
     }
 
     public Observable<Boolean> removePublicFiles() {
-        deleteFilesInPublicFolder(DIR_DATA);
-        deleteFilesInPublicFolder(DIR_MEDIA);
+        deleteFilesInPublicFolder(DIR_PUBLISHED_DATA);
+        deleteFilesInPublicFolder(DIR_PUBLISHED_MEDIA);
         return Observable.just(true);
     }
 

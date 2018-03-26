@@ -121,9 +121,8 @@ public class Navigator {
         }
     }
 
-    public void navigateToTakeVideo(@NonNull Activity activity, Uri uri) {
+    public void navigateToTakeVideo(@NonNull Activity activity) {
         Intent i = new Intent(android.provider.MediaStore.ACTION_VIDEO_CAPTURE);
-        i.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, uri);
         activity.startActivityForResult(i, ConstantUtil.VIDEO_ACTIVITY_REQUEST);
     }
 

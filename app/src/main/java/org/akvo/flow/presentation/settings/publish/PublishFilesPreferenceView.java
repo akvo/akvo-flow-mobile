@@ -34,10 +34,6 @@ import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.injector.component.ApplicationComponent;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
-import org.akvo.flow.app.FlowApp;
-import org.akvo.flow.injector.component.ApplicationComponent;
-import org.akvo.flow.injector.component.DaggerViewComponent;
-import org.akvo.flow.injector.component.ViewComponent;
 import org.akvo.flow.util.AlarmHelper;
 import org.akvo.flow.util.BootReceiverHelper;
 
@@ -116,7 +112,9 @@ public class PublishFilesPreferenceView extends LinearLayout
     @Override
     public void showPublished(int progress) {
         setEnabled(false);
+        progressBar.setIndeterminate(false);
         progressLayout.setVisibility(VISIBLE);
+        progressTextView.setVisibility(VISIBLE);
         progressBar.setProgress(progress);
         Context context = getContext();
         progressTextView.setText(context.getString(R.string.preference_publish_data_time_left,
@@ -130,12 +128,23 @@ public class PublishFilesPreferenceView extends LinearLayout
     @Override
     public void showUnPublished() {
         setEnabled(true);
+        progressBar.setIndeterminate(false);
         progressLayout.setVisibility(GONE);
         Context context = getContext();
         publishDataTitleTextView
                 .setTextColor(ContextCompat.getColor(context, R.color.black_main));
         publishDataSubtitleTextView.setText(
                 context.getString(R.string.preference_publish_data_subtitle));
+    }
+
+    @Override
+    public void showLoading() {
+        setEnabled(false);
+        progressBar.setIndeterminate(true);
+        progressBar.setIndeterminateDrawable(ContextCompat
+                .getDrawable(getContext(), R.drawable.circle_progress_drawable_moving));
+        progressTextView.setVisibility(INVISIBLE);
+        progressLayout.setVisibility(VISIBLE);
     }
 
     @Override

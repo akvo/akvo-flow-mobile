@@ -51,17 +51,22 @@ public class PublishFilesPreferencePresenter implements Presenter {
     }
 
     public void onPublishClick() {
-        //TODO: show "loading" until files are published
+        view.showLoading();
+        final long startTime = System.currentTimeMillis();
+        makeDataPublic.dispose();
         makeDataPublic.execute(new DefaultObserver<Boolean>() {
             @Override
             public void onError(Throwable e) {
                 Timber.e(e);
                 //TODO: display error to user (other issue)
+                load();
             }
 
             @Override
             public void onNext(Boolean published) {
                 //TODO: make sure everything was published
+                long endTime = System.currentTimeMillis();
+                Timber.d("moving files took: " + (endTime - startTime));
                 view.scheduleAlarm();
                 load();
             }

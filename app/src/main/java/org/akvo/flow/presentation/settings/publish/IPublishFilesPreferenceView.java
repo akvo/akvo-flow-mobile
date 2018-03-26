@@ -26,5 +26,7 @@ public interface IPublishFilesPreferenceView {
 
     void showUnPublished();
 
+    void showLoading();
+
     void scheduleAlarm();
 }

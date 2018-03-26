@@ -141,10 +141,13 @@ public class PublishFilesPreferenceView extends LinearLayout
     public void showLoading() {
         setEnabled(false);
         progressBar.setIndeterminate(true);
-        progressBar.setIndeterminateDrawable(ContextCompat
-                .getDrawable(getContext(), R.drawable.circle_progress_drawable_moving));
         progressTextView.setVisibility(INVISIBLE);
         progressLayout.setVisibility(VISIBLE);
+        Context context = getContext();
+        publishDataSubtitleTextView
+                .setText(context.getString(R.string.preference_publish_data_subtitle_publishing));
+        publishDataTitleTextView
+                .setTextColor(ContextCompat.getColor(context, R.color.black_disabled));
     }
 
     @Override

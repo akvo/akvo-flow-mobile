@@ -72,17 +72,8 @@ public class MediaFileHelper {
     }
 
     @Nullable
-    public String getAcquiredVideoFilePath(Intent intent, String mediaPath) {
-        File tmp = new File(mediaPath);
-        if (!tmp.exists()) {
-            return getVideoPathFromIntent(intent);
-        }
-        return tmp.getAbsolutePath();
-    }
-
-    @Nullable
-    public File getVideoTmpFile() {
-        return getTempMediaFile(TEMP_VIDEO_NAME_PREFIX, VIDEO_SUFFIX);
+    public String getAcquiredVideoFilePath(Intent intent) {
+        return getVideoPathFromIntent(intent);
     }
 
     @Nullable

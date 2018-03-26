@@ -35,6 +35,8 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import timber.log.Timber;
+
 public class VideoQuestionPresenter implements Presenter {
 
     private final UseCase copyVideo;
@@ -72,6 +74,7 @@ public class VideoQuestionPresenter implements Presenter {
 
                 @Override
                 public void onError(Throwable e) {
+                    Timber.e(e);
                     view.showErrorGettingMedia();
                 }
             }, params);

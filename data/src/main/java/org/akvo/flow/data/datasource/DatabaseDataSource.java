@@ -30,6 +30,7 @@ import com.squareup.sqlbrite2.BriteDatabase;
 import org.akvo.flow.data.entity.ApiDataPoint;
 import org.akvo.flow.data.entity.ApiQuestionAnswer;
 import org.akvo.flow.data.entity.ApiSurveyInstance;
+import org.akvo.flow.data.entity.MovedFile;
 import org.akvo.flow.database.Constants;
 import org.akvo.flow.database.RecordColumns;
 import org.akvo.flow.database.ResponseColumns;
@@ -39,13 +40,13 @@ import org.akvo.flow.database.SyncTimeColumns;
 import org.akvo.flow.database.TransmissionStatus;
 import org.akvo.flow.database.britedb.BriteSurveyDbAdapter;
 import org.akvo.flow.domain.entity.User;
-import org.akvo.flow.data.entity.MovedFile;
 
 import java.util.List;
 
 import javax.inject.Inject;
 
 import io.reactivex.Observable;
+import io.reactivex.Single;
 
 public class DatabaseDataSource {
 
@@ -209,6 +210,10 @@ public class DatabaseDataSource {
 
     public Observable<Cursor> getUsers() {
         return briteSurveyDbAdapter.getUsers();
+    }
+
+    public Observable<Cursor> getUser(Long userId) {
+        return briteSurveyDbAdapter.getUser(userId);
     }
 
     public Observable<Boolean> editUser(User user) {

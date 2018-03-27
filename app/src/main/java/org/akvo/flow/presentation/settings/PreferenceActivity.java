@@ -46,7 +46,6 @@ import android.widget.Toast;
 import org.akvo.flow.BuildConfig;
 import org.akvo.flow.R;
 import org.akvo.flow.activity.BackActivity;
-import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.async.ClearDataAsyncTask;
 import org.akvo.flow.data.database.SurveyDbDataSource;
 import org.akvo.flow.injector.component.DaggerViewComponent;
@@ -335,7 +334,7 @@ public class PreferenceActivity extends BackActivity implements PreferenceView {
                         public void onClick(DialogInterface dialog, int id) {
                             if (!responsesOnly) {
                                 // Delete everything implies logging the current user out (if any)
-                                FlowApp.getApp().setUser(null);
+                                //prefs.setLong(Prefs.KEY_USER_ID, Prefs.DEFAULT_VALUE_USER_ID); //TODO
                                 helper.clearUser();
                             }
                             new ClearDataAsyncTask(PreferenceActivity.this).execute(responsesOnly);

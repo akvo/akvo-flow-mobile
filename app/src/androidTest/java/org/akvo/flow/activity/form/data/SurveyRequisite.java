@@ -21,15 +21,13 @@ package org.akvo.flow.activity.form.data;
 
 import android.content.Context;
 
-import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.data.preference.Prefs;
-import org.akvo.flow.domain.User;
 
 public class SurveyRequisite {
 
     public static void setRequisites(Context context) {
-        FlowApp.getApp().setUser(new User(1L, "User"));
         Prefs prefs = new Prefs(context);
+        prefs.setLong(Prefs.KEY_USER_ID, 1L);
         //To bypass the need for a setup (create user)
         prefs.setBoolean(Prefs.KEY_SETUP, true);
         //To bypass "Low Storage" prompt
@@ -38,8 +36,8 @@ public class SurveyRequisite {
 
     //Reset to stage before tests
     public static void resetRequisites(Context context) {
-        FlowApp.getApp().setUser(null);
         Prefs prefs = new Prefs(context);
+        prefs.setLong(Prefs.KEY_USER_ID, Prefs.DEFAULT_VALUE_USER_ID);
         prefs.setBoolean(Prefs.KEY_SETUP, false);
         prefs.setLong(Prefs.KEY_SPACE_AVAILABLE, Prefs.DEF_VALUE_SPACE_AVAILABLE);
     }

@@ -351,7 +351,7 @@ public class BriteSurveyDbAdapter {
                 + SurveyColumns.SURVEY_ID
                 + " FROM " + Tables.SURVEY
                 + " WHERE " + SurveyColumns.DELETED + " <> ?";
-        Cursor c =  briteDatabase.query(sqlQuery, "1");
+        Cursor c = briteDatabase.query(sqlQuery, "1");
         if (c != null) {
             String[] ids = new String[c.getCount()];
             if (c.moveToFirst()) {
@@ -381,6 +381,13 @@ public class BriteSurveyDbAdapter {
                         return Observable.just(query.run());
                     }
                 });
+    }
+
+    public Observable<Cursor> getUser(long userId) {
+        String sqlQuery =
+                "SELECT * FROM " + Tables.USER + " WHERE " + UserColumns.DELETED + " <> 1 AND "
+                        + UserColumns._ID + "=?";
+        return Observable.just(briteDatabase.query(sqlQuery, userId + ""));
     }
 
     public void updateUser(long id, String name) {

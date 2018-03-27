@@ -27,10 +27,8 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 
 import org.akvo.flow.R;
-import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.data.database.SurveyDbDataSource;
 import org.akvo.flow.data.preference.Prefs;
-import org.akvo.flow.domain.User;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
 import org.akvo.flow.presentation.BaseActivity;
@@ -118,14 +116,14 @@ public class AddUserActivity extends BaseActivity {
         String username = nameEt.getText().toString().trim();
         String deviceId = deviceIdEt.getText().toString().trim();
         surveyDbDataSource.open();
-        long uid = surveyDbDataSource.createOrUpdateUser(null, username);
+        long userId = surveyDbDataSource.createOrUpdateUser(null, username);
         surveyDbDataSource.close();
 
         prefs.setString(Prefs.KEY_DEVICE_IDENTIFIER, deviceId);
         prefs.setBoolean(Prefs.KEY_SETUP, true);
 
         // Select the newly created user, and exit the Activity
-        FlowApp.getApp().setUser(new User(uid, username));
+        prefs.setLong(Prefs.KEY_USER_ID, userId);
         helper.initLoginData(username, deviceId);
         navigateToSurvey();
     }

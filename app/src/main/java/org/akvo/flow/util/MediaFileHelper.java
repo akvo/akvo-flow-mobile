@@ -46,7 +46,6 @@ import timber.log.Timber;
 public class MediaFileHelper {
 
     private static final String TEMP_PHOTO_NAME_PREFIX = "image";
-    private static final String TEMP_VIDEO_NAME_PREFIX = "video";
     private static final String IMAGE_SUFFIX = ".jpg";
     private static final String VIDEO_SUFFIX = ".mp4";
     private static final String DIR_MEDIA = "akvoflow/data/media";

@@ -288,12 +288,10 @@ public class SurveyDataRepository implements SurveyRepository {
                 .map(new Function<Cursor, User>() {
                     @Override
                     public User apply(Cursor cursor) {
-                        if (cursor != null) {
-                            if (cursor.moveToFirst()) {
-                                User user = userMapper.getUser(cursor);
-                                cursor.close();
-                                return user;
-                            }
+                        if (cursor != null && cursor.moveToFirst()) {
+                            User user = userMapper.getUser(cursor);
+                            cursor.close();
+                            return user;
                         }
                         return new User(Constants.INVALID_USER_ID, null);
                     }

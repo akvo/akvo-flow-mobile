@@ -78,4 +78,29 @@ class FileHelper {
             }
         }
     }
+
+    /**
+     * deletes all files in the directory (recursively) AND then deletes the
+     * directory itself if the "deleteFlag" is true
+     */
+    @SuppressWarnings({ "unchecked", "ResultOfMethodCallIgnored" })
+    void deleteFilesInDirectory(File folder, boolean deleteFolder) {
+        if (folder != null && folder.exists() && folder.isDirectory()) {
+            File[] files = folder.listFiles();
+            if (files != null) {
+                for (File file : files) {
+                    if (file.isFile()) {
+                        file.delete();
+                    } else {
+                        // recursively delete
+                        deleteFilesInDirectory(file, true);
+                    }
+                }
+            }
+            // now delete the directory itself
+            if (deleteFolder) {
+                folder.delete();
+            }
+        }
+    }
 }

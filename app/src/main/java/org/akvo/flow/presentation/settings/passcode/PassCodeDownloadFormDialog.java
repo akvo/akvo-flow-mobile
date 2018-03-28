@@ -23,26 +23,26 @@ package org.akvo.flow.presentation.settings.passcode;
 import android.content.Context;
 import android.support.v4.app.FragmentActivity;
 
-public class PassCodeDeleteCollectedDialog extends PassCodeDialog {
+public class PassCodeDownloadFormDialog extends PassCodeDialog {
 
-    private PassCodeDeleteCollectedListener listener;
+    private PassCodeDownloadFormListener listener;
 
-    public PassCodeDeleteCollectedDialog() {
+    public PassCodeDownloadFormDialog() {
     }
 
-    public static PassCodeDeleteCollectedDialog newInstance() {
-        return new PassCodeDeleteCollectedDialog();
+    public static PassCodeDownloadFormDialog newInstance() {
+        return new PassCodeDownloadFormDialog();
     }
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
         FragmentActivity activity = getActivity();
-        if (activity instanceof PassCodeDeleteCollectedListener) {
-            listener = (PassCodeDeleteCollectedListener) activity;
+        if (activity instanceof PassCodeDownloadFormListener) {
+            listener = (PassCodeDownloadFormListener) activity;
         } else {
             throw new IllegalArgumentException(
-                    "Activity must implement PassCodeDeleteCollectedListener");
+                    "Activity must implement PassCodeDownloadFormListener");
         }
     }
 
@@ -55,12 +55,12 @@ public class PassCodeDeleteCollectedDialog extends PassCodeDialog {
     @Override
     void onPassCodeCorrect() {
         if (listener != null) {
-            listener.deleteCollectedData();
+            listener.downloadForm();
         }
     }
 
-    public interface PassCodeDeleteCollectedListener {
+    public interface PassCodeDownloadFormListener {
 
-        void deleteCollectedData();
+        void downloadForm();
     }
 }

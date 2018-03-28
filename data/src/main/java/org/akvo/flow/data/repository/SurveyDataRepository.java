@@ -36,6 +36,7 @@ import org.akvo.flow.domain.entity.Survey;
 import org.akvo.flow.domain.entity.User;
 import org.akvo.flow.domain.exception.AssignmentRequiredException;
 import org.akvo.flow.domain.repository.SurveyRepository;
+import org.akvo.flow.domain.util.Constants;
 import org.reactivestreams.Publisher;
 
 import java.net.HttpURLConnection;
@@ -279,5 +280,31 @@ public class SurveyDataRepository implements SurveyRepository {
     @Override
     public Observable<Long> createUser(String userName) {
         return dataSourceFactory.getDataBaseDataSource().createUser(userName);
+    }
+
+    @Override
+    public Observable<User> getUser(Long userId) {
+        return dataSourceFactory.getDataBaseDataSource().getUser(userId)
+                .map(new Function<Cursor, User>() {
+                    @Override
+                    public User apply(Cursor cursor) {
+                        if (cursor != null && cursor.moveToFirst()) {
+                            User user = userMapper.getUser(cursor);
+                            cursor.close();
+                            return user;
+                        }
+                        return new User(Constants.INVALID_USER_ID, null);
+                    }
+                });
+    }
+
+    @Override
+    public Observable<Boolean> clearResponses() {
+        return dataSourceFactory.getDataBaseDataSource().clearCollectedData();
+    }
+
+    @Override
+    public Observable<Boolean> clearAllData() {
+        return dataSourceFactory.getDataBaseDataSource().clearAllData();
     }
 }

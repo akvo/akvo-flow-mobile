@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -18,11 +18,12 @@
  *
  */
 
-package org.akvo.flow.domain.interactor;
+package org.akvo.flow.domain.interactor.users;
 
 import org.akvo.flow.domain.entity.User;
 import org.akvo.flow.domain.executor.PostExecutionThread;
 import org.akvo.flow.domain.executor.ThreadExecutor;
+import org.akvo.flow.domain.interactor.UseCase;
 import org.akvo.flow.domain.repository.SurveyRepository;
 
 import java.util.Map;

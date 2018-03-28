@@ -351,7 +351,7 @@ public class BriteSurveyDbAdapter {
                 + SurveyColumns.SURVEY_ID
                 + " FROM " + Tables.SURVEY
                 + " WHERE " + SurveyColumns.DELETED + " <> ?";
-        Cursor c =  briteDatabase.query(sqlQuery, "1");
+        Cursor c = briteDatabase.query(sqlQuery, "1");
         if (c != null) {
             String[] ids = new String[c.getCount()];
             if (c.moveToFirst()) {
@@ -381,6 +381,13 @@ public class BriteSurveyDbAdapter {
                         return Observable.just(query.run());
                     }
                 });
+    }
+
+    public Observable<Cursor> getUser(long userId) {
+        String sqlQuery =
+                "SELECT * FROM " + Tables.USER + " WHERE " + UserColumns.DELETED + " <> 1 AND "
+                        + UserColumns._ID + "=?";
+        return Observable.just(briteDatabase.query(sqlQuery, userId + ""));
     }
 
     public void updateUser(long id, String name) {
@@ -496,5 +503,31 @@ public class BriteSurveyDbAdapter {
         contentValues.put(TransmissionColumns.FILENAME, newPath);
         String where = TransmissionColumns.FILENAME + " = ? ";
         briteDatabase.update(Tables.TRANSMISSION, contentValues, where, oldPath);
+    }
+
+    /**
+     * permanently deletes all surveys, responses, users and transmission
+     * history from the database
+     */
+    public void clearAllData() {
+        clearCollectedData();
+        deleteAllSurveys();
+        briteDatabase.delete(Tables.USER, null);
+    }
+
+    /**
+     * Permanently deletes user generated data from the database. It will clear
+     * any response saved in the database, as well as the transmission history.
+     */
+    public void clearCollectedData() {
+        deleteAllResponses();
+        briteDatabase.delete(Tables.SYNC_TIME, null);
+        briteDatabase.delete(Tables.SURVEY_INSTANCE, null);
+        briteDatabase.delete(Tables.RECORD, null);
+        briteDatabase.delete(Tables.TRANSMISSION, null);
+    }
+
+    private void deleteAllResponses() {
+        briteDatabase.delete(Tables.RESPONSE, null);
     }
 }

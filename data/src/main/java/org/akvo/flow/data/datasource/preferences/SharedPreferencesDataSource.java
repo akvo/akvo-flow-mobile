@@ -35,6 +35,7 @@ public class SharedPreferencesDataSource {
     private static final String KEY_DEVICE_IDENTIFIER = "device.identifier";
     private static final String KEY_MAX_IMG_SIZE = "media.img.maxsize";
     private static final String KEY_DATA_PUBLISH_TIME = "data_publish_time";
+    private static final String KEY_SETUP = "setup";
 
     private static final String DEFAULT_VALUE_DEVICE_IDENTIFIER = "unset";
     private static final int DEFAULT_VALUE_IMAGE_SIZE = 0;
@@ -161,6 +162,17 @@ public class SharedPreferencesDataSource {
 
     public Observable<Boolean> setSelectedUser(long userId) {
         setLong(KEY_USER_ID, userId);
+        return Observable.just(true);
+    }
+
+    private void clearSetUp() {
+        preferences.edit().remove(KEY_SETUP).apply();
+    }
+
+    public Observable<Boolean> clearUserPreferences() {
+        clearSelectedSurvey();
+        clearSelectedUser();
+        clearSetUp();
         return Observable.just(true);
     }
 }

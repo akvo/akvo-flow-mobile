@@ -125,4 +125,9 @@ public class UserDataRepository implements UserRepository {
     public Observable<Boolean> clearPublishDataTime() {
         return dataSourceFactory.getSharedPreferencesDataSource().clearPublishDataTime();
     }
+
+    @Override
+    public Observable<Boolean> clearUserPreferences() {
+        return dataSourceFactory.getSharedPreferencesDataSource().clearUserPreferences();
+    }
 }

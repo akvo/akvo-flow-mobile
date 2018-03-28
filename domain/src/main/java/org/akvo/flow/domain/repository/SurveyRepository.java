@@ -22,7 +22,6 @@ package org.akvo.flow.domain.repository;
 
 import org.akvo.flow.domain.entity.DataPoint;
 import org.akvo.flow.domain.entity.Survey;
-import org.akvo.flow.domain.entity.Survey;
 import org.akvo.flow.domain.entity.User;
 
 import java.util.List;
@@ -48,4 +47,10 @@ public interface SurveyRepository {
     Observable<Boolean> deleteUser(User user);
 
     Observable<Long> createUser(String userName);
+
+    Observable<User> getUser(Long userId);
+
+    Observable<Boolean> clearResponses();
+
+    Observable<Boolean> clearAllData();
 }

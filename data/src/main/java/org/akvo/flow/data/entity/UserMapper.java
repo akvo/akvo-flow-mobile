@@ -38,7 +38,7 @@ public class UserMapper {
     public UserMapper() {
     }
 
-    private User getUser(@NonNull Cursor cursor) {
+    public User getUser(@NonNull Cursor cursor) {
         long id = cursor.getLong(
                 cursor.getColumnIndexOrThrow(UserColumns._ID));
         String name = cursor.getString(

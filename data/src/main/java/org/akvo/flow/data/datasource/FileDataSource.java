@@ -20,9 +20,6 @@
 
 package org.akvo.flow.data.datasource;
 
-import android.content.Context;
-import android.os.Environment;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
@@ -40,26 +37,21 @@ import io.reactivex.Observable;
 @Singleton
 public class FileDataSource {
 
-    private static final String DIR_DATA = "akvoflow/data/files";
-    private static final String DIR_MEDIA = "akvoflow/data/media";
-    private static final String DIR_PUBLISHED_DATA = "akvoflow/published/files";
-    private static final String DIR_PUBLISHED_MEDIA = "akvoflow/published/media";
-
-    private final Context context;
     private final FileHelper fileHelper;
+    private final FolderBrowser folderBrowser;
 
     @Inject
-    public FileDataSource(Context context, FileHelper fileHelper) {
-        this.context = context;
+    public FileDataSource(FileHelper fileHelper, FolderBrowser folderBrowser) {
         this.fileHelper = fileHelper;
+        this.folderBrowser = folderBrowser;
     }
 
     public Observable<List<MovedFile>> moveZipFiles() {
-        return moveFiles(DIR_DATA);
+        return moveFiles(FolderBrowser.DIR_DATA);
     }
 
     public Observable<List<MovedFile>> moveMediaFiles() {
-        return moveFiles(DIR_MEDIA);
+        return moveFiles(FolderBrowser.DIR_MEDIA);
     }
 
     public Observable<Boolean> copyMediaFile(String originFilePath, String destinationFilePath) {
@@ -74,7 +66,7 @@ public class FileDataSource {
     }
 
     private Observable<List<MovedFile>> moveFiles(String folderName) {
-        File publicFolder = getPublicFolder(folderName);
+        File publicFolder = folderBrowser.getPublicFolder(folderName);
         List<MovedFile> movedFiles = new ArrayList<>();
         if (publicFolder.exists()) {
             File[] files = publicFolder.listFiles();
@@ -103,16 +95,8 @@ public class FileDataSource {
         return movedFiles;
     }
 
-    @NonNull
-    private File getPublicFolder(String folderName) {
-        String path = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator
-                + folderName;
-        return new File(path);
-    }
-
     private File getPrivateFolder(String folderName) {
-        File folder = new File(
-                context.getFilesDir().getAbsolutePath() + File.separator + folderName);
+        File folder = folderBrowser.getInternalFolder(folderName);
         if (!folder.exists()) {
             //noinspection ResultOfMethodCallIgnored
             folder.mkdirs();
@@ -122,13 +106,13 @@ public class FileDataSource {
 
     public Observable<Boolean> copyPrivateData() {
         //TODO: error handling will be added in separate issue
-        copyPrivateFileToPublic(DIR_DATA, DIR_PUBLISHED_DATA);
-        copyPrivateFileToPublic(DIR_MEDIA, DIR_PUBLISHED_MEDIA);
+        copyPrivateFileToPublic(FolderBrowser.DIR_DATA, FolderBrowser.DIR_PUBLISHED_DATA);
+        copyPrivateFileToPublic(FolderBrowser.DIR_MEDIA, FolderBrowser.DIR_PUBLISHED_MEDIA);
         return Observable.just(true);
     }
 
     private void copyPrivateFileToPublic(String privateFolderName, String publicFolderName) {
-        File destinationDataFolder = getPublicFolder(publicFolderName);
+        File destinationDataFolder = folderBrowser.getPublicFolder(publicFolderName);
         if (!destinationDataFolder.exists()) {
             //noinspection ResultOfMethodCallIgnored
             destinationDataFolder.mkdirs();
@@ -145,13 +129,13 @@ public class FileDataSource {
     }
 
     public Observable<Boolean> removePublicFiles() {
-        deleteFilesInPublicFolder(DIR_PUBLISHED_DATA);
-        deleteFilesInPublicFolder(DIR_PUBLISHED_MEDIA);
+        deleteFilesInPublicFolder(FolderBrowser.DIR_PUBLISHED_DATA);
+        deleteFilesInPublicFolder(FolderBrowser.DIR_PUBLISHED_MEDIA);
         return Observable.just(true);
     }
 
     private void deleteFilesInPublicFolder(String folderName) {
-        File dataFolder = getPublicFolder(folderName);
+        File dataFolder = folderBrowser.getPublicFolder(folderName);
         File[] files = dataFolder.listFiles();
         if (files != null) {
             for (File f : files) {
@@ -159,5 +143,33 @@ public class FileDataSource {
                 f.delete();
             }
         }
+    }
+
+    public Observable<Boolean> deleteAllUserFiles() {
+        List<File> foldersToDelete = folderBrowser.findAllPossibleFolders(FolderBrowser.DIR_FORMS);
+        foldersToDelete.addAll(folderBrowser.findAllPossibleFolders(FolderBrowser.DIR_RES));
+        File inboxFolder = folderBrowser.getPublicFolder(FolderBrowser.DIR_INBOX);
+        if (inboxFolder.exists()) {
+            foldersToDelete.add(inboxFolder);
+        }
+        for (File file : foldersToDelete) {
+            fileHelper.deleteFilesInDirectory(file, true);
+        }
+        deleteResponsesFiles();
+        return Observable.just(true);
+    }
+
+    public Observable<Boolean> deleteResponsesFiles() {
+        List<File> foldersToDelete = folderBrowser.findAllPossibleFolders(FolderBrowser.DIR_DATA);
+        foldersToDelete.addAll(folderBrowser.findAllPossibleFolders(FolderBrowser.DIR_MEDIA));
+        foldersToDelete.addAll(folderBrowser.findAllPossibleFolders(FolderBrowser.DIR_TMP));
+        File exportedFolder = folderBrowser.getPublicFolder(FolderBrowser.DIR_PUBLISHED);
+        if (exportedFolder.exists()) {
+            foldersToDelete.add(exportedFolder);
+        }
+        for (File file : foldersToDelete) {
+            fileHelper.deleteFilesInDirectory(file, true);
+        }
+        return Observable.just(true);
     }
 }

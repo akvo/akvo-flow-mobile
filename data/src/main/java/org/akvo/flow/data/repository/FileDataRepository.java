@@ -84,4 +84,14 @@ public class FileDataRepository implements FileRepository {
     public Observable<Boolean> unPublishData() {
         return dataSourceFactory.getFileDataSource().removePublicFiles();
     }
+
+    @Override
+    public Observable<Boolean> clearResponseFiles() {
+        return dataSourceFactory.getFileDataSource().deleteResponsesFiles();
+    }
+
+    @Override
+    public Observable<Boolean> clearAllUserFiles() {
+        return dataSourceFactory.getFileDataSource().deleteAllUserFiles();
+    }
 }

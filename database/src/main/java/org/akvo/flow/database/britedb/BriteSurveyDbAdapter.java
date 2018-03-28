@@ -504,4 +504,30 @@ public class BriteSurveyDbAdapter {
         String where = TransmissionColumns.FILENAME + " = ? ";
         briteDatabase.update(Tables.TRANSMISSION, contentValues, where, oldPath);
     }
+
+    /**
+     * permanently deletes all surveys, responses, users and transmission
+     * history from the database
+     */
+    public void clearAllData() {
+        clearCollectedData();
+        deleteAllSurveys();
+        briteDatabase.delete(Tables.USER, null);
+    }
+
+    /**
+     * Permanently deletes user generated data from the database. It will clear
+     * any response saved in the database, as well as the transmission history.
+     */
+    public void clearCollectedData() {
+        deleteAllResponses();
+        briteDatabase.delete(Tables.SYNC_TIME, null);
+        briteDatabase.delete(Tables.SURVEY_INSTANCE, null);
+        briteDatabase.delete(Tables.RECORD, null);
+        briteDatabase.delete(Tables.TRANSMISSION, null);
+    }
+
+    private void deleteAllResponses() {
+        briteDatabase.delete(Tables.RESPONSE, null);
+    }
 }

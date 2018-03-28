@@ -72,7 +72,6 @@ public class DatabaseDataSource {
         } else {
             return briteSurveyDbAdapter.getDataPoints(surveyGroupId);
         }
-
     }
 
     public Cursor getSyncedTime(long surveyGroupId) {
@@ -227,5 +226,13 @@ public class DatabaseDataSource {
 
     public Observable<Long> createUser(String userName) {
         return Observable.just(briteSurveyDbAdapter.createUser(userName));
+    }
+
+    public void clearCollectedData() {
+        briteSurveyDbAdapter.clearCollectedData();
+    }
+
+    public void clearAllData() {
+        briteSurveyDbAdapter.clearAllData();
     }
 }

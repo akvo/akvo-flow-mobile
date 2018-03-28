@@ -146,7 +146,7 @@ public class SurveyDbAdapter {
                 dateColumn = SurveyInstanceColumns.SAVED_DATE;
                 break;
             default:
-                return;// Nothing to see here, buddy
+                return;
         }
 
         ContentValues updatedValues = new ContentValues();
@@ -211,8 +211,7 @@ public class SurveyDbAdapter {
                 null, null, null);
     }
 
-    public long updateSurveyResponse(Long responseToSaveId,
-            ContentValues initialValues) {
+    public long updateSurveyResponse(Long responseToSaveId, ContentValues initialValues) {
         long insertedResponseId = -1;
         if (responseToSaveId == null) {
             insertedResponseId = insertResponse(initialValues);
@@ -291,10 +290,6 @@ public class SurveyDbAdapter {
         });
     }
 
-    public void createTransmission(ContentValues values) {
-        database.insert(Tables.TRANSMISSION, null, values);
-    }
-
     /**
      * Delete response for a repeated question
      */
@@ -311,22 +306,7 @@ public class SurveyDbAdapter {
                 });
     }
 
-    public void createTransmission(long surveyInstanceId, String formID, String filename) {
-        createTransmission(surveyInstanceId, formID, filename, TransmissionStatus.QUEUED);
-    }
-
-    private void createTransmission(long surveyInstanceId, String formID, String filename,
-            int status) {
-        ContentValues values = new ContentValues();
-        values.put(TransmissionColumns.SURVEY_INSTANCE_ID, surveyInstanceId);
-        values.put(TransmissionColumns.SURVEY_ID, formID);
-        values.put(TransmissionColumns.FILENAME, filename);
-        values.put(TransmissionColumns.STATUS, status);
-        if (TransmissionStatus.SYNCED == status) {
-            final String date = String.valueOf(System.currentTimeMillis());
-            values.put(TransmissionColumns.START_DATE, date);
-            values.put(TransmissionColumns.END_DATE, date);
-        }
+    public void createTransmission(ContentValues values) {
         database.insert(Tables.TRANSMISSION, null, values);
     }
 

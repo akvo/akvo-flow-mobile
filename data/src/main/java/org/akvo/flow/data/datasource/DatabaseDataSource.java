@@ -228,11 +228,13 @@ public class DatabaseDataSource {
         return Observable.just(briteSurveyDbAdapter.createUser(userName));
     }
 
-    public void clearCollectedData() {
+    public Observable<Boolean> clearCollectedData() {
         briteSurveyDbAdapter.clearCollectedData();
+        return Observable.just(true);
     }
 
-    public void clearAllData() {
+    public Observable<Boolean> clearAllData() {
         briteSurveyDbAdapter.clearAllData();
+        return Observable.just(true);
     }
 }

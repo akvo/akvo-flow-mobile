@@ -297,4 +297,14 @@ public class SurveyDataRepository implements SurveyRepository {
                     }
                 });
     }
+
+    @Override
+    public Observable<Boolean> clearResponses() {
+        return dataSourceFactory.getDataBaseDataSource().clearCollectedData();
+    }
+
+    @Override
+    public Observable<Boolean> clearAllData() {
+        return dataSourceFactory.getDataBaseDataSource().clearAllData();
+    }
 }

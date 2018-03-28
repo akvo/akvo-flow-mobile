@@ -145,7 +145,7 @@ public class FileDataSource {
         }
     }
 
-    public void deleteAllUserFiles() {
+    public Observable<Boolean> deleteAllUserFiles() {
         List<File> foldersToDelete = folderBrowser.findAllPossibleFolders(FolderBrowser.DIR_FORMS);
         foldersToDelete.addAll(folderBrowser.findAllPossibleFolders(FolderBrowser.DIR_RES));
         File inboxFolder = folderBrowser.getPublicFolder(FolderBrowser.DIR_INBOX);
@@ -156,9 +156,10 @@ public class FileDataSource {
             fileHelper.deleteFilesInDirectory(file, true);
         }
         deleteResponsesFiles();
+        return Observable.just(true);
     }
 
-    public void deleteResponsesFiles() {
+    public Observable<Boolean> deleteResponsesFiles() {
         List<File> foldersToDelete = folderBrowser.findAllPossibleFolders(FolderBrowser.DIR_DATA);
         foldersToDelete.addAll(folderBrowser.findAllPossibleFolders(FolderBrowser.DIR_MEDIA));
         foldersToDelete.addAll(folderBrowser.findAllPossibleFolders(FolderBrowser.DIR_TMP));
@@ -169,5 +170,6 @@ public class FileDataSource {
         for (File file : foldersToDelete) {
             fileHelper.deleteFilesInDirectory(file, true);
         }
+        return Observable.just(true);
     }
 }

@@ -59,4 +59,6 @@ public interface UserRepository {
     Observable<Boolean> setPublishDataTime();
 
     Observable<Boolean> clearPublishDataTime();
+
+    Observable<Boolean> clearUserPreferences();
 }

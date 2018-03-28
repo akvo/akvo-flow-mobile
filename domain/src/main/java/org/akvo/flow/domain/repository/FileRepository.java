@@ -37,4 +37,8 @@ public interface FileRepository {
     Observable<Boolean> copyFile(String originFilePath, String destinationFilePath);
 
     Observable<Boolean> unPublishData();
+
+    Observable<Boolean> clearResponseFiles();
+
+    Observable<Boolean> clearAllUserFiles();
 }

@@ -25,6 +25,8 @@ import android.support.v4.app.FragmentActivity;
 
 public class PassCodeDeleteCollectedDialog extends PassCodeDialog {
 
+    public static final String TAG = "DeleteCollected";
+
     private PassCodeDeleteCollectedListener listener;
 
     public PassCodeDeleteCollectedDialog() {

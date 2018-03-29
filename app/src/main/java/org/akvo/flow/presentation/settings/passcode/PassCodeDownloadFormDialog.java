@@ -25,6 +25,8 @@ import android.support.v4.app.FragmentActivity;
 
 public class PassCodeDownloadFormDialog extends PassCodeDialog {
 
+    public static final String TAG = "DownloadForm";
+
     private PassCodeDownloadFormListener listener;
 
     public PassCodeDownloadFormDialog() {

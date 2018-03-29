@@ -34,10 +34,7 @@ import android.support.design.widget.AppBarLayout;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.SwitchCompat;
-import android.text.TextUtils;
-import android.text.method.DigitsKeyListener;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -55,7 +52,6 @@ import org.akvo.flow.presentation.settings.passcode.PassCodeDeleteCollectedDialo
 import org.akvo.flow.presentation.settings.passcode.PassCodeDownloadFormDialog;
 import org.akvo.flow.presentation.settings.passcode.PassCodeReloadFormsDialog;
 import org.akvo.flow.service.DataSyncService;
-import org.akvo.flow.service.SurveyDownloadService;
 import org.akvo.flow.ui.Navigator;
 import org.akvo.flow.util.logging.LoggingHelper;
 
@@ -372,36 +368,13 @@ public class PreferenceActivity extends BackActivity implements PreferenceView,
 
     @Override
     public void downloadForm() {
-        AlertDialog.Builder inputDialog = new AlertDialog.Builder(PreferenceActivity.this);
-        inputDialog.setTitle(R.string.downloadsurveylabel);
-        inputDialog.setMessage(R.string.downloadsurveyinstr);
-
-        final EditText input = new EditText(PreferenceActivity.this);
-        input.setKeyListener(new DigitsKeyListener(false, false));
-        inputDialog.setView(input);
-        inputDialog.setPositiveButton(R.string.okbutton, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int whichButton) {
-                String surveyId = input.getText().toString().trim();
-                if (!TextUtils.isEmpty(surveyId)) {
-                    Intent i = new Intent(PreferenceActivity.this,
-                            SurveyDownloadService.class);
-                    i.putExtra(SurveyDownloadService.EXTRA_SURVEY_ID, surveyId);
-                    PreferenceActivity.this.startService(i);
-                }
-            }
-        });
-        inputDialog.setNegativeButton(R.string.cancelbutton, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int whichButton) {
-                dialog.dismiss();
-            }
-        });
-
-        inputDialog.show();
+        DialogFragment newFragment = ReloadFormsConfirmationDialog.newInstance();
+        newFragment.show(getSupportFragmentManager(), ReloadFormsConfirmationDialog.TAG);
     }
 
     @Override
     public void reloadForms() {
-        DialogFragment newFragment = ReloadFormsConfirmationDialog.newInstance();
-        newFragment.show(getSupportFragmentManager(), ReloadFormsConfirmationDialog.TAG);
+        DialogFragment newFragment = DownloadFormDialog.newInstance();
+        newFragment.show(getSupportFragmentManager(), DownloadFormDialog.TAG);
     }
 }

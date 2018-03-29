@@ -21,7 +21,6 @@
 package org.akvo.flow.presentation.settings;
 
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -391,7 +390,6 @@ public class PreferenceActivity extends BackActivity implements PreferenceView,
                 }
             }
         });
-
         inputDialog.setNegativeButton(R.string.cancelbutton, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
                 dialog.dismiss();
@@ -403,23 +401,7 @@ public class PreferenceActivity extends BackActivity implements PreferenceView,
 
     @Override
     public void reloadForms() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(PreferenceActivity.this);
-        builder.setTitle(R.string.conftitle);
-        builder.setMessage(R.string.reloadconftext);
-        builder.setPositiveButton(R.string.okbutton, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                Context c = PreferenceActivity.this;
-                Intent i = new Intent(c, SurveyDownloadService.class);
-                i.putExtra(SurveyDownloadService.EXTRA_DELETE_SURVEYS, true);
-                c.startService(i);
-            }
-        });
-        builder.setNegativeButton(R.string.cancelbutton,
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        dialog.cancel();
-                    }
-                });
-        builder.show();
+        DialogFragment newFragment = ReloadFormsConfirmationDialog.newInstance();
+        newFragment.show(getSupportFragmentManager(), ReloadFormsConfirmationDialog.TAG);
     }
 }

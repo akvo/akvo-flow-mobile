@@ -253,7 +253,7 @@ public class PreferenceActivity extends BackActivity implements PreferenceView,
     }
 
     /**
-     * Permanently deletes data from the device. If unsubmitted data is found on
+     * Permanently deletes data from the device. If un-submitted data is found on
      * the database, the user will be prompted with a message to confirm the
      * operation.
      *
@@ -358,12 +358,12 @@ public class PreferenceActivity extends BackActivity implements PreferenceView,
 
     @Override
     public void deleteCollectedData() {
-        deleteData(true);
+        presenter.deleteCollectedData();
     }
 
     @Override
     public void deleteAllData() {
-        deleteData(false);
+        presenter.deleteAllData();
     }
 
     @Override
@@ -376,5 +376,29 @@ public class PreferenceActivity extends BackActivity implements PreferenceView,
     public void reloadForms() {
         DialogFragment newFragment = DownloadFormDialog.newInstance();
         newFragment.show(getSupportFragmentManager(), DownloadFormDialog.TAG);
+    }
+
+    @Override
+    public void showDeleteCollectedData() {
+        DialogFragment newFragment = DeleteResponsesWarningDialog.newInstance(false);
+        newFragment.show(getSupportFragmentManager(), DeleteResponsesWarningDialog.TAG);
+    }
+
+    @Override
+    public void showDeleteCollectedDataWithPending() {
+        DialogFragment newFragment = DeleteResponsesWarningDialog.newInstance(true);
+        newFragment.show(getSupportFragmentManager(), DeleteResponsesWarningDialog.TAG);
+    }
+
+    @Override
+    public void showDeleteAllData() {
+        DialogFragment newFragment = DeleteAllWarningDialog.newInstance(false);
+        newFragment.show(getSupportFragmentManager(), DeleteAllWarningDialog.TAG);
+    }
+
+    @Override
+    public void showDeleteAllDataWithPending() {
+        DialogFragment newFragment = DeleteAllWarningDialog.newInstance(true);
+        newFragment.show(getSupportFragmentManager(), DeleteAllWarningDialog.TAG);
     }
 }

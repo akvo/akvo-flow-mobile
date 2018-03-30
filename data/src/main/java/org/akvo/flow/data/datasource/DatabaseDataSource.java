@@ -237,4 +237,8 @@ public class DatabaseDataSource {
         briteSurveyDbAdapter.clearAllData();
         return Observable.just(true);
     }
+
+    public boolean unSyncedTransmissionsExist() {
+        return briteSurveyDbAdapter.unSyncedTransmissionsExist();
+    }
 }

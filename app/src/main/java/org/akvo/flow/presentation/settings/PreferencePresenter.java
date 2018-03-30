@@ -45,6 +45,7 @@ public class PreferencePresenter implements Presenter {
     private final UseCase saveEnableMobileData;
     private final UseCase saveImageSize;
     private final UseCase saveKeepScreenOn;
+    private final UseCase unSyncedTransmissionsExist;
     private final ViewUserSettingsMapper mapper;
 
     private PreferenceView view;
@@ -54,12 +55,15 @@ public class PreferencePresenter implements Presenter {
             @Named("saveAppLanguage") UseCase saveAppLanguage,
             @Named("saveEnableMobileData") UseCase saveEnableMobileData,
             @Named("saveImageSize") UseCase saveImageSize,
-            @Named("saveKeepScreenOn") UseCase saveKeepScreenOn, ViewUserSettingsMapper mapper) {
+            @Named("saveKeepScreenOn") UseCase saveKeepScreenOn,
+            @Named("unSyncedTransmissionsExist") UseCase unSyncedTransmissionsExist,
+            ViewUserSettingsMapper mapper) {
         this.getUserSettings = getUserSettings;
         this.saveAppLanguage = saveAppLanguage;
         this.saveEnableMobileData = saveEnableMobileData;
         this.saveImageSize = saveImageSize;
         this.saveKeepScreenOn = saveKeepScreenOn;
+        this.unSyncedTransmissionsExist = unSyncedTransmissionsExist;
         this.mapper = mapper;
     }
 
@@ -136,5 +140,44 @@ public class PreferencePresenter implements Presenter {
         saveEnableMobileData.dispose();
         saveImageSize.dispose();
         saveKeepScreenOn.dispose();
+        unSyncedTransmissionsExist.dispose();
+    }
+
+    public void deleteCollectedData() {
+        unSyncedTransmissionsExist.execute(new DefaultObserver<Boolean>(){
+            @Override
+            public void onError(Throwable e) {
+                Timber.e(e);
+                view.showDeleteCollectedData();
+            }
+
+            @Override
+            public void onNext(Boolean exist) {
+                if (exist != null && exist) {
+                    view.showDeleteCollectedDataWithPending();
+                } else {
+                    view.showDeleteCollectedData();
+                }
+            }
+        }, null);
+    }
+
+    public void deleteAllData() {
+        unSyncedTransmissionsExist.execute(new DefaultObserver<Boolean>(){
+            @Override
+            public void onError(Throwable e) {
+                Timber.e(e);
+                view.showDeleteAllData();
+            }
+
+            @Override
+            public void onNext(Boolean exist) {
+                if (exist != null && exist) {
+                    view.showDeleteAllDataWithPending();
+                } else {
+                    view.showDeleteAllData();
+                }
+            }
+        }, null);
     }
 }

@@ -18,78 +18,68 @@
  *
  */
 
-package org.akvo.flow.ui.view.media;
+package org.akvo.flow.ui.view.media.video;
 
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
+import org.akvo.flow.domain.interactor.CopyVideo;
 import org.akvo.flow.domain.interactor.DefaultObserver;
-import org.akvo.flow.domain.interactor.SaveResizedImage;
 import org.akvo.flow.domain.interactor.UseCase;
 import org.akvo.flow.presentation.Presenter;
 import org.akvo.flow.util.MediaFileHelper;
 
-import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 
-public class PhotoQuestionPresenter implements Presenter {
+import timber.log.Timber;
 
-    private final UseCase saveResizedImage;
+public class VideoQuestionPresenter implements Presenter {
+
+    private final UseCase copyVideo;
     private final MediaFileHelper mediaFileHelper;
-    private IPhotoQuestionView view;
+
+    private IVideoQuestionView view;
 
     @Inject
-    public PhotoQuestionPresenter(@Named("saveResizedImage") UseCase saveResizedImage,
-            MediaFileHelper mediaFileHelper) {
-        this.saveResizedImage = saveResizedImage;
+    public VideoQuestionPresenter(@Named("copyVideo") UseCase copyVideo, MediaFileHelper mediaFileHelper) {
+        this.copyVideo = copyVideo;
         this.mediaFileHelper = mediaFileHelper;
     }
 
-    public void setView(IPhotoQuestionView view) {
+    public void setView(IVideoQuestionView view) {
         this.view = view;
     }
 
     @Override
     public void destroy() {
-        saveResizedImage.dispose();
+        copyVideo.dispose();
     }
 
-    void onImageReady(@Nullable final String mediaFilePath) {
-        if (!TextUtils.isEmpty(mediaFilePath)) {
+    public void onVideoReady(@Nullable String filePath) {
+        if (!TextUtils.isEmpty(filePath)) {
             view.showLoading();
-            final String resizedImageFilePath = mediaFileHelper.getImageFilePath();
+            final String targetVideoFilePath = mediaFileHelper.getVideoFilePath();
             Map<String, Object> params = new HashMap<>(4);
-            params.put(SaveResizedImage.ORIGINAL_FILE_NAME_PARAM, mediaFilePath);
-            params.put(SaveResizedImage.RESIZED_FILE_NAME_PARAM, resizedImageFilePath);
-            saveResizedImage.execute(new DefaultObserver<Boolean>() {
+            params.put(CopyVideo.ORIGIN_FILE_NAME_PARAM, filePath);
+            params.put(CopyVideo.DESTINATION_FILE_NAME_PARAM, targetVideoFilePath);
+            copyVideo.execute(new DefaultObserver<Boolean>() {
                 @Override
                 public void onNext(Boolean aBoolean) {
-                    view.displayImage(resizedImageFilePath);
+                    view.displayThumbnail(targetVideoFilePath);
                 }
 
                 @Override
                 public void onError(Throwable e) {
+                    Timber.e(e);
                     view.showErrorGettingMedia();
                 }
             }, params);
         } else {
             view.showErrorGettingMedia();
-        }
-    }
-
-    void onFilenameAvailable(String filename, boolean readOnly) {
-        if (!TextUtils.isEmpty(filename)) {
-            File file = new File(filename);
-            if (!file.exists() && readOnly) {
-                // Looks like the image is not present in the filesystem (i.e. remote URL)
-                File localFile = mediaFileHelper.getMediaFile(file.getName());
-                view.updateResponse(localFile.getAbsolutePath());
-            }
-            view.displayLocationInfo();
         }
     }
 }

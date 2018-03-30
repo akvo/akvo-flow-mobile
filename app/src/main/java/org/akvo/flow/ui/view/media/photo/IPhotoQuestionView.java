@@ -18,7 +18,7 @@
  *
  */
 
-package org.akvo.flow.ui.view.media;
+package org.akvo.flow.ui.view.media.photo;
 
 public interface IPhotoQuestionView {
 

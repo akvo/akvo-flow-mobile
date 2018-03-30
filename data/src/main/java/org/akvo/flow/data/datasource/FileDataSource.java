@@ -60,6 +60,17 @@ public class FileDataSource {
         return moveFiles(DIR_MEDIA);
     }
 
+    public Observable<Boolean> copyMediaFile(String originFilePath, String destinationFilePath) {
+        File originalFile = new File(originFilePath);
+        if (fileHelper.copyFile(originalFile, new File(destinationFilePath)) == null) {
+            return Observable.error(new Exception("Error copying video file"));
+        } else {
+            //noinspection ResultOfMethodCallIgnored
+            originalFile.delete();
+        }
+        return Observable.just(true);
+    }
+
     private Observable<List<MovedFile>> moveFiles(String folderName) {
         File publicFolder = getPublicFolder(folderName);
         List<MovedFile> movedFiles = new ArrayList<>();
@@ -79,7 +90,7 @@ public class FileDataSource {
         if (files != null) {
             File folder = getPrivateFolder(folderName);
             for (File f : files) {
-                String destinationPath = fileHelper.copyFile(f, folder);
+                String destinationPath = fileHelper.copyFileToFolder(f, folder);
                 if (!TextUtils.isEmpty(destinationPath)) {
                     movedFiles.add(new MovedFile(f.getPath(), destinationPath));
                     //noinspection ResultOfMethodCallIgnored
@@ -125,7 +136,7 @@ public class FileDataSource {
             File[] files = dataFolder.listFiles();
             if (files != null) {
                 for (File f : files) {
-                    fileHelper.copyFile(f, destinationDataFolder);
+                    fileHelper.copyFileToFolder(f, destinationDataFolder);
                 }
             }
         }

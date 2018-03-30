@@ -21,6 +21,7 @@
 package org.akvo.flow.injector.module;
 
 import org.akvo.flow.domain.interactor.AllowedToConnect;
+import org.akvo.flow.domain.interactor.CopyVideo;
 import org.akvo.flow.domain.interactor.CreateUser;
 import org.akvo.flow.domain.interactor.DeleteSurvey;
 import org.akvo.flow.domain.interactor.DeleteUser;
@@ -148,6 +149,13 @@ public class ViewModule {
     @Named("saveResizedImage")
     UseCase provideSaveResizedImage(SaveResizedImage saveResizedImage) {
         return saveResizedImage;
+    }
+
+
+    @Provides
+    @Named("copyVideo")
+    UseCase provideCopyVideo(CopyVideo copyVideo) {
+        return copyVideo;
     }
 
     @Provides

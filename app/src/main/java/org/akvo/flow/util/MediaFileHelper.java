@@ -66,28 +66,28 @@ public class MediaFileHelper {
         return getNamedMediaFile(IMAGE_SUFFIX).getAbsolutePath();
     }
 
-    @Nullable
-    public String getVideoFilePath(Intent intent) {
-        File tmp = getVideoTmpFile();
-        if (!tmp.exists()) {
-            tmp = new File(getVideoPathFromIntent(intent));
-        }
-        return renameFile(tmp);
+    @NonNull
+    public String getVideoFilePath() {
+        return getNamedMediaFile(VIDEO_SUFFIX).getAbsolutePath();
     }
 
-    @NonNull
-    public File getVideoTmpFile() {
-        String filename = TEMP_VIDEO_NAME_PREFIX + VIDEO_SUFFIX;
-        return getMediaFile(filename);
+    @Nullable
+    public String getAcquiredVideoFilePath(Intent intent) {
+        return getVideoPathFromIntent(intent);
     }
 
     @Nullable
     public File getImageTmpFile() {
+        return getTempMediaFile(TEMP_PHOTO_NAME_PREFIX, IMAGE_SUFFIX);
+    }
+
+    @Nullable
+    private File getTempMediaFile(String prefix, String suffix) {
         String timeStamp = dateFormat.format(new Date());
-        String imageFileName = TEMP_PHOTO_NAME_PREFIX + timeStamp + "_";
+        String imageFileName = prefix + timeStamp + "_";
         File storageDir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
         try {
-            return File.createTempFile(imageFileName, IMAGE_SUFFIX, storageDir);
+            return File.createTempFile(imageFileName, suffix, storageDir);
         } catch (IOException e) {
             Timber.e(e, "Unable to create image file");
         }
@@ -126,16 +126,6 @@ public class MediaFileHelper {
             }
         }
         return videoAbsolutePath;
-    }
-
-    private String renameFile(File temporaryVideoFile) {
-        File videoFile = getNamedMediaFile(VIDEO_SUFFIX);
-
-        if (!temporaryVideoFile.renameTo(videoFile)) {
-            Timber.e("Media file rename failed");
-            return temporaryVideoFile.getAbsolutePath();
-        }
-        return videoFile.getAbsolutePath();
     }
 
     @NonNull

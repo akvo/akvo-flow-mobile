@@ -96,12 +96,6 @@ public class ConstantUtil {
     public static final String NUMERIC_VALIDATION_TYPE = "numeric";
 
     /**
-     * scoring types
-     */
-    public static final String NUMERIC_SCORING = "numeric";
-    public static final String TEXT_MATCH_SCORING = "textmatch";
-
-    /**
      * survey types
      */
     public static final String SURVEY_TYPE = "survey";
@@ -203,11 +197,8 @@ public class ConstantUtil {
     /**
      * Max picture size
      * Values must match the ones set in arrays.
-     * TODO: Preferences should be managed with SharedPreferences api, to avoid this error prone references
      */
     public static final int IMAGE_SIZE_320_240 = 0;
-    public static final int IMAGE_SIZE_640_480 = 1;
-    public static final int IMAGE_SIZE_1280_960 = 2;
 
     public static final int NOTIFICATION_FORMS_SYNCED = 102;
     public static final int NOTIFICATION_ASSIGNMENT_ERROR = 103;
@@ -249,7 +240,6 @@ public class ConstantUtil {
     public static final int UPDATE_NOTIFICATION_DELAY_IN_MS = 7 * 60 * 60 * 24 * 1000;
 
     //requests
-    public static final int REQUEST_ADD_USER = 0;
     public static final int PHOTO_ACTIVITY_REQUEST = 1;
     public static final int VIDEO_ACTIVITY_REQUEST = 2;
     public static final int SCAN_ACTIVITY_REQUEST = 3;

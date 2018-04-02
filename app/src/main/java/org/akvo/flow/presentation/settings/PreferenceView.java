@@ -37,4 +37,8 @@ public interface PreferenceView {
     void showDeleteAllData();
 
     void showDeleteAllDataWithPending();
+
+    void showClearDataError();
+
+    void showClearDataSuccess();
 }

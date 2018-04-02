@@ -36,8 +36,6 @@ import org.akvo.flow.presentation.datapoints.map.DataPointsMapFragment;
 import org.akvo.flow.presentation.help.HelpActivity;
 import org.akvo.flow.presentation.legal.LegalNoticesActivity;
 import org.akvo.flow.presentation.navigation.FlowNavigationView;
-import org.akvo.flow.presentation.settings.DeleteAllWarningDialog;
-import org.akvo.flow.presentation.settings.DeleteResponsesWarningDialog;
 import org.akvo.flow.presentation.settings.PreferenceActivity;
 import org.akvo.flow.presentation.settings.publish.PublishFilesPreferenceView;
 import org.akvo.flow.presentation.signature.SignatureActivity;
@@ -102,8 +100,4 @@ public interface ViewComponent {
     void inject(MainActivity mainActivity);
 
     void inject(PublishFilesPreferenceView publishFilesPreferenceView);
-
-    void inject(DeleteResponsesWarningDialog deleteResponsesWarningDialog);
-
-    void inject(DeleteAllWarningDialog deleteAllWarningDialog);
 }

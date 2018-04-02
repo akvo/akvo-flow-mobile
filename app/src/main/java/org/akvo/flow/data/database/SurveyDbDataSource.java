@@ -613,10 +613,6 @@ public class SurveyDbDataSource {
         surveyDbAdapter.clearCollectedData();
     }
 
-    public void clearAllData() {
-        surveyDbAdapter.clearAllData();
-    }
-
     public long createOrUpdateUser(Long id, String username) {
         return briteSurveyDbAdapter.createOrUpdateUser(id, username);
     }

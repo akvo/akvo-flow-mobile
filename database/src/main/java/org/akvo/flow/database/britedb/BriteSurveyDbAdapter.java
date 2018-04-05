@@ -383,11 +383,11 @@ public class BriteSurveyDbAdapter {
                 });
     }
 
-    public Observable<Cursor> getUser(long userId) {
+    public Cursor getUser(long userId) {
         String sqlQuery =
                 "SELECT * FROM " + Tables.USER + " WHERE " + UserColumns.DELETED + " <> 1 AND "
                         + UserColumns._ID + "=?";
-        return Observable.just(briteDatabase.query(sqlQuery, userId + ""));
+        return briteDatabase.query(sqlQuery, userId + "");
     }
 
     public void updateUser(long id, String name) {

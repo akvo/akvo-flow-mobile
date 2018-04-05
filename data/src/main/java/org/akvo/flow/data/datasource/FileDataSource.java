@@ -125,8 +125,7 @@ public class FileDataSource {
             File[] files = dataFolder.listFiles();
             if (files != null) {
                 for (File f : files) {
-                    String name = f.getName().split("\\.")[0];
-                    if (fileNames.contains(name)) {
+                    if (fileNames.contains(f.getAbsolutePath())) {
                         fileHelper.copyFileToFolder(f, destinationDataFolder);
                     }
                 }

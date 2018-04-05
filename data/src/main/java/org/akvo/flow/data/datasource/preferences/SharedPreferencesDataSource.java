@@ -173,6 +173,7 @@ public class SharedPreferencesDataSource {
         clearSelectedSurvey();
         clearSelectedUser();
         clearSetUp();
+        clearPublishDataTime();
         return Observable.just(true);
     }
 }

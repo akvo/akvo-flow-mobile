@@ -241,4 +241,9 @@ public class DatabaseDataSource {
     public boolean unSyncedTransmissionsExist() {
         return briteSurveyDbAdapter.unSyncedTransmissionsExist();
     }
+
+    public Observable<Cursor> getAllTransmissionFileNames() {
+        return Observable
+                .just(briteSurveyDbAdapter.getAllTransmissionFileNames());
+    }
 }

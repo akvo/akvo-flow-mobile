@@ -23,8 +23,10 @@ package org.akvo.flow.domain.interactor;
 import org.akvo.flow.domain.executor.PostExecutionThread;
 import org.akvo.flow.domain.executor.ThreadExecutor;
 import org.akvo.flow.domain.repository.FileRepository;
+import org.akvo.flow.domain.repository.SurveyRepository;
 import org.akvo.flow.domain.repository.UserRepository;
 
+import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -37,22 +39,31 @@ public class PublishData extends UseCase {
 
     private final FileRepository fileRepository;
     private final UserRepository userRepository;
+    private final SurveyRepository surveyRepository;
 
     @Inject
     protected PublishData(ThreadExecutor threadExecutor, PostExecutionThread postExecutionThread,
-            FileRepository fileRepository, UserRepository userRepository) {
+            FileRepository fileRepository, UserRepository userRepository,
+            SurveyRepository surveyRepository) {
         super(threadExecutor, postExecutionThread);
         this.fileRepository = fileRepository;
         this.userRepository = userRepository;
+        this.surveyRepository = surveyRepository;
     }
 
     @Override
     protected <T> Observable buildUseCaseObservable(Map<String, T> parameters) {
-        return fileRepository.copyPrivateFiles()
-                .concatMap(new Function<Boolean, ObservableSource<Boolean>>() {
+        return surveyRepository.getAllTransmissionFileNames()
+                .concatMap(new Function<List<String>, ObservableSource<Boolean>>() {
                     @Override
-                    public ObservableSource<Boolean> apply(Boolean aBoolean) {
-                        return userRepository.setPublishDataTime();
+                    public ObservableSource<Boolean> apply(List<String> fileNames) {
+                        return fileRepository.copyPrivateFiles(fileNames)
+                                .concatMap(new Function<Boolean, ObservableSource<Boolean>>() {
+                                    @Override
+                                    public ObservableSource<Boolean> apply(Boolean aBoolean) {
+                                        return userRepository.setPublishDataTime();
+                                    }
+                                });
                     }
                 });
     }

@@ -22,7 +22,10 @@ package org.akvo.flow.domain.repository;
 
 import android.graphics.Bitmap;
 
+import java.util.List;
+
 import io.reactivex.Observable;
+import io.reactivex.annotations.NonNull;
 
 public interface FileRepository {
 
@@ -32,7 +35,7 @@ public interface FileRepository {
 
     Observable<Boolean> moveFiles();
 
-    Observable<Boolean> copyPrivateFiles();
+    Observable<Boolean> copyPrivateFiles(@NonNull List<String> fileNames);
 
     Observable<Boolean> copyFile(String originFilePath, String destinationFilePath);
 

@@ -551,4 +551,17 @@ public class BriteSurveyDbAdapter {
         }
         return transmissionsExist;
     }
+
+    public Cursor getAllTransmissionFileNames() {
+        String sql =
+                "SELECT " + TransmissionColumns.FILENAME + " FROM " + Tables.TRANSMISSION
+                        + " WHERE " + TransmissionColumns.STATUS + " IN (?, ?, ?, ?)";
+        String[] selectionArgs = new String[] {
+                String.valueOf(TransmissionStatus.QUEUED),
+                String.valueOf(TransmissionStatus.IN_PROGRESS),
+                String.valueOf(TransmissionStatus.SYNCED),
+                String.valueOf(TransmissionStatus.FAILED),
+        };
+        return briteDatabase.query(sql, selectionArgs);
+    }
 }

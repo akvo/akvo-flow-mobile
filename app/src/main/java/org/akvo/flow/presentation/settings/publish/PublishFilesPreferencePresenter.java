@@ -33,17 +33,17 @@ public class PublishFilesPreferencePresenter implements Presenter {
 
     private final PublishedTimeHelper publishedTimeHelper;
     private final UseCase getPublishDataTime;
-    private final UseCase makeDataPublic;
+    private final UseCase publishData;
 
     private IPublishFilesPreferenceView view;
 
     @Inject
     public PublishFilesPreferencePresenter(PublishedTimeHelper publishedTimeHelper,
             @Named("getPublishDataTime") UseCase getPublishDataTime,
-            @Named("makeDataPublic") UseCase makeDataPublic) {
+            @Named("publishData") UseCase publishData) {
         this.publishedTimeHelper = publishedTimeHelper;
         this.getPublishDataTime = getPublishDataTime;
-        this.makeDataPublic = makeDataPublic;
+        this.publishData = publishData;
     }
 
     public void setView(IPublishFilesPreferenceView view) {
@@ -53,8 +53,8 @@ public class PublishFilesPreferencePresenter implements Presenter {
     public void onPublishClick() {
         view.showLoading();
         final long startTime = System.currentTimeMillis();
-        makeDataPublic.dispose();
-        makeDataPublic.execute(new DefaultObserver<Boolean>() {
+        publishData.dispose();
+        publishData.execute(new DefaultObserver<Boolean>() {
             @Override
             public void onError(Throwable e) {
                 Timber.e(e);
@@ -76,7 +76,7 @@ public class PublishFilesPreferencePresenter implements Presenter {
     @Override
     public void destroy() {
         getPublishDataTime.dispose();
-        makeDataPublic.dispose();
+        publishData.dispose();
     }
 
     public void load() {

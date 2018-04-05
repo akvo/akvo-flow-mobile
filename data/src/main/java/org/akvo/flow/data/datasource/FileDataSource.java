@@ -104,7 +104,7 @@ public class FileDataSource {
         return folder;
     }
 
-    public Observable<Boolean> copyPrivateData() {
+    public Observable<Boolean> copyPrivateFiles() {
         //TODO: error handling will be added in separate issue
         copyPrivateFileToPublic(FolderBrowser.DIR_DATA, FolderBrowser.DIR_PUBLISHED_DATA);
         copyPrivateFileToPublic(FolderBrowser.DIR_MEDIA, FolderBrowser.DIR_PUBLISHED_MEDIA);

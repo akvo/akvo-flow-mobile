@@ -32,7 +32,7 @@ public interface FileRepository {
 
     Observable<Boolean> moveFiles();
 
-    Observable<Boolean> copyPrivateData();
+    Observable<Boolean> copyPrivateFiles();
 
     Observable<Boolean> copyFile(String originFilePath, String destinationFilePath);
 

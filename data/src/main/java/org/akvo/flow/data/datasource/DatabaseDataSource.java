@@ -211,7 +211,7 @@ public class DatabaseDataSource {
     }
 
     public Observable<Cursor> getUser(Long userId) {
-        return briteSurveyDbAdapter.getUser(userId);
+        return Observable.just(briteSurveyDbAdapter.getUser(userId));
     }
 
     public Observable<Boolean> editUser(User user) {

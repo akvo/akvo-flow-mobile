@@ -24,8 +24,10 @@ import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import org.akvo.flow.data.entity.MovedFile;
+import org.akvo.flow.data.util.ExternalStorageHelper;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,17 +35,21 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import io.reactivex.Observable;
+import timber.log.Timber;
 
 @Singleton
 public class FileDataSource {
 
     private final FileHelper fileHelper;
     private final FolderBrowser folderBrowser;
+    private final ExternalStorageHelper externalStorageHelper;
 
     @Inject
-    public FileDataSource(FileHelper fileHelper, FolderBrowser folderBrowser) {
+    public FileDataSource(FileHelper fileHelper, FolderBrowser folderBrowser,
+            ExternalStorageHelper externalStorageHelper) {
         this.fileHelper = fileHelper;
         this.folderBrowser = folderBrowser;
+        this.externalStorageHelper = externalStorageHelper;
     }
 
     public Observable<List<MovedFile>> moveZipFiles() {
@@ -56,19 +62,25 @@ public class FileDataSource {
 
     public Observable<Boolean> copyMediaFile(String originFilePath, String destinationFilePath) {
         File originalFile = new File(originFilePath);
-        if (fileHelper.copyFile(originalFile, new File(destinationFilePath)) == null) {
-            return Observable.error(new Exception("Error copying video file"));
-        } else {
-            //noinspection ResultOfMethodCallIgnored
-            originalFile.delete();
+        try {
+            boolean copied = fileHelper.copyFile(originalFile, new File(destinationFilePath)) == null;
+            if (copied) {
+                return Observable.error(new Exception("Error copying video file"));
+            } else {
+                //noinspection ResultOfMethodCallIgnored
+                originalFile.delete();
+            }
+            return Observable.just(true);
+        } catch (IOException e) {
+            return Observable.error(e);
         }
-        return Observable.just(true);
+
     }
 
     private Observable<List<MovedFile>> moveFiles(String folderName) {
         File publicFolder = folderBrowser.getPublicFolder(folderName);
         List<MovedFile> movedFiles = new ArrayList<>();
-        if (publicFolder.exists()) {
+        if (publicFolder != null && publicFolder.exists()) {
             File[] files = publicFolder.listFiles();
             movedFiles = copyFiles(files, folderName);
             if (files.length == movedFiles.size()) {
@@ -84,12 +96,17 @@ public class FileDataSource {
         if (files != null) {
             File folder = getPrivateFolder(folderName);
             for (File f : files) {
-                String destinationPath = fileHelper.copyFileToFolder(f, folder);
-                if (!TextUtils.isEmpty(destinationPath)) {
-                    movedFiles.add(new MovedFile(f.getPath(), destinationPath));
-                    //noinspection ResultOfMethodCallIgnored
-                    f.delete();
+                try {
+                    String destinationPath = fileHelper.copyFileToFolder(f, folder);
+                    if (!TextUtils.isEmpty(destinationPath)) {
+                        movedFiles.add(new MovedFile(f.getPath(), destinationPath));
+                        //noinspection ResultOfMethodCallIgnored
+                        f.delete();
+                    }
+                } catch (IOException e) {
+                    Timber.e(e);
                 }
+
             }
         }
         return movedFiles;
@@ -105,18 +122,22 @@ public class FileDataSource {
     }
 
     public Observable<Boolean> copyPrivateFiles(List<String> fileNames) {
-        //TODO: error handling will be added in separate issue
-        copyPrivateFileToPublic(FolderBrowser.DIR_DATA, FolderBrowser.DIR_PUBLISHED_DATA,
-                fileNames);
-        copyPrivateFileToPublic(FolderBrowser.DIR_MEDIA, FolderBrowser.DIR_PUBLISHED_MEDIA,
-                fileNames);
-        return Observable.just(true);
+        try {
+            boolean dataCopied = copyPrivateFileToPublic(FolderBrowser.DIR_DATA,
+                    FolderBrowser.DIR_PUBLISHED_DATA, fileNames);
+            boolean mediaCopied = copyPrivateFileToPublic(FolderBrowser.DIR_MEDIA,
+                    FolderBrowser.DIR_PUBLISHED_MEDIA, fileNames);
+            return Observable.just(dataCopied || mediaCopied);
+        } catch (IOException e) {
+            return Observable.error(e);
+        }
     }
 
-    private void copyPrivateFileToPublic(String privateFolderName, String publicFolderName,
-            List<String> fileNames) {
+    private boolean copyPrivateFileToPublic(String privateFolderName, String publicFolderName,
+            List<String> fileNames) throws IOException {
+        boolean filesCopied = false;
         File destinationDataFolder = folderBrowser.getPublicFolder(publicFolderName);
-        if (!destinationDataFolder.exists()) {
+        if (destinationDataFolder != null && !destinationDataFolder.exists()) {
             //noinspection ResultOfMethodCallIgnored
             destinationDataFolder.mkdirs();
         }
@@ -126,11 +147,13 @@ public class FileDataSource {
             if (files != null) {
                 for (File f : files) {
                     if (fileNames.contains(f.getAbsolutePath())) {
+                        filesCopied = true;
                         fileHelper.copyFileToFolder(f, destinationDataFolder);
                     }
                 }
             }
         }
+        return filesCopied;
     }
 
     public Observable<Boolean> removePublicFiles() {
@@ -141,7 +164,7 @@ public class FileDataSource {
 
     private void deleteFilesInPublicFolder(String folderName) {
         File dataFolder = folderBrowser.getPublicFolder(folderName);
-        File[] files = dataFolder.listFiles();
+        File[] files = dataFolder == null ? null : dataFolder.listFiles();
         if (files != null) {
             for (File f : files) {
                 //noinspection ResultOfMethodCallIgnored
@@ -154,7 +177,7 @@ public class FileDataSource {
         List<File> foldersToDelete = folderBrowser.findAllPossibleFolders(FolderBrowser.DIR_FORMS);
         foldersToDelete.addAll(folderBrowser.findAllPossibleFolders(FolderBrowser.DIR_RES));
         File inboxFolder = folderBrowser.getPublicFolder(FolderBrowser.DIR_INBOX);
-        if (inboxFolder.exists()) {
+        if (inboxFolder != null && inboxFolder.exists()) {
             foldersToDelete.add(inboxFolder);
         }
         for (File file : foldersToDelete) {
@@ -169,12 +192,16 @@ public class FileDataSource {
         foldersToDelete.addAll(folderBrowser.findAllPossibleFolders(FolderBrowser.DIR_MEDIA));
         foldersToDelete.addAll(folderBrowser.findAllPossibleFolders(FolderBrowser.DIR_TMP));
         File exportedFolder = folderBrowser.getPublicFolder(FolderBrowser.DIR_PUBLISHED);
-        if (exportedFolder.exists()) {
+        if (exportedFolder != null && exportedFolder.exists()) {
             foldersToDelete.add(exportedFolder);
         }
         for (File file : foldersToDelete) {
             fileHelper.deleteFilesInDirectory(file, true);
         }
         return Observable.just(true);
+    }
+
+    public Observable<Long> getAvailableStorage() {
+        return Observable.just(externalStorageHelper.getExternalStorageAvailableSpaceInMb());
     }
 }

@@ -156,6 +156,18 @@ public class PublishFilesPreferenceView extends LinearLayout
         bootReceiverHelper.enableBootReceiver();
     }
 
+    @Override public void showNoDataToPublishError() {
+        //TODO
+    }
+
+    @Override public void showGenericPublishError() {
+        //TODO
+    }
+
+    @Override public void showNoSpaceLeftError() {
+        //TODO
+    }
+
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();

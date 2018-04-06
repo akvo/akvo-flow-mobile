@@ -20,12 +20,14 @@
 
 package org.akvo.flow.domain.interactor;
 
+import org.akvo.flow.domain.exception.FullStorageException;
 import org.akvo.flow.domain.executor.PostExecutionThread;
 import org.akvo.flow.domain.executor.ThreadExecutor;
 import org.akvo.flow.domain.repository.FileRepository;
 import org.akvo.flow.domain.repository.SurveyRepository;
 import org.akvo.flow.domain.repository.UserRepository;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -60,11 +62,53 @@ public class PublishData extends UseCase {
                         return fileRepository.copyPrivateFiles(fileNames)
                                 .concatMap(new Function<Boolean, ObservableSource<Boolean>>() {
                                     @Override
+                                    public ObservableSource<Boolean> apply(Boolean published) {
+                                        if (published) {
+                                            userRepository.setPublishDataTime();
+                                        }
+                                        return Observable.just(published);
+                                    }
+                                });
+                    }
+                })
+                .onErrorResumeNext(new Function<Throwable, ObservableSource<Boolean>>() {
+                    @Override
+                    public ObservableSource<Boolean> apply(Throwable throwable) {
+                        return cleanUpOnError(throwable);
+                    }
+                });
+
+    }
+
+    private ObservableSource<Boolean> cleanUpOnError(final Throwable throwable) {
+        return fileRepository.unPublishData()
+                .flatMap(new Function<Boolean, ObservableSource<Boolean>>() {
+                    @Override
+                    public ObservableSource<Boolean> apply(Boolean aBoolean) {
+                        return userRepository.clearPublishDataTime()
+                                .concatMap(new Function<Boolean, ObservableSource<Boolean>>() {
+                                    @Override
                                     public ObservableSource<Boolean> apply(Boolean aBoolean) {
-                                        return userRepository.setPublishDataTime();
+                                        return checkError(throwable);
                                     }
                                 });
                     }
                 });
+    }
+
+    private ObservableSource<Boolean> checkError(final Throwable throwable) {
+        if (throwable instanceof IOException) {
+            return fileRepository.isExternalStorageFull()
+                    .concatMap(new Function<Boolean, ObservableSource<Boolean>>() {
+                        @Override
+                        public ObservableSource<Boolean> apply(Boolean full) {
+                            if (full) {
+                                return Observable.error(new FullStorageException(throwable));
+                            }
+                            return Observable.error(throwable);
+                        }
+                    });
+        }
+        return Observable.error(throwable);
     }
 }

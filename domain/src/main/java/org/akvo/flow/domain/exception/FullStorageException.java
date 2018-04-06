@@ -18,21 +18,11 @@
  *
  */
 
-package org.akvo.flow.presentation.settings.publish;
+package org.akvo.flow.domain.exception;
 
-public interface IPublishFilesPreferenceView {
+public class FullStorageException extends Exception {
 
-    void showPublished(int progress);
-
-    void showUnPublished();
-
-    void showLoading();
-
-    void scheduleAlarm();
-
-    void showNoDataToPublishError();
-
-    void showGenericPublishError();
-
-    void showNoSpaceLeftError();
+    public FullStorageException(Throwable throwable) {
+        super(throwable);
+    }
 }

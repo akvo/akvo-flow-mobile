@@ -95,4 +95,15 @@ public class FileDataRepository implements FileRepository {
     public Observable<Boolean> clearAllUserFiles() {
         return dataSourceFactory.getFileDataSource().deleteAllUserFiles();
     }
+
+    @Override
+    public Observable<Boolean> isExternalStorageFull() {
+        return dataSourceFactory.getFileDataSource().getAvailableStorage()
+                .map(new Function<Long, Boolean>() {
+                    @Override
+                    public Boolean apply(Long availableMb) {
+                        return availableMb < 100;
+                    }
+                });
+    }
 }

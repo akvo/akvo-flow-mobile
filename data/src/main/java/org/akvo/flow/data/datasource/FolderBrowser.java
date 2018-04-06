@@ -21,9 +21,10 @@
 package org.akvo.flow.data.datasource;
 
 import android.content.Context;
-import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+
+import org.akvo.flow.data.util.ExternalStorageHelper;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -44,10 +45,13 @@ public class FolderBrowser {
     static final String DIR_INBOX = "akvoflow/inbox";
 
     private final Context context;
+    private final ExternalStorageHelper externalStorageHelper;
 
     @Inject
-    public FolderBrowser(Context context) {
+    public FolderBrowser(Context context,
+            ExternalStorageHelper externalStorageHelper) {
         this.context = context;
+        this.externalStorageHelper = externalStorageHelper;
     }
 
     @NonNull
@@ -62,15 +66,18 @@ public class FolderBrowser {
             folders.add(folder2);
         }
         File folder3 = getPublicFolder(folderName);
-        if (folder3.exists()) {
+        if (folder3 != null && folder3.exists()) {
             folders.add(folder3);
         }
         return folders;
     }
 
-    @NonNull
+    @Nullable
     File getPublicFolder(String folderName) {
-        String externalStoragePath = Environment.getExternalStorageDirectory().getAbsolutePath();
+        String externalStoragePath = externalStorageHelper.getExternalStoragePath();
+        if (externalStoragePath == null) {
+            return null;
+        }
         return new File(externalStoragePath + File.separator + folderName);
     }
 

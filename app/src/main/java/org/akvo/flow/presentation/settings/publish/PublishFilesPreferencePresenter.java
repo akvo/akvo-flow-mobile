@@ -20,6 +20,7 @@
 
 package org.akvo.flow.presentation.settings.publish;
 
+import org.akvo.flow.domain.exception.FullStorageException;
 import org.akvo.flow.domain.interactor.DefaultObserver;
 import org.akvo.flow.domain.interactor.UseCase;
 import org.akvo.flow.presentation.Presenter;
@@ -52,23 +53,28 @@ public class PublishFilesPreferencePresenter implements Presenter {
 
     public void onPublishClick() {
         view.showLoading();
-        final long startTime = System.currentTimeMillis();
         publishData.dispose();
         publishData.execute(new DefaultObserver<Boolean>() {
             @Override
             public void onError(Throwable e) {
                 Timber.e(e);
-                //TODO: display error to user (other issue)
-                load();
+                view.showUnPublished();
+                if (e instanceof FullStorageException) {
+                    view.showNoSpaceLeftError();
+                } else {
+                    view.showGenericPublishError();
+                }
             }
 
             @Override
             public void onNext(Boolean published) {
-                //TODO: make sure everything was published
-                long endTime = System.currentTimeMillis();
-                Timber.d("moving files took: " + (endTime - startTime));
-                view.scheduleAlarm();
-                load();
+                if (published) {
+                    view.scheduleAlarm();
+                    load();
+                } else {
+                    view.showUnPublished();
+                    view.showNoDataToPublishError();
+                }
             }
         }, null);
     }
@@ -92,7 +98,6 @@ public class PublishFilesPreferencePresenter implements Presenter {
             public void onNext(Long publishTime) {
                 long timeSincePublished = publishedTimeHelper
                         .calculateTimeSincePublished(publishTime);
-                Timber.d("timeSincePublished: " + timeSincePublished);
                 if (timeSincePublished < PublishedTimeHelper.MAX_PUBLISH_TIME_IN_MS) {
                     int remainingTime = publishedTimeHelper.getRemainingPublishedTime(
                             timeSincePublished);

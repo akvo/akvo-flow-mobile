@@ -40,7 +40,7 @@ public class AlarmHelper {
         this.context = context.getApplicationContext();
     }
 
-    public void scheduleAlarm(int timeInMs) {
+    public void scheduleAlarm(long timeInMs) {
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         if (alarmManager != null) {
             Intent intent = new Intent(context, DataTimeoutReceiver.class);

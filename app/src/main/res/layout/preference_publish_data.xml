@@ -42,8 +42,8 @@
                     android:layout_height="64dp"
                     android:indeterminate="false"
                     android:max="90"
-                    android:progress="89"
-                    android:progressDrawable="@drawable/circle_progress_drawable" />
+                    android:progressDrawable="@drawable/circle_progress_drawable"
+                    android:indeterminateDrawable="@drawable/circle_progress_drawable_moving" />
 
             <TextView
                     tools:text="89 mins"

@@ -51,17 +51,19 @@ public class PublishFilesPreferencePresenter implements Presenter {
     }
 
     public void onPublishClick() {
-        //TODO: show "loading" until files are published
+        view.showLoading();
+        makeDataPublic.dispose();
         makeDataPublic.execute(new DefaultObserver<Boolean>() {
             @Override
             public void onError(Throwable e) {
                 Timber.e(e);
                 //TODO: display error to user (other issue)
+                load();
             }
 
             @Override
             public void onNext(Boolean published) {
-                //TODO: make sure everything was published
+                //TODO: make sure everything was published (other issue)
                 view.scheduleAlarm();
                 load();
             }
@@ -87,7 +89,6 @@ public class PublishFilesPreferencePresenter implements Presenter {
             public void onNext(Long publishTime) {
                 long timeSincePublished = publishedTimeHelper
                         .calculateTimeSincePublished(publishTime);
-                Timber.d("timeSincePublished: " + timeSincePublished);
                 if (timeSincePublished < PublishedTimeHelper.MAX_PUBLISH_TIME_IN_MS) {
                     int remainingTime = publishedTimeHelper.getRemainingPublishedTime(
                             timeSincePublished);

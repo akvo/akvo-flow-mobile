@@ -39,7 +39,7 @@ import timber.log.Timber;
 
 public class BootReceiver extends BroadcastReceiver {
 
-    public static final String BOOT_ACTION = "android.intent.action.BOOT_COMPLETED";
+    private static final String BOOT_ACTION = "android.intent.action.BOOT_COMPLETED";
 
     @Inject
     @Named("getPublishDataTime")
@@ -63,8 +63,9 @@ public class BootReceiver extends BroadcastReceiver {
                 @Override
                 public void onError(Throwable e) {
                     getPublishDataTime.dispose();
+                    bootReceiverHelper.disableBootReceiver();
+                    appContext.startService(new Intent(appContext, UnPublishDataService.class));
                     Timber.e(e);
-                    alarmHelper.scheduleAlarm(PublishedTimeHelper.MAX_PUBLISH_TIME_IN_MS);
                 }
 
                 @Override
@@ -73,7 +74,8 @@ public class BootReceiver extends BroadcastReceiver {
                     long timeSincePublished = publishedTimeHelper
                             .calculateTimeSincePublished(publishTime);
                     if (timeSincePublished < PublishedTimeHelper.MAX_PUBLISH_TIME_IN_MS) {
-                        int timeLeft = publishedTimeHelper.getMaxPublishedTime(timeSincePublished);
+                        int timeLeft = publishedTimeHelper
+                                .getRemainingPublishedTime(timeSincePublished);
                         alarmHelper.scheduleAlarm(timeLeft);
                     } else {
                         bootReceiverHelper.disableBootReceiver();

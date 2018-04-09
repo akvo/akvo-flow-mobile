@@ -31,6 +31,7 @@ import org.akvo.flow.domain.interactor.GetPublishDataTime;
 import org.akvo.flow.domain.interactor.GetSavedDataPoints;
 import org.akvo.flow.domain.interactor.GetUserSettings;
 import org.akvo.flow.domain.interactor.GetUsers;
+import org.akvo.flow.domain.interactor.MakeDataPublic;
 import org.akvo.flow.domain.interactor.SaveAppLanguage;
 import org.akvo.flow.domain.interactor.SaveEnableMobileData;
 import org.akvo.flow.domain.interactor.SaveImage;
@@ -162,5 +163,11 @@ public class ViewModule {
     @Named("getPublishDataTime")
     UseCase provideGetPublishDataTime(GetPublishDataTime getPublishDataTime) {
         return getPublishDataTime;
+    }
+
+    @Provides
+    @Named("makeDataPublic")
+    UseCase provideMakeDataPublic(MakeDataPublic makeDataPublic) {
+        return makeDataPublic;
     }
 }

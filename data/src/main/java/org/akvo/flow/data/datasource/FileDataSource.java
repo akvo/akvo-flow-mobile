@@ -141,4 +141,21 @@ public class FileDataSource {
             }
         }
     }
+
+    public Observable<Boolean> removePublicFiles() {
+        deleteFilesInPublicFolder(DIR_DATA);
+        deleteFilesInPublicFolder(DIR_MEDIA);
+        return Observable.just(true);
+    }
+
+    private void deleteFilesInPublicFolder(String folderName) {
+        File dataFolder = getPublicFolder(folderName);
+        File[] files = dataFolder.listFiles();
+        if (files != null) {
+            for (File f : files) {
+                //noinspection ResultOfMethodCallIgnored
+                f.delete();
+            }
+        }
+    }
 }

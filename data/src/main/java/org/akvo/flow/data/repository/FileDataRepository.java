@@ -79,4 +79,9 @@ public class FileDataRepository implements FileRepository {
         return dataSourceFactory.getFileDataSource()
                 .copyMediaFile(originFilePath, destinationFilePath);
     }
+
+    @Override
+    public Observable<Boolean> unPublishData() {
+        return dataSourceFactory.getFileDataSource().removePublicFiles();
+    }
 }

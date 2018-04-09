@@ -62,12 +62,14 @@ public class BootReceiver extends BroadcastReceiver {
             getPublishDataTime.execute(new DefaultObserver<Long>() {
                 @Override
                 public void onError(Throwable e) {
+                    getPublishDataTime.dispose();
                     Timber.e(e);
                     alarmHelper.scheduleAlarm(PublishedTimeHelper.MAX_PUBLISH_TIME_IN_MS);
                 }
 
                 @Override
                 public void onNext(Long publishTime) {
+                    getPublishDataTime.dispose();
                     long timeSincePublished = publishedTimeHelper
                             .calculateTimeSincePublished(publishTime);
                     if (timeSincePublished < PublishedTimeHelper.MAX_PUBLISH_TIME_IN_MS) {

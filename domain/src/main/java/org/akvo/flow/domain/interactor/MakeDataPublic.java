@@ -33,10 +33,6 @@ import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
 import io.reactivex.functions.Function;
 
-/**
- * This is a single threaded UseCase to be used with IntentServices whose onHandleIntent method runs
- * on a worker thread
- */
 public class MakeDataPublic extends UseCase {
 
     private final FileRepository fileRepository;
@@ -55,7 +51,7 @@ public class MakeDataPublic extends UseCase {
         return fileRepository.copyPrivateData()
                 .concatMap(new Function<Boolean, ObservableSource<Boolean>>() {
                     @Override
-                    public ObservableSource<Boolean> apply(Boolean aBoolean) throws Exception {
+                    public ObservableSource<Boolean> apply(Boolean aBoolean) {
                         return userRepository.setPublishDataTime();
                     }
                 });

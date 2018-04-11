@@ -26,6 +26,7 @@ import android.support.annotation.Nullable;
 
 import org.akvo.flow.database.UserColumns;
 import org.akvo.flow.domain.entity.User;
+import org.akvo.flow.domain.util.Constants;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,16 +39,10 @@ public class UserMapper {
     public UserMapper() {
     }
 
-    private User getUser(@NonNull Cursor cursor) {
-        long id = cursor.getLong(
-                cursor.getColumnIndexOrThrow(UserColumns._ID));
-        String name = cursor.getString(
-                cursor.getColumnIndexOrThrow(UserColumns.NAME));
-        return new User(id, name);
-    }
+
 
     @NonNull
-    public List<User> getUsers(@Nullable Cursor cursor) {
+    public List<User> mapUsers(@Nullable Cursor cursor) {
         List<User> users = new ArrayList<>();
         if (cursor != null) {
             if (cursor.moveToFirst()) {
@@ -58,5 +53,25 @@ public class UserMapper {
             cursor.close();
         }
         return users;
+    }
+
+    @NonNull
+    public User mapUser(@Nullable Cursor cursor) {
+        User user;
+        if (cursor != null && cursor.moveToFirst()) {
+            user = getUser(cursor);
+        } else {
+            user = new User(Constants.INVALID_USER_ID, null);
+        }
+        if (cursor != null) {
+            cursor.close();
+        }
+        return user;
+    }
+
+    private User getUser(@NonNull Cursor cursor) {
+        long id = cursor.getLong(cursor.getColumnIndexOrThrow(UserColumns._ID));
+        String name = cursor.getString(cursor.getColumnIndexOrThrow(UserColumns.NAME));
+        return new User(id, name);
     }
 }

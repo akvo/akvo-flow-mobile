@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -18,12 +18,14 @@
  *
  */
 
-package org.akvo.flow.domain.interactor;
+package org.akvo.flow.domain.interactor.users;
 
 import org.akvo.flow.domain.executor.PostExecutionThread;
 import org.akvo.flow.domain.executor.ThreadExecutor;
+import org.akvo.flow.domain.interactor.UseCase;
 import org.akvo.flow.domain.repository.SurveyRepository;
 import org.akvo.flow.domain.repository.UserRepository;
+import org.akvo.flow.domain.util.Constants;
 
 import java.util.Map;
 
@@ -35,7 +37,6 @@ import io.reactivex.functions.Function;
 public class CreateUser extends UseCase {
 
     public static final String PARAM_USER_NAME = "user";
-    private static final Long INVALID_USER_ID = -1L;
 
     private final SurveyRepository surveyRepository;
     private final UserRepository userRepository;
@@ -58,7 +59,7 @@ public class CreateUser extends UseCase {
                 .concatMap(new Function<Long, Observable<Boolean>>() {
                     @Override
                     public Observable<Boolean> apply(final Long userId) {
-                        if (INVALID_USER_ID.equals(userId)) {
+                        if (Constants.INVALID_USER_ID.equals(userId)) {
                             return Observable.error(new Exception("Error inserting user"));
                         }
                         return userRepository.setSelectedUser(userId);

@@ -183,41 +183,6 @@ public class SurveyDbAdapter {
         database.execSQL(sql);
     }
 
-    /**
-     * returns a cursor listing all users
-     *
-     * @return
-     */
-    public Cursor getUsers() {
-        Cursor cursor = database.query(Tables.USER,
-                new String[] { UserColumns._ID, UserColumns.NAME, UserColumns.EMAIL },
-                UserColumns.DELETED + " <> ?",
-                new String[] { "1" },
-                null, null, null);
-        if (cursor != null) {
-            cursor.moveToFirst();
-        }
-        return cursor;
-    }
-
-    /**
-     * retrieves a user by ID
-     *
-     * @param id
-     * @return
-     */
-    public Cursor getUser(Long id) {
-        Cursor cursor = database.query(Tables.USER,
-                new String[] { UserColumns._ID, UserColumns.NAME, UserColumns.EMAIL },
-                UserColumns._ID + "=?",
-                new String[] { id.toString() },
-                null, null, null);
-        if (cursor != null) {
-            cursor.moveToFirst();
-        }
-        return cursor;
-    }
-
     public Cursor getResponses(long surveyInstanceId) {
         return database.query(Tables.RESPONSE,
                 RESPONSE_COLUMNS,

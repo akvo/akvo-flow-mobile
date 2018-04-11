@@ -261,7 +261,7 @@ public class SurveyDataRepository implements SurveyRepository {
                 .map(new Function<Cursor, List<User>>() {
                     @Override
                     public List<User> apply(Cursor cursor) {
-                        return userMapper.getUsers(cursor);
+                        return userMapper.mapUsers(cursor);
                     }
                 });
     }
@@ -279,5 +279,16 @@ public class SurveyDataRepository implements SurveyRepository {
     @Override
     public Observable<Long> createUser(String userName) {
         return dataSourceFactory.getDataBaseDataSource().createUser(userName);
+    }
+
+    @Override
+    public Observable<User> getUser(Long userId) {
+        return dataSourceFactory.getDataBaseDataSource().getUser(userId)
+                .map(new Function<Cursor, User>() {
+                    @Override
+                    public User apply(Cursor cursor) {
+                        return userMapper.mapUser(cursor);
+                    }
+                });
     }
 }

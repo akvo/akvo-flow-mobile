@@ -46,7 +46,7 @@ import org.akvo.flow.domain.FileTransmission;
 import org.akvo.flow.domain.QuestionResponse;
 import org.akvo.flow.domain.Survey;
 import org.akvo.flow.domain.SurveyGroup;
-import org.akvo.flow.domain.User;
+import org.akvo.flow.domain.entity.User;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.PlatformUtil;
 

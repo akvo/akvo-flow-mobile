@@ -60,7 +60,8 @@ public class FileBrowser {
         return file;
     }
 
-    @NonNull public List<File> findAllPossibleFolders(Context context, String folderName) {
+    @NonNull
+    public List<File> findAllPossibleFolders(Context context, String folderName) {
         List<File> folders = new ArrayList<>(3);
         File folder = getAppInternalFolder(context, folderName);
         if (folder.exists()) {
@@ -78,7 +79,7 @@ public class FileBrowser {
     }
 
     @NonNull
-    File getAppInternalFolder(Context context, String folder) {
+    private File getAppInternalFolder(Context context, String folder) {
         String path = getAppInternalFolderPath(context, folder);
         return new File(path);
     }

@@ -48,5 +48,9 @@ public interface SurveyRepository {
 
     Observable<Long> createUser(String userName);
 
-   Observable<User> getUser(Long userId);
+    Observable<User> getUser(Long userId);
+
+    Observable<Boolean> clearResponses();
+
+    Observable<Boolean> clearAllData();
 }

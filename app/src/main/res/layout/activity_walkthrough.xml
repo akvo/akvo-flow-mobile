@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              xmlns:app="http://schemas.android.com/apk/res-auto"
+              android:orientation="vertical">
+
+    <TextView
+            android:text="@string/secure_data_walkthrough_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="40dp"
+            android:gravity="center_horizontal"/>
+
+    <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="40dp">
+
+        <android.support.v4.view.ViewPager
+                android:id="@+id/walkthrough_pager"
+                android:background="@color/blue_disabled"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+        </android.support.v4.view.ViewPager>
+
+        <org.akvo.flow.presentation.walkthrough.DotIndicator
+                android:layout_width="match_parent"
+                android:layout_height="20dp"
+                android:background="@color/blue_main"
+                android:layout_marginBottom="120dp"
+                android:layout_gravity="bottom|center_horizontal"
+                app:indicatorNumber="2"
+                app:indicatorActive="@drawable/indicator_active"
+                app:indicatorInactive="@drawable/indicator_inactive"/>
+
+        <!--<Button-->
+                <!--android:text="@string/walthrough_next_button"-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_gravity="bottom|center_horizontal"-->
+                <!--android:layout_marginBottom="16dp"-->
+                <!--android:id="@+id/button"/>-->
+    </FrameLayout>
+</LinearLayout>

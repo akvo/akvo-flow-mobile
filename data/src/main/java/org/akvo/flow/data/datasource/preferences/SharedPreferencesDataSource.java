@@ -165,6 +165,10 @@ public class SharedPreferencesDataSource {
         return Observable.just(true);
     }
 
+    public Observable<Boolean> isDeviceSetup() {
+        return Observable.just(preferences.getBoolean(KEY_SETUP, false));
+    }
+
     private void clearSetUp() {
         preferences.edit().remove(KEY_SETUP).apply();
     }

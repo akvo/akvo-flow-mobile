@@ -130,4 +130,9 @@ public class UserDataRepository implements UserRepository {
     public Observable<Boolean> clearUserPreferences() {
         return dataSourceFactory.getSharedPreferencesDataSource().clearUserPreferences();
     }
+
+    @Override
+    public Observable<Boolean> isDeviceSetUp() {
+        return dataSourceFactory.getSharedPreferencesDataSource().isDeviceSetup();
+    }
 }

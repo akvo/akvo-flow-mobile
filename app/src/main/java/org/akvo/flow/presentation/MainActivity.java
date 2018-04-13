@@ -38,15 +38,14 @@ public class MainActivity extends BaseActivity {
     @Inject
     Prefs prefs;
 
+    private boolean firstCreate;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         initializeInjector();
-        if (prefs.getBoolean(Prefs.KEY_SETUP, false)) {
-            navigator.navigateToSurveyActivity(this);
-        } else {
-            navigator.navigateToAddUser(this);
-        }
+        firstCreate = true;
+        navigator.navigateToWalkThrough(this);
     }
 
     private void initializeInjector() {
@@ -54,5 +53,22 @@ public class MainActivity extends BaseActivity {
                 DaggerViewComponent.builder().applicationComponent(getApplicationComponent())
                         .build();
         viewComponent.inject(this);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (!firstCreate) {
+            navigateToCorrectActivity();
+        }
+        firstCreate = false;
+    }
+
+    private void navigateToCorrectActivity() {
+        if (prefs.getBoolean(Prefs.KEY_SETUP, false)) {
+            navigator.navigateToSurveyActivity(this);
+        } else {
+            navigator.navigateToAddUser(this);
+        }
     }
 }

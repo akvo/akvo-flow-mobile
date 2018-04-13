@@ -26,16 +26,21 @@ import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
 import org.akvo.flow.R;
+import org.akvo.flow.injector.component.DaggerViewComponent;
+import org.akvo.flow.injector.component.ViewComponent;
+import org.akvo.flow.presentation.BaseActivity;
+import org.akvo.flow.ui.Navigator;
+
+import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class WalkThroughActivity extends AppCompatActivity implements
-        WalkThrough1Fragment.NextListener {
+public class WalkThroughActivity extends BaseActivity implements
+        WalkThrough1Fragment.NextListener, WalkThrough2Fragment.OkListener, WalkthroughView {
 
     @BindView(R.id.walkthrough_pager)
     ViewPager viewPager;
@@ -43,14 +48,28 @@ public class WalkThroughActivity extends AppCompatActivity implements
     @BindView(R.id.walkthrough_indicator)
     DotIndicator indicator;
 
+    @Inject
+    WalkthroughPresenter presenter;
+
+    @Inject
+    Navigator navigator;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_walkthrough);
+        initializeInjector();
         ButterKnife.bind(this);
+        presenter.setView(this);
         setStatusBackgroundColor();
         hideActionBar();
         setUpViews();
+    }
+
+    private void initializeInjector() {
+        ViewComponent viewComponent = DaggerViewComponent.builder()
+                .applicationComponent(getApplicationComponent()).build();
+        viewComponent.inject(this);
     }
 
     private void setUpViews() {
@@ -79,5 +98,22 @@ public class WalkThroughActivity extends AppCompatActivity implements
     @Override
     public void onNextClicked() {
         viewPager.setCurrentItem(1, true);
+    }
+
+    @Override
+    public void onOkClicked() {
+        presenter.onOkClicked();
+    }
+
+    @Override
+    public void navigateToDeviceSetUp() {
+        navigator.navigateToAddUser(this);
+        finish();
+    }
+
+    @Override
+    public void navigateToSurvey() {
+        navigator.navigateToSurveyActivity(this);
+        finish();
     }
 }

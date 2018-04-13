@@ -39,6 +39,7 @@ import org.akvo.flow.presentation.navigation.FlowNavigationView;
 import org.akvo.flow.presentation.settings.PreferenceActivity;
 import org.akvo.flow.presentation.settings.publish.PublishFilesPreferenceView;
 import org.akvo.flow.presentation.signature.SignatureActivity;
+import org.akvo.flow.presentation.walkthrough.WalkThroughActivity;
 import org.akvo.flow.ui.fragment.DatapointsFragment;
 import org.akvo.flow.ui.fragment.ResponseListFragment;
 import org.akvo.flow.ui.view.CaddisflyQuestionView;
@@ -100,4 +101,6 @@ public interface ViewComponent {
     void inject(MainActivity mainActivity);
 
     void inject(PublishFilesPreferenceView publishFilesPreferenceView);
+
+    void inject(WalkThroughActivity walkThroughActivity);
 }

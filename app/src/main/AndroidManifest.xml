@@ -30,11 +30,10 @@
                 android:launchMode="singleInstance"
                 android:noHistory="true"
                 android:theme="@style/Theme.AppCompat.Translucent">
-            <!--<intent-filter>-->
-                <!--<action android:name="android.intent.action.MAIN"/>-->
-
-                <!--<category android:name="android.intent.category.LAUNCHER"/>-->
-            <!--</intent-filter>-->
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
         </activity>
         <activity
                 android:name=".activity.AddUserActivity"
@@ -152,13 +151,7 @@
                 android:label=""
                 android:configChanges="locale|layoutDirection">
         </activity>
-        <activity android:name=".presentation.walkthrough.WalkThroughActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-
-                <category android:name="android.intent.category.LAUNCHER"/>
-            </intent-filter>
-        </activity>
+        <activity android:name=".presentation.walkthrough.WalkThroughActivity"/>
 
         <provider
                 android:name="android.support.v4.content.FileProvider"

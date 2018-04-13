@@ -298,5 +298,7 @@
     <string name="pass_code">Passcode</string>
     <string name="secure_data_walkthrough_title">Data Storage</string>
     <string name="walthrough_next_button">Next</string>
+    <string name="secure_collected_walkthrough_page1_subtitle">Data collected with Flow app is now stored privately in the device</string>
+    <string name="secure_collected_walkthrough_page2_subtitle">Use the Publish data option in Settings to make data collected offline available for bulk upload</string>
 
 </resources>

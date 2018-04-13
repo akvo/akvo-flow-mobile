@@ -24,15 +24,24 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
 import org.akvo.flow.R;
 
+import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class WalkThroughActivity extends AppCompatActivity {
+public class WalkThroughActivity extends AppCompatActivity implements
+        WalkThrough1Fragment.NextListener {
+
+    @BindView(R.id.walkthrough_pager)
+    ViewPager viewPager;
+
+    @BindView(R.id.walkthrough_indicator)
+    DotIndicator indicator;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -41,6 +50,14 @@ public class WalkThroughActivity extends AppCompatActivity {
         ButterKnife.bind(this);
         setStatusBackgroundColor();
         hideActionBar();
+        setUpViews();
+    }
+
+    private void setUpViews() {
+        WalthroughFragmentAdapter adapter = new WalthroughFragmentAdapter(
+                getSupportFragmentManager());
+        viewPager.setAdapter(adapter);
+        viewPager.addOnPageChangeListener(indicator);
     }
 
     private void setStatusBackgroundColor() {
@@ -48,7 +65,7 @@ public class WalkThroughActivity extends AppCompatActivity {
             getWindow().getDecorView().setSystemUiVisibility(
                     View.SYSTEM_UI_FLAG_LAYOUT_STABLE
                             | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
-            getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.black_transparent));
+            getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.black_main));
         }
     }
 
@@ -57,5 +74,10 @@ public class WalkThroughActivity extends AppCompatActivity {
         if (supportActionBar != null) {
             supportActionBar.hide();
         }
+    }
+
+    @Override
+    public void onNextClicked() {
+        viewPager.setCurrentItem(1, true);
     }
 }

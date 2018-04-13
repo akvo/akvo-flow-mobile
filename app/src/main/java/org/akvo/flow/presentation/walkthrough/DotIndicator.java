@@ -58,19 +58,23 @@ public class DotIndicator extends LinearLayout implements ViewPager.OnPageChange
     }
 
     private void init(@Nullable AttributeSet attrs) {
-        setOrientation(VERTICAL);
+        setOrientation(HORIZONTAL);
         if (attrs != null) {
-            TypedArray typedArray = getContext().obtainStyledAttributes(attrs, R.styleable.DotIndicator);
+            TypedArray typedArray = getContext()
+                    .obtainStyledAttributes(attrs, R.styleable.DotIndicator);
             if (typedArray != null) {
                 indicatorActive = typedArray.getResourceId(R.styleable.DotIndicator_indicatorActive,
                         R.drawable.indicator_active);
-                indicatorInactive = typedArray.getResourceId(R.styleable.DotIndicator_indicatorInactive,
-                        R.drawable.indicator_inactive);
-                numberOfDots = typedArray.getResourceId(R.styleable.DotIndicator_indicatorNumber, 0);
+                indicatorInactive = typedArray
+                        .getResourceId(R.styleable.DotIndicator_indicatorInactive,
+                                R.drawable.indicator_inactive);
+                numberOfDots = typedArray
+                        .getInteger(R.styleable.DotIndicator_indicatorNumber, 3);
                 typedArray.recycle();
             }
         }
         setNumberOfDots(numberOfDots);
+        onPageSelected(0);
     }
 
     @Override

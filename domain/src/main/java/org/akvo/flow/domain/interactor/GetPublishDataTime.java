@@ -47,11 +47,10 @@ public class GetPublishDataTime extends UseCase {
 
     @Override
     protected <T> Observable buildUseCaseObservable(Map<String, T> parameters) {
-        return userRepository.getPublishDataTime().repeatWhen(
-                new Function<Observable<Object>, ObservableSource<?>>() {
+        return userRepository.getPublishDataTime()
+                .repeatWhen(new Function<Observable<Object>, ObservableSource<?>>() {
                     @Override
-                    public ObservableSource<?> apply(Observable<Object> objectObservable)
-                            throws Exception {
+                    public ObservableSource<?> apply(Observable<Object> objectObservable) {
                         return objectObservable.delay(1, TimeUnit.MINUTES);
                     }
                 });

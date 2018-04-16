@@ -150,7 +150,7 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
 
             //When the app is restarted we need to display the current user
             if (savedInstanceState == null) {
-                verifySelectedUser();
+                showSelectedUser();
             }
             activityJustCreated = true;
             setNavigationView();
@@ -475,7 +475,7 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
                 formInstanceId, readOnly, mSurveyGroup);
     }
 
-    private void verifySelectedUser() {
+    private void showSelectedUser() {
         getSelectedUser.execute(new DefaultObserver<User>() {
             @Override
             public void onError(Throwable e) {
@@ -486,15 +486,14 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
             public void onNext(User user) {
                 String userName = user.getName();
                 if (!TextUtils.isEmpty(userName)) {
-                    showSelectedUserName(userName);
+                    showMessage(getString(R.string.logged_in_as) + " " + userName);
                 }
             }
         }, null);
     }
 
-    private void showSelectedUserName(String userName) {
-        Toast.makeText(this, getString(R.string.logged_in_as) + " " + userName, Toast.LENGTH_LONG)
-                .show();
+    private void showMessage(String message) {
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show();
     }
 
     @Override

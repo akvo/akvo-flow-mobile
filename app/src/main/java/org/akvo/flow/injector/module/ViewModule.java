@@ -25,6 +25,7 @@ import org.akvo.flow.domain.interactor.ClearAllData;
 import org.akvo.flow.domain.interactor.ClearResponses;
 import org.akvo.flow.domain.interactor.CopyVideo;
 import org.akvo.flow.domain.interactor.GetIsDeviceSetUp;
+import org.akvo.flow.domain.interactor.SetWalkthroughSeen;
 import org.akvo.flow.domain.interactor.UnSyncedTransmissionsExist;
 import org.akvo.flow.domain.interactor.WasWalkthroughSeen;
 import org.akvo.flow.domain.interactor.users.CreateUser;
@@ -211,5 +212,11 @@ public class ViewModule {
     @Named("wasWalkthroughSeen")
     UseCase provideWasWalkthroughSeen(WasWalkthroughSeen wasWalkthroughSeen) {
         return wasWalkthroughSeen;
+    }
+
+    @Provides
+    @Named("setWalkthroughSeen")
+    UseCase provideSetWalkthroughSeen(SetWalkthroughSeen setWalkthroughSeen) {
+        return setWalkthroughSeen;
     }
 }

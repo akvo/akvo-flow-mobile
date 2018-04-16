@@ -61,6 +61,7 @@ public class WalkThroughActivity extends BaseActivity implements
         initializeInjector();
         ButterKnife.bind(this);
         presenter.setView(this);
+        presenter.setWalkThroughSeen();
         setStatusBackgroundColor();
         hideActionBar();
         setUpViews();

@@ -174,6 +174,11 @@ public class SharedPreferencesDataSource {
         return Observable.just(preferences.getBoolean(KEY_SECURITY_WALKTHROUGH_SEEN, false));
     }
 
+    public Observable<Boolean> setSecurityWalkThroughSeen() {
+        setBoolean(KEY_SECURITY_WALKTHROUGH_SEEN, true);
+        return Observable.just(true);
+    }
+
     public Observable<Boolean> clearUserPreferences() {
         clearSelectedSurvey();
         clearSelectedUser();

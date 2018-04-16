@@ -140,4 +140,9 @@ public class UserDataRepository implements UserRepository {
     public Observable<Boolean> wasWalkThroughSeen() {
         return dataSourceFactory.getSharedPreferencesDataSource().wasSecurityWalkThroughSeen();
     }
+
+    @Override
+    public Observable<Boolean> setWalkThroughSeen() {
+        return dataSourceFactory.getSharedPreferencesDataSource().setSecurityWalkThroughSeen();
+    }
 }

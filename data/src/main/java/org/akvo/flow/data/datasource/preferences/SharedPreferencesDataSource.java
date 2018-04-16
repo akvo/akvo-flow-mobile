@@ -43,6 +43,7 @@ public class SharedPreferencesDataSource {
     private static final String KEY_CELL_UPLOAD = "data.cellular.upload";
     private static final String KEY_SURVEY_GROUP_ID = "surveyGroupId";
     private static final String KEY_USER_ID = "userId";
+    private static final String KEY_SECURITY_WALKTHROUGH_SEEN = "security_walkthrough_seen";
     private static final boolean DEFAULT_VALUE_CELL_UPLOAD = false;
     private static final long LONG_VALUE_UNSET = -1;
 
@@ -165,8 +166,17 @@ public class SharedPreferencesDataSource {
         return Observable.just(true);
     }
 
-    private void clearSetUp() {
-        preferences.edit().remove(KEY_SETUP).apply();
+    public Observable<Boolean> isDeviceSetup() {
+        return Observable.just(preferences.getBoolean(KEY_SETUP, false));
+    }
+
+    public Observable<Boolean> wasSecurityWalkThroughSeen() {
+        return Observable.just(preferences.getBoolean(KEY_SECURITY_WALKTHROUGH_SEEN, false));
+    }
+
+    public Observable<Boolean> setSecurityWalkThroughSeen() {
+        setBoolean(KEY_SECURITY_WALKTHROUGH_SEEN, true);
+        return Observable.just(true);
     }
 
     public Observable<Boolean> clearUserPreferences() {
@@ -175,5 +185,9 @@ public class SharedPreferencesDataSource {
         clearSetUp();
         clearPublishDataTime();
         return Observable.just(true);
+    }
+
+    private void clearSetUp() {
+        preferences.edit().remove(KEY_SETUP).apply();
     }
 }

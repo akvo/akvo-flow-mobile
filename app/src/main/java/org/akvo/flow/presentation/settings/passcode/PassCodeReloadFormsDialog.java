@@ -25,6 +25,8 @@ import android.support.v4.app.FragmentActivity;
 
 public class PassCodeReloadFormsDialog extends PassCodeDialog {
 
+    public static final String TAG = "ReloadForms";
+
     private PassCodeReloadFormsListener listener;
 
     public PassCodeReloadFormsDialog() {

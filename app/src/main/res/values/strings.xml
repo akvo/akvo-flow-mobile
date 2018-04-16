@@ -292,5 +292,6 @@
     <string name="preference_publish_data_subtitle_publishing">Making data available in the public folder for bulk upload</string>
     <string name="preference_publish_data_subtitle_published">Data is available for bulk upload over the next</string>
     <string name="preference_publish_data_time_left">%1$d mins</string>
+    <string name="pass_code">Passcode</string>
 
 </resources>

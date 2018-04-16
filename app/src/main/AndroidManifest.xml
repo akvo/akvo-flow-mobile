@@ -26,7 +26,7 @@
             android:theme="@style/FlowAppTheme">
 
         <activity
-                android:name=".presentation.MainActivity"
+                android:name=".presentation.main.MainActivity"
                 android:launchMode="singleInstance"
                 android:noHistory="true"
                 android:theme="@style/Theme.AppCompat.Translucent">

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -18,25 +18,25 @@
  *
  */
 
-package org.akvo.flow.presentation;
+package org.akvo.flow.presentation.main;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 
-import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
+import org.akvo.flow.presentation.BaseActivity;
 import org.akvo.flow.ui.Navigator;
 
 import javax.inject.Inject;
 
-public class MainActivity extends BaseActivity {
+public class MainActivity extends BaseActivity implements MainView {
 
     @Inject
     Navigator navigator;
 
     @Inject
-    Prefs prefs;
+    MainPresenter presenter;
 
     private boolean firstCreate;
 
@@ -44,6 +44,7 @@ public class MainActivity extends BaseActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         initializeInjector();
+        presenter.setView(this);
         firstCreate = true;
         navigator.navigateToWalkThrough(this);
     }
@@ -59,16 +60,24 @@ public class MainActivity extends BaseActivity {
     protected void onResume() {
         super.onResume();
         if (!firstCreate) {
-            navigateToCorrectActivity();
+            presenter.checkDeviceSetup();
         }
         firstCreate = false;
     }
 
-    private void navigateToCorrectActivity() {
-        if (prefs.getBoolean(Prefs.KEY_SETUP, false)) {
-            navigator.navigateToSurveyActivity(this);
-        } else {
-            navigator.navigateToAddUser(this);
-        }
+    @Override
+    public void navigateToDeviceSetUp() {
+        navigator.navigateToAddUser(this);
+    }
+
+    @Override
+    public void navigateToSurvey() {
+        navigator.navigateToSurveyActivity(this);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        presenter.destroy();
     }
 }

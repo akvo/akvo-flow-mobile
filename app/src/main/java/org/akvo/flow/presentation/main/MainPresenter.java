@@ -18,7 +18,7 @@
  *
  */
 
-package org.akvo.flow.presentation.walkthrough;
+package org.akvo.flow.presentation.main;
 
 import org.akvo.flow.domain.interactor.DefaultObserver;
 import org.akvo.flow.domain.interactor.UseCase;
@@ -27,14 +27,19 @@ import org.akvo.flow.presentation.Presenter;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-public class WalkthroughPresenter implements Presenter {
+public class MainPresenter implements Presenter {
 
     private final UseCase isDeviceSetup;
-    private WalkthroughView view;
+
+    private MainView view;
 
     @Inject
-    public WalkthroughPresenter(@Named("getIsDeviceSetUp") UseCase isDeviceSetup) {
+    public MainPresenter(@Named("getIsDeviceSetUp") UseCase isDeviceSetup) {
         this.isDeviceSetup = isDeviceSetup;
+    }
+
+    public void setView(MainView view) {
+        this.view = view;
     }
 
     @Override
@@ -42,7 +47,7 @@ public class WalkthroughPresenter implements Presenter {
         isDeviceSetup.dispose();
     }
 
-    public void onOkClicked() {
+    public void checkDeviceSetup() {
         isDeviceSetup.execute(new DefaultObserver<Boolean>(){
             @Override
             public void onError(Throwable e) {
@@ -58,9 +63,5 @@ public class WalkthroughPresenter implements Presenter {
                 }
             }
         }, null);
-    }
-
-    public void setView(WalkthroughView view) {
-        this.view = view;
     }
 }

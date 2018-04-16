@@ -26,6 +26,7 @@ import org.akvo.flow.domain.interactor.ClearResponses;
 import org.akvo.flow.domain.interactor.CopyVideo;
 import org.akvo.flow.domain.interactor.GetIsDeviceSetUp;
 import org.akvo.flow.domain.interactor.UnSyncedTransmissionsExist;
+import org.akvo.flow.domain.interactor.WasWalkthroughSeen;
 import org.akvo.flow.domain.interactor.users.CreateUser;
 import org.akvo.flow.domain.interactor.DeleteSurvey;
 import org.akvo.flow.domain.interactor.users.DeleteUser;
@@ -204,5 +205,11 @@ public class ViewModule {
     @Named("getIsDeviceSetUp")
     UseCase provideIsDeviceSetup(GetIsDeviceSetUp isDeviceSetUp) {
         return isDeviceSetUp;
+    }
+
+    @Provides
+    @Named("wasWalkthroughSeen")
+    UseCase provideWasWalkthroughSeen(WasWalkthroughSeen wasWalkthroughSeen) {
+        return wasWalkthroughSeen;
     }
 }

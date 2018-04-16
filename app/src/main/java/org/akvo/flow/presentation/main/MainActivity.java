@@ -38,15 +38,12 @@ public class MainActivity extends BaseActivity implements MainView {
     @Inject
     MainPresenter presenter;
 
-    private boolean firstCreate;
-
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         initializeInjector();
         presenter.setView(this);
-        firstCreate = true;
-        navigator.navigateToWalkThrough(this);
+        presenter.checkWalkthroughDisplay();
     }
 
     private void initializeInjector() {
@@ -57,15 +54,6 @@ public class MainActivity extends BaseActivity implements MainView {
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-        if (!firstCreate) {
-            presenter.checkDeviceSetup();
-        }
-        firstCreate = false;
-    }
-
-    @Override
     public void navigateToDeviceSetUp() {
         navigator.navigateToAddUser(this);
     }
@@ -73,6 +61,11 @@ public class MainActivity extends BaseActivity implements MainView {
     @Override
     public void navigateToSurvey() {
         navigator.navigateToSurveyActivity(this);
+    }
+
+    @Override
+    public void navigateToWalkThrough() {
+        navigator.navigateToWalkThrough(this);
     }
 
     @Override

@@ -135,4 +135,9 @@ public class UserDataRepository implements UserRepository {
     public Observable<Boolean> isDeviceSetUp() {
         return dataSourceFactory.getSharedPreferencesDataSource().isDeviceSetup();
     }
+
+    @Override
+    public Observable<Boolean> wasWalkThroughSeen() {
+        return dataSourceFactory.getSharedPreferencesDataSource().wasSecurityWalkThroughSeen();
+    }
 }

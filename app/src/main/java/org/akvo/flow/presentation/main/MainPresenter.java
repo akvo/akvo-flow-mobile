@@ -27,30 +27,31 @@ import org.akvo.flow.presentation.Presenter;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import timber.log.Timber;
+
 public class MainPresenter implements Presenter {
 
     private final UseCase isDeviceSetup;
+    private final UseCase wasWalkThroughSeen;
 
     private MainView view;
 
     @Inject
-    public MainPresenter(@Named("getIsDeviceSetUp") UseCase isDeviceSetup) {
+    public MainPresenter(@Named("getIsDeviceSetUp") UseCase isDeviceSetup,
+            @Named("wasWalkthroughSeen") UseCase wasWalkThroughSeen) {
         this.isDeviceSetup = isDeviceSetup;
+        this.wasWalkThroughSeen = wasWalkThroughSeen;
     }
 
     public void setView(MainView view) {
         this.view = view;
     }
 
-    @Override
-    public void destroy() {
-        isDeviceSetup.dispose();
-    }
-
     public void checkDeviceSetup() {
         isDeviceSetup.execute(new DefaultObserver<Boolean>(){
             @Override
             public void onError(Throwable e) {
+                Timber.e(e);
                 view.navigateToDeviceSetUp();
             }
 
@@ -60,6 +61,31 @@ public class MainPresenter implements Presenter {
                     view.navigateToSurvey();
                 } else {
                     view.navigateToDeviceSetUp();
+                }
+            }
+        }, null);
+    }
+
+    @Override
+    public void destroy() {
+        isDeviceSetup.dispose();
+        wasWalkThroughSeen.dispose();
+    }
+
+    public void checkWalkthroughDisplay() {
+        wasWalkThroughSeen.execute(new DefaultObserver<Boolean>() {
+            @Override
+            public void onError(Throwable e) {
+                Timber.e(e);
+                view.navigateToWalkThrough();
+            }
+
+            @Override
+            public void onNext(Boolean seen) {
+                if (seen) {
+                    checkDeviceSetup();
+                } else {
+                    view.navigateToWalkThrough();
                 }
             }
         }, null);

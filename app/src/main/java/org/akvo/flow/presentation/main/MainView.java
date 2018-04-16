@@ -25,4 +25,6 @@ public interface MainView {
     void navigateToDeviceSetUp();
 
     void navigateToSurvey();
+
+    void navigateToWalkThrough();
 }

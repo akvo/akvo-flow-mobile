@@ -63,4 +63,6 @@ public interface UserRepository {
     Observable<Boolean> clearUserPreferences();
 
     Observable<Boolean> isDeviceSetUp();
+
+    Observable<Boolean> wasWalkThroughSeen();
 }

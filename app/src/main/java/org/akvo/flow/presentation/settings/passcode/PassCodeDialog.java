@@ -54,14 +54,12 @@ public abstract class PassCodeDialog extends DialogFragment {
                 String val = input.getText().toString();
                 if (ConstantUtil.ADMIN_AUTH_CODE.equals(val)) {
                     onPassCodeCorrect();
-                    if (dialog != null) {
-                        dialog.dismiss();
-                    }
+
                 } else {
                     onPassCodeError();
-                    if (dialog != null) {
-                        dialog.dismiss();
-                    }
+                }
+                if (dialog != null) {
+                    dialog.dismiss();
                 }
             }
         });

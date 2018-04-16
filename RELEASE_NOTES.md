@@ -1,5 +1,12 @@
 Akvo FLOW app release notes
 ===========================
+# ver 2.4.7
+Date: 03 April 2018
+
+# New and noteworthy
+* **Add Pijin and Tok Pisin to languages list** - [#1062](https://github.com/akvo/akvo-flow-mobile/issues/1062) These 2 new languages can now be used in the app.
+
+---------------
 # ver 2.4.6
 Date: 08 March 2018
 

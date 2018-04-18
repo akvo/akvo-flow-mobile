@@ -52,7 +52,6 @@ public class PublishFilesPreferencePresenter implements Presenter {
 
     public void onPublishClick() {
         view.showLoading();
-        final long startTime = System.currentTimeMillis();
         publishData.dispose();
         publishData.execute(new DefaultObserver<Boolean>() {
             @Override
@@ -64,9 +63,7 @@ public class PublishFilesPreferencePresenter implements Presenter {
 
             @Override
             public void onNext(Boolean published) {
-                //TODO: make sure everything was published
-                long endTime = System.currentTimeMillis();
-                Timber.d("moving files took: " + (endTime - startTime));
+                //TODO: make sure everything was published (other issue)
                 view.scheduleAlarm();
                 load();
             }
@@ -92,7 +89,6 @@ public class PublishFilesPreferencePresenter implements Presenter {
             public void onNext(Long publishTime) {
                 long timeSincePublished = publishedTimeHelper
                         .calculateTimeSincePublished(publishTime);
-                Timber.d("timeSincePublished: " + timeSincePublished);
                 if (timeSincePublished < PublishedTimeHelper.MAX_PUBLISH_TIME_IN_MS) {
                     int remainingTime = publishedTimeHelper.getRemainingPublishedTime(
                             timeSincePublished);

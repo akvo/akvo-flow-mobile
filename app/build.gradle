@@ -1,5 +1,6 @@
 apply plugin: 'com.android.application'
 apply plugin: 'io.sentry.android.gradle'
+apply plugin: 'com.getkeepsafe.dexcount'
 
 repositories {
     mavenCentral()
@@ -189,6 +190,21 @@ configurations.all { config ->
             }
         }
     }
+}
+
+dexcount {
+    format = "list"
+    includeClasses = false
+    includeClassCount = true
+    includeFieldCount = true
+    includeTotalMethodCount = true
+    orderByMethodCount = true
+    verbose = false
+    maxTreeDepth = Integer.MAX_VALUE
+    teamCityIntegration = false
+    teamCitySlug = null
+    runOnEachPackage = true
+    maxMethodCount = 64000
 }
 
 dependencies {

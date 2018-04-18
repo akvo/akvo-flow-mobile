@@ -63,7 +63,8 @@ public class FileDataSource {
     public Observable<Boolean> copyMediaFile(String originFilePath, String destinationFilePath) {
         File originalFile = new File(originFilePath);
         try {
-            boolean copied = fileHelper.copyFile(originalFile, new File(destinationFilePath)) == null;
+            boolean copied =
+                    fileHelper.copyFile(originalFile, new File(destinationFilePath)) == null;
             if (copied) {
                 return Observable.error(new Exception("Error copying video file"));
             } else {
@@ -133,8 +134,8 @@ public class FileDataSource {
         }
     }
 
-    private boolean copyPrivateFileToAppExternalFolder(String privateFolderName, String publicFolderName,
-            List<String> fileNames) throws IOException {
+    private boolean copyPrivateFileToAppExternalFolder(String privateFolderName,
+            String publicFolderName, List<String> fileNames) throws IOException {
         boolean filesCopied = false;
         File destinationDataFolder = folderBrowser.getAppExternalFolder(publicFolderName);
         if (destinationDataFolder != null && !destinationDataFolder.exists()) {

@@ -622,16 +622,8 @@ public class FormActivity extends BackActivity implements SurveyListener,
         Intent i = new Intent(ConstantUtil.DATA_AVAILABLE_INTENT);
         sendBroadcast(i);
 
-        showConfirmDialog(R.string.submitcompletetitle, R.string.submitcompletetext,
-                this, false,
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        if (dialog != null) {
-                            setResult(RESULT_OK);
-                            finish();
-                        }
-                    }
-                });
+        setResult(RESULT_OK);
+        finish();
     }
 
     @Override

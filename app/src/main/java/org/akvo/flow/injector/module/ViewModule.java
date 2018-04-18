@@ -21,7 +21,10 @@
 package org.akvo.flow.injector.module;
 
 import org.akvo.flow.domain.interactor.AllowedToConnect;
+import org.akvo.flow.domain.interactor.ClearAllData;
+import org.akvo.flow.domain.interactor.ClearResponses;
 import org.akvo.flow.domain.interactor.CopyVideo;
+import org.akvo.flow.domain.interactor.UnSyncedTransmissionsExist;
 import org.akvo.flow.domain.interactor.users.CreateUser;
 import org.akvo.flow.domain.interactor.DeleteSurvey;
 import org.akvo.flow.domain.interactor.users.DeleteUser;
@@ -176,5 +179,23 @@ public class ViewModule {
     @Named("makeDataPublic")
     UseCase provideMakeDataPublic(MakeDataPublic makeDataPublic) {
         return makeDataPublic;
+    }
+
+    @Provides
+    @Named("unSyncedTransmissionsExist")
+    UseCase provideUnSyncedTransmissionsExist(UnSyncedTransmissionsExist transmissionsExist) {
+        return transmissionsExist;
+    }
+
+    @Provides
+    @Named("clearResponses")
+    UseCase provideClearResponses(ClearResponses clearResponses) {
+        return clearResponses;
+    }
+
+    @Provides
+    @Named("clearAllData")
+    UseCase provideClearAllData(ClearAllData clearAllData) {
+        return clearAllData;
     }
 }

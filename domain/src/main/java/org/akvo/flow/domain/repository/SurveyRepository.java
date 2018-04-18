@@ -53,4 +53,6 @@ public interface SurveyRepository {
     Observable<Boolean> clearResponses();
 
     Observable<Boolean> clearAllData();
+
+    Observable<Boolean> unSyncedTransmissionsExist();
 }

@@ -20,12 +20,9 @@
 
 package org.akvo.flow.presentation.settings;
 
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.content.res.Resources;
-import android.database.SQLException;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
@@ -43,8 +40,6 @@ import android.widget.Toast;
 import org.akvo.flow.BuildConfig;
 import org.akvo.flow.R;
 import org.akvo.flow.activity.BackActivity;
-import org.akvo.flow.async.ClearDataAsyncTask;
-import org.akvo.flow.data.database.SurveyDbDataSource;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
 import org.akvo.flow.presentation.settings.passcode.PassCodeDeleteAllDialog;
@@ -53,7 +48,6 @@ import org.akvo.flow.presentation.settings.passcode.PassCodeDownloadFormDialog;
 import org.akvo.flow.presentation.settings.passcode.PassCodeReloadFormsDialog;
 import org.akvo.flow.service.DataSyncService;
 import org.akvo.flow.ui.Navigator;
-import org.akvo.flow.util.logging.LoggingHelper;
 
 import java.util.Arrays;
 import java.util.List;
@@ -66,13 +60,14 @@ import butterknife.ButterKnife;
 import butterknife.OnCheckedChanged;
 import butterknife.OnClick;
 import butterknife.OnItemSelected;
-import timber.log.Timber;
 
 public class PreferenceActivity extends BackActivity implements PreferenceView,
         PassCodeDeleteCollectedDialog.PassCodeDeleteCollectedListener,
         PassCodeDeleteAllDialog.PassCodeDeleteAllListener,
         PassCodeDownloadFormDialog.PassCodeDownloadFormListener,
-        PassCodeReloadFormsDialog.PassCodeReloadFormsListener {
+        PassCodeReloadFormsDialog.PassCodeReloadFormsListener,
+        DeleteResponsesWarningDialog.DeleteResponsesListener,
+        DeleteAllWarningDialog.DeleteAllListener {
 
     @Inject
     Navigator navigator;
@@ -106,9 +101,6 @@ public class PreferenceActivity extends BackActivity implements PreferenceView,
 
     @Inject
     PreferencePresenter presenter;
-
-    @Inject
-    LoggingHelper helper;
 
     private List<String> languages;
     private boolean trackChanges = false;
@@ -252,61 +244,6 @@ public class PreferenceActivity extends BackActivity implements PreferenceView,
         presenter.saveImageSize(position);
     }
 
-    /**
-     * Permanently deletes data from the device. If unsubmitted data is found on
-     * the database, the user will be prompted with a message to confirm the
-     * operation.
-     *
-     * @param responsesOnly Flag to specify a partial deletion (user generated
-     *                      data).
-     */
-    private void deleteData(final boolean responsesOnly) throws SQLException {
-        try {
-            int messageId;
-            if (unsentData()) {
-                messageId = R.string.unsentdatawarning;
-            } else if (responsesOnly) {
-                messageId = R.string.delete_responses_warning;
-            } else {
-                messageId = R.string.deletealldatawarning;
-            }
-
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setMessage(messageId)
-                    .setCancelable(true)
-                    .setPositiveButton(R.string.okbutton, new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                            if (!responsesOnly) {
-                                // Delete everything implies logging the current user out (if any)
-                                //prefs.setLong(Prefs.KEY_USER_ID, Prefs.DEFAULT_VALUE_USER_ID); //TODO
-                                helper.clearUser();
-                            }
-                            new ClearDataAsyncTask(PreferenceActivity.this).execute(responsesOnly);
-                        }
-                    })
-                    .setNegativeButton(R.string.cancelbutton,
-                            new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int id) {
-                                    dialog.cancel();
-                                }
-                            });
-            builder.show();
-        } catch (SQLException e) {
-            Timber.e(e, e.getMessage());
-            Toast.makeText(this, R.string.clear_data_error, Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    private boolean unsentData() throws SQLException {
-        SurveyDbDataSource db = new SurveyDbDataSource(this, null);
-        try {
-            db.open();
-            return db.getUnSyncedTransmissions().size() > 0;
-        } finally {
-            db.close();
-        }
-    }
-
     @Override
     public void showLoading() {
         progressBar.setVisibility(View.VISIBLE);
@@ -343,8 +280,7 @@ public class PreferenceActivity extends BackActivity implements PreferenceView,
     @Override
     public void displayLanguageChanged(String languageCode) {
         updateLocale(languageCode);
-        Toast.makeText(this, R.string.please_restart, Toast.LENGTH_LONG)
-                .show();
+        showMessage(R.string.please_restart, Toast.LENGTH_LONG);
     }
 
     private void updateLocale(String languageCode) {
@@ -358,12 +294,12 @@ public class PreferenceActivity extends BackActivity implements PreferenceView,
 
     @Override
     public void deleteCollectedData() {
-        deleteData(true);
+        presenter.deleteCollectedData();
     }
 
     @Override
     public void deleteAllData() {
-        deleteData(false);
+        presenter.deleteAllData();
     }
 
     @Override
@@ -376,5 +312,53 @@ public class PreferenceActivity extends BackActivity implements PreferenceView,
     public void reloadForms() {
         DialogFragment newFragment = DownloadFormDialog.newInstance();
         newFragment.show(getSupportFragmentManager(), DownloadFormDialog.TAG);
+    }
+
+    @Override
+    public void showDeleteCollectedData() {
+        DialogFragment newFragment = DeleteResponsesWarningDialog.newInstance(false);
+        newFragment.show(getSupportFragmentManager(), DeleteResponsesWarningDialog.TAG);
+    }
+
+    @Override
+    public void showDeleteCollectedDataWithPending() {
+        DialogFragment newFragment = DeleteResponsesWarningDialog.newInstance(true);
+        newFragment.show(getSupportFragmentManager(), DeleteResponsesWarningDialog.TAG);
+    }
+
+    @Override
+    public void showDeleteAllData() {
+        DialogFragment newFragment = DeleteAllWarningDialog.newInstance(false);
+        newFragment.show(getSupportFragmentManager(), DeleteAllWarningDialog.TAG);
+    }
+
+    @Override
+    public void showDeleteAllDataWithPending() {
+        DialogFragment newFragment = DeleteAllWarningDialog.newInstance(true);
+        newFragment.show(getSupportFragmentManager(), DeleteAllWarningDialog.TAG);
+    }
+
+    @Override
+    public void showClearDataError() {
+        showMessage(R.string.clear_data_error, Toast.LENGTH_SHORT);
+    }
+
+    @Override
+    public void showClearDataSuccess() {
+        showMessage(R.string.clear_data_success, Toast.LENGTH_SHORT);
+    }
+
+    @Override
+    public void deleteResponsesConfirmed() {
+        presenter.deleteResponsesConfirmed();
+    }
+
+    @Override
+    public void deleteAllConfirmed() {
+        presenter.deleteAllConfirmed();
+    }
+
+    private void showMessage(int resId, int duration) {
+        Toast.makeText(this, resId, duration).show();
     }
 }

@@ -530,4 +530,25 @@ public class BriteSurveyDbAdapter {
     private void deleteAllResponses() {
         briteDatabase.delete(Tables.RESPONSE, null);
     }
+
+    public boolean unSyncedTransmissionsExist() {
+        boolean transmissionsExist = false;
+        String sql =
+                "SELECT " + TransmissionColumns._ID + " FROM " + Tables.TRANSMISSION + " WHERE "
+                        + TransmissionColumns.STATUS
+                        + " IN (?, ?, ?) LIMIT 1";
+        String[] selectionArgs = new String[] {
+                String.valueOf(TransmissionStatus.FAILED),
+                String.valueOf(TransmissionStatus.IN_PROGRESS),
+                String.valueOf(TransmissionStatus.QUEUED)
+        };
+        Cursor cursor = briteDatabase.query(sql, selectionArgs);
+        if (cursor != null && cursor.getCount() > 0) {
+            transmissionsExist = true;
+        }
+        if (cursor != null) {
+            cursor.close();
+        }
+        return transmissionsExist;
+    }
 }

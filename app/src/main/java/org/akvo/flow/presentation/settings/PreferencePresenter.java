@@ -28,6 +28,7 @@ import org.akvo.flow.domain.interactor.SaveImageSize;
 import org.akvo.flow.domain.interactor.SaveKeepScreenOn;
 import org.akvo.flow.domain.interactor.UseCase;
 import org.akvo.flow.presentation.Presenter;
+import org.akvo.flow.util.logging.LoggingHelper;
 
 import java.util.HashMap;
 import java.util.List;
@@ -45,7 +46,11 @@ public class PreferencePresenter implements Presenter {
     private final UseCase saveEnableMobileData;
     private final UseCase saveImageSize;
     private final UseCase saveKeepScreenOn;
+    private final UseCase unSyncedTransmissionsExist;
+    private final UseCase clearResponses;
+    private final UseCase clearAllData;
     private final ViewUserSettingsMapper mapper;
+    private final LoggingHelper helper;
 
     private PreferenceView view;
 
@@ -54,13 +59,21 @@ public class PreferencePresenter implements Presenter {
             @Named("saveAppLanguage") UseCase saveAppLanguage,
             @Named("saveEnableMobileData") UseCase saveEnableMobileData,
             @Named("saveImageSize") UseCase saveImageSize,
-            @Named("saveKeepScreenOn") UseCase saveKeepScreenOn, ViewUserSettingsMapper mapper) {
+            @Named("saveKeepScreenOn") UseCase saveKeepScreenOn,
+            @Named("unSyncedTransmissionsExist") UseCase unSyncedTransmissionsExist,
+            @Named("clearResponses") UseCase clearResponses,
+            @Named("clearAllData") UseCase clearAllData,
+            ViewUserSettingsMapper mapper, LoggingHelper helper) {
         this.getUserSettings = getUserSettings;
         this.saveAppLanguage = saveAppLanguage;
         this.saveEnableMobileData = saveEnableMobileData;
         this.saveImageSize = saveImageSize;
         this.saveKeepScreenOn = saveKeepScreenOn;
+        this.unSyncedTransmissionsExist = unSyncedTransmissionsExist;
+        this.clearResponses = clearResponses;
+        this.clearAllData = clearAllData;
         this.mapper = mapper;
+        this.helper = helper;
     }
 
     public void setView(PreferenceView view) {
@@ -136,5 +149,72 @@ public class PreferencePresenter implements Presenter {
         saveEnableMobileData.dispose();
         saveImageSize.dispose();
         saveKeepScreenOn.dispose();
+        unSyncedTransmissionsExist.dispose();
+        clearAllData.dispose();
+        clearResponses.dispose();
+    }
+
+    public void deleteCollectedData() {
+        unSyncedTransmissionsExist.execute(new DefaultObserver<Boolean>(){
+            @Override
+            public void onError(Throwable e) {
+                Timber.e(e);
+                view.showDeleteCollectedData();
+            }
+
+            @Override
+            public void onNext(Boolean exist) {
+                if (exist != null && exist) {
+                    view.showDeleteCollectedDataWithPending();
+                } else {
+                    view.showDeleteCollectedData();
+                }
+            }
+        }, null);
+    }
+
+    public void deleteAllData() {
+        unSyncedTransmissionsExist.execute(new DefaultObserver<Boolean>(){
+            @Override
+            public void onError(Throwable e) {
+                Timber.e(e);
+                view.showDeleteAllData();
+            }
+
+            @Override
+            public void onNext(Boolean exist) {
+                if (exist != null && exist) {
+                    view.showDeleteAllDataWithPending();
+                } else {
+                    view.showDeleteAllData();
+                }
+            }
+        }, null);
+    }
+
+    public void deleteResponsesConfirmed() {
+        clearResponses.execute(new ClearDataObserver(), null);
+    }
+
+    public void deleteAllConfirmed() {
+        helper.clearUser();
+        clearAllData.execute(new ClearDataObserver(), null);
+    }
+
+    private class ClearDataObserver extends DefaultObserver<Boolean> {
+        @Override
+        public void onError(Throwable e) {
+            view.showClearDataError();
+        }
+
+        @Override
+        public void onNext(Boolean cleared) {
+            if (cleared) {
+                view.showClearDataSuccess();
+            } else {
+                view.showClearDataError();
+            }
+
+        }
     }
 }

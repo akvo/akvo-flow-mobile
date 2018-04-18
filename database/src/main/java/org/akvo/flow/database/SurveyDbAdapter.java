@@ -358,20 +358,6 @@ public class SurveyDbAdapter {
     }
 
     /**
-     * permanently deletes all surveys, responses, users and transmission
-     * history from the database
-     */
-    public void clearAllData() {
-        // User generated data
-        clearCollectedData();
-
-        // Surveys and preferences
-        executeSql("DELETE FROM " + Tables.SURVEY);
-        executeSql("DELETE FROM " + Tables.SURVEY_GROUP);
-        executeSql("DELETE FROM " + Tables.USER);
-    }
-
-    /**
      * Permanently deletes user generated data from the database. It will clear
      * any response saved in the database, as well as the transmission history.
      */

@@ -301,4 +301,10 @@ public class SurveyDataRepository implements SurveyRepository {
     public Observable<Boolean> clearAllData() {
         return dataSourceFactory.getDataBaseDataSource().clearAllData();
     }
+
+    @Override
+    public Observable<Boolean> unSyncedTransmissionsExist() {
+        return Observable
+                .just(dataSourceFactory.getDataBaseDataSource().unSyncedTransmissionsExist());
+    }
 }

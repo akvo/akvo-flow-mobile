@@ -59,7 +59,7 @@ public class PublishData extends UseCase {
                 .concatMap(new Function<List<String>, ObservableSource<Boolean>>() {
                     @Override
                     public ObservableSource<Boolean> apply(List<String> fileNames) {
-                        return fileRepository.copyPrivateFiles(fileNames)
+                        return fileRepository.publishFiles(fileNames)
                                 .concatMap(new Function<Boolean, ObservableSource<Boolean>>() {
                                     @Override
                                     public ObservableSource<Boolean> apply(Boolean published) {

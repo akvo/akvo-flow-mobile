@@ -121,11 +121,11 @@ public class FileDataSource {
         return folder;
     }
 
-    public Observable<Boolean> copyPrivateFiles(List<String> fileNames) {
+    public Observable<Boolean> publishFiles(List<String> fileNames) {
         try {
-            boolean dataCopied = copyPrivateFileToPublic(FolderBrowser.DIR_DATA,
+            boolean dataCopied = copyPrivateFileToAppExternalFolder(FolderBrowser.DIR_DATA,
                     FolderBrowser.DIR_PUBLISHED_DATA, fileNames);
-            boolean mediaCopied = copyPrivateFileToPublic(FolderBrowser.DIR_MEDIA,
+            boolean mediaCopied = copyPrivateFileToAppExternalFolder(FolderBrowser.DIR_MEDIA,
                     FolderBrowser.DIR_PUBLISHED_MEDIA, fileNames);
             return Observable.just(dataCopied || mediaCopied);
         } catch (IOException e) {
@@ -133,10 +133,10 @@ public class FileDataSource {
         }
     }
 
-    private boolean copyPrivateFileToPublic(String privateFolderName, String publicFolderName,
+    private boolean copyPrivateFileToAppExternalFolder(String privateFolderName, String publicFolderName,
             List<String> fileNames) throws IOException {
         boolean filesCopied = false;
-        File destinationDataFolder = folderBrowser.getPublicFolder(publicFolderName);
+        File destinationDataFolder = folderBrowser.getAppExternalFolder(publicFolderName);
         if (destinationDataFolder != null && !destinationDataFolder.exists()) {
             //noinspection ResultOfMethodCallIgnored
             destinationDataFolder.mkdirs();
@@ -156,14 +156,14 @@ public class FileDataSource {
         return filesCopied;
     }
 
-    public Observable<Boolean> removePublicFiles() {
-        deleteFilesInPublicFolder(FolderBrowser.DIR_PUBLISHED_DATA);
-        deleteFilesInPublicFolder(FolderBrowser.DIR_PUBLISHED_MEDIA);
+    public Observable<Boolean> removePublishedFiles() {
+        deleteFilesInAppExternalFolder(FolderBrowser.DIR_PUBLISHED_DATA);
+        deleteFilesInAppExternalFolder(FolderBrowser.DIR_PUBLISHED_MEDIA);
         return Observable.just(true);
     }
 
-    private void deleteFilesInPublicFolder(String folderName) {
-        File dataFolder = folderBrowser.getPublicFolder(folderName);
+    private void deleteFilesInAppExternalFolder(String folderName) {
+        File dataFolder = folderBrowser.getAppExternalFolder(folderName);
         File[] files = dataFolder == null ? null : dataFolder.listFiles();
         if (files != null) {
             for (File f : files) {
@@ -191,7 +191,7 @@ public class FileDataSource {
         List<File> foldersToDelete = folderBrowser.findAllPossibleFolders(FolderBrowser.DIR_DATA);
         foldersToDelete.addAll(folderBrowser.findAllPossibleFolders(FolderBrowser.DIR_MEDIA));
         foldersToDelete.addAll(folderBrowser.findAllPossibleFolders(FolderBrowser.DIR_TMP));
-        File exportedFolder = folderBrowser.getPublicFolder(FolderBrowser.DIR_PUBLISHED);
+        File exportedFolder = folderBrowser.getAppExternalFolder(FolderBrowser.DIR_PUBLISHED);
         if (exportedFolder != null && exportedFolder.exists()) {
             foldersToDelete.add(exportedFolder);
         }

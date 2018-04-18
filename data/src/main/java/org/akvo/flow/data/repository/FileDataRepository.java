@@ -71,8 +71,8 @@ public class FileDataRepository implements FileRepository {
     }
 
     @Override
-    public Observable<Boolean> copyPrivateFiles(@NonNull List<String> fileNames) {
-        return dataSourceFactory.getFileDataSource().copyPrivateFiles(fileNames);
+    public Observable<Boolean> publishFiles(@NonNull List<String> fileNames) {
+        return dataSourceFactory.getFileDataSource().publishFiles(fileNames);
     }
 
     @Override
@@ -83,7 +83,7 @@ public class FileDataRepository implements FileRepository {
 
     @Override
     public Observable<Boolean> unPublishData() {
-        return dataSourceFactory.getFileDataSource().removePublicFiles();
+        return dataSourceFactory.getFileDataSource().removePublishedFiles();
     }
 
     @Override

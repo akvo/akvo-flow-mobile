@@ -23,6 +23,7 @@ package org.akvo.flow.data.datasource;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.content.ContextCompat;
 
 import org.akvo.flow.data.util.ExternalStorageHelper;
 
@@ -36,7 +37,7 @@ public class FolderBrowser {
 
     static final String DIR_DATA = "akvoflow/data/files";
     static final String DIR_MEDIA = "akvoflow/data/media";
-    static final String DIR_PUBLISHED = "akvoflow/published";
+    static final String DIR_PUBLISHED = "published";
     static final String DIR_PUBLISHED_DATA = DIR_PUBLISHED + "/files";
     static final String DIR_PUBLISHED_MEDIA = DIR_PUBLISHED + "/media";
     static final String DIR_TMP = "tmp";
@@ -88,7 +89,7 @@ public class FolderBrowser {
     }
 
     @Nullable
-    private File getAppExternalFolder(String folderName) {
+    File getAppExternalFolder(String folderName) {
         String path = getAppExternalFolderPath(folderName);
         File folder = null;
         if (path != null) {
@@ -111,7 +112,7 @@ public class FolderBrowser {
      */
     @Nullable
     private String getAppExternalStoragePath() {
-        File externalFilesDir = context.getExternalFilesDir(null);
+        File externalFilesDir = ContextCompat.getExternalFilesDirs(context, null)[0];
         if (externalFilesDir != null) {
             return externalFilesDir.getAbsolutePath();
         }

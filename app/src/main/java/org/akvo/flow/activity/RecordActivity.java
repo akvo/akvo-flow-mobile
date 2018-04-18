@@ -26,6 +26,7 @@ import android.support.v4.content.Loader;
 import android.support.v4.view.ViewPager;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
 import org.akvo.flow.R;
@@ -39,6 +40,7 @@ import org.akvo.flow.domain.SurveyedLocale;
 import org.akvo.flow.domain.User;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
+import org.akvo.flow.presentation.SnackBarManager;
 import org.akvo.flow.service.BootstrapService;
 import org.akvo.flow.ui.Navigator;
 import org.akvo.flow.ui.adapter.RecordTabsAdapter;
@@ -48,10 +50,11 @@ import org.akvo.flow.util.ConstantUtil;
 
 import javax.inject.Inject;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 public class RecordActivity extends BackActivity implements FormListFragment.SurveyListListener,
         ResponseListFragment.ResponseListListener, LoaderManager.LoaderCallbacks<SurveyedLocale> {
-
-    private static final int REQUEST_FORM = 0;
 
     private User mUser;
     private SurveyGroup mSurveyGroup;
@@ -63,11 +66,19 @@ public class RecordActivity extends BackActivity implements FormListFragment.Sur
     @Inject
     Navigator navigator;
 
+    @Inject
+    SnackBarManager snackBarManager;
+
+    @BindView(R.id.record_root_layout)
+    View rootLayout;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.record_activity);
         initializeInjector();
+        ButterKnife.bind(this);
+
         ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
         RecordTabsAdapter recordTabsAdapter = new RecordTabsAdapter(getSupportFragmentManager(),
                 getResources().getStringArray(R.array.record_tabs));
@@ -103,8 +114,8 @@ public class RecordActivity extends BackActivity implements FormListFragment.Sur
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_FORM && resultCode == RESULT_OK) {
-            finish();
+        if (requestCode == ConstantUtil.FORM_FILLING_REQUEST && resultCode == RESULT_OK) {
+            snackBarManager.displaySnackBar(rootLayout, R.string.snackbar_submitted, this);
         }
     }
 

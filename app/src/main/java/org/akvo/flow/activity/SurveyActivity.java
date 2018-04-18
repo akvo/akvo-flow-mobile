@@ -53,6 +53,7 @@ import org.akvo.flow.domain.apkupdate.ViewApkData;
 import org.akvo.flow.injector.component.ApplicationComponent;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
+import org.akvo.flow.presentation.SnackBarManager;
 import org.akvo.flow.presentation.UserDeleteConfirmationDialog;
 import org.akvo.flow.presentation.navigation.CreateUserDialog;
 import org.akvo.flow.presentation.navigation.EditUserDialog;
@@ -67,6 +68,7 @@ import org.akvo.flow.service.TimeCheckService;
 import org.akvo.flow.ui.Navigator;
 import org.akvo.flow.ui.fragment.DatapointsFragment;
 import org.akvo.flow.ui.fragment.RecordListListener;
+import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.GsonMapper;
 import org.akvo.flow.util.PlatformUtil;
 import org.akvo.flow.util.StatusUtil;
@@ -99,6 +101,9 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     @BindView(R.id.nav_view)
     FlowNavigationView navigationView;
 
+    @BindView(R.id.survey_root_layout)
+    View rootLayout;
+
     @Inject
     SurveyDbDataSource mDatabase;
 
@@ -107,6 +112,9 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
 
     @Inject
     Navigator navigator;
+
+    @Inject
+    SnackBarManager snackBarManager;
 
     private SurveyGroup mSurveyGroup;
 
@@ -237,6 +245,13 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
             supportFragmentManager.beginTransaction()
                     .replace(R.id.content_frame, datapointsFragment, DATA_POINTS_FRAGMENT_TAG)
                     .commit();
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == ConstantUtil.FORM_FILLING_REQUEST && resultCode == RESULT_OK) {
+            snackBarManager.displaySnackBar(rootLayout, R.string.snackbar_submitted, this);
         }
     }
 

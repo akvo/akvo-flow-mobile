@@ -285,7 +285,7 @@
     <string name="geo_fields_update_title">Update GPS coordinates?</string>
     <string name="cascade_error_message">Cannot load cascade resource: %1$s</string>
 
-    <string name="submit_tab_description">Submitted responses can be viewed but cannot be edited.</string>
+    <string name="submit_tab_description">You can view but not edit submitted responses</string>
     <string name="snackbar_submitted">Submitted</string>
 
 </resources>

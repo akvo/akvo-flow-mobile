@@ -52,8 +52,8 @@ public class SubmitTab extends ListView implements OnClickListener {
         mHeaderView.setId(R.id.submit_tab_header);
         mHeaderView.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT,
                 LayoutParams.WRAP_CONTENT));
-        final int padding = (int)PlatformUtil.dp2Pixel(context, 24);
-        final int paddingBottom = (int)PlatformUtil.dp2Pixel(context, 8);
+        final int padding = (int) PlatformUtil.dp2Pixel(context, 24);
+        final int paddingBottom = (int) PlatformUtil.dp2Pixel(context, 8);
         mHeaderView.setPadding(padding, padding, padding, paddingBottom);
         mHeaderView.setGravity(Gravity.CENTER);
         mHeaderView.setTextSize(18);

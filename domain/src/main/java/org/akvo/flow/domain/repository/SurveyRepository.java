@@ -55,4 +55,6 @@ public interface SurveyRepository {
     Observable<Boolean> clearAllData();
 
     Observable<Boolean> unSyncedTransmissionsExist();
+
+    Observable<List<String>> getAllTransmissionFileNames();
 }

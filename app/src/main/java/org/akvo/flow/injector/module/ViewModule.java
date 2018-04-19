@@ -35,7 +35,7 @@ import org.akvo.flow.domain.interactor.GetSavedDataPoints;
 import org.akvo.flow.domain.interactor.GetUserSettings;
 import org.akvo.flow.domain.interactor.users.GetSelectedUser;
 import org.akvo.flow.domain.interactor.users.GetUsers;
-import org.akvo.flow.domain.interactor.MakeDataPublic;
+import org.akvo.flow.domain.interactor.PublishData;
 import org.akvo.flow.domain.interactor.SaveAppLanguage;
 import org.akvo.flow.domain.interactor.SaveEnableMobileData;
 import org.akvo.flow.domain.interactor.SaveImage;
@@ -176,9 +176,9 @@ public class ViewModule {
     }
 
     @Provides
-    @Named("makeDataPublic")
-    UseCase provideMakeDataPublic(MakeDataPublic makeDataPublic) {
-        return makeDataPublic;
+    @Named("publishData")
+    UseCase provideMakeDataPublic(PublishData publishData) {
+        return publishData;
     }
 
     @Provides

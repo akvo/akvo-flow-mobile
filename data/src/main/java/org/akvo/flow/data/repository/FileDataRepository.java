@@ -31,6 +31,7 @@ import java.util.List;
 import javax.inject.Inject;
 
 import io.reactivex.Observable;
+import io.reactivex.annotations.NonNull;
 import io.reactivex.functions.Function;
 
 public class FileDataRepository implements FileRepository {
@@ -70,8 +71,8 @@ public class FileDataRepository implements FileRepository {
     }
 
     @Override
-    public Observable<Boolean> copyPrivateData() {
-        return dataSourceFactory.getFileDataSource().copyPrivateData();
+    public Observable<Boolean> copyPrivateFiles(@NonNull List<String> fileNames) {
+        return dataSourceFactory.getFileDataSource().copyPrivateFiles(fileNames);
     }
 
     @Override

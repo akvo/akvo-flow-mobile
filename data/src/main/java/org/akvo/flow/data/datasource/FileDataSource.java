@@ -104,14 +104,17 @@ public class FileDataSource {
         return folder;
     }
 
-    public Observable<Boolean> copyPrivateData() {
+    public Observable<Boolean> copyPrivateFiles(List<String> fileNames) {
         //TODO: error handling will be added in separate issue
-        copyPrivateFileToPublic(FolderBrowser.DIR_DATA, FolderBrowser.DIR_PUBLISHED_DATA);
-        copyPrivateFileToPublic(FolderBrowser.DIR_MEDIA, FolderBrowser.DIR_PUBLISHED_MEDIA);
+        copyPrivateFileToPublic(FolderBrowser.DIR_DATA, FolderBrowser.DIR_PUBLISHED_DATA,
+                fileNames);
+        copyPrivateFileToPublic(FolderBrowser.DIR_MEDIA, FolderBrowser.DIR_PUBLISHED_MEDIA,
+                fileNames);
         return Observable.just(true);
     }
 
-    private void copyPrivateFileToPublic(String privateFolderName, String publicFolderName) {
+    private void copyPrivateFileToPublic(String privateFolderName, String publicFolderName,
+            List<String> fileNames) {
         File destinationDataFolder = folderBrowser.getPublicFolder(publicFolderName);
         if (!destinationDataFolder.exists()) {
             //noinspection ResultOfMethodCallIgnored
@@ -122,7 +125,9 @@ public class FileDataSource {
             File[] files = dataFolder.listFiles();
             if (files != null) {
                 for (File f : files) {
-                    fileHelper.copyFileToFolder(f, destinationDataFolder);
+                    if (fileNames.contains(f.getAbsolutePath())) {
+                        fileHelper.copyFileToFolder(f, destinationDataFolder);
+                    }
                 }
             }
         }

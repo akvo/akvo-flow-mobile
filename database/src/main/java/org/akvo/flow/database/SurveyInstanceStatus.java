@@ -22,8 +22,8 @@ package org.akvo.flow.database;
 
 public class SurveyInstanceStatus {
     public static final int SAVED = 0;
-    public static final int SUBMITTED = 1;
-    public static final int EXPORTED = 2;
+    public static final int SUBMIT_REQUESTED = 1;
+    public static final int SUBMITTED = 2;
     public static final int SYNCED = 3;
     public static final int DOWNLOADED = 4;
 }

@@ -153,7 +153,6 @@
     <string name="status_failed">Failed</string>
     <string name="status_saved">Saved</string>
     <string name="status_submitted">Submitted</string>
-    <string name="status_exported">Exported</string>
     <!--APK update-->
     <string name="app_update_activity">Akvo Flow Update</string>
     <string name="update">Update</string>

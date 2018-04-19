@@ -139,10 +139,10 @@ public class SurveyDbAdapter {
             case SurveyInstanceStatus.SYNCED:
                 dateColumn = SurveyInstanceColumns.SYNC_DATE;
                 break;
-            case SurveyInstanceStatus.EXPORTED:
+            case SurveyInstanceStatus.SUBMITTED:
                 dateColumn = SurveyInstanceColumns.EXPORTED_DATE;
                 break;
-            case SurveyInstanceStatus.SUBMITTED:
+            case SurveyInstanceStatus.SUBMIT_REQUESTED:
                 dateColumn = SurveyInstanceColumns.SUBMITTED_DATE;
                 break;
             case SurveyInstanceStatus.SAVED:

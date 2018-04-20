@@ -19,6 +19,7 @@
 
 package org.akvo.flow.api.service;
 
+import android.os.Build;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
@@ -31,11 +32,11 @@ import java.io.IOException;
 public class ApkApiService {
 
     private static final String APK_VERSION_SERVICE_PATH =
-        "/deviceapprest?action=getLatestVersion&deviceType=androidPhone&appCode=flowapp";
+            "/deviceapprest?action=getLatestVersion&deviceType=androidPhone&appCode=flowapp&androidBuildVersion=";
 
     @Nullable
     public JSONObject getApkDataObject(String baseUrl) throws IOException, JSONException {
-        final String url = baseUrl + APK_VERSION_SERVICE_PATH;
+        final String url = baseUrl + APK_VERSION_SERVICE_PATH + Build.VERSION.SDK_INT;
         String response = HttpUtil.httpGet(url);
         if (!TextUtils.isEmpty(response)) {
             return new JSONObject(response);

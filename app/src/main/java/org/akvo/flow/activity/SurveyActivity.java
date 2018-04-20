@@ -53,6 +53,7 @@ import org.akvo.flow.domain.apkupdate.ViewApkData;
 import org.akvo.flow.injector.component.ApplicationComponent;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
+import org.akvo.flow.presentation.OutDatedDeviceDialog;
 import org.akvo.flow.presentation.SnackBarManager;
 import org.akvo.flow.presentation.UserDeleteConfirmationDialog;
 import org.akvo.flow.presentation.navigation.CreateUserDialog;
@@ -280,6 +281,9 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
             }
             updateAddDataPointFab();
         }
+
+        OutDatedDeviceDialog fragment = new OutDatedDeviceDialog();
+        fragment.show(getSupportFragmentManager(), OutDatedDeviceDialog.TAG);
     }
 
     private void updateAddDataPointFab() {

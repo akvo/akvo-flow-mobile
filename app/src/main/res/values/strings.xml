@@ -287,5 +287,8 @@
 
     <string name="submit_tab_description">You can view but not edit submitted responses</string>
     <string name="snackbar_submitted">Submitted</string>
+    <string name="about_view_old_version">You can no longer update your Flow app and enjoy our latest improvements. This is because your device runs an Android version older than 4.0.3.</string>
+    <string name="do_not_show_again">Do not show again</string>
+    <string name="attribution">* dinosaurs by Sumana Chamrunworakiat from the Noun Project</string>
 
 </resources>

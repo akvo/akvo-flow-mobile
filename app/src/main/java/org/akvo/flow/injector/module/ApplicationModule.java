@@ -36,6 +36,7 @@ import org.akvo.flow.data.net.Encoder;
 import org.akvo.flow.data.net.RestServiceFactory;
 import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.data.repository.FileDataRepository;
+import org.akvo.flow.data.repository.SetupDataRepository;
 import org.akvo.flow.data.repository.SurveyDataRepository;
 import org.akvo.flow.data.repository.UserDataRepository;
 import org.akvo.flow.database.DatabaseHelper;
@@ -43,6 +44,7 @@ import org.akvo.flow.database.LanguageTable;
 import org.akvo.flow.domain.executor.PostExecutionThread;
 import org.akvo.flow.domain.executor.ThreadExecutor;
 import org.akvo.flow.domain.repository.FileRepository;
+import org.akvo.flow.domain.repository.SetupRepository;
 import org.akvo.flow.domain.repository.SurveyRepository;
 import org.akvo.flow.domain.repository.UserRepository;
 import org.akvo.flow.domain.util.ConnectivityStateManager;
@@ -115,6 +117,12 @@ public class ApplicationModule {
     @Singleton
     UserRepository provideUserRepository(UserDataRepository userDataRepository) {
         return userDataRepository;
+    }
+
+    @Provides
+    @Singleton
+    SetupRepository provideSetupRepository(SetupDataRepository setupDataRepository) {
+        return setupDataRepository;
     }
 
     @Provides

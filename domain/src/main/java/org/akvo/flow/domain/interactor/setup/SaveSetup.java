@@ -38,7 +38,7 @@ import io.reactivex.functions.Function7;
 
 public class SaveSetup extends UseCase {
 
-    public final String PARAM_SETUP = "setup";
+    public static final String PARAM_SETUP = "setup";
 
     private final SetupRepository setupRepository;
 

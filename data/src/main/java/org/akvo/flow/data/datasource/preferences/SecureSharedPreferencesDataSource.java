@@ -99,8 +99,8 @@ public class SecureSharedPreferencesDataSource {
         return getEncodedPreference(PREF_SIGNING_KEY);
     }
 
-    public Observable<Boolean> saveSigningKey(String serverBase) {
-        return saveEncodedString(PREF_SIGNING_KEY, serverBase);
+    public Observable<Boolean> saveSigningKey(String signingKey) {
+        return saveEncodedString(PREF_SIGNING_KEY, signingKey);
     }
 
     private Observable<Boolean> saveEncodedString(String key, String value) {

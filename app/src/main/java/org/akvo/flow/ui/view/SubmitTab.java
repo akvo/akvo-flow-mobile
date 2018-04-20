@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2015 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2015,2018 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -20,12 +20,12 @@
 package org.akvo.flow.ui.view;
 
 import android.content.Context;
-import android.graphics.Color;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -41,7 +41,7 @@ public class SubmitTab extends ListView implements OnClickListener {
     private SurveyListener mListener;
 
     private TextView mHeaderView;
-    private Button mSubmitButton;
+    private View mSubmitButton;
 
     public SubmitTab(Context context, SurveyListener listener) {
         super(context);
@@ -52,21 +52,20 @@ public class SubmitTab extends ListView implements OnClickListener {
         mHeaderView.setId(R.id.submit_tab_header);
         mHeaderView.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT,
                 LayoutParams.WRAP_CONTENT));
-        final int padding = (int)PlatformUtil.dp2Pixel(context, 8);
-        mHeaderView.setPadding(padding, padding, padding, padding);
+        final int padding = (int) PlatformUtil.dp2Pixel(context, 24);
+        final int paddingBottom = (int) PlatformUtil.dp2Pixel(context, 8);
+        mHeaderView.setPadding(padding, padding, padding, paddingBottom);
+        mHeaderView.setGravity(Gravity.CENTER);
         mHeaderView.setTextSize(18);
         mHeaderView.setClickable(false);
-        mSubmitButton = new Button(context);
-        mSubmitButton.setId(R.id.submit_tab_button);
-        mSubmitButton.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT,
-                LayoutParams.WRAP_CONTENT));
-        mSubmitButton.setTextColor(Color.WHITE);
-        mSubmitButton.setBackgroundResource(R.drawable.button_primary);
-        mSubmitButton.setText(context.getString(R.string.submitbutton));
+
+        View buttonContainer = LayoutInflater.from(context)
+                .inflate(R.layout.submit_button, this, false);
+        mSubmitButton = buttonContainer.findViewById(R.id.submit_tab_button);
         mSubmitButton.setOnClickListener(this);
 
         addHeaderView(mHeaderView);
-        addFooterView(mSubmitButton);
+        addFooterView(buttonContainer);
 
         refresh(new ArrayList<Question>());
     }
@@ -82,7 +81,7 @@ public class SubmitTab extends ListView implements OnClickListener {
             mHeaderView.setText(R.string.error_empty_form);
             mSubmitButton.setEnabled(false);
         } else {
-            mHeaderView.setText(R.string.submittext);
+            mHeaderView.setText(R.string.submit_tab_description);
             mSubmitButton.setEnabled(true);
         }
     }

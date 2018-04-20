@@ -20,6 +20,7 @@
 
 package org.akvo.flow.presentation.settings.publish;
 
+import org.akvo.flow.domain.exception.FullStorageException;
 import org.akvo.flow.domain.interactor.DefaultObserver;
 import org.akvo.flow.domain.interactor.UseCase;
 import org.akvo.flow.presentation.Presenter;
@@ -57,15 +58,23 @@ public class PublishFilesPreferencePresenter implements Presenter {
             @Override
             public void onError(Throwable e) {
                 Timber.e(e);
-                //TODO: display error to user (other issue)
-                load();
+                view.showUnPublished();
+                if (e instanceof FullStorageException) {
+                    view.showNoSpaceLeftError();
+                } else {
+                    view.showGenericPublishError();
+                }
             }
 
             @Override
             public void onNext(Boolean published) {
-                //TODO: make sure everything was published (other issue)
-                view.scheduleAlarm();
-                load();
+                if (published) {
+                    view.scheduleAlarm();
+                    load();
+                } else {
+                    view.showUnPublished();
+                    view.showNoDataToPublish();
+                }
             }
         }, null);
     }

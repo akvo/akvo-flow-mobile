@@ -35,13 +35,13 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import org.akvo.flow.BuildConfig;
 import org.akvo.flow.R;
 import org.akvo.flow.activity.BackActivity;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
+import org.akvo.flow.presentation.SnackBarManager;
 import org.akvo.flow.presentation.settings.passcode.PassCodeDeleteAllDialog;
 import org.akvo.flow.presentation.settings.passcode.PassCodeDeleteCollectedDialog;
 import org.akvo.flow.presentation.settings.passcode.PassCodeDownloadFormDialog;
@@ -101,6 +101,9 @@ public class PreferenceActivity extends BackActivity implements PreferenceView,
 
     @Inject
     PreferencePresenter presenter;
+
+    @Inject
+    SnackBarManager snackBarManager;
 
     private List<String> languages;
     private boolean trackChanges = false;
@@ -280,7 +283,7 @@ public class PreferenceActivity extends BackActivity implements PreferenceView,
     @Override
     public void displayLanguageChanged(String languageCode) {
         updateLocale(languageCode);
-        showMessage(R.string.please_restart, Toast.LENGTH_LONG);
+        showMessage(R.string.please_restart);
     }
 
     private void updateLocale(String languageCode) {
@@ -340,12 +343,12 @@ public class PreferenceActivity extends BackActivity implements PreferenceView,
 
     @Override
     public void showClearDataError() {
-        showMessage(R.string.clear_data_error, Toast.LENGTH_SHORT);
+        showMessage(R.string.clear_data_error);
     }
 
     @Override
     public void showClearDataSuccess() {
-        showMessage(R.string.clear_data_success, Toast.LENGTH_SHORT);
+        showMessage(R.string.clear_data_success);
     }
 
     @Override
@@ -358,7 +361,7 @@ public class PreferenceActivity extends BackActivity implements PreferenceView,
         presenter.deleteAllConfirmed();
     }
 
-    private void showMessage(int resId, int duration) {
-        Toast.makeText(this, resId, duration).show();
+    private void showMessage(int resId) {
+        snackBarManager.displaySnackBar(instanceNameTv, resId, this);
     }
 }

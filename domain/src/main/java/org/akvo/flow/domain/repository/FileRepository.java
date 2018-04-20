@@ -44,4 +44,6 @@ public interface FileRepository {
     Observable<Boolean> clearResponseFiles();
 
     Observable<Boolean> clearAllUserFiles();
+
+    Observable<Boolean> isExternalStorageFull();
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -20,6 +20,7 @@
 
 package org.akvo.flow.data.datasource;
 
+import org.akvo.flow.data.datasource.preferences.SecureSharedPreferencesDataSource;
 import org.akvo.flow.data.datasource.preferences.SharedPreferencesDataSource;
 
 import javax.inject.Inject;
@@ -31,17 +32,24 @@ public class DataSourceFactory {
     private final SharedPreferencesDataSource sharedPreferencesDataSource;
     private final ImageDataSource imageDataSource;
     private final DatabaseDataSource dataBaseDataSource;
+    private final SecureSharedPreferencesDataSource secureSharedPreferencesDataSource;
 
     @Inject
     public DataSourceFactory(SharedPreferencesDataSource sharedPreferencesDataSource,
-            ImageDataSource imageDataSource, DatabaseDataSource dataBaseDataSource) {
+            ImageDataSource imageDataSource, DatabaseDataSource dataBaseDataSource,
+            SecureSharedPreferencesDataSource secureSharedPreferencesDataSource) {
         this.sharedPreferencesDataSource = sharedPreferencesDataSource;
         this.imageDataSource = imageDataSource;
         this.dataBaseDataSource = dataBaseDataSource;
+        this.secureSharedPreferencesDataSource = secureSharedPreferencesDataSource;
     }
 
     public SharedPreferencesDataSource getSharedPreferencesDataSource() {
         return sharedPreferencesDataSource;
+    }
+
+    public SecureSharedPreferencesDataSource getSecureSharedPreferencesDataSource() {
+        return secureSharedPreferencesDataSource;
     }
 
     public ImageDataSource getImageDataSource() {

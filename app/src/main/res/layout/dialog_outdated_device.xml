@@ -7,6 +7,7 @@
             android:id="@+id/text_old_version"
             android:text="@string/about_view_old_version"
             android:drawableLeft="@drawable/ic_dino_orange"
+            android:textColor="@color/white"
             android:drawablePadding="8dp"
             android:layout_gravity="center"
             android:layout_marginTop="16dp"

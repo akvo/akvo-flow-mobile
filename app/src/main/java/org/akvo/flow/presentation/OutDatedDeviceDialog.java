@@ -25,11 +25,16 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.view.LayoutInflater;
 
 import org.akvo.flow.R;
+import org.akvo.flow.data.preference.Prefs;
 
+/**
+ * Will be removed after v2.5.0
+ */
 public class OutDatedDeviceDialog extends DialogFragment {
 
     public static final String TAG = "OutDatedDeviceDialog";
@@ -37,20 +42,34 @@ public class OutDatedDeviceDialog extends DialogFragment {
     public OutDatedDeviceDialog() {
     }
 
+    public static OutDatedDeviceDialog newInstance() {
+        return new OutDatedDeviceDialog();
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+    }
+
     @NonNull
     @Override
     public Dialog onCreateDialog(final Bundle savedInstanceState) {
         super.onCreateDialog(savedInstanceState);
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        builder.setView(LayoutInflater.from(getActivity()).inflate(R.layout.dialog_outdated_device, null))
+        builder.setView(
+                LayoutInflater.from(getActivity()).inflate(R.layout.dialog_outdated_device, null))
                 .setPositiveButton(R.string.okbutton,
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
+                                dismiss();
                             }
                         })
                 .setNegativeButton(R.string.do_not_show_again,
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
+                                Prefs prefs = new Prefs(getActivity().getApplicationContext());
+                                prefs.setBoolean(Prefs.KEY_STOP_SHOWING_DINO, true);
+                                dismiss();
                             }
                         });
         return builder.create();

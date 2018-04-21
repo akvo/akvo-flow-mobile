@@ -45,6 +45,7 @@ public class Prefs {
     public static final String KEY_DEVICE_IDENTIFIER = "device.identifier";
     public static final String KEY_MAX_IMG_SIZE = "media.img.maxsize";
     public static final String KEY_SPACE_AVAILABLE = "cardMBAvaliable";
+    public static final String KEY_STOP_SHOWING_DINO = "stop_showing_dino";
 
     private static final String PREFS_NAME = "flow_prefs";
     private static final int PREFS_MODE = Context.MODE_PRIVATE;

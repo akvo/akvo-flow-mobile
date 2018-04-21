@@ -21,7 +21,9 @@
 package org.akvo.flow.presentation;
 
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.TextView;
 
 import org.akvo.flow.BuildConfig;
@@ -46,6 +48,12 @@ public class AboutActivity extends BackActivity {
     @BindView(R.id.text_version)
     TextView version;
 
+    @BindView(R.id.text_check_updates)
+    TextView checkUpdates;
+
+    @BindView(R.id.text_old_version)
+    TextView oldVersions;
+
     @BindView(R.id.text_copyright)
     TextView copyright;
 
@@ -62,6 +70,13 @@ public class AboutActivity extends BackActivity {
     private void initializeViews() {
         version.setText(getString(R.string.about_view_version, BuildConfig.VERSION_NAME));
         copyright.setText(getString(R.string.about_view_copyright, BuildConfig.BUILD_YEAR));
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1) {
+            oldVersions.setVisibility(View.VISIBLE);
+            checkUpdates.setVisibility(View.GONE);
+        } else {
+            checkUpdates.setVisibility(View.VISIBLE);
+            oldVersions.setVisibility(View.GONE);
+        }
     }
 
     private void initializeInjector() {

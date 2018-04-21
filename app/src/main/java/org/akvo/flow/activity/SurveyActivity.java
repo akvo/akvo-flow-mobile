@@ -23,6 +23,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.database.Cursor;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.DialogFragment;
@@ -272,18 +273,42 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
                 mDatabase.deleteEmptyRecords();
             }
 
-            ViewApkData apkData = apkUpdateStore.getApkData();
-            boolean shouldNotifyUpdate = apkUpdateStore.shouldNotifyNewVersion();
-            if (apkData != null && shouldNotifyUpdate && PlatformUtil
-                    .isNewerVersion(BuildConfig.VERSION_NAME, apkData.getVersion())) {
-                apkUpdateStore.saveAppUpdateNotifiedTime();
-                navigator.navigateToAppUpdate(this, apkData);
+            //TODO: this code will be removed starting with v2.5.0
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1) {
+                showDinoDialogIfNeeded();
+            } else {
+                showApkUpdateIfNeeded();
             }
             updateAddDataPointFab();
         }
+    }
 
-        OutDatedDeviceDialog fragment = new OutDatedDeviceDialog();
-        fragment.show(getSupportFragmentManager(), OutDatedDeviceDialog.TAG);
+    private void showApkUpdateIfNeeded() {
+        ViewApkData apkData = apkUpdateStore.getApkData();
+        boolean shouldNotifyUpdate = apkUpdateStore.shouldNotifyNewVersion();
+        if (apkData != null && shouldNotifyUpdate && PlatformUtil
+                .isNewerVersion(BuildConfig.VERSION_NAME, apkData.getVersion())) {
+            apkUpdateStore.saveAppUpdateNotifiedTime();
+            navigator.navigateToAppUpdate(this, apkData);
+        }
+    }
+
+    private void showDinoDialogIfNeeded() {
+        String dinoDialogKey = "dino_last_shown";
+        int dinoNeverShown = -1;
+        long lastNotified = prefs.getLong(dinoDialogKey, dinoNeverShown);
+        boolean stopShowingDino = prefs.getBoolean(Prefs.KEY_STOP_SHOWING_DINO, false);
+        if (lastNotified == dinoNeverShown || (!stopShowingDino && notifiedLongTimeAgo(
+                lastNotified))) {
+            prefs.setLong(dinoDialogKey, System.currentTimeMillis());
+            OutDatedDeviceDialog fragment = OutDatedDeviceDialog.newInstance();
+            fragment.show(getSupportFragmentManager(), OutDatedDeviceDialog.TAG);
+        }
+    }
+
+    private boolean notifiedLongTimeAgo(long lastNotified) {
+        return System.currentTimeMillis() - lastNotified
+                >= ConstantUtil.DINO_NOTIFICATION_DELAY_IN_MS;
     }
 
     private void updateAddDataPointFab() {

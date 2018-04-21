@@ -69,6 +69,7 @@
         <TextView
                 android:id="@+id/text_old_version"
                 android:text="@string/about_view_old_version"
+                android:visibility="gone"
                 android:layout_gravity="center"
                 android:layout_marginTop="16dp"
                 android:layout_marginLeft="16dp"

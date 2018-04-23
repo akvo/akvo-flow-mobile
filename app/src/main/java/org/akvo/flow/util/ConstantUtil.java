@@ -251,7 +251,7 @@ public class ConstantUtil {
     /**
      * 1 day
      */
-    public static final int DINO_NOTIFICATION_DELAY_IN_MS = 7 * 60 * 60 * 24 * 1000;
+    public static final int DINO_NOTIFICATION_DELAY_IN_MS = 1 * 60 * 60 * 24 * 1000;
 
     //requests
     public static final int REQUEST_ADD_USER = 0;

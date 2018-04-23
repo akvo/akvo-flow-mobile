@@ -21,9 +21,29 @@
 package org.akvo.flow.database;
 
 public class SurveyInstanceStatus {
+
+    /**
+     * User started filling a form but did not press submit
+     */
     public static final int SAVED = 0;
+
+    /**
+     * User pressed submit
+     */
     public static final int SUBMIT_REQUESTED = 1;
+
+    /**
+     * Zip file has been generated
+     */
     public static final int SUBMITTED = 2;
+
+    /**
+     * Datapoint has been sent to the dashboard
+     */
     public static final int SYNCED = 3;
+
+    /**
+     * Datapoint has been downloaded from the dashboard
+     */
     public static final int DOWNLOADED = 4;
 }

@@ -21,6 +21,7 @@ package org.akvo.flow.service;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.support.v4.util.Pair;
 
 import com.google.android.gms.gcm.GcmNetworkManager;
@@ -31,10 +32,10 @@ import com.google.android.gms.gcm.TaskParams;
 
 import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.domain.apkupdate.ApkUpdateStore;
-import org.akvo.flow.util.GsonMapper;
 import org.akvo.flow.domain.apkupdate.ViewApkData;
 import org.akvo.flow.util.ConnectivityStateManager;
 import org.akvo.flow.util.ConstantUtil;
+import org.akvo.flow.util.GsonMapper;
 
 import timber.log.Timber;
 
@@ -55,8 +56,12 @@ public class ApkUpdateService extends GcmTaskService {
     private ApkUpdateHelper apkUpdateHelper;
 
     public static void scheduleFirstTask(Context context) {
-        schedulePeriodicTask(context, ConstantUtil.FIRST_REPEAT_INTERVAL_IN_SECONDS,
-                ConstantUtil.FIRST_FLEX_INTERVAL_IN_SECOND);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1) {
+            schedulePeriodicTask(context, ConstantUtil.FIRST_REPEAT_INTERVAL_IN_SECONDS,
+                    ConstantUtil.FIRST_FLEX_INTERVAL_IN_SECOND);
+        } else {
+            cancelRepeat(context);
+        }
     }
 
     @Override

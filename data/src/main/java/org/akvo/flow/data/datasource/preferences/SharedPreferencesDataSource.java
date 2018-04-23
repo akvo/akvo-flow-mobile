@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -84,6 +84,14 @@ public class SharedPreferencesDataSource {
         return setSelectedSurvey(INVALID_ID);
     }
 
+    protected String getString(String key, String defaultValue) {
+        return preferences.getString(key, defaultValue);
+    }
+
+    protected void setString(String key, String value) {
+        preferences.edit().putString(key, value).apply();
+    }
+
     private boolean getBoolean(String key, boolean defValue) {
         return preferences.getBoolean(key, defValue);
     }
@@ -98,14 +106,6 @@ public class SharedPreferencesDataSource {
 
     private int getInt(String key, int defValue) {
         return preferences.getInt(key, defValue);
-    }
-
-    private String getString(String key, String defaultValue) {
-        return preferences.getString(key, defaultValue);
-    }
-
-    private void setString(String key, String value) {
-        preferences.edit().putString(key, value).apply();
     }
 
     private void setBoolean(String key, boolean value) {

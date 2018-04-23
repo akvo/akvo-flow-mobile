@@ -60,18 +60,21 @@ public class ResponseListAdapter extends CursorAdapter {
 
         switch (status) {
             case SurveyInstanceStatus.SAVED:
+            case SurveyInstanceStatus.SUBMIT_REQUESTED:
                 icon = R.drawable.form_saved_icn;
                 statusText = context.getString(R.string.status_saved) + ": ";
                 displayDate = cursor.getLong(SurveyDbAdapter.FormInstanceQuery.SAVED_DATE);
                 break;
             case SurveyInstanceStatus.SUBMITTED:
-            case SurveyInstanceStatus.EXPORTED:
-                icon = R.drawable.exported_icn;
+                icon = R.drawable.submitted_icn;
                 break;
             case SurveyInstanceStatus.SYNCED:
             case SurveyInstanceStatus.DOWNLOADED:
                 icon = R.drawable.checkmark;
                 break;
+            default:
+                break;
+
         }
 
         TextView userView = (TextView) view.findViewById(R.id.username);

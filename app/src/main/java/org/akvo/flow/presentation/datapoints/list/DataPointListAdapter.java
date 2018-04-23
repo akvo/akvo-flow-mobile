@@ -76,7 +76,7 @@ class DataPointListAdapter extends BaseAdapter {
         return dataPoints.size();
     }
 
-    @Nullable
+    @NonNull
     @Override
     public ListDataPoint getItem(int position) {
         return dataPoints.get(position);
@@ -116,13 +116,13 @@ class DataPointListAdapter extends BaseAdapter {
         String statusText = null;
         switch (status) {
             case SurveyInstanceStatus.SAVED:
+            case SurveyInstanceStatus.SUBMIT_REQUESTED:
                 statusRes = R.drawable.record_saved_icn;
                 statusText = context.getString(R.string.status_saved);
                 break;
             case SurveyInstanceStatus.SUBMITTED:
-            case SurveyInstanceStatus.EXPORTED:
-                statusRes = R.drawable.record_exported_icn;
-                statusText = context.getString(R.string.status_exported);
+                statusRes = R.drawable.record_submitted_icn;
+                statusText = context.getString(R.string.status_submitted);
                 break;
             case SurveyInstanceStatus.SYNCED:
             case SurveyInstanceStatus.DOWNLOADED:

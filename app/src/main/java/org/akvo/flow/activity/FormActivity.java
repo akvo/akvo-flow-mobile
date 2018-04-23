@@ -613,7 +613,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
         saveState();
 
         // if we have no missing responses, submit the survey
-        mDatabase.updateSurveyStatus(mSurveyInstanceId, SurveyInstanceStatus.SUBMITTED);
+        mDatabase.updateSurveyStatus(mSurveyInstanceId, SurveyInstanceStatus.SUBMIT_REQUESTED);
 
         // Make the current survey immutable
         mReadOnly = true;

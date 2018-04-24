@@ -20,12 +20,13 @@
 package org.akvo.flow.ui.view;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -41,7 +42,7 @@ public class SubmitTab extends ListView implements OnClickListener {
     private SurveyListener mListener;
 
     private TextView mHeaderView;
-    private View mSubmitButton;
+    private Button mSubmitButton;
 
     public SubmitTab(Context context, SurveyListener listener) {
         super(context);
@@ -58,14 +59,17 @@ public class SubmitTab extends ListView implements OnClickListener {
         mHeaderView.setGravity(Gravity.CENTER);
         mHeaderView.setTextSize(18);
         mHeaderView.setClickable(false);
-
-        View buttonContainer = LayoutInflater.from(context)
-                .inflate(R.layout.submit_button, this, false);
-        mSubmitButton = buttonContainer.findViewById(R.id.submit_tab_button);
+        mSubmitButton = new Button(context);
+        mSubmitButton.setId(R.id.submit_tab_button);
+        mSubmitButton.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT,
+                LayoutParams.WRAP_CONTENT));
+        mSubmitButton.setTextColor(Color.WHITE);
+        mSubmitButton.setBackgroundResource(R.drawable.button_primary);
+        mSubmitButton.setText(context.getString(R.string.submitbutton));
         mSubmitButton.setOnClickListener(this);
 
         addHeaderView(mHeaderView);
-        addFooterView(buttonContainer);
+        addFooterView(mSubmitButton);
 
         refresh(new ArrayList<Question>());
     }

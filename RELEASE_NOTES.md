@@ -1,5 +1,19 @@
 Akvo FLOW app release notes
 ===========================
+# ver 2.4.8
+Date: 24 April 2018
+
+# New and noteworthy
+* **Old devices and apk updates** - [#1093](https://github.com/akvo/akvo-flow-mobile/issues/1093) Display a dialog for old devices that we will soon stop supporting.
+* **Save BuildConfig settings for the dashboard** - [#1092](https://github.com/akvo/akvo-flow-mobile/issues/1092) Save settings for basic dashboard configuration.
+* **Add android build version code to deviceapprest call** - [#1091](https://github.com/akvo/akvo-flow-mobile/issues/1091) Sending android build version to the backend.
+* **Add dexcount plugin** - [#1082](https://github.com/akvo/akvo-flow-mobile/issues/1082) Checking dex file size when building the app.
+
+# Resolved issues
+* **Inconsistent datapoint states** - [#618](https://github.com/akvo/akvo-flow-mobile/issues/618) Datapoint states are now easier to understand.
+* **Confusing dialog after survey submission** - [#617](https://github.com/akvo/akvo-flow-mobile/issues/617) Removed the dialog which was shown after pressing submit.
+
+---------------
 # ver 2.4.7
 Date: 03 April 2018
 

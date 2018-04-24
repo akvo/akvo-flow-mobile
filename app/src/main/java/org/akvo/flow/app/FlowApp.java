@@ -29,6 +29,7 @@ import android.text.TextUtils;
 
 import com.squareup.leakcanary.LeakCanary;
 
+import org.akvo.flow.BuildConfig;
 import org.akvo.flow.broadcast.SyncDataReceiver;
 import org.akvo.flow.data.migration.FlowMigrationListener;
 import org.akvo.flow.data.migration.languages.MigrationLanguageMapper;
@@ -36,6 +37,10 @@ import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.database.SurveyDbAdapter;
 import org.akvo.flow.database.UserColumns;
 import org.akvo.flow.domain.User;
+import org.akvo.flow.domain.interactor.DefaultObserver;
+import org.akvo.flow.domain.interactor.UseCase;
+import org.akvo.flow.domain.interactor.setup.SaveSetup;
+import org.akvo.flow.domain.interactor.setup.SetUpParams;
 import org.akvo.flow.injector.component.ApplicationComponent;
 import org.akvo.flow.injector.component.DaggerApplicationComponent;
 import org.akvo.flow.injector.module.ApplicationModule;
@@ -43,9 +48,14 @@ import org.akvo.flow.service.ApkUpdateService;
 import org.akvo.flow.service.FileChangeTrackingService;
 import org.akvo.flow.util.logging.LoggingHelper;
 
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 import javax.inject.Inject;
+import javax.inject.Named;
+
+import timber.log.Timber;
 
 public class FlowApp extends Application {
 
@@ -61,6 +71,10 @@ public class FlowApp extends Application {
     @Inject
     LoggingHelper loggingHelper;
 
+    @Inject
+    @Named("saveSetup")
+    UseCase saveSetup;
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -74,6 +88,23 @@ public class FlowApp extends Application {
         startBootstrapFolderTracker();
         updateLoggingInfo();
         registerReceiver(new SyncDataReceiver(), new IntentFilter(SyncDataReceiver.CONNECTIVITY_ACTION));
+        saveConfig();
+    }
+
+    private void saveConfig() {
+        Map<String, Object> params = new HashMap<>(2);
+        params.put(SaveSetup.PARAM_SETUP,
+                new SetUpParams(BuildConfig.API_KEY, BuildConfig.AWS_ACCESS_KEY_ID,
+                        BuildConfig.AWS_BUCKET, BuildConfig.AWS_SECRET_KEY,
+                        BuildConfig.INSTANCE_URL, BuildConfig.SERVER_BASE,
+                        BuildConfig.SIGNING_KEY));
+        saveSetup.execute(new DefaultObserver<Boolean>() {
+            @Override
+            public void onError(Throwable e) {
+                Timber.e(e);
+            }
+
+        }, params);
     }
 
     private void updateLoggingInfo() {

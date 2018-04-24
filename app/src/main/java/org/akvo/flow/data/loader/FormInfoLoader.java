@@ -106,8 +106,8 @@ public class FormInfoLoader extends AsyncLoader<List<FormInfo>> {
         Cursor c = database.getDatapointStatus(recordId);
         if (c.moveToFirst()) {
             int status = c.getInt(c.getColumnIndex(SurveyInstanceColumns.STATUS));
-            submittedDataPoint = status == SurveyInstanceStatus.SUBMITTED
-                    || status == SurveyInstanceStatus.EXPORTED
+            submittedDataPoint = status == SurveyInstanceStatus.SUBMIT_REQUESTED
+                    || status == SurveyInstanceStatus.SUBMITTED
                     || status == SurveyInstanceStatus.SYNCED
                     || status == SurveyInstanceStatus.DOWNLOADED;
         }

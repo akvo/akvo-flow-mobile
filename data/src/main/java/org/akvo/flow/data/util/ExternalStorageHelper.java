@@ -31,6 +31,8 @@ import timber.log.Timber;
 
 public class ExternalStorageHelper {
 
+    private static final double ONE_MEBIBIT = 1048576.0;
+
     @Inject
     public ExternalStorageHelper() {
     }
@@ -51,7 +53,7 @@ public class ExternalStorageHelper {
         }
         StatFs stat = new StatFs(Environment.getExternalStorageDirectory().getPath());
         double sdAvailSize = getAvailableSpace(stat);
-        return (long) Math.floor(sdAvailSize / 1048576.0);
+        return (long) Math.floor(sdAvailSize / ONE_MEBIBIT);
     }
 
     private boolean isExternalStorageMounted() {

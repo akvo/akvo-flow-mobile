@@ -44,6 +44,11 @@ class FileHelper {
         return copyFile(originalFile, file);
     }
 
+    /**
+     * Copies a file from originalFile to destinationFile
+     *
+     * @return the destination file path if copy succeeded, null otherwise
+     */
     String copyFile(File originalFile, File destinationFile) throws IOException {
         String destinationPath = null;
         InputStream in = null;

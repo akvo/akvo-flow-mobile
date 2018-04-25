@@ -30,7 +30,7 @@ public interface IPublishFilesPreferenceView {
 
     void scheduleAlarm();
 
-    void showNoDataToPublishError();
+    void showNoDataToPublish();
 
     void showGenericPublishError();
 

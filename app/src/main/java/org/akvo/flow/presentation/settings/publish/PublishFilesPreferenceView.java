@@ -162,7 +162,7 @@ public class PublishFilesPreferenceView extends LinearLayout
     }
 
     @Override
-    public void showNoDataToPublishError() {
+    public void showNoDataToPublish() {
         snackBarManager.displaySnackBar(this, R.string.preference_publish_data_error_no_data,
                 getContext());
     }

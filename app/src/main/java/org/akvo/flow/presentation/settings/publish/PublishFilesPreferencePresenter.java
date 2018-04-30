@@ -73,7 +73,7 @@ public class PublishFilesPreferencePresenter implements Presenter {
                     load();
                 } else {
                     view.showUnPublished();
-                    view.showNoDataToPublishError();
+                    view.showNoDataToPublish();
                 }
             }
         }, null);

@@ -24,7 +24,10 @@ import org.akvo.flow.domain.interactor.AllowedToConnect;
 import org.akvo.flow.domain.interactor.ClearAllData;
 import org.akvo.flow.domain.interactor.ClearResponses;
 import org.akvo.flow.domain.interactor.CopyVideo;
+import org.akvo.flow.domain.interactor.GetIsDeviceSetUp;
+import org.akvo.flow.domain.interactor.SetWalkthroughSeen;
 import org.akvo.flow.domain.interactor.UnSyncedTransmissionsExist;
+import org.akvo.flow.domain.interactor.WasWalkthroughSeen;
 import org.akvo.flow.domain.interactor.users.CreateUser;
 import org.akvo.flow.domain.interactor.DeleteSurvey;
 import org.akvo.flow.domain.interactor.users.DeleteUser;
@@ -197,5 +200,23 @@ public class ViewModule {
     @Named("clearAllData")
     UseCase provideClearAllData(ClearAllData clearAllData) {
         return clearAllData;
+    }
+
+    @Provides
+    @Named("getIsDeviceSetUp")
+    UseCase provideIsDeviceSetup(GetIsDeviceSetUp isDeviceSetUp) {
+        return isDeviceSetUp;
+    }
+
+    @Provides
+    @Named("wasWalkthroughSeen")
+    UseCase provideWasWalkthroughSeen(WasWalkthroughSeen wasWalkthroughSeen) {
+        return wasWalkthroughSeen;
+    }
+
+    @Provides
+    @Named("setWalkthroughSeen")
+    UseCase provideSetWalkthroughSeen(SetWalkthroughSeen setWalkthroughSeen) {
+        return setWalkthroughSeen;
     }
 }

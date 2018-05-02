@@ -52,6 +52,7 @@ import org.akvo.flow.presentation.help.HelpActivity;
 import org.akvo.flow.presentation.legal.LegalNoticesActivity;
 import org.akvo.flow.presentation.settings.PreferenceActivity;
 import org.akvo.flow.presentation.signature.SignatureActivity;
+import org.akvo.flow.presentation.walkthrough.WalkThroughActivity;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.StringUtil;
 
@@ -333,6 +334,11 @@ public class Navigator {
         intent.setDataAndType(Uri.fromFile(new File(filename)),
                 "application/vnd.android.package-archive");
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        context.startActivity(intent);
+    }
+
+    public void navigateToWalkThrough(Context context) {
+        Intent intent = new Intent(context, WalkThroughActivity.class);
         context.startActivity(intent);
     }
 }

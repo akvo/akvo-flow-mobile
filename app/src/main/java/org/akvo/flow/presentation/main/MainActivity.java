@@ -18,35 +18,32 @@
  *
  */
 
-package org.akvo.flow.presentation;
+package org.akvo.flow.presentation.main;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 
-import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
+import org.akvo.flow.presentation.BaseActivity;
 import org.akvo.flow.ui.Navigator;
 
 import javax.inject.Inject;
 
-public class MainActivity extends BaseActivity {
+public class MainActivity extends BaseActivity implements MainView {
 
     @Inject
     Navigator navigator;
 
     @Inject
-    Prefs prefs;
+    MainPresenter presenter;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         initializeInjector();
-        if (prefs.getBoolean(Prefs.KEY_SETUP, false)) {
-            navigator.navigateToSurveyActivity(this);
-        } else {
-            navigator.navigateToAddUser(this);
-        }
+        presenter.setView(this);
+        presenter.checkWalkthroughDisplay();
     }
 
     private void initializeInjector() {
@@ -54,5 +51,26 @@ public class MainActivity extends BaseActivity {
                 DaggerViewComponent.builder().applicationComponent(getApplicationComponent())
                         .build();
         viewComponent.inject(this);
+    }
+
+    @Override
+    public void navigateToDeviceSetUp() {
+        navigator.navigateToAddUser(this);
+    }
+
+    @Override
+    public void navigateToSurvey() {
+        navigator.navigateToSurveyActivity(this);
+    }
+
+    @Override
+    public void navigateToWalkThrough() {
+        navigator.navigateToWalkThrough(this);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        presenter.destroy();
     }
 }

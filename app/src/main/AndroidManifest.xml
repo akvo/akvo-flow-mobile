@@ -26,13 +26,12 @@
             android:theme="@style/FlowAppTheme">
 
         <activity
-                android:name=".presentation.MainActivity"
+                android:name=".presentation.main.MainActivity"
                 android:launchMode="singleInstance"
                 android:noHistory="true"
                 android:theme="@style/Theme.AppCompat.Translucent">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
-
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
@@ -152,6 +151,8 @@
                 android:label=""
                 android:configChanges="locale|layoutDirection">
         </activity>
+        <activity android:name=".presentation.walkthrough.WalkThroughActivity"/>
+
         <provider
                 android:name="android.support.v4.content.FileProvider"
                 android:authorities="org.akvo.flow.fileprovider"

@@ -63,19 +63,18 @@ public class FileDataSource {
     public Observable<Boolean> copyMediaFile(String originFilePath, String destinationFilePath) {
         File originalFile = new File(originFilePath);
         try {
-            boolean copied =
-                    fileHelper.copyFile(originalFile, new File(destinationFilePath)) == null;
-            if (copied) {
-                return Observable.error(new Exception("Error copying video file"));
-            } else {
+            String copiedFilePath = fileHelper
+                    .copyFile(originalFile, new File(destinationFilePath));
+            if (copiedFilePath != null) {
                 //noinspection ResultOfMethodCallIgnored
                 originalFile.delete();
+            } else {
+                return Observable.error(new Exception("Error copying video file"));
             }
             return Observable.just(true);
         } catch (IOException e) {
             return Observable.error(e);
         }
-
     }
 
     private Observable<List<MovedFile>> moveFiles(String folderName) {

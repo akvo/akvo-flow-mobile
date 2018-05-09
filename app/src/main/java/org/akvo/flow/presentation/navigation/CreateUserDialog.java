@@ -24,8 +24,6 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.graphics.Color;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -80,10 +78,6 @@ public class CreateUserDialog extends DialogFragment implements
         builder.setMessage(R.string.add_user_message);
         userNameEt = (EditText) main.findViewById(R.id.user_name_et);
         userNameEt.addTextChangedListener(new UsernameInputTextWatcher(this));
-        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.HONEYCOMB) {
-            userNameEt.setTextColor(Color.WHITE);
-            userNameEt.setHintTextColor(Color.GRAY);
-        }
         builder.setView(main);
         builder.setPositiveButton(R.string.okbutton, new DialogInterface.OnClickListener() {
             @Override

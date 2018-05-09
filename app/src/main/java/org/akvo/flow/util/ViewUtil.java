@@ -173,14 +173,14 @@ public class ViewUtil {
     public static int getScreenWidth(Context context) {
         WindowManager windowManager = (WindowManager) context
                 .getSystemService(Context.WINDOW_SERVICE);
-        Display display = windowManager.getDefaultDisplay();
-        Point size = new Point();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
+        Display display;
+        if (windowManager != null) {
+            display = windowManager.getDefaultDisplay();
+            Point size = new Point();
             display.getSize(size);
             return size.x;
-        } else {
-            return display.getWidth();
         }
+        return 0;
     }
 
     @SuppressWarnings("deprecation")

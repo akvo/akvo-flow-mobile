@@ -22,7 +22,6 @@ package org.akvo.flow.ui.view.geolocation;
 
 import android.content.Context;
 import android.graphics.Color;
-import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
@@ -32,7 +31,6 @@ import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.view.View;
-import android.view.animation.AlphaAnimation;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -157,20 +155,6 @@ public class GeoInputContainer extends LinearLayout {
         elevationInput.setEnabled(false);
     }
 
-    /**
-     * setAlpha is only available API >= 11
-     */
-    private void setAlpha(float originalAlpha, float targetAlpha) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
-            final AlphaAnimation animation = new AlphaAnimation(originalAlpha, targetAlpha);
-            animation.setDuration(ALPHA_ANIMATION_DURATION);
-            animation.setFillAfter(true);
-            startAnimation(animation);
-        } else {
-            setAlpha(targetAlpha);
-        }
-    }
-
     private void resetChildViewsToDefaultValues() {
         disableWatchers = true;
         statusIndicator.setText(R.string.geo_location_accuracy_default);
@@ -205,7 +189,7 @@ public class GeoInputContainer extends LinearLayout {
     }
 
     void showLocationListenerStopped() {
-        setAlpha(ALPHA_TRANSPARENT, ALPHA_OPAQUE);
+        setAlpha(ALPHA_OPAQUE);
         enableManualInput();
     }
 
@@ -216,7 +200,7 @@ public class GeoInputContainer extends LinearLayout {
     }
 
     void showLocationListenerStarted() {
-        setAlpha(ALPHA_OPAQUE, ALPHA_TRANSPARENT);
+        setAlpha(ALPHA_TRANSPARENT);
         resetChildViewsToDefaultValues();
         showCoordinatesInaccurate();
         disableManualInput();

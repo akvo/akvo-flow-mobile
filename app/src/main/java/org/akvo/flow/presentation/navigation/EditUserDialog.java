@@ -24,8 +24,6 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.graphics.Color;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -97,10 +95,6 @@ public class EditUserDialog extends DialogFragment implements
         userNameEt.setText(viewUser.getName());
         userNameEt.addTextChangedListener(new UsernameInputTextWatcher(this));
         builder.setView(main);
-        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.HONEYCOMB) {
-            userNameEt.setTextColor(Color.WHITE);
-            userNameEt.setHintTextColor(Color.GRAY);
-        }
         builder.setPositiveButton(R.string.okbutton, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {

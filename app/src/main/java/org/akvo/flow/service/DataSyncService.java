@@ -82,7 +82,7 @@ import timber.log.Timber;
 
 /**
  * Handle survey export and sync in a background thread. The export process takes
- * no arguments, and will try to zip all the survey instances with a SUBMITTED status
+ * no arguments, and will try to zip all the survey instances with a SUBMIT_REQUESTED status
  * but with no EXPORT_DATE (export hasn't happened yet). Ideally, and if the service has been
  * triggered by a survey submission, only one survey instance will be exported. However, if for
  * whatever reason, a previous export attempt has failed, a new export will be tried on each
@@ -213,7 +213,7 @@ public class DataSyncService extends IntentService {
         if (zipFileData != null) {
             // Create new entries in the transmission queue
             mDatabase.createTransmission(id, zipFileData.formId, zipFileData.filename);
-            updateSurveyStatus(id, SurveyInstanceStatus.EXPORTED);
+            updateSurveyStatus(id, SurveyInstanceStatus.SUBMITTED);
 
             for (String image : zipFileData.imagePaths) {
                 mDatabase.createTransmission(id, zipFileData.formId, image);
@@ -222,7 +222,7 @@ public class DataSyncService extends IntentService {
     }
 
     private void checkExportedFiles() {
-        Cursor cursor = mDatabase.getSurveyInstancesByStatus(SurveyInstanceStatus.EXPORTED);
+        Cursor cursor = mDatabase.getSurveyInstancesByStatus(SurveyInstanceStatus.SUBMITTED);
         if (cursor != null) {
             if (cursor.moveToFirst()) {
                 do {
@@ -233,7 +233,7 @@ public class DataSyncService extends IntentService {
                     if (!zipFileBrowser.getSurveyInstanceFile(uuid).exists()) {
                         Timber.d("Exported file for survey %s not found. It's status " +
                                 "will be set to 'submitted', and will be reprocessed", uuid);
-                        updateSurveyStatus(id, SurveyInstanceStatus.SUBMITTED);
+                        updateSurveyStatus(id, SurveyInstanceStatus.SUBMIT_REQUESTED);
                     }
                 } while (cursor.moveToNext());
             }
@@ -244,7 +244,7 @@ public class DataSyncService extends IntentService {
     @NonNull
     private long[] getUnexportedSurveys() {
         long[] surveyInstanceIds = new long[0];// Avoid null cases
-        Cursor cursor = mDatabase.getSurveyInstancesByStatus(SurveyInstanceStatus.SUBMITTED);
+        Cursor cursor = mDatabase.getSurveyInstancesByStatus(SurveyInstanceStatus.SUBMIT_REQUESTED);
         if (cursor != null) {
             surveyInstanceIds = new long[cursor.getCount()];
             if (cursor.moveToFirst()) {
@@ -494,9 +494,9 @@ public class DataSyncService extends IntentService {
             updateSurveyStatus(surveyInstanceId, SurveyInstanceStatus.SYNCED);
         }
 
-        // Ensure the unsynced ones are just EXPORTED
+        // Ensure the unsynced ones are just SUBMITTED
         for (long surveyInstanceId : unsyncedSurveys) {
-            updateSurveyStatus(surveyInstanceId, SurveyInstanceStatus.EXPORTED);
+            updateSurveyStatus(surveyInstanceId, SurveyInstanceStatus.SUBMITTED);
         }
     }
 

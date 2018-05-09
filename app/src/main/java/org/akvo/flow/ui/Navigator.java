@@ -99,15 +99,15 @@ public class Navigator {
     }
 
     //TODO: confusing, too many params, use object
-    public void navigateToFormActivity(Context context, String surveyedLocaleId, String formId,
+    public void navigateToFormActivity(Activity activity, String surveyedLocaleId, String formId,
             long formInstanceId, boolean readOnly, SurveyGroup mSurveyGroup) {
-        Intent i = new Intent(context, FormActivity.class);
+        Intent i = new Intent(activity, FormActivity.class);
         i.putExtra(ConstantUtil.FORM_ID_EXTRA, formId);
         i.putExtra(ConstantUtil.SURVEY_GROUP_EXTRA, mSurveyGroup);
         i.putExtra(ConstantUtil.SURVEYED_LOCALE_ID_EXTRA, surveyedLocaleId);
         i.putExtra(ConstantUtil.RESPONDENT_ID_EXTRA, formInstanceId);
         i.putExtra(ConstantUtil.READ_ONLY_EXTRA, readOnly);
-        context.startActivity(i);
+        activity.startActivityForResult(i, ConstantUtil.FORM_FILLING_REQUEST);
     }
 
     public void navigateToTakePhoto(@NonNull Activity activity, Uri uri) {

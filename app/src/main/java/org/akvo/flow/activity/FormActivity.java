@@ -614,7 +614,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
         saveState();
 
         // if we have no missing responses, submit the survey
-        mDatabase.updateSurveyStatus(mSurveyInstanceId, SurveyInstanceStatus.SUBMITTED);
+        mDatabase.updateSurveyStatus(mSurveyInstanceId, SurveyInstanceStatus.SUBMIT_REQUESTED);
 
         // Make the current survey immutable
         mReadOnly = true;
@@ -623,16 +623,8 @@ public class FormActivity extends BackActivity implements SurveyListener,
         Intent i = new Intent(ConstantUtil.DATA_AVAILABLE_INTENT);
         sendBroadcast(i);
 
-        showConfirmDialog(R.string.submitcompletetitle, R.string.submitcompletetext,
-                this, false,
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        if (dialog != null) {
-                            setResult(RESULT_OK);
-                            finish();
-                        }
-                    }
-                });
+        setResult(RESULT_OK);
+        finish();
     }
 
     @Override

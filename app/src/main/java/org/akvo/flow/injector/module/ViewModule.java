@@ -41,6 +41,7 @@ import org.akvo.flow.domain.interactor.SaveSelectedSurvey;
 import org.akvo.flow.domain.interactor.SelectUser;
 import org.akvo.flow.domain.interactor.SaveResizedImage;
 import org.akvo.flow.domain.interactor.UseCase;
+import org.akvo.flow.domain.interactor.setup.SaveSetup;
 
 import javax.inject.Named;
 
@@ -152,7 +153,6 @@ public class ViewModule {
         return saveResizedImage;
     }
 
-
     @Provides
     @Named("copyVideo")
     UseCase provideCopyVideo(CopyVideo copyVideo) {
@@ -169,5 +169,11 @@ public class ViewModule {
     @Named("makeDataPublic")
     UseCase provideMakeDataPublic(MakeDataPublic makeDataPublic) {
         return makeDataPublic;
+    }
+
+    @Provides
+    @Named("saveSetup")
+    UseCase provideSaveConfig(SaveSetup saveSetup) {
+        return saveSetup;
     }
 }

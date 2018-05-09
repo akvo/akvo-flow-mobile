@@ -248,6 +248,11 @@ public class ConstantUtil {
      */
     public static final int UPDATE_NOTIFICATION_DELAY_IN_MS = 7 * 60 * 60 * 24 * 1000;
 
+    /**
+     * 1 day
+     */
+    public static final int DINO_NOTIFICATION_DELAY_IN_MS = 1 * 60 * 60 * 24 * 1000;
+
     //requests
     public static final int REQUEST_ADD_USER = 0;
     public static final int PHOTO_ACTIVITY_REQUEST = 1;
@@ -257,6 +262,8 @@ public class ConstantUtil {
     public static final int CADDISFLY_REQUEST = 5;
     public static final int PLOTTING_REQUEST = 6;
     public static final int SIGNATURE_REQUEST = 7;
+    public static final int FORM_FILLING_REQUEST = 8;
+
 
     //view tags
     public static final int SURVEY_ID_TAG_KEY = R.integer.surveyidkey;

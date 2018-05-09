@@ -30,6 +30,7 @@ import org.akvo.flow.broadcast.DataTimeoutReceiver;
 import org.akvo.flow.domain.executor.PostExecutionThread;
 import org.akvo.flow.domain.executor.ThreadExecutor;
 import org.akvo.flow.domain.repository.FileRepository;
+import org.akvo.flow.domain.repository.SetupRepository;
 import org.akvo.flow.domain.repository.SurveyRepository;
 import org.akvo.flow.domain.repository.UserRepository;
 import org.akvo.flow.injector.module.ApplicationModule;
@@ -71,6 +72,8 @@ public interface ApplicationComponent {
     FileRepository fileRepository();
 
     UserRepository userRepository();
+
+    SetupRepository setupRepository();
 
     void inject(FileChangeTrackingService fileChangeTrackingService);
 

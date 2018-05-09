@@ -34,8 +34,6 @@
     <string name="reloadsurveysdesc">Deletes and re-downloads assigned surveys (only run if instructed)</string>
     <string name="conftitle">Please Confirm</string>
     <string name="reloadconftext">Are you sure you want to purge and re-download surveys?</string>
-    <string name="submitcompletetitle">Survey submitted</string>
-    <string name="submitcompletetext">Survey responses will be sent to the server.</string>
     <string name="langoption">Languages</string>
     <string name="langmandatorytitle">Invalid Selection</string>
     <string name="langmandatorytext">You must select at least one language</string>
@@ -48,7 +46,6 @@
     <string name="unsentdatawarning">Some responses are not submitted. Make sure you export them before deletion. This operation is not reversible. Click OK to proceed or cancel to abort.</string>
     <string name="deleteonewarning">This will permanently delete this survey response. Click OK to proceed or cancel to abort.</string>
     <string name="nextbutton">Next</string>
-    <string name="submittext">If you are finished with the form, press submit to send the data. Once you press submit, you can review the data but you will not be able to edit it.</string>
     <string name="cleartitle">Clear Survey Answers</string>
     <string name="cleardesc">Are you sure you want to clear your responses?</string>
     <string name="authtitle">Authorization Required</string>
@@ -156,7 +153,6 @@
     <string name="status_failed">Failed</string>
     <string name="status_saved">Saved</string>
     <string name="status_submitted">Submitted</string>
-    <string name="status_exported">Exported</string>
     <!--APK update-->
     <string name="app_update_activity">Akvo Flow Update</string>
     <string name="update">Update</string>
@@ -292,5 +288,11 @@
     <string name="preference_publish_data_subtitle_publishing">Making data available in the public folder for bulk upload</string>
     <string name="preference_publish_data_subtitle_published">Data is available for bulk upload over the next</string>
     <string name="preference_publish_data_time_left">%1$d mins</string>
+
+    <string name="submit_tab_description">You can view but not edit submitted responses</string>
+    <string name="snackbar_submitted">Submitted</string>
+    <string name="about_view_old_version">You can no longer update your Flow app and enjoy our latest improvements. This is because your device runs an Android version older than 4.0.3.</string>
+    <string name="do_not_show_again">Do not show again</string>
+    <string name="attribution">* dinosaurs by Sumana Chamrunworakiat from the Noun Project</string>
 
 </resources>

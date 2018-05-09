@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -44,7 +44,6 @@ import java.text.DecimalFormat;
 
 public class GeoInputContainer extends LinearLayout {
 
-    private static final int ALPHA_ANIMATION_DURATION = 50;
     private static final float ALPHA_OPAQUE = 1f;
     private static final float ALPHA_TRANSPARENT = 0.1f;
 

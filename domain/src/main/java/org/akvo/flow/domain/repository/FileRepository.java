@@ -35,7 +35,7 @@ public interface FileRepository {
 
     Observable<Boolean> moveFiles();
 
-    Observable<Boolean> copyPrivateFiles(@NonNull List<String> fileNames);
+    Observable<Boolean> publishFiles(@NonNull List<String> fileNames);
 
     Observable<Boolean> copyFile(String originFilePath, String destinationFilePath);
 

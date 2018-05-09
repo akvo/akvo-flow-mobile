@@ -34,6 +34,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
@@ -48,9 +49,11 @@ import org.akvo.flow.database.SurveyDbAdapter;
 import org.akvo.flow.database.SurveyInstanceStatus;
 import org.akvo.flow.domain.Survey;
 import org.akvo.flow.domain.SurveyGroup;
-import org.akvo.flow.domain.User;
 import org.akvo.flow.domain.apkupdate.ApkUpdateStore;
 import org.akvo.flow.domain.apkupdate.ViewApkData;
+import org.akvo.flow.domain.entity.User;
+import org.akvo.flow.domain.interactor.DefaultObserver;
+import org.akvo.flow.domain.interactor.UseCase;
 import org.akvo.flow.injector.component.ApplicationComponent;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
@@ -77,10 +80,12 @@ import org.akvo.flow.util.StatusUtil;
 import org.akvo.flow.util.ViewUtil;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import timber.log.Timber;
 
 public class SurveyActivity extends AppCompatActivity implements RecordListListener,
         FlowNavigationView.DrawerNavigationListener,
@@ -118,6 +123,10 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     @Inject
     SnackBarManager snackBarManager;
 
+    @Inject
+    @Named("getSelectedUser")
+    UseCase getSelectedUser;
+
     private SurveyGroup mSurveyGroup;
 
     private ActionBarDrawerToggle mDrawerToggle;
@@ -151,7 +160,7 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
 
             //When the app is restarted we need to display the current user
             if (savedInstanceState == null) {
-                displaySelectedUser();
+                showSelectedUser();
             }
             activityJustCreated = true;
             setNavigationView();
@@ -448,20 +457,31 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     }
 
     @Override
-    public void onRecordSelected(String surveyedLocaleId) {
-        final User user = FlowApp.getApp().getUser();
-        // Ensure user is logged in
-        if (user == null) {
-            Toast.makeText(SurveyActivity.this, R.string.mustselectuser,
-                    Toast.LENGTH_LONG).show();
-            return;
-        }
+    public void onRecordSelected(final String surveyedLocaleId) {
+        getSelectedUser.execute(new DefaultObserver<User>() {
+            @Override
+            public void onError(Throwable e) {
+                Timber.e(e);
+                showMissingUserError();
+            }
 
-        if (mSurveyGroup != null && mSurveyGroup.isMonitored()) {
-            displayRecord(surveyedLocaleId);
-        } else {
-            displayForm(surveyedLocaleId, user);
-        }
+            @Override
+            public void onNext(User user) {
+                if (user.getName() == null) {
+                    showMissingUserError();
+                } else {
+                    if (mSurveyGroup != null && mSurveyGroup.isMonitored()) {
+                        displayRecord(surveyedLocaleId);
+                    } else {
+                        displayForm(surveyedLocaleId, user);
+                    }
+                }
+            }
+        }, null);
+    }
+
+    private void showMissingUserError() {
+        Toast.makeText(this, R.string.mustselectuser, Toast.LENGTH_LONG).show();
     }
 
     private void displayRecord(String surveyedLocaleId) {
@@ -499,12 +519,25 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
                 formInstanceId, readOnly, mSurveyGroup);
     }
 
-    private void displaySelectedUser() {
-        User user = FlowApp.getApp().getUser();
-        if (user != null) {
-            Toast.makeText(this, getString(R.string.logged_in_as) + " " + user.getName(),
-                    Toast.LENGTH_LONG).show();
-        }
+    private void showSelectedUser() {
+        getSelectedUser.execute(new DefaultObserver<User>() {
+            @Override
+            public void onError(Throwable e) {
+                Timber.e(e);
+            }
+
+            @Override
+            public void onNext(User user) {
+                String userName = user.getName();
+                if (!TextUtils.isEmpty(userName)) {
+                    showMessage(getString(R.string.logged_in_as) + " " + userName);
+                }
+            }
+        }, null);
+    }
+
+    private void showMessage(String message) {
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show();
     }
 
     @Override

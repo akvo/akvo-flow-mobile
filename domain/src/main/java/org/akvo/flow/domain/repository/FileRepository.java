@@ -22,7 +22,10 @@ package org.akvo.flow.domain.repository;
 
 import android.graphics.Bitmap;
 
+import java.util.List;
+
 import io.reactivex.Observable;
+import io.reactivex.annotations.NonNull;
 
 public interface FileRepository {
 
@@ -32,9 +35,15 @@ public interface FileRepository {
 
     Observable<Boolean> moveFiles();
 
-    Observable<Boolean> copyPrivateData();
+    Observable<Boolean> publishFiles(@NonNull List<String> fileNames);
 
     Observable<Boolean> copyFile(String originFilePath, String destinationFilePath);
 
     Observable<Boolean> unPublishData();
+
+    Observable<Boolean> clearResponseFiles();
+
+    Observable<Boolean> clearAllUserFiles();
+
+    Observable<Boolean> isExternalStorageFull();
 }

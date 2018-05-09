@@ -59,4 +59,12 @@ public interface UserRepository {
     Observable<Boolean> setPublishDataTime();
 
     Observable<Boolean> clearPublishDataTime();
+
+    Observable<Boolean> clearUserPreferences();
+
+    Observable<Boolean> isDeviceSetUp();
+
+    Observable<Boolean> wasWalkThroughSeen();
+
+    Observable<Boolean> setWalkThroughSeen();
 }

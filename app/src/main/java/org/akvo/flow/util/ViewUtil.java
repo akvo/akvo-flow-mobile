@@ -27,11 +27,8 @@ import android.os.Build;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.view.Display;
-import android.view.ViewGroup.LayoutParams;
 import android.view.ViewTreeObserver;
 import android.view.WindowManager;
-import android.widget.EditText;
-import android.widget.LinearLayout;
 
 import org.akvo.flow.R;
 import org.akvo.flow.service.ServiceToastRunnable;
@@ -42,26 +39,6 @@ import org.akvo.flow.service.ServiceToastRunnable;
  * @author Christopher Fagiani
  */
 public class ViewUtil {
-
-    /**
-     * displays a simple dialog box with only a single, positive button using
-     * the resource ids of the strings passed in for the title and text.
-     *
-     * @param titleId
-     * @param textId
-     * @param parentContext
-     */
-    private static void showConfirmDialog(int titleId, int textId,
-            Context parentContext) {
-        showConfirmDialog(titleId, textId, parentContext, false,
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        if (dialog != null) {
-                            dialog.cancel();
-                        }
-                    }
-                });
-    }
 
     /**
      * displays a simple dialog box with a single positive button and an
@@ -181,66 +158,6 @@ public class ViewUtil {
     }
 
     /**
-     * shows an authentication dialog that asks for the administrator passcode
-     */
-    public static void showAdminAuthDialog(final Context parentContext,
-            final AdminAuthDialogListener listener) {
-        final EditText input = new EditText(parentContext);
-        input.setSingleLine();
-        ShowTextInputDialog(parentContext, R.string.authtitle,
-                R.string.authtext, input,
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        String val = input.getText().toString();
-                        if (ConstantUtil.ADMIN_AUTH_CODE.equals(val)) {
-                            listener.onAuthenticated();
-                            if (dialog != null) {
-                                dialog.dismiss();
-                            }
-                        } else {
-                            showConfirmDialog(R.string.authfailed,
-                                    R.string.invalidpassword, parentContext);
-                            if (dialog != null) {
-                                dialog.dismiss();
-                            }
-                        }
-                    }
-                });
-    }
-
-    /**
-     * shows a dialog that prompts the user to enter a single text value as
-     * input
-     */
-    public static void ShowTextInputDialog(final Context parentContext,
-            int title, int text, EditText inputView,
-            DialogInterface.OnClickListener clickListener) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(parentContext);
-        LinearLayout main = new LinearLayout(parentContext);
-        main.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT,
-                LayoutParams.WRAP_CONTENT));
-        main.setOrientation(LinearLayout.VERTICAL);
-        builder.setTitle(title);
-        builder.setMessage(text);
-        main.addView(inputView);
-        builder.setView(main);
-        builder.setPositiveButton(R.string.okbutton, clickListener);
-
-        builder.setNegativeButton(R.string.cancelbutton,
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        if (dialog != null) {
-                            dialog.dismiss();
-                        }
-                    }
-                });
-
-        builder.show();
-    }
-
-    /**
      * Display a UI Toast using the Handler's thread (main thread)
      *
      * @param msg                message to display
@@ -274,13 +191,5 @@ public class ViewUtil {
         } else {
             viewTreeObserver.removeGlobalOnLayoutListener(victim);
         }
-    }
-
-    /**
-     * interface that should be implemented by uses of the AdminAuthDialog to be
-     * notified when authorization is successful
-     */
-    public interface AdminAuthDialogListener {
-        void onAuthenticated();
     }
 }

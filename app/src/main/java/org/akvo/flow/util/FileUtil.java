@@ -24,8 +24,6 @@ import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import org.akvo.flow.app.FlowApp;
-
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
@@ -52,14 +50,10 @@ public class FileUtil {
     // Directories stored in the External Storage root (i.e. /sdcard/akvoflow/data)
     private static final String DIR_INBOX = "akvoflow/inbox"; // Bootstrap files
 
-    // Directories stored in the app specific External Storage (i.e. /sdcard/Android/data/org.akvo.flow/files/tmp)
-    private static final String DIR_TMP = "tmp"; // Temporary files
-
     private static final int BUFFER_SIZE = 2048;
 
     public enum FileType {
-        INBOX,
-        TMP
+        INBOX
     }
 
     /**
@@ -74,10 +68,7 @@ public class FileUtil {
         String path = null;
         switch (type) {
             case INBOX:
-                path = getFilesStorageDir(false) + File.separator + DIR_INBOX;
-                break;
-            case TMP:
-                path = getFilesStorageDir(true) + File.separator + DIR_TMP;
+                path = getExternalStoragePath() + File.separator + DIR_INBOX;
                 break;
         }
         File dir = new File(path);
@@ -86,25 +77,6 @@ public class FileUtil {
             dir.mkdirs();
         }
         return dir;
-    }
-
-    /**
-     * Get the root of the files storage directory, depending on the resource being app internal
-     * (not concerning the user) or not (users might need to pull the resource from the storage).
-     *
-     * @param internal true for app specific resources, false otherwise
-     * @return The root directory for this kind of resources
-     */
-    private static String getFilesStorageDir(boolean internal) {
-        if (internal) {
-            String externalFilesDir = getAppExternalStoragePath(FlowApp.getApp());
-            if (externalFilesDir != null) {
-                return externalFilesDir;
-            } else {
-                Timber.e(new Exception("App external storage unavailable"));
-            }
-        }
-        return getExternalStoragePath();
     }
 
     /**

@@ -21,24 +21,31 @@
 package org.akvo.flow.injector.module;
 
 import org.akvo.flow.domain.interactor.AllowedToConnect;
+import org.akvo.flow.domain.interactor.ClearAllData;
+import org.akvo.flow.domain.interactor.ClearResponses;
 import org.akvo.flow.domain.interactor.CopyVideo;
-import org.akvo.flow.domain.interactor.CreateUser;
+import org.akvo.flow.domain.interactor.GetIsDeviceSetUp;
+import org.akvo.flow.domain.interactor.SetWalkthroughSeen;
+import org.akvo.flow.domain.interactor.UnSyncedTransmissionsExist;
+import org.akvo.flow.domain.interactor.WasWalkthroughSeen;
+import org.akvo.flow.domain.interactor.users.CreateUser;
 import org.akvo.flow.domain.interactor.DeleteSurvey;
-import org.akvo.flow.domain.interactor.DeleteUser;
-import org.akvo.flow.domain.interactor.EditUser;
+import org.akvo.flow.domain.interactor.users.DeleteUser;
+import org.akvo.flow.domain.interactor.users.EditUser;
 import org.akvo.flow.domain.interactor.GetAllSurveys;
 import org.akvo.flow.domain.interactor.GetPublishDataTime;
 import org.akvo.flow.domain.interactor.GetSavedDataPoints;
 import org.akvo.flow.domain.interactor.GetUserSettings;
-import org.akvo.flow.domain.interactor.GetUsers;
-import org.akvo.flow.domain.interactor.MakeDataPublic;
+import org.akvo.flow.domain.interactor.users.GetSelectedUser;
+import org.akvo.flow.domain.interactor.users.GetUsers;
+import org.akvo.flow.domain.interactor.PublishData;
 import org.akvo.flow.domain.interactor.SaveAppLanguage;
 import org.akvo.flow.domain.interactor.SaveEnableMobileData;
 import org.akvo.flow.domain.interactor.SaveImage;
 import org.akvo.flow.domain.interactor.SaveImageSize;
 import org.akvo.flow.domain.interactor.SaveKeepScreenOn;
 import org.akvo.flow.domain.interactor.SaveSelectedSurvey;
-import org.akvo.flow.domain.interactor.SelectUser;
+import org.akvo.flow.domain.interactor.users.SelectUser;
 import org.akvo.flow.domain.interactor.SaveResizedImage;
 import org.akvo.flow.domain.interactor.UseCase;
 import org.akvo.flow.domain.interactor.setup.SaveSetup;
@@ -148,6 +155,12 @@ public class ViewModule {
     }
 
     @Provides
+    @Named("getSelectedUser")
+    UseCase provideGetSelectedUser(GetSelectedUser getSelectedUser) {
+        return getSelectedUser;
+    }
+
+    @Provides
     @Named("saveResizedImage")
     UseCase provideSaveResizedImage(SaveResizedImage saveResizedImage) {
         return saveResizedImage;
@@ -166,9 +179,45 @@ public class ViewModule {
     }
 
     @Provides
-    @Named("makeDataPublic")
-    UseCase provideMakeDataPublic(MakeDataPublic makeDataPublic) {
-        return makeDataPublic;
+    @Named("publishData")
+    UseCase provideMakeDataPublic(PublishData publishData) {
+        return publishData;
+    }
+
+    @Provides
+    @Named("unSyncedTransmissionsExist")
+    UseCase provideUnSyncedTransmissionsExist(UnSyncedTransmissionsExist transmissionsExist) {
+        return transmissionsExist;
+    }
+
+    @Provides
+    @Named("clearResponses")
+    UseCase provideClearResponses(ClearResponses clearResponses) {
+        return clearResponses;
+    }
+
+    @Provides
+    @Named("clearAllData")
+    UseCase provideClearAllData(ClearAllData clearAllData) {
+        return clearAllData;
+    }
+
+    @Provides
+    @Named("getIsDeviceSetUp")
+    UseCase provideIsDeviceSetup(GetIsDeviceSetUp isDeviceSetUp) {
+        return isDeviceSetUp;
+    }
+
+    @Provides
+    @Named("wasWalkthroughSeen")
+    UseCase provideWasWalkthroughSeen(WasWalkthroughSeen wasWalkthroughSeen) {
+        return wasWalkthroughSeen;
+    }
+
+    @Provides
+    @Named("setWalkthroughSeen")
+    UseCase provideSetWalkthroughSeen(SetWalkthroughSeen setWalkthroughSeen) {
+        return setWalkthroughSeen;
     }
 
     @Provides

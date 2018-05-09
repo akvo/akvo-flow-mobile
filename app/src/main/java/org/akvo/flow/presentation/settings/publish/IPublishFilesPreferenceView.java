@@ -29,4 +29,10 @@ public interface IPublishFilesPreferenceView {
     void showLoading();
 
     void scheduleAlarm();
+
+    void showNoDataToPublish();
+
+    void showGenericPublishError();
+
+    void showNoSpaceLeftError();
 }

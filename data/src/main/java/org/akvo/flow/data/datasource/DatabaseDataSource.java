@@ -30,6 +30,7 @@ import com.squareup.sqlbrite2.BriteDatabase;
 import org.akvo.flow.data.entity.ApiDataPoint;
 import org.akvo.flow.data.entity.ApiQuestionAnswer;
 import org.akvo.flow.data.entity.ApiSurveyInstance;
+import org.akvo.flow.data.entity.MovedFile;
 import org.akvo.flow.database.Constants;
 import org.akvo.flow.database.RecordColumns;
 import org.akvo.flow.database.ResponseColumns;
@@ -39,7 +40,6 @@ import org.akvo.flow.database.SyncTimeColumns;
 import org.akvo.flow.database.TransmissionStatus;
 import org.akvo.flow.database.britedb.BriteSurveyDbAdapter;
 import org.akvo.flow.domain.entity.User;
-import org.akvo.flow.data.entity.MovedFile;
 
 import java.util.List;
 
@@ -72,7 +72,6 @@ public class DatabaseDataSource {
         } else {
             return briteSurveyDbAdapter.getDataPoints(surveyGroupId);
         }
-
     }
 
     public Cursor getSyncedTime(long surveyGroupId) {
@@ -211,6 +210,10 @@ public class DatabaseDataSource {
         return briteSurveyDbAdapter.getUsers();
     }
 
+    public Observable<Cursor> getUser(Long userId) {
+        return Observable.just(briteSurveyDbAdapter.getUser(userId));
+    }
+
     public Observable<Boolean> editUser(User user) {
         briteSurveyDbAdapter.updateUser(user.getId(), user.getName());
         return Observable.just(true);
@@ -223,5 +226,24 @@ public class DatabaseDataSource {
 
     public Observable<Long> createUser(String userName) {
         return Observable.just(briteSurveyDbAdapter.createUser(userName));
+    }
+
+    public Observable<Boolean> clearCollectedData() {
+        briteSurveyDbAdapter.clearCollectedData();
+        return Observable.just(true);
+    }
+
+    public Observable<Boolean> clearAllData() {
+        briteSurveyDbAdapter.clearAllData();
+        return Observable.just(true);
+    }
+
+    public boolean unSyncedTransmissionsExist() {
+        return briteSurveyDbAdapter.unSyncedTransmissionsExist();
+    }
+
+    public Observable<Cursor> getAllTransmissionFileNames() {
+        return Observable
+                .just(briteSurveyDbAdapter.getAllTransmissionFileNames());
     }
 }

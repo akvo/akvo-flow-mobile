@@ -25,12 +25,12 @@ import android.support.v4.util.Pair;
 import org.akvo.flow.domain.entity.Survey;
 import org.akvo.flow.domain.interactor.DefaultObserver;
 import org.akvo.flow.domain.entity.User;
-import org.akvo.flow.domain.interactor.CreateUser;
+import org.akvo.flow.domain.interactor.users.CreateUser;
 import org.akvo.flow.domain.interactor.DeleteSurvey;
-import org.akvo.flow.domain.interactor.DeleteUser;
-import org.akvo.flow.domain.interactor.EditUser;
+import org.akvo.flow.domain.interactor.users.DeleteUser;
+import org.akvo.flow.domain.interactor.users.EditUser;
 import org.akvo.flow.domain.interactor.SaveSelectedSurvey;
-import org.akvo.flow.domain.interactor.SelectUser;
+import org.akvo.flow.domain.interactor.users.SelectUser;
 import org.akvo.flow.domain.interactor.UseCase;
 import org.akvo.flow.presentation.Presenter;
 

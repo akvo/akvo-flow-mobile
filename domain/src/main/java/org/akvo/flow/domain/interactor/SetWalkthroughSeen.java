@@ -22,7 +22,6 @@ package org.akvo.flow.domain.interactor;
 
 import org.akvo.flow.domain.executor.PostExecutionThread;
 import org.akvo.flow.domain.executor.ThreadExecutor;
-import org.akvo.flow.domain.repository.FileRepository;
 import org.akvo.flow.domain.repository.UserRepository;
 
 import java.util.Map;
@@ -30,30 +29,20 @@ import java.util.Map;
 import javax.inject.Inject;
 
 import io.reactivex.Observable;
-import io.reactivex.ObservableSource;
-import io.reactivex.functions.Function;
 
-public class MakeDataPublic extends UseCase {
+public class SetWalkthroughSeen extends UseCase {
 
-    private final FileRepository fileRepository;
     private final UserRepository userRepository;
 
     @Inject
-    protected MakeDataPublic(ThreadExecutor threadExecutor, PostExecutionThread postExecutionThread,
-            FileRepository fileRepository, UserRepository userRepository) {
+    protected SetWalkthroughSeen(ThreadExecutor threadExecutor,
+            PostExecutionThread postExecutionThread, UserRepository userRepository) {
         super(threadExecutor, postExecutionThread);
-        this.fileRepository = fileRepository;
         this.userRepository = userRepository;
     }
 
     @Override
     protected <T> Observable buildUseCaseObservable(Map<String, T> parameters) {
-        return fileRepository.copyPrivateData()
-                .concatMap(new Function<Boolean, ObservableSource<Boolean>>() {
-                    @Override
-                    public ObservableSource<Boolean> apply(Boolean aBoolean) {
-                        return userRepository.setPublishDataTime();
-                    }
-                });
+        return userRepository.setWalkThroughSeen();
     }
 }

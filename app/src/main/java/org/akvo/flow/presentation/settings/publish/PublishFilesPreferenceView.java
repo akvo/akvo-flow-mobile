@@ -24,6 +24,7 @@ import android.content.Context;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
+import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -34,6 +35,7 @@ import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.injector.component.ApplicationComponent;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
+import org.akvo.flow.presentation.SnackBarManager;
 import org.akvo.flow.util.AlarmHelper;
 import org.akvo.flow.util.BootReceiverHelper;
 
@@ -69,6 +71,9 @@ public class PublishFilesPreferenceView extends LinearLayout
 
     @Inject
     BootReceiverHelper bootReceiverHelper;
+
+    @Inject
+    SnackBarManager snackBarManager;
 
     public PublishFilesPreferenceView(Context context) {
         this(context, null);
@@ -154,6 +159,31 @@ public class PublishFilesPreferenceView extends LinearLayout
     public void scheduleAlarm() {
         alarmHelper.scheduleAlarm(PublishedTimeHelper.MAX_PUBLISH_TIME_IN_MS);
         bootReceiverHelper.enableBootReceiver();
+    }
+
+    @Override
+    public void showNoDataToPublish() {
+        snackBarManager.displaySnackBar(this, R.string.preference_publish_data_error_no_data,
+                getContext());
+    }
+
+    @Override
+    public void showGenericPublishError() {
+        snackBarManager
+                .displaySnackBarWithAction(this, R.string.preference_publish_data_error_generic,
+                        R.string.action_retry, new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                presenter.onPublishClick();
+                            }
+                        },
+                        getContext());
+    }
+
+    @Override
+    public void showNoSpaceLeftError() {
+        snackBarManager.displaySnackBar(this, R.string.preference_publish_data_error_no_space,
+                getContext());
     }
 
     @Override

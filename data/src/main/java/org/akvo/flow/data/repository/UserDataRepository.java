@@ -125,4 +125,24 @@ public class UserDataRepository implements UserRepository {
     public Observable<Boolean> clearPublishDataTime() {
         return dataSourceFactory.getSharedPreferencesDataSource().clearPublishDataTime();
     }
+
+    @Override
+    public Observable<Boolean> clearUserPreferences() {
+        return dataSourceFactory.getSharedPreferencesDataSource().clearUserPreferences();
+    }
+
+    @Override
+    public Observable<Boolean> isDeviceSetUp() {
+        return dataSourceFactory.getSharedPreferencesDataSource().isDeviceSetup();
+    }
+
+    @Override
+    public Observable<Boolean> wasWalkThroughSeen() {
+        return dataSourceFactory.getSharedPreferencesDataSource().wasSecurityWalkThroughSeen();
+    }
+
+    @Override
+    public Observable<Boolean> setWalkThroughSeen() {
+        return dataSourceFactory.getSharedPreferencesDataSource().setSecurityWalkThroughSeen();
+    }
 }

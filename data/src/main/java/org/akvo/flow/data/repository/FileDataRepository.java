@@ -31,6 +31,7 @@ import java.util.List;
 import javax.inject.Inject;
 
 import io.reactivex.Observable;
+import io.reactivex.annotations.NonNull;
 import io.reactivex.functions.Function;
 
 public class FileDataRepository implements FileRepository {
@@ -70,8 +71,8 @@ public class FileDataRepository implements FileRepository {
     }
 
     @Override
-    public Observable<Boolean> copyPrivateData() {
-        return dataSourceFactory.getFileDataSource().copyPrivateData();
+    public Observable<Boolean> publishFiles(@NonNull List<String> fileNames) {
+        return dataSourceFactory.getFileDataSource().publishFiles(fileNames);
     }
 
     @Override
@@ -82,6 +83,27 @@ public class FileDataRepository implements FileRepository {
 
     @Override
     public Observable<Boolean> unPublishData() {
-        return dataSourceFactory.getFileDataSource().removePublicFiles();
+        return dataSourceFactory.getFileDataSource().removePublishedFiles();
+    }
+
+    @Override
+    public Observable<Boolean> clearResponseFiles() {
+        return dataSourceFactory.getFileDataSource().deleteResponsesFiles();
+    }
+
+    @Override
+    public Observable<Boolean> clearAllUserFiles() {
+        return dataSourceFactory.getFileDataSource().deleteAllUserFiles();
+    }
+
+    @Override
+    public Observable<Boolean> isExternalStorageFull() {
+        return dataSourceFactory.getFileDataSource().getAvailableStorage()
+                .map(new Function<Long, Boolean>() {
+                    @Override
+                    public Boolean apply(Long availableMb) {
+                        return availableMb < 100;
+                    }
+                });
     }
 }

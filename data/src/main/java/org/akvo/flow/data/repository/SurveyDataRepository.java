@@ -29,6 +29,7 @@ import org.akvo.flow.data.entity.ApiSurveyInstance;
 import org.akvo.flow.data.entity.DataPointMapper;
 import org.akvo.flow.data.entity.SurveyMapper;
 import org.akvo.flow.data.entity.SyncedTimeMapper;
+import org.akvo.flow.data.entity.TransmissionMapper;
 import org.akvo.flow.data.entity.UserMapper;
 import org.akvo.flow.data.net.FlowRestApi;
 import org.akvo.flow.domain.entity.DataPoint;
@@ -65,17 +66,20 @@ public class SurveyDataRepository implements SurveyRepository {
     private final FlowRestApi restApi;
     private final SurveyMapper surveyMapper;
     private final UserMapper userMapper;
+    private final TransmissionMapper transmissionMapper;
 
     @Inject
     public SurveyDataRepository(DataSourceFactory dataSourceFactory,
             DataPointMapper dataPointMapper, SyncedTimeMapper syncedTimeMapper, FlowRestApi restApi,
-            SurveyMapper surveyMapper, UserMapper userMapper) {
+            SurveyMapper surveyMapper, UserMapper userMapper,
+            TransmissionMapper transmissionMapper) {
         this.dataSourceFactory = dataSourceFactory;
         this.dataPointMapper = dataPointMapper;
         this.syncedTimeMapper = syncedTimeMapper;
         this.restApi = restApi;
         this.surveyMapper = surveyMapper;
         this.userMapper = userMapper;
+        this.transmissionMapper = transmissionMapper;
     }
 
     @Override
@@ -261,7 +265,7 @@ public class SurveyDataRepository implements SurveyRepository {
                 .map(new Function<Cursor, List<User>>() {
                     @Override
                     public List<User> apply(Cursor cursor) {
-                        return userMapper.getUsers(cursor);
+                        return userMapper.mapUsers(cursor);
                     }
                 });
     }
@@ -279,5 +283,43 @@ public class SurveyDataRepository implements SurveyRepository {
     @Override
     public Observable<Long> createUser(String userName) {
         return dataSourceFactory.getDataBaseDataSource().createUser(userName);
+    }
+
+    @Override
+    public Observable<User> getUser(Long userId) {
+        return dataSourceFactory.getDataBaseDataSource().getUser(userId)
+                .map(new Function<Cursor, User>() {
+                    @Override
+                    public User apply(Cursor cursor) {
+                        return userMapper.mapUser(cursor);
+                    }
+                });
+    }
+
+    @Override
+    public Observable<Boolean> clearResponses() {
+        return dataSourceFactory.getDataBaseDataSource().clearCollectedData();
+    }
+
+    @Override
+    public Observable<Boolean> clearAllData() {
+        return dataSourceFactory.getDataBaseDataSource().clearAllData();
+    }
+
+    @Override
+    public Observable<Boolean> unSyncedTransmissionsExist() {
+        return Observable
+                .just(dataSourceFactory.getDataBaseDataSource().unSyncedTransmissionsExist());
+    }
+
+    @Override
+    public Observable<List<String>> getAllTransmissionFileNames() {
+        return dataSourceFactory.getDataBaseDataSource().getAllTransmissionFileNames()
+                .map(new Function<Cursor, List<String>>() {
+                    @Override
+                    public List<String> apply(Cursor cursor) {
+                        return transmissionMapper.mapToFileNameList(cursor);
+                    }
+                });
     }
 }

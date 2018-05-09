@@ -39,12 +39,17 @@ class FileHelper {
     FileHelper() {
     }
 
-    String copyFileToFolder(File originalFile, File destinationFolder) {
+    String copyFileToFolder(File originalFile, File destinationFolder) throws IOException {
         File file = new File(destinationFolder, originalFile.getName());
         return copyFile(originalFile, file);
     }
 
-    String copyFile(File originalFile, File destinationFile) {
+    /**
+     * Copies a file from originalFile to destinationFile
+     *
+     * @return the destination file path if copy succeeded, null otherwise
+     */
+    String copyFile(File originalFile, File destinationFile) throws IOException {
         String destinationPath = null;
         InputStream in = null;
         OutputStream out = null;
@@ -60,8 +65,6 @@ class FileHelper {
             destinationPath = destinationFile.getAbsolutePath();
         } catch (FileNotFoundException e) {
             Timber.e(e);
-        } catch (IOException e) {
-            Timber.e(e);
         } finally {
             close(in);
             close(out);
@@ -75,6 +78,31 @@ class FileHelper {
                 closeable.close();
             } catch (Exception ignored) {
                 //Ignored
+            }
+        }
+    }
+
+    /**
+     * deletes all files in the directory (recursively) AND then deletes the
+     * directory itself if the "deleteFlag" is true
+     */
+    @SuppressWarnings({ "unchecked", "ResultOfMethodCallIgnored" })
+    void deleteFilesInDirectory(File folder, boolean deleteFolder) {
+        if (folder != null && folder.exists() && folder.isDirectory()) {
+            File[] files = folder.listFiles();
+            if (files != null) {
+                for (File file : files) {
+                    if (file.isFile()) {
+                        file.delete();
+                    } else {
+                        // recursively delete
+                        deleteFilesInDirectory(file, true);
+                    }
+                }
+            }
+            // now delete the directory itself
+            if (deleteFolder) {
+                folder.delete();
             }
         }
     }

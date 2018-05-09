@@ -20,6 +20,7 @@
 
 package org.akvo.flow.presentation.settings.publish;
 
+import org.akvo.flow.domain.exception.FullStorageException;
 import org.akvo.flow.domain.interactor.DefaultObserver;
 import org.akvo.flow.domain.interactor.UseCase;
 import org.akvo.flow.presentation.Presenter;
@@ -33,17 +34,17 @@ public class PublishFilesPreferencePresenter implements Presenter {
 
     private final PublishedTimeHelper publishedTimeHelper;
     private final UseCase getPublishDataTime;
-    private final UseCase makeDataPublic;
+    private final UseCase publishData;
 
     private IPublishFilesPreferenceView view;
 
     @Inject
     public PublishFilesPreferencePresenter(PublishedTimeHelper publishedTimeHelper,
             @Named("getPublishDataTime") UseCase getPublishDataTime,
-            @Named("makeDataPublic") UseCase makeDataPublic) {
+            @Named("publishData") UseCase publishData) {
         this.publishedTimeHelper = publishedTimeHelper;
         this.getPublishDataTime = getPublishDataTime;
-        this.makeDataPublic = makeDataPublic;
+        this.publishData = publishData;
     }
 
     public void setView(IPublishFilesPreferenceView view) {
@@ -52,20 +53,28 @@ public class PublishFilesPreferencePresenter implements Presenter {
 
     public void onPublishClick() {
         view.showLoading();
-        makeDataPublic.dispose();
-        makeDataPublic.execute(new DefaultObserver<Boolean>() {
+        publishData.dispose();
+        publishData.execute(new DefaultObserver<Boolean>() {
             @Override
             public void onError(Throwable e) {
                 Timber.e(e);
-                //TODO: display error to user (other issue)
-                load();
+                view.showUnPublished();
+                if (e instanceof FullStorageException) {
+                    view.showNoSpaceLeftError();
+                } else {
+                    view.showGenericPublishError();
+                }
             }
 
             @Override
             public void onNext(Boolean published) {
-                //TODO: make sure everything was published (other issue)
-                view.scheduleAlarm();
-                load();
+                if (published) {
+                    view.scheduleAlarm();
+                    load();
+                } else {
+                    view.showUnPublished();
+                    view.showNoDataToPublish();
+                }
             }
         }, null);
     }
@@ -73,7 +82,7 @@ public class PublishFilesPreferencePresenter implements Presenter {
     @Override
     public void destroy() {
         getPublishDataTime.dispose();
-        makeDataPublic.dispose();
+        publishData.dispose();
     }
 
     public void load() {

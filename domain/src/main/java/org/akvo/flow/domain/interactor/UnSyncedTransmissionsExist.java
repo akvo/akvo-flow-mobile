@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -22,7 +22,7 @@ package org.akvo.flow.domain.interactor;
 
 import org.akvo.flow.domain.executor.PostExecutionThread;
 import org.akvo.flow.domain.executor.ThreadExecutor;
-import org.akvo.flow.domain.repository.UserRepository;
+import org.akvo.flow.domain.repository.SurveyRepository;
 
 import java.util.Map;
 
@@ -30,24 +30,20 @@ import javax.inject.Inject;
 
 import io.reactivex.Observable;
 
-public class SelectUser extends UseCase {
+public class UnSyncedTransmissionsExist extends UseCase {
 
-    public static final String PARAM_USER_ID = "user_id";
-
-    private final UserRepository userRepository;
+    private final SurveyRepository surveyRepository;
 
     @Inject
-    protected SelectUser(ThreadExecutor threadExecutor,
-            PostExecutionThread postExecutionThread, UserRepository userRepository) {
+    protected UnSyncedTransmissionsExist(ThreadExecutor threadExecutor,
+            PostExecutionThread postExecutionThread,
+            SurveyRepository surveyRepository) {
         super(threadExecutor, postExecutionThread);
-        this.userRepository = userRepository;
+        this.surveyRepository = surveyRepository;
     }
 
     @Override
     protected <T> Observable buildUseCaseObservable(Map<String, T> parameters) {
-        if (parameters == null || parameters.get(PARAM_USER_ID) == null) {
-            return Observable.error(new IllegalArgumentException("missing user id"));
-        }
-        return userRepository.setSelectedUser((Long) parameters.get(PARAM_USER_ID));
+        return surveyRepository.unSyncedTransmissionsExist();
     }
 }

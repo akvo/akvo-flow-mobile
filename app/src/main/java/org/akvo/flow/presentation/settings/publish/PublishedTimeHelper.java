@@ -28,6 +28,7 @@ public class PublishedTimeHelper {
 
     public static final long MAX_PUBLISH_TIME_IN_MS = 90 * 60 * 1000;
     private static final long INVALID_PUBLISH_TIME = -1L;
+    private static final int ONE_MINUTE = 1;
 
     @Inject
     public PublishedTimeHelper() {
@@ -42,5 +43,9 @@ public class PublishedTimeHelper {
     public int getRemainingPublishedTime(long timeSincePublished) {
         long timeRemainingInMs = MAX_PUBLISH_TIME_IN_MS - timeSincePublished;
         return (int) TimeUnit.MINUTES.convert(timeRemainingInMs, TimeUnit.MILLISECONDS);
+    }
+
+    public int getRemainingPublishedTimeToDisplay(long timeSincePublished) {
+        return getRemainingPublishedTime(timeSincePublished) + ONE_MINUTE;
     }
 }

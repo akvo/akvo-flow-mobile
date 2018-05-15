@@ -99,8 +99,8 @@ public class PublishFilesPreferencePresenter implements Presenter {
                 long timeSincePublished = publishedTimeHelper
                         .calculateTimeSincePublished(publishTime);
                 if (timeSincePublished < PublishedTimeHelper.MAX_PUBLISH_TIME_IN_MS) {
-                    int remainingTime = publishedTimeHelper.getRemainingPublishedTime(
-                            timeSincePublished) + 1;
+                    int remainingTime = publishedTimeHelper.getRemainingPublishedTimeToDisplay(
+                            timeSincePublished);
                     view.showPublished(remainingTime);
                 } else {
                     getPublishDataTime.dispose();

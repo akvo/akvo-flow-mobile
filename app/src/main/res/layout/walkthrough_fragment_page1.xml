@@ -41,22 +41,4 @@
             android:id="@+id/textView2"
             android:layout_weight="3"/>
 
-    <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="3">
-
-        <Button
-                android:text="@string/walthrough_next_button"
-                android:layout_width="wrap_content"
-                android:layout_height="48dp"
-                android:paddingLeft="16dp"
-                android:paddingRight="16dp"
-                android:textColor="@color/colorAccent"
-                android:layout_gravity="top|center_horizontal"
-                style="@style/Widget.AppCompat.Button.Borderless"
-                android:id="@+id/button_next"/>
-    </FrameLayout>
-
-
 </LinearLayout>

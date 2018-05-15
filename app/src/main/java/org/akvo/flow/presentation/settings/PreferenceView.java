@@ -41,4 +41,6 @@ public interface PreferenceView {
     void showClearDataError();
 
     void showClearDataSuccess();
+
+    void dismiss();
 }

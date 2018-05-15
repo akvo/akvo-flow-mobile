@@ -211,6 +211,7 @@ public class PreferencePresenter implements Presenter {
         public void onNext(Boolean cleared) {
             if (cleared) {
                 view.showClearDataSuccess();
+                view.dismiss();
             } else {
                 view.showClearDataError();
             }

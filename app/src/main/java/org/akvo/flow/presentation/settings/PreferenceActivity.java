@@ -361,6 +361,11 @@ public class PreferenceActivity extends BackActivity implements PreferenceView,
         presenter.deleteAllConfirmed();
     }
 
+    @Override
+    public void dismiss() {
+        finish();
+    }
+
     private void showMessage(int resId) {
         snackBarManager.displaySnackBar(instanceNameTv, resId, this);
     }

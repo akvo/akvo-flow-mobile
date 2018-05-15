@@ -30,6 +30,8 @@ import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
 import android.text.TextUtils;
 import android.text.method.DigitsKeyListener;
+import android.view.LayoutInflater;
+import android.view.View;
 import android.widget.EditText;
 
 import org.akvo.flow.R;
@@ -53,10 +55,10 @@ public class DownloadFormDialog extends DialogFragment {
         AlertDialog.Builder inputDialog = new AlertDialog.Builder(activity);
         inputDialog.setTitle(R.string.downloadsurveylabel);
         inputDialog.setMessage(R.string.downloadsurveyinstr);
-
-        final EditText input = new EditText(activity);
+        View main = LayoutInflater.from(activity).inflate(R.layout.download_form_dialog, null);
+        final EditText input = (EditText) main.findViewById(R.id.form_id_et);
         input.setKeyListener(new DigitsKeyListener(false, false));
-        inputDialog.setView(input);
+        inputDialog.setView(main);
         inputDialog.setPositiveButton(R.string.okbutton, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
                 String surveyId = input.getText().toString().trim();

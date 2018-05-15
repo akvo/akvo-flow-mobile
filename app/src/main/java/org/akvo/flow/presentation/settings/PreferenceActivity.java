@@ -307,14 +307,14 @@ public class PreferenceActivity extends BackActivity implements PreferenceView,
 
     @Override
     public void downloadForm() {
-        DialogFragment newFragment = ReloadFormsConfirmationDialog.newInstance();
-        newFragment.show(getSupportFragmentManager(), ReloadFormsConfirmationDialog.TAG);
+        DialogFragment newFragment = DownloadFormDialog.newInstance();
+        newFragment.show(getSupportFragmentManager(), DownloadFormDialog.TAG);
     }
 
     @Override
     public void reloadForms() {
-        DialogFragment newFragment = DownloadFormDialog.newInstance();
-        newFragment.show(getSupportFragmentManager(), DownloadFormDialog.TAG);
+        DialogFragment newFragment = ReloadFormsConfirmationDialog.newInstance();
+        newFragment.show(getSupportFragmentManager(), ReloadFormsConfirmationDialog.TAG);
     }
 
     @Override

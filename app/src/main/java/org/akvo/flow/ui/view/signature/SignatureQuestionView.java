@@ -44,17 +44,13 @@ import org.akvo.flow.ui.view.QuestionView;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.ImageUtil;
 import org.akvo.flow.util.files.SignatureFileBrowser;
+import org.akvo.flow.util.image.GlideImageLoader;
 import org.akvo.flow.util.image.ImageLoader;
 import org.akvo.flow.util.image.ImageLoaderListener;
-import org.akvo.flow.util.image.ImageTarget;
-import org.akvo.flow.util.image.PicassoImageLoader;
-import org.akvo.flow.util.image.PicassoImageTarget;
 
 import java.io.File;
 
 import javax.inject.Inject;
-
-import timber.log.Timber;
 
 import static org.akvo.flow.util.files.SignatureFileBrowser.RESIZED_SUFFIX;
 
@@ -69,18 +65,6 @@ public class SignatureQuestionView extends QuestionView {
     private TextView nameLabel;
     private ImageLoader imageLoader;
     private Signature mSignature;
-
-    private final ImageTarget imageTarget = new PicassoImageTarget() {
-        @Override
-        public void onBitmapLoaded(Bitmap bitmap) {
-            setUpImage(bitmap);
-            updateSignButton();
-            if (bitmap != null) {
-                mSignature.setImage(ImageUtil.encodeBase64(bitmap));
-            }
-            captureResponse();
-        }
-    };
 
     public SignatureQuestionView(Context context, Question q, SurveyListener surveyListener) {
         super(context, q, surveyListener);
@@ -97,7 +81,7 @@ public class SignatureQuestionView extends QuestionView {
         nameLabel = (TextView) findViewById(R.id.signature_name_label);
         mImage = (ImageView) findViewById(R.id.signature_image);
         signButton = (Button) findViewById(R.id.sign_btn);
-        imageLoader = new PicassoImageLoader((Activity) getContext());
+        imageLoader = new GlideImageLoader((Activity) getContext());
 
         if (isReadOnly()) {
             signButton.setVisibility(GONE);
@@ -133,9 +117,18 @@ public class SignatureQuestionView extends QuestionView {
             File imageFile = signatureFileBrowser
                     .getSignatureImageFile(RESIZED_SUFFIX, mQuestion.getId(),
                             mSurveyListener.getDatapointId());
-            imageLoader.clearImage(imageFile);
             //noinspection unchecked
-            imageLoader.loadFromFile(imageFile, imageTarget);
+            imageLoader.loadFromFile(imageFile, new ImageLoaderListener() {
+                @Override
+                public void onImageReady(Bitmap bitmap) {
+                    setUpImage(bitmap);
+                    updateSignButton();
+                    if (bitmap != null) {
+                        mSignature.setImage(ImageUtil.encodeBase64(bitmap));
+                    }
+                    captureResponse();
+                }
+            });
         }
     }
 
@@ -156,14 +149,9 @@ public class SignatureQuestionView extends QuestionView {
             setUpName(name);
             imageLoader.loadFromBase64String(base64ImageString, mImage, new ImageLoaderListener() {
                 @Override
-                public void onImageReady() {
+                public void onImageReady(Bitmap bitmap) {
                     mImage.setVisibility(VISIBLE);
                     updateSignButton();
-                }
-
-                @Override
-                public void onImageError() {
-                    Timber.e("Error loading base64 string as image");
                 }
             });
         } else {

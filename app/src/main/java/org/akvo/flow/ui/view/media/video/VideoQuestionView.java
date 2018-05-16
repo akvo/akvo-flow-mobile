@@ -43,9 +43,8 @@ import org.akvo.flow.ui.Navigator;
 import org.akvo.flow.ui.view.QuestionView;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.MediaFileHelper;
+import org.akvo.flow.util.image.GlideImageLoader;
 import org.akvo.flow.util.image.ImageLoader;
-import org.akvo.flow.util.image.ImageLoaderListener;
-import org.akvo.flow.util.image.PicassoImageLoader;
 
 import java.io.File;
 
@@ -100,7 +99,7 @@ public class VideoQuestionView extends QuestionView implements MediaSyncTask.Dow
         ButterKnife.bind(this);
         presenter.setView(this);
 
-        imageLoader = new PicassoImageLoader(getContext());
+        imageLoader = new GlideImageLoader(getContext());
         mMediaButton.setText(R.string.takevideo);
         if (isReadOnly()) {
             mMediaButton.setVisibility(GONE);
@@ -248,28 +247,13 @@ public class VideoQuestionView extends QuestionView implements MediaSyncTask.Dow
         if (!new File(filename).exists()) {
             showTemporaryMedia();
         } else {
-            displayVideoThumbnail(filename);
+            imageLoader.loadFromFile(new File(filename), mImageView);
         }
     }
 
     private void showTemporaryMedia() {
         mImageView.setImageResource(R.drawable.blurry_image);
         mDownloadBtn.setVisibility(VISIBLE);
-    }
-
-    private void displayVideoThumbnail(String filename) {
-        imageLoader.loadVideoThumbnail(filename, mImageView, new ImageLoaderListener() {
-            @Override
-            public void onImageReady() {
-                // Empty
-            }
-
-            @Override
-            public void onImageError() {
-                showTemporaryMedia();
-                showImageLoadError();
-            }
-        });
     }
 
     @Override

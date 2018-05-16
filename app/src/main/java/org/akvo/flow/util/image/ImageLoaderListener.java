@@ -20,9 +20,9 @@
 
 package org.akvo.flow.util.image;
 
+import android.graphics.Bitmap;
+
 public interface ImageLoaderListener {
 
-    void onImageReady();
-
-    void onImageError();
+    void onImageReady(Bitmap bitmap);
 }

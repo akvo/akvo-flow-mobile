@@ -38,10 +38,9 @@ import org.akvo.flow.injector.component.ViewComponent;
 import org.akvo.flow.ui.view.signature.SignatureDrawView;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.ViewUtil;
+import org.akvo.flow.util.image.GlideImageLoader;
 import org.akvo.flow.util.image.ImageLoader;
-import org.akvo.flow.util.image.ImageTarget;
-import org.akvo.flow.util.image.PicassoImageLoader;
-import org.akvo.flow.util.image.PicassoImageTarget;
+import org.akvo.flow.util.image.ImageLoaderListener;
 
 import java.io.File;
 
@@ -71,17 +70,6 @@ public class SignatureActivity extends Activity implements SignatureDrawView.Sig
 
     private ImageLoader imageLoader;
 
-    private final ImageTarget imageTarget = new PicassoImageTarget() {
-        @Override
-        public void onBitmapLoaded(Bitmap bitmap) {
-            if (bitmap != null) {
-                mSignatureDrawView.setBitmap(bitmap);
-                mSignatureDrawView.invalidate();
-                onViewContentChanged();
-            }
-        }
-    };
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -94,7 +82,7 @@ public class SignatureActivity extends Activity implements SignatureDrawView.Sig
         String name = getIntent().getStringExtra(ConstantUtil.SIGNATURE_NAME_EXTRA);
         presenter.setView(this);
         presenter.setExtras(questionId, datapointId, name);
-        imageLoader = new PicassoImageLoader(this);
+        imageLoader = new GlideImageLoader(this);
         setSignatureDrawView();
     }
 
@@ -124,9 +112,18 @@ public class SignatureActivity extends Activity implements SignatureDrawView.Sig
                                 this);
                         File originalSignatureImage = presenter.getOriginalSignatureFile();
                         if (originalSignatureImage.exists()) {
-                            imageLoader.clearImage(originalSignatureImage);
                             //noinspection unchecked
-                            imageLoader.loadFromFile(originalSignatureImage, imageTarget);
+                            imageLoader.loadFromFile(originalSignatureImage,
+                                    new ImageLoaderListener() {
+                                        @Override
+                                        public void onImageReady(Bitmap bitmap) {
+                                            if (bitmap != null) {
+                                                mSignatureDrawView.setBitmap(bitmap);
+                                                mSignatureDrawView.invalidate();
+                                                onViewContentChanged();
+                                            }
+                                        }
+                                    });
                         }
                     }
                 });

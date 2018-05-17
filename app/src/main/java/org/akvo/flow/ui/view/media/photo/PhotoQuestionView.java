@@ -47,8 +47,8 @@ import org.akvo.flow.ui.Navigator;
 import org.akvo.flow.ui.view.QuestionView;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.ImageUtil;
+import org.akvo.flow.util.image.GlideImageLoader;
 import org.akvo.flow.util.image.ImageLoader;
-import org.akvo.flow.util.image.PicassoImageLoader;
 
 import java.io.File;
 
@@ -108,7 +108,7 @@ public class PhotoQuestionView extends QuestionView implements
 
         presenter.setView(this);
 
-        imageLoader = new PicassoImageLoader(getContext());
+        imageLoader = new GlideImageLoader(getContext());
         mMediaButton.setText(R.string.takephoto);
         if (isReadOnly()) {
             mMediaButton.setVisibility(GONE);
@@ -153,10 +153,6 @@ public class PhotoQuestionView extends QuestionView implements
     public void showLoading() {
         mDownloadBtn.setVisibility(GONE);
         mProgressBar.setVisibility(VISIBLE);
-    }
-
-    private void displayImage(String filename, ImageView imageView) {
-        imageLoader.loadFromFile(new File(filename), imageView);
     }
 
     /**
@@ -264,7 +260,7 @@ public class PhotoQuestionView extends QuestionView implements
         if (!new File(filename).exists()) {
             showImageCanBeDownloaded();
         } else {
-            displayImage(filename, mImageView);
+            imageLoader.loadFromFile(new File(filename), mImageView);
         }
     }
 

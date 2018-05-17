@@ -24,15 +24,11 @@ import android.widget.ImageView;
 
 import java.io.File;
 
-public interface ImageLoader<T extends ImageTarget> {
-
-    void loadFromFile(File file, T target);
+public interface ImageLoader {
 
     void loadFromFile(File file, ImageView imageView);
 
-    void loadVideoThumbnail(String filepath, ImageView imageView, ImageLoaderListener listener);
+    void loadFromFile(File file, ImageLoaderListener listener);
 
     void loadFromBase64String(String image, ImageView imageView, ImageLoaderListener listener);
-
-    void clearImage(File imageFile);
 }

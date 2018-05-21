@@ -24,26 +24,32 @@ import org.akvo.flow.domain.executor.PostExecutionThread;
 import org.akvo.flow.domain.executor.ThreadExecutor;
 import org.akvo.flow.domain.repository.FileRepository;
 import org.akvo.flow.domain.repository.SurveyRepository;
+import org.akvo.flow.domain.repository.UserRepository;
 
 import java.util.Map;
 
 import javax.inject.Inject;
 
 import io.reactivex.Observable;
+import io.reactivex.ObservableSource;
 import io.reactivex.functions.BiFunction;
+import io.reactivex.functions.Function;
 
 public class ClearResponses extends UseCase {
 
     private final SurveyRepository surveyRepository;
     private final FileRepository fileRepository;
+    private final UserRepository userRepository;
 
     @Inject
     protected ClearResponses(ThreadExecutor threadExecutor,
             PostExecutionThread postExecutionThread, SurveyRepository surveyRepository,
-            FileRepository fileRepository) {
+            FileRepository fileRepository,
+            UserRepository userRepository) {
         super(threadExecutor, postExecutionThread);
         this.surveyRepository = surveyRepository;
         this.fileRepository = fileRepository;
+        this.userRepository = userRepository;
     }
 
     @Override
@@ -53,6 +59,12 @@ public class ClearResponses extends UseCase {
                     @Override
                     public Boolean apply(Boolean clearedResponses, Boolean clearedResponseFiles) {
                         return clearedResponses && clearedResponseFiles;
+                    }
+                })
+                .flatMap(new Function<Boolean, ObservableSource<Boolean>>() {
+                    @Override
+                    public ObservableSource<Boolean> apply(Boolean aBoolean) {
+                        return userRepository.clearPublishDataTime();
                     }
                 });
     }

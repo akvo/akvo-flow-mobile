@@ -21,12 +21,15 @@
 package org.akvo.flow.domain.interactor;
 
 import org.akvo.flow.domain.repository.FileRepository;
+import org.akvo.flow.domain.repository.UserRepository;
 
 import javax.inject.Inject;
 
 import io.reactivex.Observable;
+import io.reactivex.ObservableSource;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Function;
 import io.reactivex.observers.DisposableObserver;
 
 /**
@@ -36,11 +39,14 @@ import io.reactivex.observers.DisposableObserver;
 public class UnPublishData {
 
     private final FileRepository fileRepository;
+    private final UserRepository userRepository;
     private final CompositeDisposable disposables;
 
     @Inject
-    protected UnPublishData(FileRepository fileRepository) {
+    protected UnPublishData(FileRepository fileRepository,
+            UserRepository userRepository) {
         this.fileRepository = fileRepository;
+        this.userRepository = userRepository;
         this.disposables = new CompositeDisposable();
     }
 
@@ -56,7 +62,13 @@ public class UnPublishData {
     }
 
     private Observable<Boolean> buildUseCaseObservable() {
-        return fileRepository.unPublishData();
+        return fileRepository.unPublishData()
+                .flatMap(new Function<Boolean, ObservableSource<Boolean>>() {
+                    @Override
+                    public ObservableSource<Boolean> apply(Boolean ignored) {
+                        return userRepository.clearPublishDataTime();
+                    }
+                });
     }
 
     private void addDisposable(Disposable disposable) {

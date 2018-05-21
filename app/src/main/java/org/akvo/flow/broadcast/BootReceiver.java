@@ -76,7 +76,7 @@ public class BootReceiver extends BroadcastReceiver {
                     if (timeSincePublished < PublishedTimeHelper.MAX_PUBLISH_TIME_IN_MS) {
                         int timeLeft = publishedTimeHelper
                                 .getRemainingPublishedTime(timeSincePublished);
-                        alarmHelper.scheduleAlarm(timeLeft);
+                        alarmHelper.scheduleAlarm(timeLeft * 60 * 1000);
                     } else {
                         bootReceiverHelper.disableBootReceiver();
                         appContext.startService(new Intent(appContext, UnPublishDataService.class));

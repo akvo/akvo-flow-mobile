@@ -3,6 +3,7 @@
               xmlns:app="http://schemas.android.com/apk/res-auto"
               android:layout_width="match_parent"
               android:layout_height="match_parent"
+              xmlns:tools="http://schemas.android.com/tools"
               android:background="@color/white"
               android:orientation="vertical">
 
@@ -20,7 +21,7 @@
         <android.support.v4.view.ViewPager
                 android:id="@+id/walkthrough_pager"
                 android:layout_width="match_parent"
-                android:layout_weight="12"
+                android:layout_weight="9"
                 android:layout_height="0dp">
         </android.support.v4.view.ViewPager>
 
@@ -30,9 +31,32 @@
                 android:layout_height="0dp"
                 android:layout_gravity="top|center_horizontal"
                 android:gravity="center"
-                android:layout_weight="2"
+                android:layout_weight="5"
                 app:indicatorNumber="2"
                 app:indicatorActive="@drawable/indicator_active"
                 app:indicatorInactive="@drawable/indicator_inactive"/>
+    <Button
+            android:text="@string/walthrough_next_button"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:layout_marginBottom="16dp"
+            android:textColor="@color/colorAccent"
+            android:layout_gravity="top|center_horizontal"
+            style="@style/Widget.AppCompat.Button.Borderless"
+            android:id="@+id/button_next"/>
+    <Button
+            android:text="@string/okbutton"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:textColor="@color/white"
+            android:background="@drawable/walkthrough_button_background"
+            android:layout_gravity="top|center_horizontal"
+            android:layout_marginBottom="16dp"
+            android:visibility="gone"
+            android:id="@+id/button_ok"/>
 
 </LinearLayout>

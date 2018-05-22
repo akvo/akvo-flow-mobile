@@ -27,6 +27,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.view.View;
+import android.widget.Button;
 
 import org.akvo.flow.R;
 import org.akvo.flow.injector.component.DaggerViewComponent;
@@ -38,15 +39,24 @@ import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
+import butterknife.OnPageChange;
 
-public class WalkThroughActivity extends BaseActivity implements
-        WalkThrough1Fragment.NextListener, WalkThrough2Fragment.OkListener, WalkthroughView {
+import static butterknife.OnPageChange.Callback.PAGE_SELECTED;
+
+public class WalkThroughActivity extends BaseActivity implements WalkthroughView {
 
     @BindView(R.id.walkthrough_pager)
     ViewPager viewPager;
 
     @BindView(R.id.walkthrough_indicator)
     DotIndicator indicator;
+
+    @BindView(R.id.button_next)
+    Button nextBt;
+
+    @BindView(R.id.button_ok)
+    Button okBt;
 
     @Inject
     WalkthroughPresenter presenter;
@@ -96,14 +106,25 @@ public class WalkThroughActivity extends BaseActivity implements
         }
     }
 
-    @Override
-    public void onNextClicked() {
+    @OnClick(R.id.button_next)
+    void onNextClicked() {
         viewPager.setCurrentItem(1, true);
     }
 
-    @Override
-    public void onOkClicked() {
+    @OnClick(R.id.button_ok)
+    void onOkClicked() {
         presenter.onOkClicked();
+    }
+
+    @OnPageChange(value = R.id.walkthrough_pager, callback = PAGE_SELECTED)
+    void onPageChanged(int page) {
+        if (page == 0) {
+            nextBt.setVisibility(View.VISIBLE);
+            okBt.setVisibility(View.GONE);
+        } else if (page == 1) {
+            nextBt.setVisibility(View.GONE);
+            okBt.setVisibility(View.VISIBLE);
+        }
     }
 
     @Override

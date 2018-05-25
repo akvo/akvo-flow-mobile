@@ -1,11 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <style name="Flow.PopupMenuListView" parent="@style/Widget.AppCompat.ListView.DropDown">
-        <item name="android:divider">@color/black_transparent</item>
-        <item name="android:dividerHeight">1dp</item>
-    </style>
-
     <style name="Flow.ListView" parent="@style/Widget.AppCompat.ListView">
         <item name="android:cacheColorHint">@android:color/transparent</item>
         <item name="android:divider">@color/white</item>

@@ -28,8 +28,8 @@ import android.widget.ImageView;
 import org.akvo.flow.R;
 import org.akvo.flow.activity.BackActivity;
 import org.akvo.flow.util.ConstantUtil;
+import org.akvo.flow.util.image.GlideImageLoader;
 import org.akvo.flow.util.image.ImageLoader;
-import org.akvo.flow.util.image.PicassoImageLoader;
 
 import java.io.File;
 
@@ -71,7 +71,7 @@ public class FullImageActivity extends BackActivity {
     private void loadImage() {
         Intent intent = getIntent();
         String imageFileName = intent.getStringExtra(ConstantUtil.IMAGE_URL_EXTRA);
-        ImageLoader imageLoader = new PicassoImageLoader(this);
+        ImageLoader imageLoader = new GlideImageLoader(this);
         imageLoader.loadFromFile(new File(imageFileName), imageView);
     }
 }

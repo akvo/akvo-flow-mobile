@@ -46,7 +46,7 @@ import org.akvo.flow.domain.FileTransmission;
 import org.akvo.flow.domain.QuestionResponse;
 import org.akvo.flow.domain.Survey;
 import org.akvo.flow.domain.SurveyGroup;
-import org.akvo.flow.domain.User;
+import org.akvo.flow.domain.entity.User;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.PlatformUtil;
 
@@ -216,7 +216,6 @@ public class SurveyDbDataSource {
      * already exists in the database.
      *
      * @param newResponse new QuestionResponseData to insert
-     * @return
      */
     public QuestionResponse createOrUpdateSurveyResponse(@NonNull QuestionResponse newResponse) {
         QuestionResponse responseToSave = getResponseToSave(newResponse);
@@ -256,8 +255,6 @@ public class SurveyDbDataSource {
      * db or with a lower version number). If a survey is present but marked as
      * deleted, it will not be listed as out of date (and thus won't be updated)
      *
-     * @param surveys
-     * @return
      */
     public List<Survey> fetchOutDatedSurveys(List<Survey> surveys) {
         List<Survey> outOfDateSurveys = new ArrayList<>();
@@ -279,8 +276,6 @@ public class SurveyDbDataSource {
     /**
      * updates a survey in the db and resets the deleted flag to "N"
      *
-     * @param survey
-     * @return
      */
     public void saveSurvey(Survey survey) {
 
@@ -386,7 +381,7 @@ public class SurveyDbDataSource {
         briteSurveyDbAdapter.addSurveyGroup(values);
     }
 
-    // Attempt to fetch the registration form. If the form ID is explicitely set on the SurveyGroup,
+    // Attempt to fetch the registration form. If the form ID is explicitly set on the SurveyGroup,
     // we simply query by ID. Otherwise, assume is a non-monitored form, and query the first form
     // we find.
     public Survey getRegistrationForm(SurveyGroup sg) {
@@ -567,6 +562,10 @@ public class SurveyDbDataSource {
         surveyDbAdapter.createTransmission(values);
     }
 
+    public void createTransmission(long surveyInstanceId, String formId, String filename) {
+        createTransmission(surveyInstanceId, formId, filename, TransmissionStatus.QUEUED);
+    }
+
     public void setFileTransmissionFailed(String filename) {
         int rows = updateTransmissionHistory(filename, TransmissionStatus.FAILED);
         if (rows == 0) {
@@ -588,10 +587,6 @@ public class SurveyDbDataSource {
 
     public void deleteResponse(long mSurveyInstanceId, String questionId, String iteration) {
         surveyDbAdapter.deleteResponse(mSurveyInstanceId, questionId, iteration);
-    }
-
-    public void createTransmission(long id, String formId, String filename) {
-        surveyDbAdapter.createTransmission(id, formId, filename);
     }
 
     public Cursor getResponsesData(long surveyInstanceId) {
@@ -616,10 +611,6 @@ public class SurveyDbDataSource {
 
     public void clearCollectedData() {
         surveyDbAdapter.clearCollectedData();
-    }
-
-    public void clearAllData() {
-        surveyDbAdapter.clearAllData();
     }
 
     public long createOrUpdateUser(Long id, String username) {

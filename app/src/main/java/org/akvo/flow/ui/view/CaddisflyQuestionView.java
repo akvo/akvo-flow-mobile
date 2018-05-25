@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2016-2017 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2016-2018 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -32,20 +32,27 @@ import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionResponse;
 import org.akvo.flow.event.QuestionInteractionEvent;
 import org.akvo.flow.event.SurveyListener;
+import org.akvo.flow.injector.component.DaggerViewComponent;
+import org.akvo.flow.injector.component.ViewComponent;
 import org.akvo.flow.ui.adapter.CaddisflyResultsAdapter;
 import org.akvo.flow.ui.model.caddisfly.CaddisflyJsonMapper;
 import org.akvo.flow.ui.model.caddisfly.CaddisflyTestResult;
 import org.akvo.flow.util.ConstantUtil;
-import org.akvo.flow.util.FileUtil;
+import org.akvo.flow.util.MediaFileHelper;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import javax.inject.Inject;
+
 import timber.log.Timber;
 
 public class CaddisflyQuestionView extends QuestionView implements View.OnClickListener {
+
+    @Inject
+    MediaFileHelper mediaFileHelper;
 
     private String mValue;
     private String mImage;
@@ -60,6 +67,9 @@ public class CaddisflyQuestionView extends QuestionView implements View.OnClickL
 
     private void init() {
         setQuestionView(R.layout.caddisfly_question_view);
+
+        initialiseInjector();
+
         RecyclerView resultsRv = (RecyclerView) findViewById(R.id.caddisfly_results_recycler_view);
         resultsRv.setLayoutManager(new LinearLayoutManager(resultsRv.getContext()));
         caddisflyResultsAdapter = new CaddisflyResultsAdapter(
@@ -72,6 +82,13 @@ public class CaddisflyQuestionView extends QuestionView implements View.OnClickL
             mButton.setOnClickListener(this);
         }
         displayResponseView();
+    }
+
+    private void initialiseInjector() {
+        ViewComponent viewComponent =
+                DaggerViewComponent.builder().applicationComponent(getApplicationComponent())
+                        .build();
+        viewComponent.inject(this);
     }
 
     private void displayResponseView() {
@@ -120,7 +137,7 @@ public class CaddisflyQuestionView extends QuestionView implements View.OnClickL
             File src = !TextUtils.isEmpty(image) ? new File(image) : null;
             if (src != null && src.exists()) {
                 // Move the image into the FLOW directory
-                File dst = new File(FileUtil.getFilesDir(FileUtil.FileType.MEDIA), src.getName());
+                File dst = mediaFileHelper.getMediaFile(src.getName());
 
                 if (!src.renameTo(dst)) {
                     Timber.e("Could not move file %s to %s", src.getAbsoluteFile(),

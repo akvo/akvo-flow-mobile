@@ -29,6 +29,7 @@ import android.os.Bundle;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 
@@ -51,6 +52,7 @@ import org.akvo.flow.presentation.help.HelpActivity;
 import org.akvo.flow.presentation.legal.LegalNoticesActivity;
 import org.akvo.flow.presentation.settings.PreferenceActivity;
 import org.akvo.flow.presentation.signature.SignatureActivity;
+import org.akvo.flow.presentation.walkthrough.WalkThroughActivity;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.StringUtil;
 
@@ -120,9 +122,8 @@ public class Navigator {
         }
     }
 
-    public void navigateToTakeVideo(@NonNull Activity activity, Uri uri) {
+    public void navigateToTakeVideo(@NonNull Activity activity) {
         Intent i = new Intent(android.provider.MediaStore.ACTION_VIDEO_CAPTURE);
-        i.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, uri);
         activity.startActivityForResult(i, ConstantUtil.VIDEO_ACTIVITY_REQUEST);
     }
 
@@ -308,7 +309,10 @@ public class Navigator {
 
     public void navigateToVideoView(Context context, String filename) {
         Intent intent = new Intent(Intent.ACTION_VIEW);
-        intent.setDataAndType(Uri.fromFile(new File(filename)), "video/mp4");
+        Uri fileUri = FileProvider
+                .getUriForFile(context, "org.akvo.flow.fileprovider", new File(filename));
+        intent.setDataAndType(fileUri, "video/mp4");
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         context.startActivity(intent);
     }
 
@@ -330,6 +334,11 @@ public class Navigator {
         intent.setDataAndType(Uri.fromFile(new File(filename)),
                 "application/vnd.android.package-archive");
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        context.startActivity(intent);
+    }
+
+    public void navigateToWalkThrough(Context context) {
+        Intent intent = new Intent(context, WalkThroughActivity.class);
         context.startActivity(intent);
     }
 }

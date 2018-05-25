@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -30,6 +30,7 @@ import com.squareup.sqlbrite2.BriteDatabase;
 import org.akvo.flow.data.entity.ApiDataPoint;
 import org.akvo.flow.data.entity.ApiQuestionAnswer;
 import org.akvo.flow.data.entity.ApiSurveyInstance;
+import org.akvo.flow.data.entity.MovedFile;
 import org.akvo.flow.database.Constants;
 import org.akvo.flow.database.RecordColumns;
 import org.akvo.flow.database.ResponseColumns;
@@ -71,14 +72,6 @@ public class DatabaseDataSource {
         } else {
             return briteSurveyDbAdapter.getDataPoints(surveyGroupId);
         }
-
-    }
-
-    private boolean isRequestFiltered(@Nullable Integer orderBy) {
-        return orderBy != null && (orderBy == Constants.ORDER_BY_DISTANCE ||
-                orderBy ==  Constants.ORDER_BY_DATE ||
-                orderBy ==  Constants.ORDER_BY_STATUS ||
-                orderBy ==  Constants.ORDER_BY_NAME);
     }
 
     public Cursor getSyncedTime(long surveyGroupId) {
@@ -111,13 +104,35 @@ public class DatabaseDataSource {
         }
     }
 
+
+    public void updateTransmissions(@NonNull List<MovedFile> movedFiles) {
+        BriteDatabase.Transaction transaction = briteSurveyDbAdapter.beginTransaction();
+        try {
+            for (MovedFile file: movedFiles) {
+                briteSurveyDbAdapter.updateTransmission(file.getOldPath(), file.getNewPath());
+            }
+            transaction.markSuccessful();
+        } finally {
+            transaction.end();
+        }
+    }
+
+    private boolean isRequestFiltered(@Nullable Integer orderBy) {
+        return orderBy != null && (orderBy == Constants.ORDER_BY_DISTANCE ||
+                orderBy == Constants.ORDER_BY_DATE ||
+                orderBy == Constants.ORDER_BY_STATUS ||
+                orderBy == Constants.ORDER_BY_NAME);
+    }
+
     /**
      * JSON array responses are ordered to have the latest updated datapoint last so
      * we record it to make the next query using it
-     * @param apiDataPoints
+     *
      */
     private void updateLastUpdatedDateTime(@NonNull List<ApiDataPoint> apiDataPoints) {
-        ApiDataPoint apiDataPoint = apiDataPoints.isEmpty()? null : apiDataPoints.get(apiDataPoints.size() - 1);
+        ApiDataPoint apiDataPoint = apiDataPoints.isEmpty() ?
+                null :
+                apiDataPoints.get(apiDataPoints.size() - 1);
         if (apiDataPoint != null) {
             String syncTime = String.valueOf(apiDataPoint.getLastModified());
             setSyncTime(apiDataPoint.getSurveyGroupId(), syncTime);
@@ -195,6 +210,10 @@ public class DatabaseDataSource {
         return briteSurveyDbAdapter.getUsers();
     }
 
+    public Observable<Cursor> getUser(Long userId) {
+        return Observable.just(briteSurveyDbAdapter.getUser(userId));
+    }
+
     public Observable<Boolean> editUser(User user) {
         briteSurveyDbAdapter.updateUser(user.getId(), user.getName());
         return Observable.just(true);
@@ -207,5 +226,24 @@ public class DatabaseDataSource {
 
     public Observable<Long> createUser(String userName) {
         return Observable.just(briteSurveyDbAdapter.createUser(userName));
+    }
+
+    public Observable<Boolean> clearCollectedData() {
+        briteSurveyDbAdapter.clearCollectedData();
+        return Observable.just(true);
+    }
+
+    public Observable<Boolean> clearAllData() {
+        briteSurveyDbAdapter.clearAllData();
+        return Observable.just(true);
+    }
+
+    public boolean unSyncedTransmissionsExist() {
+        return briteSurveyDbAdapter.unSyncedTransmissionsExist();
+    }
+
+    public Observable<Cursor> getAllTransmissionFileNames() {
+        return Observable
+                .just(briteSurveyDbAdapter.getAllTransmissionFileNames());
     }
 }

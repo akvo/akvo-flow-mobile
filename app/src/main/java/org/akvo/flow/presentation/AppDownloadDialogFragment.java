@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -23,6 +23,7 @@ package org.akvo.flow.presentation;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.v4.app.DialogFragment;
@@ -94,6 +95,7 @@ public class AppDownloadDialogFragment extends DialogFragment {
     }
 
 
+    @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         return new AlertDialog.Builder(getActivity())
@@ -102,13 +104,7 @@ public class AppDownloadDialogFragment extends DialogFragment {
                 .setPositiveButton(R.string.install,
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
-                                if (messageId == R.string.no_gps_status_message
-                                        && android.os.Build.VERSION.SDK_INT
-                                        < android.os.Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
-                                    navigator.downloadGpsStatusViaBrowser(getActivity());
-                                } else {
-                                    navigator.navigateToPlayStore(getActivity(), downloadUrl);
-                                }
+                                navigator.navigateToPlayStore(getActivity(), downloadUrl);
                             }
                         })
                 .setNegativeButton(R.string.cancelbutton,

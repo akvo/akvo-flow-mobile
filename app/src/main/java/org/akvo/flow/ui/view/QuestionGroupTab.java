@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2014-2017 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2014-2018 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -21,7 +21,6 @@ package org.akvo.flow.ui.view;
 
 import android.animation.LayoutTransition;
 import android.content.Context;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
@@ -39,8 +38,8 @@ import org.akvo.flow.event.QuestionInteractionListener;
 import org.akvo.flow.event.SurveyListener;
 import org.akvo.flow.ui.view.barcode.BarcodeQuestionViewFactory;
 import org.akvo.flow.ui.view.geolocation.GeoQuestionView;
-import org.akvo.flow.ui.view.media.PhotoQuestionView;
-import org.akvo.flow.ui.view.media.VideoQuestionView;
+import org.akvo.flow.ui.view.media.photo.PhotoQuestionView;
+import org.akvo.flow.ui.view.media.video.VideoQuestionView;
 import org.akvo.flow.ui.view.option.OptionQuestionFactory;
 import org.akvo.flow.ui.view.signature.SignatureQuestionView;
 import org.akvo.flow.util.ConstantUtil;
@@ -101,9 +100,7 @@ public class QuestionGroupTab extends LinearLayout implements QuestionGroupItera
         mRepetitionsText = (TextView) findViewById(R.id.repeat_header);
 
         // Animate view additions/removals if possible
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-            mContainer.setLayoutTransition(new LayoutTransition());
-        }
+        mContainer.setLayoutTransition(new LayoutTransition());
 
         View next = findViewById(R.id.next_btn);
         next.setOnClickListener(new OnClickListener() {

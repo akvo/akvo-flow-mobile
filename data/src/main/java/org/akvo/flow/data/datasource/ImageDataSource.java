@@ -26,17 +26,16 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.graphics.RectF;
-import android.support.media.ExifInterface;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.media.ExifInterface;
 import android.text.TextUtils;
 
 import org.akvo.flow.data.util.ImageSize;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
-import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -66,10 +65,12 @@ public class ImageDataSource {
     private static final int BUFFER_SIZE = 2048;
 
     private final Context context;
+    private final FileHelper fileHelper;
 
     @Inject
-    public ImageDataSource(Context context) {
+    public ImageDataSource(Context context, FileHelper fileHelper) {
         this.context = context;
+        this.fileHelper = fileHelper;
     }
 
     public Observable<Boolean> saveImages(Bitmap bitmap, String originalFilePath,
@@ -121,7 +122,7 @@ public class ImageDataSource {
         } catch (FileNotFoundException e) {
             Timber.e(e);
         } finally {
-            close(out);
+            fileHelper.close(out);
         }
         return Observable.error(new Exception("Error saving bitmap"));
     }
@@ -376,19 +377,9 @@ public class ImageDataSource {
         } catch (NoSuchAlgorithmException | IOException e) {
             Timber.e(e.getMessage());
         } finally {
-            close(in);
+            fileHelper.close(in);
         }
 
         return null;
-    }
-
-    private void close(Closeable closeable) {
-        if (closeable != null) {
-            try {
-                closeable.close();
-            } catch (Exception ignored) {
-                //Ignored
-            }
-        }
     }
 }

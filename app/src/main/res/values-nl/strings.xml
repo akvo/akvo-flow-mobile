@@ -16,7 +16,6 @@
   <string name="geodialog">Schakel s.v.p. locatie instellingen in</string>
   <string name="settings">Instellingen</string>
   <string name="aboutlabel">Over deze app</string>
-  <string name="nogpsstatus">GPS Status is niet geinstalleerd op dit apparaat. Installeer het s.v.p. via de Google Play Store.</string>
   <string name="otherinstructions">Voeg s.v.p. een beschrijving toe</string>
   <string name="texthelpoption">Bekijk help tekst</string>
   <string name="videohelpoption">Bekijk help video</string>
@@ -33,8 +32,6 @@
   <string name="reloadsurveysdesc"> Verwijdert en herlaadt alle toegewezen surveys (voer alleen uit als u daartoe instructies ontvangt).</string>
   <string name="conftitle">Bevestig s.v.p.</string>
   <string name="reloadconftext">Weet u zeker dat u alle vragenlijsten wil verwijderen en opnieuw downloaden?</string>
-  <string name="submitcompletetitle">Vragenlijst ingediend</string>
-  <string name="submitcompletetext">Antwoorden op de vragenlijsten zullen naar de server gezonden worden.</string>
   <string name="langoption">Talen</string>
   <string name="langmandatorytitle">Ongeldige selectie</string>
   <string name="langmandatorytext">U dient ten minste een taal te selecteren</string>
@@ -47,7 +44,6 @@
   <string name="unsentdatawarning">Sommige antwoorden zijn niet ingediend. Zorg ervoor dat u deze exporteert voordat u ze verwijderd. Deze bewerking is onomkeerbaar. Klik OK om verder te gaan of cancel om af te breken.</string>
   <string name="deleteonewarning">Hierdoor worden alle vragenlijst-antwoorden definitief verwijderd. Klik OK om verder te gaan of cancel om af te breken.</string>
   <string name="nextbutton">Volgende</string>
-  <string name="submittext">Als je klaar bent met het formulier, druk op indienen om de data te verzenden. Nadat u op indienen gedrukt hebt, kunt u de data alleen nog inzien, maar niet meer wijzigen.</string>
   <string name="cleartitle">Verwijder antwoorden in vragenlijst</string>
   <string name="cleardesc">Weet u zeker dat u uw antwoorden wil wissen?</string>
   <string name="authtitle">Authorisatie vereist</string>
@@ -97,7 +93,6 @@
   <!--Search-->
   <string name="search_hint">Zoek datapunt</string>
   <!--Project List (Survey Group) Activity-->
-  <string name="delete_project_text">Hierdoor wordt deze vragenlijst definitief verwijderd. Klik OK om verder te gaan of cancel om af te breken. </string>
   <!--Survey Activity-->
   <string name="error_responses">Sommige antwoorden bevatten fouten. U moet de volgende vragen herzien voor u kan indienen:</string>
   <string name="error_question_mandatory">Dit antwoord is verplicht</string>
@@ -154,7 +149,6 @@
   <string name="status_failed">Mislukt</string>
   <string name="status_saved">Opgeslagen</string>
   <string name="status_submitted">Ingediend</string>
-  <string name="status_exported">Geexporteerd</string>
   <!--APK update-->
   <string name="update">Update</string>
   <string name="not_now">Niet nu</string>
@@ -184,13 +178,9 @@
   <string name="add_point_title">Voeg punt toe</string>
   <string name="add_point_text">Wilt u een nieuw punt toevoegen op deze locatie?</string>
   <!--Navigation Drawer-->
-  <string name="select_user">Selecteer gebruiker</string>
   <string name="add_user">Voeg gebruiker toe</string>
   <string name="new_user">+ Gebruiker</string>
-  <string name="edit_user">Wijzig gebruiker</string>
   <string name="delete_user">Verwider gebruiker</string>
-  <string name="empty_user_warning">Gebruikersnaam mag niet leeg zijn</string>
-  <string name="delete_user_confirmation">Weet u zeker dat u deze gebruiker wil verwijderen?</string>
   <string name="username">Gebruikersnaam</string>
   <string name="mustselectuser">Selecteer s.v.p. een gebruiker voordat u verder gaat</string>
   <string name="surveys">Vragenlijsten</string>

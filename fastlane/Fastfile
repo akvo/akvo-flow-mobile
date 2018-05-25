@@ -15,24 +15,38 @@
 
 default_platform(:android)
 
+actions_path 'actions'
+
 platform :android do
+
   desc "Runs all the tests"
   lane :test do
-    gradle(task: "test")
+    gradle(task: "check")
   end
 
   desc "Submit a new Beta Build to Crashlytics Beta"
   lane :beta do
-    gradle(task: "clean assembleRelease")
-    crashlytics
-  
-    # sh "your_script.sh"
-    # You can also use other beta testing services here
+    gradle(task: "clean assembleFlowRelease")
+    crashlytics(
+           groups: "testers",
+           notifications: true,
+           notes: "Fixed some issues",
+         )
+    slack(
+            message: "Successfully distributed a new beta build: #{lane_context[SharedValues::ANDROID_VERSION_CODE]}"
+         )
   end
 
   desc "Deploy a new version to the Google Play"
   lane :deploy do
     gradle(task: "clean assembleRelease")
     upload_to_play_store
+  end
+
+  error do |lane, exception|
+          slack(
+            message: exception.message,
+            success: false
+          )
   end
 end

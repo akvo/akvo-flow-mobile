@@ -19,7 +19,6 @@ Sem espaço para armazenamento
   <string name="settings">Configurações</string>
   <string name="preferences_general_section">Parâmetros gerais</string>
   <string name="aboutlabel">Sobre</string>
-  <string name="nogpsstatus">O aplicativo estado do GPS não está instalado neste dispositivo. Por favor, instale-o usando o Google Play Store.</string>
   <string name="otherinstructions">Por favor, insira uma descrição</string>
   <string name="texthelpoption">Visualizar texto de ajuda</string>
   <string name="videohelpoption">Visualizar vídeo de ajuda</string>
@@ -36,8 +35,6 @@ Sem espaço para armazenamento
   <string name="reloadsurveysdesc">Apagar e descarrega novamente inquéritos emparelhados (execute apenas se instruído)</string>
   <string name="conftitle">Por favor, confirme</string>
   <string name="reloadconftext">Tem certeza de que deseja limpar e descarregar novamente os inquéritos?</string>
-  <string name="submitcompletetitle">Inquérito submetido</string>
-  <string name="submitcompletetext">As respostas do inquérito serão enviadas para o servidor.</string>
   <string name="langoption">Idiomas</string>
   <string name="langmandatorytitle">Selecção inválida</string>
   <string name="langmandatorytext">Deve seleccionar pelo menos um idioma</string>
@@ -50,7 +47,6 @@ Sem espaço para armazenamento
   <string name="unsentdatawarning">Algumas respostas não foram submetidas. Certifique-se de exportá-las antes da eliminação. Esta operação não é reversível. Clique em OK para prosseguir ou Cancelar para interromper.</string>
   <string name="deleteonewarning">Isto excluirá permanentemente esta resposta do inquérito. Clique em OK para prosseguir ou Cancelar para interromper.</string>
   <string name="nextbutton">Próximo</string>
-  <string name="submittext">Se tiver terminado o preenchimento do inquérito, clique em Submeter para enviar os dados. Depois de submeter os dados, você poderá os rever, mas não poderá editá-los.</string>
   <string name="cleartitle">Limpar respostas do inquérito</string>
   <string name="cleardesc">Tem certeza de que deseja limpar as suas respostas?</string>
   <string name="authtitle">Requer autorização</string>
@@ -100,13 +96,14 @@ Sem espaço para armazenamento
   <!--Search-->
   <string name="search_hint">Pesquisar Ponto de dados</string>
   <!--Project List (Survey Group) Activity-->
-  <string name="delete_project_text">Isto apagará permanentemente este inquérito. Clique em OK para prosseguir ou Cancelar para interromper.</string>
+  <string name="delete_survey_dialog_message">Excluír %1$s?</string>
   <!--Survey Activity-->
   <string name="error_responses">Algumas respostas contêm erros. Você deve avaliar as seguintes perguntas antes de submeter:</string>
   <string name="error_question_mandatory">Esta resposta é necessária</string>
   <string name="repeat_answer">Por favor, repita a resposta</string>
   <string name="error_answer_match">As respostas não são coerentes</string>
   <string name="error_img_preview">Não é possível carregar pré-visualização da imagem</string>
+  <string name="error_video_preview">Não é possível carregar pré-visualização do vídeo</string>
   <string name="use_external_source">Usar uma fonte externa</string>
   <string name="caddisfly_test">Vá ao testa</string>
   <string name="error_empty_form">Formulários não preenchidos não podem ser submetidos. Por favor, primeiro insira as devidas respostas.</string>
@@ -158,7 +155,6 @@ Sem espaço para armazenamento
   <string name="status_failed">Falhou</string>
   <string name="status_saved">Gravado</string>
   <string name="status_submitted">Submetido</string>
-  <string name="status_exported">Exportado</string>
   <!--APK update-->
   <string name="app_update_activity">Actualização do Akvo Flow</string>
   <string name="update">Actualizar</string>
@@ -189,19 +185,18 @@ Sem espaço para armazenamento
   <string name="add_point_title">Adicionar ponto</string>
   <string name="add_point_text">Deseja adicionar um novo ponto neste local?</string>
   <!--Navigation Drawer-->
-  <string name="select_user">Seleccionar Usuário</string>
   <string name="add_user">Adicionar Usuário</string>
   <string name="new_user">+Usuário</string>
-  <string name="edit_user">Editar usuário</string>
+  <string name="edit_user">Editar nome de usuário</string>
   <string name="delete_user">Apagar usuário</string>
-  <string name="empty_user_warning">O nome de usuário não pode estar vazio</string>
-  <string name="delete_user_confirmation">Tem certeza de que deseja apagar este usuário?</string>
+  <string name="delete_user_confirmation">Excluír usuário</string>
   <string name="username">Nome de Usuário</string>
   <string name="mustselectuser">Por favor, seleccione um usuário antes de continuar</string>
   <string name="surveys">Inquéritos</string>
   <string name="logged_in_as">Sessão iniciada como</string>
   <!--Misc-->
   <string name="okbutton">OK</string>
+  <string name="delete_button">Excluír</string>
   <string name="cancelbutton">Cancelar</string>
   <string name="savebutton">Gravar</string>
   <string name="clearbutton">Limpar</string>
@@ -267,6 +262,15 @@ Sem espaço para armazenamento
     <item quantity="one">%1$d punto de dados sincronizado</item>
     <item quantity="other">%1$d puntos de dados sincronizados</item>
   </plurals>
+  <string name="surveys_error">Erro ao carregar pesquisas</string>
+  <string name="users_error">Erro ao carregar usuários</string>
+  <string name="survey_delete_error">Erro ao excluir a pesquisa</string>
+  <string name="survey_select_error">Erro ao selecionar pesquisa</string>
+  <string name="user_edit_error">Erro ao editar usuário</string>
+  <string name="user_delete_error">Erro ao excluir usuário</string>
+  <string name="user_select_error">Erro ao selecionar usuário</string>
+  <string name="add_user_message">O novo usuário será selecionado automaticamente</string>
+  <string name="survey">pesquisa</string>
   <string name="no_gps_status_message">O aplicativo estado do GPS não está instalado neste dispositivo. Deseja instalar-o agora?</string>
   <string name="data_points_sync_no_data_points">Não ha pontos de dados para sincronizar</string>
   <string name="app_update_dialog_title">Uma nova versão do aplicativo esá disponível</string>
@@ -274,4 +278,20 @@ Sem espaço para armazenamento
   <string name="error_getting_media">Erro ao obter mídia, tente novamente.</string>
   <string name="geo_fields_update_title">Atualizar coordenadas GPS?</string>
   <string name="cascade_error_message">Não é possível carregar o recurso da cascata: %1$s</string>
+  <string name="preference_publish_data_title">Publicar dados</string>
+  <string name="preference_publish_data_subtitle">Disponibilizar dados na pasta pública para upload em massa</string>
+  <string name="preference_publish_data_subtitle_publishing">Disponibilizando dados na pasta pública para upload em massa</string>
+  <string name="preference_publish_data_subtitle_published">Os dados vão estar disponíveis para upload em massa durante</string>
+  <string name="preference_publish_data_time_left">%1$d mins</string>
+  <string name="preference_publish_data_error_no_data">Nenhum dado disponível para upload em massa.</string>
+  <string name="preference_publish_data_error_generic">Erro ao publicar dados, tente novamente.</string>
+  <string name="preference_publish_data_error_no_space">Erro ao publicar dados. Sem espaço de armazenamento. Por favor, apague os arquivos desnecessários e tente novamente.</string>
+  <string name="pass_code">Senha</string>
+  <string name="secure_data_walkthrough_title">Armazenamento de dados</string>
+  <string name="walthrough_next_button">Próximo</string>
+  <string name="secure_collected_walkthrough_page1_subtitle">Os dados coletados com o aplicativo Flow agora são armazenados de maneira privada no dispositivo</string>
+  <string name="secure_collected_walkthrough_page2_subtitle">Use a opção Publicar dados em Configurações para disponibilizar dados coletados off-line para upload em massa</string>
+  <string name="submit_tab_description">Você pode visualizar, mas não editar respostas enviadas</string>
+  <string name="snackbar_submitted">Enviado</string>
+  <string name="form_id_hint">ID do formulário</string>
 </resources>

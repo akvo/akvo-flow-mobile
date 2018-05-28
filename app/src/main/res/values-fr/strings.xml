@@ -17,7 +17,6 @@
   <string name="settings">Paramètres</string>
   <string name="preferences_general_section">Paramètres généraux</string>
   <string name="aboutlabel">A propos</string>
-  <string name="nogpsstatus">GPS Status n\'est pas installée sur cet appareil. Veuillez l\'installer en utilisant Google Play Store.</string>
   <string name="otherinstructions">Veuillez entrer une description</string>
   <string name="texthelpoption">Voir le texte d\'aide</string>
   <string name="videohelpoption">Voir la vidéo d\'aide</string>
@@ -34,8 +33,6 @@
   <string name="reloadsurveysdesc">Effacer et recharger toutes les enquêtes affectées (à effectuer seulement si demandé)</string>
   <string name="conftitle">Veuillez confirmer</string>
   <string name="reloadconftext">Etes-vous sûr de vouloir effacer et recharger toutes les enquêtes?</string>
-  <string name="submitcompletetitle">Enquête envoyée</string>
-  <string name="submitcompletetext">Les données de l\'enquêtes vont être envoyées au serveur.</string>
   <string name="langoption">Langues</string>
   <string name="langmandatorytitle">Sélection non valide</string>
   <string name="langmandatorytext">Vous devez sélectionner au moins une langue</string>
@@ -48,7 +45,6 @@
   <string name="unsentdatawarning">Certaines données n\'ont pas été envoyées. Soyez sûr de les exporter avant de les effacer. Cette opération est irréversible. </string>
   <string name="deleteonewarning">Vous allez effacer définitivement les données. </string>
   <string name="nextbutton">Suivant</string>
-  <string name="submittext">Si vous avez terminé avec le formulaire, appuyez sur \'envoyer les données\'. Une fois que vous pressez envoyer, vous pouvez revoir les données mais vous ne pourrez plus les éditer.</string>
   <string name="cleartitle">Effacer les réponses de l\'enquête</string>
   <string name="cleardesc">Etes-vous sûr de vouloir effacer les réponses?</string>
   <string name="authtitle">Autorisation nécessaire</string>
@@ -98,13 +94,14 @@
   <!--Search-->
   <string name="search_hint">Chercher un enregistrement</string>
   <!--Project List (Survey Group) Activity-->
-  <string name="delete_project_text">Cela supprimera l\'enquête de manière permanente. Cliquez OK pour continuer ou annuler pour abandonner.</string>
+  <string name="delete_survey_dialog_message">Supprimer %1$s</string>
   <!--Survey Activity-->
   <string name="error_responses">Certaines réponses contiennent des erreurs. Vous devez vérifier les questions suivantes avant de pouvoir les envoyer:</string>
   <string name="error_question_mandatory">Cette réponse est obligatoire</string>
   <string name="repeat_answer">Veuillez répéter la réponse</string>
   <string name="error_answer_match">Les réponses ne correspondent pas</string>
   <string name="error_img_preview">Impossible de charger l\'image</string>
+  <string name="error_video_preview">Impossible de charger l\'aperçu vidéo</string>
   <string name="use_external_source">Utiliser source externe</string>
   <string name="caddisfly_test">Tester</string>
   <string name="error_empty_form">Les formulaires vides ne peuvent être envoyés. Veuillez répondre aux questions.</string>
@@ -155,7 +152,6 @@
   <string name="status_failed">Échec</string>
   <string name="status_saved">Enregistré</string>
   <string name="status_submitted">Envoyé</string>
-  <string name="status_exported">Exporté</string>
   <!--APK update-->
   <string name="app_update_activity">Mise à jour de Akvo Flow</string>
   <string name="update">Mise à jour</string>
@@ -186,19 +182,18 @@
   <string name="add_point_title">Créer un point</string>
   <string name="add_point_text">Voulez vous ajouter un point a cet endroit?</string>
   <!--Navigation Drawer-->
-  <string name="select_user">Choisir un utilisateur</string>
   <string name="add_user">Ajouter un utilisateur</string>
   <string name="new_user">+ Nom d’enquêteur’</string>
-  <string name="edit_user">Sélectionner un utilisateur</string>
+  <string name="edit_user">Modifier le nom d\'utilisateur</string>
   <string name="delete_user">Supprimer un utilisateur</string>
-  <string name="empty_user_warning">Le nom d\'utilisateur est obligatoire</string>
-  <string name="delete_user_confirmation">Voulez-vous supprimer cet utilisateur?</string>
+  <string name="delete_user_confirmation">Supprimer l\'utilisateur</string>
   <string name="username">Nom d\'utilisateur</string>
   <string name="mustselectuser">Veuillez sélectionner un utilisateur pour continuer</string>
   <string name="surveys">Enquêtes</string>
   <string name="logged_in_as">Connecté en tant que</string>
   <!--Misc-->
   <string name="okbutton">OK</string>
+  <string name="delete_button">Supprimer</string>
   <string name="cancelbutton">Annuler</string>
   <string name="savebutton">Enregistrer</string>
   <string name="clearbutton">Effacer</string>
@@ -264,6 +259,15 @@
     <item quantity="one">%1$d enregistrement synchronisé</item>
     <item quantity="other">%1$d enregistrements synchronisés</item>
   </plurals>
+  <string name="surveys_error">Erreur de chargement des enquêtes</string>
+  <string name="users_error">Erreur de chargement des utilisateurs</string>
+  <string name="survey_delete_error">Erreur lors de la suppression d\'enquête</string>
+  <string name="survey_select_error">Erreur lors de la selection d\'enquête</string>
+  <string name="user_edit_error">Erreur lors de l\'édition de l\'utilisateur</string>
+  <string name="user_delete_error">Erreur lors de la suppression d\'utilisateur</string>
+  <string name="user_select_error">Erreur lors de la selection d\'utilisateur</string>
+  <string name="add_user_message">Le nouvel utilisateur sera automatiquement sélectionné</string>
+  <string name="survey">enquête</string>
   <string name="no_gps_status_message">GPS Status n\'est pas installé sur cet appareil. Voulez-vous l\'installer maintenant?</string>
   <string name="data_points_sync_no_data_points">Aucun enregistrement à synchroniser</string>
   <string name="app_update_dialog_title">Une nouvelle version de Flow est disponible</string>
@@ -271,4 +275,20 @@
   <string name="error_getting_media">Erreur d\'obtention de fichiers media, veuillez réessayer.</string>
   <string name="geo_fields_update_title">Mettre à jour les coordonnées GPS?</string>
   <string name="cascade_error_message">Erreur de téléchargement des resources de cascade: %1$s</string>
+  <string name="preference_publish_data_title">Publier les données</string>
+  <string name="preference_publish_data_subtitle">Rendre les données disponibles dans le dossier public pour le transfert groupé</string>
+  <string name="preference_publish_data_subtitle_publishing">Publication des données dans le dossier public pour le transfert groupé en cours</string>
+  <string name="preference_publish_data_subtitle_published">Les données seront disponibles pour le téléchargement en bloc pendant</string>
+  <string name="preference_publish_data_time_left">%1$d mins</string>
+  <string name="preference_publish_data_error_no_data">Pas de données disponibles pour le téléchargement en bloc</string>
+  <string name="preference_publish_data_error_generic">Erreur de publication de données, veuillez réessayer.</string>
+  <string name="preference_publish_data_error_no_space">Erreur de publication de données. Plus d\'espace de stockage. Veuillez supprimer les fichiers inutiles et réessayer.</string>
+  <string name="pass_code">Code d\'accès</string>
+  <string name="secure_data_walkthrough_title">Stockage de données</string>
+  <string name="walthrough_next_button">Suivant</string>
+  <string name="secure_collected_walkthrough_page1_subtitle">Les données collectées avec l\'application Flow sont désormais stockées en mode privé dans l\'appareil</string>
+  <string name="secure_collected_walkthrough_page2_subtitle">Utilisez l\'option Publier des données dans Paramètres pour rendre les données collectées hors connexion disponibles pour le transfert groupé</string>
+  <string name="submit_tab_description">Les réponses envoyées peuvent être vues mais non modifiées</string>
+  <string name="snackbar_submitted">Envoyé</string>
+  <string name="form_id_hint">Identifiant du formulaire</string>
 </resources>

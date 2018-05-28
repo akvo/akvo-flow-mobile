@@ -29,7 +29,6 @@ before_install:
   - git remote set-url origin https://valllllll2000:$GITHUB_API_KEY@github.com/akvo/akvo-flow-mobile.git
 
 before_script:
-    - mv app/gradle.properties.template app/gradle.properties
     #- echo no | android create avd --force -n test -t android-21 --abi armeabi-v7a -c 2048M
     #- mksdcard -l sdcard 2048M sdcard
     #- emulator -avd test -no-audio -no-window -sdcard sdcard &

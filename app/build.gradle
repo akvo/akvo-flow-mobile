@@ -14,8 +14,7 @@ def isCi = "true" == System.getenv("TRAVIS")
 
 sentry {
     autoProguardConfig true
-
-    autoUpload !isCi
+    autoUpload true
 }
 
 android {

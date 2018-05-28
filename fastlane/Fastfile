@@ -34,7 +34,7 @@ platform :android do
          )
     git_commit(path: "app/version.properties", message: "Version Bump to #{lane_context[SharedValues::ANDROID_VERSION_CODE]} [ci skip]")
     push_to_git_remote(
-          local_branch: git_branch,git g
+          local_branch: git_branch,
           force: false,
           tags: false
         )

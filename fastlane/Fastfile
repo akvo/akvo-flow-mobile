@@ -33,7 +33,11 @@ platform :android do
            notifications: true,
          )
     git_commit(path: "app/version.properties", message: "Version Bump to #{lane_context[SharedValues::ANDROID_VERSION_CODE]} [ci skip]")
-    push_to_git_remote
+    push_to_git_remote(
+          local_branch: git_branch,git g
+          force: false,
+          tags: false
+        )
     slack(
             message: "Successfully distributed a new beta build: #{lane_context[SharedValues::ANDROID_VERSION_CODE]}"
          )

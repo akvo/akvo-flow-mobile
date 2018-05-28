@@ -24,7 +24,7 @@ android:
 
 before_install:
   - openssl aes-256-cbc -K $encrypted_b2f5a33a8343_key -iv $encrypted_b2f5a33a8343_iv -in build_config.enc -out build_config -d
-  - tar xvf build_config.tar
+  - tar xvf build_config
   - gem install fastlane --no-rdoc --no-ri --no-document --quiet
 
 before_script:

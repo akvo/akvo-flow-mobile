@@ -30,7 +30,6 @@ platform :android do
     crashlytics(
            groups: "testers",
            notifications: true,
-           notes: "Fixed some issues",
          )
     slack(
             message: "Successfully distributed a new beta build: #{lane_context[SharedValues::ANDROID_VERSION_CODE]}"

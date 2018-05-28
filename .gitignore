@@ -51,3 +51,4 @@ sentry.properties
 #fastlane
 fastlane/report.xml
 fastlane/README.md
+.env.default

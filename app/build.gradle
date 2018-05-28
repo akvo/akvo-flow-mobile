@@ -78,11 +78,7 @@ android {
                 proguardFile 'proguard-files/proguard-square-retrofit.pro'
                 proguardFile 'proguard-files/proguard-support-v7-appcompat.pro'
                 proguardFile getDefaultProguardFile('proguard-android.txt')
-                if (isCi) {
-                    signingConfig signingConfigs.debug
-                } else {
-                    signingConfig signingConfigs.flowRelease
-                }
+                signingConfig signingConfigs.flowRelease
             }
         }
     }

@@ -26,11 +26,14 @@ platform :android do
 
   desc "Submit a new Beta Build to Crashlytics Beta"
   lane :beta do
+  increment_android_version_code(path: "app/version.properties")
     gradle(task: "clean assembleFlowRelease")
     crashlytics(
            groups: "testers",
            notifications: true,
          )
+    git_commit(path: "app/version.properties", message: "Version Bump to #{lane_context[SharedValues::ANDROID_VERSION_CODE]} [ci skip]")
+    push_to_git_remote
     slack(
             message: "Successfully distributed a new beta build: #{lane_context[SharedValues::ANDROID_VERSION_CODE]}"
          )

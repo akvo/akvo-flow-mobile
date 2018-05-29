@@ -50,3 +50,5 @@ after_failure:
 
 after_success:
   - fastlane beta
+  on:
+      branch: release

@@ -41,7 +41,7 @@ before_script:
 
 script:
   #- ./gradlew check --continue connectedFlowDebugAndroidTest --continue
-  - ./gradlew check --continue
+  #- ./gradlew check --continue
 
 after_failure:
   - pandoc app/build/reports/androidTests/connected/flavors/FLOW/org.akvo.flow.activity.form.formfill.CascadeQuestionViewTest.html -t plain

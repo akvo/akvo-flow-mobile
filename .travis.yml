@@ -48,7 +48,8 @@ after_failure:
   - pandoc app/build/reports/androidTests/connected/flavors/FLOW/org.akvo.flow.activity.form.formfill.LockedGeoQuestionViewTest.html -t plain
   - pandoc app/build/reports/androidTests/connected/flavors/FLOW/org.akvo.flow.activity.form.formfill.CascadeQuestionViewTest.html -t plain
 
-after_success:
-  - fastlane beta
-  on:
+deploy:
+  - provider: script
+    script: bash fastlane/deploy_beta.sh
+    on:
       branch: release

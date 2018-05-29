@@ -18,7 +18,6 @@ sentry {
 }
 
 android {
-    testBuildType "release"
     compileSdkVersion rootProject.ext.compileSdkVersion
 
     Properties versionProps = loadProperties('version.properties')

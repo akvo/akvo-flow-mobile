@@ -35,7 +35,7 @@ platform :android do
     commit_github_file(
           repository_name: "akvo/akvo-flow-mobile",
           server_url: "https://api.github.com",
-          api_token: ENV["GITHUB_TOKEN"],
+          api_token: ENV["GITHUB_API_KEY"],
           message: "Version Bump to #{lane_context[SharedValues::ANDROID_VERSION_CODE]} [ci skip]",
           branch: git_branch,
           path: "app/version.properties"

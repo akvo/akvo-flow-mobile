@@ -22,24 +22,33 @@ android:
     - extra-android-m2repository
     - sys-img-armeabi-v7a-android-21
 
-before_script:
-    - mv app/config/survey.properties.template app/survey.properties
-    - mv app/gradle.properties.template app/gradle.properties
-    - echo no | android create avd --force -n test -t android-21 --abi armeabi-v7a -c 2048M
-    - mksdcard -l sdcard 2048M sdcard
-    - emulator -avd test -no-audio -no-window -sdcard sdcard &
-    - android-wait-for-emulator
-    - adb shell settings put global window_animation_scale 0 &
-    - adb shell settings put global transition_animation_scale 0 &
-    - adb shell settings put global animator_duration_scale 0 &
-    - adb shell settings put secure long_press_timeout 1500 &
-    - adb shell input keyevent 82 &
+before_install:
+  - openssl aes-256-cbc -K $encrypted_b2f5a33a8343_key -iv $encrypted_b2f5a33a8343_iv -in build_config.enc -out build_config -d
+  - tar xvf build_config
+  - gem install fastlane --no-rdoc --no-ri --no-document --quiet
+  - git remote set-url origin https://valllllll2000:$GITHUB_API_KEY@github.com/akvo/akvo-flow-mobile.git
+  - chmod +x fastlane/deploy_beta.sh
+
+#before_script:
+#    - echo no | android create avd --force -n test -t android-21 --abi armeabi-v7a -c 2048M
+#    - mksdcard -l sdcard 2048M sdcard
+#    - emulator -avd test -no-audio -no-window -sdcard sdcard &
+#    - android-wait-for-emulator
+#    - adb shell settings put global window_animation_scale 0 &
+#    - adb shell settings put global transition_animation_scale 0 &
+#    - adb shell settings put global animator_duration_scale 0 &
+#    - adb shell settings put secure long_press_timeout 1500 &
+#    - adb shell input keyevent 82 &
 
 script:
-  - ./gradlew check --continue connectedFlowDebugAndroidTest --continue
+  - ./gradlew test --continue
+  #- ./gradlew check --continue connectedFlowDebugAndroidTest --continue
 
 after_failure:
   - pandoc app/build/reports/androidTests/connected/flavors/FLOW/org.akvo.flow.activity.form.formfill.CascadeQuestionViewTest.html -t plain
   - pandoc app/build/reports/androidTests/connected/flavors/FLOW/org.akvo.flow.activity.form.formfill.OptionsQuestionViewSingleTest.html -t plain
   - pandoc app/build/reports/androidTests/connected/flavors/FLOW/org.akvo.flow.activity.form.formfill.LockedGeoQuestionViewTest.html -t plain
   - pandoc app/build/reports/androidTests/connected/flavors/FLOW/org.akvo.flow.activity.form.formfill.CascadeQuestionViewTest.html -t plain
+
+after_success:
+  - ./fastlane/deploy_beta.sh

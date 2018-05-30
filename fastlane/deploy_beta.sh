@@ -1,3 +1,4 @@
 #!/usr/bin/env bash
 
-fastlane beta
+if [[ "$TRAVIS_BRANCH" == release* ]]; then fastlane beta
+fi

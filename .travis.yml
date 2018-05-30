@@ -51,5 +51,4 @@ after_failure:
 deploy:
   - provider: script
     script: bash fastlane/deploy_beta.sh
-    on:
-      branch: release
+    if: branch =~ ^release$

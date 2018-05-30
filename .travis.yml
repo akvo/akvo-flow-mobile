@@ -25,6 +25,8 @@ android:
 before_install:
   - openssl aes-256-cbc -K $encrypted_b2f5a33a8343_key -iv $encrypted_b2f5a33a8343_iv -in build_config.enc -out build_config -d
   - tar xvf build_config
+  - gem install fastlane --no-rdoc --no-ri --no-document --quiet
+  - git remote set-url origin https://valllllll2000:$GITHUB_API_KEY@github.com/akvo/akvo-flow-mobile.git
 
 #before_script:
 #    - echo no | android create avd --force -n test -t android-21 --abi armeabi-v7a -c 2048M
@@ -47,14 +49,5 @@ after_failure:
   - pandoc app/build/reports/androidTests/connected/flavors/FLOW/org.akvo.flow.activity.form.formfill.LockedGeoQuestionViewTest.html -t plain
   - pandoc app/build/reports/androidTests/connected/flavors/FLOW/org.akvo.flow.activity.form.formfill.CascadeQuestionViewTest.html -t plain
 
-before_deploy:
-  - gem update fastlane
-  - git remote set-url origin https://valllllll2000:$GITHUB_API_KEY@github.com/akvo/akvo-flow-mobile.git
-
-deploy:
-  - provider: script
-    script: fastlane beta
-    skip_cleanup: true
-    on:
-      all_branches: true
-      condition: $TRAVIS_BRANCH =~ ^release
+after_success:
+  - test $TRAVIS_BRANCH =~ ^release && fastlane beta

@@ -243,7 +243,7 @@
     <string name="preference_app_language">App language</string>
     <string name="preference_image_size">Image size</string>
     <string name="preferences_data_section">Data</string>
-    <string name="preference_sync_datapoints">Send submitted data points to Flow instance</string>
+    <string name="preference_sync_datapoints">Upload all submitted data points to Flow instance.</string>
     <string name="preference_delete_collected_data">Delete collected data and images</string>
     <string name="preference_delete_everything">Delete everything</string>
     <string name="preferences_configuration_section">Configuration</string>

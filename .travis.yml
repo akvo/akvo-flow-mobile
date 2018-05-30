@@ -40,7 +40,8 @@ before_script:
     - adb shell input keyevent 82 &
 
 script:
-  - ./gradlew check --continue connectedFlowDebugAndroidTest --continue
+  - ./gradlew test --continue
+  #- ./gradlew check --continue connectedFlowDebugAndroidTest --continue
 
 after_failure:
   - pandoc app/build/reports/androidTests/connected/flavors/FLOW/org.akvo.flow.activity.form.formfill.CascadeQuestionViewTest.html -t plain
@@ -51,4 +52,6 @@ after_failure:
 deploy:
   - provider: script
     script: bash fastlane/deploy_beta.sh
-    if: branch =~ ^release$
+    on:
+      all_branches: true
+      condition: $TRAVIS_BRANCH =~ ^release$

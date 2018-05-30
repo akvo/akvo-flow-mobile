@@ -52,6 +52,7 @@ after_failure:
 deploy:
   - provider: script
     script: bash fastlane/deploy_beta.sh
+    skip_cleanup: true
     on:
       all_branches: true
       condition: $TRAVIS_BRANCH =~ ^release

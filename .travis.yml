@@ -53,7 +53,7 @@ before_deploy:
 
 deploy:
   - provider: script
-    script: bash fastlane/deploy_beta.sh
+    script: rvm $TRAVIS_RUBY_VERSION do fastlane beta
     skip_cleanup: true
     on:
       all_branches: true

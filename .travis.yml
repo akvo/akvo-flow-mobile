@@ -27,6 +27,7 @@ before_install:
   - tar xvf build_config
   - gem install fastlane --no-rdoc --no-ri --no-document --quiet
   - git remote set-url origin https://valllllll2000:$GITHUB_API_KEY@github.com/akvo/akvo-flow-mobile.git
+  - chmod +x fastlane/deploy_beta.sh
 
 #before_script:
 #    - echo no | android create avd --force -n test -t android-21 --abi armeabi-v7a -c 2048M

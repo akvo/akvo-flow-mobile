@@ -48,12 +48,12 @@ after_failure:
   - pandoc app/build/reports/androidTests/connected/flavors/FLOW/org.akvo.flow.activity.form.formfill.CascadeQuestionViewTest.html -t plain
 
 before_deploy:
-  - gem install fastlane --no-rdoc --no-ri --no-document --quiet
+  - gem update fastlane
   - git remote set-url origin https://valllllll2000:$GITHUB_API_KEY@github.com/akvo/akvo-flow-mobile.git
 
 deploy:
   - provider: script
-    script: rvm 1.9.2 do fastlane beta
+    script: fastlane beta
     skip_cleanup: true
     on:
       all_branches: true

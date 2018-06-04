@@ -24,20 +24,22 @@ import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v4.view.ViewPager;
+import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
 import org.akvo.flow.R;
-import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.data.database.SurveyDbDataSource;
 import org.akvo.flow.data.loader.SurveyedLocaleItemLoader;
 import org.akvo.flow.database.SurveyInstanceStatus;
 import org.akvo.flow.domain.Survey;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.SurveyedLocale;
-import org.akvo.flow.domain.User;
+import org.akvo.flow.domain.entity.User;
+import org.akvo.flow.domain.interactor.DefaultObserver;
+import org.akvo.flow.domain.interactor.UseCase;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
 import org.akvo.flow.presentation.SnackBarManager;
@@ -49,6 +51,9 @@ import org.akvo.flow.ui.fragment.ResponseListFragment;
 import org.akvo.flow.util.ConstantUtil;
 
 import javax.inject.Inject;
+import javax.inject.Named;
+
+import timber.log.Timber;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -56,7 +61,6 @@ import butterknife.ButterKnife;
 public class RecordActivity extends BackActivity implements FormListFragment.SurveyListListener,
         ResponseListFragment.ResponseListListener, LoaderManager.LoaderCallbacks<SurveyedLocale> {
 
-    private User mUser;
     private SurveyGroup mSurveyGroup;
     private String recordId;
 
@@ -65,6 +69,10 @@ public class RecordActivity extends BackActivity implements FormListFragment.Sur
 
     @Inject
     Navigator navigator;
+
+    @Inject
+    @Named("getSelectedUser")
+    UseCase getSelectedUser;
 
     @Inject
     SnackBarManager snackBarManager;
@@ -101,7 +109,6 @@ public class RecordActivity extends BackActivity implements FormListFragment.Sur
         super.onResume();
         mDatabase.open();
 
-        mUser = FlowApp.getApp().getUser();
         recordId = getIntent().getStringExtra(ConstantUtil.RECORD_ID_EXTRA);
         getSupportLoaderManager().restartLoader(0, null, this);
     }
@@ -125,22 +132,39 @@ public class RecordActivity extends BackActivity implements FormListFragment.Sur
             Toast.makeText(this, R.string.pleasewaitforbootstrap, Toast.LENGTH_LONG).show();
             return;
         }
-        Survey survey = mDatabase.getSurvey(formId);
+        final Survey survey = mDatabase.getSurvey(formId);
         if (!survey.isHelpDownloaded()) {
             Toast.makeText(this, R.string.error_missing_cascade, Toast.LENGTH_LONG).show();
             return;
         }
 
+        getSelectedUser.execute(new DefaultObserver<User>() {
+            @Override
+            public void onError(Throwable e) {
+                Timber.e(e);
+            }
+
+            @Override
+            public void onNext(User user) {
+                String userName = user.getName();
+                if (!TextUtils.isEmpty(userName)) {
+                    displayForm(user, formId, survey);
+                }
+            }
+        }, null);
+
+
+    }
+
+    private void displayForm(User user, String formId, Survey survey) {
         // Check if there are saved (non-submitted) responses for this Survey, and take the 1st one
-        long[] instances = mDatabase.getFormInstances(recordId, formId,
-                SurveyInstanceStatus.SAVED);
+        long[] instances = mDatabase.getFormInstances(recordId, formId, SurveyInstanceStatus.SAVED);
         long formInstanceId = instances.length > 0 ?
                 instances[0] :
-                mDatabase.createSurveyRespondent(formId, survey.getVersion(), mUser,
-                        recordId);
+                mDatabase.createSurveyRespondent(formId, survey.getVersion(), user, recordId);
 
-        navigator.navigateToFormActivity(this, recordId, formId,
-                formInstanceId, false, mSurveyGroup);
+        navigator.navigateToFormActivity(this, recordId, formId, formInstanceId, false,
+                mSurveyGroup);
     }
 
     @Override

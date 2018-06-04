@@ -93,6 +93,15 @@
             <View
                     style="@style/PreferenceItemSeparator"/>
 
+            <org.akvo.flow.presentation.settings.publish.PublishFilesPreferenceView
+                    android:id="@+id/publish_files_preference"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+            </org.akvo.flow.presentation.settings.publish.PublishFilesPreferenceView>
+
+            <View
+                    style="@style/PreferenceItemSeparator"/>
+
             <TextView
                     android:id="@+id/preference_delete_collected_data_title"
                     android:text="@string/preference_delete_collected_data"
@@ -106,6 +115,7 @@
 
             <View
                     style="@style/PreferenceItemSeparator"/>
+
             <TextView
                     android:id="@+id/preference_delete_everything_title"
                     android:text="@string/preference_delete_everything"
@@ -119,6 +129,7 @@
 
             <View
                     style="@style/PreferenceItemSeparator"/>
+
             <TextView
                     android:id="@+id/preference_download_form_title"
                     android:text="@string/preference_download_form_title"
@@ -132,6 +143,7 @@
 
             <View
                     style="@style/PreferenceItemSeparator"/>
+
             <TextView
                     android:id="@+id/preference_reload_forms_title"
                     android:text="@string/reloadsurveyslabel"
@@ -142,30 +154,36 @@
                     android:id="@+id/preference_reload_forms_subtitle"
                     android:text="@string/reloadsurveysdesc"
                     style="@style/PreferenceSubtitleStyle"/>
+
             <View
                     style="@style/PreferenceSectionSeparator"/>
 
             <TextView
                     android:text="@string/preferences_configuration_section"
                     style="@style/PreferenceSectionTitleStyle"/>
+
             <TextView
                     android:id="@+id/preference_gps_fixes"
                     android:text="@string/preference_gps"
                     style="@style/PreferenceTitleStyle"
                     android:paddingBottom="8dp"/>
+
             <View
                     style="@style/PreferenceItemSeparator"/>
+
             <TextView
                     android:id="@+id/preference_storage"
                     android:text="@string/preference_storage"
                     style="@style/PreferenceTitleStyle"
                     android:paddingBottom="8dp"/>
+
             <View
                     style="@style/PreferenceSectionSeparator"/>
 
             <TextView
                     android:text="@string/preferences_section_information"
                     style="@style/PreferenceSectionTitleStyle"/>
+
             <TextView
                     android:text="@string/preference_identifier"
                     style="@style/PreferenceTitleStyle"
@@ -175,8 +193,10 @@
                     android:id="@+id/preference_identifier_value"
                     tools:text="valeria"
                     style="@style/PreferenceSubtitleStyle"/>
+
             <View
                     style="@style/PreferenceItemSeparator"/>
+
             <TextView
                     android:text="@string/preference_instance_name"
                     style="@style/PreferenceTitleStyle"

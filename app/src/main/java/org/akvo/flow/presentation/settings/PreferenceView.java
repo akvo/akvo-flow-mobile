@@ -29,4 +29,18 @@ public interface PreferenceView {
     void displaySettings(ViewUserSettings viewUserSettings);
 
     void displayLanguageChanged(String language);
+
+    void showDeleteCollectedData();
+
+    void showDeleteCollectedDataWithPending();
+
+    void showDeleteAllData();
+
+    void showDeleteAllDataWithPending();
+
+    void showClearDataError();
+
+    void showClearDataSuccess();
+
+    void dismiss();
 }

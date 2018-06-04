@@ -22,11 +22,28 @@ package org.akvo.flow.domain.repository;
 
 import android.graphics.Bitmap;
 
+import java.util.List;
+
 import io.reactivex.Observable;
+import io.reactivex.annotations.NonNull;
 
 public interface FileRepository {
 
     Observable<Boolean> saveImage(Bitmap bitmap, String fileName, String resizedFilePath);
 
     Observable<Boolean> saveResizedImage(String fileName, String resizedFilePath, int imageSize);
+
+    Observable<Boolean> moveFiles();
+
+    Observable<Boolean> publishFiles(@NonNull List<String> fileNames);
+
+    Observable<Boolean> copyFile(String originFilePath, String destinationFilePath);
+
+    Observable<Boolean> unPublishData();
+
+    Observable<Boolean> clearResponseFiles();
+
+    Observable<Boolean> clearAllUserFiles();
+
+    Observable<Boolean> isExternalStorageFull();
 }

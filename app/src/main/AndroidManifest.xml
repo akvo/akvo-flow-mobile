@@ -26,13 +26,12 @@
             android:theme="@style/FlowAppTheme">
 
         <activity
-                android:name=".presentation.MainActivity"
+                android:name=".presentation.main.MainActivity"
                 android:launchMode="singleInstance"
                 android:noHistory="true"
                 android:theme="@style/Theme.AppCompat.Translucent">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
-
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
@@ -99,6 +98,7 @@
                 <action android:name="com.google.android.gms.gcm.ACTION_TASK_READY"/>
             </intent-filter>
         </service>
+        <service android:name=".service.UnPublishDataService"/>
 
         <receiver android:exported="false" android:name=".broadcast.SyncDataReceiver">
             <intent-filter>
@@ -109,6 +109,13 @@
         <receiver android:name=".broadcast.BootStrapReceiver" android:exported="false">
             <intent-filter>
                 <action android:name="org.akvo.flow.BOOTSTRAP_NEEDED"/>
+            </intent-filter>
+        </receiver>
+        <receiver android:exported="false" android:name=".broadcast.DataTimeoutReceiver"/>
+        <receiver android:name=".broadcast.BootReceiver"
+                  android:enabled="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
             </intent-filter>
         </receiver>
 
@@ -144,6 +151,17 @@
                 android:label=""
                 android:configChanges="locale|layoutDirection">
         </activity>
+        <activity android:name=".presentation.walkthrough.WalkThroughActivity"/>
+
+        <provider
+                android:name="android.support.v4.content.FileProvider"
+                android:authorities="org.akvo.flow.fileprovider"
+                android:grantUriPermissions="true"
+                android:exported="false">
+            <meta-data
+                    android:name="android.support.FILE_PROVIDER_PATHS"
+                    android:resource="@xml/file_paths" />
+        </provider>
     </application>
 
 </manifest>

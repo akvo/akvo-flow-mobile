@@ -20,42 +20,34 @@
 
 package org.akvo.flow.presentation.settings;
 
-import android.app.AlertDialog;
-import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.content.res.Resources;
-import android.database.SQLException;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.SwitchCompat;
-import android.text.TextUtils;
-import android.text.method.DigitsKeyListener;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import org.akvo.flow.BuildConfig;
 import org.akvo.flow.R;
 import org.akvo.flow.activity.BackActivity;
-import org.akvo.flow.app.FlowApp;
-import org.akvo.flow.async.ClearDataAsyncTask;
-import org.akvo.flow.data.database.SurveyDbDataSource;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
+import org.akvo.flow.presentation.SnackBarManager;
+import org.akvo.flow.presentation.settings.passcode.PassCodeDeleteAllDialog;
+import org.akvo.flow.presentation.settings.passcode.PassCodeDeleteCollectedDialog;
+import org.akvo.flow.presentation.settings.passcode.PassCodeDownloadFormDialog;
+import org.akvo.flow.presentation.settings.passcode.PassCodeReloadFormsDialog;
 import org.akvo.flow.service.DataSyncService;
-import org.akvo.flow.service.SurveyDownloadService;
 import org.akvo.flow.ui.Navigator;
-import org.akvo.flow.util.ViewUtil;
-import org.akvo.flow.util.logging.LoggingHelper;
 
 import java.util.Arrays;
 import java.util.List;
@@ -68,9 +60,14 @@ import butterknife.ButterKnife;
 import butterknife.OnCheckedChanged;
 import butterknife.OnClick;
 import butterknife.OnItemSelected;
-import timber.log.Timber;
 
-public class PreferenceActivity extends BackActivity implements PreferenceView {
+public class PreferenceActivity extends BackActivity implements PreferenceView,
+        PassCodeDeleteCollectedDialog.PassCodeDeleteCollectedListener,
+        PassCodeDeleteAllDialog.PassCodeDeleteAllListener,
+        PassCodeDownloadFormDialog.PassCodeDownloadFormListener,
+        PassCodeReloadFormsDialog.PassCodeReloadFormsListener,
+        DeleteResponsesWarningDialog.DeleteResponsesListener,
+        DeleteAllWarningDialog.DeleteAllListener {
 
     @Inject
     Navigator navigator;
@@ -106,7 +103,7 @@ public class PreferenceActivity extends BackActivity implements PreferenceView {
     PreferencePresenter presenter;
 
     @Inject
-    LoggingHelper helper;
+    SnackBarManager snackBarManager;
 
     private List<String> languages;
     private boolean trackChanges = false;
@@ -182,100 +179,41 @@ public class PreferenceActivity extends BackActivity implements PreferenceView {
         finish();
     }
 
-    @OnClick({R.id.preference_delete_collected_data_title,
+    @OnClick({ R.id.preference_delete_collected_data_title,
             R.id.preference_delete_collected_data_subtitle
     })
     void onDeleteCollectedDataTap() {
-        ViewUtil.showAdminAuthDialog(this, new ViewUtil.AdminAuthDialogListener() {
-            @Override
-            public void onAuthenticated() {
-               deleteData(true);
-            }
-        });
+        DialogFragment newFragment = PassCodeDeleteCollectedDialog.newInstance();
+        newFragment.show(getSupportFragmentManager(), PassCodeDeleteCollectedDialog.TAG);
     }
 
-    @OnClick({R.id.preference_delete_everything_title,
+    @OnClick({ R.id.preference_delete_everything_title,
             R.id.preference_delete_everything_subtitle
     })
     void onDeleteAllTap() {
-        ViewUtil.showAdminAuthDialog(this, new ViewUtil.AdminAuthDialogListener() {
-            @Override
-            public void onAuthenticated() {
-                deleteData(false);
-            }
-        });
+        DialogFragment newFragment = PassCodeDeleteAllDialog.newInstance();
+        newFragment.show(getSupportFragmentManager(), PassCodeDeleteAllDialog.TAG);
     }
 
-    @OnClick({R.id.preference_download_form_title,
+    @OnClick({ R.id.preference_download_form_title,
             R.id.preference_download_form_subtitle
     })
     void onDownloadFormOptionTap() {
-        ViewUtil.showAdminAuthDialog(this, new ViewUtil.AdminAuthDialogListener() {
-
-            @Override
-            public void onAuthenticated() {
-                AlertDialog.Builder inputDialog = new AlertDialog.Builder(PreferenceActivity.this);
-                inputDialog.setTitle(R.string.downloadsurveylabel);
-                inputDialog.setMessage(R.string.downloadsurveyinstr);
-
-                final EditText input = new EditText(PreferenceActivity.this);
-                input.setKeyListener(new DigitsKeyListener(false, false));
-                inputDialog.setView(input);
-                inputDialog.setPositiveButton(R.string.okbutton, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int whichButton) {
-                        String surveyId = input.getText().toString().trim();
-                        if (!TextUtils.isEmpty(surveyId)) {
-                            Intent i = new Intent(PreferenceActivity.this,
-                                    SurveyDownloadService.class);
-                            i.putExtra(SurveyDownloadService.EXTRA_SURVEY_ID, surveyId);
-                            PreferenceActivity.this.startService(i);
-                        }
-                    }
-                });
-
-                inputDialog.setNegativeButton(R.string.cancelbutton, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int whichButton) {
-                        dialog.dismiss();
-                    }
-                });
-
-                inputDialog.show();
-            }
-        });
+        DialogFragment newFragment = PassCodeDownloadFormDialog.newInstance();
+        newFragment.show(getSupportFragmentManager(), PassCodeDownloadFormDialog.TAG);
     }
 
-    @OnClick({R.id.preference_reload_forms_title,
+    @OnClick({ R.id.preference_reload_forms_title,
             R.id.preference_reload_forms_subtitle
     })
     void onReloadAllSurveysOptionTap() {
-        ViewUtil.showAdminAuthDialog(this, new ViewUtil.AdminAuthDialogListener() {
-            @Override
-            public void onAuthenticated() {
-                AlertDialog.Builder builder = new AlertDialog.Builder(PreferenceActivity.this);
-                builder.setTitle(R.string.conftitle);
-                builder.setMessage(R.string.reloadconftext);
-                builder.setPositiveButton(R.string.okbutton, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        Context c = PreferenceActivity.this;
-                        Intent i = new Intent(c, SurveyDownloadService.class);
-                        i.putExtra(SurveyDownloadService.EXTRA_DELETE_SURVEYS, true);
-                        c.startService(i);
-                    }
-                });
-                builder.setNegativeButton(R.string.cancelbutton,
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                dialog.cancel();
-                            }
-                        });
-                builder.show();
-            }
-        });
+        DialogFragment newFragment = PassCodeReloadFormsDialog.newInstance();
+        newFragment.show(getSupportFragmentManager(), PassCodeReloadFormsDialog.TAG);
     }
 
     @OnClick(R.id.preference_gps_fixes)
     void onGpsFixesTap() {
-       navigator.navigateToGpsFixes(this);
+        navigator.navigateToGpsFixes(this);
     }
 
     @OnClick(R.id.preference_storage)
@@ -307,61 +245,6 @@ public class PreferenceActivity extends BackActivity implements PreferenceView {
     @OnItemSelected(R.id.preference_image_size)
     void onImageSizeSelected(int position) {
         presenter.saveImageSize(position);
-    }
-
-    /**
-     * Permanently deletes data from the device. If unsubmitted data is found on
-     * the database, the user will be prompted with a message to confirm the
-     * operation.
-     *
-     * @param responsesOnly Flag to specify a partial deletion (user generated
-     *                      data).
-     */
-    private void deleteData(final boolean responsesOnly) throws SQLException {
-        try {
-            int messageId;
-            if (unsentData()) {
-                messageId = R.string.unsentdatawarning;
-            } else if (responsesOnly) {
-                messageId = R.string.delete_responses_warning;
-            } else {
-                messageId = R.string.deletealldatawarning;
-            }
-
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setMessage(messageId)
-                    .setCancelable(true)
-                    .setPositiveButton(R.string.okbutton, new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                            if (!responsesOnly) {
-                                // Delete everything implies logging the current user out (if any)
-                                FlowApp.getApp().setUser(null);
-                                helper.clearUser();
-                            }
-                            new ClearDataAsyncTask(PreferenceActivity.this).execute(responsesOnly);
-                        }
-                    })
-                    .setNegativeButton(R.string.cancelbutton,
-                            new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int id) {
-                                    dialog.cancel();
-                                }
-                            });
-            builder.show();
-        } catch (SQLException e) {
-            Timber.e(e, e.getMessage());
-            Toast.makeText(this, R.string.clear_data_error, Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    private boolean unsentData() throws SQLException {
-        SurveyDbDataSource db = new SurveyDbDataSource(this, null);
-        try {
-            db.open();
-            return db.getUnSyncedTransmissions().size() > 0;
-        } finally {
-            db.close();
-        }
     }
 
     @Override
@@ -400,8 +283,7 @@ public class PreferenceActivity extends BackActivity implements PreferenceView {
     @Override
     public void displayLanguageChanged(String languageCode) {
         updateLocale(languageCode);
-        Toast.makeText(this, R.string.please_restart, Toast.LENGTH_LONG)
-                .show();
+        showMessage(R.string.please_restart);
     }
 
     private void updateLocale(String languageCode) {
@@ -411,5 +293,80 @@ public class PreferenceActivity extends BackActivity implements PreferenceView {
         Configuration config = resources.getConfiguration();
         config.locale = locale;
         resources.updateConfiguration(config, null);
+    }
+
+    @Override
+    public void deleteCollectedData() {
+        presenter.deleteCollectedData();
+    }
+
+    @Override
+    public void deleteAllData() {
+        presenter.deleteAllData();
+    }
+
+    @Override
+    public void downloadForm() {
+        DialogFragment newFragment = DownloadFormDialog.newInstance();
+        newFragment.show(getSupportFragmentManager(), DownloadFormDialog.TAG);
+    }
+
+    @Override
+    public void reloadForms() {
+        DialogFragment newFragment = ReloadFormsConfirmationDialog.newInstance();
+        newFragment.show(getSupportFragmentManager(), ReloadFormsConfirmationDialog.TAG);
+    }
+
+    @Override
+    public void showDeleteCollectedData() {
+        DialogFragment newFragment = DeleteResponsesWarningDialog.newInstance(false);
+        newFragment.show(getSupportFragmentManager(), DeleteResponsesWarningDialog.TAG);
+    }
+
+    @Override
+    public void showDeleteCollectedDataWithPending() {
+        DialogFragment newFragment = DeleteResponsesWarningDialog.newInstance(true);
+        newFragment.show(getSupportFragmentManager(), DeleteResponsesWarningDialog.TAG);
+    }
+
+    @Override
+    public void showDeleteAllData() {
+        DialogFragment newFragment = DeleteAllWarningDialog.newInstance(false);
+        newFragment.show(getSupportFragmentManager(), DeleteAllWarningDialog.TAG);
+    }
+
+    @Override
+    public void showDeleteAllDataWithPending() {
+        DialogFragment newFragment = DeleteAllWarningDialog.newInstance(true);
+        newFragment.show(getSupportFragmentManager(), DeleteAllWarningDialog.TAG);
+    }
+
+    @Override
+    public void showClearDataError() {
+        showMessage(R.string.clear_data_error);
+    }
+
+    @Override
+    public void showClearDataSuccess() {
+        showMessage(R.string.clear_data_success);
+    }
+
+    @Override
+    public void deleteResponsesConfirmed() {
+        presenter.deleteResponsesConfirmed();
+    }
+
+    @Override
+    public void deleteAllConfirmed() {
+        presenter.deleteAllConfirmed();
+    }
+
+    @Override
+    public void dismiss() {
+        finish();
+    }
+
+    private void showMessage(int resId) {
+        snackBarManager.displaySnackBar(instanceNameTv, resId, this);
     }
 }

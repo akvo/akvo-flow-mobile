@@ -20,10 +20,8 @@
 package org.akvo.flow.app;
 
 import android.app.Application;
-import android.content.Context;
 import android.content.IntentFilter;
 import android.content.res.Configuration;
-import android.database.Cursor;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
@@ -31,12 +29,8 @@ import com.squareup.leakcanary.LeakCanary;
 
 import org.akvo.flow.BuildConfig;
 import org.akvo.flow.broadcast.SyncDataReceiver;
-import org.akvo.flow.data.migration.FlowMigrationListener;
-import org.akvo.flow.data.migration.languages.MigrationLanguageMapper;
 import org.akvo.flow.data.preference.Prefs;
-import org.akvo.flow.database.SurveyDbAdapter;
-import org.akvo.flow.database.UserColumns;
-import org.akvo.flow.domain.User;
+import org.akvo.flow.domain.entity.User;
 import org.akvo.flow.domain.interactor.DefaultObserver;
 import org.akvo.flow.domain.interactor.UseCase;
 import org.akvo.flow.domain.interactor.setup.SaveSetup;
@@ -59,17 +53,17 @@ import timber.log.Timber;
 
 public class FlowApp extends Application {
 
-    private static FlowApp app;
-
-    @Nullable
-    private User mUser;
-
-    private Prefs prefs;
-
-    private ApplicationComponent applicationComponent;
-
     @Inject
     LoggingHelper loggingHelper;
+
+    @Inject
+    Prefs prefs;
+
+    @Inject
+    @Named("getSelectedUser")
+    UseCase getSelectedUser;
+
+    private ApplicationComponent applicationComponent;
 
     @Inject
     @Named("saveSetup")
@@ -79,12 +73,10 @@ public class FlowApp extends Application {
     public void onCreate() {
         super.onCreate();
         initializeInjector();
-        prefs = new Prefs(getApplicationContext());
         LeakCanary.install(this);
         initLogging();
-        init();
+        updateLocale();
         startUpdateService();
-        app = this;
         startBootstrapFolderTracker();
         updateLoggingInfo();
         registerReceiver(new SyncDataReceiver(), new IntentFilter(SyncDataReceiver.CONNECTIVITY_ACTION));
@@ -107,12 +99,6 @@ public class FlowApp extends Application {
         }, params);
     }
 
-    private void updateLoggingInfo() {
-        String username = mUser == null? null: mUser.getName();
-        String deviceId = prefs.getString(Prefs.KEY_DEVICE_IDENTIFIER, null);
-        loggingHelper.initLoginData(username, deviceId);
-    }
-
     private void startBootstrapFolderTracker() {
         FileChangeTrackingService.scheduleVerifier(this);
     }
@@ -133,11 +119,23 @@ public class FlowApp extends Application {
     }
 
     private void initLogging() {
-       loggingHelper.init();
+        loggingHelper.init();
     }
 
-    public static FlowApp getApp() {
-        return app;
+    private void updateLoggingInfo() {
+        getSelectedUser.execute(new DefaultObserver<User>() {
+            @Override
+            public void onError(Throwable e) {
+                Timber.e(e);
+            }
+
+            @Override
+            public void onNext(User user) {
+                String deviceId = prefs.getString(Prefs.KEY_DEVICE_IDENTIFIER, null);
+                loggingHelper.initLoginData(user.getName(), deviceId);
+            }
+        }, null);
+
     }
 
     @Override
@@ -154,11 +152,6 @@ public class FlowApp extends Application {
             Locale.setDefault(savedLocale);
             updateConfiguration(savedLocale, newConfig);
         }
-    }
-
-    private void init() {
-        updateLocale();
-        loadLastUser();
     }
 
     private void updateLocale() {
@@ -188,43 +181,6 @@ public class FlowApp extends Application {
             savedLocale = new Locale(languageCode);
         }
         return savedLocale;
-    }
-
-    public void setUser(User user) {
-        mUser = user;
-        prefs.setLong(Prefs.KEY_USER_ID, mUser != null ? mUser.getId() : -1);
-    }
-
-    public User getUser() {
-        return mUser;
-    }
-
-    /**
-     * Checks if the user preference to persist logged-in users is set and, if
-     * so, loads the last logged-in user from the DB
-     */
-    private void loadLastUser() {
-        Context context = getApplicationContext();
-        SurveyDbAdapter database = new SurveyDbAdapter(context,
-                new FlowMigrationListener(prefs, new MigrationLanguageMapper(context)));
-        database.open();
-
-        // Consider the app set up if the DB contains users. This is relevant for v2.2.0 app upgrades
-        if (!prefs.getBoolean(Prefs.KEY_SETUP, false)) {
-            prefs.setBoolean(Prefs.KEY_SETUP, database.getUsers().getCount() > 0);
-        }
-
-        long id = prefs.getLong(Prefs.KEY_USER_ID, Prefs.DEFAULT_VALUE_USER_ID);
-        if (id != Prefs.DEFAULT_VALUE_USER_ID) {
-            Cursor cur = database.getUser(id);
-            if (cur.moveToFirst()) {
-                String userName = cur.getString(cur.getColumnIndexOrThrow(UserColumns.NAME));
-                mUser = new User(id, userName);
-                cur.close();
-            }
-        }
-
-        database.close();
     }
 
     @Nullable

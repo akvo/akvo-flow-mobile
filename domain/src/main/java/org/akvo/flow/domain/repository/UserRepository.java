@@ -53,4 +53,18 @@ public interface UserRepository {
     Observable<Boolean> clearSelectedUser();
 
     Observable<Boolean> setSelectedUser(long userId);
+
+    Observable<Long> getPublishDataTime();
+
+    Observable<Boolean> setPublishDataTime();
+
+    Observable<Boolean> clearPublishDataTime();
+
+    Observable<Boolean> clearUserPreferences();
+
+    Observable<Boolean> isDeviceSetUp();
+
+    Observable<Boolean> wasWalkThroughSeen();
+
+    Observable<Boolean> setWalkThroughSeen();
 }

@@ -43,15 +43,15 @@ import org.akvo.flow.domain.QuestionResponse;
 import org.akvo.flow.domain.Survey;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.SurveyMetadata;
-import org.akvo.flow.domain.User;
+import org.akvo.flow.domain.entity.User;
 import org.akvo.flow.serialization.form.SaxSurveyParser;
 import org.akvo.flow.serialization.form.SurveyMetadataParser;
 import org.akvo.flow.util.ConstantUtil;
-import org.akvo.flow.util.files.FileBrowser;
 import org.akvo.flow.util.FileUtil;
+import org.akvo.flow.util.GsonMapper;
+import org.akvo.flow.util.files.FileBrowser;
 import org.akvo.flow.util.files.FormFileBrowser;
 import org.akvo.flow.util.files.FormResourcesFileBrowser;
-import org.akvo.flow.util.GsonMapper;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;

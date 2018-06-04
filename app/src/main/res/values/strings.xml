@@ -17,7 +17,6 @@
     <string name="settings">Settings</string>
     <string name="preferences_general_section">General</string>
     <string name="aboutlabel">About</string>
-    <string name="nogpsstatus">GPS Status is not installed on this device. Please install it using the Google Play Store.</string>
     <string name="otherinstructions">Please enter a description</string>
     <string name="texthelpoption">View Help Text</string>
     <string name="videohelpoption">View Help Video</string>
@@ -183,12 +182,10 @@
     <string name="add_point_title">Add Point</string>
     <string name="add_point_text">Do you want to add a new point at this location?</string>
     <!--Navigation Drawer-->
-    <string name="select_user">Select User</string>
     <string name="add_user">Add User</string>
     <string name="new_user">+ User</string>
     <string name="edit_user">Edit username</string>
     <string name="delete_user">Delete user</string>
-    <string name="empty_user_warning">Username cannot be empty</string>
     <string name="delete_user_confirmation">Delete user?</string>
     <string name="username">Username</string>
     <string name="mustselectuser">Please select a user before continuing</string>
@@ -283,11 +280,22 @@
     <string name="error_getting_media">Error getting media, please try again.</string>
     <string name="geo_fields_update_title">Update GPS coordinates?</string>
     <string name="cascade_error_message">Cannot load cascade resource: %1$s</string>
+    <string name="preference_publish_data_title">Publish data</string>
+    <string name="preference_publish_data_subtitle">Make data available in the public folder for bulk upload</string>
+    <string name="preference_publish_data_subtitle_publishing">Making data available in the public folder for bulk upload</string>
+    <string name="preference_publish_data_subtitle_published">Data is available for bulk upload over the next</string>
+    <string name="preference_publish_data_time_left">%1$d mins</string>
+    <string name="preference_publish_data_error_no_data">No data available for bulk upload.</string>
+    <string name="preference_publish_data_error_generic">Error publishing data, please try again.</string>
+    <string name="preference_publish_data_error_no_space">Error publishing data. No storage space. Please delete unneeded files and try again.</string>
+    <string name="pass_code">Passcode</string>
+    <string name="secure_data_walkthrough_title">Data Storage</string>
+    <string name="walthrough_next_button">Next</string>
+    <string name="secure_collected_walkthrough_page1_subtitle">Data collected with Flow app is now stored privately in the device</string>
+    <string name="secure_collected_walkthrough_page2_subtitle">Use the Publish data option in Settings to make data collected offline available for bulk upload</string>
 
     <string name="submit_tab_description">You can view but not edit submitted responses</string>
     <string name="snackbar_submitted">Submitted</string>
-    <string name="about_view_old_version">You can no longer update your Flow app and enjoy our latest improvements. This is because your device runs an Android version older than 4.0.3.</string>
-    <string name="do_not_show_again">Do not show again</string>
-    <string name="attribution">* dinosaurs by Sumana Chamrunworakiat from the Noun Project</string>
+    <string name="form_id_hint">Form id</string>
 
 </resources>

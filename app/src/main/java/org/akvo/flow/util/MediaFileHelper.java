@@ -29,10 +29,14 @@ import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import org.akvo.flow.util.files.FileBrowser;
+
 import java.io.File;
 import java.io.IOException;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 import javax.inject.Inject;
@@ -42,16 +46,18 @@ import timber.log.Timber;
 public class MediaFileHelper {
 
     private static final String TEMP_PHOTO_NAME_PREFIX = "image";
-    private static final String TEMP_VIDEO_NAME_PREFIX = "video";
     private static final String IMAGE_SUFFIX = ".jpg";
     private static final String VIDEO_SUFFIX = ".mp4";
+    private static final String DIR_MEDIA = "akvoflow/data/media";
 
     private final Context context;
-    private final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US);
+    private final DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US);
+    private final FileBrowser fileBrowser;
 
     @Inject
-    public MediaFileHelper(Context context) {
+    public MediaFileHelper(Context context, FileBrowser fileBrowser) {
         this.context = context;
+        this.fileBrowser = fileBrowser;
     }
 
     @NonNull
@@ -59,13 +65,43 @@ public class MediaFileHelper {
         return getNamedMediaFile(IMAGE_SUFFIX).getAbsolutePath();
     }
 
+    @NonNull
+    public String getVideoFilePath() {
+        return getNamedMediaFile(VIDEO_SUFFIX).getAbsolutePath();
+    }
+
     @Nullable
-    public String getVideoFilePath(Intent intent) {
-        File tmp = getVideoTmpFile();
-        if (!tmp.exists()) {
-            tmp = new File(getVideoPathFromIntent(intent));
+    public String getAcquiredVideoFilePath(Intent intent) {
+        return getVideoPathFromIntent(intent);
+    }
+
+    @Nullable
+    public File getImageTmpFile() {
+        return getTempMediaFile(TEMP_PHOTO_NAME_PREFIX, IMAGE_SUFFIX);
+    }
+
+    @Nullable
+    private File getTempMediaFile(String prefix, String suffix) {
+        String timeStamp = dateFormat.format(new Date());
+        String imageFileName = prefix + timeStamp + "_";
+        File storageDir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        try {
+            return File.createTempFile(imageFileName, suffix, storageDir);
+        } catch (IOException e) {
+            Timber.e(e, "Unable to create image file");
         }
-        return renameFile(tmp);
+        return null;
+    }
+
+    @NonNull
+    public File getMediaFile(String filename) {
+        File mediaFolder = fileBrowser.getExistingAppInternalFolder(context, DIR_MEDIA);
+        return new File(mediaFolder, filename);
+    }
+
+    @NonNull
+    public List<File> findAllPossibleFolders() {
+        return fileBrowser.findAllPossibleFolders(context, DIR_MEDIA);
     }
 
     /**
@@ -91,43 +127,10 @@ public class MediaFileHelper {
         return videoAbsolutePath;
     }
 
-    private String renameFile(File temporaryVideoFile) {
-        File videoFile = getNamedMediaFile(VIDEO_SUFFIX);
-
-        if (!temporaryVideoFile.renameTo(videoFile)) {
-            Timber.e("Media file rename failed");
-            return temporaryVideoFile.getAbsolutePath();
-        }
-        return videoFile.getAbsolutePath();
-    }
-
-    @NonNull
-    public File getVideoTmpFile() {
-        String filename = TEMP_VIDEO_NAME_PREFIX + VIDEO_SUFFIX;
-        return getMediaFile(filename);
-    }
-
-    @Nullable
-    public File getImageTmpFile() {
-        String timeStamp = dateFormat.format(new Date());
-        String imageFileName = TEMP_PHOTO_NAME_PREFIX + timeStamp + "_";
-        File storageDir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-        try {
-            return File.createTempFile(imageFileName, IMAGE_SUFFIX, storageDir);
-        } catch (IOException e) {
-            Timber.e(e, "Unable to create image file");
-        }
-        return null;
-    }
-
     @NonNull
     private File getNamedMediaFile(String fileSuffix) {
         String filename = PlatformUtil.uuid() + fileSuffix;
-        return new File(FileUtil.getFilesDir(FileUtil.FileType.MEDIA), filename);
-    }
-
-    @NonNull
-    private File getMediaFile(String filename) {
-        return new File(FileUtil.getFilesDir(FileUtil.FileType.TMP), filename);
+        File mediaFolder = fileBrowser.getExistingAppInternalFolder(context, DIR_MEDIA);
+        return new File(mediaFolder, filename);
     }
 }

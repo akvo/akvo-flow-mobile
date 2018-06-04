@@ -1,5 +1,40 @@
 Akvo FLOW app release notes
 ===========================
+# ver 2.5.0
+Date: 4 June 2018
+
+# New and noteworthy
+* **Secure collected data and images** - [#977](https://github.com/akvo/akvo-flow-mobile/issues/977) Collected data and media files are now stored in the app private storage.
+* **Add walkthrough for data storage privacy changes** - [#984](https://github.com/akvo/akvo-flow-mobile/issues/984) Added introduction to explain the changes made to the collected data and images storage.
+* **Exported data has to be saved to private app storage.** - [#991](https://github.com/akvo/akvo-flow-mobile/issues/991) Zip files are generated in the application private folder.
+* **Create a service to make existing public data private (move data from public to private storage)** - [#992](https://github.com/akvo/akvo-flow-mobile/issues/992) Old collected data is moved from public to private storage.
+* **Settings to temporary publish data - UI** - [#993](https://github.com/akvo/akvo-flow-mobile/issues/993) Added settings to allow temporarily publish collected data and media to allow manually upload it to dashboard.
+* **Media needs to be saved in private app storage** - [#1009](https://github.com/akvo/akvo-flow-mobile/issues/1009) Videos and images are saved to private app storage.
+* **Settings to temporary publish data - Logic** - [#1038](https://github.com/akvo/akvo-flow-mobile/issues/1038) Added the logic to allow publishing of private files for manual data upload to dashboard.
+* **Published files when device reboots** - [#1044](https://github.com/akvo/akvo-flow-mobile/issues/1044) When device reboots, make sure the timeout for published files is kept.
+* **Service to remove public data files** - [#1046](https://github.com/akvo/akvo-flow-mobile/issues/1046) Once time runs out, published files are removed.
+* **Show loading while data is being published** - [#1048](https://github.com/akvo/akvo-flow-mobile/issues/1048) Display a "loading" widget while the files are being published.
+* **Delete collected data and published files** - [#1049](https://github.com/akvo/akvo-flow-mobile/issues/1049) 
+* **Update the ui with the latest progress** - [#1050](https://github.com/akvo/akvo-flow-mobile/issues/1050)
+* **Secure data and images: filter out "saved" images when publishing** - [#1052](https://github.com/akvo/akvo-flow-mobile/issues/1052)
+* **Exported files folder** - [#1053](https://github.com/akvo/akvo-flow-mobile/issues/1053)
+* **Logic for deleting files and data** - [#1058](https://github.com/akvo/akvo-flow-mobile/issues/1058)
+* **Increase minSdkVersion to 15** - [#1071](https://github.com/akvo/akvo-flow-mobile/issues/1071)
+* **Move published files to app public storage** - [#1080](https://github.com/akvo/akvo-flow-mobile/issues/1080)
+* **Update translations** - [#1119](https://github.com/akvo/akvo-flow-mobile/issues/1119)
+
+# Resolved issues
+* **Fix video viewing** - [#1015](https://github.com/akvo/akvo-flow-mobile/issues/1015)
+* **Errors when publishing private data** - [#1040](https://github.com/akvo/akvo-flow-mobile/issues/1040)
+* **Videos can no longer be opened on devices with Android 8** - [#1042](https://github.com/akvo/akvo-flow-mobile/issues/1042)
+* **Improve user handing in FlowApp** - [#1056](https://github.com/akvo/akvo-flow-mobile/issues/1056)
+* **Cleanup SurveyDbAdapter and SurveyDbDataSource** - [#1059](https://github.com/akvo/akvo-flow-mobile/issues/1059)
+* **Publish data not available when minute 0 is still running** - [#1106](https://github.com/akvo/akvo-flow-mobile/issues/1106)
+* **Download form with ID and Redownload all switched** - [#1108](https://github.com/akvo/akvo-flow-mobile/issues/1108)
+* **Replace image loading library** - [#1114](https://github.com/akvo/akvo-flow-mobile/issues/1114)
+* **Remove unused resources** - [#1120](https://github.com/akvo/akvo-flow-mobile/issues/1120)
+
+---------------
 # ver 2.4.8
 Date: 24 April 2018
 

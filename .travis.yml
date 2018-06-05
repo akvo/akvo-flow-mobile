@@ -3,6 +3,9 @@ sudo: required
 env:
   global:
     - ADB_INSTALL_TIMEOUT=8 # 8 minutes (2 minutes by default)
+    secure: "dM/EYQMiv84HCLqlmJTk7f/YVbP0+llji6zvv4beG5moTFDxei+zjfz9c1qZLMudDiCvh36n6S3H4cJIzsJo/BjXOvz02qtovTsPjQYU7alaep/8cQ3NJPiohdlrGbl79gJ4QprUVZ4P7UZkHt4AZKb/qnNm15jufi2qUZ6PHB4="
+    secure: "kqxlykAu/CaUnfUM3PhaX/2Xm/cehFCNdMzbiHlfZvRONYwz9ieaN5cetvBjg7tuOIUDpgxxBx4HMVG/65j59hzPr7J4dBLzatmh6JCNIdz4MWWEpbm6j8gmNzC14Hx7ZSj91s1HuKcM4aBpIAyMJaypCo4ziN5rgcNsUldyQe0="
+    secure: "FJ4aQfC6bQEHTzDD82SHc0DPEwR6gEatlZnb5+j/MaZIrfchcv7vMpn9qh2Mtd9zbzshwsut60+alEeKlqV2YEK29Bx2lGSoUDunTzGrTdKxIgx/5WRu11WuQEtmJ3zWuFeZGrTtFCyZKOxdws0j5s+HDldBOwh/VtfyYBYXmxI="
 
 jdk:
   - oraclejdk8
@@ -28,6 +31,7 @@ before_install:
   - gem install fastlane --no-rdoc --no-ri --no-document --quiet
   - git remote set-url origin https://valllllll2000:$GITHUB_API_KEY@github.com/akvo/akvo-flow-mobile.git
   - chmod +x fastlane/deploy_beta.sh
+  - chmod +x travis/deploy_release.sh
 
 #before_script:
 #    - echo no | android create avd --force -n test -t android-21 --abi armeabi-v7a -c 2048M

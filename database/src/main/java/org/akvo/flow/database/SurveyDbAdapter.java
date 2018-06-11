@@ -306,10 +306,6 @@ public class SurveyDbAdapter {
                 });
     }
 
-    public void createTransmission(ContentValues values) {
-        database.insert(Tables.TRANSMISSION, null, values);
-    }
-
     /**
      * Updates the matching transmission history records with the status
      * passed in. If the status == Completed, the completion date is updated. If
@@ -317,10 +313,16 @@ public class SurveyDbAdapter {
      *
      * @return the number of rows affected
      */
-    public int updateTransmission(String fileName, ContentValues values) {
+    public int updateTransmissionStatus(String fileName, int status) {
         // TODO: Update Survey Instance STATUS as well
-        return database.update(Tables.TRANSMISSION, values,
-                TransmissionColumns.FILENAME + " = ?",
+        ContentValues values = new ContentValues();
+        values.put(TransmissionColumns.STATUS, status);
+        if (TransmissionStatus.SYNCED == status) {
+            values.put(TransmissionColumns.END_DATE, System.currentTimeMillis() + "");
+        } else if (TransmissionStatus.IN_PROGRESS == status) {
+            values.put(TransmissionColumns.START_DATE, System.currentTimeMillis() + "");
+        }
+        return database.update(Tables.TRANSMISSION, values, TransmissionColumns.FILENAME + " = ?",
                 new String[] { fileName });
     }
 

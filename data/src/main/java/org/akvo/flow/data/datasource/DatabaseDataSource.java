@@ -171,8 +171,7 @@ public class DatabaseDataSource {
             // a file to hold this data, we set the value to the instance UUID
             briteSurveyDbAdapter
                     .createTransmission(id, String.valueOf(surveyInstance.getSurveyId()),
-                            surveyInstance.getUuid(),
-                            TransmissionStatus.SYNCED);
+                            surveyInstance.getUuid(), TransmissionStatus.SYNCED);
         }
         briteSurveyDbAdapter.deleteEmptyRecords();
     }

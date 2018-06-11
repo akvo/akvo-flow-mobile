@@ -547,42 +547,22 @@ public class SurveyDbDataSource {
         surveyDbAdapter.deleteResponse(mSurveyInstanceId, questionId);
     }
 
-    private void createTransmission(long surveyInstanceId, String formId, String filename,
-            int status) {
-        ContentValues values = new ContentValues();
-        values.put(TransmissionColumns.SURVEY_INSTANCE_ID, surveyInstanceId);
-        values.put(TransmissionColumns.SURVEY_ID, formId);
-        values.put(TransmissionColumns.FILENAME, filename);
-        values.put(TransmissionColumns.STATUS, status);
-        if (TransmissionStatus.SYNCED == status) {
-            final String date = String.valueOf(System.currentTimeMillis());
-            values.put(TransmissionColumns.START_DATE, date);
-            values.put(TransmissionColumns.END_DATE, date);
-        }
-        surveyDbAdapter.createTransmission(values);
-    }
-
     public void createTransmission(long surveyInstanceId, String formId, String filename) {
-        createTransmission(surveyInstanceId, formId, filename, TransmissionStatus.QUEUED);
+        briteSurveyDbAdapter
+                .createTransmission(surveyInstanceId, formId, filename, TransmissionStatus.QUEUED);
     }
 
     public void setFileTransmissionFailed(String filename) {
-        int rows = updateTransmissionHistory(filename, TransmissionStatus.FAILED);
+        int rows = updateTransmissionStatus(filename, TransmissionStatus.FAILED);
         if (rows == 0) {
             // Use a dummy "-1" as survey_instance_id, as the database needs that attribute
-            createTransmission(-1, null, filename, TransmissionStatus.FAILED);
+            briteSurveyDbAdapter
+                    .createTransmission(-1, null, filename, TransmissionStatus.FAILED);
         }
     }
 
-    public int updateTransmissionHistory(String filename, int status) {
-        ContentValues values = new ContentValues();
-        values.put(TransmissionColumns.STATUS, status);
-        if (TransmissionStatus.SYNCED == status) {
-            values.put(TransmissionColumns.END_DATE, System.currentTimeMillis() + "");
-        } else if (TransmissionStatus.IN_PROGRESS == status) {
-            values.put(TransmissionColumns.START_DATE, System.currentTimeMillis() + "");
-        }
-        return surveyDbAdapter.updateTransmission(filename, values);
+    public int updateTransmissionStatus(String filename, int status) {
+        return surveyDbAdapter.updateTransmissionStatus(filename, status);
     }
 
     public void deleteResponse(long mSurveyInstanceId, String questionId, String iteration) {

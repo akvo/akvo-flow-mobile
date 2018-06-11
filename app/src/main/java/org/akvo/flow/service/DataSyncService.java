@@ -479,8 +479,7 @@ public class DataSyncService extends IntentService {
         for (int i = 0; i < totalFiles; i++) {
             FileTransmission transmission = transmissions.get(i);
             final long surveyInstanceId = transmission.getRespondentId();
-            if (syncFile(transmission.getFileName(), transmission.getFormId()
-            )) {
+            if (syncFile(transmission.getFileName(), transmission.getFormId())) {
                 syncedSurveys.add(surveyInstanceId);
             } else {
                 unsyncedSurveys.add(surveyInstanceId);
@@ -528,7 +527,7 @@ public class DataSyncService extends IntentService {
 
         // Temporarily set the status to 'IN PROGRESS'. Transmission status should
         // *always* be updated with the outcome of the upload operation.
-        mDatabase.updateTransmissionHistory(filename, TransmissionStatus.IN_PROGRESS);
+        mDatabase.updateTransmissionStatus(filename, TransmissionStatus.IN_PROGRESS);
 
         int status = TransmissionStatus.FAILED;
         boolean synced = false;
@@ -551,7 +550,7 @@ public class DataSyncService extends IntentService {
             }
         }
 
-        mDatabase.updateTransmissionHistory(filename, status);
+        mDatabase.updateTransmissionStatus(filename, status);
         return synced;
     }
 

@@ -237,12 +237,11 @@ public class DatabaseDataSource {
         return Observable.just(true);
     }
 
-    public boolean unSyncedTransmissionsExist() {
-        return briteSurveyDbAdapter.unSyncedTransmissionsExist();
+    public Observable<Boolean> unSyncedTransmissionsExist() {
+        return Observable.just(briteSurveyDbAdapter.unSyncedTransmissionsExist());
     }
 
-    public Observable<Cursor> getAllTransmissionFileNames() {
-        return Observable
-                .just(briteSurveyDbAdapter.getAllTransmissionFileNames());
+    public Observable<Cursor> getAllTransmissions() {
+        return Observable.just(briteSurveyDbAdapter.getAllTransmissions());
     }
 }

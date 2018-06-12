@@ -326,20 +326,21 @@ public class SurveyDbAdapter {
                 new String[] { fileName });
     }
 
-    public Cursor getFileTransmissions(long surveyInstanceId) {
-        return database.query(Tables.TRANSMISSION,
-                new String[] {
-                        TransmissionColumns._ID, TransmissionColumns.SURVEY_INSTANCE_ID,
-                        TransmissionColumns.SURVEY_ID, TransmissionColumns.STATUS,
-                        TransmissionColumns.FILENAME, TransmissionColumns.START_DATE,
-                        TransmissionColumns.END_DATE
-                },
-                TransmissionColumns.SURVEY_INSTANCE_ID + " = ?",
-                new String[] { String.valueOf(surveyInstanceId) },
-                null, null, null);
+    public Cursor getSurveyInstanceTransmissions(long surveyInstanceId) {
+        return getTransmissions(TransmissionColumns.SURVEY_INSTANCE_ID + " = ?",
+                new String[] { String.valueOf(surveyInstanceId) }
+        );
     }
 
-    public Cursor getUnSyncedTransmissions(String[] selectionArgs) {
+    public Cursor getUnSyncedTransmissions() {
+        return getTransmissions(TransmissionColumns.STATUS + " IN (?, ?, ?)", new String[] {
+                String.valueOf(TransmissionStatus.FAILED),
+                String.valueOf(TransmissionStatus.IN_PROGRESS),// Stalled IN_PROGRESS files
+                String.valueOf(TransmissionStatus.QUEUED)
+        });
+    }
+
+    private Cursor getTransmissions(String selection, String[] selectionArgs) {
         return database.query(Tables.TRANSMISSION,
                 new String[] {
                         TransmissionColumns._ID, TransmissionColumns.SURVEY_INSTANCE_ID,
@@ -347,8 +348,7 @@ public class SurveyDbAdapter {
                         TransmissionColumns.FILENAME, TransmissionColumns.START_DATE,
                         TransmissionColumns.END_DATE
                 },
-                TransmissionColumns.STATUS + " IN (?, ?, ?)",
-                selectionArgs, null, null, null);
+                selection, selectionArgs, null, null, null);
     }
 
     /**

@@ -29,7 +29,7 @@ import org.akvo.flow.data.entity.ApiSurveyInstance;
 import org.akvo.flow.data.entity.DataPointMapper;
 import org.akvo.flow.data.entity.SurveyMapper;
 import org.akvo.flow.data.entity.SyncedTimeMapper;
-import org.akvo.flow.data.entity.TransmissionMapper;
+import org.akvo.flow.data.entity.TransmissionFilenameMapper;
 import org.akvo.flow.data.entity.UserMapper;
 import org.akvo.flow.data.net.FlowRestApi;
 import org.akvo.flow.domain.entity.DataPoint;
@@ -66,13 +66,13 @@ public class SurveyDataRepository implements SurveyRepository {
     private final FlowRestApi restApi;
     private final SurveyMapper surveyMapper;
     private final UserMapper userMapper;
-    private final TransmissionMapper transmissionMapper;
+    private final TransmissionFilenameMapper transmissionMapper;
 
     @Inject
     public SurveyDataRepository(DataSourceFactory dataSourceFactory,
             DataPointMapper dataPointMapper, SyncedTimeMapper syncedTimeMapper, FlowRestApi restApi,
             SurveyMapper surveyMapper, UserMapper userMapper,
-            TransmissionMapper transmissionMapper) {
+            TransmissionFilenameMapper transmissionMapper) {
         this.dataSourceFactory = dataSourceFactory;
         this.dataPointMapper = dataPointMapper;
         this.syncedTimeMapper = syncedTimeMapper;
@@ -308,13 +308,12 @@ public class SurveyDataRepository implements SurveyRepository {
 
     @Override
     public Observable<Boolean> unSyncedTransmissionsExist() {
-        return Observable
-                .just(dataSourceFactory.getDataBaseDataSource().unSyncedTransmissionsExist());
+        return dataSourceFactory.getDataBaseDataSource().unSyncedTransmissionsExist();
     }
 
     @Override
     public Observable<List<String>> getAllTransmissionFileNames() {
-        return dataSourceFactory.getDataBaseDataSource().getAllTransmissionFileNames()
+        return dataSourceFactory.getDataBaseDataSource().getAllTransmissions()
                 .map(new Function<Cursor, List<String>>() {
                     @Override
                     public List<String> apply(Cursor cursor) {

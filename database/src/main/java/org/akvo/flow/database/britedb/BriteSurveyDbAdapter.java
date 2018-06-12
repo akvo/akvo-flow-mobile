@@ -269,6 +269,7 @@ public class BriteSurveyDbAdapter {
 
     public void createTransmission(long surveyInstanceId, String formID, String filename,
             int status) {
+        Timber.d("creating transmission with file: %s", filename);
         ContentValues values = new ContentValues();
         values.put(TransmissionColumns.SURVEY_INSTANCE_ID, surveyInstanceId);
         values.put(TransmissionColumns.SURVEY_ID, formID);
@@ -533,16 +534,14 @@ public class BriteSurveyDbAdapter {
 
     public boolean unSyncedTransmissionsExist() {
         boolean transmissionsExist = false;
-        String sql =
-                "SELECT " + TransmissionColumns._ID + " FROM " + Tables.TRANSMISSION + " WHERE "
-                        + TransmissionColumns.STATUS
-                        + " IN (?, ?, ?) LIMIT 1";
+        String column = TransmissionColumns._ID;
+        String whereClause = TransmissionColumns.STATUS + " IN (?, ?, ?) LIMIT 1";
         String[] selectionArgs = new String[] {
                 String.valueOf(TransmissionStatus.FAILED),
                 String.valueOf(TransmissionStatus.IN_PROGRESS),
                 String.valueOf(TransmissionStatus.QUEUED)
         };
-        Cursor cursor = briteDatabase.query(sql, selectionArgs);
+        Cursor cursor = queryTransmissions(column, whereClause, selectionArgs);
         if (cursor != null && cursor.getCount() > 0) {
             transmissionsExist = true;
         }
@@ -552,16 +551,20 @@ public class BriteSurveyDbAdapter {
         return transmissionsExist;
     }
 
-    public Cursor getAllTransmissionFileNames() {
-        String sql =
-                "SELECT " + TransmissionColumns.FILENAME + " FROM " + Tables.TRANSMISSION
-                        + " WHERE " + TransmissionColumns.STATUS + " IN (?, ?, ?, ?)";
+    public Cursor getAllTransmissions() {
+        String column = TransmissionColumns.FILENAME;
+        String whereClause = TransmissionColumns.STATUS + " IN (?, ?, ?, ?)";
         String[] selectionArgs = new String[] {
                 String.valueOf(TransmissionStatus.QUEUED),
                 String.valueOf(TransmissionStatus.IN_PROGRESS),
                 String.valueOf(TransmissionStatus.SYNCED),
                 String.valueOf(TransmissionStatus.FAILED),
         };
+        return queryTransmissions(column, whereClause, selectionArgs);
+    }
+
+    private Cursor queryTransmissions(String column, String whereClause, String[] selectionArgs) {
+        String sql = "SELECT " + column + " FROM " + Tables.TRANSMISSION + " WHERE " + whereClause;
         return briteDatabase.query(sql, selectionArgs);
     }
 }

@@ -22,6 +22,7 @@ package org.akvo.flow.ui.view.media.video;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
@@ -59,7 +60,8 @@ import butterknife.OnClick;
  *
  * @author Christopher Fagiani
  */
-public class VideoQuestionView extends QuestionView implements MediaSyncTask.DownloadListener, IVideoQuestionView {
+public class VideoQuestionView extends QuestionView
+        implements MediaSyncTask.DownloadListener, IVideoQuestionView {
 
     @Inject
     SnackBarManager snackBarManager;
@@ -120,11 +122,12 @@ public class VideoQuestionView extends QuestionView implements MediaSyncTask.Dow
 
     @OnClick(R.id.image)
     void onVideoViewClicked() {
-        if (TextUtils.isEmpty(filename) || !(new File(filename).exists())) {
-            showImageLoadError();
-            return;
+        File file = rebuildFilePath();
+        if (file != null && file.exists()) {
+            navigator.navigateToVideoView(getContext(), filename);
+        } else {
+            showVideoLoadError();
         }
-        navigator.navigateToVideoView(getContext(), filename);
     }
 
     @OnClick(R.id.media_btn)
@@ -240,14 +243,11 @@ public class VideoQuestionView extends QuestionView implements MediaSyncTask.Dow
 
     private void displayThumbnail() {
         hideDownloadOptions();
-
-        if (TextUtils.isEmpty(filename)) {
-            return;
-        }
-        if (!new File(filename).exists()) {
-            showTemporaryMedia();
-        } else {
+        File file = rebuildFilePath();
+        if (file != null && file.exists()) {
             imageLoader.loadFromFile(new File(filename), mImageView);
+        } else {
+            showTemporaryMedia();
         }
     }
 
@@ -259,12 +259,22 @@ public class VideoQuestionView extends QuestionView implements MediaSyncTask.Dow
     @Override
     public void onResourceDownload(boolean done) {
         if (!done) {
-            showImageLoadError();
+            showVideoLoadError();
         }
         displayThumbnail();
     }
 
-    private void showImageLoadError() {
+    private void showVideoLoadError() {
         snackBarManager.displaySnackBar(this, R.string.error_video_preview, getContext());
+    }
+
+    /**
+     * File paths cannot be trusted so we need to get the name of the file and rebuild the path.
+     * All media files should be located in the same folder
+     * @return File with the correct file path on the device
+     */
+    @Nullable
+    private File rebuildFilePath() {
+        return presenter.getExistingImageFilePath(filename);
     }
 }

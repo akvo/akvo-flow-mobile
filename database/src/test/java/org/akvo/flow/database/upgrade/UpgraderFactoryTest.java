@@ -49,7 +49,7 @@ public class UpgraderFactoryTest {
         UpgraderVisitor upgrader = (UpgraderVisitor) upgraderFactory
                 .createUpgrader(DatabaseHelper.VER_LAUNCH, null, null);
 
-        assertEquals(7, upgrader.getUpgraders().size());
+        assertEquals(8, upgrader.getUpgraders().size());
         assertTrue(containsLaunchUpgrader(upgrader.getUpgraders()));
         assertTrue(containsFormSubmitterUpgrader(upgrader.getUpgraders()));
         assertTrue(containsFormCheckUpgrader(upgrader.getUpgraders()));
@@ -57,6 +57,7 @@ public class UpgraderFactoryTest {
         assertTrue(containsCaddisflyUpgrader(upgrader.getUpgraders()));
         assertTrue(containsPreferencesUpgrader(upgrader.getUpgraders()));
         assertTrue(containsLanguagesUpgrader(upgrader.getUpgraders()));
+        assertTrue(containsResponsesUpgrader(upgrader.getUpgraders()));
     }
 
     @Test
@@ -65,7 +66,7 @@ public class UpgraderFactoryTest {
         UpgraderVisitor upgrader = (UpgraderVisitor) upgraderFactory
                 .createUpgrader(DatabaseHelper.VER_FORM_SUBMITTER, null, null);
 
-        assertEquals(6, upgrader.getUpgraders().size());
+        assertEquals(7, upgrader.getUpgraders().size());
         assertFalse(containsLaunchUpgrader(upgrader.getUpgraders()));
         assertTrue(containsFormSubmitterUpgrader(upgrader.getUpgraders()));
         assertTrue(containsFormCheckUpgrader(upgrader.getUpgraders()));
@@ -73,6 +74,7 @@ public class UpgraderFactoryTest {
         assertTrue(containsCaddisflyUpgrader(upgrader.getUpgraders()));
         assertTrue(containsPreferencesUpgrader(upgrader.getUpgraders()));
         assertTrue(containsLanguagesUpgrader(upgrader.getUpgraders()));
+        assertTrue(containsResponsesUpgrader(upgrader.getUpgraders()));
     }
 
     @Test
@@ -81,7 +83,7 @@ public class UpgraderFactoryTest {
         UpgraderVisitor upgrader = (UpgraderVisitor) upgraderFactory
                 .createUpgrader(DatabaseHelper.VER_FORM_DEL_CHECK, null, null);
 
-        assertEquals(5, upgrader.getUpgraders().size());
+        assertEquals(6, upgrader.getUpgraders().size());
         assertFalse(containsLaunchUpgrader(upgrader.getUpgraders()));
         assertFalse(containsFormSubmitterUpgrader(upgrader.getUpgraders()));
         assertTrue(containsFormCheckUpgrader(upgrader.getUpgraders()));
@@ -89,6 +91,7 @@ public class UpgraderFactoryTest {
         assertTrue(containsCaddisflyUpgrader(upgrader.getUpgraders()));
         assertTrue(containsPreferencesUpgrader(upgrader.getUpgraders()));
         assertTrue(containsLanguagesUpgrader(upgrader.getUpgraders()));
+        assertTrue(containsResponsesUpgrader(upgrader.getUpgraders()));
     }
 
     @Test
@@ -97,7 +100,7 @@ public class UpgraderFactoryTest {
         UpgraderVisitor upgrader = (UpgraderVisitor) upgraderFactory
                 .createUpgrader(DatabaseHelper.VER_FORM_VERSION, null, null);
 
-        assertEquals(4, upgrader.getUpgraders().size());
+        assertEquals(5, upgrader.getUpgraders().size());
         assertFalse(containsLaunchUpgrader(upgrader.getUpgraders()));
         assertFalse(containsFormSubmitterUpgrader(upgrader.getUpgraders()));
         assertFalse(containsFormCheckUpgrader(upgrader.getUpgraders()));
@@ -105,6 +108,7 @@ public class UpgraderFactoryTest {
         assertTrue(containsCaddisflyUpgrader(upgrader.getUpgraders()));
         assertTrue(containsPreferencesUpgrader(upgrader.getUpgraders()));
         assertTrue(containsLanguagesUpgrader(upgrader.getUpgraders()));
+        assertTrue(containsResponsesUpgrader(upgrader.getUpgraders()));
     }
 
     @Test
@@ -113,7 +117,7 @@ public class UpgraderFactoryTest {
         UpgraderVisitor upgrader = (UpgraderVisitor) upgraderFactory
                 .createUpgrader(DatabaseHelper.VER_CADDISFLY_QN, null, null);
 
-        assertEquals(3, upgrader.getUpgraders().size());
+        assertEquals(4, upgrader.getUpgraders().size());
         assertFalse(containsLaunchUpgrader(upgrader.getUpgraders()));
         assertFalse(containsFormSubmitterUpgrader(upgrader.getUpgraders()));
         assertFalse(containsFormCheckUpgrader(upgrader.getUpgraders()));
@@ -121,6 +125,7 @@ public class UpgraderFactoryTest {
         assertTrue(containsCaddisflyUpgrader(upgrader.getUpgraders()));
         assertTrue(containsPreferencesUpgrader(upgrader.getUpgraders()));
         assertTrue(containsLanguagesUpgrader(upgrader.getUpgraders()));
+        assertTrue(containsResponsesUpgrader(upgrader.getUpgraders()));
     }
 
     @Test
@@ -129,7 +134,7 @@ public class UpgraderFactoryTest {
         UpgraderVisitor upgrader = (UpgraderVisitor) upgraderFactory
                 .createUpgrader(DatabaseHelper.VER_PREFERENCES_MIGRATE, null, null);
 
-        assertEquals(2, upgrader.getUpgraders().size());
+        assertEquals(3, upgrader.getUpgraders().size());
         assertFalse(containsLaunchUpgrader(upgrader.getUpgraders()));
         assertFalse(containsFormSubmitterUpgrader(upgrader.getUpgraders()));
         assertFalse(containsFormCheckUpgrader(upgrader.getUpgraders()));
@@ -137,13 +142,31 @@ public class UpgraderFactoryTest {
         assertFalse(containsCaddisflyUpgrader(upgrader.getUpgraders()));
         assertTrue(containsPreferencesUpgrader(upgrader.getUpgraders()));
         assertTrue(containsLanguagesUpgrader(upgrader.getUpgraders()));
+        assertTrue(containsResponsesUpgrader(upgrader.getUpgraders()));
     }
 
     @Test
-    public void createUpgraderShouldCreateNoUpgraderWhenLanguages() {
+    public void createUpgraderShouldCreateCorrectUpgraderWhenLanguages() {
         UpgraderFactory upgraderFactory = new UpgraderFactory();
         UpgraderVisitor upgrader = (UpgraderVisitor) upgraderFactory
                 .createUpgrader(DatabaseHelper.VER_LANGUAGES_MIGRATE, null, null);
+
+        assertEquals(2, upgrader.getUpgraders().size());
+        assertFalse(containsLaunchUpgrader(upgrader.getUpgraders()));
+        assertFalse(containsFormSubmitterUpgrader(upgrader.getUpgraders()));
+        assertFalse(containsFormCheckUpgrader(upgrader.getUpgraders()));
+        assertFalse(containsFormVersionUpgrader(upgrader.getUpgraders()));
+        assertFalse(containsCaddisflyUpgrader(upgrader.getUpgraders()));
+        assertFalse(containsPreferencesUpgrader(upgrader.getUpgraders()));
+        assertTrue(containsLanguagesUpgrader(upgrader.getUpgraders()));
+        assertTrue(containsResponsesUpgrader(upgrader.getUpgraders()));
+    }
+
+    @Test
+    public void createUpgraderShouldCreateCorrectUpgraderWhenResponse() {
+        UpgraderFactory upgraderFactory = new UpgraderFactory();
+        UpgraderVisitor upgrader = (UpgraderVisitor) upgraderFactory
+                .createUpgrader(DatabaseHelper.VER_RESPONSE_ITERATION, null, null);
 
         assertEquals(1, upgrader.getUpgraders().size());
         assertFalse(containsLaunchUpgrader(upgrader.getUpgraders()));
@@ -152,14 +175,15 @@ public class UpgraderFactoryTest {
         assertFalse(containsFormVersionUpgrader(upgrader.getUpgraders()));
         assertFalse(containsCaddisflyUpgrader(upgrader.getUpgraders()));
         assertFalse(containsPreferencesUpgrader(upgrader.getUpgraders()));
-        assertTrue(containsLanguagesUpgrader(upgrader.getUpgraders()));
+        assertFalse(containsLanguagesUpgrader(upgrader.getUpgraders()));
+        assertTrue(containsResponsesUpgrader(upgrader.getUpgraders()));
     }
 
     @Test
-    public void createUpgraderShouldCreateNoUpgraderWhenResponseIteration() {
+    public void createUpgraderShouldCreateNoUpgraderWhenTransmissionIteration() {
         UpgraderFactory upgraderFactory = new UpgraderFactory();
         UpgraderVisitor upgrader = (UpgraderVisitor) upgraderFactory
-                .createUpgrader(DatabaseHelper.VER_RESPONSE_ITERATION, null, null);
+                .createUpgrader(DatabaseHelper.VER_TRANSMISSION_ITERATION, null, null);
 
         assertEquals(0, upgrader.getUpgraders().size());
     }
@@ -221,6 +245,16 @@ public class UpgraderFactoryTest {
     private boolean containsLanguagesUpgrader(List<DatabaseUpgrader> upgraders) {
         for (DatabaseUpgrader upgrader : upgraders) {
             if (upgrader instanceof LanguagesUpgrader) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+    private boolean containsResponsesUpgrader(List<DatabaseUpgrader> upgraders) {
+        for (DatabaseUpgrader upgrader : upgraders) {
+            if (upgrader instanceof ResponsesUpgrader) {
                 return true;
             }
         }

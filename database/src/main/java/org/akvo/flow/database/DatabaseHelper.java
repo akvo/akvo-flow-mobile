@@ -28,6 +28,7 @@ import android.util.Pair;
 
 import org.akvo.flow.database.migration.MigrationListener;
 import org.akvo.flow.database.migration.ResponseMigrationHelper;
+import org.akvo.flow.database.migration.TransmissionMigrationHelper;
 import org.akvo.flow.database.upgrade.UpgraderFactory;
 
 import java.util.Map;
@@ -51,7 +52,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final int VER_PREFERENCES_MIGRATE = 83;
     public static final int VER_LANGUAGES_MIGRATE = 84;
     public static final int VER_RESPONSE_ITERATION = 85;
-    static final int DATABASE_VERSION = VER_RESPONSE_ITERATION;
+    public static final int VER_TRANSMISSION_ITERATION = 86;
+    static final int DATABASE_VERSION = VER_TRANSMISSION_ITERATION;
 
     private static SQLiteDatabase database;
     private static final Object LOCK_OBJ = new Object();
@@ -188,6 +190,20 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 + " ADD COLUMN " + SurveyInstanceColumns.SUBMITTER + " TEXT");
     }
 
+    public void upgradeFromLanguages(SQLiteDatabase db) {
+        db.execSQL("ALTER TABLE " + Tables.RESPONSE
+                + " ADD COLUMN " + ResponseColumns.ITERATION + " INTEGER NOT NULL DEFAULT 0");
+        ResponseMigrationHelper responseMigrationHelper = new ResponseMigrationHelper();
+        Map<Pair<String, String>, ContentValues> responseMigrationData = responseMigrationHelper
+                .obtainResponseMigrationData(db);
+        responseMigrationHelper.migrateResponses(responseMigrationData, db);
+    }
+
+    public void upgradeFromResponses(SQLiteDatabase db) {
+        TransmissionMigrationHelper helper = new TransmissionMigrationHelper();
+        helper.migrateTransmissions(db);
+    }
+
     /**
      * This is not ideal but due to our setup, using something other than getWritableDatabase
      * produces errors.
@@ -196,16 +212,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     @Override
     public SQLiteDatabase getReadableDatabase() {
         return getWritableDatabase();
-    }
-
-
-    public void upgradeFromLanguages(SQLiteDatabase db) {
-        db.execSQL("ALTER TABLE " + Tables.RESPONSE
-                + " ADD COLUMN " + ResponseColumns.ITERATION + " INTEGER NOT NULL DEFAULT 0");
-        ResponseMigrationHelper responseMigrationHelper = new ResponseMigrationHelper();
-        Map<Pair<String, String>, ContentValues> responseMigrationData = responseMigrationHelper
-                .obtainResponseMigrationData(db);
-        responseMigrationHelper.migrateResponses(responseMigrationData, db);
     }
 
     @Override
@@ -263,4 +269,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + Tables.RECORD);
         db.execSQL("DROP TABLE IF EXISTS " + Tables.TRANSMISSION);
     }
+
+
 }

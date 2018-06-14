@@ -552,7 +552,7 @@ public class DataSyncService extends IntentService {
             FlowApi api = new FlowApi(getApplicationContext());
             switch (api.sendProcessingNotification(formId, action, filePath)) {
                 case HttpURLConnection.HTTP_OK:
-                    status = TransmissionStatus.SYNCED;// Mark everything synced
+                    status = TransmissionStatus.SYNCED; // Mark everything synced
                     synced = true;
                     break;
                 case HttpURLConnection.HTTP_NOT_FOUND:

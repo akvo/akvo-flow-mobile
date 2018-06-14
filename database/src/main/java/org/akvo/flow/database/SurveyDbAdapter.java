@@ -308,14 +308,16 @@ public class SurveyDbAdapter {
 
     public Cursor getSurveyInstanceTransmissions(long surveyInstanceId) {
         return getTransmissions(TransmissionColumns.SURVEY_INSTANCE_ID + " = ?",
-                new String[] { String.valueOf(surveyInstanceId) }
+                new String[] {
+                        String.valueOf(surveyInstanceId)
+                }
         );
     }
 
     public Cursor getUnSyncedTransmissions() {
         return getTransmissions(TransmissionColumns.STATUS + " IN (?, ?, ?)", new String[] {
                 String.valueOf(TransmissionStatus.FAILED),
-                String.valueOf(TransmissionStatus.IN_PROGRESS),// Stalled IN_PROGRESS files
+                String.valueOf(TransmissionStatus.IN_PROGRESS), // Stalled IN_PROGRESS files
                 String.valueOf(TransmissionStatus.QUEUED)
         });
     }

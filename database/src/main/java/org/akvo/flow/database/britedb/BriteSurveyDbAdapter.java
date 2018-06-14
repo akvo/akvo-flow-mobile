@@ -269,7 +269,6 @@ public class BriteSurveyDbAdapter {
 
     public void createTransmission(long surveyInstanceId, String formID, String filename,
             int status) {
-        Timber.d("creating transmission with file: %s", filename);
         ContentValues values = new ContentValues();
         values.put(TransmissionColumns.SURVEY_INSTANCE_ID, surveyInstanceId);
         values.put(TransmissionColumns.SURVEY_ID, formID);
@@ -281,6 +280,25 @@ public class BriteSurveyDbAdapter {
             values.put(TransmissionColumns.END_DATE, date);
         }
         briteDatabase.insert(Tables.TRANSMISSION, values);
+    }
+
+    /**
+     * Updates the matching transmission history records with the status
+     * passed in. If the status == Synced, the end date is updated. If
+     * the status == In Progress, the start date is updated.
+     *
+     * @return the number of rows affected
+     */
+    public void updateTransmissionStatus(long id, int status) {
+        ContentValues values = new ContentValues();
+        values.put(TransmissionColumns.STATUS, status);
+        if (TransmissionStatus.SYNCED == status) {
+            values.put(TransmissionColumns.END_DATE, System.currentTimeMillis() + "");
+        } else if (TransmissionStatus.IN_PROGRESS == status) {
+            values.put(TransmissionColumns.START_DATE, System.currentTimeMillis() + "");
+        }
+        briteDatabase.update(Tables.TRANSMISSION, values, TransmissionColumns._ID + " = ?",
+                id + "");
     }
 
     /**
@@ -499,13 +517,6 @@ public class BriteSurveyDbAdapter {
         return userId;
     }
 
-    public void updateTransmission(String oldPath, String newPath) {
-        ContentValues contentValues = new ContentValues(1);
-        contentValues.put(TransmissionColumns.FILENAME, newPath);
-        String where = TransmissionColumns.FILENAME + " = ? ";
-        briteDatabase.update(Tables.TRANSMISSION, contentValues, where, oldPath);
-    }
-
     /**
      * permanently deletes all surveys, responses, users and transmission
      * history from the database
@@ -566,5 +577,12 @@ public class BriteSurveyDbAdapter {
     private Cursor queryTransmissions(String column, String whereClause, String[] selectionArgs) {
         String sql = "SELECT " + column + " FROM " + Tables.TRANSMISSION + " WHERE " + whereClause;
         return briteDatabase.query(sql, selectionArgs);
+    }
+
+    public int updateFailedTransmission(String filename, int status) {
+        ContentValues contentValues = new ContentValues(1);
+        contentValues.put(TransmissionColumns.STATUS, status);
+        String where = TransmissionColumns.FILENAME + " = ? ";
+        return briteDatabase.update(Tables.TRANSMISSION, contentValues, where, filename);
     }
 }

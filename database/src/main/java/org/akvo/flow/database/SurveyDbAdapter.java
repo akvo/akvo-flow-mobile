@@ -306,26 +306,6 @@ public class SurveyDbAdapter {
                 });
     }
 
-    /**
-     * Updates the matching transmission history records with the status
-     * passed in. If the status == Completed, the completion date is updated. If
-     * the status == In Progress, the start date is updated.
-     *
-     * @return the number of rows affected
-     */
-    public int updateTransmissionStatus(String fileName, int status) {
-        // TODO: Update Survey Instance STATUS as well
-        ContentValues values = new ContentValues();
-        values.put(TransmissionColumns.STATUS, status);
-        if (TransmissionStatus.SYNCED == status) {
-            values.put(TransmissionColumns.END_DATE, System.currentTimeMillis() + "");
-        } else if (TransmissionStatus.IN_PROGRESS == status) {
-            values.put(TransmissionColumns.START_DATE, System.currentTimeMillis() + "");
-        }
-        return database.update(Tables.TRANSMISSION, values, TransmissionColumns.FILENAME + " = ?",
-                new String[] { fileName });
-    }
-
     public Cursor getSurveyInstanceTransmissions(long surveyInstanceId) {
         return getTransmissions(TransmissionColumns.SURVEY_INSTANCE_ID + " = ?",
                 new String[] { String.valueOf(surveyInstanceId) }

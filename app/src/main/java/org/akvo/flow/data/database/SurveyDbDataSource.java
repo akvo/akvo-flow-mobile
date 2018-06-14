@@ -507,16 +507,16 @@ public class SurveyDbDataSource {
     }
 
     public void setFileTransmissionFailed(String filename) {
-        int rows = updateTransmissionStatus(filename, TransmissionStatus.FAILED);
+        int rows = briteSurveyDbAdapter
+                .updateFailedTransmission(filename, TransmissionStatus.FAILED);
         if (rows == 0) {
             // Use a dummy "-1" as survey_instance_id, as the database needs that attribute
-            briteSurveyDbAdapter
-                    .createTransmission(-1, null, filename, TransmissionStatus.FAILED);
+            briteSurveyDbAdapter.createTransmission(-1, null, filename, TransmissionStatus.FAILED);
         }
     }
 
-    public int updateTransmissionStatus(String filename, int status) {
-        return surveyDbAdapter.updateTransmissionStatus(filename, status);
+    public void updateTransmissionStatus(long id, int status) {
+        briteSurveyDbAdapter.updateTransmissionStatus(id, status);
     }
 
     public void deleteResponse(long mSurveyInstanceId, String questionId, String iteration) {

@@ -22,6 +22,7 @@ package org.akvo.flow.data.database;
 
 import android.database.Cursor;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import org.akvo.flow.database.TransmissionColumns;
 import org.akvo.flow.domain.FileTransmission;
@@ -34,7 +35,7 @@ public class TransmissionsMapper {
 
     @NonNull
     List<FileTransmission> getFileTransmissions(Cursor cursor) {
-        List<FileTransmission> transmissions = new ArrayList<FileTransmission>();
+        List<FileTransmission> transmissions = new ArrayList<>();
 
         if (cursor != null) {
             if (cursor.moveToFirst()) {
@@ -57,12 +58,8 @@ public class TransmissionsMapper {
                     trans.setStatus(cursor.getInt(statusCol));
 
                     // Start and End date. Handle null cases
-                    if (!cursor.isNull(startCol)) {
-                        trans.setStartDate(new Date(cursor.getLong(startCol)));
-                    }
-                    if (!cursor.isNull(endCol)) {
-                        trans.setEndDate(new Date(cursor.getLong(endCol)));
-                    }
+                    trans.setStartDate(getDate(cursor, startCol));
+                    trans.setEndDate(getDate(cursor, endCol));
 
                     transmissions.add(trans);
                 } while (cursor.moveToNext());
@@ -71,5 +68,13 @@ public class TransmissionsMapper {
         }
 
         return transmissions;
+    }
+
+    @Nullable
+    private Date getDate(Cursor cursor, int column) {
+        if (!cursor.isNull(column)) {
+            return new Date(cursor.getLong(column));
+        }
+        return null;
     }
 }

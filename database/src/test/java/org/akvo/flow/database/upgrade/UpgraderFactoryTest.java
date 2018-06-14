@@ -251,7 +251,6 @@ public class UpgraderFactoryTest {
         return false;
     }
 
-
     private boolean containsResponsesUpgrader(List<DatabaseUpgrader> upgraders) {
         for (DatabaseUpgrader upgrader : upgraders) {
             if (upgrader instanceof ResponsesUpgrader) {

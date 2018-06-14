@@ -40,12 +40,12 @@ public class TransmissionMigrationHelper {
                 TransmissionColumns._ID, TransmissionColumns.FILENAME
         }, null, null, null, null, null);
         if (cursor != null) {
-                Map<Long, ContentValues> insertions = new HashMap<>(cursor.getCount());
+            Map<Long, ContentValues> insertions = new HashMap<>(cursor.getCount());
             if (cursor.moveToFirst()) {
                 int idColumnIndex = cursor.getColumnIndexOrThrow(TransmissionColumns._ID);
                 int fileColumnIndex = cursor.getColumnIndexOrThrow(TransmissionColumns.FILENAME);
                 do {
-                   long id = cursor.getInt(idColumnIndex);
+                    long id = cursor.getInt(idColumnIndex);
                     String filePath = cursor.getString(fileColumnIndex);
                     ContentValues contentValues = new ContentValues(1);
                     if (!TextUtils.isEmpty(filePath) && filePath.contains(File.separator)
@@ -58,8 +58,8 @@ public class TransmissionMigrationHelper {
                 } while (cursor.moveToNext());
             }
             cursor.close();
-            Set<Long> longs = insertions.keySet();
-            for (long id : longs) {
+            Set<Long> transmissionIds = insertions.keySet();
+            for (long id : transmissionIds) {
                 db.update(Tables.TRANSMISSION, insertions.get(id), TransmissionColumns._ID + " =? ",
                         new String[] {
                                 id + ""

@@ -145,7 +145,7 @@
   <!--Form & transmission status-->
   <string name="status_queued">In de rij gezet</string>
   <string name="status_in_progress">In behandeling</string>
-  <string name="status_synced">Gesynchroniseerd</string>
+  <string name="status_uploaded">Gesynchroniseerd</string>
   <string name="status_failed">Mislukt</string>
   <string name="status_saved">Opgeslagen</string>
   <string name="status_submitted">Ingediend</string>

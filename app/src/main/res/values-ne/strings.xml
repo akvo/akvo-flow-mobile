@@ -136,7 +136,7 @@
   <!--Form & transmission status-->
   <string name="status_queued">लाममा छ</string>
   <string name="status_in_progress">सफल हुन सकेन।</string>
-  <string name="status_synced">सिँक सफल भयो।</string>
+  <string name="status_uploaded">सिँक सफल भयो।</string>
   <string name="status_failed">सफल हुन सकेन।</string>
   <string name="status_saved">सेभ भयो।</string>
   <string name="status_submitted">बुझाईयो।</string>

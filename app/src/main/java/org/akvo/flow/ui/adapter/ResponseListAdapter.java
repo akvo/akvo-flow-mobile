@@ -68,7 +68,7 @@ public class ResponseListAdapter extends CursorAdapter {
             case SurveyInstanceStatus.SUBMITTED:
                 icon = R.drawable.submitted_icn;
                 break;
-            case SurveyInstanceStatus.SYNCED:
+            case SurveyInstanceStatus.UPLOADED:
             case SurveyInstanceStatus.DOWNLOADED:
                 icon = R.drawable.checkmark;
                 break;

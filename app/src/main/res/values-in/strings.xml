@@ -147,7 +147,7 @@
   <!--Form & transmission status-->
   <string name="status_queued">Dalam antrian</string>
   <string name="status_in_progress">Dalam proses</string>
-  <string name="status_synced">Tersinkronisasi</string>
+  <string name="status_uploaded">Tersinkronisasi</string>
   <string name="status_failed">Gagal</string>
   <string name="status_saved">Tersimpan</string>
   <string name="status_submitted">Terkirim</string>

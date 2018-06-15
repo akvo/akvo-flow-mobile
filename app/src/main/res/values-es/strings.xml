@@ -148,7 +148,7 @@
   <!--Form & transmission status-->
   <string name="status_queued">En espera</string>
   <string name="status_in_progress">En curso</string>
-  <string name="status_synced">Sincronizado</string>
+  <string name="status_uploaded">Sincronizado</string>
   <string name="status_failed">Fallido</string>
   <string name="status_saved">Guardado</string>
   <string name="status_submitted">Finalizado</string>

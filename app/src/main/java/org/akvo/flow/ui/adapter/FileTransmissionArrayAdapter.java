@@ -64,7 +64,7 @@ public class FileTransmissionArrayAdapter extends ArrayAdapter<FileTransmission>
                 tv.setCompoundDrawablesWithIntrinsicBounds(R.drawable.status_progress, 0, 0, 0);
                 break;
             case TransmissionStatus.SYNCED:
-                tv.setText(R.string.status_synced);
+                tv.setText(R.string.status_uploaded);
                 tv.setCompoundDrawablesWithIntrinsicBounds(R.drawable.status_synced, 0, 0, 0);
                 break;
             case TransmissionStatus.FAILED:

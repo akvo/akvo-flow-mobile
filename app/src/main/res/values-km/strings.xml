@@ -125,7 +125,7 @@
   <!--Form & transmission status-->
   <string name="status_queued">បានរង់ចាំ </string>
   <string name="status_in_progress">កំពុងដំណើរការ </string>
-  <string name="status_synced">បានដាក់ឲ្យចេញដំណាលគ្នា </string>
+  <string name="status_uploaded">បានដាក់ឲ្យចេញដំណាលគ្នា </string>
   <string name="status_failed">មិនបានសម្រេច </string>
   <string name="status_saved">បានរក្សាទុក</string>
   <string name="status_submitted">បានបញ្ជូនចេញ </string>

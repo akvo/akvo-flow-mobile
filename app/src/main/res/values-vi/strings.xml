@@ -137,7 +137,7 @@
   <!--Form & transmission status-->
   <string name="status_queued">Sắp xếp</string>
   <string name="status_in_progress">Đang được tiến hành</string>
-  <string name="status_synced">Đã đồng bộ hóa</string>
+  <string name="status_uploaded">Đã đồng bộ hóa</string>
   <string name="status_failed">Bị lỗi</string>
   <string name="status_saved">Đã lưu</string>
   <string name="status_submitted">Đã đệ trình</string>

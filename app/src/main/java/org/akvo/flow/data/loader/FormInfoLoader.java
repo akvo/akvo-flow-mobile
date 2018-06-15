@@ -108,7 +108,7 @@ public class FormInfoLoader extends AsyncLoader<List<FormInfo>> {
             int status = c.getInt(c.getColumnIndex(SurveyInstanceColumns.STATUS));
             submittedDataPoint = status == SurveyInstanceStatus.SUBMIT_REQUESTED
                     || status == SurveyInstanceStatus.SUBMITTED
-                    || status == SurveyInstanceStatus.SYNCED
+                    || status == SurveyInstanceStatus.UPLOADED
                     || status == SurveyInstanceStatus.DOWNLOADED;
         }
         c.close();

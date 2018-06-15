@@ -148,7 +148,7 @@
   <!--Form & transmission status-->
   <string name="status_queued">कतार में है </string>
   <string name="status_in_progress">प्रक्रिया जारी है </string>
-  <string name="status_synced">सिंक्ड </string>
+  <string name="status_uploaded">सिंक्ड </string>
   <string name="status_failed"> विफल</string>
   <string name="status_saved">सुरक्षित </string>
   <string name="status_submitted">जमा हो चूका है </string>

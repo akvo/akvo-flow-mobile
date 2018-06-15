@@ -151,7 +151,7 @@ Sem espaço para armazenamento
   <!--Form & transmission status-->
   <string name="status_queued">Em espera</string>
   <string name="status_in_progress">Em progresso</string>
-  <string name="status_synced">Sincronizado</string>
+  <string name="status_uploaded">Sincronizado</string>
   <string name="status_failed">Falhou</string>
   <string name="status_saved">Gravado</string>
   <string name="status_submitted">Submetido</string>

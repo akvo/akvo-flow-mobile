@@ -16,7 +16,8 @@
                     android:title="@string/download"/>
             <item
                     android:id="@+id/upload"
-                    android:title="@string/upload"/>
+                    android:title="@string/upload"
+                    android:visible="false"/>
             <item
                     android:id="@+id/stats"
                     android:title="@string/stats"/>

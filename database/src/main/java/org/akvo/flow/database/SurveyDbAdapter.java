@@ -133,7 +133,7 @@ public class SurveyDbAdapter {
         String dateColumn;
         switch (status) {
             case SurveyInstanceStatus.DOWNLOADED:
-            case SurveyInstanceStatus.SYNCED:
+            case SurveyInstanceStatus.UPLOADED:
                 dateColumn = SurveyInstanceColumns.SYNC_DATE;
                 break;
             case SurveyInstanceStatus.SUBMITTED:

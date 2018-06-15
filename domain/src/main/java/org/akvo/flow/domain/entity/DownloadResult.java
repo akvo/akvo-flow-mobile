@@ -20,12 +20,12 @@
 
 package org.akvo.flow.domain.entity;
 
-public class SyncResult {
+public class DownloadResult {
 
     private final ResultCode resultCode;
     private final int numberOfSyncedItems;
 
-    public SyncResult(ResultCode resultCode, int numberOfSyncedItems) {
+    public DownloadResult(ResultCode resultCode, int numberOfSyncedItems) {
         this.resultCode = resultCode;
         this.numberOfSyncedItems = numberOfSyncedItems;
     }

@@ -40,7 +40,7 @@ public class SurveyInstanceStatus {
     /**
      * Datapoint has been sent to the dashboard
      */
-    public static final int SYNCED = 3;
+    public static final int UPLOADED = 3;
 
     /**
      * Datapoint has been downloaded from the dashboard

@@ -34,7 +34,7 @@ import static org.akvo.flow.data.util.Constants.PHONE_NUMBER;
 import static org.akvo.flow.data.util.Constants.SURVEYED_LOCALE;
 import static org.akvo.flow.data.util.Constants.SURVEY_GROUP;
 
-interface DataPointSyncService {
+interface DataPointDownloadService {
 
     @GET(SURVEYED_LOCALE)
     @Headers("Cache-Control: no-cache")

@@ -36,7 +36,7 @@ public interface SurveyRepository {
     Observable<List<DataPoint>> getDataPoints(Long surveyGroupId, Double latitude,
             Double longitude, Integer orderBy);
 
-    Flowable<Integer> syncRemoteDataPoints(long surveyGroupId);
+    Flowable<Integer> downloadDataPoints(long surveyGroupId);
 
     Observable<Boolean> deleteSurvey(long surveyToDeleteId);
 

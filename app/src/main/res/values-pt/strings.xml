@@ -72,7 +72,7 @@ Sem espaço para armazenamento
   <string name="clear_data_success">Dados apagados do dispositivo com sucesso </string>
   <string name="clear_data_error">Erro ao apagar os dados do dispositivo</string>
   <string name="search">Procurar</string>
-  <string name="sync">Sincronizar</string>
+  <string name="download">Sincronizar</string>
   <string name="sort">Ordenar</string>
   <string name="stats">Estatísticas</string>
   <string name="data_points_sync_error_message_network"> Falhou a sincronização. Não tem conexão.</string>
@@ -151,7 +151,7 @@ Sem espaço para armazenamento
   <!--Form & transmission status-->
   <string name="status_queued">Em espera</string>
   <string name="status_in_progress">Em progresso</string>
-  <string name="status_synced">Sincronizado</string>
+  <string name="status_uploaded">Sincronizado</string>
   <string name="status_failed">Falhou</string>
   <string name="status_saved">Gravado</string>
   <string name="status_submitted">Submetido</string>

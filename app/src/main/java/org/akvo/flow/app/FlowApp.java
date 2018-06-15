@@ -25,6 +25,8 @@ import android.content.res.Configuration;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
+import com.crashlytics.android.Crashlytics;
+import com.crashlytics.android.core.CrashlyticsCore;
 import com.squareup.leakcanary.LeakCanary;
 
 import org.akvo.flow.BuildConfig;
@@ -49,6 +51,7 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import io.fabric.sdk.android.Fabric;
 import timber.log.Timber;
 
 public class FlowApp extends Application {
@@ -74,6 +77,7 @@ public class FlowApp extends Application {
         super.onCreate();
         initializeInjector();
         LeakCanary.install(this);
+        initFabric();
         initLogging();
         updateLocale();
         startUpdateService();
@@ -81,6 +85,13 @@ public class FlowApp extends Application {
         updateLoggingInfo();
         registerReceiver(new SyncDataReceiver(), new IntentFilter(SyncDataReceiver.CONNECTIVITY_ACTION));
         saveConfig();
+    }
+
+    private void initFabric() {
+        CrashlyticsCore crashlyticsCore = new CrashlyticsCore.Builder()
+                .disabled(true)
+                .build();
+        Fabric.with(this, new Crashlytics.Builder().core(crashlyticsCore).build());
     }
 
     private void saveConfig() {

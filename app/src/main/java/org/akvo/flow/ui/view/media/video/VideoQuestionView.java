@@ -22,6 +22,7 @@ package org.akvo.flow.ui.view.media.video;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
@@ -59,7 +60,8 @@ import butterknife.OnClick;
  *
  * @author Christopher Fagiani
  */
-public class VideoQuestionView extends QuestionView implements MediaSyncTask.DownloadListener, IVideoQuestionView {
+public class VideoQuestionView extends QuestionView
+        implements MediaSyncTask.DownloadListener, IVideoQuestionView {
 
     @Inject
     SnackBarManager snackBarManager;
@@ -86,7 +88,7 @@ public class VideoQuestionView extends QuestionView implements MediaSyncTask.Dow
     View mDownloadBtn;
 
     private ImageLoader imageLoader;
-    private String filename;
+    private String filePath;
 
     public VideoQuestionView(Context context, Question q, SurveyListener surveyListener) {
         super(context, q, surveyListener);
@@ -120,11 +122,12 @@ public class VideoQuestionView extends QuestionView implements MediaSyncTask.Dow
 
     @OnClick(R.id.image)
     void onVideoViewClicked() {
-        if (TextUtils.isEmpty(filename) || !(new File(filename).exists())) {
-            showImageLoadError();
-            return;
+        File file = rebuildFilePath();
+        if (file != null && file.exists()) {
+            navigator.navigateToVideoView(getContext(), file.getAbsolutePath());
+        } else {
+            showVideoLoadError();
         }
-        navigator.navigateToVideoView(getContext(), filename);
     }
 
     @OnClick(R.id.media_btn)
@@ -138,7 +141,7 @@ public class VideoQuestionView extends QuestionView implements MediaSyncTask.Dow
         mProgressBar.setVisibility(VISIBLE);
 
         MediaSyncTask downloadTask = new MediaSyncTask(getContext(),
-                new File(filename), this);
+                new File(filePath), this);
         downloadTask.execute();
     }
 
@@ -171,7 +174,7 @@ public class VideoQuestionView extends QuestionView implements MediaSyncTask.Dow
 
     @Override
     public void displayThumbnail(String videoFilePath) {
-        filename = videoFilePath;
+        filePath = videoFilePath;
         captureResponse();
         displayThumbnail();
     }
@@ -189,21 +192,21 @@ public class VideoQuestionView extends QuestionView implements MediaSyncTask.Dow
         }
 
         Media mMedia = MediaValue.deserialize(resp.getValue());
-        filename = mMedia == null ? null : mMedia.getFilename();
+        filePath = mMedia == null ? null : mMedia.getFilename();
 
         displayThumbnail();
-        if (TextUtils.isEmpty(filename)) {
+        if (TextUtils.isEmpty(filePath)) {
             return;
         }
 
         // We now check whether the file is found in the local filesystem, and update the path if it's not
-        File file = new File(filename);
+        File file = new File(filePath);
         if (!file.exists() && isReadOnly()) {
             // Looks like the image is not present in the filesystem (i.e. remote URL)
             // Update response, matching the local path. Note: In the future, media responses should
             // not leak filesystem paths, for these are not guaranteed to be homogeneous in all devices.
             file = mediaFileHelper.getMediaFile(file.getName());
-            filename = file.getAbsolutePath();
+            filePath = file.getAbsolutePath();
             captureResponse();
         }
     }
@@ -214,7 +217,7 @@ public class VideoQuestionView extends QuestionView implements MediaSyncTask.Dow
     @Override
     public void resetQuestion(boolean fireEvent) {
         super.resetQuestion(fireEvent);
-        filename = null;
+        filePath = null;
         mImageView.setImageDrawable(null);
         hideDownloadOptions();
     }
@@ -222,17 +225,17 @@ public class VideoQuestionView extends QuestionView implements MediaSyncTask.Dow
     @Override
     public void captureResponse(boolean suppressListeners) {
         QuestionResponse response = null;
-        if (!TextUtils.isEmpty(filename)) {
+        if (!TextUtils.isEmpty(filePath)) {
             Question question = getQuestion();
             Media media = new Media();
-            media.setFilename(filename);
+            media.setFilename(filePath);
             String value = MediaValue.serialize(media);
             response = new QuestionResponse.QuestionResponseBuilder()
                     .setValue(value)
                     .setType(ConstantUtil.VIDEO_RESPONSE_TYPE)
                     .setQuestionId(question.getQuestionId())
                     .setIteration(question.getIteration())
-                    .setFilename(filename)
+                    .setFilename(filePath)
                     .createQuestionResponse();
         }
         setResponse(response);
@@ -240,14 +243,11 @@ public class VideoQuestionView extends QuestionView implements MediaSyncTask.Dow
 
     private void displayThumbnail() {
         hideDownloadOptions();
-
-        if (TextUtils.isEmpty(filename)) {
-            return;
-        }
-        if (!new File(filename).exists()) {
-            showTemporaryMedia();
+        File file = rebuildFilePath();
+        if (file != null && file.exists()) {
+            imageLoader.loadFromFile(file, mImageView);
         } else {
-            imageLoader.loadFromFile(new File(filename), mImageView);
+            showTemporaryMedia();
         }
     }
 
@@ -259,12 +259,22 @@ public class VideoQuestionView extends QuestionView implements MediaSyncTask.Dow
     @Override
     public void onResourceDownload(boolean done) {
         if (!done) {
-            showImageLoadError();
+            showVideoLoadError();
         }
         displayThumbnail();
     }
 
-    private void showImageLoadError() {
+    private void showVideoLoadError() {
         snackBarManager.displaySnackBar(this, R.string.error_video_preview, getContext());
+    }
+
+    /**
+     * File paths cannot be trusted so we need to get the name of the file and rebuild the path.
+     * All media files should be located in the same folder
+     * @return File with the correct file path on the device
+     */
+    @Nullable
+    private File rebuildFilePath() {
+        return presenter.getExistingImageFilePath(filePath);
     }
 }

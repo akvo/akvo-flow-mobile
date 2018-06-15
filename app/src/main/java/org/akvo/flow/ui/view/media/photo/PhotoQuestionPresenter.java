@@ -58,6 +58,21 @@ public class PhotoQuestionPresenter implements Presenter {
         saveResizedImage.dispose();
     }
 
+    @Nullable
+    public File getExistingImageFilePath(@Nullable String filePath) {
+        if (TextUtils.isEmpty(filePath)) {
+            return null;
+        }
+        String filename = filePath;
+        if (filePath.contains(File.separator)) {
+            filename = filePath.substring(filePath.lastIndexOf(File.separator) + 1);
+        }
+        if (TextUtils.isEmpty(filename)) {
+            return null;
+        }
+        return mediaFileHelper.getMediaFile(filename);
+    }
+
     void onImageReady(@Nullable final String mediaFilePath) {
         if (!TextUtils.isEmpty(mediaFilePath)) {
             view.showLoading();

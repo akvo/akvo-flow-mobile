@@ -48,7 +48,7 @@ public class FlowRestApi {
         this.encoder = encoder;
     }
 
-    public Flowable<ApiLocaleResult> loadNewDataPoints(long surveyGroup,
+    public Flowable<ApiLocaleResult> downloadDataPoints(long surveyGroup,
             @NonNull String timestamp) {
         String lastUpdated = !TextUtils.isEmpty(timestamp) ? timestamp : "0";
         String phoneNumber = encoder.encodeParam(this.phoneNumber);

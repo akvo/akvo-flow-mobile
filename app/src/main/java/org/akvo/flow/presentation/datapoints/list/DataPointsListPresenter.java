@@ -24,7 +24,7 @@ import android.support.annotation.NonNull;
 
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.entity.DataPoint;
-import org.akvo.flow.domain.entity.SyncResult;
+import org.akvo.flow.domain.entity.DownloadResult;
 import org.akvo.flow.domain.interactor.DefaultFlowableObserver;
 import org.akvo.flow.domain.interactor.DefaultObserver;
 import org.akvo.flow.domain.interactor.DownloadDataPoints;
@@ -46,7 +46,7 @@ import javax.inject.Named;
 
 import timber.log.Timber;
 
-import static org.akvo.flow.domain.entity.SyncResult.ResultCode.SUCCESS;
+import static org.akvo.flow.domain.entity.DownloadResult.ResultCode.SUCCESS;
 
 public class DataPointsListPresenter implements Presenter {
 
@@ -188,14 +188,14 @@ public class DataPointsListPresenter implements Presenter {
     private void downloadDataPoints(final long surveyGroupId) {
         Map<String, Object> params = new HashMap<>(2);
         params.put(DownloadDataPoints.KEY_SURVEY_GROUP_ID, surveyGroupId);
-        downloadDataPoints.execute(new DefaultFlowableObserver<SyncResult>() {
+        downloadDataPoints.execute(new DefaultFlowableObserver<DownloadResult>() {
             @Override
             public void onComplete() {
                 view.hideLoading();
             }
 
             @Override
-            public void onNext(SyncResult result) {
+            public void onNext(DownloadResult result) {
                 if (result.getResultCode() == SUCCESS) {
                     if (result.getNumberOfSyncedItems() > 0) {
                         view.showSyncedResults(result.getNumberOfSyncedItems());

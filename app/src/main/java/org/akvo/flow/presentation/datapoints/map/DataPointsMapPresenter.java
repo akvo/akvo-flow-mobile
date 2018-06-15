@@ -24,7 +24,7 @@ import android.support.annotation.NonNull;
 
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.entity.DataPoint;
-import org.akvo.flow.domain.entity.SyncResult;
+import org.akvo.flow.domain.entity.DownloadResult;
 import org.akvo.flow.domain.interactor.DefaultFlowableObserver;
 import org.akvo.flow.domain.interactor.DefaultObserver;
 import org.akvo.flow.domain.interactor.ErrorComposable;
@@ -44,7 +44,7 @@ import javax.inject.Named;
 
 import timber.log.Timber;
 
-import static org.akvo.flow.domain.entity.SyncResult.ResultCode.SUCCESS;
+import static org.akvo.flow.domain.entity.DownloadResult.ResultCode.SUCCESS;
 
 public class DataPointsMapPresenter implements Presenter {
 
@@ -143,14 +143,14 @@ public class DataPointsMapPresenter implements Presenter {
     private void sync(final long surveyGroupId) {
         Map<String, Object> params = new HashMap<>(2);
         params.put(DownloadDataPoints.KEY_SURVEY_GROUP_ID, surveyGroupId);
-        downloadDataPoints.execute(new DefaultFlowableObserver<SyncResult>() {
+        downloadDataPoints.execute(new DefaultFlowableObserver<DownloadResult>() {
             @Override
             public void onComplete() {
                 view.hideProgress();
             }
 
             @Override
-            public void onNext(SyncResult result) {
+            public void onNext(DownloadResult result) {
                 Timber.d("onNext datapoint sync: synced : %d", result.getNumberOfSyncedItems());
 
                 if (result.getResultCode() == SUCCESS) {

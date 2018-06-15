@@ -20,7 +20,7 @@
 
 package org.akvo.flow.domain.interactor;
 
-import org.akvo.flow.domain.entity.SyncResult;
+import org.akvo.flow.domain.entity.DownloadResult;
 import org.akvo.flow.domain.exception.AssignmentRequiredException;
 import org.akvo.flow.domain.executor.PostExecutionThread;
 import org.akvo.flow.domain.executor.ThreadExecutor;
@@ -72,25 +72,25 @@ public class DownloadDataPoints {
             return Flowable.error(new IllegalArgumentException("Missing survey group id"));
         }
         if (!connectivityStateManager.isConnectionAvailable()) {
-            return Flowable.just(new SyncResult(SyncResult.ResultCode.ERROR_NO_NETWORK, 0));
+            return Flowable.just(new DownloadResult(DownloadResult.ResultCode.ERROR_NO_NETWORK, 0));
         }
         return syncDataPoints(parameters);
     }
 
-    private <T> Flowable<SyncResult> syncDataPoints(Map<String, T> parameters) {
-        return surveyRepository.syncRemoteDataPoints((Long) parameters.get(KEY_SURVEY_GROUP_ID))
-                .map(new Function<Integer, SyncResult>() {
+    private <T> Flowable<DownloadResult> syncDataPoints(Map<String, T> parameters) {
+        return surveyRepository.downloadDataPoints((Long) parameters.get(KEY_SURVEY_GROUP_ID))
+                .map(new Function<Integer, DownloadResult>() {
                     @Override
-                    public SyncResult apply(Integer integer) {
-                        return new SyncResult(SyncResult.ResultCode.SUCCESS, integer);
+                    public DownloadResult apply(Integer integer) {
+                        return new DownloadResult(DownloadResult.ResultCode.SUCCESS, integer);
                     }
                 })
-                .onErrorResumeNext(new Function<Throwable, Flowable<SyncResult>>() {
+                .onErrorResumeNext(new Function<Throwable, Flowable<DownloadResult>>() {
                     @Override
-                    public Flowable<SyncResult> apply(Throwable throwable) {
+                    public Flowable<DownloadResult> apply(Throwable throwable) {
                         if (throwable instanceof AssignmentRequiredException) {
-                            return Flowable.just(new SyncResult(
-                                    SyncResult.ResultCode.ERROR_ASSIGNMENT_MISSING, 0));
+                            return Flowable.just(new DownloadResult(
+                                    DownloadResult.ResultCode.ERROR_ASSIGNMENT_MISSING, 0));
                         }
                         return Flowable.error(throwable);
                     }

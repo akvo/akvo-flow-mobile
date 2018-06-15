@@ -59,7 +59,7 @@
   <string name="clear_data_success">ទិន្នន័យត្រូវបានលុបចេញពីឧបករណ៍នេះដោយជោគជ័យ</string>
   <string name="clear_data_error">កំហុសឆ្គងលុបទិន្នន័យពីឧបករណ៍ </string>
   <string name="search">ស្វែងរក </string>
-  <string name="sync">ធ្វើឲ្យចេញដំណាលគ្នា</string>
+  <string name="download">ធ្វើឲ្យចេញដំណាលគ្នា</string>
   <string name="sort">ដាក់ទៅតាមប្រភេទ </string>
   <string name="stats">ស្ថានភាព </string>
   <string name="prefill_title">បំពេញចម្លើយជាមុន </string>

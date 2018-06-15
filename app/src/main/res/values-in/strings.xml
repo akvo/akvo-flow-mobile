@@ -70,7 +70,7 @@
   <string name="clear_data_success">Data telah dihapus dari perangkat secara sukses.</string>
   <string name="clear_data_error">Ada kesalahan dalam menghapus data dari perangkat</string>
   <string name="search">Cari</string>
-  <string name="sync">Sinkronisasi</string>
+  <string name="download">Sinkronisasi</string>
   <string name="sort">Sortir</string>
   <string name="stats">Statistik</string>
   <string name="data_points_sync_error_message_network">Sinkronisasi gagal. Tidak ada koneksi.</string>

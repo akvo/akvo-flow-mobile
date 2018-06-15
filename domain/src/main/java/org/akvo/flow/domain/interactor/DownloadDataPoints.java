@@ -36,7 +36,7 @@ import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 
-public class SyncDataPoints {
+public class DownloadDataPoints {
 
     public static final String KEY_SURVEY_GROUP_ID = "survey_group_id";
 
@@ -48,7 +48,7 @@ public class SyncDataPoints {
     private final ConnectivityStateManager connectivityStateManager;
 
     @Inject
-    protected SyncDataPoints(ThreadExecutor threadExecutor,
+    protected DownloadDataPoints(ThreadExecutor threadExecutor,
             PostExecutionThread postExecutionThread, SurveyRepository surveyRepository,
             ConnectivityStateManager connectivityStateManager) {
         this.threadExecutor = threadExecutor;

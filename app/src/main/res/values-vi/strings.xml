@@ -67,7 +67,7 @@
   <string name="clear_data_success">Dữ liệu đã được xóa khỏi thiết bị</string>
   <string name="clear_data_error">Lỗi xảy ra trong quá trình xóa dữ liệu khỏi thiết bị</string>
   <string name="search">Search</string>
-  <string name="sync">Đồng bộ hóa dữ liệu</string>
+  <string name="download">Đồng bộ hóa dữ liệu</string>
   <string name="sort">Sắp xếp theo</string>
   <string name="stats">Thống kê điều tra</string>
   <string name="prefill_title">Những câu trả lời trước đây</string>

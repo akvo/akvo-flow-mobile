@@ -69,7 +69,7 @@
   <string name="clear_data_success">Data succesvol verwijderd van het apparaat</string>
   <string name="clear_data_error">Fout bij het verwijderen van data van het apparaat</string>
   <string name="search">Zoek</string>
-  <string name="sync">Synchroniseer </string>
+  <string name="download">Synchroniseer </string>
   <string name="sort">Sorteer</string>
   <string name="stats">Statistieken</string>
   <string name="data_points_sync_error_message_network"> Synchronisatie mislukt. Geen verbinding.</string>

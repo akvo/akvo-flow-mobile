@@ -281,7 +281,7 @@ public class DataPointsMapFragment extends SupportMapFragment implements OnInfoW
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.sync_records:
+            case R.id.download:
                 presenter.onSyncRecordsPressed();
                 return true;
             default:

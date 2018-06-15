@@ -70,7 +70,7 @@
   <string name="clear_data_success">डेटा आपके फ़ोन अथवा टेबलेट से सफलता पूर्ण हटा दिया गया है </string>
   <string name="clear_data_error">फ़ोन से डेटा हटाने में त्रुटि</string>
   <string name="search">खोज </string>
-  <string name="sync">सिंक </string>
+  <string name="download">सिंक </string>
   <string name="sort">छाँटिएन </string>
   <string name="stats">आंकड़े</string>
   <string name="data_points_sync_error_message_network">सिंक असफल: इंटरनेट पहुंच से बाहर है</string>

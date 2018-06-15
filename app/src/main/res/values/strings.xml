@@ -70,7 +70,8 @@
     <string name="clear_data_success">Data successfully deleted from the device</string>
     <string name="clear_data_error">Error deleting data from the device</string>
     <string name="search">Search</string>
-    <string name="sync">Download</string>
+    <string name="download">Download</string>
+    <string name="upload">Upload</string>
     <string name="sort">Sort</string>
     <string name="stats">Stats</string>
     <string name="data_points_sync_error_message_network">Download failed. No connection.</string>

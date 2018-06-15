@@ -355,8 +355,8 @@ public class DataPointsListFragment extends Fragment implements LocationListener
             case R.id.order_by:
                 presenter.onOrderByClicked();
                 return true;
-            case R.id.sync_records:
-                presenter.onSyncRecordsPressed();
+            case R.id.download:
+                presenter.onDownloadPressed();
                 return true;
             default:
                 return false;
@@ -464,7 +464,7 @@ public class DataPointsListFragment extends Fragment implements LocationListener
         dataPointSyncSnackBarManager.showErrorNoNetwork(getView(), new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                presenter.onSyncRecordsPressed();
+                presenter.onDownloadPressed();
             }
         });
     }
@@ -474,7 +474,7 @@ public class DataPointsListFragment extends Fragment implements LocationListener
         dataPointSyncSnackBarManager.showErrorSync(getView(), new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                presenter.onSyncRecordsPressed();
+                presenter.onDownloadPressed();
             }
         });
     }

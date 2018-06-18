@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2010-2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -108,7 +108,7 @@ public class FormInfoLoader extends AsyncLoader<List<FormInfo>> {
             int status = c.getInt(c.getColumnIndex(SurveyInstanceColumns.STATUS));
             submittedDataPoint = status == SurveyInstanceStatus.SUBMIT_REQUESTED
                     || status == SurveyInstanceStatus.SUBMITTED
-                    || status == SurveyInstanceStatus.SYNCED
+                    || status == SurveyInstanceStatus.UPLOADED
                     || status == SurveyInstanceStatus.DOWNLOADED;
         }
         c.close();

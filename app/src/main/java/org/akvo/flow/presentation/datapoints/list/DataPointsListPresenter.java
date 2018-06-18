@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -24,12 +24,12 @@ import android.support.annotation.NonNull;
 
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.entity.DataPoint;
-import org.akvo.flow.domain.entity.SyncResult;
+import org.akvo.flow.domain.entity.DownloadResult;
 import org.akvo.flow.domain.interactor.DefaultFlowableObserver;
 import org.akvo.flow.domain.interactor.DefaultObserver;
+import org.akvo.flow.domain.interactor.DownloadDataPoints;
 import org.akvo.flow.domain.interactor.ErrorComposable;
 import org.akvo.flow.domain.interactor.GetSavedDataPoints;
-import org.akvo.flow.domain.interactor.SyncDataPoints;
 import org.akvo.flow.domain.interactor.UseCase;
 import org.akvo.flow.presentation.Presenter;
 import org.akvo.flow.presentation.datapoints.list.entity.ListDataPoint;
@@ -46,12 +46,12 @@ import javax.inject.Named;
 
 import timber.log.Timber;
 
-import static org.akvo.flow.domain.entity.SyncResult.ResultCode.SUCCESS;
+import static org.akvo.flow.domain.entity.DownloadResult.ResultCode.SUCCESS;
 
 public class DataPointsListPresenter implements Presenter {
 
     private final UseCase getSavedDataPoints;
-    private final SyncDataPoints syncDataPoints;
+    private final DownloadDataPoints downloadDataPoints;
     private final UseCase allowedToConnect;
     private final ListDataPointMapper mapper;
 
@@ -63,11 +63,11 @@ public class DataPointsListPresenter implements Presenter {
 
     @Inject
     DataPointsListPresenter(@Named("getSavedDataPoints") UseCase getSavedDataPoints,
-            ListDataPointMapper mapper, SyncDataPoints syncDataPoints,
+            ListDataPointMapper mapper, DownloadDataPoints downloadDataPoints,
             @Named("allowedToConnect") UseCase allowedToConnect) {
         this.getSavedDataPoints = getSavedDataPoints;
         this.mapper = mapper;
-        this.syncDataPoints = syncDataPoints;
+        this.downloadDataPoints = downloadDataPoints;
         this.allowedToConnect = allowedToConnect;
     }
 
@@ -154,18 +154,18 @@ public class DataPointsListPresenter implements Presenter {
     @Override
     public void destroy() {
         getSavedDataPoints.dispose();
-        syncDataPoints.dispose();
+        downloadDataPoints.dispose();
         allowedToConnect.dispose();
     }
 
-    void onSyncRecordsPressed() {
+    void onDownloadPressed() {
         if (surveyGroup != null) {
             view.showLoading();
-            syncRecords(surveyGroup.getId());
+            verifyConnection(surveyGroup.getId());
         }
     }
 
-    private void syncRecords(final long surveyGroupId) {
+    private void verifyConnection(final long surveyGroupId) {
         allowedToConnect.execute(new DefaultObserver<Boolean>() {
             @Override
             public void onError(Throwable e) {
@@ -178,24 +178,24 @@ public class DataPointsListPresenter implements Presenter {
                     view.hideLoading();
                     view.showErrorSyncNotAllowed();
                 } else {
-                    sync(surveyGroupId);
+                    downloadDataPoints(surveyGroupId);
                 }
             }
         }, null);
 
     }
 
-    private void sync(final long surveyGroupId) {
+    private void downloadDataPoints(final long surveyGroupId) {
         Map<String, Object> params = new HashMap<>(2);
-        params.put(SyncDataPoints.KEY_SURVEY_GROUP_ID, surveyGroupId);
-        syncDataPoints.execute(new DefaultFlowableObserver<SyncResult>() {
+        params.put(DownloadDataPoints.KEY_SURVEY_GROUP_ID, surveyGroupId);
+        downloadDataPoints.execute(new DefaultFlowableObserver<DownloadResult>() {
             @Override
             public void onComplete() {
                 view.hideLoading();
             }
 
             @Override
-            public void onNext(SyncResult result) {
+            public void onNext(DownloadResult result) {
                 if (result.getResultCode() == SUCCESS) {
                     if (result.getNumberOfSyncedItems() > 0) {
                         view.showSyncedResults(result.getNumberOfSyncedItems());
@@ -250,7 +250,7 @@ public class DataPointsListPresenter implements Presenter {
 
     void onNewSurveySelected(SurveyGroup surveyGroup) {
         getSavedDataPoints.dispose();
-        syncDataPoints.dispose();
+        downloadDataPoints.dispose();
         view.hideLoading();
         onDataReady(surveyGroup);
         loadDataPoints();

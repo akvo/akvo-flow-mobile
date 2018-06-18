@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -24,12 +24,12 @@ import android.support.annotation.NonNull;
 
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.entity.DataPoint;
-import org.akvo.flow.domain.entity.SyncResult;
+import org.akvo.flow.domain.entity.DownloadResult;
 import org.akvo.flow.domain.interactor.DefaultFlowableObserver;
 import org.akvo.flow.domain.interactor.DefaultObserver;
 import org.akvo.flow.domain.interactor.ErrorComposable;
 import org.akvo.flow.domain.interactor.GetSavedDataPoints;
-import org.akvo.flow.domain.interactor.SyncDataPoints;
+import org.akvo.flow.domain.interactor.DownloadDataPoints;
 import org.akvo.flow.domain.interactor.UseCase;
 import org.akvo.flow.presentation.Presenter;
 import org.akvo.flow.presentation.datapoints.map.entity.MapDataPoint;
@@ -44,13 +44,13 @@ import javax.inject.Named;
 
 import timber.log.Timber;
 
-import static org.akvo.flow.domain.entity.SyncResult.ResultCode.SUCCESS;
+import static org.akvo.flow.domain.entity.DownloadResult.ResultCode.SUCCESS;
 
 public class DataPointsMapPresenter implements Presenter {
 
     private final UseCase getSavedDataPoints;
     private final MapDataPointMapper mapper;
-    private final SyncDataPoints syncDataPoints;
+    private final DownloadDataPoints downloadDataPoints;
     private final UseCase allowedToConnect;
 
     private DataPointsMapView view;
@@ -58,11 +58,11 @@ public class DataPointsMapPresenter implements Presenter {
 
     @Inject
     DataPointsMapPresenter(@Named("getSavedDataPoints") UseCase getSavedDataPoints,
-            MapDataPointMapper mapper, SyncDataPoints syncDataPoints,
+            MapDataPointMapper mapper, DownloadDataPoints downloadDataPoints,
             @Named("allowedToConnect") UseCase allowedToConnect) {
         this.getSavedDataPoints = getSavedDataPoints;
         this.mapper = mapper;
-        this.syncDataPoints = syncDataPoints;
+        this.downloadDataPoints = downloadDataPoints;
         this.allowedToConnect = allowedToConnect;
     }
 
@@ -110,7 +110,7 @@ public class DataPointsMapPresenter implements Presenter {
     @Override
     public void destroy() {
         getSavedDataPoints.dispose();
-        syncDataPoints.dispose();
+        downloadDataPoints.dispose();
     }
 
     void onSyncRecordsPressed() {
@@ -142,15 +142,15 @@ public class DataPointsMapPresenter implements Presenter {
 
     private void sync(final long surveyGroupId) {
         Map<String, Object> params = new HashMap<>(2);
-        params.put(SyncDataPoints.KEY_SURVEY_GROUP_ID, surveyGroupId);
-        syncDataPoints.execute(new DefaultFlowableObserver<SyncResult>() {
+        params.put(DownloadDataPoints.KEY_SURVEY_GROUP_ID, surveyGroupId);
+        downloadDataPoints.execute(new DefaultFlowableObserver<DownloadResult>() {
             @Override
             public void onComplete() {
                 view.hideProgress();
             }
 
             @Override
-            public void onNext(SyncResult result) {
+            public void onNext(DownloadResult result) {
                 Timber.d("onNext datapoint sync: synced : %d", result.getNumberOfSyncedItems());
 
                 if (result.getResultCode() == SUCCESS) {
@@ -185,7 +185,7 @@ public class DataPointsMapPresenter implements Presenter {
 
     public void onNewSurveySelected(SurveyGroup surveyGroup) {
         getSavedDataPoints.dispose();
-        syncDataPoints.dispose();
+        downloadDataPoints.dispose();
         view.hideProgress();
         onDataReady(surveyGroup);
         loadDataPoints();

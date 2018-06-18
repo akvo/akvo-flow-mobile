@@ -330,7 +330,8 @@ public class SurveyDbAdapter {
                         TransmissionColumns.FILENAME, TransmissionColumns.START_DATE,
                         TransmissionColumns.END_DATE
                 },
-                selection, selectionArgs, null, null, null);
+                selection + " AND " + TransmissionColumns.FILENAME + " LIKE '%.%'", selectionArgs,
+                null, null, null);
     }
 
     /**

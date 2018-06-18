@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -57,4 +57,6 @@ public interface SurveyRepository {
     Observable<Boolean> unSyncedTransmissionsExist();
 
     Observable<List<String>> getAllTransmissionFileNames();
+
+    Observable<String[]> getFormIds(String surveyId);
 }

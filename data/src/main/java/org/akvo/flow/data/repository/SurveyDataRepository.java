@@ -27,6 +27,7 @@ import org.akvo.flow.data.entity.ApiDataPoint;
 import org.akvo.flow.data.entity.ApiLocaleResult;
 import org.akvo.flow.data.entity.ApiSurveyInstance;
 import org.akvo.flow.data.entity.DataPointMapper;
+import org.akvo.flow.data.entity.FormIdMapper;
 import org.akvo.flow.data.entity.SurveyMapper;
 import org.akvo.flow.data.entity.SyncedTimeMapper;
 import org.akvo.flow.data.entity.TransmissionFilenameMapper;
@@ -67,6 +68,7 @@ public class SurveyDataRepository implements SurveyRepository {
     private final SurveyMapper surveyMapper;
     private final UserMapper userMapper;
     private final TransmissionFilenameMapper transmissionMapper;
+    private FormIdMapper surveyIdMapper;
 
     @Inject
     public SurveyDataRepository(DataSourceFactory dataSourceFactory,
@@ -318,6 +320,17 @@ public class SurveyDataRepository implements SurveyRepository {
                     @Override
                     public List<String> apply(Cursor cursor) {
                         return transmissionMapper.mapToFileNameList(cursor);
+                    }
+                });
+    }
+
+    @Override
+    public Observable<String[]> getFormIds(String surveyId) {
+        return dataSourceFactory.getDataBaseDataSource().getFormIds(surveyId)
+                .map(new Function<Cursor, String[]>() {
+                    @Override
+                    public String[] apply(Cursor cursor) {
+                        return surveyIdMapper.mapToFormId(cursor);
                     }
                 });
     }

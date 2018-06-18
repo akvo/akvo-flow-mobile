@@ -143,7 +143,7 @@ public class ApplicationModule {
     @Singleton
     BriteDatabase provideDatabase(SqlBrite sqlBrite, SQLiteOpenHelper helper) {
         BriteDatabase db = sqlBrite.wrapDatabaseHelper(helper, Schedulers.io());
-        db.setLoggingEnabled(false);
+        db.setLoggingEnabled(BuildConfig.DEBUG);
         return db;
     }
 

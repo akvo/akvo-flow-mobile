@@ -23,6 +23,7 @@ package org.akvo.flow.database.britedb;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 
 import com.squareup.sqlbrite2.BriteDatabase;
 import com.squareup.sqlbrite2.SqlBrite;
@@ -340,9 +341,8 @@ public class BriteSurveyDbAdapter {
                 });
     }
 
-    public Cursor getSurveys(long surveyGroupId) {
-        String sqlQuery = "SELECT "
-                + SurveyColumns._ID + ", "
+    public Cursor getForms(long surveyId) {
+        String columns = SurveyColumns._ID + ", "
                 + SurveyColumns.SURVEY_ID + ", "
                 + SurveyColumns.NAME + ", "
                 + SurveyColumns.FILENAME + ", "
@@ -350,14 +350,16 @@ public class BriteSurveyDbAdapter {
                 + SurveyColumns.LANGUAGE + ", "
                 + SurveyColumns.HELP_DOWNLOADED + ", "
                 + SurveyColumns.VERSION + ", "
-                + SurveyColumns.LOCATION
+                + SurveyColumns.LOCATION;
+        String sqlQuery = "SELECT "
+                + columns
                 + " FROM " + Tables.SURVEY;
         String whereClause = SurveyColumns.DELETED + " <> 1";
         String[] whereParams = new String[0];
-        if (surveyGroupId > 0) {
+        if (surveyId > 0) {
             whereClause += " AND " + SurveyColumns.SURVEY_GROUP_ID + " = ?";
             whereParams = new String[] {
-                    String.valueOf(surveyGroupId)
+                    String.valueOf(surveyId)
             };
         }
         sqlQuery += " WHERE " + whereClause;
@@ -365,24 +367,33 @@ public class BriteSurveyDbAdapter {
     }
 
     @Nullable
-    public String[] getSurveyIds() {
-        String sqlQuery = "SELECT "
-                + SurveyColumns.SURVEY_ID
-                + " FROM " + Tables.SURVEY
-                + " WHERE " + SurveyColumns.DELETED + " <> ?";
-        Cursor c = briteDatabase.query(sqlQuery, "1");
-        if (c != null) {
-            String[] ids = new String[c.getCount()];
-            if (c.moveToFirst()) {
-                do {
-                    ids[c.getPosition()] = c
-                            .getString(c.getColumnIndexOrThrow(SurveyColumns.SURVEY_ID));
-                } while (c.moveToNext());
-            }
-            c.close();
-            return ids;
+    public Cursor getFormIds() {
+        String columns = SurveyColumns.SURVEY_ID;
+        return queryForms(columns, "", null);
+    }
+
+    @Nullable
+    public Cursor getFormIds(String surveyId) {
+        String columns = SurveyColumns.SURVEY_ID;
+        String whereClause = SurveyColumns.SURVEY_GROUP_ID + " = ?";
+        List<String> surveyIds = new ArrayList<>(1);
+        surveyIds.add(surveyId);
+
+        return queryForms(columns, whereClause, surveyIds);
+    }
+
+    private Cursor queryForms(String columns, String whereClause, List<String> whereParams) {
+        String defaultWhereClause = " WHERE " + SurveyColumns.DELETED + " <> ?";
+        List<String> params = new ArrayList<>();
+        params.add("1");
+        if (!TextUtils.isEmpty(whereClause)) {
+            defaultWhereClause += " AND " + whereClause;
         }
-        return null;
+        String sqlQuery = "SELECT " + columns + " FROM " + Tables.SURVEY + defaultWhereClause;
+        if (whereParams != null) {
+            params.addAll(whereParams);
+        }
+        return briteDatabase.query(sqlQuery, params.toArray(new String[params.size()]));
     }
 
     public void addSurveyGroup(ContentValues values) {

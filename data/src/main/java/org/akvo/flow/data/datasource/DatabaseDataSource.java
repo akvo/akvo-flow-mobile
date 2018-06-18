@@ -223,4 +223,8 @@ public class DatabaseDataSource {
     public Observable<Cursor> getAllTransmissions() {
         return Observable.just(briteSurveyDbAdapter.getAllTransmissions());
     }
+
+    public Observable<Cursor> getFormIds(String surveyId) {
+        return Observable.just(briteSurveyDbAdapter.getFormIds(surveyId));
+    }
 }

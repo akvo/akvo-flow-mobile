@@ -29,6 +29,7 @@ import android.text.TextUtils;
 
 import com.squareup.sqlbrite2.BriteDatabase;
 
+import org.akvo.flow.data.entity.FormIdMapper;
 import org.akvo.flow.data.migration.FlowMigrationListener;
 import org.akvo.flow.data.migration.languages.MigrationLanguageMapper;
 import org.akvo.flow.data.preference.Prefs;
@@ -65,6 +66,7 @@ public class SurveyDbDataSource {
     private final BriteSurveyDbAdapter briteSurveyDbAdapter;
     private final SurveyMapper surveyMapper = new SurveyMapper();
     private final TransmissionsMapper transmissionsMapper = new TransmissionsMapper();
+    private final FormIdMapper surveyIdMapper = new FormIdMapper();
 
     @Inject
     public SurveyDbDataSource(Context context, BriteDatabase briteDatabase) {
@@ -344,7 +346,7 @@ public class SurveyDbDataSource {
             return getSurvey(formId);
         }
         Survey s = null;
-        Cursor c = briteSurveyDbAdapter.getSurveys(sg.getId());
+        Cursor c = briteSurveyDbAdapter.getForms(sg.getId());
         if (c != null) {
             if (c.moveToFirst()) {
                 s = surveyMapper.getSurvey(c);
@@ -381,8 +383,7 @@ public class SurveyDbDataSource {
      * To get the Cursor result, use getSurveys(surveyGroupId)
      */
     public List<Survey> getSurveyList(long surveyGroupId) {
-        // Reuse getSurveys() method
-        Cursor cursor = briteSurveyDbAdapter.getSurveys(surveyGroupId);
+        Cursor cursor = briteSurveyDbAdapter.getForms(surveyGroupId);
 
         ArrayList<Survey> surveys = new ArrayList<>();
 
@@ -446,7 +447,8 @@ public class SurveyDbDataSource {
     }
 
     public String[] getSurveyIds() {
-        return briteSurveyDbAdapter.getSurveyIds();
+        Cursor cursor = briteSurveyDbAdapter.getFormIds();
+        return surveyIdMapper.mapToFormId(cursor);
     }
 
     public void deleteAllSurveys() {

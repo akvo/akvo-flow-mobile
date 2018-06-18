@@ -3,6 +3,7 @@ sudo: required
 env:
   global:
     - ADB_INSTALL_TIMEOUT=8 # 8 minutes (2 minutes by default)
+     - secure: "eOWoVFTzI/4eqNWUKN3ltMcpN1eQFfkKoxDrGw5VrgqwUSUcOLca2WXbozNCNadk5xLFjHZGNa5QsYsPqG8O3dyyqsynTjIMytijcTE2XYjvld2WD2XfG1q3C0qqL+HDbBq7nQczWjcCbYhkHWSxJWSC9g82rVOa2T6p1PHoGx8="
 
 jdk:
   - oraclejdk8

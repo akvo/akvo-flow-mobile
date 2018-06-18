@@ -145,10 +145,10 @@ public class FileDataSource {
         if (dataFolder.exists()) {
             File[] files = dataFolder.listFiles();
             if (files != null) {
-                for (File f : files) {
-                    if (fileNames.contains(f.getAbsolutePath())) {
+                for (File fileToMove : files) {
+                    if (fileNames.contains(fileToMove.getName())) {
                         filesCopied = true;
-                        fileHelper.copyFileToFolder(f, destinationDataFolder);
+                        fileHelper.copyFileToFolder(fileToMove, destinationDataFolder);
                     }
                 }
             }

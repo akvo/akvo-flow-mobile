@@ -53,7 +53,7 @@ public class DatabaseHelperTest {
     private SQLiteDatabase mockDb;
 
     @Test
-    public void onUpgradeShouldUpgradeCorrectlyIfVersionBeforeLaunch() throws Exception {
+    public void onUpgradeShouldUpgradeCorrectlyIfVersionBeforeLaunch() {
         DatabaseHelper helper = spy(
                 new DatabaseHelper(mockContext, mockLanguageTable, mockMigrationListener));
         doNothing().when(helper).onCreate(any(SQLiteDatabase.class));
@@ -66,7 +66,7 @@ public class DatabaseHelperTest {
     }
 
     @Test
-    public void onUpgradeShouldUpgradeCorrectlyIfVersionLaunch() throws Exception {
+    public void onUpgradeShouldUpgradeCorrectlyIfVersionLaunch() {
         DatabaseHelper helper = spy(
                 new DatabaseHelper(mockContext, mockLanguageTable, mockMigrationListener));
         configureDatabaseHelper(helper);
@@ -80,6 +80,7 @@ public class DatabaseHelperTest {
         verify(helper, times(1)).upgradeFromCaddisfly(mockDb);
         verify(helper, times(1)).upgradeFromPreferences(mockDb);
         verify(helper, times(1)).upgradeFromLanguages(mockDb);
+        verify(helper, times(1)).upgradeFromResponses(mockDb);
     }
 
     private void configureDatabaseHelper(DatabaseHelper helper) {
@@ -90,10 +91,11 @@ public class DatabaseHelperTest {
         doNothing().when(helper).upgradeFromCaddisfly(any(SQLiteDatabase.class));
         doNothing().when(helper).upgradeFromPreferences(any(SQLiteDatabase.class));
         doNothing().when(helper).upgradeFromLanguages(any(SQLiteDatabase.class));
+        doNothing().when(helper).upgradeFromResponses(any(SQLiteDatabase.class));
     }
 
     @Test
-    public void onUpgradeShouldUpgradeCorrectlyIfVersionSubmitter() throws Exception {
+    public void onUpgradeShouldUpgradeCorrectlyIfVersionSubmitter() {
         DatabaseHelper helper = spy(
                 new DatabaseHelper(mockContext, mockLanguageTable, mockMigrationListener));
         configureDatabaseHelper(helper);
@@ -107,10 +109,11 @@ public class DatabaseHelperTest {
         verify(helper, times(1)).upgradeFromCaddisfly(mockDb);
         verify(helper, times(1)).upgradeFromPreferences(mockDb);
         verify(helper, times(1)).upgradeFromLanguages(mockDb);
+        verify(helper, times(1)).upgradeFromResponses(mockDb);
     }
 
     @Test
-    public void onUpgradeShouldUpgradeCorrectlyIfVersionCheck() throws Exception {
+    public void onUpgradeShouldUpgradeCorrectlyIfVersionCheck() {
         DatabaseHelper helper = spy(
                 new DatabaseHelper(mockContext, mockLanguageTable, mockMigrationListener));
         configureDatabaseHelper(helper);
@@ -124,10 +127,11 @@ public class DatabaseHelperTest {
         verify(helper, times(1)).upgradeFromCaddisfly(mockDb);
         verify(helper, times(1)).upgradeFromPreferences(mockDb);
         verify(helper, times(1)).upgradeFromLanguages(mockDb);
+        verify(helper, times(1)).upgradeFromResponses(mockDb);
     }
 
     @Test
-    public void onUpgradeShouldUpgradeCorrectlyIfVersionFormVersion() throws Exception {
+    public void onUpgradeShouldUpgradeCorrectlyIfVersionFormVersion() {
         DatabaseHelper helper = spy(
                 new DatabaseHelper(mockContext, mockLanguageTable, mockMigrationListener));
         configureDatabaseHelper(helper);
@@ -141,10 +145,11 @@ public class DatabaseHelperTest {
         verify(helper, times(1)).upgradeFromCaddisfly(mockDb);
         verify(helper, times(1)).upgradeFromPreferences(mockDb);
         verify(helper, times(1)).upgradeFromLanguages(mockDb);
+        verify(helper, times(1)).upgradeFromResponses(mockDb);
     }
 
     @Test
-    public void onUpgradeShouldUpgradeCorrectlyIfVersionCaddisfly() throws Exception {
+    public void onUpgradeShouldUpgradeCorrectlyIfVersionCaddisfly() {
         DatabaseHelper helper = spy(
                 new DatabaseHelper(mockContext, mockLanguageTable, mockMigrationListener));
         configureDatabaseHelper(helper);
@@ -158,10 +163,11 @@ public class DatabaseHelperTest {
         verify(helper, times(1)).upgradeFromCaddisfly(mockDb);
         verify(helper, times(1)).upgradeFromPreferences(mockDb);
         verify(helper, times(1)).upgradeFromLanguages(mockDb);
+        verify(helper, times(1)).upgradeFromResponses(mockDb);
     }
 
     @Test
-    public void onUpgradeShouldUpgradeCorrectlyIfVersionPreferences() throws Exception {
+    public void onUpgradeShouldUpgradeCorrectlyIfVersionPreferences() {
         DatabaseHelper helper = spy(
                 new DatabaseHelper(mockContext, mockLanguageTable, mockMigrationListener));
         configureDatabaseHelper(helper);
@@ -175,10 +181,11 @@ public class DatabaseHelperTest {
         verify(helper, times(0)).upgradeFromCaddisfly(mockDb);
         verify(helper, times(1)).upgradeFromPreferences(mockDb);
         verify(helper, times(1)).upgradeFromLanguages(mockDb);
+        verify(helper, times(1)).upgradeFromResponses(mockDb);
     }
 
     @Test
-    public void onUpgradeShouldUpgradeCorrectlyIfVersionLanguagesMigrate() throws Exception {
+    public void onUpgradeShouldUpgradeCorrectlyIfVersionLanguagesMigrate() {
         DatabaseHelper helper = spy(
                 new DatabaseHelper(mockContext, mockLanguageTable, mockMigrationListener));
         configureDatabaseHelper(helper);
@@ -192,5 +199,24 @@ public class DatabaseHelperTest {
         verify(helper, times(0)).upgradeFromCaddisfly(mockDb);
         verify(helper, times(0)).upgradeFromPreferences(mockDb);
         verify(helper, times(1)).upgradeFromLanguages(mockDb);
+        verify(helper, times(1)).upgradeFromResponses(mockDb);
+    }
+
+    @Test
+    public void onUpgradeShouldUpgradeCorrectlyIfVersionResponseMigrate() {
+        DatabaseHelper helper = spy(
+                new DatabaseHelper(mockContext, mockLanguageTable, mockMigrationListener));
+        configureDatabaseHelper(helper);
+
+        helper.onUpgrade(mockDb, DatabaseHelper.VER_RESPONSE_ITERATION, DatabaseHelper.DATABASE_VERSION);
+
+        verify(helper, times(0)).upgradeFromLaunch(mockDb);
+        verify(helper, times(0)).upgradeFromFormSubmitter(mockDb);
+        verify(helper, times(0)).upgradeFromFormCheck(mockDb);
+        verify(helper, times(0)).upgradeFromFormVersion(mockDb);
+        verify(helper, times(0)).upgradeFromCaddisfly(mockDb);
+        verify(helper, times(0)).upgradeFromPreferences(mockDb);
+        verify(helper, times(0)).upgradeFromLanguages(mockDb);
+        verify(helper, times(1)).upgradeFromResponses(mockDb);
     }
 }

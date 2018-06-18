@@ -283,6 +283,25 @@ public class BriteSurveyDbAdapter {
     }
 
     /**
+     * Updates the matching transmission history records with the status
+     * passed in. If the status == Synced, the end date is updated. If
+     * the status == In Progress, the start date is updated.
+     *
+     * @return the number of rows affected
+     */
+    public void updateTransmissionStatus(long id, int status) {
+        ContentValues values = new ContentValues();
+        values.put(TransmissionColumns.STATUS, status);
+        if (TransmissionStatus.SYNCED == status) {
+            values.put(TransmissionColumns.END_DATE, System.currentTimeMillis() + "");
+        } else if (TransmissionStatus.IN_PROGRESS == status) {
+            values.put(TransmissionColumns.START_DATE, System.currentTimeMillis() + "");
+        }
+        briteDatabase.update(Tables.TRANSMISSION, values, TransmissionColumns._ID + " = ?",
+                id + "");
+    }
+
+    /**
      * Delete any Record that contains no SurveyInstance
      */
     public void deleteEmptyRecords() {
@@ -498,13 +517,6 @@ public class BriteSurveyDbAdapter {
         return userId;
     }
 
-    public void updateTransmission(String oldPath, String newPath) {
-        ContentValues contentValues = new ContentValues(1);
-        contentValues.put(TransmissionColumns.FILENAME, newPath);
-        String where = TransmissionColumns.FILENAME + " = ? ";
-        briteDatabase.update(Tables.TRANSMISSION, contentValues, where, oldPath);
-    }
-
     /**
      * permanently deletes all surveys, responses, users and transmission
      * history from the database
@@ -533,16 +545,14 @@ public class BriteSurveyDbAdapter {
 
     public boolean unSyncedTransmissionsExist() {
         boolean transmissionsExist = false;
-        String sql =
-                "SELECT " + TransmissionColumns._ID + " FROM " + Tables.TRANSMISSION + " WHERE "
-                        + TransmissionColumns.STATUS
-                        + " IN (?, ?, ?) LIMIT 1";
+        String column = TransmissionColumns._ID;
+        String whereClause = TransmissionColumns.STATUS + " IN (?, ?, ?) LIMIT 1";
         String[] selectionArgs = new String[] {
                 String.valueOf(TransmissionStatus.FAILED),
                 String.valueOf(TransmissionStatus.IN_PROGRESS),
                 String.valueOf(TransmissionStatus.QUEUED)
         };
-        Cursor cursor = briteDatabase.query(sql, selectionArgs);
+        Cursor cursor = queryTransmissions(column, whereClause, selectionArgs);
         if (cursor != null && cursor.getCount() > 0) {
             transmissionsExist = true;
         }
@@ -552,16 +562,27 @@ public class BriteSurveyDbAdapter {
         return transmissionsExist;
     }
 
-    public Cursor getAllTransmissionFileNames() {
-        String sql =
-                "SELECT " + TransmissionColumns.FILENAME + " FROM " + Tables.TRANSMISSION
-                        + " WHERE " + TransmissionColumns.STATUS + " IN (?, ?, ?, ?)";
+    public Cursor getAllTransmissions() {
+        String column = TransmissionColumns.FILENAME;
+        String whereClause = TransmissionColumns.STATUS + " IN (?, ?, ?, ?)";
         String[] selectionArgs = new String[] {
                 String.valueOf(TransmissionStatus.QUEUED),
                 String.valueOf(TransmissionStatus.IN_PROGRESS),
                 String.valueOf(TransmissionStatus.SYNCED),
                 String.valueOf(TransmissionStatus.FAILED),
         };
+        return queryTransmissions(column, whereClause, selectionArgs);
+    }
+
+    private Cursor queryTransmissions(String column, String whereClause, String[] selectionArgs) {
+        String sql = "SELECT " + column + " FROM " + Tables.TRANSMISSION + " WHERE " + whereClause;
         return briteDatabase.query(sql, selectionArgs);
+    }
+
+    public int updateFailedTransmission(String filename, int status) {
+        ContentValues contentValues = new ContentValues(1);
+        contentValues.put(TransmissionColumns.STATUS, status);
+        String where = TransmissionColumns.FILENAME + " = ? ";
+        return briteDatabase.update(Tables.TRANSMISSION, contentValues, where, filename);
     }
 }

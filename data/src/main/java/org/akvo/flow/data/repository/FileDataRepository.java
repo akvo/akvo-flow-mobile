@@ -63,8 +63,7 @@ public class FileDataRepository implements FileRepository {
                 dataSourceFactory.getFileDataSource().moveMediaFiles())
                 .concatMap(new Function<List<MovedFile>, Observable<Boolean>>() {
                     @Override
-                    public Observable<Boolean> apply(List<MovedFile> movedFiles) throws Exception {
-                        dataSourceFactory.getDataBaseDataSource().updateTransmissions(movedFiles);
+                    public Observable<Boolean> apply(List<MovedFile> movedFiles) {
                         return Observable.just(true);
                     }
                 });

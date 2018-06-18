@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2010-2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -40,7 +40,7 @@ public class SurveyInstanceStatus {
     /**
      * Datapoint has been sent to the dashboard
      */
-    public static final int SYNCED = 3;
+    public static final int UPLOADED = 3;
 
     /**
      * Datapoint has been downloaded from the dashboard

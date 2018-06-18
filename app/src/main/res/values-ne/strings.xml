@@ -68,7 +68,7 @@
   <string name="clear_data_success">डिभाइसबाट डाटा सफलतापुर्वक हटाइयो।</string>
   <string name="clear_data_error">डिभाइसबाट डाटा हटाउन त्रुटि भएको छ। </string>
   <string name="search">खोजी गर्नुहोस्</string>
-  <string name="sync">सिन्क गर्नुहोस्</string>
+  <string name="download">सिन्क गर्नुहोस्</string>
   <string name="sort">क्रममा मिलाउनुहोस्</string>
   <string name="stats">तथ्यान्क</string>
   <string name="prefill_title">पहिले नै भरिएका उतरहरु</string>
@@ -136,7 +136,7 @@
   <!--Form & transmission status-->
   <string name="status_queued">लाममा छ</string>
   <string name="status_in_progress">सफल हुन सकेन।</string>
-  <string name="status_synced">सिँक सफल भयो।</string>
+  <string name="status_uploaded">सिँक सफल भयो।</string>
   <string name="status_failed">सफल हुन सकेन।</string>
   <string name="status_saved">सेभ भयो।</string>
   <string name="status_submitted">बुझाईयो।</string>

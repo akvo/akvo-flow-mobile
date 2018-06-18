@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -36,7 +36,7 @@ public interface SurveyRepository {
     Observable<List<DataPoint>> getDataPoints(Long surveyGroupId, Double latitude,
             Double longitude, Integer orderBy);
 
-    Flowable<Integer> syncRemoteDataPoints(long surveyGroupId);
+    Flowable<Integer> downloadDataPoints(long surveyGroupId);
 
     Observable<Boolean> deleteSurvey(long surveyToDeleteId);
 

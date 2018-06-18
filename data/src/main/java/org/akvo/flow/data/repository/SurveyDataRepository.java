@@ -107,7 +107,7 @@ public class SurveyDataRepository implements SurveyRepository {
     }
 
     @Override
-    public Flowable<Integer> syncRemoteDataPoints(final long surveyGroupId) {
+    public Flowable<Integer> downloadDataPoints(final long surveyGroupId) {
         return syncDataPoints(surveyGroupId)
                 .onErrorResumeNext(new Function<Throwable, Flowable<Integer>>() {
                     @Override
@@ -134,7 +134,7 @@ public class SurveyDataRepository implements SurveyRepository {
 
     private Flowable<Integer> syncDataPoints(final long surveyGroupId) {
         final State state = new State(getSyncedTime(surveyGroupId));
-        return loadNewDataPoints(surveyGroupId, state)
+        return downloadDataPoints(surveyGroupId, state)
                 .doOnNext(new Consumer<State>() {
                     @Override
                     public void accept(@NonNull State state) throws Exception {
@@ -168,12 +168,12 @@ public class SurveyDataRepository implements SurveyRepository {
                 });
     }
 
-    private Flowable<State> loadNewDataPoints(final long surveyGroupId,
+    private Flowable<State> downloadDataPoints(final long surveyGroupId,
             final State state) {
         return Flowable.defer(new Callable<Flowable<ApiLocaleResult>>() {
             @Override
             public Flowable<ApiLocaleResult> call() throws Exception {
-                return restApi.loadNewDataPoints(surveyGroupId,
+                return restApi.downloadDataPoints(surveyGroupId,
                         state.getTimestamp());
             }
         }).map(new Function<ApiLocaleResult, List<ApiDataPoint>>() {

@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015-2017 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2015-2018 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -68,7 +68,7 @@ public class ResponseListAdapter extends CursorAdapter {
             case SurveyInstanceStatus.SUBMITTED:
                 icon = R.drawable.submitted_icn;
                 break;
-            case SurveyInstanceStatus.SYNCED:
+            case SurveyInstanceStatus.UPLOADED:
             case SurveyInstanceStatus.DOWNLOADED:
                 icon = R.drawable.checkmark;
                 break;

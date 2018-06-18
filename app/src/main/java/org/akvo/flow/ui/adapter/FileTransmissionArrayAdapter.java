@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2018 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -64,7 +64,7 @@ public class FileTransmissionArrayAdapter extends ArrayAdapter<FileTransmission>
                 tv.setCompoundDrawablesWithIntrinsicBounds(R.drawable.status_progress, 0, 0, 0);
                 break;
             case TransmissionStatus.SYNCED:
-                tv.setText(R.string.status_synced);
+                tv.setText(R.string.status_uploaded);
                 tv.setCompoundDrawablesWithIntrinsicBounds(R.drawable.status_synced, 0, 0, 0);
                 break;
             case TransmissionStatus.FAILED:

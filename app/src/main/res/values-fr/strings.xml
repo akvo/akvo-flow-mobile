@@ -70,7 +70,7 @@
   <string name="clear_data_success">Les données ont été effacées de l\'appareil avec succès</string>
   <string name="clear_data_error">Des erreurs se sont produites lors de l\'effacement des données de l\'appareil</string>
   <string name="search">Recherche</string>
-  <string name="sync">Sync</string>
+  <string name="download">Sync</string>
   <string name="sort">Trier</string>
   <string name="stats">Stats</string>
   <string name="data_points_sync_error_message_network">La synchronisation a échoué. Pas de connection.</string>
@@ -148,7 +148,7 @@
   <!--Form & transmission status-->
   <string name="status_queued">En attente</string>
   <string name="status_in_progress">En cours</string>
-  <string name="status_synced">Synchronisé</string>
+  <string name="status_uploaded">Synchronisé</string>
   <string name="status_failed">Échec</string>
   <string name="status_saved">Enregistré</string>
   <string name="status_submitted">Envoyé</string>

@@ -495,11 +495,11 @@ public class DataSyncService extends IntentService {
             }
         }
 
-        // Retain successful survey instances, to mark them as SYNCED
+        // Retain successful survey instances, to mark them as UPLOADED
         syncedSurveys.removeAll(unsyncedSurveys);
 
         for (long surveyInstanceId : syncedSurveys) {
-            updateSurveyStatus(surveyInstanceId, SurveyInstanceStatus.SYNCED);
+            updateSurveyStatus(surveyInstanceId, SurveyInstanceStatus.UPLOADED);
         }
 
         // Ensure the unsynced ones are just SUBMITTED

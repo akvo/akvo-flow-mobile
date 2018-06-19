@@ -262,9 +262,10 @@ public class DataSyncService extends IntentService {
         try {
             ZipFileData zipFileData = new ZipFileData();
             // Process form instance data and collect image filenames
+            Set<String> imagePaths = new HashSet<>();
             FormInstance formInstance = processFormInstance(surveyInstanceId,
-                    zipFileData.imagePaths);
-
+                    imagePaths);
+            zipFileData.imagePaths.addAll(imagePaths);
             // Serialize form instance as JSON
             zipFileData.data = new GsonMapper().write(formInstance, FormInstance.class);
             zipFileData.uuid = formInstance.getUUID();
@@ -287,7 +288,7 @@ public class DataSyncService extends IntentService {
             File zipFile = zipFileBrowser.getSurveyInstanceFile(zipFileData.uuid);
 
             // Write the data into the zip file
-            String fileName = zipFile.getAbsolutePath();// Will normalize filename.
+            String fileName = zipFile.getName();
             zipFileData.filename = fileName;
             Timber.i("Creating zip file: " + fileName);
             FileOutputStream fout = new FileOutputStream(zipFile);
@@ -339,7 +340,7 @@ public class DataSyncService extends IntentService {
      */
     @NonNull
     private FormInstance processFormInstance(long surveyInstanceId,
-            @NonNull List<String> imagePaths) {
+            @NonNull Set<String> imagePaths) {
         FormInstance formInstance = new FormInstance();
         List<Response> responses = new ArrayList<>();
         Cursor data = mDatabase.getResponsesData(surveyInstanceId);
@@ -391,19 +392,14 @@ public class DataSyncService extends IntentService {
                 }
 
                 // If the response has any file attached, enqueue it to the image list
-                String filename = data.getString(filename_col);
+                String filePath = data.getString(filename_col);
+                String filename = getFilenameFromPath(filePath);
+
                 if (!TextUtils.isEmpty(filename)) {
                     imagePaths.add(filename);
                 }
 
-                // Ensure backwards compatibility. Old image responses may contain filenames
                 String type = data.getString(answer_type_col);
-                if (ConstantUtil.IMAGE_RESPONSE_TYPE.equals(type)
-                        || ConstantUtil.VIDEO_RESPONSE_TYPE.equals(type)) {
-                    if (!TextUtils.isEmpty(value) && new File(value).exists()) {
-                        imagePaths.add(value);
-                    }
-                }
 
                 String rawQuestionId = data.getString(question_fk_col);
                 int iteration = data.getInt(iterationColumn);
@@ -423,10 +419,23 @@ public class DataSyncService extends IntentService {
             } while (data.moveToNext());
 
             formInstance.setResponses(responses);
+        }
+        if (data != null) {
             data.close();
         }
 
         return formInstance;
+    }
+
+    @Nullable
+    private String getFilenameFromPath(@Nullable String filePath) {
+        String filename = null;
+        if (!TextUtils.isEmpty(filePath) && filePath.contains(File.separator)
+                && filePath.contains(".")) {
+            filename = filePath.substring(filePath.lastIndexOf(File.separator) + 1);
+
+        }
+        return filename;
     }
 
     // replace troublesome chars in user-provided values
@@ -479,19 +488,18 @@ public class DataSyncService extends IntentService {
         for (int i = 0; i < totalFiles; i++) {
             FileTransmission transmission = transmissions.get(i);
             final long surveyInstanceId = transmission.getRespondentId();
-            if (syncFile(transmission.getFileName(), transmission.getFormId()
-            )) {
+            if (syncFile(transmission)) {
                 syncedSurveys.add(surveyInstanceId);
             } else {
                 unsyncedSurveys.add(surveyInstanceId);
             }
         }
 
-        // Retain successful survey instances, to mark them as SYNCED
+        // Retain successful survey instances, to mark them as UPLOADED
         syncedSurveys.removeAll(unsyncedSurveys);
 
         for (long surveyInstanceId : syncedSurveys) {
-            updateSurveyStatus(surveyInstanceId, SurveyInstanceStatus.SYNCED);
+            updateSurveyStatus(surveyInstanceId, SurveyInstanceStatus.UPLOADED);
         }
 
         // Ensure the unsynced ones are just SUBMITTED
@@ -500,13 +508,18 @@ public class DataSyncService extends IntentService {
         }
     }
 
-    private boolean syncFile(@NonNull String filename, @NonNull String formId) {
+    private boolean syncFile(@NonNull FileTransmission transmission) {
+        String filename = transmission.getFileName();
+        String formId = transmission.getFormId();
         if (TextUtils.isEmpty(filename) || filename.lastIndexOf(".") < 0) {
             return false;
         }
 
-        String contentType, dir, action;
+        String contentType;
+        String dir;
+        String action;
         boolean isPublic;
+        String filePath;
         String ext = filename.substring(filename.lastIndexOf("."));
         contentType = contentType(ext);
         switch (ext) {
@@ -516,11 +529,13 @@ public class DataSyncService extends IntentService {
                 dir = ConstantUtil.S3_IMAGE_DIR;
                 action = ACTION_IMAGE;
                 isPublic = true;// Images/Videos have a public read policy
+                filePath = buildMediaFilePath(filename);
                 break;
             case ConstantUtil.ARCHIVE_SUFFIX:
                 dir = ConstantUtil.S3_DATA_DIR;
                 action = ACTION_SUBMIT;
                 isPublic = false;
+                filePath = buildZipFilePath(filename);
                 break;
             default:
                 return false;
@@ -528,17 +543,16 @@ public class DataSyncService extends IntentService {
 
         // Temporarily set the status to 'IN PROGRESS'. Transmission status should
         // *always* be updated with the outcome of the upload operation.
-        mDatabase.updateTransmissionHistory(filename, TransmissionStatus.IN_PROGRESS);
+        mDatabase.updateTransmissionStatus(transmission.getId(), TransmissionStatus.IN_PROGRESS);
 
         int status = TransmissionStatus.FAILED;
         boolean synced = false;
 
-        if (sendFile(filename, dir, contentType, isPublic, FILE_UPLOAD_RETRIES)) {
+        if (sendFile(filePath, dir, contentType, isPublic, FILE_UPLOAD_RETRIES)) {
             FlowApi api = new FlowApi(getApplicationContext());
-            switch (api.sendProcessingNotification(formId, action,
-                    getDestName(filename))) {
+            switch (api.sendProcessingNotification(formId, action, filePath)) {
                 case HttpURLConnection.HTTP_OK:
-                    status = TransmissionStatus.SYNCED;// Mark everything completed
+                    status = TransmissionStatus.SYNCED; // Mark everything synced
                     synced = true;
                     break;
                 case HttpURLConnection.HTTP_NOT_FOUND:
@@ -551,8 +565,16 @@ public class DataSyncService extends IntentService {
             }
         }
 
-        mDatabase.updateTransmissionHistory(filename, status);
+        mDatabase.updateTransmissionStatus(transmission.getId(), status);
         return synced;
+    }
+
+    private String buildZipFilePath(String filename) {
+        return zipFileBrowser.getZipFile(filename).getAbsolutePath();
+    }
+
+    private String buildMediaFilePath(String filename) {
+        return mediaFileHelper.getMediaFile(filename).getAbsolutePath();
     }
 
     private boolean sendFile(@NonNull String fileAbsolutePath, String dir, String contentType,
@@ -605,9 +627,10 @@ public class DataSyncService extends IntentService {
                 // Handle missing files. If an unknown file exists in the filesystem
                 // it will be marked as failed in the transmission history, so it can
                 // be handled and retried in the next sync attempt.
-                for (String filename : files) {
-                    if (new File(filename).exists()) {
-                        mDatabase.setFileTransmissionFailed(filename);
+                for (String filePath : files) {
+                    String filenameFromPath = getFilenameFromPath(filePath);
+                    if (!TextUtils.isEmpty(filenameFromPath)) {
+                        mDatabase.setFileTransmissionFailed(filenameFromPath);
                     }
                 }
 
@@ -650,17 +673,6 @@ public class DataSyncService extends IntentService {
             }
         }
         return files;
-    }
-
-    @NonNull
-    private static String getDestName(@NonNull String filename) {
-        if (filename.contains("/")) {
-            return filename.substring(filename.lastIndexOf("/") + 1);
-        } else if (filename.contains("\\")) {
-            filename = filename.substring(filename.lastIndexOf("\\") + 1);
-        }
-
-        return filename;
     }
 
     private void updateSurveyStatus(long surveyInstanceId, int status) {

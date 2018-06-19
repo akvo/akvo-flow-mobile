@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -48,11 +48,11 @@ public class FlowRestApi {
         this.encoder = encoder;
     }
 
-    public Flowable<ApiLocaleResult> loadNewDataPoints(long surveyGroup,
+    public Flowable<ApiLocaleResult> downloadDataPoints(long surveyGroup,
             @NonNull String timestamp) {
         String lastUpdated = !TextUtils.isEmpty(timestamp) ? timestamp : "0";
         String phoneNumber = encoder.encodeParam(this.phoneNumber);
-        return serviceFactory.createRetrofitService(DataPointSyncService.class)
+        return serviceFactory.createRetrofitService(DataPointDownloadService.class)
                 .loadNewDataPoints(androidId, imei, lastUpdated, phoneNumber, surveyGroup + "");
     }
 }

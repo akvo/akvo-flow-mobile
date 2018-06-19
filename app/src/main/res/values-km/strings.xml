@@ -59,7 +59,7 @@
   <string name="clear_data_success">ទិន្នន័យត្រូវបានលុបចេញពីឧបករណ៍នេះដោយជោគជ័យ</string>
   <string name="clear_data_error">កំហុសឆ្គងលុបទិន្នន័យពីឧបករណ៍ </string>
   <string name="search">ស្វែងរក </string>
-  <string name="sync">ធ្វើឲ្យចេញដំណាលគ្នា</string>
+  <string name="download">ធ្វើឲ្យចេញដំណាលគ្នា</string>
   <string name="sort">ដាក់ទៅតាមប្រភេទ </string>
   <string name="stats">ស្ថានភាព </string>
   <string name="prefill_title">បំពេញចម្លើយជាមុន </string>
@@ -125,7 +125,7 @@
   <!--Form & transmission status-->
   <string name="status_queued">បានរង់ចាំ </string>
   <string name="status_in_progress">កំពុងដំណើរការ </string>
-  <string name="status_synced">បានដាក់ឲ្យចេញដំណាលគ្នា </string>
+  <string name="status_uploaded">បានដាក់ឲ្យចេញដំណាលគ្នា </string>
   <string name="status_failed">មិនបានសម្រេច </string>
   <string name="status_saved">បានរក្សាទុក</string>
   <string name="status_submitted">បានបញ្ជូនចេញ </string>

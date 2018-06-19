@@ -39,7 +39,6 @@ import org.akvo.flow.database.SurveyDbAdapter;
 import org.akvo.flow.database.SurveyGroupColumns;
 import org.akvo.flow.database.SurveyInstanceColumns;
 import org.akvo.flow.database.SurveyInstanceStatus;
-import org.akvo.flow.database.TransmissionColumns;
 import org.akvo.flow.database.TransmissionStatus;
 import org.akvo.flow.database.britedb.BriteSurveyDbAdapter;
 import org.akvo.flow.domain.FileTransmission;
@@ -51,7 +50,6 @@ import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.PlatformUtil;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -66,6 +64,7 @@ public class SurveyDbDataSource {
     private final SurveyDbAdapter surveyDbAdapter;
     private final BriteSurveyDbAdapter briteSurveyDbAdapter;
     private final SurveyMapper surveyMapper = new SurveyMapper();
+    private final TransmissionsMapper transmissionsMapper = new TransmissionsMapper();
 
     @Inject
     public SurveyDbDataSource(Context context, BriteDatabase briteDatabase) {
@@ -313,63 +312,18 @@ public class SurveyDbDataSource {
         return survey;
     }
 
-    @NonNull
-    private List<FileTransmission> getFileTransmissions(Cursor cursor) {
-        List<FileTransmission> transmissions = new ArrayList<>();
-
-        if (cursor != null) {
-            if (cursor.moveToFirst()) {
-                final int startCol = cursor.getColumnIndexOrThrow(TransmissionColumns.START_DATE);
-                final int endCol = cursor.getColumnIndexOrThrow(TransmissionColumns.END_DATE);
-                final int idCol = cursor.getColumnIndexOrThrow(TransmissionColumns._ID);
-                final int formIdCol = cursor.getColumnIndexOrThrow(TransmissionColumns.SURVEY_ID);
-                final int surveyInstanceCol = cursor
-                        .getColumnIndexOrThrow(TransmissionColumns.SURVEY_INSTANCE_ID);
-                final int fileCol = cursor.getColumnIndexOrThrow(TransmissionColumns.FILENAME);
-                final int statusCol = cursor.getColumnIndexOrThrow(TransmissionColumns.STATUS);
-
-                transmissions = new ArrayList<>();
-                do {
-                    FileTransmission trans = new FileTransmission();
-                    trans.setId(cursor.getLong(idCol));
-                    trans.setFormId(cursor.getString(formIdCol));
-                    trans.setRespondentId(cursor.getLong(surveyInstanceCol));
-                    trans.setFileName(cursor.getString(fileCol));
-                    trans.setStatus(cursor.getInt(statusCol));
-
-                    // Start and End date. Handle null cases
-                    if (!cursor.isNull(startCol)) {
-                        trans.setStartDate(new Date(cursor.getLong(startCol)));
-                    }
-                    if (!cursor.isNull(endCol)) {
-                        trans.setEndDate(new Date(cursor.getLong(endCol)));
-                    }
-
-                    transmissions.add(trans);
-                } while (cursor.moveToNext());
-            }
-            cursor.close();
-        }
-
-        return transmissions;
-    }
-
-    public List<FileTransmission> getFileTransmissions(long surveyInstanceId) {
-        Cursor cursor = surveyDbAdapter.getFileTransmissions(surveyInstanceId);
-        return getFileTransmissions(cursor);
+    public List<FileTransmission> getSurveyInstanceTransmissions(long surveyInstanceId) {
+        Cursor cursor = surveyDbAdapter.getSurveyInstanceTransmissions(surveyInstanceId);
+        return transmissionsMapper.getFileTransmissions(cursor);
     }
 
     /**
-     * Get the list of queued and failed transmissions
+     * Get the list of queued, in progress and failed transmissions
      */
     @NonNull
     public List<FileTransmission> getUnSyncedTransmissions() {
-        Cursor cursor = surveyDbAdapter.getUnSyncedTransmissions(new String[] {
-                String.valueOf(TransmissionStatus.FAILED),
-                String.valueOf(TransmissionStatus.IN_PROGRESS),// Stalled IN_PROGRESS files
-                String.valueOf(TransmissionStatus.QUEUED)
-        });
-        return getFileTransmissions(cursor);
+        Cursor cursor = surveyDbAdapter.getUnSyncedTransmissions();
+        return transmissionsMapper.getFileTransmissions(cursor);
     }
 
     public void addSurveyGroup(SurveyGroup surveyGroup) {
@@ -547,42 +501,22 @@ public class SurveyDbDataSource {
         surveyDbAdapter.deleteResponse(mSurveyInstanceId, questionId);
     }
 
-    private void createTransmission(long surveyInstanceId, String formId, String filename,
-            int status) {
-        ContentValues values = new ContentValues();
-        values.put(TransmissionColumns.SURVEY_INSTANCE_ID, surveyInstanceId);
-        values.put(TransmissionColumns.SURVEY_ID, formId);
-        values.put(TransmissionColumns.FILENAME, filename);
-        values.put(TransmissionColumns.STATUS, status);
-        if (TransmissionStatus.SYNCED == status) {
-            final String date = String.valueOf(System.currentTimeMillis());
-            values.put(TransmissionColumns.START_DATE, date);
-            values.put(TransmissionColumns.END_DATE, date);
-        }
-        surveyDbAdapter.createTransmission(values);
-    }
-
     public void createTransmission(long surveyInstanceId, String formId, String filename) {
-        createTransmission(surveyInstanceId, formId, filename, TransmissionStatus.QUEUED);
+        briteSurveyDbAdapter
+                .createTransmission(surveyInstanceId, formId, filename, TransmissionStatus.QUEUED);
     }
 
     public void setFileTransmissionFailed(String filename) {
-        int rows = updateTransmissionHistory(filename, TransmissionStatus.FAILED);
+        int rows = briteSurveyDbAdapter
+                .updateFailedTransmission(filename, TransmissionStatus.FAILED);
         if (rows == 0) {
             // Use a dummy "-1" as survey_instance_id, as the database needs that attribute
-            createTransmission(-1, null, filename, TransmissionStatus.FAILED);
+            briteSurveyDbAdapter.createTransmission(-1, null, filename, TransmissionStatus.FAILED);
         }
     }
 
-    public int updateTransmissionHistory(String filename, int status) {
-        ContentValues values = new ContentValues();
-        values.put(TransmissionColumns.STATUS, status);
-        if (TransmissionStatus.SYNCED == status) {
-            values.put(TransmissionColumns.END_DATE, System.currentTimeMillis() + "");
-        } else if (TransmissionStatus.IN_PROGRESS == status) {
-            values.put(TransmissionColumns.START_DATE, System.currentTimeMillis() + "");
-        }
-        return surveyDbAdapter.updateTransmission(filename, values);
+    public void updateTransmissionStatus(long id, int status) {
+        briteSurveyDbAdapter.updateTransmissionStatus(id, status);
     }
 
     public void deleteResponse(long mSurveyInstanceId, String questionId, String iteration) {

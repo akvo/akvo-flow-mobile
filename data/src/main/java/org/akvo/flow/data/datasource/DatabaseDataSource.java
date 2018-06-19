@@ -30,14 +30,12 @@ import com.squareup.sqlbrite2.BriteDatabase;
 import org.akvo.flow.data.entity.ApiDataPoint;
 import org.akvo.flow.data.entity.ApiQuestionAnswer;
 import org.akvo.flow.data.entity.ApiSurveyInstance;
-import org.akvo.flow.data.entity.MovedFile;
 import org.akvo.flow.database.Constants;
 import org.akvo.flow.database.RecordColumns;
 import org.akvo.flow.database.ResponseColumns;
 import org.akvo.flow.database.SurveyInstanceColumns;
 import org.akvo.flow.database.SurveyInstanceStatus;
 import org.akvo.flow.database.SyncTimeColumns;
-import org.akvo.flow.database.TransmissionStatus;
 import org.akvo.flow.database.britedb.BriteSurveyDbAdapter;
 import org.akvo.flow.domain.entity.User;
 
@@ -104,19 +102,6 @@ public class DatabaseDataSource {
         }
     }
 
-
-    public void updateTransmissions(@NonNull List<MovedFile> movedFiles) {
-        BriteDatabase.Transaction transaction = briteSurveyDbAdapter.beginTransaction();
-        try {
-            for (MovedFile file: movedFiles) {
-                briteSurveyDbAdapter.updateTransmission(file.getOldPath(), file.getNewPath());
-            }
-            transaction.markSuccessful();
-        } finally {
-            transaction.end();
-        }
-    }
-
     private boolean isRequestFiltered(@Nullable Integer orderBy) {
         return orderBy != null && (orderBy == Constants.ORDER_BY_DISTANCE ||
                 orderBy == Constants.ORDER_BY_DATE ||
@@ -166,13 +151,6 @@ public class DatabaseDataSource {
             long id = briteSurveyDbAdapter.syncSurveyInstance(values, surveyInstance.getUuid());
 
             syncResponses(surveyInstance.getQasList(), id);
-
-            // The filename is a unique column in the transmission table, and as we do not have
-            // a file to hold this data, we set the value to the instance UUID
-            briteSurveyDbAdapter
-                    .createTransmission(id, String.valueOf(surveyInstance.getSurveyId()),
-                            surveyInstance.getUuid(),
-                            TransmissionStatus.SYNCED);
         }
         briteSurveyDbAdapter.deleteEmptyRecords();
     }
@@ -238,12 +216,11 @@ public class DatabaseDataSource {
         return Observable.just(true);
     }
 
-    public boolean unSyncedTransmissionsExist() {
-        return briteSurveyDbAdapter.unSyncedTransmissionsExist();
+    public Observable<Boolean> unSyncedTransmissionsExist() {
+        return Observable.just(briteSurveyDbAdapter.unSyncedTransmissionsExist());
     }
 
-    public Observable<Cursor> getAllTransmissionFileNames() {
-        return Observable
-                .just(briteSurveyDbAdapter.getAllTransmissionFileNames());
+    public Observable<Cursor> getAllTransmissions() {
+        return Observable.just(briteSurveyDbAdapter.getAllTransmissions());
     }
 }

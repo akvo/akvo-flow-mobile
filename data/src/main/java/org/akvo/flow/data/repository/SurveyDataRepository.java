@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -29,7 +29,7 @@ import org.akvo.flow.data.entity.ApiSurveyInstance;
 import org.akvo.flow.data.entity.DataPointMapper;
 import org.akvo.flow.data.entity.SurveyMapper;
 import org.akvo.flow.data.entity.SyncedTimeMapper;
-import org.akvo.flow.data.entity.TransmissionMapper;
+import org.akvo.flow.data.entity.TransmissionFilenameMapper;
 import org.akvo.flow.data.entity.UserMapper;
 import org.akvo.flow.data.net.FlowRestApi;
 import org.akvo.flow.domain.entity.DataPoint;
@@ -66,13 +66,13 @@ public class SurveyDataRepository implements SurveyRepository {
     private final FlowRestApi restApi;
     private final SurveyMapper surveyMapper;
     private final UserMapper userMapper;
-    private final TransmissionMapper transmissionMapper;
+    private final TransmissionFilenameMapper transmissionMapper;
 
     @Inject
     public SurveyDataRepository(DataSourceFactory dataSourceFactory,
             DataPointMapper dataPointMapper, SyncedTimeMapper syncedTimeMapper, FlowRestApi restApi,
             SurveyMapper surveyMapper, UserMapper userMapper,
-            TransmissionMapper transmissionMapper) {
+            TransmissionFilenameMapper transmissionMapper) {
         this.dataSourceFactory = dataSourceFactory;
         this.dataPointMapper = dataPointMapper;
         this.syncedTimeMapper = syncedTimeMapper;
@@ -107,7 +107,7 @@ public class SurveyDataRepository implements SurveyRepository {
     }
 
     @Override
-    public Flowable<Integer> syncRemoteDataPoints(final long surveyGroupId) {
+    public Flowable<Integer> downloadDataPoints(final long surveyGroupId) {
         return syncDataPoints(surveyGroupId)
                 .onErrorResumeNext(new Function<Throwable, Flowable<Integer>>() {
                     @Override
@@ -134,7 +134,7 @@ public class SurveyDataRepository implements SurveyRepository {
 
     private Flowable<Integer> syncDataPoints(final long surveyGroupId) {
         final State state = new State(getSyncedTime(surveyGroupId));
-        return loadNewDataPoints(surveyGroupId, state)
+        return downloadDataPoints(surveyGroupId, state)
                 .doOnNext(new Consumer<State>() {
                     @Override
                     public void accept(@NonNull State state) throws Exception {
@@ -168,12 +168,12 @@ public class SurveyDataRepository implements SurveyRepository {
                 });
     }
 
-    private Flowable<State> loadNewDataPoints(final long surveyGroupId,
+    private Flowable<State> downloadDataPoints(final long surveyGroupId,
             final State state) {
         return Flowable.defer(new Callable<Flowable<ApiLocaleResult>>() {
             @Override
             public Flowable<ApiLocaleResult> call() throws Exception {
-                return restApi.loadNewDataPoints(surveyGroupId,
+                return restApi.downloadDataPoints(surveyGroupId,
                         state.getTimestamp());
             }
         }).map(new Function<ApiLocaleResult, List<ApiDataPoint>>() {
@@ -308,13 +308,12 @@ public class SurveyDataRepository implements SurveyRepository {
 
     @Override
     public Observable<Boolean> unSyncedTransmissionsExist() {
-        return Observable
-                .just(dataSourceFactory.getDataBaseDataSource().unSyncedTransmissionsExist());
+        return dataSourceFactory.getDataBaseDataSource().unSyncedTransmissionsExist();
     }
 
     @Override
     public Observable<List<String>> getAllTransmissionFileNames() {
-        return dataSourceFactory.getDataBaseDataSource().getAllTransmissionFileNames()
+        return dataSourceFactory.getDataBaseDataSource().getAllTransmissions()
                 .map(new Function<Cursor, List<String>>() {
                     @Override
                     public List<String> apply(Cursor cursor) {

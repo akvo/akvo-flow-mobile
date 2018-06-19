@@ -133,7 +133,7 @@ public class SurveyDbAdapter {
         String dateColumn;
         switch (status) {
             case SurveyInstanceStatus.DOWNLOADED:
-            case SurveyInstanceStatus.SYNCED:
+            case SurveyInstanceStatus.UPLOADED:
                 dateColumn = SurveyInstanceColumns.SYNC_DATE;
                 break;
             case SurveyInstanceStatus.SUBMITTED:
@@ -306,25 +306,23 @@ public class SurveyDbAdapter {
                 });
     }
 
-    public void createTransmission(ContentValues values) {
-        database.insert(Tables.TRANSMISSION, null, values);
+    public Cursor getSurveyInstanceTransmissions(long surveyInstanceId) {
+        return getTransmissions(TransmissionColumns.SURVEY_INSTANCE_ID + " = ?",
+                new String[] {
+                        String.valueOf(surveyInstanceId)
+                }
+        );
     }
 
-    /**
-     * Updates the matching transmission history records with the status
-     * passed in. If the status == Completed, the completion date is updated. If
-     * the status == In Progress, the start date is updated.
-     *
-     * @return the number of rows affected
-     */
-    public int updateTransmission(String fileName, ContentValues values) {
-        // TODO: Update Survey Instance STATUS as well
-        return database.update(Tables.TRANSMISSION, values,
-                TransmissionColumns.FILENAME + " = ?",
-                new String[] { fileName });
+    public Cursor getUnSyncedTransmissions() {
+        return getTransmissions(TransmissionColumns.STATUS + " IN (?, ?, ?)", new String[] {
+                String.valueOf(TransmissionStatus.FAILED),
+                String.valueOf(TransmissionStatus.IN_PROGRESS), // Stalled IN_PROGRESS files
+                String.valueOf(TransmissionStatus.QUEUED)
+        });
     }
 
-    public Cursor getFileTransmissions(long surveyInstanceId) {
+    private Cursor getTransmissions(String selection, String[] selectionArgs) {
         return database.query(Tables.TRANSMISSION,
                 new String[] {
                         TransmissionColumns._ID, TransmissionColumns.SURVEY_INSTANCE_ID,
@@ -332,21 +330,8 @@ public class SurveyDbAdapter {
                         TransmissionColumns.FILENAME, TransmissionColumns.START_DATE,
                         TransmissionColumns.END_DATE
                 },
-                TransmissionColumns.SURVEY_INSTANCE_ID + " = ?",
-                new String[] { String.valueOf(surveyInstanceId) },
+                selection + " AND " + TransmissionColumns.FILENAME + " LIKE '%.%'", selectionArgs,
                 null, null, null);
-    }
-
-    public Cursor getUnSyncedTransmissions(String[] selectionArgs) {
-        return database.query(Tables.TRANSMISSION,
-                new String[] {
-                        TransmissionColumns._ID, TransmissionColumns.SURVEY_INSTANCE_ID,
-                        TransmissionColumns.SURVEY_ID, TransmissionColumns.STATUS,
-                        TransmissionColumns.FILENAME, TransmissionColumns.START_DATE,
-                        TransmissionColumns.END_DATE
-                },
-                TransmissionColumns.STATUS + " IN (?, ?, ?)",
-                selectionArgs, null, null, null);
     }
 
     /**

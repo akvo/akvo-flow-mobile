@@ -292,10 +292,10 @@ public class Navigator {
         context.startActivity(browserIntent);
     }
 
-    public void navigateToLargeImage(AppCompatActivity activity, String filename) {
+    public void navigateToLargeImage(AppCompatActivity activity, String filePath) {
         if (activity != null) {
             Intent intent = new Intent(activity, FullImageActivity.class);
-            intent.putExtra(ConstantUtil.IMAGE_URL_EXTRA, filename);
+            intent.putExtra(ConstantUtil.IMAGE_URL_EXTRA, filePath);
             ActionBar supportActionBar = activity.getSupportActionBar();
             if (supportActionBar != null) {
                 CharSequence title = supportActionBar.getTitle();

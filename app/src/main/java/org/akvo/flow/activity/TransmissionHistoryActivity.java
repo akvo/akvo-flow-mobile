@@ -86,7 +86,7 @@ public class TransmissionHistoryActivity extends BackActivity {
 
     private void getTransmissionData() {
         List<FileTransmission> transmissionList = databaseAdapter
-                .getFileTransmissions(surveyInstanceId);
+                .getSurveyInstanceTransmissions(surveyInstanceId);
         displayTransmissionData(transmissionList);
     }
 

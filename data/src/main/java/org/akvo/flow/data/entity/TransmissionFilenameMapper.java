@@ -31,10 +31,10 @@ import javax.inject.Inject;
 
 import io.reactivex.annotations.Nullable;
 
-public class TransmissionMapper {
+public class TransmissionFilenameMapper {
 
     @Inject
-    public TransmissionMapper() {
+    public TransmissionFilenameMapper() {
     }
 
     public List<String> mapToFileNameList(@Nullable Cursor cursor) {
@@ -52,7 +52,7 @@ public class TransmissionMapper {
     }
 
     private String getFileName(Cursor cursor) {
-        return cursor.getString(
-                cursor.getColumnIndexOrThrow(TransmissionColumns.FILENAME));
+        return cursor
+                .getString(cursor.getColumnIndexOrThrow(TransmissionColumns.FILENAME));
     }
 }

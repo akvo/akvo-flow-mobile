@@ -21,12 +21,10 @@
 package org.akvo.flow.util.files;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
 
 import org.akvo.flow.util.ConstantUtil;
 
 import java.io.File;
-import java.util.List;
 
 import javax.inject.Inject;
 
@@ -48,8 +46,7 @@ public class ZipFileBrowser {
                 uuid + ConstantUtil.ARCHIVE_SUFFIX);
     }
 
-    @NonNull
-    public List<File> findAllPossibleFolders() {
-        return fileBrowser.findAllPossibleFolders(context, DIR_DATA);
+    public File getZipFile(String filename) {
+        return new File(fileBrowser.getExistingAppInternalFolder(context, DIR_DATA), filename);
     }
 }

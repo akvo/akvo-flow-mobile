@@ -36,7 +36,6 @@ import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
 import java.util.Locale;
 
 import javax.inject.Inject;
@@ -97,11 +96,6 @@ public class MediaFileHelper {
     public File getMediaFile(String filename) {
         File mediaFolder = fileBrowser.getExistingAppInternalFolder(context, DIR_MEDIA);
         return new File(mediaFolder, filename);
-    }
-
-    @NonNull
-    public List<File> findAllPossibleFolders() {
-        return fileBrowser.findAllPossibleFolders(context, DIR_MEDIA);
     }
 
     /**

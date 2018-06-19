@@ -3,7 +3,7 @@ sudo: required
 env:
   global:
     - ADB_INSTALL_TIMEOUT=8 # 8 minutes (2 minutes by default)
-    - secure: "eOWoVFTzI/4eqNWUKN3ltMcpN1eQFfkKoxDrGw5VrgqwUSUcOLca2WXbozNCNadk5xLFjHZGNa5QsYsPqG8O3dyyqsynTjIMytijcTE2XYjvld2WD2XfG1q3C0qqL+HDbBq7nQczWjcCbYhkHWSxJWSC9g82rVOa2T6p1PHoGx8="
+    - secure: "bh/ISP3IKy+eoWOY3mWjPn3lEoc8bUCZGbSl92/QXUMQQfiCZJRgVmsZfuCBnByzl2t9F/wTZQfnTTsYF0fpX9wCrp+S9nfmlujhFTkN1uc2SVJrh0Ecf2adWZun18SXuUaI6vuNNwVBDu+YAm22BggM5/9IH0dgER9+Zb3z+rc="
     - secure: "Okh2Xw70CDccPKQsHa0LP44QD4fguY53EsKlkj4Gh7uu2+HQohoGYF7o4naD18tuHL2Kpg0uM/i4IJvq53OCwTK0ZNhE+OzjQpD4kh0PMYi5/NQNckaHdOtPaeAw+8x+/MEmuHCji3figTYeRtC35LRD0UYT0hw0t/Kp6OfWesc="
     - secure: "U1bHOcp7gWC5rhFqjBScm+oMcmbtfGFajlgr0RNqbHFsvnL9Zf20gCCGYzPmzsfJKlISwYZo7XCJCYrkW5/jaBvllJLW4rNbTh6Tuj7Lt2GDcHH1nmtbsU5Vw7b8HiLXU2y/6YWgZeoKgdSWdbuCZVm8X44N7HJRtI3TuMJlgPY="
 

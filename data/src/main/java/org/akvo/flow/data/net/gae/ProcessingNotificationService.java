@@ -18,33 +18,34 @@
  *
  */
 
-package org.akvo.flow.data.net;
-
-import org.akvo.flow.data.entity.ApiFilesResult;
-
-import java.util.List;
+package org.akvo.flow.data.net.gae;
 
 import io.reactivex.Observable;
+import retrofit2.Response;
 import retrofit2.http.GET;
 import retrofit2.http.Headers;
 import retrofit2.http.Query;
 
+import static org.akvo.flow.data.util.ApiUrls.ACTION;
 import static org.akvo.flow.data.util.ApiUrls.ANDROID_ID;
 import static org.akvo.flow.data.util.ApiUrls.DEVICE_ID;
-import static org.akvo.flow.data.util.ApiUrls.DEVICE_NOTIFICATION;
-import static org.akvo.flow.data.util.ApiUrls.FORM_IDS;
+import static org.akvo.flow.data.util.ApiUrls.FILENAME;
+import static org.akvo.flow.data.util.ApiUrls.FORM_ID;
 import static org.akvo.flow.data.util.ApiUrls.IMEI;
 import static org.akvo.flow.data.util.ApiUrls.PHONE_NUMBER;
+import static org.akvo.flow.data.util.ApiUrls.PROCESSING_NOTIFICATION;
 import static org.akvo.flow.data.util.ApiUrls.VERSION;
 
-interface DeviceFilesService {
+public interface ProcessingNotificationService {
 
-    @GET(DEVICE_NOTIFICATION)
+    @GET(PROCESSING_NOTIFICATION)
     @Headers("Cache-Control: no-cache")
-    Observable<ApiFilesResult> getFilesLists(@Query(PHONE_NUMBER) String phoneNumber,
+    Observable<Response<String>> notifyFileAvailable(@Query(ACTION) String action,
+            @Query(FORM_ID) String formId,
+            @Query(FILENAME) String filename,
+            @Query(PHONE_NUMBER) String phoneNumber,
             @Query(ANDROID_ID) String androidId,
             @Query(IMEI) String imei,
             @Query(VERSION) String version,
-            @Query(DEVICE_ID) String deviceId,
-            @Query(FORM_IDS) List<String> formIds);
+            @Query(DEVICE_ID) String deviceId);
 }

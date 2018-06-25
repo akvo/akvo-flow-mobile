@@ -28,6 +28,9 @@ import org.akvo.flow.data.entity.ApiFilesResult;
 import org.akvo.flow.data.entity.ApiLocaleResult;
 import org.akvo.flow.data.entity.S3File;
 import org.akvo.flow.data.entity.Transmission;
+import org.akvo.flow.data.net.gae.DataPointDownloadService;
+import org.akvo.flow.data.net.gae.DeviceFilesService;
+import org.akvo.flow.data.net.gae.ProcessingNotificationService;
 import org.akvo.flow.data.net.s3.AwsS3;
 import org.akvo.flow.data.util.ApiUrls;
 import org.akvo.flow.data.util.Constants;
@@ -43,6 +46,7 @@ import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
 
 @Singleton
 public class RestApi {
@@ -89,7 +93,17 @@ public class RestApi {
                 .getFilesLists(phoneNumber, androidId, imei, version, deviceId, formIds);
     }
 
-    public Observable<Transmission> uploadFile(Transmission transmission) {
+    public Observable<Boolean> notifyFileAvailable(String action, String formId, String filename,
+            String deviceId) {
+        serviceFactory
+                .createRetrofitService(ProcessingNotificationService.class, apiUrls.getGaeUrl())
+                .notifyFileAvailable(action, formId, filename, phoneNumber, androidId, imei,
+                        version, deviceId);
+        return Observable.just(true); //TODO: verify result
+    }
+
+    //TODO: cleanup this method a bit
+    public Observable<ResponseBody> uploadFile(Transmission transmission) {
 
         S3File s3File = transmission.getS3File();
         File file = s3File.getFile();
@@ -110,13 +124,14 @@ public class RestApi {
         RequestBody body = RequestBody.create(MediaType.parse(contentType), file);
         AwsS3 retrofitService = serviceFactory
                 .createRetrofitService(AwsS3.class, apiUrls.getS3Url());
-        if(isPublic) {
-            retrofitService
-                    .uploadPublic(objectKey, md5Base64, contentType, date, authorization, body);
+        //TODO: remove hardcoded values
+        if (isPublic) {
+            return retrofitService
+                    .uploadPublic("images", filename, md5Base64, contentType, date, authorization, body);
         } else {
-            retrofitService.upload(objectKey, md5Base64, contentType, date, authorization, body);
+            return retrofitService.upload("devicezip", filename, md5Base64, contentType, date, authorization, body);
         }
-        return Observable.just(transmission); //TODO: check result
+       // return Observable.just(transmission); //TODO: check result ++ retry
     }
 
     private String getMd5Base64(S3File file) {

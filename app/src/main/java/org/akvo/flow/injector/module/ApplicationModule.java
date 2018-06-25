@@ -201,7 +201,7 @@ public class ApplicationModule {
     @Provides
     @Singleton
     ApiUrls provideApiUrls() {
-        return new ApiUrls(BuildConfig.INSTANCE_URL,
+        return new ApiUrls(BuildConfig.SERVER_BASE,
                 "https://" + BuildConfig.AWS_BUCKET + ".s3.amazonaws.com");
     }
 }

@@ -32,6 +32,7 @@ import org.akvo.flow.data.entity.DataPointMapper;
 import org.akvo.flow.data.entity.FilesResultMapper;
 import org.akvo.flow.data.entity.FilteredFilesResult;
 import org.akvo.flow.data.entity.FormIdMapper;
+import org.akvo.flow.data.entity.S3File;
 import org.akvo.flow.data.entity.SurveyMapper;
 import org.akvo.flow.data.entity.SyncedTimeMapper;
 import org.akvo.flow.data.entity.Transmission;
@@ -64,6 +65,7 @@ import io.reactivex.functions.BiFunction;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 import io.reactivex.functions.Predicate;
+import okhttp3.ResponseBody;
 import retrofit2.HttpException;
 import timber.log.Timber;
 
@@ -378,7 +380,7 @@ public class SurveyDataRepository implements SurveyRepository {
     }
 
     @Override
-    public Observable<Boolean> processTransmissions() {
+    public Observable<Boolean> processTransmissions(final String deviceId) {
         return dataSourceFactory.getDataBaseDataSource().getUnSyncedTransmissions()
                 .map(new Function<Cursor, List<Transmission>>() {
                     @Override
@@ -389,30 +391,7 @@ public class SurveyDataRepository implements SurveyRepository {
                 .concatMap(new Function<List<Transmission>, Observable<Boolean>>() {
                     @Override
                     public Observable<Boolean> apply(List<Transmission> transmissions) {
-                        return Observable.fromIterable(transmissions)
-                                .concatMap(new Function<Transmission, Observable<Transmission>>() {
-                                    @Override
-                                    public Observable<Transmission> apply(final Transmission transmission) {
-                                        return restApi.uploadFile(transmission)
-                                                .doOnNext(new Consumer<Transmission>() {
-                                                    @Override
-                                                    public void accept(Transmission aBoolean) {
-                                                        dataSourceFactory.getDataBaseDataSource()
-                                                                .setFileTransmissionSucceeded(
-                                                                        transmission.getId());
-                                                    }
-                                                })
-                                                .doOnError(new Consumer<Throwable>() {
-                                                    @Override
-                                                    public void accept(Throwable throwable) {
-                                                        dataSourceFactory.getDataBaseDataSource()
-                                                                .setFileTransmissionFailed(
-                                                                        transmission.getId());
-                                                    }
-                                                });
-                                    }
-                                })
-                                .toList().toObservable()
+                        return syncTransmissions(transmissions, deviceId)
                                 .concatMap(new Function<List<Transmission>, Observable<Boolean>>() {
                                             @Override
                                             public Observable<Boolean> apply(List<Transmission> t) {
@@ -421,6 +400,46 @@ public class SurveyDataRepository implements SurveyRepository {
                                                 return Observable.just(true); //TODO:
                                             }
                                         });
+                    }
+                });
+    }
+
+    private Observable<List<Transmission>> syncTransmissions(List<Transmission> transmissions,
+            final String deviceId) {
+        return Observable.fromIterable(transmissions)
+                .concatMap(new Function<Transmission, Observable<Transmission>>() {
+                    @Override
+                    public Observable<Transmission> apply(final Transmission transmission) {
+                        return syncTransmission(transmission, deviceId);
+                    }
+                })
+                .toList().toObservable();
+    }
+
+    private Observable<Transmission> syncTransmission(final Transmission transmission,
+            final String deviceId) {
+        return restApi.uploadFile(transmission)
+                .concatMap(new Function<ResponseBody, Observable<Transmission>>() {
+                    @Override
+                    public Observable<Transmission> apply(ResponseBody transmission2) {
+                        S3File s3File = transmission.getS3File();
+                        restApi.notifyFileAvailable(s3File.getAction(),
+                                transmission.getFormId(), s3File.getFile().getName(), deviceId);
+                        return Observable.just(transmission);
+                    }
+                })
+                .doOnNext(new Consumer<Transmission>() {
+                    @Override
+                    public void accept(Transmission aBoolean) {
+                        dataSourceFactory.getDataBaseDataSource().setFileTransmissionSucceeded(
+                                        transmission.getId());
+                    }
+                })
+                .doOnError(new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) {
+                        dataSourceFactory.getDataBaseDataSource().setFileTransmissionFailed(
+                                        transmission.getId());
                     }
                 });
     }

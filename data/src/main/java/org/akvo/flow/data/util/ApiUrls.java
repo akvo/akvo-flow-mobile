@@ -26,6 +26,7 @@ import javax.inject.Singleton;
 public class ApiUrls {
     public static final String SURVEYED_LOCALE = "/surveyedlocale";
     public static final String DEVICE_NOTIFICATION = "/devicenotification";
+    public static final String PROCESSING_NOTIFICATION = "processor";
     public static final String SURVEY_GROUP = "surveyGroupId";
     public static final String PHONE_NUMBER = "phoneNumber";
     public static final String IMEI = "imei";
@@ -36,6 +37,9 @@ public class ApiUrls {
     public static final String ANDROID_ID = "androidId";
     public static final String DEVICE_ID = "devId";
     public static final String FORM_IDS = "formID[]";
+    public static final String ACTION = "action";
+    public static final String FORM_ID = "formID";
+    public static final String FILENAME = "fileName";
 
     private final String gaeUrl;
     private final String s3Url;

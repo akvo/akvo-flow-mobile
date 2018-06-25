@@ -61,7 +61,7 @@ public class UploadDataPoints extends ThreadAwareUseCase {
                         return userRepository.getDeviceId()
                                 .concatMap(new Function<String, Observable<Boolean>>() {
                                     @Override
-                                    public Observable<Boolean> apply(String deviceId) {
+                                    public Observable<Boolean> apply(final String deviceId) {
                                         return surveyRepository
                                                 .downloadMissingAndDeleted(forms, deviceId)
                                                 .concatMap(
@@ -70,7 +70,7 @@ public class UploadDataPoints extends ThreadAwareUseCase {
                                                             public Observable<Boolean> apply(
                                                                     Boolean ignored) {
                                                                 return surveyRepository
-                                                                        .processTransmissions();
+                                                                        .processTransmissions(deviceId);
                                                             }
                                                         });
                                     }

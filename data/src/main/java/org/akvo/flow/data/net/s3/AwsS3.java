@@ -22,7 +22,7 @@ package org.akvo.flow.data.net.s3;
 
 import io.reactivex.Observable;
 import okhttp3.RequestBody;
-import retrofit2.Response;
+import okhttp3.ResponseBody;
 import retrofit2.http.Header;
 import retrofit2.http.Headers;
 import retrofit2.http.Multipart;
@@ -33,8 +33,9 @@ import retrofit2.http.Path;
 public interface AwsS3 {
 
     @Multipart
-    @PUT("/{key}")
-    Observable<Response<String>> upload(@Path("key") String key,
+    @PUT("/{key}/{file}")
+    Observable<ResponseBody> upload(@Path("key") String key,
+                @Path("file") String file,
                 @Header("Content-MD5") String md5Base64,
                 @Header("Content-type") String contentType,
                 @Header("Date") String date,
@@ -43,8 +44,9 @@ public interface AwsS3 {
 
     @Headers({"x-amz-acl: public-read"})
     @Multipart
-    @PUT("/{key}")
-    Observable<Response<String>> uploadPublic(@Path("key") String key,
+    @PUT("/{key}/{file}")
+    Observable<ResponseBody> uploadPublic(@Path("key") String key,
+            @Path("file") String file,
             @Header("Content-MD5") String md5Base64,
             @Header("Content-type") String contentType,
             @Header("Date") String date,

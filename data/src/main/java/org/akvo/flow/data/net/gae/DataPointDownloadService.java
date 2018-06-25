@@ -18,7 +18,7 @@
  *
  */
 
-package org.akvo.flow.data.net;
+package org.akvo.flow.data.net.gae;
 
 import org.akvo.flow.data.entity.ApiLocaleResult;
 
@@ -34,7 +34,7 @@ import static org.akvo.flow.data.util.ApiUrls.PHONE_NUMBER;
 import static org.akvo.flow.data.util.ApiUrls.SURVEYED_LOCALE;
 import static org.akvo.flow.data.util.ApiUrls.SURVEY_GROUP;
 
-interface DataPointDownloadService {
+public interface DataPointDownloadService {
 
     @GET(SURVEYED_LOCALE)
     @Headers("Cache-Control: no-cache")

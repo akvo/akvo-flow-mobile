@@ -30,7 +30,6 @@ import android.util.Base64;
 
 import org.akvo.flow.BuildConfig;
 import org.akvo.flow.R;
-import org.akvo.flow.api.FlowApi;
 import org.akvo.flow.api.S3Api;
 import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.data.database.SurveyDbDataSource;
@@ -38,9 +37,7 @@ import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.database.ResponseColumns;
 import org.akvo.flow.database.SurveyInstanceColumns;
 import org.akvo.flow.database.SurveyInstanceStatus;
-import org.akvo.flow.database.TransmissionStatus;
 import org.akvo.flow.database.UserColumns;
-import org.akvo.flow.domain.FileTransmission;
 import org.akvo.flow.domain.Survey;
 import org.akvo.flow.domain.interactor.DefaultObserver;
 import org.akvo.flow.domain.interactor.MakeDataPrivate;
@@ -58,7 +55,6 @@ import org.akvo.flow.util.files.ZipFileBrowser;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.HttpURLConnection;
 import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -484,13 +480,11 @@ public class DataSyncService extends IntentService {
         uploadSync.execute(new DefaultObserver<Boolean>() {
             @Override
             public void onError(Throwable e) {
-                super.onError(e);
                 Timber.e(e);
             }
 
             @Override
             public void onNext(Boolean aBoolean) {
-                super.onNext(aBoolean);
                 Timber.d("Success");
             }
         }, null);
@@ -529,66 +523,66 @@ public class DataSyncService extends IntentService {
 //        }
     }
 
-    private boolean syncFile(@NonNull FileTransmission transmission) {
-        String filename = transmission.getFileName();
-        String formId = transmission.getFormId();
-        if (TextUtils.isEmpty(filename) || filename.lastIndexOf(".") < 0) {
-            return false;
-        }
-
-        String contentType;
-        String dir;
-        String action;
-        boolean isPublic;
-        String filePath;
-        String ext = filename.substring(filename.lastIndexOf("."));
-        contentType = contentType(ext);
-        switch (ext) {
-            case ConstantUtil.JPG_SUFFIX:
-            case ConstantUtil.PNG_SUFFIX:
-            case ConstantUtil.VIDEO_SUFFIX:
-                dir = ConstantUtil.S3_IMAGE_DIR;
-                action = ACTION_IMAGE;
-                isPublic = true;// Images/Videos have a public read policy
-                filePath = buildMediaFilePath(filename);
-                break;
-            case ConstantUtil.ARCHIVE_SUFFIX:
-                dir = ConstantUtil.S3_DATA_DIR;
-                action = ACTION_SUBMIT;
-                isPublic = false;
-                filePath = buildZipFilePath(filename);
-                break;
-            default:
-                return false;
-        }
-
-        // Temporarily set the status to 'IN PROGRESS'. Transmission status should
-        // *always* be updated with the outcome of the upload operation.
-        mDatabase.updateTransmissionStatus(transmission.getId(), TransmissionStatus.IN_PROGRESS);
-
-        int status = TransmissionStatus.FAILED;
-        boolean synced = false;
-
-        if (sendFile(filePath, dir, contentType, isPublic, FILE_UPLOAD_RETRIES)) {
-            FlowApi api = new FlowApi(getApplicationContext());
-            switch (api.sendProcessingNotification(formId, action, filePath)) {
-                case HttpURLConnection.HTTP_OK:
-                    status = TransmissionStatus.SYNCED; // Mark everything synced
-                    synced = true;
-                    break;
-                case HttpURLConnection.HTTP_NOT_FOUND:
-                    // This form has been deleted in the dashboard, thus we cannot sync it
-                    displayErrorNotification(formId);
-                    status = TransmissionStatus.FORM_DELETED;
-                    break;
-                default:// Any error code
-                    break;
-            }
-        }
-
-        mDatabase.updateTransmissionStatus(transmission.getId(), status);
-        return synced;
-    }
+//    private boolean syncFile(@NonNull FileTransmission transmission) {
+//        String filename = transmission.getFileName();
+//        String formId = transmission.getFormId();
+//        if (TextUtils.isEmpty(filename) || filename.lastIndexOf(".") < 0) {
+//            return false;
+//        }
+//
+//        String contentType;
+//        String dir;
+//        String action;
+//        boolean isPublic;
+//        String filePath;
+//        String ext = filename.substring(filename.lastIndexOf("."));
+//        contentType = contentType(ext);
+//        switch (ext) {
+//            case ConstantUtil.JPG_SUFFIX:
+//            case ConstantUtil.PNG_SUFFIX:
+//            case ConstantUtil.VIDEO_SUFFIX:
+//                dir = ConstantUtil.S3_IMAGE_DIR;
+//                action = ACTION_IMAGE;
+//                isPublic = true;// Images/Videos have a public read policy
+//                filePath = buildMediaFilePath(filename);
+//                break;
+//            case ConstantUtil.ARCHIVE_SUFFIX:
+//                dir = ConstantUtil.S3_DATA_DIR;
+//                action = ACTION_SUBMIT;
+//                isPublic = false;
+//                filePath = buildZipFilePath(filename);
+//                break;
+//            default:
+//                return false;
+//        }
+//
+//        // Temporarily set the status to 'IN PROGRESS'. Transmission status should
+//        // *always* be updated with the outcome of the upload operation.
+//        mDatabase.updateTransmissionStatus(transmission.getId(), TransmissionStatus.IN_PROGRESS);
+//
+//        int status = TransmissionStatus.FAILED;
+//        boolean synced = false;
+//
+//        if (sendFile(filePath, dir, contentType, isPublic, FILE_UPLOAD_RETRIES)) {
+//            FlowApi api = new FlowApi(getApplicationContext());
+//            switch (api.sendProcessingNotification(formId, action, filePath)) {
+//                case HttpURLConnection.HTTP_OK:
+//                    status = TransmissionStatus.SYNCED; // Mark everything synced
+//                    synced = true;
+//                    break;
+//                case HttpURLConnection.HTTP_NOT_FOUND:
+//                    // This form has been deleted in the dashboard, thus we cannot sync it
+//                    displayErrorNotification(formId);
+//                    status = TransmissionStatus.FORM_DELETED;
+//                    break;
+//                default:// Any error code
+//                    break;
+//            }
+//        }
+//
+//        mDatabase.updateTransmissionStatus(transmission.getId(), status);
+//        return synced;
+//    }
 
     private String buildZipFilePath(String filename) {
         return zipFileBrowser.getZipFile(filename).getAbsolutePath();

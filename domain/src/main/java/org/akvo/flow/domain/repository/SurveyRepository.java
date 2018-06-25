@@ -64,5 +64,5 @@ public interface SurveyRepository {
 
     Observable<Boolean> downloadMissingAndDeleted(List<String> formIds, String deviceId);
 
-    Observable<Boolean> processTransmissions();
+    Observable<Boolean> processTransmissions(String deviceId);
 }

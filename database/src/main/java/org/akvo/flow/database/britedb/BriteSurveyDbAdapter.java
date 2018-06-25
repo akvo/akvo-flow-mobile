@@ -372,13 +372,14 @@ public class BriteSurveyDbAdapter {
         return queryForms(columns, "", null);
     }
 
-    @Nullable
-    public Cursor getFormIds(String surveyId) {
+    public Cursor getFormIds(@Nullable String surveyId) {
+        if (surveyId == null) {
+            return getFormIds();
+        }
         String columns = SurveyColumns.SURVEY_ID;
         String whereClause = SurveyColumns.SURVEY_GROUP_ID + " = ?";
         List<String> surveyIds = new ArrayList<>(1);
         surveyIds.add(surveyId);
-
         return queryForms(columns, whereClause, surveyIds);
     }
 
@@ -595,5 +596,22 @@ public class BriteSurveyDbAdapter {
         contentValues.put(TransmissionColumns.STATUS, status);
         String where = TransmissionColumns.FILENAME + " = ? ";
         return briteDatabase.update(Tables.TRANSMISSION, contentValues, where, filename);
+    }
+
+    public Cursor getUnSyncedTransmissions() {
+        String column =
+                TransmissionColumns._ID + ", "
+                        + TransmissionColumns.SURVEY_INSTANCE_ID + ", "
+                        + TransmissionColumns.SURVEY_ID + ", "
+                        + TransmissionColumns.FILENAME;
+        String whereClause =
+                TransmissionColumns.STATUS + " IN (?, ?, ?) AND " + TransmissionColumns.FILENAME
+                        + " LIKE '%.%'";
+        String[] selectionArgs = new String[] {
+                String.valueOf(TransmissionStatus.QUEUED),
+                String.valueOf(TransmissionStatus.IN_PROGRESS),
+                String.valueOf(TransmissionStatus.FAILED),
+        };
+        return queryTransmissions(column, whereClause, selectionArgs);
     }
 }

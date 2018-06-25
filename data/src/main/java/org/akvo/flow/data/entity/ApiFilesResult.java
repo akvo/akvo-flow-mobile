@@ -20,38 +20,35 @@
 
 package org.akvo.flow.data.entity;
 
-import android.database.Cursor;
-
-import org.akvo.flow.database.SurveyColumns;
-
-import java.util.ArrayList;
 import java.util.List;
 
-import javax.inject.Inject;
+public class ApiFilesResult {
 
-public class FormIdMapper {
+    private List<String> missingFiles;
+    private List<String> missingUnknown;
+    private List<String> deletedForms;
 
-    @Inject
-    public FormIdMapper() {
+    public List<String> getMissingFiles() {
+        return missingFiles;
     }
 
-    public List<String> mapToFormId(Cursor cursor) {
-        int size = cursor == null ? 0 : cursor.getCount();
-        List<String> formIds = new ArrayList<>(size);
-        if (cursor != null && cursor.moveToFirst()) {
-            do {
-                formIds.add(getFormId(cursor));
-            } while (cursor.moveToNext());
-        }
-        if (cursor != null) {
-            cursor.close();
-        }
-        return formIds;
+    public void setMissingFiles(List<String> missingFiles) {
+        this.missingFiles = missingFiles;
     }
 
+    public List<String> getMissingUnknown() {
+        return missingUnknown;
+    }
 
-    private String getFormId(Cursor cursor) {
-        return cursor
-                .getString(cursor.getColumnIndexOrThrow(SurveyColumns.SURVEY_ID));
+    public void setMissingUnknown(List<String> missingUnknown) {
+        this.missingUnknown = missingUnknown;
+    }
+
+    public List<String> getDeletedForms() {
+        return deletedForms;
+    }
+
+    public void setDeletedForms(List<String> deletedForms) {
+        this.deletedForms = deletedForms;
     }
 }

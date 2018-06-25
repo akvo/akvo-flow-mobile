@@ -18,16 +18,25 @@
  *
  */
 
-package org.akvo.flow.data.util;
+package org.akvo.flow.data.entity;
 
-public class Constants {
+import java.util.List;
 
-    public static final String ARCHIVE_SUFFIX = ".zip";
-    public static final String JPG_SUFFIX = ".jpg";
-    public static final String PNG_SUFFIX = ".png";
-    public static final String VIDEO_SUFFIX = ".mp4";
-    public static final String DATA_CONTENT_TYPE = "application/zip";
-    public static final String JPEG_CONTENT_TYPE = "image/jpeg";
-    public static final String PNG_CONTENT_TYPE = "image/png";
-    public static final String VIDEO_CONTENT_TYPE = "video/mp4";
+public class FilteredFilesResult {
+
+    private final List<String> missingFiles;
+    private final List<String> deletedForms;
+
+    public FilteredFilesResult(List<String> missingFiles, List<String> deletedForms) {
+        this.missingFiles =  missingFiles;
+        this.deletedForms = deletedForms;
+    }
+
+    public List<String> getMissingFiles() {
+        return missingFiles;
+    }
+
+    public List<String> getDeletedForms() {
+        return deletedForms;
+    }
 }

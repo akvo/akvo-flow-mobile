@@ -23,16 +23,22 @@ package org.akvo.flow.data.repository;
 import android.database.Cursor;
 
 import org.akvo.flow.data.datasource.DataSourceFactory;
+import org.akvo.flow.data.datasource.DatabaseDataSource;
 import org.akvo.flow.data.entity.ApiDataPoint;
+import org.akvo.flow.data.entity.ApiFilesResult;
 import org.akvo.flow.data.entity.ApiLocaleResult;
 import org.akvo.flow.data.entity.ApiSurveyInstance;
 import org.akvo.flow.data.entity.DataPointMapper;
+import org.akvo.flow.data.entity.FilesResultMapper;
+import org.akvo.flow.data.entity.FilteredFilesResult;
 import org.akvo.flow.data.entity.FormIdMapper;
 import org.akvo.flow.data.entity.SurveyMapper;
 import org.akvo.flow.data.entity.SyncedTimeMapper;
+import org.akvo.flow.data.entity.Transmission;
 import org.akvo.flow.data.entity.TransmissionFilenameMapper;
+import org.akvo.flow.data.entity.TransmissionMapper;
 import org.akvo.flow.data.entity.UserMapper;
-import org.akvo.flow.data.net.FlowRestApi;
+import org.akvo.flow.data.net.RestApi;
 import org.akvo.flow.domain.entity.DataPoint;
 import org.akvo.flow.domain.entity.Survey;
 import org.akvo.flow.domain.entity.User;
@@ -54,33 +60,42 @@ import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.SingleSource;
 import io.reactivex.annotations.NonNull;
+import io.reactivex.functions.BiFunction;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 import io.reactivex.functions.Predicate;
 import retrofit2.HttpException;
+import timber.log.Timber;
 
 public class SurveyDataRepository implements SurveyRepository {
 
     private final DataSourceFactory dataSourceFactory;
     private final DataPointMapper dataPointMapper;
     private final SyncedTimeMapper syncedTimeMapper;
-    private final FlowRestApi restApi;
+    private final RestApi restApi;
     private final SurveyMapper surveyMapper;
     private final UserMapper userMapper;
-    private final TransmissionFilenameMapper transmissionMapper;
-    private FormIdMapper surveyIdMapper;
+    private final TransmissionFilenameMapper transmissionFileMapper;
+    private final FormIdMapper surveyIdMapper;
+    private final FilesResultMapper filesResultMapper;
+    private final TransmissionMapper transmissionMapper;
 
     @Inject
     public SurveyDataRepository(DataSourceFactory dataSourceFactory,
-            DataPointMapper dataPointMapper, SyncedTimeMapper syncedTimeMapper, FlowRestApi restApi,
+            DataPointMapper dataPointMapper, SyncedTimeMapper syncedTimeMapper, RestApi restApi,
             SurveyMapper surveyMapper, UserMapper userMapper,
-            TransmissionFilenameMapper transmissionMapper) {
+            TransmissionFilenameMapper transmissionFilenameMapper, FormIdMapper surveyIdMapper,
+            FilesResultMapper filesResultMapper,
+            TransmissionMapper transmissionMapper) {
         this.dataSourceFactory = dataSourceFactory;
         this.dataPointMapper = dataPointMapper;
         this.syncedTimeMapper = syncedTimeMapper;
         this.restApi = restApi;
         this.surveyMapper = surveyMapper;
         this.userMapper = userMapper;
+        this.transmissionFileMapper = transmissionFilenameMapper;
+        this.surveyIdMapper = surveyIdMapper;
+        this.filesResultMapper = filesResultMapper;
         this.transmissionMapper = transmissionMapper;
     }
 
@@ -319,18 +334,93 @@ public class SurveyDataRepository implements SurveyRepository {
                 .map(new Function<Cursor, List<String>>() {
                     @Override
                     public List<String> apply(Cursor cursor) {
-                        return transmissionMapper.mapToFileNameList(cursor);
+                        return transmissionFileMapper.mapToFileNameList(cursor);
                     }
                 });
     }
 
     @Override
-    public Observable<String[]> getFormIds(String surveyId) {
+    public Observable<List<String>> getFormIds(String surveyId) {
         return dataSourceFactory.getDataBaseDataSource().getFormIds(surveyId)
-                .map(new Function<Cursor, String[]>() {
+                .map(new Function<Cursor, List<String>>() {
                     @Override
-                    public String[] apply(Cursor cursor) {
+                    public List<String> apply(Cursor cursor) {
                         return surveyIdMapper.mapToFormId(cursor);
+                    }
+                });
+    }
+
+    @Override
+    public Observable<Boolean> downloadMissingAndDeleted(List<String> formIds, String deviceId) {
+        return restApi.getPendingFiles(formIds, deviceId)
+                .map(new Function<ApiFilesResult, FilteredFilesResult>() {
+                    @Override
+                    public FilteredFilesResult apply(ApiFilesResult apiFilesResult) {
+                        return filesResultMapper.transform(apiFilesResult);
+                    }
+                })
+                .concatMap(new Function<FilteredFilesResult, Observable<Boolean>>() {
+                    @Override
+                    public Observable<Boolean> apply(FilteredFilesResult filtered) {
+                        DatabaseDataSource dataSource = dataSourceFactory
+                                .getDataBaseDataSource();
+                        return Observable.zip(dataSource
+                                        .setFileTransmissionFailed(filtered.getMissingFiles()),
+                                dataSource.setDeletedForms(filtered.getDeletedForms()),
+                                new BiFunction<Boolean, Boolean, Boolean>() {
+                                    @Override
+                                    public Boolean apply(Boolean result1, Boolean result2) {
+                                        return result1 && result2;
+                                    }
+                                });
+                    }
+                });
+    }
+
+    @Override
+    public Observable<Boolean> processTransmissions() {
+        return dataSourceFactory.getDataBaseDataSource().getUnSyncedTransmissions()
+                .map(new Function<Cursor, List<Transmission>>() {
+                    @Override
+                    public List<Transmission> apply(Cursor cursor) {
+                        return transmissionMapper.transform(cursor);
+                    }
+                })
+                .concatMap(new Function<List<Transmission>, Observable<Boolean>>() {
+                    @Override
+                    public Observable<Boolean> apply(List<Transmission> transmissions) {
+                        return Observable.fromIterable(transmissions)
+                                .concatMap(new Function<Transmission, Observable<Transmission>>() {
+                                    @Override
+                                    public Observable<Transmission> apply(final Transmission transmission) {
+                                        return restApi.uploadFile(transmission)
+                                                .doOnNext(new Consumer<Transmission>() {
+                                                    @Override
+                                                    public void accept(Transmission aBoolean) {
+                                                        dataSourceFactory.getDataBaseDataSource()
+                                                                .setFileTransmissionSucceeded(
+                                                                        transmission.getId());
+                                                    }
+                                                })
+                                                .doOnError(new Consumer<Throwable>() {
+                                                    @Override
+                                                    public void accept(Throwable throwable) {
+                                                        dataSourceFactory.getDataBaseDataSource()
+                                                                .setFileTransmissionFailed(
+                                                                        transmission.getId());
+                                                    }
+                                                });
+                                    }
+                                })
+                                .toList().toObservable()
+                                .concatMap(new Function<List<Transmission>, Observable<Boolean>>() {
+                                            @Override
+                                            public Observable<Boolean> apply(List<Transmission> t) {
+                                                Timber.d("concatMap: " + t.size() + " [ " + t
+                                                        .toString() + " ]");
+                                                return Observable.just(true); //TODO:
+                                            }
+                                        });
                     }
                 });
     }

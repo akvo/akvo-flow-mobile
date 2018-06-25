@@ -24,31 +24,35 @@ import org.akvo.flow.domain.interactor.AllowedToConnect;
 import org.akvo.flow.domain.interactor.ClearAllData;
 import org.akvo.flow.domain.interactor.ClearResponses;
 import org.akvo.flow.domain.interactor.CopyVideo;
-import org.akvo.flow.domain.interactor.GetIsDeviceSetUp;
-import org.akvo.flow.domain.interactor.SetWalkthroughSeen;
-import org.akvo.flow.domain.interactor.UnSyncedTransmissionsExist;
-import org.akvo.flow.domain.interactor.WasWalkthroughSeen;
-import org.akvo.flow.domain.interactor.users.CreateUser;
 import org.akvo.flow.domain.interactor.DeleteSurvey;
-import org.akvo.flow.domain.interactor.users.DeleteUser;
-import org.akvo.flow.domain.interactor.users.EditUser;
 import org.akvo.flow.domain.interactor.GetAllSurveys;
+import org.akvo.flow.domain.interactor.GetIsDeviceSetUp;
 import org.akvo.flow.domain.interactor.GetPublishDataTime;
 import org.akvo.flow.domain.interactor.GetSavedDataPoints;
 import org.akvo.flow.domain.interactor.GetUserSettings;
-import org.akvo.flow.domain.interactor.users.GetSelectedUser;
-import org.akvo.flow.domain.interactor.users.GetUsers;
 import org.akvo.flow.domain.interactor.PublishData;
 import org.akvo.flow.domain.interactor.SaveAppLanguage;
 import org.akvo.flow.domain.interactor.SaveEnableMobileData;
 import org.akvo.flow.domain.interactor.SaveImage;
 import org.akvo.flow.domain.interactor.SaveImageSize;
 import org.akvo.flow.domain.interactor.SaveKeepScreenOn;
-import org.akvo.flow.domain.interactor.SaveSelectedSurvey;
-import org.akvo.flow.domain.interactor.users.SelectUser;
 import org.akvo.flow.domain.interactor.SaveResizedImage;
+import org.akvo.flow.domain.interactor.SaveSelectedSurvey;
+import org.akvo.flow.domain.interactor.SetWalkthroughSeen;
+import org.akvo.flow.domain.interactor.ThreadAwareUseCase;
+import org.akvo.flow.domain.interactor.UnSyncedTransmissionsExist;
+import org.akvo.flow.domain.interactor.UploadDataPoints;
 import org.akvo.flow.domain.interactor.UseCase;
+import org.akvo.flow.domain.interactor.WasWalkthroughSeen;
 import org.akvo.flow.domain.interactor.setup.SaveSetup;
+import org.akvo.flow.domain.interactor.users.CreateUser;
+import org.akvo.flow.domain.interactor.users.DeleteUser;
+import org.akvo.flow.domain.interactor.users.EditUser;
+import org.akvo.flow.domain.interactor.users.GetSelectedUser;
+import org.akvo.flow.domain.interactor.users.GetUsers;
+import org.akvo.flow.domain.interactor.users.SelectUser;
+import org.akvo.flow.domain.repository.SurveyRepository;
+import org.akvo.flow.domain.repository.UserRepository;
 
 import javax.inject.Named;
 
@@ -224,5 +228,18 @@ public class ViewModule {
     @Named("saveSetup")
     UseCase provideSaveConfig(SaveSetup saveSetup) {
         return saveSetup;
+    }
+
+    @Provides
+    @Named("uploadSync")
+    ThreadAwareUseCase provideUploadSync(SurveyRepository surveyRepository,
+            UserRepository userRepository) {
+        return new UploadDataPoints(null, null, surveyRepository, userRepository);
+    }
+
+    @Provides
+    @Named("uploadAsync")
+    ThreadAwareUseCase provideUploadAsync(UploadDataPoints uploadDataPoints) {
+        return uploadDataPoints;
     }
 }

@@ -20,6 +20,8 @@
 
 package org.akvo.flow.domain.repository;
 
+import android.support.annotation.Nullable;
+
 import org.akvo.flow.domain.entity.DataPoint;
 import org.akvo.flow.domain.entity.Survey;
 import org.akvo.flow.domain.entity.User;
@@ -58,5 +60,9 @@ public interface SurveyRepository {
 
     Observable<List<String>> getAllTransmissionFileNames();
 
-    Observable<String[]> getFormIds(String surveyId);
+    Observable<List<String>> getFormIds(@Nullable String surveyId);
+
+    Observable<Boolean> downloadMissingAndDeleted(List<String> formIds, String deviceId);
+
+    Observable<Boolean> processTransmissions();
 }

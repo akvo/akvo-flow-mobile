@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -21,39 +21,33 @@
 package org.akvo.flow.data.net;
 
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.util.Base64;
 
 import java.io.IOException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
 
 import okhttp3.HttpUrl;
 import okhttp3.Interceptor;
 import okhttp3.Request;
 import okhttp3.Response;
-import timber.log.Timber;
 
-import static org.akvo.flow.data.util.Constants.HMAC;
-import static org.akvo.flow.data.util.Constants.TIMESTAMP;
+import static org.akvo.flow.data.util.ApiUrls.HMAC;
+import static org.akvo.flow.data.util.ApiUrls.TIMESTAMP;
 
 public class HMACInterceptor implements Interceptor {
-
-    private static final String HMAC_SHA_1_ALGORITHM = "HmacSHA1";
 
     private final String key;
     private final SimpleDateFormat dateFormat;
     private final Encoder encoder;
+    private final SignatureHelper signatureHelper;
 
-    public HMACInterceptor(String key, SimpleDateFormat dateFormat, Encoder encoder) {
+    public HMACInterceptor(String key, SimpleDateFormat dateFormat, Encoder encoder,
+            SignatureHelper signatureHelper) {
         this.dateFormat = dateFormat;
         this.key = key;
         this.encoder = encoder;
+        this.signatureHelper = signatureHelper;
     }
 
     @Override
@@ -66,7 +60,7 @@ public class HMACInterceptor implements Interceptor {
         String urlBeginning = uriString.substring(0, separator);
 
         query = appendQueryParam(query, TIMESTAMP, getTimestamp());
-        String auth = getAuthorization(query, key);
+        String auth = signatureHelper.getAuthorization(query, key, Base64.DEFAULT);
         query = appendQueryParam(query, HMAC, auth);
 
         String reconstructedUrl = urlBeginning + query;
@@ -81,24 +75,5 @@ public class HMACInterceptor implements Interceptor {
 
     private String getTimestamp() {
         return encoder.encodeParam(dateFormat.format(new Date()));
-    }
-
-    @Nullable
-    private String getAuthorization(@NonNull String query, String apiKey) {
-        String authorization = null;
-        try {
-            SecretKeySpec signingKey = new SecretKeySpec(apiKey.getBytes(), HMAC_SHA_1_ALGORITHM);
-
-            Mac mac = Mac.getInstance(HMAC_SHA_1_ALGORITHM);
-            mac.init(signingKey);
-
-            byte[] rawHmac = mac.doFinal(query.getBytes());
-
-            authorization = Base64.encodeToString(rawHmac, Base64.DEFAULT);
-        } catch (@NonNull NoSuchAlgorithmException | InvalidKeyException e) {
-            Timber.e(e.getMessage());
-        }
-
-        return authorization;
     }
 }

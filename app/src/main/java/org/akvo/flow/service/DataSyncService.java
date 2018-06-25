@@ -44,9 +44,9 @@ import org.akvo.flow.domain.FileTransmission;
 import org.akvo.flow.domain.Survey;
 import org.akvo.flow.domain.interactor.DefaultObserver;
 import org.akvo.flow.domain.interactor.MakeDataPrivate;
+import org.akvo.flow.domain.interactor.ThreadAwareUseCase;
 import org.akvo.flow.domain.response.FormInstance;
 import org.akvo.flow.domain.response.Response;
-import org.akvo.flow.exception.HttpException;
 import org.akvo.flow.util.ConnectivityStateManager;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.GsonMapper;
@@ -54,9 +54,6 @@ import org.akvo.flow.util.MediaFileHelper;
 import org.akvo.flow.util.NotificationHelper;
 import org.akvo.flow.util.StringUtil;
 import org.akvo.flow.util.files.ZipFileBrowser;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -77,6 +74,7 @@ import java.util.zip.ZipOutputStream;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import timber.log.Timber;
 
@@ -138,6 +136,10 @@ public class DataSyncService extends IntentService {
     @Inject
     MakeDataPrivate makeDataPrivate;
 
+    @Named("uploadSync")
+    @Inject
+    ThreadAwareUseCase uploadSync;
+
     public DataSyncService() {
         super(TAG);
     }
@@ -149,12 +151,18 @@ public class DataSyncService extends IntentService {
         application.getApplicationComponent().inject(this);
     }
 
+    @Override public void onDestroy() {
+        super.onDestroy();
+        makeDataPrivate.dispose();
+        uploadSync.dispose();
+    }
+
     @Override
     protected void onHandleIntent(Intent intent) {
         makeDataPrivate.dispose();
         makeDataPrivate.execute(new DefaultObserver<Boolean>() {
             @Override
-            public void onNext(Boolean ignored) {
+            public void onComplete() {
                 exportAndSync();
             }
 
@@ -164,7 +172,6 @@ public class DataSyncService extends IntentService {
                 exportAndSync();
             }
         });
-        makeDataPrivate.dispose();
     }
 
     private void exportAndSync() {
@@ -472,40 +479,54 @@ public class DataSyncService extends IntentService {
     private void syncFiles() {
         // Check notifications for this device. This will update the status of the transmissions
         // if necessary, or mark form as deleted.
-        checkDeviceNotifications();
-
-        List<FileTransmission> transmissions = mDatabase.getUnSyncedTransmissions();
-
-        if (transmissions.isEmpty()) {
-            return;
-        }
-
-        Set<Long> syncedSurveys = new HashSet<>();// Successful transmissions
-        Set<Long> unsyncedSurveys = new HashSet<>();// Unsuccessful transmissions
-
-        final int totalFiles = transmissions.size();
-
-        for (int i = 0; i < totalFiles; i++) {
-            FileTransmission transmission = transmissions.get(i);
-            final long surveyInstanceId = transmission.getRespondentId();
-            if (syncFile(transmission)) {
-                syncedSurveys.add(surveyInstanceId);
-            } else {
-                unsyncedSurveys.add(surveyInstanceId);
+        Timber.d("syncFiles");
+        uploadSync.dispose();
+        uploadSync.execute(new DefaultObserver<Boolean>() {
+            @Override
+            public void onError(Throwable e) {
+                super.onError(e);
+                Timber.e(e);
             }
-        }
 
-        // Retain successful survey instances, to mark them as UPLOADED
-        syncedSurveys.removeAll(unsyncedSurveys);
+            @Override
+            public void onNext(Boolean aBoolean) {
+                super.onNext(aBoolean);
+                Timber.d("Success");
+            }
+        }, null);
 
-        for (long surveyInstanceId : syncedSurveys) {
-            updateSurveyStatus(surveyInstanceId, SurveyInstanceStatus.UPLOADED);
-        }
-
-        // Ensure the unsynced ones are just SUBMITTED
-        for (long surveyInstanceId : unsyncedSurveys) {
-            updateSurveyStatus(surveyInstanceId, SurveyInstanceStatus.SUBMITTED);
-        }
+//        List<FileTransmission> transmissions = mDatabase.getUnSyncedTransmissions();
+//
+//        if (transmissions.isEmpty()) {
+//            return;
+//        }
+//
+//        Set<Long> syncedSurveys = new HashSet<>();// Successful transmissions
+//        Set<Long> unsyncedSurveys = new HashSet<>();// Unsuccessful transmissions
+//
+//        final int totalFiles = transmissions.size();
+//
+//        for (int i = 0; i < totalFiles; i++) {
+//            FileTransmission transmission = transmissions.get(i);
+//            final long surveyInstanceId = transmission.getRespondentId();
+//            if (syncFile(transmission)) {
+//                syncedSurveys.add(surveyInstanceId);
+//            } else {
+//                unsyncedSurveys.add(surveyInstanceId);
+//            }
+//        }
+//
+//        // Retain successful survey instances, to mark them as UPLOADED
+//        syncedSurveys.removeAll(unsyncedSurveys);
+//
+//        for (long surveyInstanceId : syncedSurveys) {
+//            updateSurveyStatus(surveyInstanceId, SurveyInstanceStatus.UPLOADED);
+//        }
+//
+//        // Ensure the unsynced ones are just SUBMITTED
+//        for (long surveyInstanceId : unsyncedSurveys) {
+//            updateSurveyStatus(surveyInstanceId, SurveyInstanceStatus.SUBMITTED);
+//        }
     }
 
     private boolean syncFile(@NonNull FileTransmission transmission) {
@@ -603,76 +624,6 @@ public class DataSyncService extends IntentService {
         }
 
         return ok;
-    }
-
-    /**
-     * Request missing files (images) in the datastore.
-     * The server will provide us with a list of missing images,
-     * so we can accordingly update their status in the database.
-     * This will help us fixing the Issue #55
-     * Steps:
-     * 1- Request the list of files to the server
-     * 2- Update the status of those files in the local database
-     */
-    private void checkDeviceNotifications() {
-        FlowApi flowApi = new FlowApi(getApplicationContext());
-        try {
-            String[] surveyIds = mDatabase.getSurveyIds();
-            JSONObject jResponse = flowApi.getDeviceNotification(surveyIds);
-
-            if (jResponse != null) {
-                List<String> files = parseFiles(jResponse.optJSONArray("missingFiles"));
-                files.addAll(parseFiles(jResponse.optJSONArray("missingUnknown")));
-
-                // Handle missing files. If an unknown file exists in the filesystem
-                // it will be marked as failed in the transmission history, so it can
-                // be handled and retried in the next sync attempt.
-                for (String filePath : files) {
-                    String filenameFromPath = getFilenameFromPath(filePath);
-                    if (!TextUtils.isEmpty(filenameFromPath)) {
-                        mDatabase.setFileTransmissionFailed(filenameFromPath);
-                    }
-                }
-
-                JSONArray jForms = jResponse.optJSONArray("deletedForms");
-                if (jForms != null) {
-                    for (int i = 0; i < jForms.length(); i++) {
-                        String id = jForms.getString(i);
-                        Survey s = mDatabase.getSurvey(id);
-                        if (s != null) {
-                            displayFormDeletedNotification(id, s.getName());
-                        }
-                        mDatabase.deleteSurvey(id);
-                    }
-                }
-            } else {
-                Timber.e("Could not retrieve missing files");
-            }
-        } catch (HttpException e) {
-            Timber.e(e, "Could not retrieve missing or deleted files: message: %s, status code: %s",
-                    e.getMessage(),
-                    e.getStatus());
-        } catch (Exception e) {
-            Timber.e(e, "Could not retrieve missing or deleted files");
-        }
-    }
-
-    /**
-     * Given a json array, return the list of contained filenames,
-     * formatting the path to match the structure of the sdcard's files.
-     */
-    @NonNull
-    private List<String> parseFiles(@Nullable JSONArray jFiles) throws JSONException {
-        List<String> files = new ArrayList<>();
-        if (jFiles != null) {
-            for (int i = 0; i < jFiles.length(); i++) {
-                // Build the sdcard path for each image
-                String filename = jFiles.getString(i);
-                File file = mediaFileHelper.getMediaFile(filename);
-                files.add(file.getAbsolutePath());
-            }
-        }
-        return files;
     }
 
     private void updateSurveyStatus(long surveyInstanceId, int status) {

@@ -27,6 +27,7 @@ import com.squareup.sqlbrite2.BriteDatabase;
 import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.broadcast.BootReceiver;
 import org.akvo.flow.broadcast.DataTimeoutReceiver;
+import org.akvo.flow.data.net.RestApi;
 import org.akvo.flow.domain.executor.PostExecutionThread;
 import org.akvo.flow.domain.executor.ThreadExecutor;
 import org.akvo.flow.domain.repository.FileRepository;
@@ -74,6 +75,8 @@ public interface ApplicationComponent {
     UserRepository userRepository();
 
     SetupRepository setupRepository();
+
+    RestApi flowRestApi();
 
     void inject(FileChangeTrackingService fileChangeTrackingService);
 

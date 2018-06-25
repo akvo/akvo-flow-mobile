@@ -129,7 +129,7 @@ public class SurveyDbAdapter {
      * Status must be one of the 'SurveyInstanceStatus' one. The corresponding
      * Date column will be updated with the current timestamp.
      */
-    public void updateSurveyStatus(long surveyInstanceId, int status) {
+    public void updateSurveyInstanceStatus(long surveyInstanceId, int status) {
         String dateColumn;
         switch (status) {
             case SurveyInstanceStatus.DOWNLOADED:

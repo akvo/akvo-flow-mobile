@@ -18,16 +18,29 @@
  *
  */
 
-package org.akvo.flow.data.util;
+package org.akvo.flow.data.net;
 
-public class Constants {
+public class S3User {
 
-    public static final String ARCHIVE_SUFFIX = ".zip";
-    public static final String JPG_SUFFIX = ".jpg";
-    public static final String PNG_SUFFIX = ".png";
-    public static final String VIDEO_SUFFIX = ".mp4";
-    public static final String DATA_CONTENT_TYPE = "application/zip";
-    public static final String JPEG_CONTENT_TYPE = "image/jpeg";
-    public static final String PNG_CONTENT_TYPE = "image/png";
-    public static final String VIDEO_CONTENT_TYPE = "video/mp4";
+    private final String bucket;
+    private final String accessKey;
+    private final String secret;
+
+    public S3User(String bucket, String accessKey, String secret) {
+        this.bucket = bucket;
+        this.accessKey = accessKey;
+        this.secret = secret;
+    }
+
+    public String getBucket() {
+        return bucket;
+    }
+
+    public String getAccessKey() {
+        return accessKey;
+    }
+
+    public String getSecret() {
+        return secret;
+    }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -20,25 +20,31 @@
 
 package org.akvo.flow.data.net;
 
-import org.akvo.flow.data.entity.ApiLocaleResult;
+import org.akvo.flow.data.entity.ApiFilesResult;
 
-import io.reactivex.Flowable;
+import java.util.List;
+
+import io.reactivex.Observable;
 import retrofit2.http.GET;
 import retrofit2.http.Headers;
 import retrofit2.http.Query;
 
 import static org.akvo.flow.data.util.ApiUrls.ANDROID_ID;
+import static org.akvo.flow.data.util.ApiUrls.DEVICE_ID;
+import static org.akvo.flow.data.util.ApiUrls.DEVICE_NOTIFICATION;
+import static org.akvo.flow.data.util.ApiUrls.FORM_IDS;
 import static org.akvo.flow.data.util.ApiUrls.IMEI;
-import static org.akvo.flow.data.util.ApiUrls.LAST_UPDATED;
 import static org.akvo.flow.data.util.ApiUrls.PHONE_NUMBER;
-import static org.akvo.flow.data.util.ApiUrls.SURVEYED_LOCALE;
-import static org.akvo.flow.data.util.ApiUrls.SURVEY_GROUP;
+import static org.akvo.flow.data.util.ApiUrls.VERSION;
 
-interface DataPointDownloadService {
+interface DeviceFilesService {
 
-    @GET(SURVEYED_LOCALE)
+    @GET(DEVICE_NOTIFICATION)
     @Headers("Cache-Control: no-cache")
-    Flowable<ApiLocaleResult> loadNewDataPoints(@Query(ANDROID_ID) String androidId,
-            @Query(IMEI) String imei, @Query(LAST_UPDATED) String lastUpdated,
-            @Query(PHONE_NUMBER) String phoneNumber, @Query(SURVEY_GROUP) String surveyGroup);
+    Observable<ApiFilesResult> getFilesLists(@Query(PHONE_NUMBER) String phoneNumber,
+            @Query(ANDROID_ID) String androidId,
+            @Query(IMEI) String imei,
+            @Query(VERSION) String version,
+            @Query(DEVICE_ID) String deviceId,
+            @Query(FORM_IDS) List<String> formIds);
 }

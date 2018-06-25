@@ -25,27 +25,57 @@ import android.support.annotation.Nullable;
 import org.akvo.flow.domain.executor.PostExecutionThread;
 import org.akvo.flow.domain.executor.ThreadExecutor;
 import org.akvo.flow.domain.repository.SurveyRepository;
+import org.akvo.flow.domain.repository.UserRepository;
 
+import java.util.List;
 import java.util.Map;
 
-import io.reactivex.Observable;
+import javax.inject.Inject;
 
-public class UploadDataPoints extends ConfigurableThreadUseCase {
+import io.reactivex.Observable;
+import io.reactivex.functions.Function;
+
+public class UploadDataPoints extends ThreadAwareUseCase {
 
     public static final String KEY_SURVEY_ID = "survey_id";
 
     private final SurveyRepository surveyRepository;
+    private final UserRepository userRepository;
 
-    protected UploadDataPoints(@Nullable ThreadExecutor threadExecutor,
+    @Inject
+    public UploadDataPoints(@Nullable ThreadExecutor threadExecutor,
             @Nullable PostExecutionThread postExecutionThread,
-            SurveyRepository surveyRepository) {
+            SurveyRepository surveyRepository, UserRepository userRepository) {
         super(threadExecutor, postExecutionThread);
         this.surveyRepository = surveyRepository;
+        this.userRepository = userRepository;
     }
 
     @Override
     protected <T> Observable buildUseCaseObservable(Map<String, T> parameters) {
         String surveyId = parameters != null ? (String) parameters.get(KEY_SURVEY_ID) : null;
-        return surveyRepository.getFormIds(surveyId);
+        return surveyRepository.getFormIds(surveyId)
+                .concatMap(new Function<List<String>, Observable<Boolean>>() {
+                    @Override
+                    public Observable<Boolean> apply(final List<String> forms) {
+                        return userRepository.getDeviceId()
+                                .concatMap(new Function<String, Observable<Boolean>>() {
+                                    @Override
+                                    public Observable<Boolean> apply(String deviceId) {
+                                        return surveyRepository
+                                                .downloadMissingAndDeleted(forms, deviceId)
+                                                .concatMap(
+                                                        new Function<Boolean, Observable<Boolean>>() {
+                                                            @Override
+                                                            public Observable<Boolean> apply(
+                                                                    Boolean ignored) {
+                                                                return surveyRepository
+                                                                        .processTransmissions();
+                                                            }
+                                                        });
+                                    }
+                                });
+                    }
+                });
     }
 }

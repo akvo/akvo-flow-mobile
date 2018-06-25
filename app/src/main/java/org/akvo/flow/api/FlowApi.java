@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2013-2017 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2013-2018 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -22,7 +22,6 @@ package org.akvo.flow.api;
 import android.content.Context;
 import android.net.Uri;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import org.akvo.flow.BuildConfig;
@@ -102,29 +101,29 @@ public class FlowApi {
      * @return String body of the HTTP response
      * @throws Exception
      */
-    @Nullable
-    public JSONObject getDeviceNotification(@NonNull String[] surveyIds)
-            throws Exception {
-        // Send the list of surveys we've got downloaded, getting notified of the deleted ones
-        String url = buildDeviceNotificationUrl(baseUrl, surveyIds);
-        String response = HttpUtil.httpGet(url);
-        if (!TextUtils.isEmpty(response)) {
-            return new JSONObject(response);
-        }
-        return null;
-    }
+//    @Nullable
+//    public JSONObject getDeviceNotification(@NonNull String[] surveyIds)
+//            throws Exception {
+//        // Send the list of surveys we've got downloaded, getting notified of the deleted ones
+//        String url = buildDeviceNotificationUrl(baseUrl, surveyIds);
+//        String response = HttpUtil.httpGet(url);
+//        if (!TextUtils.isEmpty(response)) {
+//            return new JSONObject(response);
+//        }
+//        return null;
+//    }
 
-    @NonNull
-    private String buildDeviceNotificationUrl(@NonNull String serverBase,
-            @NonNull String[] surveyIds) {
-        Uri.Builder builder = Uri.parse(serverBase).buildUpon();
-        builder.appendPath(Path.DEVICE_NOTIFICATION);
-        appendDeviceParams(builder);
-        for (String id : surveyIds) {
-            builder.appendQueryParameter(Param.FORM_ID, id);
-        }
-        return builder.build().toString();
-    }
+//    @NonNull
+//    private String buildDeviceNotificationUrl(@NonNull String serverBase,
+//            @NonNull String[] surveyIds) {
+//        Uri.Builder builder = Uri.parse(serverBase).buildUpon();
+//        builder.appendPath(Path.DEVICE_NOTIFICATION);
+//        appendDeviceParams(builder);
+//        for (String id : surveyIds) {
+//            builder.appendQueryParameter(Param.FORM_ID, id);
+//        }
+//        return builder.build().toString();
+//    }
 
     @NonNull
     public List<Survey> getSurveyHeader(@NonNull String surveyId)
@@ -212,7 +211,6 @@ public class FlowApi {
         String NOTIFICATION = "processor";
         String SURVEY_LIST_SERVICE = "surveymanager";
         String SURVEY_HEADER_SERVICE = "surveymanager";
-        String DEVICE_NOTIFICATION = "devicenotification";
         String TIME_CHECK = "devicetimerest";
     }
 

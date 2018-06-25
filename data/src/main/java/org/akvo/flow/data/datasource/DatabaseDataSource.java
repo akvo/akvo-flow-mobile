@@ -36,6 +36,7 @@ import org.akvo.flow.database.ResponseColumns;
 import org.akvo.flow.database.SurveyInstanceColumns;
 import org.akvo.flow.database.SurveyInstanceStatus;
 import org.akvo.flow.database.SyncTimeColumns;
+import org.akvo.flow.database.TransmissionStatus;
 import org.akvo.flow.database.britedb.BriteSurveyDbAdapter;
 import org.akvo.flow.domain.entity.User;
 
@@ -226,5 +227,44 @@ public class DatabaseDataSource {
 
     public Observable<Cursor> getFormIds(String surveyId) {
         return Observable.just(briteSurveyDbAdapter.getFormIds(surveyId));
+    }
+
+    public Observable<Boolean> setFileTransmissionFailed(@Nullable List<String> filenames) {
+        if (filenames == null || filenames.isEmpty()) {
+            return Observable.just(true);
+        }
+        for (String filename: filenames) {
+            int rows = briteSurveyDbAdapter
+                    .updateFailedTransmission(filename, TransmissionStatus.FAILED);
+            if (rows == 0) {
+                // Use a dummy "-1" as survey_instance_id, as the database needs that attribute
+                briteSurveyDbAdapter
+                        .createTransmission(-1, null, filename, TransmissionStatus.FAILED);
+            }
+        }
+        return Observable.just(true);
+    }
+
+    public Observable<Boolean> setDeletedForms(@Nullable List<String> deletedFormIds) {
+        if (deletedFormIds != null) {
+            for (String formId: deletedFormIds) {
+               briteSurveyDbAdapter.deleteSurvey(formId);
+            }
+        }
+        return Observable.just(true);
+    }
+
+    public Observable<Cursor> getUnSyncedTransmissions() {
+        return Observable.just(briteSurveyDbAdapter.getUnSyncedTransmissions());
+    }
+
+    public void setFileTransmissionSucceeded(Long id) {
+        briteSurveyDbAdapter
+                .updateTransmissionStatus(id, TransmissionStatus.SYNCED);
+    }
+
+    public void setFileTransmissionFailed(Long id) {
+        briteSurveyDbAdapter
+                .updateTransmissionStatus(id, TransmissionStatus.FAILED);
     }
 }

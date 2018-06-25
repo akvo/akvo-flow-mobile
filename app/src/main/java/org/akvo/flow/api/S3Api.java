@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2013 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2013,2018 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -22,6 +22,7 @@ package org.akvo.flow.api;
 import android.util.Base64;
 
 import org.akvo.flow.BuildConfig;
+import org.akvo.flow.data.net.SignatureHelper;
 import org.akvo.flow.exception.HttpException;
 import org.akvo.flow.util.FileUtil;
 import org.akvo.flow.util.HttpUtil;
@@ -36,17 +37,11 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.security.InvalidKeyException;
-import java.security.Key;
-import java.security.NoSuchAlgorithmException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
-
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
 
 import timber.log.Timber;
 
@@ -61,6 +56,8 @@ public class S3Api {
     private String mAccessKey;
     private String mSecret;
 
+    private final SignatureHelper signatureHelper = new SignatureHelper();
+
     public S3Api() {
         mBucket = BuildConfig.AWS_BUCKET;
         mAccessKey = BuildConfig.AWS_ACCESS_KEY_ID;
@@ -71,7 +68,7 @@ public class S3Api {
         // Get date and signature
         final String date = getDate();
         final String payload = String.format(PAYLOAD_HEAD, date, mBucket, objectKey);
-        final String signature = getSignature(payload);
+        final String signature = signatureHelper.getAuthorization(payload, mSecret, Base64.NO_WRAP);
         final URL url = new URL(String.format(URL, mBucket, objectKey));
 
         HttpURLConnection conn = null;
@@ -111,7 +108,7 @@ public class S3Api {
         // Get date and signature
         final String date = getDate();
         final String payload = String.format(PAYLOAD_GET, date, mBucket, objectKey);
-        final String signature = getSignature(payload);
+        final String signature = signatureHelper.getAuthorization(payload, mSecret, Base64.NO_WRAP);
         final URL url = new URL(String.format(URL, mBucket, objectKey));
 
         InputStream in = null;
@@ -147,13 +144,13 @@ public class S3Api {
         // Get date and signature
         final byte[] rawMd5 = FileUtil.getMD5Checksum(file);
         final String md5Base64 = Base64.encodeToString(rawMd5, Base64.NO_WRAP);
-        final String md5Hex = FileUtil.hexMd5(rawMd5);
-        final String date = getDate();
-        String payloadStr = isPublic ? PAYLOAD_PUT_PUBLIC : PAYLOAD_PUT_PRIVATE;
-        final String payload = String.format(payloadStr, md5Base64, type, date, mBucket, objectKey);
-        final String signature = getSignature(payload);
-        final URL url = new URL(String.format(URL, mBucket, objectKey));
 
+        final String date = getDate();
+        final String payloadStr = isPublic ? PAYLOAD_PUT_PUBLIC : PAYLOAD_PUT_PRIVATE;
+        final String payload = String.format(payloadStr, md5Base64, type, date, mBucket, objectKey);
+        final String signature = signatureHelper.getAuthorization(payload, mSecret, Base64.NO_WRAP);
+        final URL url = new URL(String.format(URL, mBucket, objectKey));
+        Timber.d("url: "+url.toString());
         InputStream in = null;
         OutputStream out = null;
         HttpURLConnection conn = null;
@@ -187,6 +184,7 @@ public class S3Api {
                 return false;
             }
             String etag = getEtag(conn);
+            final String md5Hex = FileUtil.hexMd5(rawMd5);
             if (!md5Hex.equals(etag)) {
                 Timber.e("ETag comparison failed. Response ETag: " + etag +
                         "Locally computed MD5: " + md5Hex);
@@ -207,22 +205,6 @@ public class S3Api {
         final DateFormat df = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss ", Locale.US);
         df.setTimeZone(TimeZone.getTimeZone("GMT"));
         return df.format(new Date()) + "GMT";
-    }
-
-    private String getSignature(String payload) {
-        try {
-            Key signingKey = new SecretKeySpec(mSecret.getBytes(), "HmacSHA1");
-            Mac mac = Mac.getInstance("HmacSHA1");
-            mac.init(signingKey);
-            byte[] rawHmac = mac.doFinal(payload.getBytes());
-            return Base64.encodeToString(rawHmac, Base64.NO_WRAP);
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-            return null;
-        } catch (InvalidKeyException e) {
-            e.printStackTrace();
-            return null;
-        }
     }
 
     private String getEtag(HttpURLConnection conn) {

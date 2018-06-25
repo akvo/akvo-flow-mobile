@@ -39,7 +39,7 @@ import io.reactivex.schedulers.Schedulers;
  * onHandleIntent method runs on a worker thread) or an executor and post execution thread can be
  * passed as prams.
  */
-public abstract class ConfigurableThreadUseCase {
+public abstract class ThreadAwareUseCase {
 
     @Nullable
     private final ThreadExecutor threadExecutor;
@@ -49,7 +49,7 @@ public abstract class ConfigurableThreadUseCase {
 
     private final CompositeDisposable disposables;
 
-    protected ConfigurableThreadUseCase(@Nullable ThreadExecutor threadExecutor,
+    protected ThreadAwareUseCase(@Nullable ThreadExecutor threadExecutor,
             @Nullable PostExecutionThread postExecutionThread) {
         this.threadExecutor = threadExecutor;
         this.postExecutionThread = postExecutionThread;

@@ -20,6 +20,7 @@
 
 package org.akvo.flow.data.datasource;
 
+import java.io.BufferedInputStream;
 import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
@@ -28,15 +29,46 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 import javax.inject.Inject;
 
 import timber.log.Timber;
 
-class FileHelper {
+public class FileHelper {
+
+    private static final int BUFFER_SIZE = 2048;
 
     @Inject
     FileHelper() {
+    }
+
+    /**
+     * Compute MD5 checksum of the given file
+     */
+    public byte[] getMD5Checksum(File file) {
+        InputStream in = null;
+        MessageDigest md;
+        try {
+            md = MessageDigest.getInstance("MD5");
+            in = new BufferedInputStream(new FileInputStream(file));
+
+            byte[] buffer = new byte[BUFFER_SIZE];
+
+            int read;
+            while ((read = in.read(buffer)) != -1) {
+                md.update(buffer, 0, read);
+            }
+
+            return md.digest();
+        } catch (NoSuchAlgorithmException | IOException e) {
+            Timber.e(e.getMessage());
+        } finally {
+            close(in);
+        }
+
+        return null;
     }
 
     String copyFileToFolder(File originalFile, File destinationFolder) throws IOException {

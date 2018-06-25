@@ -446,7 +446,7 @@ public class SurveyDbDataSource {
         briteSurveyDbAdapter.markSurveyHelpDownloaded(sid, b);
     }
 
-    public String[] getSurveyIds() {
+    public List<String> getSurveyIds() {
         Cursor cursor = briteSurveyDbAdapter.getFormIds();
         return surveyIdMapper.mapToFormId(cursor);
     }
@@ -484,7 +484,7 @@ public class SurveyDbDataSource {
     }
 
     public void updateSurveyStatus(long mSurveyInstanceId, int saved) {
-        surveyDbAdapter.updateSurveyStatus(mSurveyInstanceId, saved);
+        surveyDbAdapter.updateSurveyInstanceStatus(mSurveyInstanceId, saved);
     }
 
     public void updateRecordModifiedDate(String recordId, long timestamp) {
@@ -508,14 +508,14 @@ public class SurveyDbDataSource {
                 .createTransmission(surveyInstanceId, formId, filename, TransmissionStatus.QUEUED);
     }
 
-    public void setFileTransmissionFailed(String filename) {
-        int rows = briteSurveyDbAdapter
-                .updateFailedTransmission(filename, TransmissionStatus.FAILED);
-        if (rows == 0) {
-            // Use a dummy "-1" as survey_instance_id, as the database needs that attribute
-            briteSurveyDbAdapter.createTransmission(-1, null, filename, TransmissionStatus.FAILED);
-        }
-    }
+//    public void setFileTransmissionFailed(String filename) {
+//        int rows = briteSurveyDbAdapter
+//                .updateFailedTransmission(filename, TransmissionStatus.FAILED);
+//        if (rows == 0) {
+//            // Use a dummy "-1" as survey_instance_id, as the database needs that attribute
+//            briteSurveyDbAdapter.createTransmission(-1, null, filename, TransmissionStatus.FAILED);
+//        }
+//    }
 
     public void updateTransmissionStatus(long id, int status) {
         briteSurveyDbAdapter.updateTransmissionStatus(id, status);

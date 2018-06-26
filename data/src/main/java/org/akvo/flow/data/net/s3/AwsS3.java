@@ -23,16 +23,14 @@ package org.akvo.flow.data.net.s3;
 import io.reactivex.Observable;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
+import retrofit2.http.Body;
 import retrofit2.http.Header;
 import retrofit2.http.Headers;
-import retrofit2.http.Multipart;
 import retrofit2.http.PUT;
-import retrofit2.http.Part;
 import retrofit2.http.Path;
 
 public interface AwsS3 {
 
-    @Multipart
     @PUT("/{key}/{file}")
     Observable<ResponseBody> upload(@Path("key") String key,
                 @Path("file") String file,
@@ -40,10 +38,9 @@ public interface AwsS3 {
                 @Header("Content-type") String contentType,
                 @Header("Date") String date,
                 @Header("Authorization") String authorization,
-                @Part("Body") RequestBody body);
+                @Body RequestBody body);
 
     @Headers({"x-amz-acl: public-read"})
-    @Multipart
     @PUT("/{key}/{file}")
     Observable<ResponseBody> uploadPublic(@Path("key") String key,
             @Path("file") String file,
@@ -51,5 +48,5 @@ public interface AwsS3 {
             @Header("Content-type") String contentType,
             @Header("Date") String date,
             @Header("Authorization") String authorization,
-            @Part("Body") RequestBody body);
+            @Body RequestBody body);
 }

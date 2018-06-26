@@ -27,6 +27,7 @@ public class ApiUrls {
     public static final String SURVEYED_LOCALE = "/surveyedlocale";
     public static final String DEVICE_NOTIFICATION = "/devicenotification";
     public static final String PROCESSING_NOTIFICATION = "processor";
+    public static final String S3_FILE_PATH = "/{key}/{file}";
     public static final String SURVEY_GROUP = "surveyGroupId";
     public static final String PHONE_NUMBER = "phoneNumber";
     public static final String IMEI = "imei";

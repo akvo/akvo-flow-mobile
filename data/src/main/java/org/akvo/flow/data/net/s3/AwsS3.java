@@ -29,9 +29,11 @@ import retrofit2.http.Headers;
 import retrofit2.http.PUT;
 import retrofit2.http.Path;
 
+import static org.akvo.flow.data.util.ApiUrls.S3_FILE_PATH;
+
 public interface AwsS3 {
 
-    @PUT("/{key}/{file}")
+    @PUT(S3_FILE_PATH)
     Observable<ResponseBody> upload(@Path("key") String key,
                 @Path("file") String file,
                 @Header("Content-MD5") String md5Base64,
@@ -41,7 +43,7 @@ public interface AwsS3 {
                 @Body RequestBody body);
 
     @Headers({"x-amz-acl: public-read"})
-    @PUT("/{key}/{file}")
+    @PUT(S3_FILE_PATH)
     Observable<ResponseBody> uploadPublic(@Path("key") String key,
             @Path("file") String file,
             @Header("Content-MD5") String md5Base64,

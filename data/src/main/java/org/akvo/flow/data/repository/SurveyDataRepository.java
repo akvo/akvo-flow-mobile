@@ -441,6 +441,11 @@ public class SurveyDataRepository implements SurveyRepository {
                         dataSourceFactory.getDataBaseDataSource().setFileTransmissionFailed(
                                         transmission.getId());
                     }
+                }).onErrorReturn(new Function<Throwable, Transmission>() {
+                    @Override
+                    public Transmission apply(Throwable throwable) {
+                        return transmission;
+                    }
                 });
     }
 }

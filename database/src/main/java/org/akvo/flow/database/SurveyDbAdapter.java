@@ -31,8 +31,6 @@ import org.akvo.flow.database.migration.MigrationListener;
 import java.util.ArrayList;
 import java.util.List;
 
-import timber.log.Timber;
-
 /**
  * Database class for the survey db. It can create/upgrade the database as well
  * as select/insert/update survey responses. TODO: break this up into separate
@@ -122,45 +120,6 @@ public class SurveyDbAdapter {
                 new String[] {
                         String.valueOf(surveyInstanceId)
                 }, null, null, null);
-    }
-
-    /**
-     * updates the status of a survey instance to the status passed in.
-     * Status must be one of the 'SurveyInstanceStatus' one. The corresponding
-     * Date column will be updated with the current timestamp.
-     */
-    public void updateSurveyInstanceStatus(long surveyInstanceId, int status) {
-        String dateColumn;
-        switch (status) {
-            case SurveyInstanceStatus.DOWNLOADED:
-            case SurveyInstanceStatus.UPLOADED:
-                dateColumn = SurveyInstanceColumns.SYNC_DATE;
-                break;
-            case SurveyInstanceStatus.SUBMITTED:
-                dateColumn = SurveyInstanceColumns.EXPORTED_DATE;
-                break;
-            case SurveyInstanceStatus.SUBMIT_REQUESTED:
-                dateColumn = SurveyInstanceColumns.SUBMITTED_DATE;
-                break;
-            case SurveyInstanceStatus.SAVED:
-                dateColumn = SurveyInstanceColumns.SAVED_DATE;
-                break;
-            default:
-                return;
-        }
-
-        ContentValues updatedValues = new ContentValues();
-        updatedValues.put(SurveyInstanceColumns.STATUS, status);
-        updatedValues.put(dateColumn, System.currentTimeMillis());
-
-        final int rows = database.update(Tables.SURVEY_INSTANCE,
-                updatedValues,
-                SurveyInstanceColumns._ID + " = ?",
-                new String[] { String.valueOf(surveyInstanceId) });
-
-        if (rows < 1) {
-            Timber.e("Could not update status for Survey Instance: %d", surveyInstanceId);
-        }
     }
 
     /**
@@ -312,14 +271,6 @@ public class SurveyDbAdapter {
                         String.valueOf(surveyInstanceId)
                 }
         );
-    }
-
-    public Cursor getUnSyncedTransmissions() {
-        return getTransmissions(TransmissionColumns.STATUS + " IN (?, ?, ?)", new String[] {
-                String.valueOf(TransmissionStatus.FAILED),
-                String.valueOf(TransmissionStatus.IN_PROGRESS), // Stalled IN_PROGRESS files
-                String.valueOf(TransmissionStatus.QUEUED)
-        });
     }
 
     private Cursor getTransmissions(String selection, String[] selectionArgs) {

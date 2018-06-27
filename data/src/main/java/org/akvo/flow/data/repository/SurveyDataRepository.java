@@ -36,8 +36,11 @@ import org.akvo.flow.data.entity.S3File;
 import org.akvo.flow.data.entity.SurveyMapper;
 import org.akvo.flow.data.entity.SyncedTimeMapper;
 import org.akvo.flow.data.entity.Transmission;
+import org.akvo.flow.data.entity.TransmissionError;
 import org.akvo.flow.data.entity.TransmissionFilenameMapper;
 import org.akvo.flow.data.entity.TransmissionMapper;
+import org.akvo.flow.data.entity.TransmissionResult;
+import org.akvo.flow.data.entity.TransmissionSuccess;
 import org.akvo.flow.data.entity.UserMapper;
 import org.akvo.flow.data.net.RestApi;
 import org.akvo.flow.domain.entity.DataPoint;
@@ -50,7 +53,9 @@ import org.reactivestreams.Publisher;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
@@ -381,7 +386,7 @@ public class SurveyDataRepository implements SurveyRepository {
 
     @Override
     public Observable<Boolean> processTransmissions(final String deviceId) {
-        return dataSourceFactory.getDataBaseDataSource().getUnSyncedTransmissions()
+        return dataSourceFactory. getDataBaseDataSource().getUnSyncedTransmissions()
                 .map(new Function<Cursor, List<Transmission>>() {
                     @Override
                     public List<Transmission> apply(Cursor cursor) {
@@ -391,34 +396,51 @@ public class SurveyDataRepository implements SurveyRepository {
                 .concatMap(new Function<List<Transmission>, Observable<Boolean>>() {
                     @Override
                     public Observable<Boolean> apply(List<Transmission> transmissions) {
-                        return syncTransmissions(transmissions, deviceId)
-                                .concatMap(new Function<List<Transmission>, Observable<Boolean>>() {
-                                            @Override
-                                            public Observable<Boolean> apply(List<Transmission> t) {
-                                                Timber.d("concatMap: " + t.size() + " [ " + t
-                                                        .toString() + " ]");
-                                                return Observable.just(true); //TODO:
-                                            }
-                                        });
+                        return syncTransmissions(transmissions, deviceId);
                     }
                 });
     }
 
-    private Observable<List<Transmission>> syncTransmissions(List<Transmission> transmissions,
+    private Observable<Boolean> updateSurveyInstance(List<TransmissionResult> list) {
+        DatabaseDataSource dataBaseDataSource = dataSourceFactory.getDataBaseDataSource();
+        Set<Long> failedTransmissions = new HashSet<>();
+        Set<Long> successFullTransmissions = new HashSet<>();
+        for (TransmissionResult result: list) {
+            if (result instanceof TransmissionError) {
+                failedTransmissions.add(result.getSurveyInstanceId());
+            } else {
+                successFullTransmissions.add(result.getSurveyInstanceId());
+            }
+        }
+        successFullTransmissions.removeAll(failedTransmissions);
+        return Observable.merge(dataBaseDataSource.updateFailedSubmissions(failedTransmissions),
+                dataBaseDataSource.updateSuccessfulSubmissions(successFullTransmissions));
+    }
+
+    private Observable<Boolean> syncTransmissions(List<Transmission> transmissions,
             final String deviceId) {
         return Observable.fromIterable(transmissions)
-                .concatMap(new Function<Transmission, Observable<Transmission>>() {
+                .concatMap(new Function<Transmission, Observable<TransmissionResult>>() {
                     @Override
-                    public Observable<Transmission> apply(final Transmission transmission) {
+                    public Observable<TransmissionResult> apply(final Transmission transmission) {
                         return syncTransmission(transmission, deviceId);
                     }
                 })
-                .toList().toObservable();
+                .toList().toObservable()
+                .concatMap(new Function<List<TransmissionResult>, Observable<Boolean>>() {
+                            @Override
+                            public Observable<Boolean> apply(List<TransmissionResult> list) {
+                                return updateSurveyInstance(list);
+                            }
+                        });
     }
 
     //TODO: return success or failure
-    private Observable<Transmission> syncTransmission(final Transmission transmission,
+    private Observable<TransmissionResult> syncTransmission(final Transmission transmission,
             final String deviceId) {
+        final DatabaseDataSource dataBaseDataSource = dataSourceFactory.getDataBaseDataSource();
+        final long transmissionId = transmission.getId();
+        final long surveyInstanceId = transmission.getRespondentId();
         return restApi.uploadFile(transmission)
                 .concatMap(new Function<ResponseBody, Observable<ResponseBody>>() {
                     @Override
@@ -431,28 +453,26 @@ public class SurveyDataRepository implements SurveyRepository {
                 .doOnNext(new Consumer<ResponseBody>() {
                     @Override
                     public void accept(ResponseBody ignored) {
-                        dataSourceFactory.getDataBaseDataSource().setFileTransmissionSucceeded(
-                                        transmission.getId());
+                        dataBaseDataSource.setFileTransmissionSucceeded(transmissionId);
                     }
                 })
                 .doOnError(new Consumer<Throwable>() {
                     @Override
                     public void accept(Throwable throwable) {
-                        dataSourceFactory.getDataBaseDataSource().setFileTransmissionFailed(
-                                        transmission.getId());
+                        dataBaseDataSource.setFileTransmissionFailed(transmissionId);
                     }
                 })
-                .map(new Function<ResponseBody, Transmission>() {
+                .map(new Function<ResponseBody, TransmissionResult>() {
                     @Override
-                    public Transmission apply(ResponseBody ignored) {
-                        return transmission;
+                    public TransmissionResult apply(ResponseBody ignored) {
+                        return new TransmissionSuccess(surveyInstanceId);
                     }
                 })
-                .onErrorReturn(new Function<Throwable, Transmission>() {
+                .onErrorReturn(new Function<Throwable, TransmissionResult>() {
                     @Override
-                    public Transmission apply(Throwable throwable) {
+                    public TransmissionResult apply(Throwable throwable) {
                         Timber.e(throwable);
-                        return transmission;
+                        return new TransmissionError(surveyInstanceId);
                     }
                 });
     }

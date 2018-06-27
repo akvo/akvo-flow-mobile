@@ -133,7 +133,8 @@ public class DataSyncService extends IntentService {
         application.getApplicationComponent().inject(this);
     }
 
-    @Override public void onDestroy() {
+    @Override
+    public void onDestroy() {
         super.onDestroy();
         makeDataPrivate.dispose();
         uploadSync.dispose();
@@ -461,18 +462,19 @@ public class DataSyncService extends IntentService {
     private void syncFiles() {
         // Check notifications for this device. This will update the status of the transmissions
         // if necessary, or mark form as deleted.
-        Timber.d("syncFiles");
         uploadSync.dispose();
         uploadSync.execute(new DefaultObserver<Boolean>() {
             @Override
             public void onError(Throwable e) {
                 Timber.e(e);
+                broadcastDataPointStatusChange();
             }
 
             @Override
             public void onNext(Boolean aBoolean) {
-                Timber.d("Success");
+                broadcastDataPointStatusChange();
             }
+
         }, null);
 
 //        List<FileTransmission> transmissions = mDatabase.getUnSyncedTransmissions();
@@ -514,6 +516,10 @@ public class DataSyncService extends IntentService {
         mDatabase.updateSurveyStatus(surveyInstanceId, status);
 
         // Dispatch a Broadcast notification to notify of survey instances status change
+        broadcastDataPointStatusChange();
+    }
+
+    private void broadcastDataPointStatusChange() {
         Intent intentBroadcast = new Intent(ConstantUtil.ACTION_DATA_SYNC);
         LocalBroadcastManager.getInstance(this).sendBroadcast(intentBroadcast);
     }

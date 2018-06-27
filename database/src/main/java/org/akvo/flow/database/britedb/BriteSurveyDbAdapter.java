@@ -33,6 +33,7 @@ import org.akvo.flow.database.ResponseColumns;
 import org.akvo.flow.database.SurveyColumns;
 import org.akvo.flow.database.SurveyGroupColumns;
 import org.akvo.flow.database.SurveyInstanceColumns;
+import org.akvo.flow.database.SurveyInstanceStatus;
 import org.akvo.flow.database.SyncTimeColumns;
 import org.akvo.flow.database.Tables;
 import org.akvo.flow.database.TransmissionColumns;
@@ -188,6 +189,45 @@ public class BriteSurveyDbAdapter {
 
     public void insertSyncedTime(ContentValues values) {
         briteDatabase.insert(Tables.SYNC_TIME, values);
+    }
+
+    /**
+     * updates the status of a survey instance to the status passed in.
+     * Status must be one of the 'SurveyInstanceStatus' one. The corresponding
+     * Date column will be updated with the current timestamp.
+     */
+    public void updateSurveyInstanceStatus(long surveyInstanceId, int status) {
+        String dateColumn;
+        switch (status) {
+            case SurveyInstanceStatus.DOWNLOADED:
+            case SurveyInstanceStatus.UPLOADED:
+                dateColumn = SurveyInstanceColumns.SYNC_DATE;
+                break;
+            case SurveyInstanceStatus.SUBMITTED:
+                dateColumn = SurveyInstanceColumns.EXPORTED_DATE;
+                break;
+            case SurveyInstanceStatus.SUBMIT_REQUESTED:
+                dateColumn = SurveyInstanceColumns.SUBMITTED_DATE;
+                break;
+            case SurveyInstanceStatus.SAVED:
+                dateColumn = SurveyInstanceColumns.SAVED_DATE;
+                break;
+            default:
+                return;
+        }
+
+        ContentValues updatedValues = new ContentValues();
+        updatedValues.put(SurveyInstanceColumns.STATUS, status);
+        updatedValues.put(dateColumn, System.currentTimeMillis());
+
+        final int rows = briteDatabase.update(Tables.SURVEY_INSTANCE,
+                updatedValues,
+                SurveyInstanceColumns._ID + " = ?",
+                String.valueOf(surveyInstanceId));
+
+        if (rows < 1) {
+            Timber.e("Could not update status for Survey Instance: %d", surveyInstanceId);
+        }
     }
 
     public long syncSurveyInstance(ContentValues values, String surveyInstanceUuid) {

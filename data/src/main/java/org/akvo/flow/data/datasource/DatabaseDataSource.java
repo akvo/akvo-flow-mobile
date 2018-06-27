@@ -41,6 +41,7 @@ import org.akvo.flow.database.britedb.BriteSurveyDbAdapter;
 import org.akvo.flow.domain.entity.User;
 
 import java.util.List;
+import java.util.Set;
 
 import javax.inject.Inject;
 
@@ -266,5 +267,33 @@ public class DatabaseDataSource {
     public void setFileTransmissionFailed(Long id) {
         briteSurveyDbAdapter
                 .updateTransmissionStatus(id, TransmissionStatus.FAILED);
+    }
+
+    public Observable<Boolean> updateFailedSubmissions(Set<Long> failedSubmissions) {
+        BriteDatabase.Transaction transaction = briteSurveyDbAdapter.beginTransaction();
+        try {
+            for (long submission : failedSubmissions) {
+                briteSurveyDbAdapter
+                        .updateSurveyInstanceStatus(submission, SurveyInstanceStatus.SUBMITTED);
+            }
+            transaction.markSuccessful();
+        } finally {
+            transaction.end();
+        }
+        return Observable.just(true);
+    }
+
+    public Observable<Boolean> updateSuccessfulSubmissions(Set<Long> successfulSubmissions) {
+        BriteDatabase.Transaction transaction = briteSurveyDbAdapter.beginTransaction();
+        try {
+            for (long submission : successfulSubmissions) {
+                briteSurveyDbAdapter
+                        .updateSurveyInstanceStatus(submission, SurveyInstanceStatus.UPLOADED);
+            }
+            transaction.markSuccessful();
+        } finally {
+            transaction.end();
+        }
+        return Observable.just(true);
     }
 }

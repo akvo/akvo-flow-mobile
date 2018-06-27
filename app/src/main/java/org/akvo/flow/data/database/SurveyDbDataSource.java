@@ -474,8 +474,8 @@ public class SurveyDbDataSource {
         return surveyDbAdapter.getFormInstance(mSurveyInstanceId);
     }
 
-    public void updateSurveyStatus(long mSurveyInstanceId, int saved) {
-        surveyDbAdapter.updateSurveyInstanceStatus(mSurveyInstanceId, saved);
+    public void updateSurveyStatus(long surveyInstanceId, int status) {
+        briteSurveyDbAdapter.updateSurveyInstanceStatus(surveyInstanceId, status);
     }
 
     public void updateRecordModifiedDate(String recordId, long timestamp) {

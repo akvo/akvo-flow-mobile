@@ -21,7 +21,7 @@
 package org.akvo.flow.data.net.gae;
 
 import io.reactivex.Observable;
-import retrofit2.Response;
+import okhttp3.ResponseBody;
 import retrofit2.http.GET;
 import retrofit2.http.Headers;
 import retrofit2.http.Query;
@@ -40,7 +40,7 @@ public interface ProcessingNotificationService {
 
     @GET(PROCESSING_NOTIFICATION)
     @Headers("Cache-Control: no-cache")
-    Observable<Response<String>> notifyFileAvailable(@Query(ACTION) String action,
+    Observable<ResponseBody> notifyFileAvailable(@Query(ACTION) String action,
             @Query(FORM_ID) String formId,
             @Query(FILENAME) String filename,
             @Query(PHONE_NUMBER) String phoneNumber,

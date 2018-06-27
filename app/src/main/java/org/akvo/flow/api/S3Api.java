@@ -30,7 +30,6 @@ import org.akvo.flow.util.HttpUtil;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -43,13 +42,9 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
 
-import timber.log.Timber;
-
 public class S3Api {
     private static final String URL = "https://%s.s3.amazonaws.com/%s";
     private static final String PAYLOAD_GET = "GET\n\n\n%s\n/%s/%s";// date, bucket, obj
-    private static final String PAYLOAD_PUT_PUBLIC = "PUT\n%s\n%s\n%s\nx-amz-acl:public-read\n/%s/%s";// md5, type, date, bucket, obj
-    private static final String PAYLOAD_PUT_PRIVATE = "PUT\n%s\n%s\n%s\n/%s/%s";// md5, type, date, bucket, obj
     private static final String PAYLOAD_HEAD = "HEAD\n\n\n%s\n/%s/%s";// date, bucket, obj
 
     private String mBucket;
@@ -128,70 +123,6 @@ public class S3Api {
             if (status != HttpURLConnection.HTTP_OK) {
                 throw new IOException("Status Code: " + status + ". Expected: 200 - OK");
             }
-        } finally {
-            if (conn != null) {
-                conn.disconnect();
-            }
-            FileUtil.close(in);
-            FileUtil.close(out);
-        }
-    }
-
-    public boolean put(String objectKey, File file, String type, boolean isPublic) throws IOException {
-        // Calculate data size, up to 2 GB
-        final int size = file.length() < Integer.MAX_VALUE ? (int)file.length() : -1;
-
-        // Get date and signature
-        final byte[] rawMd5 = FileUtil.getMD5Checksum(file);
-        final String md5Base64 = Base64.encodeToString(rawMd5, Base64.NO_WRAP);
-
-        final String date = getDate();
-        final String payloadStr = isPublic ? PAYLOAD_PUT_PUBLIC : PAYLOAD_PUT_PRIVATE;
-        final String payload = String.format(payloadStr, md5Base64, type, date, mBucket, objectKey);
-        final String signature = signatureHelper.getAuthorization(payload, mSecret, Base64.NO_WRAP);
-        final URL url = new URL(String.format(URL, mBucket, objectKey));
-        Timber.d("url: "+url.toString());
-        InputStream in = null;
-        OutputStream out = null;
-        HttpURLConnection conn = null;
-        try {
-            conn = (HttpURLConnection) url.openConnection();
-            conn.setDoOutput(true);
-            if (size > 0) {
-                conn.setFixedLengthStreamingMode(size);
-            } else {
-                conn.setChunkedStreamingMode(0);
-            }
-            conn.setRequestMethod("PUT");
-            conn.setRequestProperty("Content-MD5", md5Base64);
-            conn.setRequestProperty("Content-Type", type);
-            conn.setRequestProperty("Date", date);
-            if (isPublic) {
-                // If we don't send this header, the object will be private by default
-                conn.setRequestProperty("x-amz-acl", "public-read");
-            }
-            conn.setRequestProperty("Authorization", "AWS " + mAccessKey + ":" + signature);
-
-            in = new BufferedInputStream(new FileInputStream(file));
-            out = new BufferedOutputStream(conn.getOutputStream());
-
-            HttpUtil.copyStream(in, out);
-            out.flush();
-
-            int status = conn.getResponseCode();
-            if (status != 200 && status != 201) {
-                Timber.e("Status Code: " + status + ". Expected: 200 or 201");
-                return false;
-            }
-            String etag = getEtag(conn);
-            final String md5Hex = FileUtil.hexMd5(rawMd5);
-            if (!md5Hex.equals(etag)) {
-                Timber.e("ETag comparison failed. Response ETag: " + etag +
-                        "Locally computed MD5: " + md5Hex);
-                return false;
-            }
-            Timber.d("File successfully uploaded: " + file.getName());
-            return true;
         } finally {
             if (conn != null) {
                 conn.disconnect();

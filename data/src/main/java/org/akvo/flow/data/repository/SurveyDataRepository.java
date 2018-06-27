@@ -416,21 +416,21 @@ public class SurveyDataRepository implements SurveyRepository {
                 .toList().toObservable();
     }
 
+    //TODO: return success or failure
     private Observable<Transmission> syncTransmission(final Transmission transmission,
             final String deviceId) {
         return restApi.uploadFile(transmission)
-                .concatMap(new Function<ResponseBody, Observable<Transmission>>() {
+                .concatMap(new Function<ResponseBody, Observable<ResponseBody>>() {
                     @Override
-                    public Observable<Transmission> apply(ResponseBody transmission2) {
+                    public Observable<ResponseBody> apply(ResponseBody ignored) {
                         S3File s3File = transmission.getS3File();
-                        restApi.notifyFileAvailable(s3File.getAction(),
+                        return restApi.notifyFileAvailable(s3File.getAction(),
                                 transmission.getFormId(), s3File.getFile().getName(), deviceId);
-                        return Observable.just(transmission);
                     }
                 })
-                .doOnNext(new Consumer<Transmission>() {
+                .doOnNext(new Consumer<ResponseBody>() {
                     @Override
-                    public void accept(Transmission aBoolean) {
+                    public void accept(ResponseBody ignored) {
                         dataSourceFactory.getDataBaseDataSource().setFileTransmissionSucceeded(
                                         transmission.getId());
                     }
@@ -441,9 +441,17 @@ public class SurveyDataRepository implements SurveyRepository {
                         dataSourceFactory.getDataBaseDataSource().setFileTransmissionFailed(
                                         transmission.getId());
                     }
-                }).onErrorReturn(new Function<Throwable, Transmission>() {
+                })
+                .map(new Function<ResponseBody, Transmission>() {
+                    @Override
+                    public Transmission apply(ResponseBody ignored) {
+                        return transmission;
+                    }
+                })
+                .onErrorReturn(new Function<Throwable, Transmission>() {
                     @Override
                     public Transmission apply(Throwable throwable) {
+                        Timber.e(throwable);
                         return transmission;
                     }
                 });

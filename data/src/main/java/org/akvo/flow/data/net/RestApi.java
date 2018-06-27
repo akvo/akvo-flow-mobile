@@ -52,6 +52,7 @@ import okhttp3.ResponseBody;
 public class RestApi {
     private static final String PAYLOAD_PUT_PUBLIC = "PUT\n%s\n%s\n%s\nx-amz-acl:public-read\n/%s/%s";// md5, type, date, bucket, obj
     private static final String PAYLOAD_PUT_PRIVATE = "PUT\n%s\n%s\n%s\n/%s/%s";// md5, type, date, bucket, obj
+    private static final int FILE_UPLOAD_RETRIES = 2;
 
     private final String androidId;
     private final String imei;
@@ -93,13 +94,12 @@ public class RestApi {
                 .getFilesLists(phoneNumber, androidId, imei, version, deviceId, formIds);
     }
 
-    public Observable<Boolean> notifyFileAvailable(String action, String formId, String filename,
+    public Observable<ResponseBody> notifyFileAvailable(String action, String formId, String filename,
             String deviceId) {
-        serviceFactory
+        return serviceFactory
                 .createRetrofitService(ProcessingNotificationService.class, apiUrls.getGaeUrl())
                 .notifyFileAvailable(action, formId, filename, phoneNumber, androidId, imei,
-                        version, deviceId);
-        return Observable.just(true); //TODO: verify result
+                        version, deviceId); //TODO: verify result
     }
 
     //TODO: cleanup this method a bit
@@ -125,13 +125,13 @@ public class RestApi {
         AwsS3 retrofitService = serviceFactory
                 .createRetrofitService(AwsS3.class, apiUrls.getS3Url());
         //TODO: remove hardcoded values
+        //TODO: check result ++ retry
         if (isPublic) {
             return retrofitService
                     .uploadPublic("images", filename, md5Base64, contentType, date, authorization, body);
         } else {
             return retrofitService.upload("devicezip", filename, md5Base64, contentType, date, authorization, body);
         }
-       // return Observable.just(transmission); //TODO: check result ++ retry
     }
 
     private String getMd5Base64(S3File file) {

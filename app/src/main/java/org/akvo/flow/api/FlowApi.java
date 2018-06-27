@@ -43,17 +43,15 @@ import timber.log.Timber;
 
 public class FlowApi {
 
+    private static final String HTTPS_PREFIX = "https";
+    private static final String HTTP_PREFIX = "http";
+
     private final String phoneNumber;
     private final String imei;
     private final String androidId;
-
     private final String deviceIdentifier;
-
-    private static final int ERROR_UNKNOWN = -1;
-
-    private static final String HTTPS_PREFIX = "https";
-    private static final String HTTP_PREFIX = "http";
     private final String baseUrl;
+
 
     public FlowApi(Context context) {
         this.baseUrl = BuildConfig.SERVER_BASE;
@@ -133,39 +131,6 @@ public class FlowApi {
         return builder.build().toString();
     }
 
-    /**
-     * Notify GAE back-end that data is available
-     * Sends a message to the service with the file name that was just uploaded
-     * so it can start processing the file
-     */
-//    public int sendProcessingNotification(@NonNull String formId, @NonNull String action,
-//            @NonNull String fileName) {
-//        String url = buildProcessingNotificationUrl(baseUrl, formId, action, fileName);
-//        try {
-//            HttpUtil.httpGet(url);
-//            return HttpURLConnection.HTTP_OK;
-//        } catch (HttpException e) {
-//            Timber.e(e.getStatus() + " response for formId: " + formId);
-//            return e.getStatus();
-//        } catch (Exception e) {
-//            Timber.e("GAE sync notification failed for file: " + fileName);
-//            return ERROR_UNKNOWN;
-//        }
-//    }
-
-//    @NonNull
-//    private String buildProcessingNotificationUrl(@NonNull String serverBaseUrl,
-//            @NonNull String formId, @NonNull
-//            String action, @NonNull String fileName) {
-//        Uri.Builder builder = Uri.parse(serverBaseUrl).buildUpon();
-//        builder.appendPath(Path.NOTIFICATION);
-//        builder.appendQueryParameter(Param.PARAM_ACTION, action);
-//        builder.appendQueryParameter(Param.FORM_ID, formId);
-//        builder.appendQueryParameter(Param.FILENAME, fileName);
-//        appendDeviceParams(builder);
-//        return builder.build().toString();
-//    }
-
     private void appendDeviceParams(@NonNull Uri.Builder builder) {
         builder.appendQueryParameter(Param.PHONE_NUMBER, phoneNumber);
         builder.appendQueryParameter(Param.ANDROID_ID, androidId);
@@ -175,8 +140,6 @@ public class FlowApi {
     }
 
     interface Path {
-
-//        String NOTIFICATION = "processor";
         String SURVEY_LIST_SERVICE = "surveymanager";
         String SURVEY_HEADER_SERVICE = "surveymanager";
         String TIME_CHECK = "devicetimerest";
@@ -192,9 +155,7 @@ public class FlowApi {
         String ANDROID_ID = "androidId";
 
         String PARAM_ACTION = "action";
-//        String FORM_ID = "formID";
         String SURVEY_ID = "surveyId";
-//        String FILENAME = "fileName";
 
         String VALUE_HEADER = "getSurveyHeader";
         String VALUE_SURVEY = "getAvailableSurveysDevice";

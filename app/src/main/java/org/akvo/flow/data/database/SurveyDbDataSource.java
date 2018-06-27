@@ -319,15 +319,6 @@ public class SurveyDbDataSource {
         return transmissionsMapper.getFileTransmissions(cursor);
     }
 
-    /**
-     * Get the list of queued, in progress and failed transmissions
-     */
-    @NonNull
-    public List<FileTransmission> getUnSyncedTransmissions() {
-        Cursor cursor = surveyDbAdapter.getUnSyncedTransmissions();
-        return transmissionsMapper.getFileTransmissions(cursor);
-    }
-
     public void addSurveyGroup(SurveyGroup surveyGroup) {
         ContentValues values = new ContentValues();
         values.put(SurveyGroupColumns.SURVEY_GROUP_ID, surveyGroup.getId());
@@ -508,19 +499,6 @@ public class SurveyDbDataSource {
                 .createTransmission(surveyInstanceId, formId, filename, TransmissionStatus.QUEUED);
     }
 
-//    public void setFileTransmissionFailed(String filename) {
-//        int rows = briteSurveyDbAdapter
-//                .updateFailedTransmission(filename, TransmissionStatus.FAILED);
-//        if (rows == 0) {
-//            // Use a dummy "-1" as survey_instance_id, as the database needs that attribute
-//            briteSurveyDbAdapter.createTransmission(-1, null, filename, TransmissionStatus.FAILED);
-//        }
-//    }
-
-    public void updateTransmissionStatus(long id, int status) {
-        briteSurveyDbAdapter.updateTransmissionStatus(id, status);
-    }
-
     public void deleteResponse(long mSurveyInstanceId, String questionId, String iteration) {
         surveyDbAdapter.deleteResponse(mSurveyInstanceId, questionId, iteration);
     }
@@ -531,10 +509,6 @@ public class SurveyDbDataSource {
 
     public Cursor getSurveyInstancesByStatus(int status) {
         return surveyDbAdapter.getSurveyInstancesByStatus(status);
-    }
-
-    public void deleteSurvey(String id) {
-        briteSurveyDbAdapter.deleteSurvey(id);
     }
 
     public String createSurveyedLocale(long id) {

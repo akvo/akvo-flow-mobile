@@ -50,14 +50,4 @@ public class Transmission {
     public S3File getS3File() {
         return s3File;
     }
-
-    @Override
-    public String toString() {
-        return "Transmission{" +
-                "id=" + id +
-                ", respondentId=" + respondentId +
-                ", formId='" + formId + '\'' +
-                ", s3File=" + s3File +
-                '}';
-    }
 }

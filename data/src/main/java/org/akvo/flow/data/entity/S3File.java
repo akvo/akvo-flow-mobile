@@ -62,11 +62,4 @@ public class S3File {
     public byte[] getRawMd5() {
         return rawMd5;
     }
-
-    @Override
-    public String toString() {
-        return "S3File{" +
-                "file=" + file.getName() +
-                '}';
-    }
 }

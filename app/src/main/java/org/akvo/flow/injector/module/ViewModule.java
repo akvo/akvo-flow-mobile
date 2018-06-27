@@ -39,7 +39,6 @@ import org.akvo.flow.domain.interactor.SaveKeepScreenOn;
 import org.akvo.flow.domain.interactor.SaveResizedImage;
 import org.akvo.flow.domain.interactor.SaveSelectedSurvey;
 import org.akvo.flow.domain.interactor.SetWalkthroughSeen;
-import org.akvo.flow.domain.interactor.ThreadAwareUseCase;
 import org.akvo.flow.domain.interactor.UnSyncedTransmissionsExist;
 import org.akvo.flow.domain.interactor.UploadDataPoints;
 import org.akvo.flow.domain.interactor.UseCase;
@@ -53,6 +52,7 @@ import org.akvo.flow.domain.interactor.users.GetUsers;
 import org.akvo.flow.domain.interactor.users.SelectUser;
 import org.akvo.flow.domain.repository.SurveyRepository;
 import org.akvo.flow.domain.repository.UserRepository;
+import org.akvo.flow.domain.util.ConnectivityStateManager;
 
 import javax.inject.Named;
 
@@ -232,14 +232,21 @@ public class ViewModule {
 
     @Provides
     @Named("uploadSync")
-    ThreadAwareUseCase provideUploadSync(SurveyRepository surveyRepository,
+    UseCase provideUploadSync(SurveyRepository surveyRepository,
             UserRepository userRepository) {
         return new UploadDataPoints(null, null, surveyRepository, userRepository);
     }
 
     @Provides
     @Named("uploadAsync")
-    ThreadAwareUseCase provideUploadAsync(UploadDataPoints uploadDataPoints) {
+    UseCase provideUploadAsync(UploadDataPoints uploadDataPoints) {
         return uploadDataPoints;
+    }
+
+    @Provides
+    @Named("allowedToConnectSync")
+    UseCase provideAllowedToConnectSync(UserRepository userRepository,
+            ConnectivityStateManager connectivityStateManager) {
+        return new AllowedToConnect(null, null, userRepository, connectivityStateManager);
     }
 }

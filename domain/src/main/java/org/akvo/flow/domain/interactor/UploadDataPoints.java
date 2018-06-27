@@ -35,7 +35,7 @@ import javax.inject.Inject;
 import io.reactivex.Observable;
 import io.reactivex.functions.Function;
 
-public class UploadDataPoints extends ThreadAwareUseCase {
+public class UploadDataPoints extends UseCase {
 
     public static final String KEY_SURVEY_ID = "survey_id";
 

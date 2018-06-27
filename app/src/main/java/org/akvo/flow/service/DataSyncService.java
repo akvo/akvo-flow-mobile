@@ -40,7 +40,7 @@ import org.akvo.flow.database.UserColumns;
 import org.akvo.flow.domain.Survey;
 import org.akvo.flow.domain.interactor.DefaultObserver;
 import org.akvo.flow.domain.interactor.MakeDataPrivate;
-import org.akvo.flow.domain.interactor.ThreadAwareUseCase;
+import org.akvo.flow.domain.interactor.UseCase;
 import org.akvo.flow.domain.response.FormInstance;
 import org.akvo.flow.domain.response.Response;
 import org.akvo.flow.util.ConnectivityStateManager;
@@ -120,7 +120,7 @@ public class DataSyncService extends IntentService {
 
     @Named("uploadSync")
     @Inject
-    ThreadAwareUseCase uploadSync;
+    UseCase uploadSync;
 
     public DataSyncService() {
         super(TAG);
@@ -476,39 +476,6 @@ public class DataSyncService extends IntentService {
             }
 
         }, null);
-
-//        List<FileTransmission> transmissions = mDatabase.getUnSyncedTransmissions();
-//
-//        if (transmissions.isEmpty()) {
-//            return;
-//        }
-//
-//        Set<Long> syncedSurveys = new HashSet<>();// Successful transmissions
-//        Set<Long> unsyncedSurveys = new HashSet<>();// Unsuccessful transmissions
-//
-//        final int totalFiles = transmissions.size();
-//
-//        for (int i = 0; i < totalFiles; i++) {
-//            FileTransmission transmission = transmissions.get(i);
-//            final long surveyInstanceId = transmission.getRespondentId();
-//            if (syncFile(transmission)) {
-//                syncedSurveys.add(surveyInstanceId);
-//            } else {
-//                unsyncedSurveys.add(surveyInstanceId);
-//            }
-//        }
-//
-//        // Retain successful survey instances, to mark them as UPLOADED
-//        syncedSurveys.removeAll(unsyncedSurveys);
-//
-//        for (long surveyInstanceId : syncedSurveys) {
-//            updateSurveyStatus(surveyInstanceId, SurveyInstanceStatus.UPLOADED);
-//        }
-//
-//        // Ensure the unsynced ones are just SUBMITTED
-//        for (long surveyInstanceId : unsyncedSurveys) {
-//            updateSurveyStatus(surveyInstanceId, SurveyInstanceStatus.SUBMITTED);
-//        }
     }
 
     private void updateSurveyStatus(long surveyInstanceId, int status) {

@@ -188,7 +188,7 @@ public class ApplicationModule {
 
     @Provides
     @Singleton
-    RestApi provideFlowRestApi(DeviceHelper deviceHelper, FlowServiceFactory serviceFactory,
+    RestApi provideRestApi(DeviceHelper deviceHelper, FlowServiceFactory serviceFactory,
             Encoder encoder, ApiUrls apiUrls, SignatureHelper signatureHelper) {
         S3User s3User = new S3User(BuildConfig.AWS_BUCKET, BuildConfig.AWS_ACCESS_KEY_ID,
                 BuildConfig.AWS_SECRET_KEY);

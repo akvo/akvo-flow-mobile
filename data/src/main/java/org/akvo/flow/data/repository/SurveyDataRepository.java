@@ -82,13 +82,13 @@ public class SurveyDataRepository implements SurveyRepository {
     private final FilesResultMapper filesResultMapper;
     private final TransmissionMapper transmissionMapper;
 
+    //TODO: this needs to be split, too many methods and params
     @Inject
     public SurveyDataRepository(DataSourceFactory dataSourceFactory,
             DataPointMapper dataPointMapper, SyncedTimeMapper syncedTimeMapper, RestApi restApi,
             SurveyMapper surveyMapper, UserMapper userMapper,
             TransmissionFilenameMapper transmissionFilenameMapper, FormIdMapper surveyIdMapper,
-            FilesResultMapper filesResultMapper,
-            TransmissionMapper transmissionMapper) {
+            FilesResultMapper filesResultMapper, TransmissionMapper transmissionMapper) {
         this.dataSourceFactory = dataSourceFactory;
         this.dataPointMapper = dataPointMapper;
         this.syncedTimeMapper = syncedTimeMapper;

@@ -76,7 +76,7 @@ public interface ApplicationComponent {
 
     SetupRepository setupRepository();
 
-    RestApi flowRestApi();
+    RestApi restApi();
 
     void inject(FileChangeTrackingService fileChangeTrackingService);
 

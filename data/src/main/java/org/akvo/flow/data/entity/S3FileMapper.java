@@ -48,9 +48,9 @@ public class S3FileMapper {
         S3File trans = null;
         File transmissionFile = getFile(filename);
         if (transmissionFile != null && transmissionFile.exists()) {
-            byte[] rawMd5 = fileHelper.getMD5Checksum(transmissionFile);
+            String md5Checksum = fileHelper.getMd5Base64(transmissionFile);
             trans = new S3File(transmissionFile, isFilePublic(filename), getDir(filename),
-                    getAction(filename), rawMd5);
+                    getAction(filename), md5Checksum);
         }
         return trans;
     }
@@ -118,4 +118,6 @@ public class S3FileMapper {
         }
         return filename.substring(filename.lastIndexOf("."));
     }
+
+
 }

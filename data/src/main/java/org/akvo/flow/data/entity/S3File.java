@@ -20,12 +20,16 @@
 
 package org.akvo.flow.data.entity;
 
+import android.support.annotation.NonNull;
+
+import org.akvo.flow.data.util.Constants;
+
 import java.io.File;
 
 public class S3File {
 
-    public static final String S3_DATA_DIR = "devicezip/";
-    public static final String S3_IMAGE_DIR = "images/";
+    public static final String S3_DATA_DIR = "devicezip";
+    public static final String S3_IMAGE_DIR = "images";
     public static final String ACTION_SUBMIT = "submit";
     public static final String ACTION_IMAGE = "image";
 
@@ -33,14 +37,17 @@ public class S3File {
     private final boolean isPublic;
     private final String dir;
     private final String action;
-    private final byte[] rawMd5;
+    private final String md5Base64;
 
-    public S3File(File file, boolean isPublic, String dir, String action, byte[] rawMd5) {
+    private final String filename;
+
+    public S3File(File file, boolean isPublic, String dir, String action, String md5Base64) {
         this.file = file;
         this.isPublic = isPublic;
         this.dir = dir;
         this.action = action;
-        this.rawMd5 = rawMd5;
+        this.md5Base64 = md5Base64;
+        this.filename = file.getName();
     }
 
     public File getFile() {
@@ -59,7 +66,32 @@ public class S3File {
         return action;
     }
 
-    public byte[] getRawMd5() {
-        return rawMd5;
+    public String getMd5Base64() {
+        return md5Base64;
+    }
+
+    public String getFilename() {
+        return filename;
+    }
+
+    public String getContentType() {
+        String ext = filename.substring(filename.lastIndexOf("."));
+        switch (ext) {
+            case Constants.PNG_SUFFIX:
+                return Constants.PNG_CONTENT_TYPE;
+            case Constants.JPG_SUFFIX:
+                return Constants.JPEG_CONTENT_TYPE;
+            case Constants.VIDEO_SUFFIX:
+                return Constants.VIDEO_CONTENT_TYPE;
+            case Constants.ARCHIVE_SUFFIX:
+                return Constants.DATA_CONTENT_TYPE;
+            default:
+                return null;
+        }
+    }
+
+    @NonNull
+    public String getObjectKey() {
+        return dir + "/" + filename;
     }
 }

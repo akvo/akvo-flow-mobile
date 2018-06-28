@@ -33,9 +33,7 @@ import org.akvo.flow.data.net.gae.DeviceFilesService;
 import org.akvo.flow.data.net.gae.ProcessingNotificationService;
 import org.akvo.flow.data.net.s3.AwsS3;
 import org.akvo.flow.data.util.ApiUrls;
-import org.akvo.flow.data.util.Constants;
 
-import java.io.File;
 import java.text.DateFormat;
 import java.util.Date;
 import java.util.List;
@@ -52,7 +50,6 @@ import okhttp3.ResponseBody;
 public class RestApi {
     private static final String PAYLOAD_PUT_PUBLIC = "PUT\n%s\n%s\n%s\nx-amz-acl:public-read\n/%s/%s";// md5, type, date, bucket, obj
     private static final String PAYLOAD_PUT_PRIVATE = "PUT\n%s\n%s\n%s\n/%s/%s";// md5, type, date, bucket, obj
-    private static final int FILE_UPLOAD_RETRIES = 2;
 
     private final String androidId;
     private final String imei;
@@ -94,65 +91,56 @@ public class RestApi {
                 .getFilesLists(phoneNumber, androidId, imei, version, deviceId, formIds);
     }
 
-    public Observable<ResponseBody> notifyFileAvailable(String action, String formId, String filename,
-            String deviceId) {
+    public Observable<ResponseBody> notifyFileAvailable(String action, String formId,
+            String filename, String deviceId) {
         return serviceFactory
                 .createRetrofitService(ProcessingNotificationService.class, apiUrls.getGaeUrl())
                 .notifyFileAvailable(action, formId, filename, phoneNumber, androidId, imei,
-                        version, deviceId); //TODO: verify result
+                        version, deviceId);
     }
 
-    //TODO: cleanup this method a bit
     public Observable<ResponseBody> uploadFile(Transmission transmission) {
-
         S3File s3File = transmission.getS3File();
-        File file = s3File.getFile();
-        final String md5Base64 = getMd5Base64(s3File);
-
         final String date = getDate();
-        String filename = file.getName();
-        String contentType = contentType(filename);
-        boolean isPublic = s3File.isPublic();
-        final String payloadStr = isPublic ? PAYLOAD_PUT_PUBLIC : PAYLOAD_PUT_PRIVATE;
-        String objectKey = s3File.getDir() + filename;
+
+        if (s3File.isPublic()) {
+            return uploadPublicFile(date, s3File);
+        } else {
+            return uploadPrivateFile(date, s3File);
+        }
+    }
+
+    private Observable<ResponseBody> uploadPublicFile(String date, S3File s3File) {
+        String authorization = getAmazonAuth(date, PAYLOAD_PUT_PUBLIC, s3File);
+        return createRetrofitService()
+                .uploadPublic(s3File.getDir(), s3File.getFilename(), s3File.getMd5Base64(),
+                        s3File.getContentType(), date, authorization, createBody(s3File));
+    }
+
+    private AwsS3 createRetrofitService() {
+        return serviceFactory.createRetrofitService(AwsS3.class, apiUrls.getS3Url());
+    }
+
+    private Observable<ResponseBody> uploadPrivateFile(String date, S3File s3File) {
+        String authorization = getAmazonAuth(date, PAYLOAD_PUT_PRIVATE, s3File);
+        return createRetrofitService()
+                .upload(s3File.getDir(), s3File.getFilename(), s3File.getMd5Base64(),
+                        s3File.getContentType(), date, authorization, createBody(s3File));
+    }
+
+    @NonNull
+    private RequestBody createBody(S3File s3File) {
+        return RequestBody.create(MediaType.parse(s3File.getContentType()), s3File.getFile());
+    }
+
+    @NonNull
+    private String getAmazonAuth(String date, String payloadStr, S3File s3File) {
         final String payload = String
-                .format(payloadStr, md5Base64, contentType, date, s3User.getBucket(), objectKey);
+                .format(payloadStr, s3File.getMd5Base64(), s3File.getContentType(), date,
+                        s3User.getBucket(), s3File.getObjectKey());
         final String signature = signatureHelper
                 .getAuthorization(payload, s3User.getSecret(), Base64.NO_WRAP);
-        String authorization = "AWS " + s3User.getAccessKey() + ":" + signature;
-
-        RequestBody body = RequestBody.create(MediaType.parse(contentType), file);
-        AwsS3 retrofitService = serviceFactory
-                .createRetrofitService(AwsS3.class, apiUrls.getS3Url());
-        //TODO: remove hardcoded values
-        //TODO: check result ++ retry
-        if (isPublic) {
-            return retrofitService
-                    .uploadPublic("images", filename, md5Base64, contentType, date, authorization, body);
-        } else {
-            return retrofitService.upload("devicezip", filename, md5Base64, contentType, date, authorization, body);
-        }
-    }
-
-    private String getMd5Base64(S3File file) {
-        final byte[] rawMd5 = file.getRawMd5();
-        return Base64.encodeToString(rawMd5, Base64.NO_WRAP);
-    }
-
-    private String contentType(String filename) {
-        String ext = filename.substring(filename.lastIndexOf("."));
-        switch (ext) {
-            case Constants.PNG_SUFFIX:
-                return Constants.PNG_CONTENT_TYPE;
-            case Constants.JPG_SUFFIX:
-                return Constants.JPEG_CONTENT_TYPE;
-            case Constants.VIDEO_SUFFIX:
-                return Constants.VIDEO_CONTENT_TYPE;
-            case Constants.ARCHIVE_SUFFIX:
-                return Constants.DATA_CONTENT_TYPE;
-            default:
-                return null;
-        }
+        return "AWS " + s3User.getAccessKey() + ":" + signature;
     }
 
     private String getDate() {

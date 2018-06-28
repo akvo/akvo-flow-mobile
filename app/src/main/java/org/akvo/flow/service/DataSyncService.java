@@ -171,7 +171,7 @@ public class DataSyncService extends IntentService {
 
                 @Override
                 public void onError(Throwable e) {
-                    super.onError(e);
+                    Timber.e(e);
                 }
             }, null);
         } catch (Exception e) {
@@ -454,22 +454,7 @@ public class DataSyncService extends IntentService {
         return val;
     }
 
-    // ================================================================= //
-    // ======================= SYNCHRONISATION ========================= //
-    // ================================================================= //
-
-    /**
-     * Sync every file (zip file, images, etc) that has a non synced state. This refers to:
-     * - Queued transmissions
-     * - Failed transmissions
-     * Each transmission will be retried up to three times. If the transmission does
-     * not succeed in those attempts, it will be marked as failed, and retried in the next sync.
-     * Files are uploaded to S3 and the response's ETag is compared against a locally computed
-     * MD5 checksum. Only if these fields match the transmission will be considered successful.
-     */
     private void syncFiles() {
-        // Check notifications for this device. This will update the status of the transmissions
-        // if necessary, or mark form as deleted.
         uploadSync.dispose();
         uploadSync.execute(new DefaultObserver<Boolean>() {
             @Override
@@ -479,7 +464,7 @@ public class DataSyncService extends IntentService {
             }
 
             @Override
-            public void onNext(Boolean aBoolean) {
+            public void onNext(Boolean ignored) {
                 broadcastDataPointStatusChange();
             }
 
@@ -487,10 +472,7 @@ public class DataSyncService extends IntentService {
     }
 
     private void updateSurveyStatus(long surveyInstanceId, int status) {
-        // First off, update the status
-        mDatabase.updateSurveyStatus(surveyInstanceId, status);
-
-        // Dispatch a Broadcast notification to notify of survey instances status change
+        mDatabase.updateSurveyInstanceStatus(surveyInstanceId, status);
         broadcastDataPointStatusChange();
     }
 

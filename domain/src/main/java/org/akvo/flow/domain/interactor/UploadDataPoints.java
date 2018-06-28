@@ -64,14 +64,15 @@ public class UploadDataPoints extends UseCase {
                                     public Observable<Boolean> apply(final String deviceId) {
                                         return surveyRepository
                                                 .downloadMissingAndDeleted(forms, deviceId)
-                                                .concatMap(
-                                                        new Function<Boolean, Observable<Boolean>>() {
-                                                            @Override
-                                                            public Observable<Boolean> apply(
-                                                                    Boolean ignored) {
-                                                                return surveyRepository
-                                                                        .processTransmissions(deviceId);
-                                                            }
+                                                .concatMap(new Function<Boolean,
+                                                        Observable<Boolean>>() {
+                                                    @Override
+                                                    public Observable<Boolean> apply(
+                                                            Boolean ignored) {
+                                                        return surveyRepository
+                                                                .processTransmissions(
+                                                                        deviceId);
+                                                    }
                                                         });
                                     }
                                 });

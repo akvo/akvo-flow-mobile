@@ -435,7 +435,6 @@ public class SurveyDataRepository implements SurveyRepository {
                         });
     }
 
-    //TODO: return success or failure
     private Observable<TransmissionResult> syncTransmission(final Transmission transmission,
             final String deviceId) {
         final DatabaseDataSource dataBaseDataSource = dataSourceFactory.getDataBaseDataSource();

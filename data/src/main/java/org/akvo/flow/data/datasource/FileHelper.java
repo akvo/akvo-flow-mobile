@@ -20,6 +20,9 @@
 
 package org.akvo.flow.data.datasource;
 
+import android.support.annotation.Nullable;
+import android.util.Base64;
+
 import java.io.BufferedInputStream;
 import java.io.Closeable;
 import java.io.File;
@@ -47,6 +50,7 @@ public class FileHelper {
     /**
      * Compute MD5 checksum of the given file
      */
+    @Nullable
     public byte[] getMD5Checksum(File file) {
         InputStream in = null;
         MessageDigest md;
@@ -69,6 +73,15 @@ public class FileHelper {
         }
 
         return null;
+    }
+
+    public String getMd5Base64(File file) {
+        byte[] md5Checksum = getMD5Checksum(file);
+        if (md5Checksum != null) {
+            return Base64.encodeToString(md5Checksum, Base64.NO_WRAP);
+        } else {
+            return "";
+        }
     }
 
     String copyFileToFolder(File originalFile, File destinationFolder) throws IOException {

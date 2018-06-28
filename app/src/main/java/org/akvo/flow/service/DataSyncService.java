@@ -43,7 +43,6 @@ import org.akvo.flow.domain.interactor.MakeDataPrivate;
 import org.akvo.flow.domain.interactor.UseCase;
 import org.akvo.flow.domain.response.FormInstance;
 import org.akvo.flow.domain.response.Response;
-import org.akvo.flow.util.ConnectivityStateManager;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.GsonMapper;
 import org.akvo.flow.util.MediaFileHelper;
@@ -107,9 +106,6 @@ public class DataSyncService extends IntentService {
     Prefs preferences;
 
     @Inject
-    ConnectivityStateManager connectivityStateManager;
-
-    @Inject
     ZipFileBrowser zipFileBrowser;
 
     @Inject
@@ -121,6 +117,10 @@ public class DataSyncService extends IntentService {
     @Named("uploadSync")
     @Inject
     UseCase uploadSync;
+
+    @Named("allowedToConnectSync")
+    @Inject
+    UseCase allowedToConnectSync;
 
     public DataSyncService() {
         super(TAG);
@@ -161,11 +161,19 @@ public class DataSyncService extends IntentService {
         try {
             mDatabase.open();
             exportSurveys();
+            allowedToConnectSync.execute(new DefaultObserver<Boolean>() {
+                @Override
+                public void onNext(Boolean connectAllowed) {
+                    if (connectAllowed) {
+                        syncFiles();
+                    }
+                }
 
-            if (connectivityStateManager.isConnectionAvailable(preferences
-                    .getBoolean(Prefs.KEY_CELL_UPLOAD, Prefs.DEFAULT_VALUE_CELL_UPLOAD))) {
-                syncFiles();
-            }
+                @Override
+                public void onError(Throwable e) {
+                    super.onError(e);
+                }
+            }, null);
         } catch (Exception e) {
             Timber.e(e, e.getMessage());
         } finally {

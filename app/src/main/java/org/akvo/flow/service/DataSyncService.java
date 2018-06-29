@@ -160,7 +160,7 @@ public class DataSyncService extends IntentService {
                 Timber.e(e);
                 exportAndSync();
             }
-        });
+        }, null);
     }
 
     private void exportAndSync() {

@@ -62,7 +62,7 @@ public interface SurveyRepository {
 
     Observable<List<String>> getFormIds(@Nullable String surveyId);
 
-    Observable<Boolean> downloadMissingAndDeleted(List<String> formIds, String deviceId);
+    Observable<List<String>> downloadMissingAndDeleted(List<String> formIds, String deviceId);
 
     Observable<Boolean> processTransmissions(String deviceId);
 }

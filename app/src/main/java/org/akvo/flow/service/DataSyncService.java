@@ -116,11 +116,15 @@ public class DataSyncService extends IntentService {
 
     @Named("uploadSync")
     @Inject
-    UseCase uploadSync;
+    UseCase upload;
 
     @Named("allowedToConnectSync")
     @Inject
-    UseCase allowedToConnectSync;
+    UseCase allowedToConnect;
+
+    @Named("checkDeviceNotificationSync")
+    @Inject
+    UseCase checkDeviceNotification;
 
     public DataSyncService() {
         super(TAG);
@@ -137,7 +141,9 @@ public class DataSyncService extends IntentService {
     public void onDestroy() {
         super.onDestroy();
         makeDataPrivate.dispose();
-        uploadSync.dispose();
+        upload.dispose();
+        allowedToConnect.dispose();
+        checkDeviceNotification.dispose();
     }
 
     @Override
@@ -161,11 +167,11 @@ public class DataSyncService extends IntentService {
         try {
             mDatabase.open();
             exportSurveys();
-            allowedToConnectSync.execute(new DefaultObserver<Boolean>() {
+            allowedToConnect.execute(new DefaultObserver<Boolean>() {
                 @Override
                 public void onNext(Boolean connectAllowed) {
                     if (connectAllowed) {
-                        syncFiles();
+                        checkDeviceNotification();
                     }
                 }
 
@@ -454,9 +460,29 @@ public class DataSyncService extends IntentService {
         return val;
     }
 
+    private void checkDeviceNotification() {
+        checkDeviceNotification.dispose();
+        checkDeviceNotification.execute(new DefaultObserver<List<String>>() {
+            @Override
+            public void onError(Throwable e) {
+                Timber.e(e);
+                syncFiles();
+            }
+
+            @Override
+            public void onNext(List<String> deletedFiles) {
+                for (String formId : deletedFiles) {
+                    displayFormDeletedNotification(formId);
+                }
+                syncFiles();
+            }
+        }, null);
+
+    }
+
     private void syncFiles() {
-        uploadSync.dispose();
-        uploadSync.execute(new DefaultObserver<Boolean>() {
+        upload.dispose();
+        upload.execute(new DefaultObserver<Boolean>() {
             @Override
             public void onError(Throwable e) {
                 Timber.e(e);
@@ -486,12 +512,10 @@ public class DataSyncService extends IntentService {
                 getString(R.string.sync_error_message), this, formId(formId));
     }
 
-    private void displayFormDeletedNotification(String id, String name) {
-        // Create a unique ID for this form's delete notification
-        final int notificationId = formId(id);
+    private void displayFormDeletedNotification(String formId) {
+        final int notificationId = formId(formId);
 
-        // Do not show failed if there is none
-        String text = String.format(getString(R.string.data_sync_error_form_deleted_text), name);
+        String text = String.format(getString(R.string.data_sync_error_form_deleted_text), formId);
         String title = getString(R.string.data_sync_error_form_deleted_title);
 
         NotificationHelper.displayNonOnGoingErrorNotification(this, notificationId, text, title);

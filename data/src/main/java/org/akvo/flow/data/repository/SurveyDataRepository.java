@@ -358,7 +358,8 @@ public class SurveyDataRepository implements SurveyRepository {
     }
 
     @Override
-    public Observable<Boolean> downloadMissingAndDeleted(List<String> formIds, String deviceId) {
+    public Observable<List<String>> downloadMissingAndDeleted(List<String> formIds,
+            String deviceId) {
         return restApi.getPendingFiles(formIds, deviceId)
                 .map(new Function<ApiFilesResult, FilteredFilesResult>() {
                     @Override
@@ -366,18 +367,17 @@ public class SurveyDataRepository implements SurveyRepository {
                         return filesResultMapper.transform(apiFilesResult);
                     }
                 })
-                .concatMap(new Function<FilteredFilesResult, Observable<Boolean>>() {
+                .concatMap(new Function<FilteredFilesResult, Observable<List<String>>>() {
                     @Override
-                    public Observable<Boolean> apply(FilteredFilesResult filtered) {
-                        DatabaseDataSource dataSource = dataSourceFactory
-                                .getDataBaseDataSource();
+                    public Observable<List<String>> apply(final FilteredFilesResult filtered) {
+                        DatabaseDataSource dataSource = dataSourceFactory.getDataBaseDataSource();
                         return Observable.zip(dataSource
                                         .setFileTransmissionFailed(filtered.getMissingFiles()),
                                 dataSource.setDeletedForms(filtered.getDeletedForms()),
-                                new BiFunction<Boolean, Boolean, Boolean>() {
+                                new BiFunction<Boolean, Boolean, List<String>>() {
                                     @Override
-                                    public Boolean apply(Boolean result1, Boolean result2) {
-                                        return result1 && result2;
+                                    public List<String> apply(Boolean ignored, Boolean ignored2) {
+                                        return filtered.getDeletedForms();
                                     }
                                 });
                     }
@@ -386,7 +386,7 @@ public class SurveyDataRepository implements SurveyRepository {
 
     @Override
     public Observable<Boolean> processTransmissions(final String deviceId) {
-        return dataSourceFactory. getDataBaseDataSource().getUnSyncedTransmissions()
+        return dataSourceFactory.getDataBaseDataSource().getUnSyncedTransmissions()
                 .map(new Function<Cursor, List<Transmission>>() {
                     @Override
                     public List<Transmission> apply(Cursor cursor) {
@@ -405,7 +405,7 @@ public class SurveyDataRepository implements SurveyRepository {
         DatabaseDataSource dataBaseDataSource = dataSourceFactory.getDataBaseDataSource();
         Set<Long> failedTransmissions = new HashSet<>();
         Set<Long> successFullTransmissions = new HashSet<>();
-        for (TransmissionResult result: list) {
+        for (TransmissionResult result : list) {
             if (result instanceof TransmissionError) {
                 failedTransmissions.add(result.getSurveyInstanceId());
             } else {
@@ -428,11 +428,11 @@ public class SurveyDataRepository implements SurveyRepository {
                 })
                 .toList().toObservable()
                 .concatMap(new Function<List<TransmissionResult>, Observable<Boolean>>() {
-                            @Override
-                            public Observable<Boolean> apply(List<TransmissionResult> list) {
-                                return updateSurveyInstance(list);
-                            }
-                        });
+                    @Override
+                    public Observable<Boolean> apply(List<TransmissionResult> list) {
+                        return updateSurveyInstance(list);
+                    }
+                });
     }
 
     private Observable<TransmissionResult> syncTransmission(final Transmission transmission,

@@ -21,6 +21,7 @@
 package org.akvo.flow.injector.module;
 
 import org.akvo.flow.domain.interactor.AllowedToConnect;
+import org.akvo.flow.domain.interactor.CheckDeviceNotifications;
 import org.akvo.flow.domain.interactor.ClearAllData;
 import org.akvo.flow.domain.interactor.ClearResponses;
 import org.akvo.flow.domain.interactor.CopyVideo;
@@ -248,5 +249,12 @@ public class ViewModule {
     UseCase provideAllowedToConnectSync(UserRepository userRepository,
             ConnectivityStateManager connectivityStateManager) {
         return new AllowedToConnect(null, null, userRepository, connectivityStateManager);
+    }
+
+    @Provides
+    @Named("checkDeviceNotificationSync")
+    UseCase provideDeviceNotificationSync(SurveyRepository surveyRepository,
+            UserRepository userRepository) {
+        return new CheckDeviceNotifications(null, null, surveyRepository, userRepository);
     }
 }

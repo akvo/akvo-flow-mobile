@@ -28,6 +28,7 @@ import org.akvo.flow.domain.repository.SurveyRepository;
 import org.akvo.flow.domain.repository.UserRepository;
 
 import java.util.Map;
+import java.util.Set;
 
 import javax.inject.Inject;
 
@@ -51,9 +52,9 @@ public class UploadDataPoints extends UseCase {
     @Override
     protected <T> Observable buildUseCaseObservable(Map<String, T> parameters) {
         return userRepository.getDeviceId()
-                .concatMap(new Function<String, Observable<Boolean>>() {
+                .concatMap(new Function<String, Observable<Set<String>>>() {
                     @Override
-                    public Observable<Boolean> apply(final String deviceId) {
+                    public Observable<Set<String>> apply(final String deviceId) {
                         return surveyRepository.processTransmissions(deviceId);
                     }
                 });

@@ -269,6 +269,11 @@ public class DatabaseDataSource {
                 .updateTransmissionStatus(id, TransmissionStatus.FAILED);
     }
 
+    public void setFileTransmissionFormDeleted(long id) {
+        briteSurveyDbAdapter
+                .updateTransmissionStatus(id, TransmissionStatus.FORM_DELETED);
+    }
+
     public Observable<Boolean> updateFailedSubmissions(Set<Long> failedSubmissions) {
         BriteDatabase.Transaction transaction = briteSurveyDbAdapter.beginTransaction();
         try {

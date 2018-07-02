@@ -91,7 +91,7 @@ public class RestApi {
                 .getFilesLists(phoneNumber, androidId, imei, version, deviceId, formIds);
     }
 
-    public Observable<ResponseBody> notifyFileAvailable(String action, String formId,
+    public Observable<?> notifyFileAvailable(String action, String formId,
             String filename, String deviceId) {
         return serviceFactory
                 .createRetrofitService(ProcessingNotificationService.class, apiUrls.getGaeUrl())

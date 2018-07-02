@@ -20,9 +20,16 @@
 
 package org.akvo.flow.data.entity;
 
-public class TransmissionSuccess extends TransmissionResult {
+public class UploadFormDeletedError extends UploadResult {
 
-    public TransmissionSuccess(long surveyInstanceId) {
+    private final String formId;
+
+    public UploadFormDeletedError(long surveyInstanceId, String formId) {
         super(surveyInstanceId);
+        this.formId = formId;
+    }
+
+    public String getFormId() {
+        return formId;
     }
 }

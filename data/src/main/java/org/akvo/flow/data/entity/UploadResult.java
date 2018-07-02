@@ -20,11 +20,11 @@
 
 package org.akvo.flow.data.entity;
 
-public abstract class TransmissionResult {
+public abstract class UploadResult {
 
     private final long surveyInstanceId;
 
-    protected TransmissionResult(long surveyInstanceId) {
+    protected UploadResult(long surveyInstanceId) {
         this.surveyInstanceId = surveyInstanceId;
     }
 

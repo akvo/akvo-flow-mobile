@@ -20,9 +20,9 @@
 
 package org.akvo.flow.data.entity;
 
-public class TransmissionError extends TransmissionResult {
+public class UploadSuccess extends UploadResult {
 
-    public TransmissionError(long surveyInstanceId) {
+    public UploadSuccess(long surveyInstanceId) {
         super(surveyInstanceId);
     }
 }

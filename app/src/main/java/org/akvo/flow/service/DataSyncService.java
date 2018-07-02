@@ -482,7 +482,7 @@ public class DataSyncService extends IntentService {
 
     private void syncFiles() {
         upload.dispose();
-        upload.execute(new DefaultObserver<Boolean>() {
+        upload.execute(new DefaultObserver<Set<String>>() {
             @Override
             public void onError(Throwable e) {
                 Timber.e(e);
@@ -490,7 +490,10 @@ public class DataSyncService extends IntentService {
             }
 
             @Override
-            public void onNext(Boolean ignored) {
+            public void onNext(Set<String> errorForms) {
+                for (String formId : errorForms) {
+                    displayErrorNotification(formId);
+                }
                 broadcastDataPointStatusChange();
             }
 

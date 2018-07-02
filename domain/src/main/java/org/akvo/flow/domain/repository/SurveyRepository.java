@@ -27,6 +27,7 @@ import org.akvo.flow.domain.entity.Survey;
 import org.akvo.flow.domain.entity.User;
 
 import java.util.List;
+import java.util.Set;
 
 import io.reactivex.Flowable;
 import io.reactivex.Observable;
@@ -64,5 +65,5 @@ public interface SurveyRepository {
 
     Observable<List<String>> downloadMissingAndDeleted(List<String> formIds, String deviceId);
 
-    Observable<Boolean> processTransmissions(String deviceId);
+    Observable<Set<String>> processTransmissions(String deviceId);
 }

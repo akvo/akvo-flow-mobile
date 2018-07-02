@@ -36,11 +36,12 @@ import org.akvo.flow.data.entity.S3File;
 import org.akvo.flow.data.entity.SurveyMapper;
 import org.akvo.flow.data.entity.SyncedTimeMapper;
 import org.akvo.flow.data.entity.Transmission;
-import org.akvo.flow.data.entity.TransmissionError;
+import org.akvo.flow.data.entity.UploadError;
 import org.akvo.flow.data.entity.TransmissionFilenameMapper;
 import org.akvo.flow.data.entity.TransmissionMapper;
-import org.akvo.flow.data.entity.TransmissionResult;
-import org.akvo.flow.data.entity.TransmissionSuccess;
+import org.akvo.flow.data.entity.UploadFormDeletedError;
+import org.akvo.flow.data.entity.UploadResult;
+import org.akvo.flow.data.entity.UploadSuccess;
 import org.akvo.flow.data.entity.UserMapper;
 import org.akvo.flow.data.net.RestApi;
 import org.akvo.flow.domain.entity.DataPoint;
@@ -385,7 +386,7 @@ public class SurveyDataRepository implements SurveyRepository {
     }
 
     @Override
-    public Observable<Boolean> processTransmissions(final String deviceId) {
+    public Observable<Set<String>> processTransmissions(final String deviceId) {
         return dataSourceFactory.getDataBaseDataSource().getUnSyncedTransmissions()
                 .map(new Function<Cursor, List<Transmission>>() {
                     @Override
@@ -393,85 +394,98 @@ public class SurveyDataRepository implements SurveyRepository {
                         return transmissionMapper.transform(cursor);
                     }
                 })
-                .concatMap(new Function<List<Transmission>, Observable<Boolean>>() {
+                .concatMap(new Function<List<Transmission>, Observable<Set<String>>>() {
                     @Override
-                    public Observable<Boolean> apply(List<Transmission> transmissions) {
+                    public Observable<Set<String>> apply(List<Transmission> transmissions) {
                         return syncTransmissions(transmissions, deviceId);
                     }
                 });
     }
 
-    private Observable<Boolean> updateSurveyInstance(List<TransmissionResult> list) {
+    private Observable<Set<String>> updateSurveyInstance(List<UploadResult> list) {
         DatabaseDataSource dataBaseDataSource = dataSourceFactory.getDataBaseDataSource();
         Set<Long> failedTransmissions = new HashSet<>();
         Set<Long> successFullTransmissions = new HashSet<>();
-        for (TransmissionResult result : list) {
-            if (result instanceof TransmissionError) {
-                failedTransmissions.add(result.getSurveyInstanceId());
-            } else {
+        final Set<String> deletedFormsTransmissions = new HashSet<>();
+        for (UploadResult result : list) {
+            if (result instanceof UploadSuccess) {
                 successFullTransmissions.add(result.getSurveyInstanceId());
+            } else {
+                failedTransmissions.add(result.getSurveyInstanceId());
+                if (result instanceof UploadFormDeletedError) {
+                    deletedFormsTransmissions.add(((UploadFormDeletedError) result).getFormId());
+                }
             }
         }
         successFullTransmissions.removeAll(failedTransmissions);
-        return Observable.merge(dataBaseDataSource.updateFailedSubmissions(failedTransmissions),
-                dataBaseDataSource.updateSuccessfulSubmissions(successFullTransmissions));
+        return Observable.zip(dataBaseDataSource.updateFailedSubmissions(failedTransmissions),
+                dataBaseDataSource.updateSuccessfulSubmissions(successFullTransmissions),
+                new BiFunction<Boolean, Boolean, Set<String>>() {
+                    @Override
+                    public Set<String> apply(Boolean ignored, Boolean ignored2) {
+                        return deletedFormsTransmissions;
+                    }
+                });
     }
 
-    private Observable<Boolean> syncTransmissions(List<Transmission> transmissions,
+    private Observable<Set<String>> syncTransmissions(List<Transmission> transmissions,
             final String deviceId) {
         return Observable.fromIterable(transmissions)
-                .concatMap(new Function<Transmission, Observable<TransmissionResult>>() {
+                .concatMap(new Function<Transmission, Observable<UploadResult>>() {
                     @Override
-                    public Observable<TransmissionResult> apply(final Transmission transmission) {
+                    public Observable<UploadResult> apply(final Transmission transmission) {
                         return syncTransmission(transmission, deviceId);
                     }
                 })
                 .toList().toObservable()
-                .concatMap(new Function<List<TransmissionResult>, Observable<Boolean>>() {
+                .concatMap(new Function<List<UploadResult>, Observable<Set<String>>>() {
                     @Override
-                    public Observable<Boolean> apply(List<TransmissionResult> list) {
+                    public Observable<Set<String>> apply(List<UploadResult> list) {
                         return updateSurveyInstance(list);
                     }
                 });
     }
 
-    private Observable<TransmissionResult> syncTransmission(final Transmission transmission,
+    private Observable<UploadResult> syncTransmission(final Transmission transmission,
             final String deviceId) {
         final DatabaseDataSource dataBaseDataSource = dataSourceFactory.getDataBaseDataSource();
         final long transmissionId = transmission.getId();
         final long surveyInstanceId = transmission.getRespondentId();
+        final String formId = transmission.getFormId();
         return restApi.uploadFile(transmission)
-                .concatMap(new Function<ResponseBody, Observable<ResponseBody>>() {
+                .concatMap(new Function<ResponseBody, Observable<?>>() {
                     @Override
-                    public Observable<ResponseBody> apply(ResponseBody ignored) {
+                    public Observable<?> apply(ResponseBody ignored) {
                         S3File s3File = transmission.getS3File();
                         return restApi.notifyFileAvailable(s3File.getAction(),
                                 transmission.getFormId(), s3File.getFile().getName(), deviceId);
                     }
                 })
-                .doOnNext(new Consumer<ResponseBody>() {
+                .doOnNext(new Consumer<Object>() {
                     @Override
-                    public void accept(ResponseBody ignored) {
+                    public void accept(Object o) {
                         dataBaseDataSource.setFileTransmissionSucceeded(transmissionId);
                     }
                 })
-                .doOnError(new Consumer<Throwable>() {
+                .map(new Function<Object, UploadResult>() {
                     @Override
-                    public void accept(Throwable throwable) {
-                        dataBaseDataSource.setFileTransmissionFailed(transmissionId);
+                    public UploadResult apply(Object ignored) {
+                        return new UploadSuccess(surveyInstanceId);
                     }
                 })
-                .map(new Function<ResponseBody, TransmissionResult>() {
+                .onErrorReturn(new Function<Throwable, UploadResult>() {
                     @Override
-                    public TransmissionResult apply(ResponseBody ignored) {
-                        return new TransmissionSuccess(surveyInstanceId);
-                    }
-                })
-                .onErrorReturn(new Function<Throwable, TransmissionResult>() {
-                    @Override
-                    public TransmissionResult apply(Throwable throwable) {
+                    public UploadResult apply(Throwable throwable) {
                         Timber.e(throwable);
-                        return new TransmissionError(surveyInstanceId);
+                        boolean formNotFound = throwable instanceof HttpException && (
+                                ((HttpException) throwable).code() == 404);
+                        if (formNotFound) {
+                            dataBaseDataSource.setFileTransmissionFormDeleted(transmissionId);
+                            return new UploadFormDeletedError(surveyInstanceId, formId);
+                        } else {
+                            dataBaseDataSource.setFileTransmissionFailed(transmissionId);
+                            return new UploadError(surveyInstanceId);
+                        }
                     }
                 });
     }

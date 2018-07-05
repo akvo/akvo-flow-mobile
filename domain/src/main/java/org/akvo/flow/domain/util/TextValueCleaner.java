@@ -32,27 +32,29 @@ public class TextValueCleaner {
     public TextValueCleaner() {
     }
 
-    public String cleanVal(@Nullable String val) {
-        if (val != null) {
-            if (val.contains(DELIMITER)) {
-                val = val.replace(DELIMITER, SPACE);
+    public String cleanVal(@Nullable String value) {
+        String cleanValue = value;
+        if (cleanValue != null) {
+            if (cleanValue.contains(DELIMITER)) {
+                cleanValue = cleanValue.replace(DELIMITER, SPACE);
             }
-            if (val.contains(",")) {
-                val = val.replace(",", SPACE);
+            if (cleanValue.contains(",")) {
+                cleanValue = cleanValue.replace(",", SPACE);
             }
-            if (val.contains("\n")) {
-                val = val.replace("\n", SPACE);
+            if (cleanValue.contains("\n")) {
+                cleanValue = cleanValue.replace("\n", SPACE);
             }
         }
-        return val;
+        return cleanValue;
     }
 
-    public String sanitizeValue(String value) {
-        if (value != null) {
-            value = value.replace("\n", SPACE);
-            value = value.replace(DELIMITER, SPACE);
-            value = value.trim();
+    public String sanitizeValue(@Nullable String value) {
+        String cleanValue = value;
+        if (cleanValue != null) {
+            cleanValue = cleanValue.trim();
+            cleanValue = cleanValue.replace("\n", SPACE);
+            cleanValue = cleanValue.replace(DELIMITER, SPACE);
         }
-        return value;
+        return cleanValue;
     }
 }

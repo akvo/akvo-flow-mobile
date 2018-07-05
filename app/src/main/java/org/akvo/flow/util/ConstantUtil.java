@@ -167,7 +167,6 @@ public class ConstantUtil {
     /**
      * S3 bucket directories (object prefixes)
      */
-    public static final String S3_DATA_DIR = "devicezip/";
     public static final String S3_IMAGE_DIR = "images/";
     public static final String S3_SURVEYS_DIR = "surveys/";
 
@@ -235,11 +234,6 @@ public class ConstantUtil {
      * 7 days
      */
     public static final int UPDATE_NOTIFICATION_DELAY_IN_MS = 7 * 60 * 60 * 24 * 1000;
-
-    /**
-     * 1 day
-     */
-    public static final int DINO_NOTIFICATION_DELAY_IN_MS = 1 * 60 * 60 * 24 * 1000;
 
     //requests
     public static final int PHOTO_ACTIVITY_REQUEST = 1;

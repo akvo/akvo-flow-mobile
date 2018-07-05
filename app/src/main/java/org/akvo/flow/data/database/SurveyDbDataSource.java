@@ -40,7 +40,6 @@ import org.akvo.flow.database.SurveyDbAdapter;
 import org.akvo.flow.database.SurveyGroupColumns;
 import org.akvo.flow.database.SurveyInstanceColumns;
 import org.akvo.flow.database.SurveyInstanceStatus;
-import org.akvo.flow.database.TransmissionStatus;
 import org.akvo.flow.database.britedb.BriteSurveyDbAdapter;
 import org.akvo.flow.domain.FileTransmission;
 import org.akvo.flow.domain.QuestionResponse;
@@ -494,21 +493,8 @@ public class SurveyDbDataSource {
         surveyDbAdapter.deleteResponse(mSurveyInstanceId, questionId);
     }
 
-    public void createTransmission(long surveyInstanceId, String formId, String filename) {
-        briteSurveyDbAdapter
-                .createTransmission(surveyInstanceId, formId, filename, TransmissionStatus.QUEUED);
-    }
-
     public void deleteResponse(long mSurveyInstanceId, String questionId, String iteration) {
         surveyDbAdapter.deleteResponse(mSurveyInstanceId, questionId, iteration);
-    }
-
-    public Cursor getResponsesData(long surveyInstanceId) {
-        return surveyDbAdapter.getResponsesData(surveyInstanceId);
-    }
-
-    public Cursor getSurveyInstancesByStatus(int status) {
-        return surveyDbAdapter.getSurveyInstancesByStatus(status);
     }
 
     public String createSurveyedLocale(long id) {

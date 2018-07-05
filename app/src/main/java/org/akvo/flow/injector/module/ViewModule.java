@@ -20,12 +20,15 @@
 
 package org.akvo.flow.injector.module;
 
+import org.akvo.flow.domain.entity.DeviceIdMapper;
 import org.akvo.flow.domain.interactor.AllowedToConnect;
 import org.akvo.flow.domain.interactor.CheckDeviceNotifications;
+import org.akvo.flow.domain.interactor.CheckSubmittedFiles;
 import org.akvo.flow.domain.interactor.ClearAllData;
 import org.akvo.flow.domain.interactor.ClearResponses;
 import org.akvo.flow.domain.interactor.CopyVideo;
 import org.akvo.flow.domain.interactor.DeleteSurvey;
+import org.akvo.flow.domain.interactor.ExportSurveyInstances;
 import org.akvo.flow.domain.interactor.GetAllSurveys;
 import org.akvo.flow.domain.interactor.GetIsDeviceSetUp;
 import org.akvo.flow.domain.interactor.GetPublishDataTime;
@@ -51,6 +54,7 @@ import org.akvo.flow.domain.interactor.users.EditUser;
 import org.akvo.flow.domain.interactor.users.GetSelectedUser;
 import org.akvo.flow.domain.interactor.users.GetUsers;
 import org.akvo.flow.domain.interactor.users.SelectUser;
+import org.akvo.flow.domain.repository.FileRepository;
 import org.akvo.flow.domain.repository.SurveyRepository;
 import org.akvo.flow.domain.repository.UserRepository;
 import org.akvo.flow.domain.util.ConnectivityStateManager;
@@ -256,5 +260,21 @@ public class ViewModule {
     UseCase provideDeviceNotificationSync(SurveyRepository surveyRepository,
             UserRepository userRepository) {
         return new CheckDeviceNotifications(null, null, surveyRepository, userRepository);
+    }
+
+    @Provides
+    @Named("checkSubmittedFilesSync")
+    UseCase provideSubmittedFilesSync(SurveyRepository surveyRepository,
+            FileRepository fileRepository) {
+        return new CheckSubmittedFiles(null, null, surveyRepository, fileRepository);
+    }
+
+    @Provides
+    @Named("exportSurveyInstancesSync")
+    UseCase provideExportSurveyInstancesSync(DeviceIdMapper mapper,
+            SurveyRepository surveyRepository, FileRepository fileRepository,
+            UserRepository userRepository) {
+        return new ExportSurveyInstances(null, null, userRepository, mapper, surveyRepository,
+                fileRepository);
     }
 }

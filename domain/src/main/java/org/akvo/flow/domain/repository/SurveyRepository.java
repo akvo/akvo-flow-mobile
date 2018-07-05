@@ -23,6 +23,8 @@ package org.akvo.flow.domain.repository;
 import android.support.annotation.Nullable;
 
 import org.akvo.flow.domain.entity.DataPoint;
+import org.akvo.flow.domain.entity.FormInstanceMetadata;
+import org.akvo.flow.domain.entity.InstanceIdUuid;
 import org.akvo.flow.domain.entity.Survey;
 import org.akvo.flow.domain.entity.User;
 
@@ -66,4 +68,14 @@ public interface SurveyRepository {
     Observable<List<String>> downloadMissingAndDeleted(List<String> formIds, String deviceId);
 
     Observable<Set<String>> processTransmissions(String deviceId);
+
+    Observable<List<InstanceIdUuid>> getSubmittedInstances();
+
+    Observable<Boolean> setInstanceStatusToRequested(long id);
+
+    Observable<List<Long>> getPendingSurveyInstances();
+
+    Observable<FormInstanceMetadata> getFormInstanceData(Long instanceId, String deviceId);
+
+    Observable<Boolean> createTransmissions(Long instanceId, String formId, Set<String> fileNames);
 }

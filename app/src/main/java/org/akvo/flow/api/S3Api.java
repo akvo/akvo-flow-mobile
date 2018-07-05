@@ -59,7 +59,7 @@ public class S3Api {
         mSecret = BuildConfig.AWS_SECRET_KEY;
     }
 
-    public String getEtag(String objectKey) throws IOException {
+    private String getEtag(String objectKey) throws IOException {
         // Get date and signature
         final String date = getDate();
         final String payload = String.format(PAYLOAD_HEAD, date, mBucket, objectKey);

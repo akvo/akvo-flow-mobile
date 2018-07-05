@@ -57,6 +57,10 @@ public class BriteSurveyDbAdapter {
 
     private static final int DOES_NOT_EXIST = -1;
 
+    private static final String SURVEY_INSTANCE_JOIN_RESPONSE_USER = "survey_instance "
+            + "LEFT OUTER JOIN response ON survey_instance._id=response.survey_instance_id "
+            + "LEFT OUTER JOIN user ON survey_instance.user_id=user._id";
+
     private final BriteDatabase briteDatabase;
 
     public BriteSurveyDbAdapter(BriteDatabase briteDatabase) {
@@ -251,6 +255,33 @@ public class BriteSurveyDbAdapter {
             id = briteDatabase.insert(Tables.SURVEY_INSTANCE, values);
         }
         return id;
+    }
+
+    public Cursor getSurveyInstancesByStatus(int status) {
+        String sql = "SELECT " + SurveyInstanceColumns._ID + ", " + SurveyInstanceColumns.UUID
+                + " FROM " + Tables.SURVEY_INSTANCE
+                + " WHERE " + SurveyInstanceColumns.STATUS + " = ?";
+        return briteDatabase.query(sql, String.valueOf(status));
+    }
+
+    public Cursor getResponses(long surveyInstanceId) {
+        String sql = "SELECT " + SurveyInstanceColumns.SURVEY_ID + ", "
+                + SurveyInstanceColumns.SUBMITTED_DATE + ", "
+                + SurveyInstanceColumns.UUID + ", "
+                + SurveyInstanceColumns.START_DATE + ", "
+                + SurveyInstanceColumns.RECORD_ID + ", "
+                + SurveyInstanceColumns.DURATION + ", "
+                + ResponseColumns.ANSWER + ", "
+                + ResponseColumns.TYPE + ", "
+                + ResponseColumns.QUESTION_ID + ", "
+                + ResponseColumns.FILENAME + ", "
+                + UserColumns.NAME + ", "
+                + UserColumns.EMAIL + ", "
+                + ResponseColumns.ITERATION
+                + " FROM " + SURVEY_INSTANCE_JOIN_RESPONSE_USER
+                + " WHERE " + ResponseColumns.SURVEY_INSTANCE_ID + " = ? AND "
+                + ResponseColumns.INCLUDE + " = 1";
+        return briteDatabase.query(sql, String.valueOf(surveyInstanceId));
     }
 
     public BriteDatabase.Transaction beginTransaction() {

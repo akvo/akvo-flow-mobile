@@ -32,6 +32,7 @@ import android.support.annotation.Nullable;
 import android.support.media.ExifInterface;
 import android.text.TextUtils;
 
+import org.akvo.flow.data.util.FileHelper;
 import org.akvo.flow.data.util.ImageSize;
 
 import java.io.BufferedOutputStream;

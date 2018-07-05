@@ -18,18 +18,23 @@
  *
  */
 
-package org.akvo.flow.data.util;
+package org.akvo.flow.domain.entity;
 
-public class Constants {
+public class InstanceIdUuid {
 
-    public static final String ARCHIVE_SUFFIX = ".zip";
-    public static final String JPG_SUFFIX = ".jpg";
-    public static final String PNG_SUFFIX = ".png";
-    public static final String VIDEO_SUFFIX = ".mp4";
-    public static final String DATA_CONTENT_TYPE = "application/zip";
-    public static final String JPEG_CONTENT_TYPE = "image/jpeg";
-    public static final String PNG_CONTENT_TYPE = "image/png";
-    public static final String VIDEO_CONTENT_TYPE = "video/mp4";
-    public static final String SURVEY_DATA_FILE_JSON = "data.json";
-    public static final String UTF_8_CHARSET = "UTF-8";
+    private final long id;
+    private final String uuid;
+
+    public InstanceIdUuid(long id, String uuid) {
+        this.id = id;
+        this.uuid = uuid;
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public String getUuid() {
+        return uuid;
+    }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -23,10 +23,7 @@ package org.akvo.flow.util.files;
 import android.content.Context;
 import android.support.annotation.NonNull;
 
-import org.akvo.flow.util.files.FileBrowser;
-
 import java.io.File;
-import java.util.List;
 
 import javax.inject.Inject;
 
@@ -50,10 +47,5 @@ public class FormResourcesFileBrowser extends FileBrowser {
     @NonNull
     public File findFile(Context context, String fileName) {
         return fileBrowser.findFile(context, DIR_RES, fileName);
-    }
-
-    @NonNull
-    public List<File> findAllPossibleFolders(Context context) {
-        return fileBrowser.findAllPossibleFolders(context, DIR_RES);
     }
 }

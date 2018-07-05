@@ -18,35 +18,25 @@
  *
  */
 
-package org.akvo.flow.util.files;
+package org.akvo.flow.domain.entity;
 
-import android.content.Context;
+import android.support.annotation.Nullable;
 
-import org.akvo.flow.util.ConstantUtil;
-
-import java.io.File;
+import org.akvo.flow.domain.util.TextValueCleaner;
 
 import javax.inject.Inject;
 
-public class ZipFileBrowser {
+public class DeviceIdMapper {
 
-    private static final String DIR_DATA = "akvoflow/data/files";
-
-    private final FileBrowser fileBrowser;
-    private final Context context;
+    private final TextValueCleaner textValueCleaner;
 
     @Inject
-    public ZipFileBrowser(FileBrowser fileBrowser, Context context) {
-        this.fileBrowser = fileBrowser;
-        this.context = context;
+    public DeviceIdMapper(TextValueCleaner textValueCleaner) {
+        this.textValueCleaner = textValueCleaner;
     }
 
-    public File getSurveyInstanceFile(String uuid) {
-        return new File(fileBrowser.getExistingAppInternalFolder(context, DIR_DATA),
-                uuid + ConstantUtil.ARCHIVE_SUFFIX);
-    }
-
-    public File getZipFile(String filename) {
-        return new File(fileBrowser.getExistingAppInternalFolder(context, DIR_DATA), filename);
+    @Nullable
+    public String cleanVal(@Nullable String val) {
+        return textValueCleaner.cleanVal(val);
     }
 }

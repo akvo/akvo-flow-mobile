@@ -18,9 +18,10 @@
  *
  */
 
-package org.akvo.flow.data.datasource;
+package org.akvo.flow.data.util;
 
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 import android.util.Base64;
 
 import java.io.BufferedInputStream;
@@ -34,6 +35,10 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.zip.Adler32;
+import java.util.zip.CheckedOutputStream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import javax.inject.Inject;
 
@@ -84,7 +89,7 @@ public class FileHelper {
         }
     }
 
-    String copyFileToFolder(File originalFile, File destinationFolder) throws IOException {
+    public String copyFileToFolder(File originalFile, File destinationFolder) throws IOException {
         File file = new File(destinationFolder, originalFile.getName());
         return copyFile(originalFile, file);
     }
@@ -94,7 +99,7 @@ public class FileHelper {
      *
      * @return the destination file path if copy succeeded, null otherwise
      */
-    String copyFile(File originalFile, File destinationFile) throws IOException {
+    public String copyFile(File originalFile, File destinationFile) throws IOException {
         String destinationPath = null;
         InputStream in = null;
         OutputStream out = null;
@@ -117,7 +122,7 @@ public class FileHelper {
         return destinationPath;
     }
 
-    void close(Closeable closeable) {
+    public void close(Closeable closeable) {
         if (closeable != null) {
             try {
                 closeable.close();
@@ -131,8 +136,8 @@ public class FileHelper {
      * deletes all files in the directory (recursively) AND then deletes the
      * directory itself if the "deleteFlag" is true
      */
-    @SuppressWarnings({ "unchecked", "ResultOfMethodCallIgnored" })
-    void deleteFilesInDirectory(File folder, boolean deleteFolder) {
+    @SuppressWarnings({ "unchecked", "ResultOfMethodCallIgnored" }) public void deleteFilesInDirectory(
+            File folder, boolean deleteFolder) {
         if (folder != null && folder.exists() && folder.isDirectory()) {
             File[] files = folder.listFiles();
             if (files != null) {
@@ -150,5 +155,30 @@ public class FileHelper {
                 folder.delete();
             }
         }
+    }
+
+    @Nullable
+    public String getFilenameFromPath(@Nullable String filePath) {
+        String filename = null;
+        if (!TextUtils.isEmpty(filePath) && filePath.contains(File.separator)
+                && filePath.contains(".")) {
+            filename = filePath.substring(filePath.lastIndexOf(File.separator) + 1);
+        }
+        return filename;
+    }
+
+    public void writeZipFile(File zipFolder, String zipFileName, String formInstanceData)
+            throws IOException {
+        File zipFile = new File(zipFolder, zipFileName);
+        Timber.d("Writing zip to file " + zipFile.getName());
+        FileOutputStream fout;
+        fout = new FileOutputStream(zipFile);
+        CheckedOutputStream checkedOutStream = new CheckedOutputStream(fout, new Adler32());
+        ZipOutputStream zos = new ZipOutputStream(checkedOutStream);
+        zos.putNextEntry(new ZipEntry(Constants.SURVEY_DATA_FILE_JSON));
+        byte[] allBytes = formInstanceData.getBytes(Constants.UTF_8_CHARSET);
+        zos.write(allBytes, 0, allBytes.length);
+        zos.closeEntry();
+        zos.close();
     }
 }

@@ -46,6 +46,7 @@ import java.util.Set;
 import javax.inject.Inject;
 
 import io.reactivex.Observable;
+import io.reactivex.functions.Function;
 
 public class DatabaseDataSource {
 
@@ -299,6 +300,49 @@ public class DatabaseDataSource {
         } finally {
             transaction.end();
         }
+        return Observable.just(true);
+    }
+
+    public Observable<Cursor> getSubmittedInstances() {
+        return Observable.just(briteSurveyDbAdapter
+                .getSurveyInstancesByStatus(SurveyInstanceStatus.SUBMITTED));
+    }
+
+    public Observable<Boolean> setInstanceStatusToRequested(long id) {
+        briteSurveyDbAdapter.updateSurveyInstanceStatus(id, SurveyInstanceStatus.SUBMIT_REQUESTED);
+        return Observable.just(true);
+    }
+
+    public Observable<Cursor> getPendingSurveyInstances() {
+        return Observable.just(briteSurveyDbAdapter
+                .getSurveyInstancesByStatus(SurveyInstanceStatus.SUBMIT_REQUESTED));
+    }
+
+    public Observable<Boolean> setInstanceStatusToSubmitted(long id) {
+        briteSurveyDbAdapter.updateSurveyInstanceStatus(id, SurveyInstanceStatus.SUBMITTED);
+        return Observable.just(true);
+    }
+
+    public Observable<Cursor> getResponses(Long surveyInstanceId) {
+        return Observable.just(briteSurveyDbAdapter.getResponses(surveyInstanceId));
+    }
+
+
+    public Observable<List<Boolean>> createTransmissions(final Long instanceId, final String formId,
+            Set<String> filenames) {
+        return Observable.fromIterable(filenames)
+                .concatMap(new Function<String, Observable<Boolean>>() {
+                    @Override
+                    public Observable<Boolean> apply(final String filename) {
+                        return insertTransmission(instanceId, formId, filename);
+                    }
+                })
+                .toList().toObservable();
+    }
+
+    private Observable<Boolean> insertTransmission(Long instanceId, String formId, String filename) {
+        briteSurveyDbAdapter
+                .createTransmission(instanceId, formId, filename, TransmissionStatus.QUEUED);
         return Observable.just(true);
     }
 }

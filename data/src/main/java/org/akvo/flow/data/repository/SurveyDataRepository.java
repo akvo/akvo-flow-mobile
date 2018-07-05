@@ -32,19 +32,23 @@ import org.akvo.flow.data.entity.DataPointMapper;
 import org.akvo.flow.data.entity.FilesResultMapper;
 import org.akvo.flow.data.entity.FilteredFilesResult;
 import org.akvo.flow.data.entity.FormIdMapper;
+import org.akvo.flow.data.entity.FormInstanceMapper;
+import org.akvo.flow.data.entity.FormInstanceMetadataMapper;
 import org.akvo.flow.data.entity.S3File;
 import org.akvo.flow.data.entity.SurveyMapper;
 import org.akvo.flow.data.entity.SyncedTimeMapper;
 import org.akvo.flow.data.entity.Transmission;
-import org.akvo.flow.data.entity.UploadError;
 import org.akvo.flow.data.entity.TransmissionFilenameMapper;
 import org.akvo.flow.data.entity.TransmissionMapper;
+import org.akvo.flow.data.entity.UploadError;
 import org.akvo.flow.data.entity.UploadFormDeletedError;
 import org.akvo.flow.data.entity.UploadResult;
 import org.akvo.flow.data.entity.UploadSuccess;
 import org.akvo.flow.data.entity.UserMapper;
 import org.akvo.flow.data.net.RestApi;
 import org.akvo.flow.domain.entity.DataPoint;
+import org.akvo.flow.domain.entity.FormInstanceMetadata;
+import org.akvo.flow.domain.entity.InstanceIdUuid;
 import org.akvo.flow.domain.entity.Survey;
 import org.akvo.flow.domain.entity.User;
 import org.akvo.flow.domain.exception.AssignmentRequiredException;
@@ -87,6 +91,8 @@ public class SurveyDataRepository implements SurveyRepository {
     private final FormIdMapper surveyIdMapper;
     private final FilesResultMapper filesResultMapper;
     private final TransmissionMapper transmissionMapper;
+    private final FormInstanceMapper formInstanceMapper;
+    private final FormInstanceMetadataMapper formInstanceMetadataMapper;
 
     //TODO: this needs to be split, too many methods and params
     @Inject
@@ -94,7 +100,9 @@ public class SurveyDataRepository implements SurveyRepository {
             DataPointMapper dataPointMapper, SyncedTimeMapper syncedTimeMapper, RestApi restApi,
             SurveyMapper surveyMapper, UserMapper userMapper,
             TransmissionFilenameMapper transmissionFilenameMapper, FormIdMapper surveyIdMapper,
-            FilesResultMapper filesResultMapper, TransmissionMapper transmissionMapper) {
+            FilesResultMapper filesResultMapper, TransmissionMapper transmissionMapper,
+            FormInstanceMapper formInstanceMapper,
+            FormInstanceMetadataMapper formInstanceMetadataMapper) {
         this.dataSourceFactory = dataSourceFactory;
         this.dataPointMapper = dataPointMapper;
         this.syncedTimeMapper = syncedTimeMapper;
@@ -105,6 +113,8 @@ public class SurveyDataRepository implements SurveyRepository {
         this.surveyIdMapper = surveyIdMapper;
         this.filesResultMapper = filesResultMapper;
         this.transmissionMapper = transmissionMapper;
+        this.formInstanceMapper = formInstanceMapper;
+        this.formInstanceMetadataMapper = formInstanceMetadataMapper;
     }
 
     @Override
@@ -398,6 +408,59 @@ public class SurveyDataRepository implements SurveyRepository {
                     @Override
                     public Observable<Set<String>> apply(List<Transmission> transmissions) {
                         return syncTransmissions(transmissions, deviceId);
+                    }
+                });
+    }
+
+    @Override
+    public Observable<List<InstanceIdUuid>> getSubmittedInstances() {
+        return dataSourceFactory.getDataBaseDataSource().getSubmittedInstances()
+                .map(new Function<Cursor, List<InstanceIdUuid>>() {
+                    @Override
+                    public List<InstanceIdUuid> apply(Cursor cursor) {
+                        return formInstanceMapper.getInstanceIdUuids(cursor);
+                    }
+                });
+    }
+
+    @Override
+    public Observable<Boolean> setInstanceStatusToRequested(long id) {
+        return dataSourceFactory.getDataBaseDataSource().setInstanceStatusToRequested(id);
+    }
+
+    @Override
+    public Observable<List<Long>> getPendingSurveyInstances() {
+        return dataSourceFactory.getDataBaseDataSource().getPendingSurveyInstances()
+                .map(new Function<Cursor, List<Long>>(){
+                    @Override
+                    public List<Long> apply(Cursor cursor) {
+                        return formInstanceMapper.getInstanceIds(cursor);
+                    }
+                });
+    }
+
+    @Override
+    public Observable<FormInstanceMetadata> getFormInstanceData(Long instanceId,
+            final String deviceId) {
+        return dataSourceFactory.getDataBaseDataSource().getResponses(instanceId).map(
+                new Function<Cursor, FormInstanceMetadata>() {
+                    @Override
+                    public FormInstanceMetadata apply(Cursor cursor) {
+                        return formInstanceMetadataMapper.transform(cursor, deviceId);
+                    }
+                });
+    }
+
+    @Override
+    public Observable<Boolean> createTransmissions(final Long instanceId, final String formId,
+            Set<String> fileNames) {
+        final DatabaseDataSource dataBaseDataSource = dataSourceFactory.getDataBaseDataSource();
+        return dataBaseDataSource
+                .createTransmissions(instanceId, formId, fileNames)
+                .flatMap(new Function<List<Boolean>, Observable<Boolean>>() {
+                    @Override
+                    public Observable<Boolean> apply(List<Boolean> ignored) {
+                        return dataBaseDataSource.setInstanceStatusToSubmitted(instanceId);
                     }
                 });
     }

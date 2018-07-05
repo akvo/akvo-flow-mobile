@@ -40,9 +40,6 @@ import java.util.List;
  */
 public class SurveyDbAdapter {
 
-    private static final String SURVEY_INSTANCE_JOIN_RESPONSE_USER = "survey_instance "
-            + "LEFT OUTER JOIN response ON survey_instance._id=response.survey_instance_id "
-            + "LEFT OUTER JOIN user ON survey_instance.user_id=user._id";
     private static final String SURVEY_INSTANCE_JOIN_SURVEY = "survey_instance "
             + "JOIN survey ON survey_instance.survey_id = survey.survey_id "
             + "JOIN survey_group ON survey.survey_group_id=survey_group.survey_group_id";
@@ -96,30 +93,6 @@ public class SurveyDbAdapter {
         if (databaseHelper != null) {
             databaseHelper.close();
         }
-    }
-
-    public Cursor getSurveyInstancesByStatus(int status) {
-        return database.query(Tables.SURVEY_INSTANCE,
-                new String[] { SurveyInstanceColumns._ID, SurveyInstanceColumns.UUID },
-                SurveyInstanceColumns.STATUS + " = ?",
-                new String[] { String.valueOf(status) },
-                null, null, null);
-    }
-
-    public Cursor getResponsesData(long surveyInstanceId) {
-        return database.query(SURVEY_INSTANCE_JOIN_RESPONSE_USER,
-                new String[] {
-                        SurveyInstanceColumns.SURVEY_ID, SurveyInstanceColumns.SUBMITTED_DATE,
-                        SurveyInstanceColumns.UUID, SurveyInstanceColumns.START_DATE,
-                        SurveyInstanceColumns.RECORD_ID, SurveyInstanceColumns.DURATION,
-                        ResponseColumns.ANSWER, ResponseColumns.TYPE, ResponseColumns.QUESTION_ID,
-                        ResponseColumns.FILENAME, UserColumns.NAME, UserColumns.EMAIL,
-                        ResponseColumns.ITERATION
-                },
-                ResponseColumns.SURVEY_INSTANCE_ID + " = ? AND " + ResponseColumns.INCLUDE + " = 1",
-                new String[] {
-                        String.valueOf(surveyInstanceId)
-                }, null, null, null);
     }
 
     /**

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -281,7 +281,7 @@ public class DataPointsMapFragment extends SupportMapFragment implements OnInfoW
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.sync_records:
+            case R.id.download:
                 presenter.onSyncRecordsPressed();
                 return true;
             default:

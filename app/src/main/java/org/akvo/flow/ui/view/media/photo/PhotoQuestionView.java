@@ -22,6 +22,7 @@ package org.akvo.flow.ui.view.media.photo;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.View;
@@ -126,13 +127,13 @@ public class PhotoQuestionView extends QuestionView implements
 
     @OnClick(R.id.image)
     void onImageViewClicked() {
-        String filename = mMedia != null ? mMedia.getFilename() : null;
-        if (TextUtils.isEmpty(filename) || !(new File(filename).exists())) {
+        File file = rebuildFilePath();
+        if (file != null && file.exists()) {
+            AppCompatActivity activity = (AppCompatActivity) getContext();
+            navigator.navigateToLargeImage(activity, file.getAbsolutePath());
+        } else {
             showImageError();
-            return;
         }
-        AppCompatActivity activity = (AppCompatActivity) getContext();
-        navigator.navigateToLargeImage(activity, filename);
     }
 
     @OnClick(R.id.media_btn)
@@ -141,7 +142,7 @@ public class PhotoQuestionView extends QuestionView implements
     }
 
     @OnClick(R.id.media_download)
-    void onVideoDownloadClick() {
+    void onImageDownloadClick() {
         showLoading();
 
         MediaSyncTask downloadTask = new MediaSyncTask(getContext(),
@@ -253,14 +254,11 @@ public class PhotoQuestionView extends QuestionView implements
     private void displayThumbnail() {
         hideDownloadViews();
 
-        String filename = mMedia != null ? mMedia.getFilename() : null;
-        if (TextUtils.isEmpty(filename)) {
-            return;
-        }
-        if (!new File(filename).exists()) {
-            showImageCanBeDownloaded();
+        File file = rebuildFilePath();
+        if (file != null && file.exists()) {
+            imageLoader.loadFromFile(file, mImageView);
         } else {
-            imageLoader.loadFromFile(new File(filename), mImageView);
+            showImageCanBeDownloaded();
         }
     }
 
@@ -299,8 +297,10 @@ public class PhotoQuestionView extends QuestionView implements
             location.setAccuracy(accuracy);
 
             mMedia.setLocation(location);
-            // Add location to EXIF too
-            ImageUtil.setLocation(mMedia.getFilename(), latitude, longitude);
+            File file = rebuildFilePath();
+            if (file != null && file.exists()) {
+                ImageUtil.setLocation(file.getAbsolutePath(), latitude, longitude);
+            }
 
             captureResponse();
             displayLocationInfo();
@@ -319,24 +319,34 @@ public class PhotoQuestionView extends QuestionView implements
 
     @Override
     public void displayLocationInfo() {
-        String filename = mMedia != null ? mMedia.getFilename() : null;
-        if (TextUtils.isEmpty(filename) || !new File(filename).exists()) {
-            mLocationInfo.setVisibility(GONE);
-            return;
-        }
-
-        mLocationInfo.setVisibility(VISIBLE);
-        double[] location = ImageUtil.getLocation(filename);
-        if (location != null) {
-            mLocationInfo.setText(R.string.image_location_saved);
-        } else if (mLocationListener.isListening()) {
-            mLocationInfo.setText(R.string.image_location_reading);
+        File file = rebuildFilePath();
+        if (file != null && file.exists()) {
+            mLocationInfo.setVisibility(VISIBLE);
+            double[] location = ImageUtil.getLocation(file.getAbsolutePath());
+            if (location != null) {
+                mLocationInfo.setText(R.string.image_location_saved);
+            } else if (mLocationListener.isListening()) {
+                mLocationInfo.setText(R.string.image_location_reading);
+            } else {
+                mLocationInfo.setText(R.string.image_location_unknown);
+            }
         } else {
-            mLocationInfo.setText(R.string.image_location_unknown);
+            mLocationInfo.setVisibility(GONE);
         }
     }
 
     private void showImageError() {
         snackBarManager.displaySnackBar(this, R.string.error_img_preview, getContext());
+    }
+
+    /**
+     * File paths cannot be trusted so we need to get the name of the file and rebuild the path.
+     * All media files should be located in the same folder
+     * @return File with the correct file path on the device
+     */
+    @Nullable
+    private File rebuildFilePath() {
+        String filePath = mMedia != null ? mMedia.getFilename() : null;
+        return presenter.getExistingImageFilePath(filePath);
     }
 }

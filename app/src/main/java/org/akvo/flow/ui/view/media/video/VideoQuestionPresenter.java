@@ -29,6 +29,7 @@ import org.akvo.flow.domain.interactor.UseCase;
 import org.akvo.flow.presentation.Presenter;
 import org.akvo.flow.util.MediaFileHelper;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -81,5 +82,20 @@ public class VideoQuestionPresenter implements Presenter {
         } else {
             view.showErrorGettingMedia();
         }
+    }
+
+    @Nullable
+    public File getExistingImageFilePath(@Nullable String filePath) {
+        if (TextUtils.isEmpty(filePath)) {
+            return null;
+        }
+        String filename = filePath;
+        if (filePath.contains(File.separator)) {
+            filename = filePath.substring(filePath.lastIndexOf(File.separator) + 1);
+        }
+        if (TextUtils.isEmpty(filename)) {
+            return null;
+        }
+        return mediaFileHelper.getMediaFile(filename);
     }
 }

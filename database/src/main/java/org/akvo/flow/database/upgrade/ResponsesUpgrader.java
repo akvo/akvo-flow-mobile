@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010-2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -18,32 +18,24 @@
  *
  */
 
-package org.akvo.flow.database;
+package org.akvo.flow.database.upgrade;
 
-public class SurveyInstanceStatus {
+import android.database.sqlite.SQLiteDatabase;
 
-    /**
-     * User started filling a form but did not press submit
-     */
-    public static final int SAVED = 0;
+import org.akvo.flow.database.DatabaseHelper;
 
-    /**
-     * User pressed submit
-     */
-    public static final int SUBMIT_REQUESTED = 1;
+public class ResponsesUpgrader implements DatabaseUpgrader {
 
-    /**
-     * Zip file has been generated
-     */
-    public static final int SUBMITTED = 2;
+    private final DatabaseHelper helper;
+    private final SQLiteDatabase db;
 
-    /**
-     * Datapoint has been sent to the dashboard
-     */
-    public static final int UPLOADED = 3;
+    public ResponsesUpgrader(DatabaseHelper helper, SQLiteDatabase db) {
+        this.helper = helper;
+        this.db = db;
+    }
 
-    /**
-     * Datapoint has been downloaded from the dashboard
-     */
-    public static final int DOWNLOADED = 4;
+    @Override
+    public void upgrade() {
+        helper.upgradeFromResponses(db);
+    }
 }

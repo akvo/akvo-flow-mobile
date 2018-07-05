@@ -47,3 +47,10 @@ captures/
 sentry.properties
 
 !/util/upload-apk/build/libs/deploy-1.0.jar
+
+#CI config
+fastlane/report.xml
+fastlane/README.md
+build_config
+.env.default
+app/fabric.properties

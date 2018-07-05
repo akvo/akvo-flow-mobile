@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -92,7 +92,7 @@ class DataPointListAdapter extends BaseAdapter {
     public View getView(int position, View convertView, @NonNull ViewGroup parent) {
         View view;
         if (convertView == null) {
-            view = inflater.inflate(R.layout.surveyed_locale_item, parent, false);
+            view = inflater.inflate(R.layout.datapoint_list_item, parent, false);
         } else {
             view = convertView;
         }
@@ -124,10 +124,10 @@ class DataPointListAdapter extends BaseAdapter {
                 statusRes = R.drawable.record_submitted_icn;
                 statusText = context.getString(R.string.status_submitted);
                 break;
-            case SurveyInstanceStatus.SYNCED:
+            case SurveyInstanceStatus.UPLOADED:
             case SurveyInstanceStatus.DOWNLOADED:
                 statusRes = R.drawable.record_synced_icn;
-                statusText = context.getString(R.string.status_synced);
+                statusText = context.getString(R.string.status_uploaded);
                 break;
             default:
                 //wrong state

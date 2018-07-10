@@ -125,12 +125,6 @@ public class DataSyncService extends IntentService {
         }, null);
     }
 
-
-
-    // ================================================================= //
-    // ============================ EXPORT ============================= //
-    // ================================================================= //
-
     private void verify() {
         checkPublishedFiles.dispose();
         checkPublishedFiles.execute(new DefaultObserver<List<Boolean>>() {

@@ -33,7 +33,6 @@ import android.support.v4.content.FileProvider;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 
-import org.akvo.flow.BuildConfig;
 import org.akvo.flow.R;
 import org.akvo.flow.activity.AddUserActivity;
 import org.akvo.flow.activity.AppUpdateActivity;
@@ -280,16 +279,6 @@ public class Navigator {
                                 + ConstantUtil.GPS_STATUS_PACKAGE_V2);
         fragment.show(activity.getSupportFragmentManager(),
                 AppDownloadDialogFragment.TAG);
-    }
-
-    /**
-     * Gps status app in play store is only available to 4.0++ devices, for older devices
-     * we need to take them to the browser to download the url
-     */
-    public void downloadGpsStatusViaBrowser(@NonNull Context context) {
-        Intent browserIntent = new Intent(Intent.ACTION_VIEW,
-                Uri.parse(BuildConfig.SERVER_BASE + "/" + "gps"));
-        context.startActivity(browserIntent);
     }
 
     public void navigateToLargeImage(AppCompatActivity activity, String filePath) {

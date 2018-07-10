@@ -1,5 +1,26 @@
 Akvo FLOW app release notes
 ===========================
+# ver 2.5.1.1
+Date: 10 July 2018
+
+# Resolved issues
+* **Data processing request includes the entire file path** - [#1147](https://github.com/akvo/akvo-flow-mobile/issues/1147) Fix for newly submitted data points to be processed correctly.
+* **Remove unused method for old gps app** - [#1143](https://github.com/akvo/akvo-flow-mobile/issues/1143) Remove an unused method.
+
+---------------
+# ver 2.5.1
+Date: 05 July 2018
+
+# New and noteworthy
+* **CI deployment of release branch on uat1 for testing** - [#976](https://github.com/akvo/akvo-flow-mobile/issues/976) Now all commits to release trigger beta builds.
+
+# Resolved issues
+* **Transmission keeps absolute path to files** - [#1084](https://github.com/akvo/akvo-flow-mobile/issues/1084) Fixed issue where files were not found due to full path kept in database transmission table.
+* **Syncing in data points** - [#1116](https://github.com/akvo/akvo-flow-mobile/issues/1116) Getting existing datapoints is now called "Download".
+* **Media files in saved forms** - [#1130](https://github.com/akvo/akvo-flow-mobile/issues/1130) Fixed saved submission images were lost if updated to 2.5.0 before submitting.
+* **Remove transmission item for synced in datapoints** - [#1132](https://github.com/akvo/akvo-flow-mobile/issues/1132) Removed display of confusing UUID which did not correspond to an actual file.
+
+---------------
 # ver 2.5.0
 Date: 4 June 2018
 

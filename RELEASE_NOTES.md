@@ -1,5 +1,13 @@
 Akvo FLOW app release notes
 ===========================
+# ver 2.5.1.1
+Date: 10 July 2018
+
+# Resolved issues
+* **Data processing request includes the entire file path** - [#1147](https://github.com/akvo/akvo-flow-mobile/issues/1147) Fix for newly submitted data points to be processed correctly.
+* **Remove unused method for old gps app** - [#1143](https://github.com/akvo/akvo-flow-mobile/issues/1143) Remove an unused method.
+
+---------------
 # ver 2.5.1
 Date: 05 July 2018
 

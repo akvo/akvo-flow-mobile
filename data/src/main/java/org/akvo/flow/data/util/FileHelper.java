@@ -171,8 +171,7 @@ public class FileHelper {
             throws IOException {
         File zipFile = new File(zipFolder, zipFileName);
         Timber.d("Writing zip to file " + zipFile.getName());
-        FileOutputStream fout;
-        fout = new FileOutputStream(zipFile);
+        FileOutputStream fout = new FileOutputStream(zipFile);
         CheckedOutputStream checkedOutStream = new CheckedOutputStream(fout, new Adler32());
         ZipOutputStream zos = new ZipOutputStream(checkedOutStream);
         zos.putNextEntry(new ZipEntry(Constants.SURVEY_DATA_FILE_JSON));
@@ -180,5 +179,6 @@ public class FileHelper {
         zos.write(allBytes, 0, allBytes.length);
         zos.closeEntry();
         zos.close();
+        fout.close();
     }
 }

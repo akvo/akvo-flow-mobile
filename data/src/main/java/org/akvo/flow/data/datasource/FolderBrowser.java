@@ -100,13 +100,10 @@ public class FolderBrowser {
 
     @Nullable
     File getExistingAppExternalFolder(String folderName) {
-        String path = getAppExternalFolderPath(folderName);
-        File folder = null;
-        if (path != null) {
-            folder = new File(path);
-            if (!folder.exists()) {
-                folder.mkdirs();
-            }
+        String path = getInternalFolder(folderName).getAbsolutePath();
+        File folder = new File(path);
+        if (!folder.exists()) {
+            folder.mkdirs();
         }
         return folder;
     }

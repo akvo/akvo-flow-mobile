@@ -20,7 +20,6 @@
 
 package org.akvo.flow.domain.interactor;
 
-import android.support.annotation.Nullable;
 import android.support.v4.util.Pair;
 
 import org.akvo.flow.domain.entity.InstanceIdUuid;

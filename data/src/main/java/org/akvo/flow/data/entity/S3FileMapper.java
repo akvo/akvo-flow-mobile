@@ -91,7 +91,7 @@ public class S3FileMapper {
             folderName = FolderBrowser.DIR_DATA;
         } else {
             //unsupported file format found
-            folderName =  null;
+            folderName = null;
         }
         File folder = folderBrowser.getInternalFolder(folderName);
         File file = new File(folder, filename);
@@ -118,6 +118,4 @@ public class S3FileMapper {
         }
         return filename.substring(filename.lastIndexOf("."));
     }
-
-
 }

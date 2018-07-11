@@ -164,12 +164,15 @@ public class DataSyncService extends Service {
             public void onNext(Boolean connectAllowed) {
                 if (connectAllowed) {
                     checkDeviceNotification();
+                } else {
+                    stopService();
                 }
             }
 
             @Override
             public void onError(Throwable e) {
                 Timber.e(e);
+                stopService();
             }
         }, null);
     }

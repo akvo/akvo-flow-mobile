@@ -20,13 +20,13 @@
 
 package org.akvo.flow.domain.interactor;
 
-import org.akvo.flow.domain.entity.DeviceIdMapper;
 import org.akvo.flow.domain.entity.FormInstanceMetadata;
 import org.akvo.flow.domain.executor.PostExecutionThread;
 import org.akvo.flow.domain.executor.ThreadExecutor;
 import org.akvo.flow.domain.repository.FileRepository;
 import org.akvo.flow.domain.repository.SurveyRepository;
 import org.akvo.flow.domain.repository.UserRepository;
+import org.akvo.flow.domain.util.TextValueCleaner;
 
 import java.util.HashSet;
 import java.util.List;
@@ -41,19 +41,19 @@ import io.reactivex.functions.Function;
 public class ExportSurveyInstances extends UseCase {
 
     private final UserRepository userRepository;
-    private final DeviceIdMapper deviceIdMapper;
+    private final TextValueCleaner valueCleaner;
     private final SurveyRepository surveyRepository;
     private final FileRepository fileRepository;
 
     @Inject
     protected ExportSurveyInstances(ThreadExecutor threadExecutor,
             PostExecutionThread postExecutionThread, UserRepository userRepository,
-            DeviceIdMapper deviceIdMapper,
+            TextValueCleaner valueCleaner,
             SurveyRepository surveyRepository,
             FileRepository fileRepository) {
         super(threadExecutor, postExecutionThread);
         this.userRepository = userRepository;
-        this.deviceIdMapper = deviceIdMapper;
+        this.valueCleaner = valueCleaner;
         this.surveyRepository = surveyRepository;
         this.fileRepository = fileRepository;
     }
@@ -64,7 +64,7 @@ public class ExportSurveyInstances extends UseCase {
                 .map(new Function<String, String>() {
                     @Override
                     public String apply(String deviceId) {
-                        return deviceIdMapper.cleanVal(deviceId);
+                        return valueCleaner.cleanVal(deviceId);
                     }
                 })
                 .flatMap(new Function<String, Observable<Boolean>>() {

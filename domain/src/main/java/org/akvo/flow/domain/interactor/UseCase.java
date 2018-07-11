@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -20,8 +20,6 @@
 
 package org.akvo.flow.domain.interactor;
 
-import android.support.annotation.Nullable;
-
 import org.akvo.flow.domain.executor.PostExecutionThread;
 import org.akvo.flow.domain.executor.ThreadExecutor;
 
@@ -35,22 +33,19 @@ import io.reactivex.schedulers.Schedulers;
 
 /**
  * Abstract class for a Use Case (Interactor in terms of Clean Architecture).
- * This use case allows to be run at the same thread as it was called (as with IntentServices whose
- * onHandleIntent method runs on a worker thread) or an executor and post execution thread can be
- * passed as prams.
+ * This interface represents a execution unit for different use cases (this means any use case
+ * in the application should implement this contract).
+ * By convention each UseCase implementation will return the result using a {@link DisposableObserver}
+ * that will execute its job in a background thread and will post the result in the UI thread.
  */
 public abstract class UseCase {
 
-    @Nullable
     private final ThreadExecutor threadExecutor;
-
-    @Nullable
     private final PostExecutionThread postExecutionThread;
-
     private final CompositeDisposable disposables;
 
-    protected UseCase(@Nullable ThreadExecutor threadExecutor,
-            @Nullable PostExecutionThread postExecutionThread) {
+    protected UseCase(ThreadExecutor threadExecutor,
+            PostExecutionThread postExecutionThread) {
         this.threadExecutor = threadExecutor;
         this.postExecutionThread = postExecutionThread;
         this.disposables = new CompositeDisposable();
@@ -63,13 +58,9 @@ public abstract class UseCase {
 
     @SuppressWarnings("unchecked")
     public <T> void execute(DisposableObserver<T> observer, Map<String, Object> parameters) {
-        Observable<T> observable = buildUseCaseObservable(parameters);
-        if (threadExecutor != null) {
-            observable = observable.subscribeOn(Schedulers.from(threadExecutor));
-        }
-        if (postExecutionThread != null) {
-            observable = observable.observeOn(postExecutionThread.getScheduler());
-        }
+        final Observable<T> observable = buildUseCaseObservable(parameters)
+                .subscribeOn(Schedulers.from(threadExecutor))
+                .observeOn(postExecutionThread.getScheduler());
         addDisposable(observable.subscribeWith(observer));
     }
 

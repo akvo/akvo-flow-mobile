@@ -20,8 +20,6 @@
 
 package org.akvo.flow.domain.interactor;
 
-import android.support.annotation.Nullable;
-
 import org.akvo.flow.domain.entity.DeviceIdMapper;
 import org.akvo.flow.domain.entity.FormInstanceMetadata;
 import org.akvo.flow.domain.executor.PostExecutionThread;
@@ -48,8 +46,8 @@ public class ExportSurveyInstances extends UseCase {
     private final FileRepository fileRepository;
 
     @Inject
-    public ExportSurveyInstances(@Nullable ThreadExecutor threadExecutor,
-            @Nullable PostExecutionThread postExecutionThread, UserRepository userRepository,
+    protected ExportSurveyInstances(ThreadExecutor threadExecutor,
+            PostExecutionThread postExecutionThread, UserRepository userRepository,
             DeviceIdMapper deviceIdMapper,
             SurveyRepository surveyRepository,
             FileRepository fileRepository) {

@@ -20,8 +20,6 @@
 
 package org.akvo.flow.domain.interactor;
 
-import android.support.annotation.Nullable;
-
 import org.akvo.flow.domain.executor.PostExecutionThread;
 import org.akvo.flow.domain.executor.ThreadExecutor;
 import org.akvo.flow.domain.repository.SurveyRepository;
@@ -43,9 +41,8 @@ public class CheckDeviceNotifications extends UseCase {
     private final UserRepository userRepository;
 
     @Inject
-    public CheckDeviceNotifications(@Nullable ThreadExecutor threadExecutor,
-            @Nullable PostExecutionThread postExecutionThread,
-            SurveyRepository surveyRepository,
+    protected CheckDeviceNotifications(ThreadExecutor threadExecutor,
+            PostExecutionThread postExecutionThread, SurveyRepository surveyRepository,
             UserRepository userRepository) {
         super(threadExecutor, postExecutionThread);
         this.surveyRepository = surveyRepository;

@@ -20,7 +20,6 @@
 
 package org.akvo.flow.injector.module;
 
-import org.akvo.flow.domain.entity.DeviceIdMapper;
 import org.akvo.flow.domain.interactor.AllowedToConnect;
 import org.akvo.flow.domain.interactor.CheckDeviceNotifications;
 import org.akvo.flow.domain.interactor.CheckSubmittedFiles;
@@ -34,6 +33,7 @@ import org.akvo.flow.domain.interactor.GetIsDeviceSetUp;
 import org.akvo.flow.domain.interactor.GetPublishDataTime;
 import org.akvo.flow.domain.interactor.GetSavedDataPoints;
 import org.akvo.flow.domain.interactor.GetUserSettings;
+import org.akvo.flow.domain.interactor.MakeDataPrivate;
 import org.akvo.flow.domain.interactor.PublishData;
 import org.akvo.flow.domain.interactor.SaveAppLanguage;
 import org.akvo.flow.domain.interactor.SaveEnableMobileData;
@@ -54,10 +54,6 @@ import org.akvo.flow.domain.interactor.users.EditUser;
 import org.akvo.flow.domain.interactor.users.GetSelectedUser;
 import org.akvo.flow.domain.interactor.users.GetUsers;
 import org.akvo.flow.domain.interactor.users.SelectUser;
-import org.akvo.flow.domain.repository.FileRepository;
-import org.akvo.flow.domain.repository.SurveyRepository;
-import org.akvo.flow.domain.repository.UserRepository;
-import org.akvo.flow.domain.util.ConnectivityStateManager;
 
 import javax.inject.Named;
 
@@ -236,10 +232,15 @@ public class ViewModule {
     }
 
     @Provides
+    @Named("makeDataPrivate")
+    UseCase provideMakeDataPrivate(MakeDataPrivate makeDataPrivate) {
+        return makeDataPrivate;
+    }
+
+    @Provides
     @Named("uploadSync")
-    UseCase provideUploadSync(SurveyRepository surveyRepository,
-            UserRepository userRepository) {
-        return new UploadDataPoints(null, null, surveyRepository, userRepository);
+    UseCase provideUploadSync(UploadDataPoints uploadDataPoints) {
+        return uploadDataPoints;
     }
 
     @Provides
@@ -249,32 +250,20 @@ public class ViewModule {
     }
 
     @Provides
-    @Named("allowedToConnectSync")
-    UseCase provideAllowedToConnectSync(UserRepository userRepository,
-            ConnectivityStateManager connectivityStateManager) {
-        return new AllowedToConnect(null, null, userRepository, connectivityStateManager);
+    @Named("checkDeviceNotification")
+    UseCase provideDeviceNotificationSync(CheckDeviceNotifications checkDeviceNotifications) {
+        return checkDeviceNotifications;
     }
 
     @Provides
-    @Named("checkDeviceNotificationSync")
-    UseCase provideDeviceNotificationSync(SurveyRepository surveyRepository,
-            UserRepository userRepository) {
-        return new CheckDeviceNotifications(null, null, surveyRepository, userRepository);
+    @Named("checkSubmittedFiles")
+    UseCase provideSubmittedFilesSync(CheckSubmittedFiles checkSubmittedFiles) {
+        return checkSubmittedFiles;
     }
 
     @Provides
-    @Named("checkSubmittedFilesSync")
-    UseCase provideSubmittedFilesSync(SurveyRepository surveyRepository,
-            FileRepository fileRepository) {
-        return new CheckSubmittedFiles(null, null, surveyRepository, fileRepository);
-    }
-
-    @Provides
-    @Named("exportSurveyInstancesSync")
-    UseCase provideExportSurveyInstancesSync(DeviceIdMapper mapper,
-            SurveyRepository surveyRepository, FileRepository fileRepository,
-            UserRepository userRepository) {
-        return new ExportSurveyInstances(null, null, userRepository, mapper, surveyRepository,
-                fileRepository);
+    @Named("exportSurveyInstances")
+    UseCase provideExportSurveyInstancesSync(ExportSurveyInstances exportSurveyInstances) {
+        return exportSurveyInstances;
     }
 }

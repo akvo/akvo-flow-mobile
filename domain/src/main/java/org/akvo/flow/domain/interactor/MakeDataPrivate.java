@@ -20,6 +20,8 @@
 
 package org.akvo.flow.domain.interactor;
 
+import org.akvo.flow.domain.executor.PostExecutionThread;
+import org.akvo.flow.domain.executor.ThreadExecutor;
 import org.akvo.flow.domain.repository.FileRepository;
 
 import java.util.Map;
@@ -37,8 +39,9 @@ public class MakeDataPrivate extends UseCase {
     private final FileRepository fileRepository;
 
     @Inject
-    protected MakeDataPrivate(FileRepository fileRepository) {
-        super(null, null);
+    protected MakeDataPrivate(ThreadExecutor threadExecutor,
+            PostExecutionThread postExecutionThread, FileRepository fileRepository) {
+        super(threadExecutor, postExecutionThread);
         this.fileRepository = fileRepository;
     }
 

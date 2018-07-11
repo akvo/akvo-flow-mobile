@@ -46,8 +46,8 @@ public class CheckSubmittedFiles extends UseCase {
     private final FileRepository fileRepository;
 
     @Inject
-    public CheckSubmittedFiles(@Nullable ThreadExecutor threadExecutor,
-            @Nullable PostExecutionThread postExecutionThread,
+    protected CheckSubmittedFiles(ThreadExecutor threadExecutor,
+            PostExecutionThread postExecutionThread,
             SurveyRepository surveyRepository, FileRepository fileRepository) {
         super(threadExecutor, postExecutionThread);
         this.surveyRepository = surveyRepository;

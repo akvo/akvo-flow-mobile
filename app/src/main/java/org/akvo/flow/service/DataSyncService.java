@@ -19,17 +19,17 @@
 
 package org.akvo.flow.service;
 
-import android.app.IntentService;
+import android.app.Service;
 import android.content.Intent;
+import android.os.IBinder;
+import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
 
 import org.akvo.flow.R;
 import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.domain.interactor.DefaultObserver;
-import org.akvo.flow.domain.interactor.MakeDataPrivate;
 import org.akvo.flow.domain.interactor.UseCase;
 import org.akvo.flow.util.ConstantUtil;
-import org.akvo.flow.util.MediaFileHelper;
 import org.akvo.flow.util.NotificationHelper;
 
 import java.util.List;
@@ -54,39 +54,33 @@ import timber.log.Timber;
  *
  * @author Christopher Fagiani
  */
-public class DataSyncService extends IntentService {
+public class DataSyncService extends Service {
 
-    private static final String TAG = "DataSyncService";
-
-    @Inject
-    MediaFileHelper mediaFileHelper;
+    public static final int NOTIFICATION_ID = 1234;
 
     @Inject
-    MakeDataPrivate makeDataPrivate;
+    @Named("makeDataPrivate")
+    UseCase makeDataPrivate;
 
     @Named("uploadSync")
     @Inject
     UseCase upload;
 
-    @Named("allowedToConnectSync")
+    @Named("allowedToConnect")
     @Inject
     UseCase allowedToConnect;
 
-    @Named("checkDeviceNotificationSync")
+    @Named("checkDeviceNotification")
     @Inject
     UseCase checkDeviceNotification;
 
     @Inject
-    @Named("checkSubmittedFilesSync")
+    @Named("checkSubmittedFiles")
     UseCase checkPublishedFiles;
 
     @Inject
-    @Named("exportSurveyInstancesSync")
+    @Named("exportSurveyInstances")
     UseCase exportSurveyInstances;
-
-    public DataSyncService() {
-        super(TAG);
-    }
 
     @Override
     public void onCreate() {
@@ -106,23 +100,30 @@ public class DataSyncService extends IntentService {
         exportSurveyInstances.dispose();
     }
 
+    @Nullable
     @Override
-    protected void onHandleIntent(Intent intent) {
+    public IBinder onBind(Intent intent) {
+        return null;
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        startForeground(NOTIFICATION_ID,
+                NotificationHelper.getSyncingNotification(getApplicationContext()));
         makeDataPrivate.dispose();
         makeDataPrivate.execute(new DefaultObserver<Boolean>() {
             @Override
             public void onComplete() {
                 verify();
-
             }
 
             @Override
             public void onError(Throwable e) {
                 Timber.e(e);
                 verify();
-
             }
         }, null);
+        return super.onStartCommand(intent, flags, startId);
     }
 
     private void verify() {
@@ -200,6 +201,7 @@ public class DataSyncService extends IntentService {
             public void onError(Throwable e) {
                 Timber.e(e);
                 broadcastDataPointStatusChange();
+                stopService();
             }
 
             @Override
@@ -208,9 +210,15 @@ public class DataSyncService extends IntentService {
                     displayErrorNotification(formId);
                 }
                 broadcastDataPointStatusChange();
+                stopService();
             }
 
         }, null);
+    }
+
+    private void stopService() {
+        stopForeground(true);
+        stopSelf();
     }
 
     private void broadcastDataPointStatusChange() {

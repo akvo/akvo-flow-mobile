@@ -299,4 +299,7 @@
     <string name="snackbar_submitted">Submitted</string>
     <string name="form_id_hint">Form id</string>
 
+    <string name="sync_service_notification_title">Syncing data</string>
+    <string name="sync_service_notification_ticker">Syncing</string>
+
 </resources>

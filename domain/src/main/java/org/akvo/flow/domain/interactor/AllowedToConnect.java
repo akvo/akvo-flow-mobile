@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -37,7 +37,7 @@ public class AllowedToConnect extends UseCase {
     private final ConnectivityStateManager connectivityStateManager;
 
     @Inject
-    public AllowedToConnect(ThreadExecutor threadExecutor,
+    protected AllowedToConnect(ThreadExecutor threadExecutor,
             PostExecutionThread postExecutionThread, UserRepository userRepository,
             ConnectivityStateManager connectivityStateManager) {
         super(threadExecutor, postExecutionThread);

@@ -22,6 +22,7 @@ package org.akvo.flow.domain.repository;
 
 import android.graphics.Bitmap;
 
+import java.io.File;
 import java.util.List;
 
 import io.reactivex.Observable;
@@ -46,4 +47,8 @@ public interface FileRepository {
     Observable<Boolean> clearAllUserFiles();
 
     Observable<Boolean> isExternalStorageFull();
+
+    Observable<File> getZipFile(String uuid);
+
+    Observable<Boolean> createDataZip(String zipFileName, String formInstanceData);
 }

@@ -43,6 +43,8 @@ dependencies {
     implementation 'io.reactivex.rxjava2:rxjava:2.1.0'
     implementation 'com.android.support:support-annotations:25.3.1'
     implementation 'com.android.support:appcompat-v7:25.3.1'
+    implementation 'com.jakewharton.timber:timber:4.5.1'
+    implementation 'com.google.code.gson:gson:2.8.2'
 
     testImplementation 'junit:junit:4.12'
 }

@@ -34,7 +34,7 @@ import org.akvo.flow.domain.apkupdate.ApkUpdateStore;
 import org.akvo.flow.domain.apkupdate.ViewApkData;
 import org.akvo.flow.util.ConnectivityStateManager;
 import org.akvo.flow.util.ConstantUtil;
-import org.akvo.flow.util.GsonMapper;
+import org.akvo.flow.domain.util.GsonMapper;
 
 import timber.log.Timber;
 

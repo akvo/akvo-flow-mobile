@@ -21,34 +21,39 @@
 package org.akvo.flow.injector.module;
 
 import org.akvo.flow.domain.interactor.AllowedToConnect;
+import org.akvo.flow.domain.interactor.CheckDeviceNotifications;
+import org.akvo.flow.domain.interactor.CheckSubmittedFiles;
 import org.akvo.flow.domain.interactor.ClearAllData;
 import org.akvo.flow.domain.interactor.ClearResponses;
 import org.akvo.flow.domain.interactor.CopyVideo;
-import org.akvo.flow.domain.interactor.GetIsDeviceSetUp;
-import org.akvo.flow.domain.interactor.SetWalkthroughSeen;
-import org.akvo.flow.domain.interactor.UnSyncedTransmissionsExist;
-import org.akvo.flow.domain.interactor.WasWalkthroughSeen;
-import org.akvo.flow.domain.interactor.users.CreateUser;
 import org.akvo.flow.domain.interactor.DeleteSurvey;
-import org.akvo.flow.domain.interactor.users.DeleteUser;
-import org.akvo.flow.domain.interactor.users.EditUser;
+import org.akvo.flow.domain.interactor.ExportSurveyInstances;
 import org.akvo.flow.domain.interactor.GetAllSurveys;
+import org.akvo.flow.domain.interactor.GetIsDeviceSetUp;
 import org.akvo.flow.domain.interactor.GetPublishDataTime;
 import org.akvo.flow.domain.interactor.GetSavedDataPoints;
 import org.akvo.flow.domain.interactor.GetUserSettings;
-import org.akvo.flow.domain.interactor.users.GetSelectedUser;
-import org.akvo.flow.domain.interactor.users.GetUsers;
+import org.akvo.flow.domain.interactor.MakeDataPrivate;
 import org.akvo.flow.domain.interactor.PublishData;
 import org.akvo.flow.domain.interactor.SaveAppLanguage;
 import org.akvo.flow.domain.interactor.SaveEnableMobileData;
 import org.akvo.flow.domain.interactor.SaveImage;
 import org.akvo.flow.domain.interactor.SaveImageSize;
 import org.akvo.flow.domain.interactor.SaveKeepScreenOn;
-import org.akvo.flow.domain.interactor.SaveSelectedSurvey;
-import org.akvo.flow.domain.interactor.users.SelectUser;
 import org.akvo.flow.domain.interactor.SaveResizedImage;
+import org.akvo.flow.domain.interactor.SaveSelectedSurvey;
+import org.akvo.flow.domain.interactor.SetWalkthroughSeen;
+import org.akvo.flow.domain.interactor.UnSyncedTransmissionsExist;
+import org.akvo.flow.domain.interactor.UploadDataPoints;
 import org.akvo.flow.domain.interactor.UseCase;
+import org.akvo.flow.domain.interactor.WasWalkthroughSeen;
 import org.akvo.flow.domain.interactor.setup.SaveSetup;
+import org.akvo.flow.domain.interactor.users.CreateUser;
+import org.akvo.flow.domain.interactor.users.DeleteUser;
+import org.akvo.flow.domain.interactor.users.EditUser;
+import org.akvo.flow.domain.interactor.users.GetSelectedUser;
+import org.akvo.flow.domain.interactor.users.GetUsers;
+import org.akvo.flow.domain.interactor.users.SelectUser;
 
 import javax.inject.Named;
 
@@ -224,5 +229,41 @@ public class ViewModule {
     @Named("saveSetup")
     UseCase provideSaveConfig(SaveSetup saveSetup) {
         return saveSetup;
+    }
+
+    @Provides
+    @Named("makeDataPrivate")
+    UseCase provideMakeDataPrivate(MakeDataPrivate makeDataPrivate) {
+        return makeDataPrivate;
+    }
+
+    @Provides
+    @Named("uploadSync")
+    UseCase provideUploadSync(UploadDataPoints uploadDataPoints) {
+        return uploadDataPoints;
+    }
+
+    @Provides
+    @Named("uploadAsync")
+    UseCase provideUploadAsync(UploadDataPoints uploadDataPoints) {
+        return uploadDataPoints;
+    }
+
+    @Provides
+    @Named("checkDeviceNotification")
+    UseCase provideDeviceNotificationSync(CheckDeviceNotifications checkDeviceNotifications) {
+        return checkDeviceNotifications;
+    }
+
+    @Provides
+    @Named("checkSubmittedFiles")
+    UseCase provideSubmittedFilesSync(CheckSubmittedFiles checkSubmittedFiles) {
+        return checkSubmittedFiles;
+    }
+
+    @Provides
+    @Named("exportSurveyInstances")
+    UseCase provideExportSurveyInstancesSync(ExportSurveyInstances exportSurveyInstances) {
+        return exportSurveyInstances;
     }
 }

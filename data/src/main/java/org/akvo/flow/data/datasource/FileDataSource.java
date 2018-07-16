@@ -24,7 +24,9 @@ import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import org.akvo.flow.data.entity.MovedFile;
+import org.akvo.flow.data.util.Constants;
 import org.akvo.flow.data.util.ExternalStorageHelper;
+import org.akvo.flow.data.util.FileHelper;
 
 import java.io.File;
 import java.io.IOException;
@@ -203,5 +205,21 @@ public class FileDataSource {
 
     public Observable<Long> getAvailableStorage() {
         return Observable.just(externalStorageHelper.getExternalStorageAvailableSpaceInMb());
+    }
+
+    public Observable<File> getZipFile(String uuid) {
+        String name = uuid + Constants.ARCHIVE_SUFFIX;
+        return Observable.just(new File(folderBrowser.getAppExternalFolder(FolderBrowser.DIR_DATA),
+                name));
+    }
+
+    public Observable<Boolean> writeDataToZipFile(String zipFileName, String formInstanceData) {
+        File folder = folderBrowser.getExistingAppExternalFolder(FolderBrowser.DIR_DATA);
+        try {
+            fileHelper.writeZipFile(folder, zipFileName, formInstanceData);
+            return Observable.just(true);
+        } catch (IOException e) {
+            return Observable.error(e);
+        }
     }
 }

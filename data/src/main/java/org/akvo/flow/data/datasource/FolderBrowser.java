@@ -35,8 +35,8 @@ import javax.inject.Inject;
 
 public class FolderBrowser {
 
-    static final String DIR_DATA = "akvoflow/data/files";
-    static final String DIR_MEDIA = "akvoflow/data/media";
+    public static final String DIR_MEDIA = "akvoflow/data/media";
+    public static final String DIR_DATA = "akvoflow/data/files";
     static final String DIR_PUBLISHED = "published";
     static final String DIR_PUBLISHED_DATA = DIR_PUBLISHED + "/files";
     static final String DIR_PUBLISHED_MEDIA = DIR_PUBLISHED + "/media";
@@ -73,6 +73,12 @@ public class FolderBrowser {
         return folders;
     }
 
+    @NonNull
+    public File getInternalFolder(String folder) {
+        String path = context.getFilesDir().getAbsolutePath() + File.separator + folder;
+        return new File(path);
+    }
+
     @Nullable
     File getPublicFolder(String folderName) {
         String externalStoragePath = externalStorageHelper.getExternalStoragePath();
@@ -82,18 +88,22 @@ public class FolderBrowser {
         return new File(externalStoragePath + File.separator + folderName);
     }
 
-    @NonNull
-    File getInternalFolder(String folder) {
-        String path = context.getFilesDir().getAbsolutePath() + File.separator + folder;
-        return new File(path);
-    }
-
     @Nullable
     File getAppExternalFolder(String folderName) {
         String path = getAppExternalFolderPath(folderName);
         File folder = null;
         if (path != null) {
             folder = new File(path);
+        }
+        return folder;
+    }
+
+    @Nullable
+    File getExistingAppExternalFolder(String folderName) {
+        String path = getInternalFolder(folderName).getAbsolutePath();
+        File folder = new File(path);
+        if (!folder.exists()) {
+            folder.mkdirs();
         }
         return folder;
     }

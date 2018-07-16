@@ -26,6 +26,7 @@ import org.akvo.flow.data.datasource.DataSourceFactory;
 import org.akvo.flow.data.entity.MovedFile;
 import org.akvo.flow.domain.repository.FileRepository;
 
+import java.io.File;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -104,5 +105,16 @@ public class FileDataRepository implements FileRepository {
                         return availableMb < 100;
                     }
                 });
+    }
+
+    @Override
+    public Observable<File> getZipFile(String uuid) {
+        return dataSourceFactory.getFileDataSource().getZipFile(uuid);
+    }
+
+    @Override
+    public Observable<Boolean> createDataZip(String zipFileName,
+            String formInstanceData) {
+        return dataSourceFactory.getFileDataSource().writeDataToZipFile(zipFileName, formInstanceData);
     }
 }

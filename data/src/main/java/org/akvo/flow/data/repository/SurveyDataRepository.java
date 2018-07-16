@@ -23,16 +23,32 @@ package org.akvo.flow.data.repository;
 import android.database.Cursor;
 
 import org.akvo.flow.data.datasource.DataSourceFactory;
+import org.akvo.flow.data.datasource.DatabaseDataSource;
 import org.akvo.flow.data.entity.ApiDataPoint;
+import org.akvo.flow.data.entity.ApiFilesResult;
 import org.akvo.flow.data.entity.ApiLocaleResult;
 import org.akvo.flow.data.entity.ApiSurveyInstance;
 import org.akvo.flow.data.entity.DataPointMapper;
+import org.akvo.flow.data.entity.FilesResultMapper;
+import org.akvo.flow.data.entity.FilteredFilesResult;
+import org.akvo.flow.data.entity.FormIdMapper;
+import org.akvo.flow.data.entity.FormInstanceMapper;
+import org.akvo.flow.data.entity.FormInstanceMetadataMapper;
+import org.akvo.flow.data.entity.S3File;
 import org.akvo.flow.data.entity.SurveyMapper;
 import org.akvo.flow.data.entity.SyncedTimeMapper;
+import org.akvo.flow.data.entity.Transmission;
 import org.akvo.flow.data.entity.TransmissionFilenameMapper;
+import org.akvo.flow.data.entity.TransmissionMapper;
+import org.akvo.flow.data.entity.UploadError;
+import org.akvo.flow.data.entity.UploadFormDeletedError;
+import org.akvo.flow.data.entity.UploadResult;
+import org.akvo.flow.data.entity.UploadSuccess;
 import org.akvo.flow.data.entity.UserMapper;
-import org.akvo.flow.data.net.FlowRestApi;
+import org.akvo.flow.data.net.RestApi;
 import org.akvo.flow.domain.entity.DataPoint;
+import org.akvo.flow.domain.entity.FormInstanceMetadata;
+import org.akvo.flow.domain.entity.InstanceIdUuid;
 import org.akvo.flow.domain.entity.Survey;
 import org.akvo.flow.domain.entity.User;
 import org.akvo.flow.domain.exception.AssignmentRequiredException;
@@ -42,7 +58,9 @@ import org.reactivestreams.Publisher;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
@@ -53,33 +71,50 @@ import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.SingleSource;
 import io.reactivex.annotations.NonNull;
+import io.reactivex.functions.BiFunction;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 import io.reactivex.functions.Predicate;
+import okhttp3.ResponseBody;
 import retrofit2.HttpException;
+import timber.log.Timber;
 
 public class SurveyDataRepository implements SurveyRepository {
 
     private final DataSourceFactory dataSourceFactory;
     private final DataPointMapper dataPointMapper;
     private final SyncedTimeMapper syncedTimeMapper;
-    private final FlowRestApi restApi;
+    private final RestApi restApi;
     private final SurveyMapper surveyMapper;
     private final UserMapper userMapper;
-    private final TransmissionFilenameMapper transmissionMapper;
+    private final TransmissionFilenameMapper transmissionFileMapper;
+    private final FormIdMapper surveyIdMapper;
+    private final FilesResultMapper filesResultMapper;
+    private final TransmissionMapper transmissionMapper;
+    private final FormInstanceMapper formInstanceMapper;
+    private final FormInstanceMetadataMapper formInstanceMetadataMapper;
 
+    //TODO: this needs to be split, too many methods and params
     @Inject
     public SurveyDataRepository(DataSourceFactory dataSourceFactory,
-            DataPointMapper dataPointMapper, SyncedTimeMapper syncedTimeMapper, FlowRestApi restApi,
+            DataPointMapper dataPointMapper, SyncedTimeMapper syncedTimeMapper, RestApi restApi,
             SurveyMapper surveyMapper, UserMapper userMapper,
-            TransmissionFilenameMapper transmissionMapper) {
+            TransmissionFilenameMapper transmissionFilenameMapper, FormIdMapper surveyIdMapper,
+            FilesResultMapper filesResultMapper, TransmissionMapper transmissionMapper,
+            FormInstanceMapper formInstanceMapper,
+            FormInstanceMetadataMapper formInstanceMetadataMapper) {
         this.dataSourceFactory = dataSourceFactory;
         this.dataPointMapper = dataPointMapper;
         this.syncedTimeMapper = syncedTimeMapper;
         this.restApi = restApi;
         this.surveyMapper = surveyMapper;
         this.userMapper = userMapper;
+        this.transmissionFileMapper = transmissionFilenameMapper;
+        this.surveyIdMapper = surveyIdMapper;
+        this.filesResultMapper = filesResultMapper;
         this.transmissionMapper = transmissionMapper;
+        this.formInstanceMapper = formInstanceMapper;
+        this.formInstanceMetadataMapper = formInstanceMetadataMapper;
     }
 
     @Override
@@ -317,7 +352,203 @@ public class SurveyDataRepository implements SurveyRepository {
                 .map(new Function<Cursor, List<String>>() {
                     @Override
                     public List<String> apply(Cursor cursor) {
-                        return transmissionMapper.mapToFileNameList(cursor);
+                        return transmissionFileMapper.mapToFileNameList(cursor);
+                    }
+                });
+    }
+
+    @Override
+    public Observable<List<String>> getFormIds(String surveyId) {
+        return dataSourceFactory.getDataBaseDataSource().getFormIds(surveyId)
+                .map(new Function<Cursor, List<String>>() {
+                    @Override
+                    public List<String> apply(Cursor cursor) {
+                        return surveyIdMapper.mapToFormId(cursor);
+                    }
+                });
+    }
+
+    @Override
+    public Observable<List<String>> downloadMissingAndDeleted(List<String> formIds,
+            String deviceId) {
+        return restApi.getPendingFiles(formIds, deviceId)
+                .map(new Function<ApiFilesResult, FilteredFilesResult>() {
+                    @Override
+                    public FilteredFilesResult apply(ApiFilesResult apiFilesResult) {
+                        return filesResultMapper.transform(apiFilesResult);
+                    }
+                })
+                .concatMap(new Function<FilteredFilesResult, Observable<List<String>>>() {
+                    @Override
+                    public Observable<List<String>> apply(final FilteredFilesResult filtered) {
+                        DatabaseDataSource dataSource = dataSourceFactory.getDataBaseDataSource();
+                        return Observable.zip(dataSource
+                                        .setFileTransmissionFailed(filtered.getMissingFiles()),
+                                dataSource.setDeletedForms(filtered.getDeletedForms()),
+                                new BiFunction<Boolean, Boolean, List<String>>() {
+                                    @Override
+                                    public List<String> apply(Boolean ignored, Boolean ignored2) {
+                                        return filtered.getDeletedForms();
+                                    }
+                                });
+                    }
+                });
+    }
+
+    @Override
+    public Observable<Set<String>> processTransmissions(final String deviceId) {
+        return dataSourceFactory.getDataBaseDataSource().getUnSyncedTransmissions()
+                .map(new Function<Cursor, List<Transmission>>() {
+                    @Override
+                    public List<Transmission> apply(Cursor cursor) {
+                        return transmissionMapper.transform(cursor);
+                    }
+                })
+                .concatMap(new Function<List<Transmission>, Observable<Set<String>>>() {
+                    @Override
+                    public Observable<Set<String>> apply(List<Transmission> transmissions) {
+                        return syncTransmissions(transmissions, deviceId);
+                    }
+                });
+    }
+
+    @Override
+    public Observable<List<InstanceIdUuid>> getSubmittedInstances() {
+        return dataSourceFactory.getDataBaseDataSource().getSubmittedInstances()
+                .map(new Function<Cursor, List<InstanceIdUuid>>() {
+                    @Override
+                    public List<InstanceIdUuid> apply(Cursor cursor) {
+                        return formInstanceMapper.getInstanceIdUuids(cursor);
+                    }
+                });
+    }
+
+    @Override
+    public Observable<Boolean> setInstanceStatusToRequested(long id) {
+        return dataSourceFactory.getDataBaseDataSource().setInstanceStatusToRequested(id);
+    }
+
+    @Override
+    public Observable<List<Long>> getPendingSurveyInstances() {
+        return dataSourceFactory.getDataBaseDataSource().getPendingSurveyInstances()
+                .map(new Function<Cursor, List<Long>>(){
+                    @Override
+                    public List<Long> apply(Cursor cursor) {
+                        return formInstanceMapper.getInstanceIds(cursor);
+                    }
+                });
+    }
+
+    @Override
+    public Observable<FormInstanceMetadata> getFormInstanceData(Long instanceId,
+            final String deviceId) {
+        return dataSourceFactory.getDataBaseDataSource().getResponses(instanceId).map(
+                new Function<Cursor, FormInstanceMetadata>() {
+                    @Override
+                    public FormInstanceMetadata apply(Cursor cursor) {
+                        return formInstanceMetadataMapper.transform(cursor, deviceId);
+                    }
+                });
+    }
+
+    @Override
+    public Observable<Boolean> createTransmissions(final Long instanceId, final String formId,
+            Set<String> fileNames) {
+        final DatabaseDataSource dataBaseDataSource = dataSourceFactory.getDataBaseDataSource();
+        return dataBaseDataSource
+                .createTransmissions(instanceId, formId, fileNames)
+                .flatMap(new Function<List<Boolean>, Observable<Boolean>>() {
+                    @Override
+                    public Observable<Boolean> apply(List<Boolean> ignored) {
+                        return dataBaseDataSource.setInstanceStatusToSubmitted(instanceId);
+                    }
+                });
+    }
+
+    private Observable<Set<String>> updateSurveyInstance(List<UploadResult> list) {
+        DatabaseDataSource dataBaseDataSource = dataSourceFactory.getDataBaseDataSource();
+        Set<Long> failedTransmissions = new HashSet<>();
+        Set<Long> successFullTransmissions = new HashSet<>();
+        final Set<String> deletedFormsTransmissions = new HashSet<>();
+        for (UploadResult result : list) {
+            if (result instanceof UploadSuccess) {
+                successFullTransmissions.add(result.getSurveyInstanceId());
+            } else {
+                failedTransmissions.add(result.getSurveyInstanceId());
+                if (result instanceof UploadFormDeletedError) {
+                    deletedFormsTransmissions.add(((UploadFormDeletedError) result).getFormId());
+                }
+            }
+        }
+        successFullTransmissions.removeAll(failedTransmissions);
+        return Observable.zip(dataBaseDataSource.updateFailedSubmissions(failedTransmissions),
+                dataBaseDataSource.updateSuccessfulSubmissions(successFullTransmissions),
+                new BiFunction<Boolean, Boolean, Set<String>>() {
+                    @Override
+                    public Set<String> apply(Boolean ignored, Boolean ignored2) {
+                        return deletedFormsTransmissions;
+                    }
+                });
+    }
+
+    private Observable<Set<String>> syncTransmissions(List<Transmission> transmissions,
+            final String deviceId) {
+        return Observable.fromIterable(transmissions)
+                .concatMap(new Function<Transmission, Observable<UploadResult>>() {
+                    @Override
+                    public Observable<UploadResult> apply(final Transmission transmission) {
+                        return syncTransmission(transmission, deviceId);
+                    }
+                })
+                .toList().toObservable()
+                .concatMap(new Function<List<UploadResult>, Observable<Set<String>>>() {
+                    @Override
+                    public Observable<Set<String>> apply(List<UploadResult> list) {
+                        return updateSurveyInstance(list);
+                    }
+                });
+    }
+
+    private Observable<UploadResult> syncTransmission(final Transmission transmission,
+            final String deviceId) {
+        final DatabaseDataSource dataBaseDataSource = dataSourceFactory.getDataBaseDataSource();
+        final long transmissionId = transmission.getId();
+        final long surveyInstanceId = transmission.getRespondentId();
+        final String formId = transmission.getFormId();
+        return restApi.uploadFile(transmission)
+                .concatMap(new Function<ResponseBody, Observable<?>>() {
+                    @Override
+                    public Observable<?> apply(ResponseBody ignored) {
+                        S3File s3File = transmission.getS3File();
+                        return restApi.notifyFileAvailable(s3File.getAction(),
+                                transmission.getFormId(), s3File.getFile().getName(), deviceId);
+                    }
+                })
+                .doOnNext(new Consumer<Object>() {
+                    @Override
+                    public void accept(Object o) {
+                        dataBaseDataSource.setFileTransmissionSucceeded(transmissionId);
+                    }
+                })
+                .map(new Function<Object, UploadResult>() {
+                    @Override
+                    public UploadResult apply(Object ignored) {
+                        return new UploadSuccess(surveyInstanceId);
+                    }
+                })
+                .onErrorReturn(new Function<Throwable, UploadResult>() {
+                    @Override
+                    public UploadResult apply(Throwable throwable) {
+                        Timber.e(throwable);
+                        boolean formNotFound = throwable instanceof HttpException && (
+                                ((HttpException) throwable).code() == 404);
+                        if (formNotFound) {
+                            dataBaseDataSource.setFileTransmissionFormDeleted(transmissionId);
+                            return new UploadFormDeletedError(surveyInstanceId, formId);
+                        } else {
+                            dataBaseDataSource.setFileTransmissionFailed(transmissionId);
+                            return new UploadError(surveyInstanceId);
+                        }
                     }
                 });
     }

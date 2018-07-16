@@ -31,6 +31,7 @@ import org.akvo.flow.domain.interactor.DownloadDataPoints;
 import org.akvo.flow.domain.interactor.ErrorComposable;
 import org.akvo.flow.domain.interactor.GetSavedDataPoints;
 import org.akvo.flow.domain.interactor.UseCase;
+import org.akvo.flow.domain.util.Constants;
 import org.akvo.flow.presentation.Presenter;
 import org.akvo.flow.presentation.datapoints.list.entity.ListDataPoint;
 import org.akvo.flow.presentation.datapoints.list.entity.ListDataPointMapper;
@@ -40,6 +41,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -53,6 +55,8 @@ public class DataPointsListPresenter implements Presenter {
     private final UseCase getSavedDataPoints;
     private final DownloadDataPoints downloadDataPoints;
     private final UseCase allowedToConnect;
+    private final UseCase checkDeviceNotification;
+    private final UseCase upload;
     private final ListDataPointMapper mapper;
 
     private DataPointsListView view;
@@ -64,11 +68,14 @@ public class DataPointsListPresenter implements Presenter {
     @Inject
     DataPointsListPresenter(@Named("getSavedDataPoints") UseCase getSavedDataPoints,
             ListDataPointMapper mapper, DownloadDataPoints downloadDataPoints,
-            @Named("allowedToConnect") UseCase allowedToConnect) {
+            @Named("allowedToConnect") UseCase allowedToConnect, @Named("checkDeviceNotification")
+            UseCase checkDeviceNotification, @Named("uploadSync") UseCase upload) {
         this.getSavedDataPoints = getSavedDataPoints;
         this.mapper = mapper;
         this.downloadDataPoints = downloadDataPoints;
         this.allowedToConnect = allowedToConnect;
+        this.checkDeviceNotification = checkDeviceNotification;
+        this.upload = upload;
     }
 
     public void setView(@NonNull DataPointsListView view) {
@@ -156,6 +163,8 @@ public class DataPointsListPresenter implements Presenter {
         getSavedDataPoints.dispose();
         downloadDataPoints.dispose();
         allowedToConnect.dispose();
+        checkDeviceNotification.dispose();
+        upload.dispose();
     }
 
     void onDownloadPressed() {
@@ -259,5 +268,44 @@ public class DataPointsListPresenter implements Presenter {
     private void noSurveySelected() {
         view.displayData(Collections.EMPTY_LIST);
         view.showNoSurveySelected();
+    }
+
+    public void onUploadPressed() {
+        //TODO: check if allowed to connect
+        view.showLoading();
+        final Map<String, Object> params = new HashMap<>(2);
+        params.put(Constants.KEY_SURVEY_ID, surveyGroup.getId()+"");
+        checkDeviceNotification.execute(new DefaultObserver<List<String>>(){
+            @Override
+            public void onError(Throwable e) {
+                Timber.e(e);
+                uploadDataPoints(params);
+            }
+
+            @Override
+            public void onNext(List<String> strings) {
+                uploadDataPoints(params);
+            }
+        }, params);
+    }
+
+    private void uploadDataPoints(Map<String, Object> params) {
+        upload.execute(new DefaultObserver<Set<String>>() {
+            @Override
+            public void onError(Throwable e) {
+                Timber.e(e);
+                view.hideLoading();
+            }
+
+            @Override
+            public void onComplete() {
+                view.hideLoading();
+            }
+
+            @Override
+            public void onNext(Set<String> strings) {
+                Timber.d("Synced");
+            }
+        }, params);
     }
 }

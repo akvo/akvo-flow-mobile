@@ -22,6 +22,7 @@ package org.akvo.flow.database.britedb;
 
 import android.content.ContentValues;
 import android.database.Cursor;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
@@ -682,6 +683,24 @@ public class BriteSurveyDbAdapter {
                 String.valueOf(TransmissionStatus.QUEUED),
                 String.valueOf(TransmissionStatus.IN_PROGRESS),
                 String.valueOf(TransmissionStatus.FAILED),
+        };
+        return queryTransmissions(column, whereClause, selectionArgs);
+    }
+
+    public Cursor getUnSyncedTransmissions(@NonNull String formId) {
+        String column =
+                TransmissionColumns._ID + ", "
+                        + TransmissionColumns.SURVEY_INSTANCE_ID + ", "
+                        + TransmissionColumns.SURVEY_ID + ", "
+                        + TransmissionColumns.FILENAME;
+        String whereClause =
+                TransmissionColumns.STATUS + " IN (?, ?, ?) AND " + TransmissionColumns.FILENAME
+                        + " LIKE '%.%' AND " + TransmissionColumns.SURVEY_ID + " = ?";
+        String[] selectionArgs = new String[] {
+                String.valueOf(TransmissionStatus.QUEUED),
+                String.valueOf(TransmissionStatus.IN_PROGRESS),
+                String.valueOf(TransmissionStatus.FAILED),
+                formId
         };
         return queryTransmissions(column, whereClause, selectionArgs);
     }

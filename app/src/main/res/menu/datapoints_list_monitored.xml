@@ -23,8 +23,7 @@
                     android:title="@string/download"/>
             <item
                     android:id="@+id/upload"
-                    android:title="@string/upload"
-                    android:visible="false"/>
+                    android:title="@string/upload"/>
             <item
                     android:id="@+id/order_by"
                     android:title="@string/sort"/>

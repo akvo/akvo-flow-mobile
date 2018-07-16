@@ -67,7 +67,7 @@ public interface SurveyRepository {
 
     Observable<List<String>> downloadMissingAndDeleted(List<String> formIds, String deviceId);
 
-    Observable<Set<String>> processTransmissions(String deviceId);
+    Observable<Set<String>> processTransmissions(String deviceId, String surveyId);
 
     Observable<List<InstanceIdUuid>> getSubmittedInstances();
 

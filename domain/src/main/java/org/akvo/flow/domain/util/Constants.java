@@ -23,4 +23,5 @@ package org.akvo.flow.domain.util;
 public class Constants {
 
     public static final Long INVALID_USER_ID = -1L;
+    public static final String KEY_SURVEY_ID = "survey_id";
 }

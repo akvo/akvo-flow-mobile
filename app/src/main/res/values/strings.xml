@@ -301,5 +301,6 @@
 
     <string name="sync_service_notification_title">Syncing data</string>
     <string name="sync_service_notification_ticker">Syncing</string>
+    <string name="form_submit_error">Error submitting form, please try again</string>
 
 </resources>

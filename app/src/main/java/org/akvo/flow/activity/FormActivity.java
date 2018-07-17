@@ -38,6 +38,7 @@ import android.view.SubMenu;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import org.akvo.flow.R;
@@ -61,6 +62,9 @@ import org.akvo.flow.event.SurveyListener;
 import org.akvo.flow.injector.component.ApplicationComponent;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
+import org.akvo.flow.presentation.SnackBarManager;
+import org.akvo.flow.presentation.form.FormPresenter;
+import org.akvo.flow.presentation.form.FormView;
 import org.akvo.flow.ui.Navigator;
 import org.akvo.flow.ui.adapter.LanguageAdapter;
 import org.akvo.flow.ui.adapter.SurveyTabAdapter;
@@ -70,11 +74,11 @@ import org.akvo.flow.ui.view.QuestionView;
 import org.akvo.flow.ui.view.geolocation.GeoFieldsResetConfirmDialogFragment;
 import org.akvo.flow.ui.view.geolocation.GeoQuestionView;
 import org.akvo.flow.util.ConstantUtil;
-import org.akvo.flow.util.files.FormFileBrowser;
 import org.akvo.flow.util.MediaFileHelper;
 import org.akvo.flow.util.PlatformUtil;
 import org.akvo.flow.util.StorageHelper;
 import org.akvo.flow.util.ViewUtil;
+import org.akvo.flow.util.files.FormFileBrowser;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -93,7 +97,7 @@ import timber.log.Timber;
 import static org.akvo.flow.util.ViewUtil.showConfirmDialog;
 
 public class FormActivity extends BackActivity implements SurveyListener,
-        QuestionInteractionListener,
+        QuestionInteractionListener, FormView,
         GeoFieldsResetConfirmDialogFragment.GeoFieldsResetConfirmListener {
 
     @Inject
@@ -108,6 +112,12 @@ public class FormActivity extends BackActivity implements SurveyListener,
     @Inject
     Prefs prefs;
 
+    @Inject
+    FormPresenter presenter;
+
+    @Inject
+    SnackBarManager snackBarManager;
+
     private final Navigator navigator = new Navigator();
     private final StorageHelper storageHelper = new StorageHelper();
 
@@ -119,6 +129,8 @@ public class FormActivity extends BackActivity implements SurveyListener,
 
     private ViewPager mPager;
     private SurveyTabAdapter mAdapter;
+    private ProgressBar progressBar;
+    private View rootView;
 
     /**
      * flag to represent whether the Survey can be edited or not
@@ -145,6 +157,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
         super.onCreate(savedInstanceState);
         setContentView(R.layout.form_activity);
         initializeInjector();
+        presenter.setView(this);
         // Read all the params. Note that the survey instance id is now mandatory
         Intent intent = getIntent();
         surveyId = intent.getStringExtra(ConstantUtil.FORM_ID_EXTRA);
@@ -181,6 +194,8 @@ public class FormActivity extends BackActivity implements SurveyListener,
             mAdapter = new SurveyTabAdapter(this, mPager, this, this);
             mPager.setAdapter(mAdapter);
 
+            progressBar = (ProgressBar) findViewById(R.id.progressBar);
+            rootView = findViewById(R.id.coordinator_layout);
             // Initialize new survey or load previous responses
             Map<String, QuestionResponse> responses = mDatabase.getResponses(mSurveyInstanceId);
             if (!responses.isEmpty()) {
@@ -408,13 +423,14 @@ public class FormActivity extends BackActivity implements SurveyListener,
 
     @Override
     public void onDestroy() {
-        super.onDestroy();
         if (mAdapter != null) {
             mAdapter.onDestroy();
         }
         if (mDatabase != null) {
             mDatabase.close();
         }
+        presenter.destroy();
+        super.onDestroy();
     }
 
     @Override
@@ -614,17 +630,34 @@ public class FormActivity extends BackActivity implements SurveyListener,
         saveState();
 
         // if we have no missing responses, submit the survey
-        mDatabase.updateSurveyInstanceStatus(mSurveyInstanceId, SurveyInstanceStatus.SUBMIT_REQUESTED);
+        mDatabase.updateSurveyInstanceStatus(mSurveyInstanceId,
+                SurveyInstanceStatus.SUBMIT_REQUESTED);
 
-        // Make the current survey immutable
-        mReadOnly = true;
+        presenter.onSubmitPressed(mSurveyInstanceId);
+    }
 
-        // send a broadcast message indicating new data is available
+    @Override
+    public void showLoading() {
+        progressBar.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void hideLoading() {
+        progressBar.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void dismiss() {
+        //for data syncing to start
         Intent i = new Intent(ConstantUtil.DATA_AVAILABLE_INTENT);
         sendBroadcast(i);
-
         setResult(RESULT_OK);
         finish();
+    }
+
+    @Override
+    public void showErrorExport() {
+        snackBarManager.displaySnackBar(rootView, R.string.form_submit_error, this);
     }
 
     @Override

@@ -55,8 +55,8 @@ public class CaddisflyPresenter implements Presenter {
     public void onImageReady(@NonNull final File originalImageFile) {
         final String copiedImagePath = mediaFileHelper.getMediaFile(originalImageFile.getName())
                 .getAbsolutePath();
-        Map<String, Object> params = new HashMap<>(4);
         String originalImagePath = originalImageFile.getAbsolutePath();
+        Map<String, Object> params = new HashMap<>(4);
         params.put(SaveResizedImage.ORIGINAL_FILE_NAME_PARAM, originalImagePath);
         params.put(SaveResizedImage.RESIZED_FILE_NAME_PARAM, copiedImagePath);
         copyFile.execute(new DefaultObserver<Boolean>() {

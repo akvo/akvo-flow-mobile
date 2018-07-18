@@ -229,7 +229,7 @@ public class ViewModule {
 
     @Provides
     @Named("copyFile")
-    UseCase provideCopyImage(CopyFile copyFile) {
+    UseCase provideCopyFile(CopyFile copyFile) {
         return copyFile;
     }
 }

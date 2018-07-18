@@ -110,6 +110,9 @@ android {
             it.buildConfigField "String", "SIGNING_KEY", "\"${signingKey}\""
             it.buildConfigField "String", "BUILD_YEAR", "\"${buildYear}\""
         }
+        debug {
+            ext.enableCrashlytics = false
+        }
     }
 
     packagingOptions {

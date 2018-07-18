@@ -32,9 +32,6 @@ public class ConstantUtil {
      */
     public static final String FILE_SURVEY_LOCATION_TYPE = "file";
     public static final String ARCHIVE_SUFFIX = ".zip";
-    public static final String JPG_SUFFIX = ".jpg";
-    public static final String PNG_SUFFIX = ".png";
-    public static final String VIDEO_SUFFIX = ".mp4";
     public static final String XML_SUFFIX = ".xml";
     public static final String BOOTSTRAP_DB_FILE = "dbinstructions.sql";
     public static final String PROCESSED_OK_SUFFIX = ".processed";
@@ -170,7 +167,6 @@ public class ConstantUtil {
     /**
      * S3 bucket directories (object prefixes)
      */
-    public static final String S3_DATA_DIR = "devicezip/";
     public static final String S3_IMAGE_DIR = "images/";
     public static final String S3_SURVEYS_DIR = "surveys/";
 
@@ -238,11 +234,6 @@ public class ConstantUtil {
      * 7 days
      */
     public static final int UPDATE_NOTIFICATION_DELAY_IN_MS = 7 * 60 * 60 * 24 * 1000;
-
-    /**
-     * 1 day
-     */
-    public static final int DINO_NOTIFICATION_DELAY_IN_MS = 1 * 60 * 60 * 24 * 1000;
 
     //requests
     public static final int PHOTO_ACTIVITY_REQUEST = 1;

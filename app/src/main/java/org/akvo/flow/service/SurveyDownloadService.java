@@ -122,7 +122,8 @@ public class SurveyDownloadService extends IntentService {
 
     private void reDownloadAllSurveys(@NonNull Intent intent) {
         intent.removeExtra(EXTRA_DELETE_SURVEYS);
-        String[] surveyIds = databaseAdaptor.getSurveyIds();
+        List<String> ids = databaseAdaptor.getSurveyIds();
+        String[] surveyIds = ids.toArray(new String[ids.size()]);
         databaseAdaptor.deleteAllSurveys();
         checkAndDownload(surveyIds);
     }

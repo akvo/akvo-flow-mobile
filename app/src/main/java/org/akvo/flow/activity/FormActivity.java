@@ -320,7 +320,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
 
     private void saveState() {
         if (!mReadOnly) {
-            mDatabase.updateSurveyStatus(mSurveyInstanceId, SurveyInstanceStatus.SAVED);
+            mDatabase.updateSurveyInstanceStatus(mSurveyInstanceId, SurveyInstanceStatus.SAVED);
             mDatabase.updateRecordModifiedDate(mRecordId, System.currentTimeMillis());
 
             // Record meta-data, if applies
@@ -614,7 +614,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
         saveState();
 
         // if we have no missing responses, submit the survey
-        mDatabase.updateSurveyStatus(mSurveyInstanceId, SurveyInstanceStatus.SUBMIT_REQUESTED);
+        mDatabase.updateSurveyInstanceStatus(mSurveyInstanceId, SurveyInstanceStatus.SUBMIT_REQUESTED);
 
         // Make the current survey immutable
         mReadOnly = true;

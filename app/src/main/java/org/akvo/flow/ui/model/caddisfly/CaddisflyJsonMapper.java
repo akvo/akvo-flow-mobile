@@ -30,13 +30,18 @@ import com.google.gson.JsonSyntaxException;
 import java.util.Collections;
 import java.util.List;
 
+import javax.inject.Inject;
+
 import timber.log.Timber;
 
 public class CaddisflyJsonMapper {
 
-    private final Gson gson = new Gson();
+    private final Gson gson;
 
+    @Inject
     public CaddisflyJsonMapper() {
+        //TODO: inject this
+        gson = new Gson();
     }
 
     @NonNull

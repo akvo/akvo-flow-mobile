@@ -46,4 +46,6 @@ public interface FileRepository {
     Observable<Boolean> clearAllUserFiles();
 
     Observable<Boolean> isExternalStorageFull();
+
+    Observable<Boolean> removeFile(String originFilePath);
 }

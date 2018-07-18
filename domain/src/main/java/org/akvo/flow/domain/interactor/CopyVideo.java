@@ -29,6 +29,7 @@ import java.util.Map;
 import javax.inject.Inject;
 
 import io.reactivex.Observable;
+import io.reactivex.functions.Function;
 
 public class CopyVideo extends UseCase {
 
@@ -53,6 +54,12 @@ public class CopyVideo extends UseCase {
 
         final String originFilePath = (String) parameters.get(ORIGIN_FILE_NAME_PARAM);
         final String destinationFilePath = (String) parameters.get(DESTINATION_FILE_NAME_PARAM);
-        return fileRepository.copyFile(originFilePath, destinationFilePath);
+        return fileRepository.copyFile(originFilePath, destinationFilePath)
+                .concatMap(new Function<Boolean, Observable<Boolean>>() {
+                    @Override
+                    public Observable<Boolean> apply(Boolean aBoolean) {
+                        return fileRepository.removeFile(originFilePath);
+                    }
+                });
     }
 }

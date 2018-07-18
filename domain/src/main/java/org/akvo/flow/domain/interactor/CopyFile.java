@@ -23,31 +23,25 @@ package org.akvo.flow.domain.interactor;
 import org.akvo.flow.domain.executor.PostExecutionThread;
 import org.akvo.flow.domain.executor.ThreadExecutor;
 import org.akvo.flow.domain.repository.FileRepository;
-import org.akvo.flow.domain.repository.UserRepository;
 
 import java.util.Map;
 
 import javax.inject.Inject;
 
 import io.reactivex.Observable;
-import io.reactivex.functions.Function;
 
-public class SaveResizedImage extends UseCase {
+public class CopyFile extends UseCase {
 
     public static final String ORIGINAL_FILE_NAME_PARAM = "original_file";
     public static final String RESIZED_FILE_NAME_PARAM = "resized_file";
 
     private final FileRepository fileRepository;
-    private final UserRepository userRepository;
 
     @Inject
-    protected SaveResizedImage(ThreadExecutor threadExecutor,
-            PostExecutionThread postExecutionThread,
-            FileRepository fileRepository,
-            UserRepository userRepository) {
+    protected CopyFile(ThreadExecutor threadExecutor,
+            PostExecutionThread postExecutionThread, FileRepository fileRepository) {
         super(threadExecutor, postExecutionThread);
         this.fileRepository = fileRepository;
-        this.userRepository = userRepository;
     }
 
     @Override
@@ -60,14 +54,6 @@ public class SaveResizedImage extends UseCase {
         final String originalFilePath = (String) parameters.get(ORIGINAL_FILE_NAME_PARAM);
         final String resizedFilePath = (String) parameters.get(RESIZED_FILE_NAME_PARAM);
 
-        return userRepository.getImageSize()
-                .concatMap(new Function<Integer, Observable<Boolean>>() {
-                    @Override
-                    public Observable<Boolean> apply(Integer imageSize) {
-                        return fileRepository
-                                .saveResizedImage(originalFilePath, resizedFilePath, imageSize);
-                    }
-                });
-
+        return fileRepository.copyFile(originalFilePath, resizedFilePath);
     }
 }

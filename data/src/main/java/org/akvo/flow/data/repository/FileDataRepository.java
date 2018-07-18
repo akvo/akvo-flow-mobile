@@ -76,8 +76,7 @@ public class FileDataRepository implements FileRepository {
 
     @Override
     public Observable<Boolean> copyFile(String originFilePath, String destinationFilePath) {
-        return dataSourceFactory.getFileDataSource()
-                .copyMediaFile(originFilePath, destinationFilePath);
+        return dataSourceFactory.getFileDataSource().copyFile(originFilePath, destinationFilePath);
     }
 
     @Override
@@ -104,5 +103,10 @@ public class FileDataRepository implements FileRepository {
                         return availableMb < 100;
                     }
                 });
+    }
+
+    @Override
+    public Observable<Boolean> removeFile(String originFilePath) {
+        return dataSourceFactory.getFileDataSource().deleteFile(originFilePath);
     }
 }

@@ -45,7 +45,7 @@ import org.akvo.flow.data.entity.UploadFormDeletedError;
 import org.akvo.flow.data.entity.UploadResult;
 import org.akvo.flow.data.entity.UploadSuccess;
 import org.akvo.flow.data.entity.UserMapper;
-import org.akvo.flow.data.net.FlowRestApi;
+import org.akvo.flow.data.net.RestApi;
 import org.akvo.flow.domain.entity.DataPoint;
 import org.akvo.flow.domain.entity.FormInstanceMetadata;
 import org.akvo.flow.domain.entity.InstanceIdUuid;
@@ -84,7 +84,7 @@ public class SurveyDataRepository implements SurveyRepository {
     private final DataSourceFactory dataSourceFactory;
     private final DataPointMapper dataPointMapper;
     private final SyncedTimeMapper syncedTimeMapper;
-    private final FlowRestApi flowRestApi;
+    private final RestApi restApi;
     private final SurveyMapper surveyMapper;
     private final UserMapper userMapper;
     private final TransmissionFilenameMapper transmissionFileMapper;
@@ -97,7 +97,7 @@ public class SurveyDataRepository implements SurveyRepository {
     //TODO: this needs to be split, too many methods and params
     @Inject
     public SurveyDataRepository(DataSourceFactory dataSourceFactory,
-            DataPointMapper dataPointMapper, SyncedTimeMapper syncedTimeMapper, FlowRestApi flowRestApi,
+            DataPointMapper dataPointMapper, SyncedTimeMapper syncedTimeMapper, RestApi restApi,
             SurveyMapper surveyMapper, UserMapper userMapper,
             TransmissionFilenameMapper transmissionFilenameMapper, FormIdMapper surveyIdMapper,
             FilesResultMapper filesResultMapper, TransmissionMapper transmissionMapper,
@@ -106,7 +106,7 @@ public class SurveyDataRepository implements SurveyRepository {
         this.dataSourceFactory = dataSourceFactory;
         this.dataPointMapper = dataPointMapper;
         this.syncedTimeMapper = syncedTimeMapper;
-        this.flowRestApi = flowRestApi;
+        this.restApi = restApi;
         this.surveyMapper = surveyMapper;
         this.userMapper = userMapper;
         this.transmissionFileMapper = transmissionFilenameMapper;
@@ -208,7 +208,7 @@ public class SurveyDataRepository implements SurveyRepository {
         return Flowable.defer(new Callable<Flowable<ApiLocaleResult>>() {
             @Override
             public Flowable<ApiLocaleResult> call() throws Exception {
-                return flowRestApi.downloadDataPoints(surveyGroupId,
+                return restApi.downloadDataPoints(surveyGroupId,
                         state.getTimestamp());
             }
         }).map(new Function<ApiLocaleResult, List<ApiDataPoint>>() {
@@ -371,7 +371,7 @@ public class SurveyDataRepository implements SurveyRepository {
     @Override
     public Observable<List<String>> downloadMissingAndDeleted(List<String> formIds,
             String deviceId) {
-        return flowRestApi.getPendingFiles(formIds, deviceId)
+        return restApi.getPendingFiles(formIds, deviceId)
                 .map(new Function<ApiFilesResult, FilteredFilesResult>() {
                     @Override
                     public FilteredFilesResult apply(ApiFilesResult apiFilesResult) {
@@ -515,12 +515,12 @@ public class SurveyDataRepository implements SurveyRepository {
         final long transmissionId = transmission.getId();
         final long surveyInstanceId = transmission.getRespondentId();
         final String formId = transmission.getFormId();
-        return flowRestApi.uploadFile(transmission)
+        return restApi.uploadFile(transmission)
                 .concatMap(new Function<ResponseBody, Observable<?>>() {
                     @Override
                     public Observable<?> apply(ResponseBody ignored) {
                         S3File s3File = transmission.getS3File();
-                        return flowRestApi.notifyFileAvailable(s3File.getAction(),
+                        return restApi.notifyFileAvailable(s3File.getAction(),
                                 transmission.getFormId(), s3File.getFile().getName(), deviceId);
                     }
                 })

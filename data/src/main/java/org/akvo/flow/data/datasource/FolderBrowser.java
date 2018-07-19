@@ -35,6 +35,7 @@ import javax.inject.Inject;
 
 public class FolderBrowser {
 
+    static final String CADDISFLY_OLD_FOLDER = "/result-images";
     static final String DIR_DATA = "akvoflow/data/files";
     static final String DIR_MEDIA = "akvoflow/data/media";
     static final String DIR_PUBLISHED = "published";

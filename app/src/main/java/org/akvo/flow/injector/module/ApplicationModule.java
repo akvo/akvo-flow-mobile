@@ -23,6 +23,7 @@ package org.akvo.flow.injector.module;
 import android.content.Context;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import com.google.gson.Gson;
 import com.squareup.sqlbrite2.BriteDatabase;
 import com.squareup.sqlbrite2.SqlBrite;
 
@@ -177,5 +178,11 @@ public class ApplicationModule {
     @Singleton
     PostExecutionThread providePostExecutionThread(UIThread uiThread) {
         return uiThread;
+    }
+
+    @Provides
+    @Singleton
+    Gson provideGson() {
+        return new Gson();
     }
 }

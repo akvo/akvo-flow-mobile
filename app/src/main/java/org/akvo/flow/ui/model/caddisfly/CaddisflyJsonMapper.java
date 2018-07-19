@@ -39,9 +39,8 @@ public class CaddisflyJsonMapper {
     private final Gson gson;
 
     @Inject
-    public CaddisflyJsonMapper() {
-        //TODO: inject this
-        gson = new Gson();
+    public CaddisflyJsonMapper(Gson gson) {
+        this.gson = gson;
     }
 
     @NonNull

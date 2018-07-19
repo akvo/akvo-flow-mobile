@@ -22,6 +22,7 @@ package org.akvo.flow.injector.component;
 
 import android.content.Context;
 
+import com.google.gson.Gson;
 import com.squareup.sqlbrite2.BriteDatabase;
 
 import org.akvo.flow.app.FlowApp;
@@ -74,6 +75,8 @@ public interface ApplicationComponent {
     UserRepository userRepository();
 
     SetupRepository setupRepository();
+
+    Gson gson();
 
     void inject(FileChangeTrackingService fileChangeTrackingService);
 

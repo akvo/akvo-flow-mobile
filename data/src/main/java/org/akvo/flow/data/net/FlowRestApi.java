@@ -54,7 +54,7 @@ public class FlowRestApi {
     private final String androidId;
     private final String imei;
     private final String phoneNumber;
-    private final FlowServiceFactory serviceFactory;
+    private final RestServiceFactory serviceFactory;
     private final Encoder encoder;
     private final String version;
     private final ApiUrls apiUrls;
@@ -62,7 +62,7 @@ public class FlowRestApi {
     private final S3User s3User;
     private final DateFormat dateFormat;
 
-    public FlowRestApi(DeviceHelper deviceHelper, FlowServiceFactory serviceFactory,
+    public FlowRestApi(DeviceHelper deviceHelper, RestServiceFactory serviceFactory,
             Encoder encoder, String version, ApiUrls apiUrls, SignatureHelper signatureHelper,
             S3User s3User, DateFormat dateFormat) {
         this.androidId = deviceHelper.getAndroidId();

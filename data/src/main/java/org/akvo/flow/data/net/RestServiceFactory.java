@@ -35,7 +35,7 @@ import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 @Singleton
-public class FlowServiceFactory {
+public class RestServiceFactory {
 
     private static final int CONNECTION_TIMEOUT = 10;
     /**
@@ -50,7 +50,7 @@ public class FlowServiceFactory {
     private SignatureHelper signatureHelper;
 
     @Inject
-    public FlowServiceFactory(HttpLoggingInterceptor loggingInterceptor,
+    public RestServiceFactory(HttpLoggingInterceptor loggingInterceptor,
             SimpleDateFormat simpleDateFormat, Encoder encoder, String key,
             SignatureHelper signatureHelper) {
         this.loggingInterceptor = loggingInterceptor;

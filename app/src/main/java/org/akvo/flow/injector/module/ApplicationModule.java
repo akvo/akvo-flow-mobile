@@ -34,8 +34,8 @@ import org.akvo.flow.data.migration.FlowMigrationListener;
 import org.akvo.flow.data.migration.languages.MigrationLanguageMapper;
 import org.akvo.flow.data.net.DeviceHelper;
 import org.akvo.flow.data.net.Encoder;
-import org.akvo.flow.data.net.FlowServiceFactory;
-import org.akvo.flow.data.net.RestApi;
+import org.akvo.flow.data.net.FlowRestApi;
+import org.akvo.flow.data.net.RestServiceFactory;
 import org.akvo.flow.data.net.S3User;
 import org.akvo.flow.data.net.SignatureHelper;
 import org.akvo.flow.data.preference.Prefs;
@@ -156,14 +156,14 @@ public class ApplicationModule {
 
     @Provides
     @Singleton
-    FlowServiceFactory provideServiceFactory(Encoder encoder, SignatureHelper signatureHelper) {
+    RestServiceFactory provideServiceFactory(Encoder encoder, SignatureHelper signatureHelper) {
         HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor();
         if (BuildConfig.DEBUG) {
             loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
         }
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(SERVICE_FACTORY_DATE_PATTERN, Locale.US);
         simpleDateFormat.setTimeZone(TimeZone.getTimeZone(TIMEZONE));
-        return new FlowServiceFactory(loggingInterceptor, simpleDateFormat, encoder,
+        return new RestServiceFactory(loggingInterceptor, simpleDateFormat, encoder,
                 BuildConfig.API_KEY, signatureHelper);
     }
 
@@ -188,13 +188,13 @@ public class ApplicationModule {
 
     @Provides
     @Singleton
-    RestApi provideRestApi(DeviceHelper deviceHelper, FlowServiceFactory serviceFactory,
+    FlowRestApi provideRestApi(DeviceHelper deviceHelper, RestServiceFactory serviceFactory,
             Encoder encoder, ApiUrls apiUrls, SignatureHelper signatureHelper) {
         S3User s3User = new S3User(BuildConfig.AWS_BUCKET, BuildConfig.AWS_ACCESS_KEY_ID,
                 BuildConfig.AWS_SECRET_KEY);
         final DateFormat df = new SimpleDateFormat(REST_API_DATE_PATTERN, Locale.US);
         df.setTimeZone(TimeZone.getTimeZone(TIMEZONE));
-        return new RestApi(deviceHelper, serviceFactory, encoder, BuildConfig.VERSION_NAME,
+        return new FlowRestApi(deviceHelper, serviceFactory, encoder, BuildConfig.VERSION_NAME,
                 apiUrls, signatureHelper, s3User, df);
     }
 

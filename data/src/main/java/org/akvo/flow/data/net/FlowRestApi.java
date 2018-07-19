@@ -47,14 +47,14 @@ import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 
 @Singleton
-public class RestApi {
+public class FlowRestApi {
     private static final String PAYLOAD_PUT_PUBLIC = "PUT\n%s\n%s\n%s\nx-amz-acl:public-read\n/%s/%s";// md5, type, date, bucket, obj
     private static final String PAYLOAD_PUT_PRIVATE = "PUT\n%s\n%s\n%s\n/%s/%s";// md5, type, date, bucket, obj
 
     private final String androidId;
     private final String imei;
     private final String phoneNumber;
-    private final FlowServiceFactory serviceFactory;
+    private final RestServiceFactory serviceFactory;
     private final Encoder encoder;
     private final String version;
     private final ApiUrls apiUrls;
@@ -62,7 +62,7 @@ public class RestApi {
     private final S3User s3User;
     private final DateFormat dateFormat;
 
-    public RestApi(DeviceHelper deviceHelper, FlowServiceFactory serviceFactory,
+    public FlowRestApi(DeviceHelper deviceHelper, RestServiceFactory serviceFactory,
             Encoder encoder, String version, ApiUrls apiUrls, SignatureHelper signatureHelper,
             S3User s3User, DateFormat dateFormat) {
         this.androidId = deviceHelper.getAndroidId();

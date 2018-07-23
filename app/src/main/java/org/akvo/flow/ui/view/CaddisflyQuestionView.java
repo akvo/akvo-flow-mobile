@@ -150,8 +150,6 @@ public class CaddisflyQuestionView extends QuestionView implements View.OnClickL
                 captureResponse();
             }
             displayResponseView();
-        } else {
-            captureResponse();
         }
     }
 

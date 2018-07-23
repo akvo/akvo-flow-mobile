@@ -60,15 +60,12 @@ public class FileDataSource {
         return moveFiles(FolderBrowser.DIR_MEDIA);
     }
 
-    public Observable<Boolean> copyMediaFile(String originFilePath, String destinationFilePath) {
+    public Observable<Boolean> copyFile(String originFilePath, String destinationFilePath) {
         File originalFile = new File(originFilePath);
         try {
-            String copiedFilePath = fileHelper
-                    .copyFile(originalFile, new File(destinationFilePath));
-            if (copiedFilePath != null) {
-                //noinspection ResultOfMethodCallIgnored
-                originalFile.delete();
-            } else {
+            File destinationFile = new File(destinationFilePath);
+            String copiedFilePath = fileHelper.copyFile(originalFile, destinationFile);
+            if (copiedFilePath == null) {
                 return Observable.error(new Exception("Error copying video file"));
             }
             return Observable.just(true);
@@ -203,5 +200,9 @@ public class FileDataSource {
 
     public Observable<Long> getAvailableStorage() {
         return Observable.just(externalStorageHelper.getExternalStorageAvailableSpaceInMb());
+    }
+
+    public Observable<Boolean> deleteFile(String originFilePath) {
+        return Observable.just(fileHelper.deleteFile(originFilePath));
     }
 }

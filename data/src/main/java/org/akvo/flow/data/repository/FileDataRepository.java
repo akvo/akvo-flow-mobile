@@ -23,7 +23,6 @@ package org.akvo.flow.data.repository;
 import android.graphics.Bitmap;
 
 import org.akvo.flow.data.datasource.DataSourceFactory;
-import org.akvo.flow.data.entity.MovedFile;
 import org.akvo.flow.domain.repository.FileRepository;
 
 import java.util.List;
@@ -61,9 +60,9 @@ public class FileDataRepository implements FileRepository {
     public Observable<Boolean> moveFiles() {
         return Observable.merge(dataSourceFactory.getFileDataSource().moveZipFiles(),
                 dataSourceFactory.getFileDataSource().moveMediaFiles())
-                .concatMap(new Function<List<MovedFile>, Observable<Boolean>>() {
+                .concatMap(new Function<List<String>, Observable<Boolean>>() {
                     @Override
-                    public Observable<Boolean> apply(List<MovedFile> movedFiles) {
+                    public Observable<Boolean> apply(List<String> movedFiles) {
                         return Observable.just(true);
                     }
                 });

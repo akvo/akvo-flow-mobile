@@ -34,17 +34,20 @@ public class DataSourceFactory {
     private final DatabaseDataSource dataBaseDataSource;
     private final FileDataSource fileDataSource;
     private final SecureSharedPreferencesDataSource secureSharedPreferencesDataSource;
+    private final MediaDataSource mediaDataSource;
 
     @Inject
     public DataSourceFactory(SharedPreferencesDataSource sharedPreferencesDataSource,
             ImageDataSource imageDataSource, DatabaseDataSource dataBaseDataSource,
             SecureSharedPreferencesDataSource secureSharedPreferencesDataSource,
-            FileDataSource fileDataSource) {
+            FileDataSource fileDataSource,
+            MediaDataSource mediaDataSource) {
         this.sharedPreferencesDataSource = sharedPreferencesDataSource;
         this.imageDataSource = imageDataSource;
         this.dataBaseDataSource = dataBaseDataSource;
         this.secureSharedPreferencesDataSource = secureSharedPreferencesDataSource;
         this.fileDataSource = fileDataSource;
+        this.mediaDataSource = mediaDataSource;
     }
 
     public SharedPreferencesDataSource getSharedPreferencesDataSource() {
@@ -65,5 +68,9 @@ public class DataSourceFactory {
 
     public FileDataSource getFileDataSource() {
         return fileDataSource;
+    }
+
+    public MediaDataSource getMediaDataSource() {
+        return mediaDataSource;
     }
 }

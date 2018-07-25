@@ -26,5 +26,7 @@ public interface IVideoQuestionView {
 
     void showLoading();
 
+    void hideLoading();
+
     void displayThumbnail(String videoFilePath);
 }

@@ -20,6 +20,7 @@
 
 package org.akvo.flow.ui.view.media.video;
 
+import android.net.Uri;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
@@ -60,13 +61,15 @@ public class VideoQuestionPresenter implements Presenter {
         copyVideo.dispose();
     }
 
-    public void onVideoReady(@Nullable String filePath) {
+    public void onVideoReady(@Nullable Uri uri) {
+        String filePath = mediaFileHelper.getVideoPathFromIntent(uri);
         if (!TextUtils.isEmpty(filePath)) {
             view.showLoading();
             final String targetVideoFilePath = mediaFileHelper.getVideoFilePath();
-            Map<String, Object> params = new HashMap<>(4);
+            Map<String, Object> params = new HashMap<>(6);
             params.put(CopyVideo.ORIGIN_FILE_NAME_PARAM, filePath);
             params.put(CopyVideo.DESTINATION_FILE_NAME_PARAM, targetVideoFilePath);
+            params.put(CopyVideo.URI_ORIGINAL_FILE, uri);
             copyVideo.execute(new DefaultObserver<Boolean>() {
                 @Override
                 public void onNext(Boolean aBoolean) {
@@ -76,12 +79,17 @@ public class VideoQuestionPresenter implements Presenter {
                 @Override
                 public void onError(Throwable e) {
                     Timber.e(e);
-                    view.showErrorGettingMedia();
+                    onErrorLoadingVideo();
                 }
             }, params);
         } else {
-            view.showErrorGettingMedia();
+            onErrorLoadingVideo();
         }
+    }
+
+    private void onErrorLoadingVideo() {
+        view.hideLoading();
+        view.showErrorGettingMedia();
     }
 
     @Nullable

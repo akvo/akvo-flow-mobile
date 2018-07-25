@@ -21,7 +21,6 @@
 package org.akvo.flow.util;
 
 import android.content.Context;
-import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Environment;
@@ -70,11 +69,6 @@ public class MediaFileHelper {
     }
 
     @Nullable
-    public String getAcquiredVideoFilePath(Intent intent) {
-        return getVideoPathFromIntent(intent);
-    }
-
-    @Nullable
     public File getImageTmpFile() {
         return getTempMediaFile(TEMP_PHOTO_NAME_PREFIX, IMAGE_SUFFIX);
     }
@@ -102,9 +96,9 @@ public class MediaFileHelper {
      * On some devices the uri we pass for taking videos is ignored and in this case we need to get
      * the actual uri returned by the intent
      */
-    private String getVideoPathFromIntent(Intent intent) {
+    @Nullable
+    public String getVideoPathFromIntent(Uri videoUri) {
         String videoAbsolutePath = null;
-        Uri videoUri = intent.getData();
         if (videoUri != null) {
             String[] filePathColumns = {
                     MediaStore.Images.Media.DATA
@@ -112,9 +106,10 @@ public class MediaFileHelper {
             Cursor cursor = context.getContentResolver()
                     .query(videoUri, filePathColumns, null, null, null);
             if (cursor != null) {
-                cursor.moveToFirst();
-                int columnIndex = cursor.getColumnIndex(filePathColumns[0]);
-                videoAbsolutePath = cursor.getString(columnIndex);
+                if (cursor.moveToFirst()) {
+                    int columnIndex = cursor.getColumnIndex(MediaStore.Images.Media.DATA);
+                    videoAbsolutePath = cursor.getString(columnIndex);
+                }
                 cursor.close();
             }
         }

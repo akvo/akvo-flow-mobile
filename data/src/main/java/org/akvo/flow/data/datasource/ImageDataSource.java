@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -21,12 +21,10 @@
 package org.akvo.flow.data.datasource;
 
 import android.content.Context;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.graphics.RectF;
-import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.media.ExifInterface;
@@ -52,7 +50,6 @@ import javax.inject.Singleton;
 
 import io.reactivex.Observable;
 import io.reactivex.functions.BiFunction;
-import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 import timber.log.Timber;
 
@@ -90,23 +87,15 @@ public class ImageDataSource {
         return resizeImage(originalImagePath, resizedImagePath, imageSize)
                 .concatMap(new Function<Boolean, Observable<Boolean>>() {
                     @Override
-                    public Observable<Boolean> apply(Boolean result) throws Exception {
-                        return cleanup(originalImagePath, resizedImagePath);
+                    public Observable<Boolean> apply(Boolean result) {
+                        return updateExifOrientationData(originalImagePath, resizedImagePath);
                     }
                 });
     }
 
-    private Observable<Boolean> cleanup(final String originalImagePath,
-            final String resizedImagePath) {
-        return updateExifOrientationData(originalImagePath, resizedImagePath)
-                .doOnNext(new Consumer<Boolean>() {
-                    @Override
-                    public void accept(Boolean aBoolean) throws Exception {
-                        removeDuplicateImage(originalImagePath);
-                        //noinspection ResultOfMethodCallIgnored
-                        new File(originalImagePath).delete();
-                    }
-                });
+    public Observable<Boolean> duplicateImageFound(String filepath, String lastImagePath) {
+        return Observable.just(!filepath.equals(lastImagePath) && compareImages(filepath,
+                lastImagePath));
     }
 
     private Observable<Boolean> saveImage(@Nullable Bitmap bitmap, String filename) {
@@ -176,7 +165,7 @@ public class ImageDataSource {
         }
 
         if (options.outHeight > options.outWidth) {
-            imageSize = ImageSize.swapWidthHeightForPortrait(imageSize);
+            imageSize = imageSize.swapWidthHeightForPortrait();
         }
         return imageSize;
     }
@@ -254,57 +243,6 @@ public class ImageDataSource {
     private String getExifOrientationTag(String filename) throws IOException {
         ExifInterface exif = new ExifInterface(filename);
         return exif.getAttribute(ExifInterface.TAG_ORIENTATION);
-    }
-
-    /**
-     * Some manufacturers will duplicate the image saving a copy in the DCIM
-     * folder. This method will try to spot those situations and remove the
-     * duplicated image.
-     *
-     * @param filepath The absolute path to the original image
-     */
-    private void removeDuplicateImage(String filepath) {
-        Cursor cursor = getLastImageTaken();
-
-        if (cursor != null) {
-            if (cursor.moveToFirst()) {
-                final String lastImagePath = cursor.getString(cursor
-                        .getColumnIndex(MediaStore.Images.ImageColumns.DATA));
-
-                if ((!filepath.equals(lastImagePath)) && (compareImages(filepath, lastImagePath))) {
-                    deleteDuplicatedImage(lastImagePath);
-                }
-            }
-            cursor.close();
-        }
-    }
-
-    private void deleteDuplicatedImage(String lastImagePath) {
-        final int result = context.getContentResolver().delete(
-                MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                MediaStore.Images.ImageColumns.DATA + " = ?",
-                new String[] {
-                        lastImagePath
-                });
-
-        if (result == 1) {
-            Timber.i("Duplicated file successfully removed: %s", lastImagePath);
-        } else {
-            Timber.e("Error removing duplicated image: %s", lastImagePath);
-        }
-    }
-
-    private Cursor getLastImageTaken() {
-        return context.getContentResolver().query(
-                    MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                    new String[] {
-                            MediaStore.Images.ImageColumns.DATA,
-                            MediaStore.Images.ImageColumns.DATE_TAKEN
-                    },
-                    null,
-                    null,
-                    MediaStore.Images.ImageColumns.DATE_TAKEN + " DESC"
-            );
     }
 
     /**

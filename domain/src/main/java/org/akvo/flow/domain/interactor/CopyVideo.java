@@ -20,6 +20,8 @@
 
 package org.akvo.flow.domain.interactor;
 
+import android.net.Uri;
+
 import org.akvo.flow.domain.executor.PostExecutionThread;
 import org.akvo.flow.domain.executor.ThreadExecutor;
 import org.akvo.flow.domain.repository.FileRepository;
@@ -29,12 +31,10 @@ import java.util.Map;
 import javax.inject.Inject;
 
 import io.reactivex.Observable;
-import io.reactivex.functions.Function;
 
 public class CopyVideo extends UseCase {
 
-    public static final String ORIGIN_FILE_NAME_PARAM = "original_file";
-    public static final String DESTINATION_FILE_NAME_PARAM = "target_file";
+    public static final String URI_ORIGINAL_FILE = "video_uri";
 
     private final FileRepository fileRepository;
 
@@ -47,19 +47,11 @@ public class CopyVideo extends UseCase {
 
     @Override
     protected <T> Observable buildUseCaseObservable(Map<String, T> parameters) {
-        if (parameters == null || !parameters.containsKey(ORIGIN_FILE_NAME_PARAM)
-                || !parameters.containsKey(DESTINATION_FILE_NAME_PARAM)) {
+        if (parameters == null || !parameters.containsKey(URI_ORIGINAL_FILE)) {
             return Observable.error(new IllegalArgumentException("Missing params"));
         }
 
-        final String originFilePath = (String) parameters.get(ORIGIN_FILE_NAME_PARAM);
-        final String destinationFilePath = (String) parameters.get(DESTINATION_FILE_NAME_PARAM);
-        return fileRepository.copyFile(originFilePath, destinationFilePath)
-                .concatMap(new Function<Boolean, Observable<Boolean>>() {
-                    @Override
-                    public Observable<Boolean> apply(Boolean aBoolean) {
-                        return fileRepository.removeFile(originFilePath);
-                    }
-                });
+        final Uri uri = (Uri) parameters.get(URI_ORIGINAL_FILE);
+        return fileRepository.copyVideo(uri);
     }
 }

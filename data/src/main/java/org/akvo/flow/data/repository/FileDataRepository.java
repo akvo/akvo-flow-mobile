@@ -21,8 +21,10 @@
 package org.akvo.flow.data.repository;
 
 import android.graphics.Bitmap;
+import android.net.Uri;
 
 import org.akvo.flow.data.datasource.DataSourceFactory;
+import org.akvo.flow.data.datasource.MediaDataSource;
 import org.akvo.flow.domain.repository.FileRepository;
 
 import java.util.List;
@@ -31,6 +33,7 @@ import javax.inject.Inject;
 
 import io.reactivex.Observable;
 import io.reactivex.annotations.NonNull;
+import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 
 public class FileDataRepository implements FileRepository {
@@ -50,10 +53,39 @@ public class FileDataRepository implements FileRepository {
     }
 
     @Override
-    public Observable<Boolean> saveResizedImage(String originalImagePath, String resizedImagePath,
-            int imageSize) {
+    public Observable<Boolean> saveResizedImage(final String originalImagePath,
+            String resizedImagePath, int imageSize) {
         return dataSourceFactory.getImageDataSource()
-                .saveResizedImage(originalImagePath, resizedImagePath, imageSize);
+                .saveResizedImage(originalImagePath, resizedImagePath, imageSize)
+                .concatMap(new Function<Boolean, Observable<Boolean>>() {
+                    @Override
+                    public Observable<Boolean> apply(Boolean aBoolean) {
+                        return cleanupDuplicateImage(
+                                originalImagePath);
+                    }
+                });
+    }
+
+    private Observable<Boolean> cleanupDuplicateImage(final String originalImagePath) {
+        final MediaDataSource mediaDataSource = dataSourceFactory.getMediaDataSource();
+        return mediaDataSource.getLastImageTaken()
+                .concatMap(new Function<String, Observable<Boolean>>() {
+                    @Override
+                    public Observable<Boolean> apply(final String lastImageTaken) {
+                        return dataSourceFactory.getImageDataSource()
+                                .duplicateImageFound(originalImagePath, lastImageTaken)
+                                .concatMap(new Function<Boolean, Observable<Boolean>>() {
+                                    @Override
+                                    public Observable<Boolean> apply(Boolean duplicate) {
+                                        if (duplicate) {
+                                            mediaDataSource.deleteImage(lastImageTaken);
+                                        }
+                                        return dataSourceFactory.getFileDataSource()
+                                                .deleteFile(originalImagePath);
+                                    }
+                                });
+                    }
+                });
     }
 
     @Override
@@ -105,7 +137,20 @@ public class FileDataRepository implements FileRepository {
     }
 
     @Override
-    public Observable<Boolean> removeFile(String originFilePath) {
-        return dataSourceFactory.getFileDataSource().deleteFile(originFilePath);
+    public Observable<String> copyVideo(final Uri uri) {
+        final MediaDataSource mediaDataSource = dataSourceFactory.getMediaDataSource();
+        return mediaDataSource.getVideoFilePath(uri)
+                .concatMap(new Function<String, Observable<String>>() {
+                    @Override
+                    public Observable<String> apply(final String videoFilePath) {
+                        return dataSourceFactory.getFileDataSource().copyVideo(videoFilePath)
+                                .doOnNext(new Consumer<String>() {
+                                    @Override
+                                    public void accept(String ignored) {
+                                        mediaDataSource.notifyMediaDelete(uri);
+                                    }
+                                });
+                    }
+                });
     }
 }

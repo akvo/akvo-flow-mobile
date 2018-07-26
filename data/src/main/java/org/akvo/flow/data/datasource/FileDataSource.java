@@ -34,32 +34,33 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import io.reactivex.Observable;
+import io.reactivex.functions.Function;
 import timber.log.Timber;
 
 @Singleton
 public class FileDataSource {
 
     private final FileHelper fileHelper;
-    private final FolderBrowser folderBrowser;
+    private final FlowFileBrowser flowFileBrowser;
     private final ExternalStorageHelper externalStorageHelper;
 
     @Inject
-    public FileDataSource(FileHelper fileHelper, FolderBrowser folderBrowser,
+    public FileDataSource(FileHelper fileHelper, FlowFileBrowser flowFileBrowser,
             ExternalStorageHelper externalStorageHelper) {
         this.fileHelper = fileHelper;
-        this.folderBrowser = folderBrowser;
+        this.flowFileBrowser = flowFileBrowser;
         this.externalStorageHelper = externalStorageHelper;
     }
 
     public Observable<List<String>> moveZipFiles() {
-        List<String> fileList = moveFiles(FolderBrowser.DIR_DATA);
+        List<String> fileList = moveFiles(FlowFileBrowser.DIR_DATA);
         return Observable.just(fileList);
     }
 
     public Observable<List<String>> moveMediaFiles() {
         List<String> fileList = moveFiles(
-                FolderBrowser.DIR_MEDIA + FolderBrowser.CADDISFLY_OLD_FOLDER);
-        fileList.addAll(moveFiles(FolderBrowser.DIR_MEDIA));
+                FlowFileBrowser.DIR_MEDIA + FlowFileBrowser.CADDISFLY_OLD_FOLDER);
+        fileList.addAll(moveFiles(FlowFileBrowser.DIR_MEDIA));
         return Observable.just(fileList);
     }
 
@@ -78,7 +79,7 @@ public class FileDataSource {
     }
 
     private List<String> moveFiles(String folderName) {
-        File publicFolder = folderBrowser.getPublicFolder(folderName);
+        File publicFolder = flowFileBrowser.getPublicFolder(folderName);
         List<String> movedFiles = new ArrayList<>();
         if (publicFolder != null && publicFolder.exists()) {
             File[] files = publicFolder.listFiles();
@@ -113,7 +114,7 @@ public class FileDataSource {
     }
 
     private File getPrivateFolder(String folderName) {
-        File folder = folderBrowser.getInternalFolder(folderName);
+        File folder = flowFileBrowser.getInternalFolder(folderName);
         if (!folder.exists()) {
             //noinspection ResultOfMethodCallIgnored
             folder.mkdirs();
@@ -123,10 +124,10 @@ public class FileDataSource {
 
     public Observable<Boolean> publishFiles(List<String> fileNames) {
         try {
-            boolean dataCopied = copyPrivateFileToAppExternalFolder(FolderBrowser.DIR_DATA,
-                    FolderBrowser.DIR_PUBLISHED_DATA, fileNames);
-            boolean mediaCopied = copyPrivateFileToAppExternalFolder(FolderBrowser.DIR_MEDIA,
-                    FolderBrowser.DIR_PUBLISHED_MEDIA, fileNames);
+            boolean dataCopied = copyPrivateFileToAppExternalFolder(FlowFileBrowser.DIR_DATA,
+                    FlowFileBrowser.DIR_PUBLISHED_DATA, fileNames);
+            boolean mediaCopied = copyPrivateFileToAppExternalFolder(FlowFileBrowser.DIR_MEDIA,
+                    FlowFileBrowser.DIR_PUBLISHED_MEDIA, fileNames);
             return Observable.just(dataCopied || mediaCopied);
         } catch (IOException e) {
             return Observable.error(e);
@@ -136,7 +137,7 @@ public class FileDataSource {
     private boolean copyPrivateFileToAppExternalFolder(String privateFolderName,
             String publicFolderName, List<String> fileNames) throws IOException {
         boolean filesCopied = false;
-        File destinationDataFolder = folderBrowser.getAppExternalFolder(publicFolderName);
+        File destinationDataFolder = flowFileBrowser.getAppExternalFolder(publicFolderName);
         if (destinationDataFolder != null && !destinationDataFolder.exists()) {
             //noinspection ResultOfMethodCallIgnored
             destinationDataFolder.mkdirs();
@@ -157,13 +158,13 @@ public class FileDataSource {
     }
 
     public Observable<Boolean> removePublishedFiles() {
-        deleteFilesInAppExternalFolder(FolderBrowser.DIR_PUBLISHED_DATA);
-        deleteFilesInAppExternalFolder(FolderBrowser.DIR_PUBLISHED_MEDIA);
+        deleteFilesInAppExternalFolder(FlowFileBrowser.DIR_PUBLISHED_DATA);
+        deleteFilesInAppExternalFolder(FlowFileBrowser.DIR_PUBLISHED_MEDIA);
         return Observable.just(true);
     }
 
     private void deleteFilesInAppExternalFolder(String folderName) {
-        File dataFolder = folderBrowser.getAppExternalFolder(folderName);
+        File dataFolder = flowFileBrowser.getAppExternalFolder(folderName);
         File[] files = dataFolder == null ? null : dataFolder.listFiles();
         if (files != null) {
             for (File f : files) {
@@ -174,9 +175,9 @@ public class FileDataSource {
     }
 
     public Observable<Boolean> deleteAllUserFiles() {
-        List<File> foldersToDelete = folderBrowser.findAllPossibleFolders(FolderBrowser.DIR_FORMS);
-        foldersToDelete.addAll(folderBrowser.findAllPossibleFolders(FolderBrowser.DIR_RES));
-        File inboxFolder = folderBrowser.getPublicFolder(FolderBrowser.DIR_INBOX);
+        List<File> foldersToDelete = flowFileBrowser.findAllPossibleFolders(FlowFileBrowser.DIR_FORMS);
+        foldersToDelete.addAll(flowFileBrowser.findAllPossibleFolders(FlowFileBrowser.DIR_RES));
+        File inboxFolder = flowFileBrowser.getPublicFolder(FlowFileBrowser.DIR_INBOX);
         if (inboxFolder != null && inboxFolder.exists()) {
             foldersToDelete.add(inboxFolder);
         }
@@ -188,10 +189,10 @@ public class FileDataSource {
     }
 
     public Observable<Boolean> deleteResponsesFiles() {
-        List<File> foldersToDelete = folderBrowser.findAllPossibleFolders(FolderBrowser.DIR_DATA);
-        foldersToDelete.addAll(folderBrowser.findAllPossibleFolders(FolderBrowser.DIR_MEDIA));
-        foldersToDelete.addAll(folderBrowser.findAllPossibleFolders(FolderBrowser.DIR_TMP));
-        File exportedFolder = folderBrowser.getAppExternalFolder(FolderBrowser.DIR_PUBLISHED);
+        List<File> foldersToDelete = flowFileBrowser.findAllPossibleFolders(FlowFileBrowser.DIR_DATA);
+        foldersToDelete.addAll(flowFileBrowser.findAllPossibleFolders(FlowFileBrowser.DIR_MEDIA));
+        foldersToDelete.addAll(flowFileBrowser.findAllPossibleFolders(FlowFileBrowser.DIR_TMP));
+        File exportedFolder = flowFileBrowser.getAppExternalFolder(FlowFileBrowser.DIR_PUBLISHED);
         if (exportedFolder != null && exportedFolder.exists()) {
             foldersToDelete.add(exportedFolder);
         }
@@ -207,5 +208,22 @@ public class FileDataSource {
 
     public Observable<Boolean> deleteFile(String originFilePath) {
         return Observable.just(fileHelper.deleteFile(originFilePath));
+    }
+
+    public Observable<String> copyVideo(final String videoFilePath) {
+        final String copiedVideoPath = flowFileBrowser.getVideoFilePath();
+        return copyFile(videoFilePath, copiedVideoPath)
+                .flatMap(new Function<Boolean, Observable<String>>() {
+                    @Override
+                    public Observable<String> apply(Boolean ignored) {
+                        return deleteFile(videoFilePath)
+                                .map(new Function<Boolean, String>() {
+                                    @Override
+                                    public String apply(Boolean ignored) {
+                                        return copiedVideoPath;
+                                    }
+                                });
+                    }
+                });
     }
 }

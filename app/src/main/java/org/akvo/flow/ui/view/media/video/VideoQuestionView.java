@@ -282,6 +282,6 @@ public class VideoQuestionView extends QuestionView
      */
     @Nullable
     private File rebuildFilePath() {
-        return presenter.getExistingImageFilePath(filePath);
+        return presenter.getExistingVideoFilePath(filePath);
     }
 }

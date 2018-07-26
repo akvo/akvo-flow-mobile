@@ -62,38 +62,26 @@ public class VideoQuestionPresenter implements Presenter {
     }
 
     public void onVideoReady(@Nullable Uri uri) {
-        String filePath = mediaFileHelper.getVideoPathFromIntent(uri);
-        if (!TextUtils.isEmpty(filePath)) {
             view.showLoading();
-            final String targetVideoFilePath = mediaFileHelper.getVideoFilePath();
-            Map<String, Object> params = new HashMap<>(6);
-            params.put(CopyVideo.ORIGIN_FILE_NAME_PARAM, filePath);
-            params.put(CopyVideo.DESTINATION_FILE_NAME_PARAM, targetVideoFilePath);
+            Map<String, Object> params = new HashMap<>(2);
             params.put(CopyVideo.URI_ORIGINAL_FILE, uri);
-            copyVideo.execute(new DefaultObserver<Boolean>() {
+            copyVideo.execute(new DefaultObserver<String>() {
                 @Override
-                public void onNext(Boolean aBoolean) {
+                public void onNext(String targetVideoFilePath) {
                     view.displayThumbnail(targetVideoFilePath);
                 }
 
                 @Override
                 public void onError(Throwable e) {
                     Timber.e(e);
-                    onErrorLoadingVideo();
+                    view.hideLoading();
+                    view.showErrorGettingMedia();
                 }
             }, params);
-        } else {
-            onErrorLoadingVideo();
-        }
-    }
-
-    private void onErrorLoadingVideo() {
-        view.hideLoading();
-        view.showErrorGettingMedia();
     }
 
     @Nullable
-    public File getExistingImageFilePath(@Nullable String filePath) {
+    public File getExistingVideoFilePath(@Nullable String filePath) {
         if (TextUtils.isEmpty(filePath)) {
             return null;
         }

@@ -48,7 +48,5 @@ public interface FileRepository {
 
     Observable<Boolean> isExternalStorageFull();
 
-    Observable<Boolean> removeFile(String originFilePath);
-
-    Observable<Boolean> notifyMediaDelete(Uri originalImagePath);
+    Observable<String> copyVideo(Uri uri);
 }

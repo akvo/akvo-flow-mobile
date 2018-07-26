@@ -24,6 +24,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.MediaStore;
+import android.support.annotation.Nullable;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -82,5 +83,27 @@ public class MediaDataSource {
             Timber.e("Error removing duplicated image: %s", lastImagePath);
         }
         return Observable.just(true);
+    }
+
+    public Observable<String> getVideoFilePath(@Nullable Uri videoUri) {
+        String videoAbsolutePath = null;
+        if (videoUri != null) {
+            String[] filePathColumns = {
+                    MediaStore.Images.Media.DATA
+            };
+            Cursor cursor = context.getContentResolver()
+                    .query(videoUri, filePathColumns, null, null, null);
+            if (cursor != null) {
+                if (cursor.moveToFirst()) {
+                    int columnIndex = cursor.getColumnIndex(MediaStore.Images.Media.DATA);
+                    videoAbsolutePath = cursor.getString(columnIndex);
+                }
+                cursor.close();
+            }
+        }
+        if (videoAbsolutePath == null) {
+            return Observable.error(new Exception("Video path not found"));
+        }
+        return Observable.just(videoAbsolutePath);
     }
 }

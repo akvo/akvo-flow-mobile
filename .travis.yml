@@ -33,20 +33,19 @@ before_install:
   - chmod +x fastlane/deploy_beta.sh
   - chmod +x travis/deploy_release.sh
 
-#before_script:
-#    - echo no | android create avd --force -n test -t android-21 --abi armeabi-v7a -c 2048M
-#    - mksdcard -l sdcard 2048M sdcard
-#    - emulator -avd test -no-audio -no-window -sdcard sdcard &
-#    - android-wait-for-emulator
-#    - adb shell settings put global window_animation_scale 0 &
-#    - adb shell settings put global transition_animation_scale 0 &
-#    - adb shell settings put global animator_duration_scale 0 &
-#    - adb shell settings put secure long_press_timeout 1500 &
-#    - adb shell input keyevent 82 &
+before_script:
+    - echo no | android create avd --force -n test -t android-21 --abi armeabi-v7a -c 2048M
+    - mksdcard -l sdcard 2048M sdcard
+    - emulator -avd test -no-audio -no-window -sdcard sdcard &
+    - android-wait-for-emulator
+    - adb shell settings put global window_animation_scale 0 &
+    - adb shell settings put global transition_animation_scale 0 &
+    - adb shell settings put global animator_duration_scale 0 &
+    - adb shell settings put secure long_press_timeout 1500 &
+    - adb shell input keyevent 82 &
 
 script:
-  - ./gradlew test --continue
-  #- ./gradlew check --continue connectedFlowDebugAndroidTest --continue
+  - ./gradlew check --continue connectedFlowDebugAndroidTest --continue
 
 after_failure:
   - pandoc app/build/reports/androidTests/connected/flavors/FLOW/org.akvo.flow.activity.form.formfill.CascadeQuestionViewTest.html -t plain

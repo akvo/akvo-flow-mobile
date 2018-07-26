@@ -23,7 +23,6 @@ package org.akvo.flow.data.datasource;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
-import org.akvo.flow.data.entity.MovedFile;
 import org.akvo.flow.data.util.ExternalStorageHelper;
 
 import java.io.File;
@@ -52,23 +51,24 @@ public class FileDataSource {
         this.externalStorageHelper = externalStorageHelper;
     }
 
-    public Observable<List<MovedFile>> moveZipFiles() {
-        return moveFiles(FolderBrowser.DIR_DATA);
+    public Observable<List<String>> moveZipFiles() {
+        List<String> fileList = moveFiles(FolderBrowser.DIR_DATA);
+        return Observable.just(fileList);
     }
 
-    public Observable<List<MovedFile>> moveMediaFiles() {
-        return moveFiles(FolderBrowser.DIR_MEDIA);
+    public Observable<List<String>> moveMediaFiles() {
+        List<String> fileList = moveFiles(
+                FolderBrowser.DIR_MEDIA + FolderBrowser.CADDISFLY_OLD_FOLDER);
+        fileList.addAll(moveFiles(FolderBrowser.DIR_MEDIA));
+        return Observable.just(fileList);
     }
 
-    public Observable<Boolean> copyMediaFile(String originFilePath, String destinationFilePath) {
+    public Observable<Boolean> copyFile(String originFilePath, String destinationFilePath) {
         File originalFile = new File(originFilePath);
         try {
-            String copiedFilePath = fileHelper
-                    .copyFile(originalFile, new File(destinationFilePath));
-            if (copiedFilePath != null) {
-                //noinspection ResultOfMethodCallIgnored
-                originalFile.delete();
-            } else {
+            File destinationFile = new File(destinationFilePath);
+            String copiedFilePath = fileHelper.copyFile(originalFile, destinationFile);
+            if (copiedFilePath == null) {
                 return Observable.error(new Exception("Error copying video file"));
             }
             return Observable.just(true);
@@ -77,9 +77,9 @@ public class FileDataSource {
         }
     }
 
-    private Observable<List<MovedFile>> moveFiles(String folderName) {
+    private List<String> moveFiles(String folderName) {
         File publicFolder = folderBrowser.getPublicFolder(folderName);
-        List<MovedFile> movedFiles = new ArrayList<>();
+        List<String> movedFiles = new ArrayList<>();
         if (publicFolder != null && publicFolder.exists()) {
             File[] files = publicFolder.listFiles();
             movedFiles = copyFiles(files, folderName);
@@ -88,18 +88,18 @@ public class FileDataSource {
                 publicFolder.delete();
             }
         }
-        return Observable.just(movedFiles);
+        return movedFiles;
     }
 
-    private List<MovedFile> copyFiles(@Nullable File[] files, String folderName) {
-        List<MovedFile> movedFiles = new ArrayList<>();
+    private List<String> copyFiles(@Nullable File[] files, String folderName) {
+        List<String> movedFiles = new ArrayList<>();
         if (files != null) {
             File folder = getPrivateFolder(folderName);
             for (File f : files) {
                 try {
                     String destinationPath = fileHelper.copyFileToFolder(f, folder);
                     if (!TextUtils.isEmpty(destinationPath)) {
-                        movedFiles.add(new MovedFile(f.getPath(), destinationPath));
+                        movedFiles.add(destinationPath);
                         //noinspection ResultOfMethodCallIgnored
                         f.delete();
                     }
@@ -203,5 +203,9 @@ public class FileDataSource {
 
     public Observable<Long> getAvailableStorage() {
         return Observable.just(externalStorageHelper.getExternalStorageAvailableSpaceInMb());
+    }
+
+    public Observable<Boolean> deleteFile(String originFilePath) {
+        return Observable.just(fileHelper.deleteFile(originFilePath));
     }
 }

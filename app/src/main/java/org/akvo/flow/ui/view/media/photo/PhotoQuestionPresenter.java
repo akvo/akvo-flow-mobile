@@ -73,12 +73,12 @@ public class PhotoQuestionPresenter implements Presenter {
         return mediaFileHelper.getMediaFile(filename);
     }
 
-    void onImageReady(@Nullable final String mediaFilePath) {
-        if (!TextUtils.isEmpty(mediaFilePath)) {
+    void onImageReady(@Nullable final String originalFilePath) {
+        if (!TextUtils.isEmpty(originalFilePath)) {
             view.showLoading();
             final String resizedImageFilePath = mediaFileHelper.getImageFilePath();
             Map<String, Object> params = new HashMap<>(4);
-            params.put(SaveResizedImage.ORIGINAL_FILE_NAME_PARAM, mediaFilePath);
+            params.put(SaveResizedImage.ORIGINAL_FILE_NAME_PARAM, originalFilePath);
             params.put(SaveResizedImage.RESIZED_FILE_NAME_PARAM, resizedImageFilePath);
             saveResizedImage.execute(new DefaultObserver<Boolean>() {
                 @Override

@@ -9,6 +9,7 @@ set -e
 #
 # FLOW_S3_ACCESS_KEY=your_S3_access_key
 # FLOW_S3_SECRET_KEY=your_S3_secret_key
+# FLOW_SERVER_CONFIG=/path/to/akvo-flow-server-config
 #
 
 FLOW_DEPLOY_JAR="util/upload-apk/build/libs/deploy-1.0.jar"

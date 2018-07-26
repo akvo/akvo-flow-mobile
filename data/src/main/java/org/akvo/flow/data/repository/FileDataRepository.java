@@ -54,8 +54,7 @@ public class FileDataRepository implements FileRepository {
 
     @Override
     public Observable<Boolean> saveResizedImage(final String originalImagePath,
-            String resizedImagePath,
-            int imageSize) {
+            String resizedImagePath, int imageSize) {
         return dataSourceFactory.getImageDataSource()
                 .saveResizedImage(originalImagePath, resizedImagePath, imageSize)
                 .concatMap(new Function<Boolean, Observable<Boolean>>() {
@@ -154,5 +153,4 @@ public class FileDataRepository implements FileRepository {
                     }
                 });
     }
-
 }

@@ -157,9 +157,9 @@ public class VideoQuestionView extends QuestionView
      */
     @Override
     public void questionComplete(Bundle mediaData) {
-        Uri uri =
-                mediaData != null ?
-                        (Uri) mediaData.getParcelable(ConstantUtil.VIDEO_FILE_KEY) : null;
+        Uri uri = mediaData != null ?
+                (Uri) mediaData.getParcelable(ConstantUtil.VIDEO_FILE_KEY) :
+                null;
         presenter.onVideoReady(uri);
     }
 

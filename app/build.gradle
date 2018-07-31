@@ -85,8 +85,8 @@ android {
 
     buildTypes {
         buildTypes.each {
+            def serverBase = surveyProps['serverBase'].toString()
             def awsBucket = surveyProps['awsBucket'].toString()
-            def serverBase = "https://${awsBucket}.appspot.com"
             def awsAccessKeyId = surveyProps['awsAccessKeyId'].toString()
             def awsSecretKey = surveyProps['awsSecretKey'].toString()
             def apiKey = surveyProps['apiKey'].toString()

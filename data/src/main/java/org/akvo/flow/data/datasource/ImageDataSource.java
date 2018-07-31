@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -32,19 +32,15 @@ import android.support.annotation.Nullable;
 import android.support.media.ExifInterface;
 import android.text.TextUtils;
 
+import org.akvo.flow.data.util.FileHelper;
 import org.akvo.flow.data.util.ImageSize;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 
 import javax.inject.Inject;
@@ -62,7 +58,6 @@ public class ImageDataSource {
     private static final int RESIZED_IMAGE_WIDTH = 320;
     private static final int RESIZED_IMAGE_HEIGHT = 240;
     private static final int QUALITY_FULL = 100;
-    private static final int BUFFER_SIZE = 2048;
 
     private final Context context;
     private final FileHelper fileHelper;
@@ -350,36 +345,9 @@ public class ImageDataSource {
      * @return true if their MD5 checksum is the same, false otherwise.
      */
     private boolean compareFilesChecksum(String path1, String path2) {
-        final byte[] checksum1 = getMD5Checksum(new File(path1));
-        final byte[] checksum2 = getMD5Checksum(new File(path2));
+        final byte[] checksum1 = fileHelper.getMD5Checksum(new File(path1));
+        final byte[] checksum2 = fileHelper.getMD5Checksum(new File(path2));
 
         return Arrays.equals(checksum1, checksum2);
-    }
-
-    /**
-     * Compute MD5 checksum of the given file
-     */
-    private byte[] getMD5Checksum(File file) {
-        InputStream in = null;
-        MessageDigest md;
-        try {
-            md = MessageDigest.getInstance("MD5");
-            in = new BufferedInputStream(new FileInputStream(file));
-
-            byte[] buffer = new byte[BUFFER_SIZE];
-
-            int read;
-            while ((read = in.read(buffer)) != -1) {
-                md.update(buffer, 0, read);
-            }
-
-            return md.digest();
-        } catch (NoSuchAlgorithmException | IOException e) {
-            Timber.e(e.getMessage());
-        } finally {
-            fileHelper.close(in);
-        }
-
-        return null;
     }
 }

@@ -21,6 +21,7 @@
 package org.akvo.flow.ui.view.media.video;
 
 import android.content.Context;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
@@ -156,9 +157,10 @@ public class VideoQuestionView extends QuestionView
      */
     @Override
     public void questionComplete(Bundle mediaData) {
-        String mediaFilePath =
-                mediaData != null ? mediaData.getString(ConstantUtil.MEDIA_FILE_KEY) : null;
-        presenter.onVideoReady(mediaFilePath);
+        Uri uri = mediaData != null ?
+                (Uri) mediaData.getParcelable(ConstantUtil.VIDEO_FILE_KEY) :
+                null;
+        presenter.onVideoReady(uri);
     }
 
     @Override
@@ -170,6 +172,11 @@ public class VideoQuestionView extends QuestionView
     public void showLoading() {
         mDownloadBtn.setVisibility(GONE);
         mProgressBar.setVisibility(VISIBLE);
+    }
+
+    @Override
+    public void hideLoading() {
+        mProgressBar.setVisibility(GONE);
     }
 
     @Override
@@ -275,6 +282,6 @@ public class VideoQuestionView extends QuestionView
      */
     @Nullable
     private File rebuildFilePath() {
-        return presenter.getExistingImageFilePath(filePath);
+        return presenter.getExistingVideoFilePath(filePath);
     }
 }

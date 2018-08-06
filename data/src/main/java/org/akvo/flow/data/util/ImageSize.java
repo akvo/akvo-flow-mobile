@@ -20,8 +20,6 @@
 
 package org.akvo.flow.data.util;
 
-import android.support.annotation.NonNull;
-
 /**
  * Android has a Size class but only available since api level 21
  */
@@ -47,7 +45,7 @@ public final class ImageSize {
         return height;
     }
 
-    public static ImageSize swapWidthHeightForPortrait(@NonNull ImageSize imageSize) {
-        return new ImageSize(imageSize.getHeight(), imageSize.getWidth());
+    public ImageSize swapWidthHeightForPortrait() {
+        return new ImageSize(getHeight(), getWidth());
     }
 }

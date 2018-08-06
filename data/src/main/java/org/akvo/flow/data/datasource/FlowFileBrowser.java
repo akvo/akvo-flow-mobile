@@ -30,11 +30,13 @@ import org.akvo.flow.data.util.ExternalStorageHelper;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import javax.inject.Inject;
 
-public class FolderBrowser {
+public class FlowFileBrowser {
 
+    static final String CADDISFLY_OLD_FOLDER = "/result-images";
     static final String DIR_DATA = "akvoflow/data/files";
     static final String DIR_MEDIA = "akvoflow/data/media";
     static final String DIR_PUBLISHED = "published";
@@ -44,12 +46,13 @@ public class FolderBrowser {
     static final String DIR_RES = "res";
     static final String DIR_FORMS = "forms";
     static final String DIR_INBOX = "akvoflow/inbox";
+    private static final String VIDEO_SUFFIX = ".mp4";
 
     private final Context context;
     private final ExternalStorageHelper externalStorageHelper;
 
     @Inject
-    public FolderBrowser(Context context,
+    public FlowFileBrowser(Context context,
             ExternalStorageHelper externalStorageHelper) {
         this.context = context;
         this.externalStorageHelper = externalStorageHelper;
@@ -96,6 +99,15 @@ public class FolderBrowser {
             folder = new File(path);
         }
         return folder;
+    }
+
+    String getVideoFilePath() {
+        String filename = UUID.randomUUID().toString() + VIDEO_SUFFIX;
+        File mediaFolder = getInternalFolder(DIR_MEDIA);
+        if (!mediaFolder.exists()) {
+            mediaFolder.mkdirs();
+        }
+        return new File(mediaFolder, filename).getAbsolutePath();
     }
 
     @Nullable

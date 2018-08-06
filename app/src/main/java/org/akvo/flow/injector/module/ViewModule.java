@@ -23,6 +23,7 @@ package org.akvo.flow.injector.module;
 import org.akvo.flow.domain.interactor.AllowedToConnect;
 import org.akvo.flow.domain.interactor.ClearAllData;
 import org.akvo.flow.domain.interactor.ClearResponses;
+import org.akvo.flow.domain.interactor.CopyFile;
 import org.akvo.flow.domain.interactor.CopyVideo;
 import org.akvo.flow.domain.interactor.GetIsDeviceSetUp;
 import org.akvo.flow.domain.interactor.SetWalkthroughSeen;
@@ -224,5 +225,11 @@ public class ViewModule {
     @Named("saveSetup")
     UseCase provideSaveConfig(SaveSetup saveSetup) {
         return saveSetup;
+    }
+
+    @Provides
+    @Named("copyFile")
+    UseCase provideCopyFile(CopyFile copyFile) {
+        return copyFile;
     }
 }

@@ -31,6 +31,7 @@ import java.io.OutputStream;
 
 import javax.inject.Inject;
 
+import io.reactivex.annotations.Nullable;
 import timber.log.Timber;
 
 class FileHelper {
@@ -49,6 +50,7 @@ class FileHelper {
      *
      * @return the destination file path if copy succeeded, null otherwise
      */
+    @Nullable
     String copyFile(File originalFile, File destinationFile) throws IOException {
         String destinationPath = null;
         InputStream in = null;
@@ -105,5 +107,10 @@ class FileHelper {
                 folder.delete();
             }
         }
+    }
+
+    boolean deleteFile(String path) {
+        File file = new File(path);
+        return file.exists() && file.delete();
     }
 }

@@ -21,6 +21,7 @@
 package org.akvo.flow.domain.repository;
 
 import android.graphics.Bitmap;
+import android.net.Uri;
 
 import java.util.List;
 
@@ -46,4 +47,6 @@ public interface FileRepository {
     Observable<Boolean> clearAllUserFiles();
 
     Observable<Boolean> isExternalStorageFull();
+
+    Observable<String> copyVideo(Uri uri);
 }

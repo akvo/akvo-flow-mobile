@@ -34,11 +34,13 @@ import org.akvo.flow.event.QuestionInteractionEvent;
 import org.akvo.flow.event.SurveyListener;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
+import org.akvo.flow.presentation.SnackBarManager;
+import org.akvo.flow.presentation.form.caddisfly.CaddisflyPresenter;
+import org.akvo.flow.presentation.form.caddisfly.CaddisflyView;
 import org.akvo.flow.ui.adapter.CaddisflyResultsAdapter;
 import org.akvo.flow.ui.model.caddisfly.CaddisflyJsonMapper;
 import org.akvo.flow.ui.model.caddisfly.CaddisflyTestResult;
 import org.akvo.flow.util.ConstantUtil;
-import org.akvo.flow.util.MediaFileHelper;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -49,14 +51,20 @@ import javax.inject.Inject;
 
 import timber.log.Timber;
 
-public class CaddisflyQuestionView extends QuestionView implements View.OnClickListener {
+public class CaddisflyQuestionView extends QuestionView implements View.OnClickListener,
+        CaddisflyView {
 
     @Inject
-    MediaFileHelper mediaFileHelper;
+    CaddisflyPresenter presenter;
+
+    @Inject
+    CaddisflyJsonMapper caddisflyJsonMapper;
+
+    @Inject
+    SnackBarManager snackBarManager;
 
     private String mValue;
     private String mImage;
-    private final CaddisflyJsonMapper caddisflyJsonMapper = new CaddisflyJsonMapper();
     private CaddisflyResultsAdapter caddisflyResultsAdapter;
     private List<CaddisflyTestResult> caddisflyTestResults = new ArrayList<>();
 
@@ -82,6 +90,7 @@ public class CaddisflyQuestionView extends QuestionView implements View.OnClickL
             mButton.setOnClickListener(this);
         }
         displayResponseView();
+        presenter.setView(this);
     }
 
     private void initialiseInjector() {
@@ -136,20 +145,12 @@ public class CaddisflyQuestionView extends QuestionView implements View.OnClickL
 
             File src = !TextUtils.isEmpty(image) ? new File(image) : null;
             if (src != null && src.exists()) {
-                // Move the image into the FLOW directory
-                File dst = mediaFileHelper.getMediaFile(src.getName());
-
-                if (!src.renameTo(dst)) {
-                    Timber.e("Could not move file %s to %s", src.getAbsoluteFile(),
-                            dst.getAbsoluteFile());
-                } else {
-                    mImage = dst.getAbsolutePath();
-                }
+                presenter.onImageReady(src);
+            } else {
+                captureResponse();
             }
-
             displayResponseView();
         }
-        captureResponse();
     }
 
     @Override
@@ -165,4 +166,20 @@ public class CaddisflyQuestionView extends QuestionView implements View.OnClickL
         notifyQuestionListeners(QuestionInteractionEvent.CADDISFLY, data);
     }
 
+    @Override
+    public void showErrorGettingMedia() {
+        snackBarManager.displaySnackBar(this, R.string.error_getting_media, getContext());
+    }
+
+    @Override
+    public void updateResponse() {
+        mImage = null;
+        captureResponse();
+    }
+
+    @Override
+    public void updateResponse(String copiedImagePath) {
+        mImage = copiedImagePath;
+        captureResponse();
+    }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -46,6 +46,7 @@ import java.util.Locale;
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
+import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withClassName;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
@@ -92,7 +93,7 @@ public class DateQuestionViewTest {
     }
 
     @Test
-    public void canFillDateQuestion() throws Exception {
+    public void canFillDateQuestion() {
         Calendar cal = Calendar.getInstance();
         int year = cal.get(Calendar.YEAR);
         int month = cal.get(Calendar.MONTH);
@@ -101,13 +102,14 @@ public class DateQuestionViewTest {
         String dateString = getShortDate(cal);
 
         pickDate(year, month + 1, day); // +1 on month due to January starting at 0
+        onView(withId(R.id.date_et)).check(matches(isDisplayed()));
         onView(withId(R.id.date_et)).check(matches(withText(dateString)));
         clickNext();
         verifySubmitButtonEnabled();
     }
 
     @Test
-    public void canNotSubmitEmptyDateQuestion() throws Exception {
+    public void canNotSubmitEmptyDateQuestion() {
         clickNext();
         verifySubmitButtonDisabled();
     }

@@ -213,8 +213,7 @@ public class FormActivityTestUtil {
     public static ViewInteraction getDateEditText(Question question) {
         return onView(
                 allOf(withId(R.id.date_et),
-                        withQuestionViewParent(question, DateQuestionView.class)))
-                .perform(scrollTo());
+                        withQuestionViewParent(question, DateQuestionView.class)));
     }
 
     @NonNull

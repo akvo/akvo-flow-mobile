@@ -136,8 +136,8 @@ public class FileHelper {
      * deletes all files in the directory (recursively) AND then deletes the
      * directory itself if the "deleteFlag" is true
      */
-    @SuppressWarnings({ "unchecked", "ResultOfMethodCallIgnored" }) public void deleteFilesInDirectory(
-            File folder, boolean deleteFolder) {
+    @SuppressWarnings({ "unchecked", "ResultOfMethodCallIgnored" })
+    public void deleteFilesInDirectory(File folder, boolean deleteFolder) {
         if (folder != null && folder.exists() && folder.isDirectory()) {
             File[] files = folder.listFiles();
             if (files != null) {
@@ -180,5 +180,10 @@ public class FileHelper {
         zos.closeEntry();
         zos.close();
         fout.close();
+    }
+
+    public boolean deleteFile(String path) {
+        File file = new File(path);
+        return file.exists() && file.delete();
     }
 }

@@ -1,5 +1,17 @@
 Akvo FLOW app release notes
 ===========================
+# ver 2.5.2
+Date: 06 August 2018
+
+# New and noteworthy
+* **CI deploy for all instances** - [#1125](https://github.com/akvo/akvo-flow-mobile/issues/1125) We can now deploy using Travis CI.
+
+# Resolved issues
+* **Caddisfly images folder issue** - [#1129](https://github.com/akvo/akvo-flow-mobile/issues/1129) An unexpected old caddisfly images folder was preventing the copying and removal of media files.
+* **Videos taken with the flow app are "added" to library** - [#1145](https://github.com/akvo/akvo-flow-mobile/issues/1145) Video files taken for the Flow app are no longer added to the device public library.
+* **Caddisfly images are lost with recent version of the app** - [#1160](https://github.com/akvo/akvo-flow-mobile/issues/1160) Caddisfly images are now uploaded correctly.
+
+---------------
 # ver 2.5.1.1
 Date: 10 July 2018
 

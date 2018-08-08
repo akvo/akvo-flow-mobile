@@ -1,6 +1,8 @@
 apply plugin: 'com.android.application'
 apply plugin: 'io.sentry.android.gradle'
-apply plugin: 'com.getkeepsafe.dexcount'
+if (!project.hasProperty("nodexcount")) {
+    apply plugin: 'com.getkeepsafe.dexcount'
+}
 apply plugin: 'io.fabric'
 
 repositories {
@@ -9,8 +11,6 @@ repositories {
     maven { url 'https://maven.fabric.io/public' }
     google()
 }
-
-def isCi = "true" == System.getenv("TRAVIS")
 
 sentry {
     autoProguardConfig true
@@ -91,11 +91,6 @@ android {
             def awsSecretKey = surveyProps['awsSecretKey'].toString()
             def apiKey = surveyProps['apiKey'].toString()
 
-            def signingKey = surveyProps['signingKey'].toString()
-            if ("null" == signingKey) {
-                signingKey = ""
-            }
-
             def instanceUrl = surveyProps['instanceUrl'].toString()
             if ("null" == instanceUrl) {
                 instanceUrl = serverBase
@@ -107,7 +102,7 @@ android {
             it.buildConfigField "String", "AWS_ACCESS_KEY_ID", "\"${awsAccessKeyId}\""
             it.buildConfigField "String", "AWS_SECRET_KEY", "\"${awsSecretKey}\""
             it.buildConfigField "String", "API_KEY", "\"${apiKey}\""
-            it.buildConfigField "String", "SIGNING_KEY", "\"${signingKey}\""
+            it.buildConfigField "String", "SIGNING_KEY", "\"\""
             it.buildConfigField "String", "BUILD_YEAR", "\"${buildYear}\""
         }
         debug {
@@ -168,7 +163,7 @@ private Properties loadProperties(String fileName) {
     if (versionPropsFile.canRead()) {
         versionProps.load(new FileInputStream(versionPropsFile))
     } else {
-        throw new GradleException("Could not read ".fileName)
+        throw new GradleException("Could not read ${fileName}")
     }
     versionProps
 }
@@ -193,21 +188,6 @@ configurations.all { config ->
     }
 }
 
-dexcount {
-    format = "list"
-    includeClasses = false
-    includeClassCount = true
-    includeFieldCount = true
-    includeTotalMethodCount = true
-    orderByMethodCount = true
-    verbose = false
-    maxTreeDepth = Integer.MAX_VALUE
-    teamCityIntegration = false
-    teamCitySlug = null
-    runOnEachPackage = true
-    maxMethodCount = 64000
-}
-
 dependencies {
     implementation fileTree(include: '*.jar', dir: 'libs')
     implementation 'com.android.support:appcompat-v7:25.3.1'
@@ -224,7 +204,7 @@ dependencies {
     annotationProcessor 'com.google.dagger:dagger-compiler:2.8'
     implementation 'com.jakewharton:butterknife:8.5.1'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.5.1'
-    implementation 'io.sentry:sentry-android:1.6.3'
+    implementation 'io.sentry:sentry-android:1.7.5'
     implementation 'com.github.bumptech.glide:glide:3.5.2'
     implementation 'com.squareup.sqlbrite2:sqlbrite:2.0.0'
     implementation 'io.reactivex.rxjava2:rxandroid:2.0.1'

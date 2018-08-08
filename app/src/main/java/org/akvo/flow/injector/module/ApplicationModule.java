@@ -23,6 +23,7 @@ package org.akvo.flow.injector.module;
 import android.content.Context;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import com.google.gson.Gson;
 import com.squareup.sqlbrite2.BriteDatabase;
 import com.squareup.sqlbrite2.SqlBrite;
 
@@ -34,7 +35,7 @@ import org.akvo.flow.data.migration.FlowMigrationListener;
 import org.akvo.flow.data.migration.languages.MigrationLanguageMapper;
 import org.akvo.flow.data.net.DeviceHelper;
 import org.akvo.flow.data.net.Encoder;
-import org.akvo.flow.data.net.FlowRestApi;
+import org.akvo.flow.data.net.RestApi;
 import org.akvo.flow.data.net.RestServiceFactory;
 import org.akvo.flow.data.net.S3User;
 import org.akvo.flow.data.net.SignatureHelper;
@@ -188,13 +189,13 @@ public class ApplicationModule {
 
     @Provides
     @Singleton
-    FlowRestApi provideRestApi(DeviceHelper deviceHelper, RestServiceFactory serviceFactory,
+    RestApi provideRestApi(DeviceHelper deviceHelper, RestServiceFactory serviceFactory,
             Encoder encoder, ApiUrls apiUrls, SignatureHelper signatureHelper) {
         S3User s3User = new S3User(BuildConfig.AWS_BUCKET, BuildConfig.AWS_ACCESS_KEY_ID,
                 BuildConfig.AWS_SECRET_KEY);
         final DateFormat df = new SimpleDateFormat(REST_API_DATE_PATTERN, Locale.US);
         df.setTimeZone(TimeZone.getTimeZone(TIMEZONE));
-        return new FlowRestApi(deviceHelper, serviceFactory, encoder, BuildConfig.VERSION_NAME,
+        return new RestApi(deviceHelper, serviceFactory, encoder, BuildConfig.VERSION_NAME,
                 apiUrls, signatureHelper, s3User, df);
     }
 
@@ -203,5 +204,11 @@ public class ApplicationModule {
     ApiUrls provideApiUrls() {
         return new ApiUrls(BuildConfig.SERVER_BASE,
                 "https://" + BuildConfig.AWS_BUCKET + ".s3.amazonaws.com");
+    }
+
+    @Provides
+    @Singleton
+    Gson provideGson() {
+        return new Gson();
     }
 }

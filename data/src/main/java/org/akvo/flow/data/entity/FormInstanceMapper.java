@@ -155,6 +155,7 @@ public class FormInstanceMapper {
         int durationColumn = data.getColumnIndexOrThrow(SurveyInstanceColumns.DURATION);
         int localeIdColumn = data.getColumnIndexOrThrow(SurveyInstanceColumns.RECORD_ID);
         int displayNameColumn = data.getColumnIndexOrThrow(UserColumns.NAME);
+        int versionColumn = data.getColumnIndexOrThrow(SurveyInstanceColumns.VERSION);
 
         String uuid = getInstanceUuid(data);
         String formId = data.getString(surveyIdColumn);
@@ -164,7 +165,8 @@ public class FormInstanceMapper {
         final long submittedDate = data.getLong(submittedDateColumn);
         final long duration = (data.getLong(durationColumn)) / 1000;
 
+        double formVersion = data.getDouble(versionColumn);
         return new FormInstance(uuid, dataPointId, deviceId, username, email,
-                formId, submittedDate, duration);
+                formId, submittedDate, duration, formVersion);
     }
 }

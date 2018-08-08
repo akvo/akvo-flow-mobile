@@ -272,6 +272,7 @@ public class BriteSurveyDbAdapter {
                 + SurveyInstanceColumns.START_DATE + ", "
                 + SurveyInstanceColumns.RECORD_ID + ", "
                 + SurveyInstanceColumns.DURATION + ", "
+                + SurveyInstanceColumns.VERSION + ", "
                 + ResponseColumns.ANSWER + ", "
                 + ResponseColumns.TYPE + ", "
                 + ResponseColumns.QUESTION_ID + ", "

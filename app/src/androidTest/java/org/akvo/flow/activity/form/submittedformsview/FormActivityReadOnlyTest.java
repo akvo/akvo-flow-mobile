@@ -30,6 +30,8 @@ import android.support.v4.util.Pair;
 import android.test.suitebuilder.annotation.LargeTest;
 import android.text.TextUtils;
 
+import com.google.gson.Gson;
+
 import org.akvo.flow.R;
 import org.akvo.flow.activity.FormActivity;
 import org.akvo.flow.activity.form.data.SurveyInstaller;
@@ -208,7 +210,7 @@ public class FormActivityReadOnlyTest {
     private void verifyCaddisflyQuestionView(Question question) {
         String questionValue = getResponseValue(question);
 
-        List<CaddisflyTestResult> caddisflyTestResults = new CaddisflyJsonMapper()
+        List<CaddisflyTestResult> caddisflyTestResults = new CaddisflyJsonMapper(new Gson())
                 .transform(questionValue);
         ViewInteraction caddislfyRecyclerView = onView(
                 allOf(withId(R.id.caddisfly_results_recycler_view),

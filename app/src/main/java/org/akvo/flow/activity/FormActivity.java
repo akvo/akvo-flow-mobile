@@ -549,12 +549,11 @@ public class FormActivity extends BackActivity implements SurveyListener,
 
         switch (requestCode) {
             case ConstantUtil.PHOTO_ACTIVITY_REQUEST:
-                onMediaAcquired(imagePath);
+                onImageAcquired(imagePath);
                 break;
             case ConstantUtil.VIDEO_ACTIVITY_REQUEST:
-                String videoAbsolutePath = mediaFileHelper
-                        .getAcquiredVideoFilePath(intent);
-                onMediaAcquired(videoAbsolutePath);
+
+                onVideoAcquired(intent.getData());
                 break;
             case ConstantUtil.EXTERNAL_SOURCE_REQUEST:
             case ConstantUtil.CADDISFLY_REQUEST:
@@ -569,9 +568,15 @@ public class FormActivity extends BackActivity implements SurveyListener,
         mRequestQuestionId = null;// Reset the tmp reference
     }
 
-    private void onMediaAcquired(String absolutePath) {
+    private void onImageAcquired(String absolutePath) {
         Bundle mediaData = new Bundle();
-        mediaData.putString(ConstantUtil.MEDIA_FILE_KEY, absolutePath);
+        mediaData.putString(ConstantUtil.IMAGE_FILE_KEY, absolutePath);
+        mAdapter.onQuestionComplete(mRequestQuestionId, mediaData);
+    }
+
+    private void onVideoAcquired(Uri uri) {
+        Bundle mediaData = new Bundle();
+        mediaData.putParcelable(ConstantUtil.VIDEO_FILE_KEY, uri);
         mAdapter.onQuestionComplete(mRequestQuestionId, mediaData);
     }
 

@@ -21,11 +21,7 @@
 package org.akvo.flow.util;
 
 import android.content.Context;
-import android.content.Intent;
-import android.database.Cursor;
-import android.net.Uri;
 import android.os.Environment;
-import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
@@ -46,7 +42,6 @@ public class MediaFileHelper {
 
     private static final String TEMP_PHOTO_NAME_PREFIX = "image";
     private static final String IMAGE_SUFFIX = ".jpg";
-    private static final String VIDEO_SUFFIX = ".mp4";
     private static final String DIR_MEDIA = "akvoflow/data/media";
 
     private final Context context;
@@ -62,16 +57,6 @@ public class MediaFileHelper {
     @NonNull
     public String getImageFilePath() {
         return getNamedMediaFile(IMAGE_SUFFIX).getAbsolutePath();
-    }
-
-    @NonNull
-    public String getVideoFilePath() {
-        return getNamedMediaFile(VIDEO_SUFFIX).getAbsolutePath();
-    }
-
-    @Nullable
-    public String getAcquiredVideoFilePath(Intent intent) {
-        return getVideoPathFromIntent(intent);
     }
 
     @Nullable
@@ -96,29 +81,6 @@ public class MediaFileHelper {
     public File getMediaFile(String filename) {
         File mediaFolder = fileBrowser.getExistingAppInternalFolder(context, DIR_MEDIA);
         return new File(mediaFolder, filename);
-    }
-
-    /**
-     * On some devices the uri we pass for taking videos is ignored and in this case we need to get
-     * the actual uri returned by the intent
-     */
-    private String getVideoPathFromIntent(Intent intent) {
-        String videoAbsolutePath = null;
-        Uri videoUri = intent.getData();
-        if (videoUri != null) {
-            String[] filePathColumns = {
-                    MediaStore.Images.Media.DATA
-            };
-            Cursor cursor = context.getContentResolver()
-                    .query(videoUri, filePathColumns, null, null, null);
-            if (cursor != null) {
-                cursor.moveToFirst();
-                int columnIndex = cursor.getColumnIndex(filePathColumns[0]);
-                videoAbsolutePath = cursor.getString(columnIndex);
-                cursor.close();
-            }
-        }
-        return videoAbsolutePath;
     }
 
     @NonNull

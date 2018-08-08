@@ -23,6 +23,7 @@ package org.akvo.flow.injector.module;
 import android.content.Context;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import com.google.gson.Gson;
 import com.squareup.sqlbrite2.BriteDatabase;
 import com.squareup.sqlbrite2.SqlBrite;
 
@@ -203,5 +204,11 @@ public class ApplicationModule {
     ApiUrls provideApiUrls() {
         return new ApiUrls(BuildConfig.SERVER_BASE,
                 "https://" + BuildConfig.AWS_BUCKET + ".s3.amazonaws.com");
+    }
+
+    @Provides
+    @Singleton
+    Gson provideGson() {
+        return new Gson();
     }
 }

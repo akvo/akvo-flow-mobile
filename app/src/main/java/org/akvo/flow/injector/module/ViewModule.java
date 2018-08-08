@@ -25,6 +25,7 @@ import org.akvo.flow.domain.interactor.CheckDeviceNotifications;
 import org.akvo.flow.domain.interactor.CheckSubmittedFiles;
 import org.akvo.flow.domain.interactor.ClearAllData;
 import org.akvo.flow.domain.interactor.ClearResponses;
+import org.akvo.flow.domain.interactor.CopyFile;
 import org.akvo.flow.domain.interactor.CopyVideo;
 import org.akvo.flow.domain.interactor.DeleteSurvey;
 import org.akvo.flow.domain.interactor.ExportSurveyInstances;
@@ -229,6 +230,12 @@ public class ViewModule {
     @Named("saveSetup")
     UseCase provideSaveConfig(SaveSetup saveSetup) {
         return saveSetup;
+    }
+
+    @Provides
+    @Named("copyFile")
+    UseCase provideCopyFile(CopyFile copyFile) {
+        return copyFile;
     }
 
     @Provides

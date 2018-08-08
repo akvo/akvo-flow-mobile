@@ -15,9 +15,11 @@ buildscript {
 }
 
 ext {
-    compileSdkVersion = 25
+    compileSdkVersion = 27
     minSdkVersion = 15
     targetSdkVersion = 21
+    supportVersion = "27.1.1"
+    leakCanaryVersion = "1.6.1"
 }
 
 allprojects {
@@ -39,10 +41,6 @@ task checkstyle(type: Checkstyle) {
 
 task clean(type: Delete) {
     delete rootProject.buildDir
-}
-
-configurations {
-    all*.exclude group: 'com.android.support', module: 'support-v4'
 }
 
 apply plugin: 'checkstyle'

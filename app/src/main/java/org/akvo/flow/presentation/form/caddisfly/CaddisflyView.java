@@ -18,23 +18,13 @@
  *
  */
 
-package org.akvo.flow.data.entity;
+package org.akvo.flow.presentation.form.caddisfly;
 
-public class MovedFile {
+public interface CaddisflyView {
 
-    private final String oldPath;
-    private final String newPath;
+    void showErrorGettingMedia();
 
-    public MovedFile(String oldPath, String newPath) {
-        this.oldPath = oldPath;
-        this.newPath = newPath;
-    }
+    void updateResponse();
 
-    public String getOldPath() {
-        return oldPath;
-    }
-
-    public String getNewPath() {
-        return newPath;
-    }
+    void updateResponse(String copiedImagePath);
 }

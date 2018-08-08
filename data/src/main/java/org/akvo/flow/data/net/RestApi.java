@@ -47,7 +47,7 @@ import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 
 @Singleton
-public class FlowRestApi {
+public class RestApi {
     private static final String PAYLOAD_PUT_PUBLIC = "PUT\n%s\n%s\n%s\nx-amz-acl:public-read\n/%s/%s";// md5, type, date, bucket, obj
     private static final String PAYLOAD_PUT_PRIVATE = "PUT\n%s\n%s\n%s\n/%s/%s";// md5, type, date, bucket, obj
 
@@ -62,7 +62,7 @@ public class FlowRestApi {
     private final S3User s3User;
     private final DateFormat dateFormat;
 
-    public FlowRestApi(DeviceHelper deviceHelper, RestServiceFactory serviceFactory,
+    public RestApi(DeviceHelper deviceHelper, RestServiceFactory serviceFactory,
             Encoder encoder, String version, ApiUrls apiUrls, SignatureHelper signatureHelper,
             S3User s3User, DateFormat dateFormat) {
         this.androidId = deviceHelper.getAndroidId();

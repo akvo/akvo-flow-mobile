@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -48,7 +48,7 @@ public class FlowSentryHttpConnection extends HttpConnection {
         if (permissionVerifier.shouldAttemptPost()) {
             super.doSend(event);
         } else {
-            throw new ConnectionException("Connection forbidden by user");
+            throw new ConnectionException("Connection forbidden by user", new Exception());
         }
     }
 }

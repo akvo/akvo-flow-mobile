@@ -166,7 +166,7 @@ public class PhotoQuestionView extends QuestionView implements
     }
 
     private String getImagePath(Bundle mediaData) {
-        return mediaData != null ? mediaData.getString(ConstantUtil.MEDIA_FILE_KEY) : null;
+        return mediaData != null ? mediaData.getString(ConstantUtil.IMAGE_FILE_KEY) : null;
     }
 
     @Override

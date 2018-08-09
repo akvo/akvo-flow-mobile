@@ -205,11 +205,11 @@ public class CascadeQuestionView extends QuestionView
     public void rehydrate(QuestionResponse resp) {
         super.rehydrate(resp);
 
+        mSpinnerContainer.removeAllViews();
         String answer = resp != null ? resp.getValue() : null;
         if (mDatabase == null || TextUtils.isEmpty(answer)) {
             return;
         }
-        mSpinnerContainer.removeAllViews();
 
         List<CascadeNode> values = CascadeValue.deserialize(answer);
 
@@ -246,13 +246,22 @@ public class CascadeQuestionView extends QuestionView
     @Override
     public void resetQuestion(boolean fireEvent) {
         super.resetQuestion(fireEvent);
-        updateSpinners(POSITION_NONE);
+        if (isReadOnly()) {
+            mSpinnerContainer.removeAllViews();
+        } else {
+            updateSpinners(POSITION_NONE);
+        }
         if (mDatabase == null) {
             String error = getContext()
                     .getString(R.string.cascade_error_message, getQuestion().getSrc());
             Timber.e(new IllegalStateException(error), error);
             setError(error);
         }
+    }
+
+    @Override
+    public void setResponse(QuestionResponse response) {
+        super.setResponse(response);
     }
 
     @Override

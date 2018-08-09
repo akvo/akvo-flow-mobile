@@ -179,6 +179,7 @@ public class FormActivityTest {
             verifyErrorFields(mandatoryQuestions);
         }
         ViewInteraction submitButton = onView(withId(R.id.submit_tab_button));
+        submitButton.perform(scrollTo());
         submitButton.check(matches(
                 allOf(isDisplayed(), withText(R.string.submitbutton), not(isEnabled()))));
     }

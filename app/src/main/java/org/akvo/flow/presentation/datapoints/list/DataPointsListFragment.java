@@ -37,7 +37,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.SearchView;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -313,7 +312,7 @@ public class DataPointsListFragment extends Fragment implements LocationListener
 
     private void setUpSearchView(final Menu menu) {
         MenuItem searchMenuItem = menu.findItem(R.id.search);
-        searchView = (SearchView) MenuItemCompat.getActionView(searchMenuItem);
+        searchView = (SearchView) searchMenuItem.getActionView();
         searchView.setIconifiedByDefault(true);
         searchView.setQueryHint(getString(R.string.search_hint));
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
@@ -333,8 +332,8 @@ public class DataPointsListFragment extends Fragment implements LocationListener
                 return false;
             }
         });
-        MenuItemCompat.setOnActionExpandListener(searchMenuItem,
-                new MenuItemCompat.OnActionExpandListener() {
+        searchMenuItem.setOnActionExpandListener(
+                new MenuItem.OnActionExpandListener() {
                     @Override
                     public boolean onMenuItemActionExpand(MenuItem item) {
                         // EMPTY

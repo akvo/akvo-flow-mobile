@@ -24,6 +24,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.test.InstrumentationRegistry;
+import android.support.test.espresso.DataInteraction;
 import android.support.test.espresso.ViewInteraction;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
@@ -45,12 +46,14 @@ import org.akvo.flow.ui.view.GeoshapeQuestionView;
 import org.akvo.flow.ui.view.QuestionGroupTab;
 import org.akvo.flow.ui.view.QuestionHeaderView;
 import org.akvo.flow.ui.view.QuestionView;
+import org.akvo.flow.ui.view.SubmitTab;
 import org.akvo.flow.ui.view.barcode.BarcodeQuestionViewMultiple;
 import org.akvo.flow.ui.view.barcode.BarcodeQuestionViewSingle;
 import org.akvo.flow.ui.view.geolocation.GeoQuestionView;
 import org.akvo.flow.ui.view.signature.SignatureQuestionView;
 import org.akvo.flow.util.ConstantUtil;
 import org.hamcrest.Matcher;
+import org.hamcrest.Matchers;
 import org.hamcrest.core.IsInstanceOf;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -62,6 +65,7 @@ import org.junit.runner.RunWith;
 import java.util.ArrayList;
 import java.util.List;
 
+import static android.support.test.espresso.Espresso.onData;
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.action.ViewActions.closeSoftKeyboard;
@@ -95,8 +99,9 @@ import static org.akvo.flow.activity.form.FormActivityTestUtil.verifyQuestionHea
 import static org.akvo.flow.activity.form.FormActivityTestUtil.verifyToolBar;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.withQuestionViewParent;
 import static org.akvo.flow.tests.R.raw.all_questions_form;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.core.AllOf.allOf;
 import static org.hamcrest.core.IsNot.not;
 
 @LargeTest
@@ -178,9 +183,14 @@ public class FormActivityTest {
             submitTabHeader.check(matches(withText(R.string.error_responses)));
             verifyErrorFields(mandatoryQuestions);
         }
-        ViewInteraction submitButton = onView(withId(R.id.submit_tab_button));
+
+        DataInteraction submitButton = onData(isFooter()).inAdapterView(withId(R.id.submit_tab));
         submitButton.check(matches(
                 allOf(isDisplayed(), withText(R.string.submitbutton), not(isEnabled()))));
+    }
+
+    private Matcher<Object> isFooter() {
+        return allOf(is(instanceOf(String.class)), Matchers.<Object>is(SubmitTab.FOOTER));
     }
 
     private void verifyErrorFields(List<Question> mandatoryQuestions) {

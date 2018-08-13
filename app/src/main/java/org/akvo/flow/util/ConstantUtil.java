@@ -240,11 +240,6 @@ public class ConstantUtil {
      */
     public static final int UPDATE_NOTIFICATION_DELAY_IN_MS = 7 * 60 * 60 * 24 * 1000;
 
-    /**
-     * 1 day
-     */
-    public static final int DINO_NOTIFICATION_DELAY_IN_MS = 1 * 60 * 60 * 24 * 1000;
-
     //requests
     public static final int PHOTO_ACTIVITY_REQUEST = 1;
     public static final int VIDEO_ACTIVITY_REQUEST = 2;
@@ -254,6 +249,8 @@ public class ConstantUtil {
     public static final int PLOTTING_REQUEST = 6;
     public static final int SIGNATURE_REQUEST = 7;
     public static final int FORM_FILLING_REQUEST = 8;
+    public static final int GET_PHOTO_ACTIVITY_REQUEST = 9;
+    public static final int GET_VIDEO_ACTIVITY_REQUEST = 10;
 
 
     //view tags

@@ -330,4 +330,20 @@ public class Navigator {
         Intent intent = new Intent(context, WalkThroughActivity.class);
         context.startActivity(intent);
     }
+
+    public void navigateToGetPhoto(AppCompatActivity activity) {
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.setType("image/*");
+        if (intent.resolveActivity(activity.getPackageManager()) != null) {
+            activity.startActivityForResult(intent, ConstantUtil.GET_PHOTO_ACTIVITY_REQUEST);
+        }
+    }
+
+    public void navigateToGetVideo(AppCompatActivity activity) {
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.setType("video/*");
+        if (intent.resolveActivity(activity.getPackageManager()) != null) {
+            activity.startActivityForResult(intent, ConstantUtil.GET_VIDEO_ACTIVITY_REQUEST);
+        }
+    }
 }

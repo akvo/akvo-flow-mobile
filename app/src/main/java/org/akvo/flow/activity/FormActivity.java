@@ -549,11 +549,10 @@ public class FormActivity extends BackActivity implements SurveyListener,
 
         switch (requestCode) {
             case ConstantUtil.PHOTO_ACTIVITY_REQUEST:
-                onImageAcquired(imagePath);
+                onImageTaken(imagePath);
                 break;
             case ConstantUtil.VIDEO_ACTIVITY_REQUEST:
-
-                onVideoAcquired(intent.getData());
+                onVideoTaken(intent.getData());
                 break;
             case ConstantUtil.EXTERNAL_SOURCE_REQUEST:
             case ConstantUtil.CADDISFLY_REQUEST:
@@ -568,13 +567,13 @@ public class FormActivity extends BackActivity implements SurveyListener,
         mRequestQuestionId = null;// Reset the tmp reference
     }
 
-    private void onImageAcquired(String absolutePath) {
+    private void onImageTaken(String absolutePath) {
         Bundle mediaData = new Bundle();
         mediaData.putString(ConstantUtil.IMAGE_FILE_KEY, absolutePath);
         mAdapter.onQuestionComplete(mRequestQuestionId, mediaData);
     }
 
-    private void onVideoAcquired(Uri uri) {
+    private void onVideoTaken(Uri uri) {
         Bundle mediaData = new Bundle();
         mediaData.putParcelable(ConstantUtil.VIDEO_FILE_KEY, uri);
         mAdapter.onQuestionComplete(mRequestQuestionId, mediaData);
@@ -693,8 +692,12 @@ public class FormActivity extends BackActivity implements SurveyListener,
     public void onQuestionInteraction(QuestionInteractionEvent event) {
         if (QuestionInteractionEvent.TAKE_PHOTO_EVENT.equals(event.getEventType())) {
             takePhoto(event);
+        } else if (QuestionInteractionEvent.GET_PHOTO_EVENT.equals(event.getEventType())) {
+            navigateToGetPhoto(event);
         } else if (QuestionInteractionEvent.TAKE_VIDEO_EVENT.equals(event.getEventType())) {
             navigateToTakeVideo(event);
+        } else if (QuestionInteractionEvent.GET_VIDEO_EVENT.equals(event.getEventType())) {
+            navigateToGetVideo(event);
         } else if (QuestionInteractionEvent.SCAN_BARCODE_EVENT.equals(event.getEventType())) {
             navigateToBarcodeScanner(event);
         } else if (QuestionInteractionEvent.QUESTION_CLEAR_EVENT.equals(event.getEventType())) {
@@ -710,6 +713,16 @@ public class FormActivity extends BackActivity implements SurveyListener,
         } else if (QuestionInteractionEvent.ADD_SIGNATURE_EVENT.equals(event.getEventType())) {
             navigateToSignatureActivity(event);
         }
+    }
+
+    private void navigateToGetVideo(QuestionInteractionEvent event) {
+        recordSourceId(event);
+        navigator.navigateToGetVideo(this);
+    }
+
+    private void navigateToGetPhoto(QuestionInteractionEvent event) {
+        recordSourceId(event);
+        navigator.navigateToGetPhoto(this);
     }
 
     private void navigateToSignatureActivity(QuestionInteractionEvent event) {

@@ -26,7 +26,6 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 
@@ -76,8 +75,8 @@ public class VideoQuestionView extends QuestionView
     @Inject
     VideoQuestionPresenter presenter;
 
-    @BindView(R.id.media_btn)
-    Button mMediaButton;
+    @BindView(R.id.acquire_media_ll)
+    View mediaLayout;
 
     @BindView(R.id.image)
     ImageView mImageView;
@@ -103,9 +102,8 @@ public class VideoQuestionView extends QuestionView
         presenter.setView(this);
 
         imageLoader = new GlideImageLoader(getContext());
-        mMediaButton.setText(R.string.takevideo);
         if (isReadOnly()) {
-            mMediaButton.setVisibility(GONE);
+            mediaLayout.setVisibility(GONE);
         }
     }
 
@@ -131,9 +129,14 @@ public class VideoQuestionView extends QuestionView
         }
     }
 
-    @OnClick(R.id.media_btn)
+    @OnClick(R.id.camera_btn)
     void onTakeVideoClicked() {
         notifyQuestionListeners(QuestionInteractionEvent.TAKE_VIDEO_EVENT);
+    }
+
+    @OnClick(R.id.gallery_btn)
+    void onGetPictureClicked() {
+        notifyQuestionListeners(QuestionInteractionEvent.GET_VIDEO_EVENT);
     }
 
     @OnClick(R.id.media_download)

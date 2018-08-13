@@ -26,7 +26,6 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -77,8 +76,8 @@ public class PhotoQuestionView extends QuestionView implements
     @Inject
     PhotoQuestionPresenter presenter;
 
-    @BindView(R.id.media_btn)
-    Button mMediaButton;
+    @BindView(R.id.acquire_media_ll)
+    View mediaLayout;
 
     @BindView(R.id.image)
     ImageView mImageView;
@@ -110,9 +109,8 @@ public class PhotoQuestionView extends QuestionView implements
         presenter.setView(this);
 
         imageLoader = new GlideImageLoader(getContext());
-        mMediaButton.setText(R.string.takephoto);
         if (isReadOnly()) {
-            mMediaButton.setVisibility(GONE);
+            mediaLayout.setVisibility(GONE);
         }
 
         mMedia = null;
@@ -136,9 +134,14 @@ public class PhotoQuestionView extends QuestionView implements
         }
     }
 
-    @OnClick(R.id.media_btn)
+    @OnClick(R.id.camera_btn)
     void onTakePictureClicked() {
         notifyQuestionListeners(QuestionInteractionEvent.TAKE_PHOTO_EVENT);
+    }
+
+    @OnClick(R.id.gallery_btn)
+    void onGetPictureClicked() {
+        notifyQuestionListeners(QuestionInteractionEvent.GET_PHOTO_EVENT);
     }
 
     @OnClick(R.id.media_download)

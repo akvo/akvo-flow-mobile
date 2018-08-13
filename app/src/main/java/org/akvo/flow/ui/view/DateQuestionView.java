@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2018 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -101,6 +101,7 @@ public class DateQuestionView extends QuestionView implements View.OnClickListen
     private void displayFormattedDate() {
         String formattedTime = userDisplayedDateFormat.format(mLocalCalendar.getTime());
         mDateTextEdit.setText(formattedTime);
+        mDateTextEdit.setVisibility(VISIBLE);
     }
 
     @Override

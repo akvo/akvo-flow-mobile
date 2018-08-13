@@ -360,7 +360,7 @@ public class FormActivityTest {
 
     private void verifyDateInput(Question question) {
         ViewInteraction dateInput = getDateEditText(question);
-        dateInput.check(matches(isDisplayed()));
+        dateInput.check(matches(not(isDisplayed())));
         dateInput.check(matches(withText("")));
     }
 

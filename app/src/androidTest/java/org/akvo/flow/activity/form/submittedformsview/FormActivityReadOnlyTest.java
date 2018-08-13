@@ -311,6 +311,7 @@ public class FormActivityReadOnlyTest {
     private void verifyDateInput(Question question) {
         String questionValue = getResponseValue(question);
         ViewInteraction dateInput = getDateEditText(question);
+        dateInput.perform(scrollTo());
         dateInput.check(matches(isDisplayed()));
         DateFormat userDisplayedDateFormat = SimpleDateFormat.getDateInstance();
         userDisplayedDateFormat.setTimeZone(TimeZone.getDefault());

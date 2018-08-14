@@ -256,6 +256,10 @@ public class DatabaseDataSource {
         return Observable.just(true);
     }
 
+    public Observable<Cursor> getUnSyncedTransmissions(String formId) {
+        return Observable.just(briteSurveyDbAdapter.getUnSyncedTransmissions(formId));
+    }
+
     public Observable<Cursor> getUnSyncedTransmissions() {
         return Observable.just(briteSurveyDbAdapter.getUnSyncedTransmissions());
     }

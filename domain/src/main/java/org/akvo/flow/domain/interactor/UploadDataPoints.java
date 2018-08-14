@@ -24,6 +24,7 @@ import org.akvo.flow.domain.executor.PostExecutionThread;
 import org.akvo.flow.domain.executor.ThreadExecutor;
 import org.akvo.flow.domain.repository.SurveyRepository;
 import org.akvo.flow.domain.repository.UserRepository;
+import org.akvo.flow.domain.util.Constants;
 
 import java.util.Map;
 import java.util.Set;
@@ -40,8 +41,8 @@ public class UploadDataPoints extends UseCase {
 
     @Inject
     protected UploadDataPoints(ThreadExecutor threadExecutor,
-            PostExecutionThread postExecutionThread,
-            SurveyRepository surveyRepository, UserRepository userRepository) {
+            PostExecutionThread postExecutionThread, SurveyRepository surveyRepository,
+            UserRepository userRepository) {
         super(threadExecutor, postExecutionThread);
         this.surveyRepository = surveyRepository;
         this.userRepository = userRepository;
@@ -49,11 +50,13 @@ public class UploadDataPoints extends UseCase {
 
     @Override
     protected <T> Observable buildUseCaseObservable(Map<String, T> parameters) {
+        final String surveyId =
+                parameters != null ? (String) parameters.get(Constants.KEY_SURVEY_ID) : null;
         return userRepository.getDeviceId()
                 .concatMap(new Function<String, Observable<Set<String>>>() {
                     @Override
                     public Observable<Set<String>> apply(final String deviceId) {
-                        return surveyRepository.processTransmissions(deviceId);
+                        return surveyRepository.processTransmissions(deviceId, surveyId);
                     }
                 });
     }

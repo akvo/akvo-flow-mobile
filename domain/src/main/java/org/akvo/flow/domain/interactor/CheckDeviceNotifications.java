@@ -24,6 +24,7 @@ import org.akvo.flow.domain.executor.PostExecutionThread;
 import org.akvo.flow.domain.executor.ThreadExecutor;
 import org.akvo.flow.domain.repository.SurveyRepository;
 import org.akvo.flow.domain.repository.UserRepository;
+import org.akvo.flow.domain.util.Constants;
 
 import java.util.List;
 import java.util.Map;
@@ -34,8 +35,6 @@ import io.reactivex.Observable;
 import io.reactivex.functions.Function;
 
 public class CheckDeviceNotifications extends UseCase {
-
-    public static final String KEY_SURVEY_ID = "survey_id";
 
     private final SurveyRepository surveyRepository;
     private final UserRepository userRepository;
@@ -51,7 +50,7 @@ public class CheckDeviceNotifications extends UseCase {
 
     @Override
     protected <T> Observable buildUseCaseObservable(Map<String, T> parameters) {
-        String surveyId = parameters != null ? (String) parameters.get(KEY_SURVEY_ID) : null;
+        String surveyId = parameters != null ? (String) parameters.get(Constants.KEY_SURVEY_ID) : null;
         return surveyRepository.getFormIds(surveyId)
                 .concatMap(new Function<List<String>, Observable<List<String>>>() {
                     @Override

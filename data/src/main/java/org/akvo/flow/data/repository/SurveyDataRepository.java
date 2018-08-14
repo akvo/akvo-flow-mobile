@@ -21,6 +21,7 @@
 package org.akvo.flow.data.repository;
 
 import android.database.Cursor;
+import android.text.TextUtils;
 
 import org.akvo.flow.data.datasource.DataSourceFactory;
 import org.akvo.flow.data.datasource.DatabaseDataSource;
@@ -71,6 +72,7 @@ import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.SingleSource;
 import io.reactivex.annotations.NonNull;
+import io.reactivex.annotations.Nullable;
 import io.reactivex.functions.BiFunction;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
@@ -396,18 +398,60 @@ public class SurveyDataRepository implements SurveyRepository {
     }
 
     @Override
-    public Observable<Set<String>> processTransmissions(final String deviceId) {
-        return dataSourceFactory.getDataBaseDataSource().getUnSyncedTransmissions()
+    public Observable<Set<String>> processTransmissions(final String deviceId,
+            @Nullable String surveyId) {
+        return getUnSyncedTransmissions(surveyId)
+                .concatMap(new Function<List<Transmission>, Observable<Set<String>>>() {
+                    @Override
+                    public Observable<Set<String>> apply(List<Transmission> transmissions) {
+                        return syncTransmissions(transmissions, deviceId);
+                    }
+                });
+    }
+
+    private Observable<List<Transmission>> getUnSyncedTransmissions(String surveyId) {
+        if (TextUtils.isEmpty(surveyId)) {
+            return getAllTransmissions();
+        } else {
+            return getSurveyTransmissions(surveyId);
+        }
+    }
+
+    private Observable<List<Transmission>> getSurveyTransmissions(@NonNull String surveyId) {
+        return getFormIds(surveyId)
+                .flatMap(new Function<List<String>, Observable<List<Transmission>>>() {
+                    @Override
+                    public Observable<List<Transmission>> apply(List<String> formIds) {
+                        return Observable.fromIterable(formIds)
+                                .flatMap(new Function<String, Observable<List<Transmission>>>() {
+                                            @Override
+                                            public Observable<List<Transmission>> apply(
+                                                    String formId) {
+                                                return getFormTransmissions(formId);
+                                            }
+                                        });
+
+                    }
+                });
+    }
+
+    private Observable<List<Transmission>> getFormTransmissions(String formId) {
+        return dataSourceFactory.getDataBaseDataSource()
+                .getUnSyncedTransmissions(formId)
                 .map(new Function<Cursor, List<Transmission>>() {
                     @Override
                     public List<Transmission> apply(Cursor cursor) {
                         return transmissionMapper.transform(cursor);
                     }
-                })
-                .concatMap(new Function<List<Transmission>, Observable<Set<String>>>() {
+                });
+    }
+
+    private Observable<List<Transmission>> getAllTransmissions() {
+        return dataSourceFactory.getDataBaseDataSource().getUnSyncedTransmissions()
+                .map(new Function<Cursor, List<Transmission>>() {
                     @Override
-                    public Observable<Set<String>> apply(List<Transmission> transmissions) {
-                        return syncTransmissions(transmissions, deviceId);
+                    public List<Transmission> apply(Cursor cursor) {
+                        return transmissionMapper.transform(cursor);
                     }
                 });
     }
@@ -431,7 +475,7 @@ public class SurveyDataRepository implements SurveyRepository {
     @Override
     public Observable<List<Long>> getPendingSurveyInstances() {
         return dataSourceFactory.getDataBaseDataSource().getPendingSurveyInstances()
-                .map(new Function<Cursor, List<Long>>(){
+                .map(new Function<Cursor, List<Long>>() {
                     @Override
                     public List<Long> apply(Cursor cursor) {
                         return formInstanceMapper.getInstanceIds(cursor);

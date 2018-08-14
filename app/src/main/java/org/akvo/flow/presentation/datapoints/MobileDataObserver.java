@@ -18,10 +18,29 @@
  *
  */
 
-package org.akvo.flow.domain.util;
+package org.akvo.flow.presentation.datapoints;
 
-public class Constants {
+import org.akvo.flow.domain.interactor.DefaultObserver;
 
-    public static final Long INVALID_USER_ID = -1L;
-    public static final String KEY_SURVEY_ID = "survey_id";
+import timber.log.Timber;
+
+public abstract class MobileDataObserver extends DefaultObserver<Boolean> {
+
+    @Override
+    public void onError(Throwable e) {
+        Timber.e(e); //should not happen
+    }
+
+    @Override
+    public void onNext(Boolean allowed) {
+        if (allowed == null || !allowed) {
+            onMobileDataNotAllowed();
+        } else {
+            onMobileDataAllowed();
+        }
+    }
+
+    protected abstract void onMobileDataNotAllowed();
+
+    protected abstract void onMobileDataAllowed();
 }

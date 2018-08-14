@@ -24,9 +24,9 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
-import org.akvo.flow.data.util.FileHelper;
-import org.akvo.flow.data.datasource.FolderBrowser;
+import org.akvo.flow.data.datasource.FlowFileBrowser;
 import org.akvo.flow.data.util.Constants;
+import org.akvo.flow.data.util.FileHelper;
 
 import java.io.File;
 
@@ -34,11 +34,11 @@ import javax.inject.Inject;
 
 public class S3FileMapper {
 
-    private final FolderBrowser folderBrowser;
+    private final FlowFileBrowser folderBrowser;
     private final FileHelper fileHelper;
 
     @Inject
-    public S3FileMapper(FolderBrowser folderBrowser, FileHelper fileHelper) {
+    public S3FileMapper(FlowFileBrowser folderBrowser, FileHelper fileHelper) {
         this.folderBrowser = folderBrowser;
         this.fileHelper = fileHelper;
     }
@@ -86,9 +86,9 @@ public class S3FileMapper {
         String ext = getFileExtension(filename);
         String folderName;
         if (isMedia(ext)) {
-            folderName = FolderBrowser.DIR_MEDIA;
+            folderName = FlowFileBrowser.DIR_MEDIA;
         } else if (isArchive(ext)) {
-            folderName = FolderBrowser.DIR_DATA;
+            folderName = FlowFileBrowser.DIR_DATA;
         } else {
             //unsupported file format found
             folderName = null;

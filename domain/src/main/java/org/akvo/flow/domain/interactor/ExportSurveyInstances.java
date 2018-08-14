@@ -36,9 +36,12 @@ import java.util.Set;
 import javax.inject.Inject;
 
 import io.reactivex.Observable;
+import io.reactivex.annotations.NonNull;
 import io.reactivex.functions.Function;
 
 public class ExportSurveyInstances extends UseCase {
+
+    public static final String SURVEY_INSTANCE_ID_PARAM = "survey_instance_id";
 
     private final UserRepository userRepository;
     private final TextValueCleaner valueCleaner;
@@ -48,8 +51,7 @@ public class ExportSurveyInstances extends UseCase {
     @Inject
     protected ExportSurveyInstances(ThreadExecutor threadExecutor,
             PostExecutionThread postExecutionThread, UserRepository userRepository,
-            TextValueCleaner valueCleaner,
-            SurveyRepository surveyRepository,
+            TextValueCleaner valueCleaner, SurveyRepository surveyRepository,
             FileRepository fileRepository) {
         super(threadExecutor, postExecutionThread);
         this.userRepository = userRepository;
@@ -60,6 +62,9 @@ public class ExportSurveyInstances extends UseCase {
 
     @Override
     protected <T> Observable buildUseCaseObservable(Map<String, T> parameters) {
+        final Long surveyInstanceId = parameters == null ?
+                null :
+                (Long) parameters.get(SURVEY_INSTANCE_ID_PARAM);
         return userRepository.getDeviceId()
                 .map(new Function<String, String>() {
                     @Override
@@ -70,27 +75,33 @@ public class ExportSurveyInstances extends UseCase {
                 .flatMap(new Function<String, Observable<Boolean>>() {
                     @Override
                     public Observable<Boolean> apply(final String deviceId) {
-                        return surveyRepository.getPendingSurveyInstances()
-                                .concatMap(new Function<List<Long>, Observable<Boolean>>() {
-                                    @Override
-                                    public Observable<Boolean> apply(List<Long> instanceIds) {
-                                        return Observable.fromIterable(instanceIds)
-                                                .concatMap(
-                                                        new Function<Long, Observable<Boolean>>() {
-                                                            @Override
-                                                            public Observable<Boolean> apply(
-                                                                    Long instanceId) {
-                                                                return createInstanceZipFile(
-                                                                        instanceId, deviceId);
-                                                            }
-                                                        });
-                                    }
-                                });
+                        if (surveyInstanceId == null) {
+                            return createInstancesZipFiles(deviceId);
+                        } else {
+                            return createInstanceZipFile(surveyInstanceId, deviceId);
+                        }
                     }
                 });
     }
 
-    private Observable<Boolean> createInstanceZipFile(final Long instanceId, String deviceId) {
+    private Observable<Boolean> createInstancesZipFiles(final String deviceId) {
+        return surveyRepository.getPendingSurveyInstances()
+                .concatMap(new Function<List<Long>, Observable<Boolean>>() {
+                    @Override
+                    public Observable<Boolean> apply(List<Long> instanceIds) {
+                        return Observable.fromIterable(instanceIds)
+                                .concatMap(new Function<Long, Observable<Boolean>>() {
+                                            @Override
+                                            public Observable<Boolean> apply(Long instanceId) {
+                                                return createInstanceZipFile(instanceId, deviceId);
+                                            }
+                                        });
+                    }
+                });
+    }
+
+    private Observable<Boolean> createInstanceZipFile(@NonNull final Long instanceId,
+            String deviceId) {
         return surveyRepository.getFormInstanceData(instanceId, deviceId)
                 .concatMap(new Function<FormInstanceMetadata, Observable<Boolean>>() {
                     @Override

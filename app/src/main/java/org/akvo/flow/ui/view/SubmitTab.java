@@ -21,6 +21,7 @@ package org.akvo.flow.ui.view;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.support.annotation.VisibleForTesting;
 import android.view.Gravity;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -39,6 +40,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SubmitTab extends ListView implements OnClickListener {
+
+    @VisibleForTesting
+    public static final String FOOTER = "FOOTER";
+
     private SurveyListener mListener;
 
     private TextView mHeaderView;
@@ -69,7 +74,7 @@ public class SubmitTab extends ListView implements OnClickListener {
         mSubmitButton.setOnClickListener(this);
 
         addHeaderView(mHeaderView);
-        addFooterView(mSubmitButton);
+        addFooterView(mSubmitButton, FOOTER, true);
 
         refresh(new ArrayList<Question>());
     }

@@ -334,6 +334,7 @@ public class Navigator {
     public void navigateToGetPhoto(AppCompatActivity activity) {
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
         intent.setType("image/*");
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
         if (intent.resolveActivity(activity.getPackageManager()) != null) {
             activity.startActivityForResult(intent, ConstantUtil.GET_PHOTO_ACTIVITY_REQUEST);
         }
@@ -342,6 +343,7 @@ public class Navigator {
     public void navigateToGetVideo(AppCompatActivity activity) {
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
         intent.setType("video/*");
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
         if (intent.resolveActivity(activity.getPackageManager()) != null) {
             activity.startActivityForResult(intent, ConstantUtil.GET_VIDEO_ACTIVITY_REQUEST);
         }

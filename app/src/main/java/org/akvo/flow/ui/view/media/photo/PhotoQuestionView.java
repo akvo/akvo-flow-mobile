@@ -165,11 +165,11 @@ public class PhotoQuestionView extends QuestionView implements
      */
     @Override
     public void questionComplete(Bundle mediaData) {
-        presenter.onImageReady(getImagePath(mediaData));
-    }
-
-    private String getImagePath(Bundle mediaData) {
-        return mediaData != null ? mediaData.getString(ConstantUtil.IMAGE_FILE_KEY) : null;
+        String imagePath =
+                mediaData != null ? mediaData.getString(ConstantUtil.IMAGE_FILE_KEY) : null;
+        boolean deleteOriginal =
+                mediaData != null && mediaData.getBoolean(ConstantUtil.PARAM_REMOVE_ORIGINAL, false);
+        presenter.onImageReady(imagePath, deleteOriginal);
     }
 
     @Override
@@ -345,6 +345,7 @@ public class PhotoQuestionView extends QuestionView implements
     /**
      * File paths cannot be trusted so we need to get the name of the file and rebuild the path.
      * All media files should be located in the same folder
+     *
      * @return File with the correct file path on the device
      */
     @Nullable

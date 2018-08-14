@@ -36,14 +36,14 @@ public class SaveResizedImage extends UseCase {
 
     public static final String ORIGINAL_FILE_NAME_PARAM = "original_file";
     public static final String RESIZED_FILE_NAME_PARAM = "resized_file";
+    public static final String REMOVE_ORIGINAL_IMAGE_PARAM = "remove_original";
 
     private final FileRepository fileRepository;
     private final UserRepository userRepository;
 
     @Inject
     protected SaveResizedImage(ThreadExecutor threadExecutor,
-            PostExecutionThread postExecutionThread,
-            FileRepository fileRepository,
+            PostExecutionThread postExecutionThread, FileRepository fileRepository,
             UserRepository userRepository) {
         super(threadExecutor, postExecutionThread);
         this.fileRepository = fileRepository;
@@ -59,13 +59,17 @@ public class SaveResizedImage extends UseCase {
 
         final String originalFilePath = (String) parameters.get(ORIGINAL_FILE_NAME_PARAM);
         final String resizedFilePath = (String) parameters.get(RESIZED_FILE_NAME_PARAM);
+        T removeDuplicateParam = parameters.get(REMOVE_ORIGINAL_IMAGE_PARAM);
+        final boolean removeDuplicate =
+                removeDuplicateParam != null && (Boolean) removeDuplicateParam;
 
         return userRepository.getImageSize()
                 .concatMap(new Function<Integer, Observable<Boolean>>() {
                     @Override
                     public Observable<Boolean> apply(Integer imageSize) {
                         return fileRepository
-                                .saveResizedImage(originalFilePath, resizedFilePath, imageSize);
+                                .copyResizedImage(originalFilePath, resizedFilePath, imageSize,
+                                        removeDuplicate);
                     }
                 });
 

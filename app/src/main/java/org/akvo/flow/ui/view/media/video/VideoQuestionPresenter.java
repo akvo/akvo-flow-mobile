@@ -61,10 +61,11 @@ public class VideoQuestionPresenter implements Presenter {
         copyVideo.dispose();
     }
 
-    public void onVideoReady(@Nullable Uri uri) {
+    public void onVideoReady(@Nullable Uri uri, boolean removeOriginal) {
             view.showLoading();
-            Map<String, Object> params = new HashMap<>(2);
+            Map<String, Object> params = new HashMap<>(4);
             params.put(CopyVideo.URI_ORIGINAL_FILE, uri);
+            params.put(CopyVideo.REMOVE_ORIGINAL_IMAGE_PARAM, removeOriginal);
             copyVideo.execute(new DefaultObserver<String>() {
                 @Override
                 public void onNext(String targetVideoFilePath) {

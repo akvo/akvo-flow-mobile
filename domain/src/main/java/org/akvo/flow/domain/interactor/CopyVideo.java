@@ -35,6 +35,7 @@ import io.reactivex.Observable;
 public class CopyVideo extends UseCase {
 
     public static final String URI_ORIGINAL_FILE = "video_uri";
+    public static final String REMOVE_ORIGINAL_IMAGE_PARAM = "remove_original";
 
     private final FileRepository fileRepository;
 
@@ -52,6 +53,8 @@ public class CopyVideo extends UseCase {
         }
 
         final Uri uri = (Uri) parameters.get(URI_ORIGINAL_FILE);
-        return fileRepository.copyVideo(uri);
+        T remove = parameters.get(REMOVE_ORIGINAL_IMAGE_PARAM);
+        final boolean removeOriginal = remove != null && (Boolean) remove;
+        return fileRepository.copyVideo(uri, removeOriginal);
     }
 }

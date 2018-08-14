@@ -162,7 +162,7 @@ public class ViewModule {
     }
 
     @Provides
-    @Named("saveResizedImage")
+    @Named("copyResizedImage")
     UseCase provideSaveResizedImage(SaveResizedImage saveResizedImage) {
         return saveResizedImage;
     }

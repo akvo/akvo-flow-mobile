@@ -105,6 +105,7 @@ public class ConstantUtil {
      */
     public static final String IMAGE_FILE_KEY = "image_path";
     public static final String VIDEO_FILE_KEY = "video_path";
+    public static final String PARAM_REMOVE_ORIGINAL = "remove_original";
 
     public static final String SIGNATURE_NAME_EXTRA = "signature_name";
     public static final String SIGNATURE_QUESTION_ID_EXTRA = "signature_question_id";

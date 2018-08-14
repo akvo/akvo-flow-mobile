@@ -554,6 +554,12 @@ public class FormActivity extends BackActivity implements SurveyListener,
             case ConstantUtil.VIDEO_ACTIVITY_REQUEST:
                 onVideoTaken(intent.getData());
                 break;
+            case ConstantUtil.GET_PHOTO_ACTIVITY_REQUEST:
+                onImageAcquired(intent.getData());
+                break;
+            case ConstantUtil.GET_VIDEO_ACTIVITY_REQUEST:
+                onVideoAcquired(intent.getData());
+                break;
             case ConstantUtil.EXTERNAL_SOURCE_REQUEST:
             case ConstantUtil.CADDISFLY_REQUEST:
             case ConstantUtil.SCAN_ACTIVITY_REQUEST:
@@ -564,17 +570,29 @@ public class FormActivity extends BackActivity implements SurveyListener,
                 break;
         }
 
-        mRequestQuestionId = null;// Reset the tmp reference
+        mRequestQuestionId = null;
+    }
+
+    private void onVideoAcquired(Uri uri) {
+        Bundle mediaData = new Bundle();
+        mediaData.putParcelable(ConstantUtil.VIDEO_FILE_KEY, uri);
+        mAdapter.onQuestionComplete(mRequestQuestionId, mediaData);
+    }
+
+    private void onImageAcquired(Uri imageUri) {
+        //TODO:
     }
 
     private void onImageTaken(String absolutePath) {
         Bundle mediaData = new Bundle();
         mediaData.putString(ConstantUtil.IMAGE_FILE_KEY, absolutePath);
+        mediaData.putBoolean(ConstantUtil.PARAM_REMOVE_ORIGINAL, true);
         mAdapter.onQuestionComplete(mRequestQuestionId, mediaData);
     }
 
     private void onVideoTaken(Uri uri) {
         Bundle mediaData = new Bundle();
+        mediaData.putBoolean(ConstantUtil.PARAM_REMOVE_ORIGINAL, true);
         mediaData.putParcelable(ConstantUtil.VIDEO_FILE_KEY, uri);
         mAdapter.onQuestionComplete(mRequestQuestionId, mediaData);
     }

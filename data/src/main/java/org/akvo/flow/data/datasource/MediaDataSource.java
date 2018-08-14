@@ -26,6 +26,9 @@ import android.net.Uri;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
@@ -105,5 +108,13 @@ public class MediaDataSource {
             return Observable.error(new Exception("Video path not found"));
         }
         return Observable.just(videoAbsolutePath);
+    }
+
+    public Observable<InputStream> getVideoInputStream(Uri uri) {
+        try {
+            return Observable.just(context.getContentResolver().openInputStream(uri));
+        } catch (FileNotFoundException e) {
+            return Observable.error(e);
+        }
     }
 }

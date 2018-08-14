@@ -163,7 +163,9 @@ public class VideoQuestionView extends QuestionView
         Uri uri = mediaData != null ?
                 (Uri) mediaData.getParcelable(ConstantUtil.VIDEO_FILE_KEY) :
                 null;
-        presenter.onVideoReady(uri);
+        boolean removeOriginal = mediaData != null && mediaData
+                .getBoolean(ConstantUtil.PARAM_REMOVE_ORIGINAL, false);
+        presenter.onVideoReady(uri, removeOriginal);
     }
 
     @Override

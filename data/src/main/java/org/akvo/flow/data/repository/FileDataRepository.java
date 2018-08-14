@@ -27,13 +27,13 @@ import org.akvo.flow.data.datasource.DataSourceFactory;
 import org.akvo.flow.data.datasource.MediaDataSource;
 import org.akvo.flow.domain.repository.FileRepository;
 
+import java.io.InputStream;
 import java.util.List;
 
 import javax.inject.Inject;
 
 import io.reactivex.Observable;
 import io.reactivex.annotations.NonNull;
-import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 
 public class FileDataRepository implements FileRepository {
@@ -53,20 +53,28 @@ public class FileDataRepository implements FileRepository {
     }
 
     @Override
-    public Observable<Boolean> saveResizedImage(final String originalImagePath,
-            String resizedImagePath, int imageSize) {
-        return dataSourceFactory.getImageDataSource()
-                .saveResizedImage(originalImagePath, resizedImagePath, imageSize)
+    public Observable<Boolean> copyResizedImage(final String originalImagePath,
+            String resizedImagePath, int imageSize, final boolean removeDuplicate) {
+        return saveResizedImage(originalImagePath, resizedImagePath, imageSize)
                 .concatMap(new Function<Boolean, Observable<Boolean>>() {
                     @Override
-                    public Observable<Boolean> apply(Boolean aBoolean) {
-                        return cleanupDuplicateImage(
-                                originalImagePath);
+                    public Observable<Boolean> apply(Boolean result) {
+                        if (removeDuplicate) {
+                            return deleteOriginal(originalImagePath);
+                        } else {
+                            return Observable.just(result);
+                        }
                     }
                 });
     }
 
-    private Observable<Boolean> cleanupDuplicateImage(final String originalImagePath) {
+    private Observable<Boolean> saveResizedImage(String originalImagePath, String resizedImagePath,
+            int imageSize) {
+        return dataSourceFactory.getImageDataSource()
+                .saveResizedImage(originalImagePath, resizedImagePath, imageSize);
+    }
+
+    private Observable<Boolean> deleteOriginal(final String originalImagePath) {
         final MediaDataSource mediaDataSource = dataSourceFactory.getMediaDataSource();
         return mediaDataSource.getLastImageTaken()
                 .concatMap(new Function<String, Observable<Boolean>>() {
@@ -137,17 +145,20 @@ public class FileDataRepository implements FileRepository {
     }
 
     @Override
-    public Observable<String> copyVideo(final Uri uri) {
-        final MediaDataSource mediaDataSource = dataSourceFactory.getMediaDataSource();
-        return mediaDataSource.getVideoFilePath(uri)
-                .concatMap(new Function<String, Observable<String>>() {
+    public Observable<String> copyVideo(final Uri uri, final boolean removeOriginal) {
+        return dataSourceFactory.getMediaDataSource().getVideoInputStream(uri)
+                .concatMap(new Function<InputStream, Observable<String>>() {
                     @Override
-                    public Observable<String> apply(final String videoFilePath) {
-                        return dataSourceFactory.getFileDataSource().copyVideo(videoFilePath)
-                                .doOnNext(new Consumer<String>() {
+                    public Observable<String> apply(InputStream inputStream) {
+                        return dataSourceFactory.getFileDataSource().copyVideo(inputStream)
+                                .flatMap(new Function<String, Observable<String>>() {
                                     @Override
-                                    public void accept(String ignored) {
-                                        mediaDataSource.notifyMediaDelete(uri);
+                                    public Observable<String> apply(String s) {
+                                        if (removeOriginal) {
+                                            dataSourceFactory.getMediaDataSource()
+                                                    .notifyMediaDelete(uri);
+                                        }
+                                        return Observable.just(s);
                                     }
                                 });
                     }

@@ -130,9 +130,4 @@ class FileHelper {
             }
         }
     }
-
-    boolean deleteFile(String path) {
-        File file = new File(path);
-        return file.exists() && file.delete();
-    }
 }

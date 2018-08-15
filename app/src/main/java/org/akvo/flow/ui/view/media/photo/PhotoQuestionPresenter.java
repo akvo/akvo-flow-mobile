@@ -20,6 +20,7 @@
 
 package org.akvo.flow.ui.view.media.photo;
 
+import android.net.Uri;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
@@ -73,8 +74,8 @@ public class PhotoQuestionPresenter implements Presenter {
         return mediaFileHelper.getMediaFile(filename);
     }
 
-    void onImageReady(@Nullable final String originalFilePath, boolean deleteOriginal) {
-        if (!TextUtils.isEmpty(originalFilePath)) {
+    void onImageReady(@Nullable final Uri originalFilePath, boolean deleteOriginal) {
+        if (originalFilePath != null) {
             view.showLoading();
             final String resizedImageFilePath = mediaFileHelper.getImageFilePath();
             Map<String, Object> params = new HashMap<>(6);
@@ -89,6 +90,7 @@ public class PhotoQuestionPresenter implements Presenter {
 
                 @Override
                 public void onError(Throwable e) {
+                    view.hideLoading();
                     view.showErrorGettingMedia();
                 }
             }, params);

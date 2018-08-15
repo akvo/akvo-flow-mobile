@@ -20,6 +20,8 @@
 
 package org.akvo.flow.domain.interactor;
 
+import android.net.Uri;
+
 import org.akvo.flow.domain.executor.PostExecutionThread;
 import org.akvo.flow.domain.executor.ThreadExecutor;
 import org.akvo.flow.domain.repository.FileRepository;
@@ -57,7 +59,7 @@ public class SaveResizedImage extends UseCase {
             return Observable.error(new IllegalArgumentException("Missing params"));
         }
 
-        final String originalFilePath = (String) parameters.get(ORIGINAL_FILE_NAME_PARAM);
+        final Uri originalFilePath = (Uri) parameters.get(ORIGINAL_FILE_NAME_PARAM);
         final String resizedFilePath = (String) parameters.get(RESIZED_FILE_NAME_PARAM);
         T removeDuplicateParam = parameters.get(REMOVE_ORIGINAL_IMAGE_PARAM);
         final boolean removeDuplicate =

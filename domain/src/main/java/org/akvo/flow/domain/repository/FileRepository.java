@@ -32,7 +32,7 @@ public interface FileRepository {
 
     Observable<Boolean> saveImage(Bitmap bitmap, String fileName, String resizedFilePath);
 
-    Observable<Boolean> copyResizedImage(String fileName, String resizedFilePath, int imageSize,
+    Observable<Boolean> copyResizedImage(Uri fileName, String resizedFilePath, int imageSize,
             boolean removeDuplicate);
 
     Observable<Boolean> moveFiles();

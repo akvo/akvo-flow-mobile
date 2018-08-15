@@ -21,10 +21,7 @@
 package org.akvo.flow.data.datasource;
 
 import android.content.Context;
-import android.database.Cursor;
 import android.net.Uri;
-import android.provider.MediaStore;
-import android.support.annotation.Nullable;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
@@ -33,7 +30,6 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import io.reactivex.Observable;
-import timber.log.Timber;
 
 @Singleton
 public class MediaDataSource {
@@ -50,69 +46,13 @@ public class MediaDataSource {
         return Observable.just(true);
     }
 
-    public Observable<String> getLastImageTaken() {
-        Cursor cursor = context.getContentResolver().query(
-                MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                new String[] {
-                        MediaStore.Images.ImageColumns.DATA,
-                        MediaStore.Images.ImageColumns.DATE_TAKEN
-                },
-                null,
-                null,
-                MediaStore.Images.ImageColumns.DATE_TAKEN + " DESC"
-        );
-        String lastImagePath = "";
-        if (cursor != null) {
-            if (cursor.moveToFirst()) {
-                lastImagePath = cursor.getString(cursor
-                        .getColumnIndex(MediaStore.Images.ImageColumns.DATA));
-            }
-            cursor.close();
-        }
-        return Observable.just(lastImagePath);
-    }
-
-    public Observable<Boolean> deleteImage(String lastImagePath) {
-        final int result = context.getContentResolver().delete(
-                MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                MediaStore.Images.ImageColumns.DATA + " = ?",
-                new String[] {
-                        lastImagePath
-                });
-
-        if (result == 1) {
-            Timber.i("Duplicated file successfully removed: %s", lastImagePath);
-        } else {
-            Timber.e("Error removing duplicated image: %s", lastImagePath);
-        }
-        return Observable.just(true);
-    }
-
-    public Observable<String> getVideoFilePath(@Nullable Uri videoUri) {
-        String videoAbsolutePath = null;
-        if (videoUri != null) {
-            String[] filePathColumns = {
-                    MediaStore.Images.Media.DATA
-            };
-            Cursor cursor = context.getContentResolver()
-                    .query(videoUri, filePathColumns, null, null, null);
-            if (cursor != null) {
-                if (cursor.moveToFirst()) {
-                    int columnIndex = cursor.getColumnIndex(MediaStore.Images.Media.DATA);
-                    videoAbsolutePath = cursor.getString(columnIndex);
-                }
-                cursor.close();
-            }
-        }
-        if (videoAbsolutePath == null) {
-            return Observable.error(new Exception("Video path not found"));
-        }
-        return Observable.just(videoAbsolutePath);
-    }
-
-    public Observable<InputStream> getVideoInputStream(Uri uri) {
+    public Observable<InputStream> getInputStreamFromUri(Uri uri) {
         try {
-            return Observable.just(context.getContentResolver().openInputStream(uri));
+            InputStream inputStream = context.getContentResolver().openInputStream(uri);
+            if (inputStream == null) {
+                return Observable.error(new Exception("null inputStream for: " + uri.toString()));
+            }
+            return Observable.just(inputStream);
         } catch (FileNotFoundException e) {
             return Observable.error(e);
         }

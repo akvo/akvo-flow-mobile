@@ -220,10 +220,6 @@ public class FileDataSource {
         return Observable.just(externalStorageHelper.getExternalStorageAvailableSpaceInMb());
     }
 
-    public Observable<Boolean> deleteFile(String originFilePath) {
-        return Observable.just(fileHelper.deleteFile(originFilePath));
-    }
-
     public Observable<String> copyVideo(InputStream inputStream) {
         final String copiedVideoPath = flowFileBrowser.getVideoFilePath();
         return copyFile(copiedVideoPath, inputStream)

@@ -261,6 +261,8 @@ public class ConstantUtil {
 
     public static final int SNACK_BAR_DURATION_IN_MS = 4000;
 
+    public static final String FILE_PROVIDER_AUTHORITY = "org.akvo.flow.fileprovider";
+
     /**
      * prevent instantiation
      */

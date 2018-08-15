@@ -21,6 +21,7 @@
 package org.akvo.flow.ui.view.media.photo;
 
 import android.content.Context;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -165,10 +166,12 @@ public class PhotoQuestionView extends QuestionView implements
      */
     @Override
     public void questionComplete(Bundle mediaData) {
-        String imagePath =
-                mediaData != null ? mediaData.getString(ConstantUtil.IMAGE_FILE_KEY) : null;
+        Uri imagePath =
+                mediaData != null ?
+                        (Uri) mediaData.getParcelable(ConstantUtil.IMAGE_FILE_KEY) : null;
         boolean deleteOriginal =
-                mediaData != null && mediaData.getBoolean(ConstantUtil.PARAM_REMOVE_ORIGINAL, false);
+                mediaData != null && mediaData
+                        .getBoolean(ConstantUtil.PARAM_REMOVE_ORIGINAL, false);
         presenter.onImageReady(imagePath, deleteOriginal);
     }
 
@@ -188,6 +191,11 @@ public class PhotoQuestionView extends QuestionView implements
             mLocationListener.start();
         }
         displayLocationInfo();
+    }
+
+    @Override
+    public void hideLoading() {
+        mProgressBar.setVisibility(GONE);
     }
 
     @Override

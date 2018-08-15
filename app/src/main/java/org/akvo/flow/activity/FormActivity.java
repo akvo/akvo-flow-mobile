@@ -28,6 +28,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
+import android.support.v4.content.FileProvider;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
@@ -70,11 +71,11 @@ import org.akvo.flow.ui.view.QuestionView;
 import org.akvo.flow.ui.view.geolocation.GeoFieldsResetConfirmDialogFragment;
 import org.akvo.flow.ui.view.geolocation.GeoQuestionView;
 import org.akvo.flow.util.ConstantUtil;
-import org.akvo.flow.util.files.FormFileBrowser;
 import org.akvo.flow.util.MediaFileHelper;
 import org.akvo.flow.util.PlatformUtil;
 import org.akvo.flow.util.StorageHelper;
 import org.akvo.flow.util.ViewUtil;
+import org.akvo.flow.util.files.FormFileBrowser;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -138,7 +139,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
     private Map<String, QuestionResponse> mQuestionResponses; // QuestionId - QuestionResponse
     private String surveyId;
 
-    private String imagePath;
+    private Uri imagePath;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -549,7 +550,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
 
         switch (requestCode) {
             case ConstantUtil.PHOTO_ACTIVITY_REQUEST:
-                onImageTaken(imagePath);
+                onImageTaken();
                 break;
             case ConstantUtil.VIDEO_ACTIVITY_REQUEST:
                 onVideoTaken(intent.getData());
@@ -580,12 +581,14 @@ public class FormActivity extends BackActivity implements SurveyListener,
     }
 
     private void onImageAcquired(Uri imageUri) {
-        //TODO:
+        Bundle mediaData = new Bundle();
+        mediaData.putParcelable(ConstantUtil.IMAGE_FILE_KEY, imageUri);
+        mAdapter.onQuestionComplete(mRequestQuestionId, mediaData);
     }
 
-    private void onImageTaken(String absolutePath) {
+    private void onImageTaken() {
         Bundle mediaData = new Bundle();
-        mediaData.putString(ConstantUtil.IMAGE_FILE_KEY, absolutePath);
+        mediaData.putParcelable(ConstantUtil.IMAGE_FILE_KEY, imagePath);
         mediaData.putBoolean(ConstantUtil.PARAM_REMOVE_ORIGINAL, true);
         mAdapter.onQuestionComplete(mRequestQuestionId, mediaData);
     }
@@ -817,8 +820,9 @@ public class FormActivity extends BackActivity implements SurveyListener,
         recordSourceId(event);
         File imageTmpFile = mediaFileHelper.getImageTmpFile();
         if (imageTmpFile != null) {
-            imagePath = imageTmpFile.getAbsolutePath();
-            navigator.navigateToTakePhoto(this, Uri.fromFile(imageTmpFile));
+            imagePath = FileProvider
+                    .getUriForFile(this, ConstantUtil.FILE_PROVIDER_AUTHORITY, imageTmpFile);
+            navigator.navigateToTakePhoto(this, imagePath);
         }
         //TODO: notify error taking pictures
     }

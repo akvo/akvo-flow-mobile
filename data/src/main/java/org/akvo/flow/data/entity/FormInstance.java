@@ -35,10 +35,11 @@ public class FormInstance {
     private final String formId;
     private final long submissionDate;
     private final long duration;
+    private final double formVersion;
     private final List<Response> responses = new ArrayList<>();
 
     public FormInstance(String uuid, String dataPointId, String deviceId, String username,
-            String email, String formId, long submissionDate, long duration) {
+            String email, String formId, long submissionDate, long duration, double formVersion) {
         this.uuid = uuid;
         this.dataPointId = dataPointId;
         this.deviceId = deviceId;
@@ -47,6 +48,7 @@ public class FormInstance {
         this.formId = formId;
         this.submissionDate = submissionDate;
         this.duration = duration;
+        this.formVersion = formVersion;
     }
 
     public List<Response> getResponses() {
@@ -83,5 +85,9 @@ public class FormInstance {
 
     public long getDuration() {
         return duration;
+    }
+
+    public double getFormVersion() {
+        return formVersion;
     }
 }

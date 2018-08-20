@@ -29,7 +29,6 @@ import android.os.Bundle;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.content.FileProvider;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 
@@ -123,7 +122,11 @@ public class Navigator {
 
     public void navigateToTakeVideo(@NonNull Activity activity) {
         Intent i = new Intent(android.provider.MediaStore.ACTION_VIDEO_CAPTURE);
-        activity.startActivityForResult(i, ConstantUtil.VIDEO_ACTIVITY_REQUEST);
+        if (i.resolveActivity(activity.getPackageManager()) != null) {
+            activity.startActivityForResult(i, ConstantUtil.VIDEO_ACTIVITY_REQUEST);
+        } else {
+            Timber.e(new Exception("No app found to take videos"));
+        }
     }
 
     public void navigateToBarcodeScanner(@NonNull AppCompatActivity activity) {
@@ -296,10 +299,8 @@ public class Navigator {
         }
     }
 
-    public void navigateToVideoView(Context context, String filename) {
+    public void navigateToVideoView(Context context, Uri fileUri) {
         Intent intent = new Intent(Intent.ACTION_VIEW);
-        Uri fileUri = FileProvider
-                .getUriForFile(context, "org.akvo.flow.fileprovider", new File(filename));
         intent.setDataAndType(fileUri, "video/mp4");
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         context.startActivity(intent);
@@ -329,5 +330,23 @@ public class Navigator {
     public void navigateToWalkThrough(Context context) {
         Intent intent = new Intent(context, WalkThroughActivity.class);
         context.startActivity(intent);
+    }
+
+    public void navigateToGetPhoto(AppCompatActivity activity) {
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.setType("image/*");
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        if (intent.resolveActivity(activity.getPackageManager()) != null) {
+            activity.startActivityForResult(intent, ConstantUtil.GET_PHOTO_ACTIVITY_REQUEST);
+        }
+    }
+
+    public void navigateToGetVideo(AppCompatActivity activity) {
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.setType("video/*");
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        if (intent.resolveActivity(activity.getPackageManager()) != null) {
+            activity.startActivityForResult(intent, ConstantUtil.GET_VIDEO_ACTIVITY_REQUEST);
+        }
     }
 }

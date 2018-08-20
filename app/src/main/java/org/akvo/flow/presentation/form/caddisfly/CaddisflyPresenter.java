@@ -22,8 +22,8 @@ package org.akvo.flow.presentation.form.caddisfly;
 
 import android.support.annotation.NonNull;
 
+import org.akvo.flow.domain.interactor.CopyFile;
 import org.akvo.flow.domain.interactor.DefaultObserver;
-import org.akvo.flow.domain.interactor.SaveResizedImage;
 import org.akvo.flow.domain.interactor.UseCase;
 import org.akvo.flow.presentation.Presenter;
 import org.akvo.flow.util.MediaFileHelper;
@@ -57,8 +57,8 @@ public class CaddisflyPresenter implements Presenter {
                 .getAbsolutePath();
         String originalImagePath = originalImageFile.getAbsolutePath();
         Map<String, Object> params = new HashMap<>(4);
-        params.put(SaveResizedImage.ORIGINAL_FILE_NAME_PARAM, originalImagePath);
-        params.put(SaveResizedImage.RESIZED_FILE_NAME_PARAM, copiedImagePath);
+        params.put(CopyFile.ORIGINAL_FILE_NAME_PARAM, originalImagePath);
+        params.put(CopyFile.RESIZED_FILE_NAME_PARAM, copiedImagePath);
         copyFile.execute(new DefaultObserver<Boolean>() {
             @Override
             public void onError(Throwable e) {

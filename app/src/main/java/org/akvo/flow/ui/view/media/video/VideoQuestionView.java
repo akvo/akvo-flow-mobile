@@ -24,9 +24,9 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.content.FileProvider;
 import android.text.TextUtils;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 
@@ -76,8 +76,8 @@ public class VideoQuestionView extends QuestionView
     @Inject
     VideoQuestionPresenter presenter;
 
-    @BindView(R.id.media_btn)
-    Button mMediaButton;
+    @BindView(R.id.acquire_media_ll)
+    View mediaLayout;
 
     @BindView(R.id.image)
     ImageView mImageView;
@@ -103,9 +103,8 @@ public class VideoQuestionView extends QuestionView
         presenter.setView(this);
 
         imageLoader = new GlideImageLoader(getContext());
-        mMediaButton.setText(R.string.takevideo);
         if (isReadOnly()) {
-            mMediaButton.setVisibility(GONE);
+            mediaLayout.setVisibility(GONE);
         }
     }
 
@@ -125,15 +124,22 @@ public class VideoQuestionView extends QuestionView
     void onVideoViewClicked() {
         File file = rebuildFilePath();
         if (file != null && file.exists()) {
-            navigator.navigateToVideoView(getContext(), file.getAbsolutePath());
+            Uri fileUri = FileProvider
+                    .getUriForFile(getContext(), ConstantUtil.FILE_PROVIDER_AUTHORITY, file);
+            navigator.navigateToVideoView(getContext(), fileUri);
         } else {
             showVideoLoadError();
         }
     }
 
-    @OnClick(R.id.media_btn)
+    @OnClick(R.id.camera_btn)
     void onTakeVideoClicked() {
         notifyQuestionListeners(QuestionInteractionEvent.TAKE_VIDEO_EVENT);
+    }
+
+    @OnClick(R.id.gallery_btn)
+    void onGetPictureClicked() {
+        notifyQuestionListeners(QuestionInteractionEvent.GET_VIDEO_EVENT);
     }
 
     @OnClick(R.id.media_download)
@@ -160,7 +166,9 @@ public class VideoQuestionView extends QuestionView
         Uri uri = mediaData != null ?
                 (Uri) mediaData.getParcelable(ConstantUtil.VIDEO_FILE_KEY) :
                 null;
-        presenter.onVideoReady(uri);
+        boolean removeOriginal = mediaData != null && mediaData
+                .getBoolean(ConstantUtil.PARAM_REMOVE_ORIGINAL, false);
+        presenter.onVideoReady(uri, removeOriginal);
     }
 
     @Override

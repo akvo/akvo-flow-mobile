@@ -70,11 +70,11 @@ import org.akvo.flow.ui.view.QuestionView;
 import org.akvo.flow.ui.view.geolocation.GeoFieldsResetConfirmDialogFragment;
 import org.akvo.flow.ui.view.geolocation.GeoQuestionView;
 import org.akvo.flow.util.ConstantUtil;
-import org.akvo.flow.util.files.FormFileBrowser;
 import org.akvo.flow.util.MediaFileHelper;
 import org.akvo.flow.util.PlatformUtil;
 import org.akvo.flow.util.StorageHelper;
 import org.akvo.flow.util.ViewUtil;
+import org.akvo.flow.util.files.FormFileBrowser;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -138,7 +138,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
     private Map<String, QuestionResponse> mQuestionResponses; // QuestionId - QuestionResponse
     private String surveyId;
 
-    private String imagePath;
+    private Uri imagePath;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -549,10 +549,15 @@ public class FormActivity extends BackActivity implements SurveyListener,
 
         switch (requestCode) {
             case ConstantUtil.PHOTO_ACTIVITY_REQUEST:
-                onImageAcquired(imagePath);
+                onImageTaken();
                 break;
             case ConstantUtil.VIDEO_ACTIVITY_REQUEST:
-
+                onVideoTaken(intent.getData());
+                break;
+            case ConstantUtil.GET_PHOTO_ACTIVITY_REQUEST:
+                onImageAcquired(intent.getData());
+                break;
+            case ConstantUtil.GET_VIDEO_ACTIVITY_REQUEST:
                 onVideoAcquired(intent.getData());
                 break;
             case ConstantUtil.EXTERNAL_SOURCE_REQUEST:
@@ -565,17 +570,31 @@ public class FormActivity extends BackActivity implements SurveyListener,
                 break;
         }
 
-        mRequestQuestionId = null;// Reset the tmp reference
-    }
-
-    private void onImageAcquired(String absolutePath) {
-        Bundle mediaData = new Bundle();
-        mediaData.putString(ConstantUtil.IMAGE_FILE_KEY, absolutePath);
-        mAdapter.onQuestionComplete(mRequestQuestionId, mediaData);
+        mRequestQuestionId = null;
     }
 
     private void onVideoAcquired(Uri uri) {
         Bundle mediaData = new Bundle();
+        mediaData.putParcelable(ConstantUtil.VIDEO_FILE_KEY, uri);
+        mAdapter.onQuestionComplete(mRequestQuestionId, mediaData);
+    }
+
+    private void onImageAcquired(Uri imageUri) {
+        Bundle mediaData = new Bundle();
+        mediaData.putParcelable(ConstantUtil.IMAGE_FILE_KEY, imageUri);
+        mAdapter.onQuestionComplete(mRequestQuestionId, mediaData);
+    }
+
+    private void onImageTaken() {
+        Bundle mediaData = new Bundle();
+        mediaData.putParcelable(ConstantUtil.IMAGE_FILE_KEY, imagePath);
+        mediaData.putBoolean(ConstantUtil.PARAM_REMOVE_ORIGINAL, true);
+        mAdapter.onQuestionComplete(mRequestQuestionId, mediaData);
+    }
+
+    private void onVideoTaken(Uri uri) {
+        Bundle mediaData = new Bundle();
+        mediaData.putBoolean(ConstantUtil.PARAM_REMOVE_ORIGINAL, true);
         mediaData.putParcelable(ConstantUtil.VIDEO_FILE_KEY, uri);
         mAdapter.onQuestionComplete(mRequestQuestionId, mediaData);
     }
@@ -693,8 +712,12 @@ public class FormActivity extends BackActivity implements SurveyListener,
     public void onQuestionInteraction(QuestionInteractionEvent event) {
         if (QuestionInteractionEvent.TAKE_PHOTO_EVENT.equals(event.getEventType())) {
             takePhoto(event);
+        } else if (QuestionInteractionEvent.GET_PHOTO_EVENT.equals(event.getEventType())) {
+            navigateToGetPhoto(event);
         } else if (QuestionInteractionEvent.TAKE_VIDEO_EVENT.equals(event.getEventType())) {
             navigateToTakeVideo(event);
+        } else if (QuestionInteractionEvent.GET_VIDEO_EVENT.equals(event.getEventType())) {
+            navigateToGetVideo(event);
         } else if (QuestionInteractionEvent.SCAN_BARCODE_EVENT.equals(event.getEventType())) {
             navigateToBarcodeScanner(event);
         } else if (QuestionInteractionEvent.QUESTION_CLEAR_EVENT.equals(event.getEventType())) {
@@ -710,6 +733,16 @@ public class FormActivity extends BackActivity implements SurveyListener,
         } else if (QuestionInteractionEvent.ADD_SIGNATURE_EVENT.equals(event.getEventType())) {
             navigateToSignatureActivity(event);
         }
+    }
+
+    private void navigateToGetVideo(QuestionInteractionEvent event) {
+        recordSourceId(event);
+        navigator.navigateToGetVideo(this);
+    }
+
+    private void navigateToGetPhoto(QuestionInteractionEvent event) {
+        recordSourceId(event);
+        navigator.navigateToGetPhoto(this);
     }
 
     private void navigateToSignatureActivity(QuestionInteractionEvent event) {
@@ -784,10 +817,10 @@ public class FormActivity extends BackActivity implements SurveyListener,
 
     private void takePhoto(QuestionInteractionEvent event) {
         recordSourceId(event);
-        File imageTmpFile = mediaFileHelper.getImageTmpFile();
+        File imageTmpFile = mediaFileHelper.getTemporaryImageFile();
         if (imageTmpFile != null) {
-            imagePath = imageTmpFile.getAbsolutePath();
-            navigator.navigateToTakePhoto(this, Uri.fromFile(imageTmpFile));
+            imagePath = Uri.fromFile(imageTmpFile);
+            navigator.navigateToTakePhoto(this, imagePath);
         }
         //TODO: notify error taking pictures
     }

@@ -357,6 +357,9 @@ public class DataPointsListFragment extends Fragment implements LocationListener
             case R.id.download:
                 presenter.onDownloadPressed();
                 return true;
+            case R.id.upload:
+                presenter.onUploadPressed();
+                return true;
             default:
                 return false;
         }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2016-2018 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -19,6 +19,7 @@
 
 package org.akvo.flow.util;
 
+import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -36,39 +37,42 @@ public class NotificationHelper {
     /**
      * Displays a notification in the system status bar
      *
-     * @param title - headline to display in notification bar
-     * @param text - body of notification (when user expands bar)
+     * @param title          - headline to display in notification bar
+     * @param text           - body of notification (when user expands bar)
      * @param notificationId - unique (within app) ID of notification
      */
-    public static void displayNotification(String title, String text, Context context, int notificationId) {
+    public static void displayNotification(String title, String text, Context context,
+            int notificationId) {
         NotificationCompat.Builder builder =
-            createNotificationBuilder(title, text, context);
+                createNotificationBuilder(title, text, context);
         notifyWithDummyIntent(context, notificationId, builder);
     }
 
     /**
      * Displays a notification in the system status bar
      *
-     * @param title - headline to display in notification bar
-     * @param text - body of notification (when user expands bar)
+     * @param title          - headline to display in notification bar
+     * @param text           - body of notification (when user expands bar)
      * @param notificationId - unique (within app) ID of notification
      */
-    public static void displayErrorNotification(String title, String text, Context context, int notificationId) {
+    public static void displayErrorNotification(String title, String text, Context context,
+            int notificationId) {
         NotificationCompat.Builder builder =
-            createErrorNotificationBuilder(title, text, context);
+                createErrorNotificationBuilder(title, text, context);
         notifyWithDummyIntent(context, notificationId, builder);
     }
 
-
-    public static void displayNonOnGoingErrorNotification(Context context, int notificationId, String text, String title) {
+    public static void displayNonOnGoingErrorNotification(Context context, int notificationId,
+            String text, String title) {
         NotificationCompat.Builder builder = createErrorNotificationBuilder(title, text, context);
         builder.setOngoing(false);
 
         notifyWithDummyIntent(context, notificationId, builder);
     }
 
-    public static void displayNotification(Context context, int total, String title, String text, int notificationId,
-                                           boolean ongoing, int progress) {
+    public static void displayNotification(Context context, int total, String title, String text,
+            int notificationId,
+            boolean ongoing, int progress) {
         NotificationCompat.Builder builder = createNotificationBuilder(title, text, context);
 
         builder.setOngoing(ongoing);// Ongoing if still syncing the records
@@ -79,22 +83,37 @@ public class NotificationHelper {
         notifyWithDummyIntent(context, notificationId, builder);
     }
 
-    private static void notifyWithDummyIntent(Context context, int notificationId, NotificationCompat.Builder builder) {
+    public static Notification getSyncingNotification(Context context) {
+        String title = context.getString(R.string.sync_service_notification_title);
+        NotificationCompat.Builder b = new NotificationCompat.Builder(context)
+                .setSmallIcon(R.drawable.notification_icon)
+                .setContentTitle(title)
+                .setTicker(context.getString(R.string.sync_service_notification_ticker))
+                .setProgress(0, 0, true)
+                .setColor(ContextCompat.getColor(context, R.color.orange_main))
+                .setOngoing(true);
+        return (b.build());
+    }
+
+    private static void notifyWithDummyIntent(Context context, int notificationId,
+            NotificationCompat.Builder builder) {
         // Dummy intent. Do nothing when clicked
         PendingIntent dummyIntent = PendingIntent.getActivity(context, 0, new Intent(), 0);
         builder.setContentIntent(dummyIntent);
 
         NotificationManager notificationManager =
-            (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+                (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.notify(notificationId, builder.build());
     }
 
-    private static NotificationCompat.Builder createNotificationBuilder(String title, String text, Context context) {
+    private static NotificationCompat.Builder createNotificationBuilder(String title, String text,
+            Context context) {
         return createDefaultNotification(title, text, context)
                 .setColor(ContextCompat.getColor(context, R.color.orange_main));
     }
 
-    private static NotificationCompat.Builder createDefaultNotification(String title, String text, Context context) {
+    private static NotificationCompat.Builder createDefaultNotification(String title, String text,
+            Context context) {
         return new NotificationCompat.Builder(context).setSmallIcon(R.drawable.notification_icon)
                 .setStyle(new NotificationCompat.BigTextStyle().bigText(text))
                 .setContentTitle(title)
@@ -102,7 +121,8 @@ public class NotificationHelper {
                 .setTicker(title);
     }
 
-    private static NotificationCompat.Builder createErrorNotificationBuilder(String title, String text, Context context) {
+    private static NotificationCompat.Builder createErrorNotificationBuilder(String title,
+            String text, Context context) {
         return createDefaultNotification(title, text, context)
                 .setColor(ContextCompat.getColor(context, R.color.red));
     }

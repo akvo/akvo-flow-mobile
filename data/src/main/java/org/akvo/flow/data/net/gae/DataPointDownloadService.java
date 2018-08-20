@@ -18,7 +18,7 @@
  *
  */
 
-package org.akvo.flow.data.net;
+package org.akvo.flow.data.net.gae;
 
 import org.akvo.flow.data.entity.ApiLocaleResult;
 
@@ -27,14 +27,14 @@ import retrofit2.http.GET;
 import retrofit2.http.Headers;
 import retrofit2.http.Query;
 
-import static org.akvo.flow.data.util.Constants.ANDROID_ID;
-import static org.akvo.flow.data.util.Constants.IMEI;
-import static org.akvo.flow.data.util.Constants.LAST_UPDATED;
-import static org.akvo.flow.data.util.Constants.PHONE_NUMBER;
-import static org.akvo.flow.data.util.Constants.SURVEYED_LOCALE;
-import static org.akvo.flow.data.util.Constants.SURVEY_GROUP;
+import static org.akvo.flow.data.util.ApiUrls.ANDROID_ID;
+import static org.akvo.flow.data.util.ApiUrls.IMEI;
+import static org.akvo.flow.data.util.ApiUrls.LAST_UPDATED;
+import static org.akvo.flow.data.util.ApiUrls.PHONE_NUMBER;
+import static org.akvo.flow.data.util.ApiUrls.SURVEYED_LOCALE;
+import static org.akvo.flow.data.util.ApiUrls.SURVEY_GROUP;
 
-interface DataPointDownloadService {
+public interface DataPointDownloadService {
 
     @GET(SURVEYED_LOCALE)
     @Headers("Cache-Control: no-cache")

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -20,6 +20,8 @@
 
 package org.akvo.flow.data.net;
 
+import android.support.annotation.NonNull;
+
 import java.text.SimpleDateFormat;
 import java.util.concurrent.TimeUnit;
 
@@ -39,30 +41,37 @@ public class RestServiceFactory {
     /**
      * Requests to GAE take a long time especially when there are a lot of datapoints
      */
-    public static final int NO_TIMEOUT = 0;
+    private static final int NO_TIMEOUT = 0;
 
     private final HttpLoggingInterceptor loggingInterceptor;
     private final SimpleDateFormat dateFormat;
     private final Encoder encoder;
     private final String key;
-    private final String baseUrl;
+    private SignatureHelper signatureHelper;
 
     @Inject
     public RestServiceFactory(HttpLoggingInterceptor loggingInterceptor,
-            SimpleDateFormat simpleDateFormat, Encoder encoder, String key, String baseUrl) {
+            SimpleDateFormat simpleDateFormat, Encoder encoder, String key,
+            SignatureHelper signatureHelper) {
         this.loggingInterceptor = loggingInterceptor;
         this.dateFormat = simpleDateFormat;
         this.encoder = encoder;
         this.key = key;
-        this.baseUrl = baseUrl;
+        this.signatureHelper = signatureHelper;
     }
 
-    public <T> T createRetrofitService(final Class<T> clazz) {
-        OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
-        httpClient.addInterceptor(loggingInterceptor);
-        httpClient.connectTimeout(CONNECTION_TIMEOUT, TimeUnit.SECONDS);
-        httpClient.readTimeout(NO_TIMEOUT, TimeUnit.SECONDS);
-        httpClient.addInterceptor(new HMACInterceptor(key, dateFormat, encoder));
+    public <T> T createRetrofitServiceWithInterceptor(final Class<T> clazz, String baseUrl) {
+        OkHttpClient.Builder httpClient = createHttpClient();
+        httpClient.addInterceptor(new HMACInterceptor(key, dateFormat, encoder, signatureHelper));
+        return createRetrofit(clazz, httpClient, baseUrl);
+    }
+
+    public <T> T createRetrofitService(final Class<T> clazz, String baseUrl) {
+        OkHttpClient.Builder httpClient = createHttpClient();
+        return createRetrofit(clazz, httpClient, baseUrl);
+    }
+
+    private <T> T createRetrofit(Class<T> clazz, OkHttpClient.Builder httpClient, String baseUrl) {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(baseUrl)
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
@@ -70,5 +79,14 @@ public class RestServiceFactory {
                 .client(httpClient.build())
                 .build();
         return retrofit.create(clazz);
+    }
+
+    @NonNull
+    private OkHttpClient.Builder createHttpClient() {
+        OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
+        httpClient.addInterceptor(loggingInterceptor);
+        httpClient.connectTimeout(CONNECTION_TIMEOUT, TimeUnit.SECONDS);
+        httpClient.readTimeout(NO_TIMEOUT, TimeUnit.SECONDS);
+        return httpClient;
     }
 }

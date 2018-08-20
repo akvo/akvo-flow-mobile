@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010-2016 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2010-2016,2018 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -20,7 +20,6 @@
 package org.akvo.flow.util;
 
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.util.Log;
 
 import org.akvo.flow.exception.HttpException;
@@ -28,19 +27,14 @@ import org.akvo.flow.exception.HttpException;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.Map;
-import java.util.Map.Entry;
 
 /**
  * Simple utility to make http calls and read the responses
@@ -99,42 +93,6 @@ public class HttpUtil {
         }
     }
 
-    /**
-     * does an HTTP Post to the url specified using the params passed in
-     */
-    public static String httpPost(String url, Map<String, String> params) throws IOException {
-        OutputStream out = null;
-        InputStream in = null;
-        Writer writer;
-        HttpURLConnection conn = null;
-        try {
-            conn = (HttpURLConnection) new URL(url).openConnection();
-            conn.setDoInput(true);
-            conn.setDoOutput(true);
-
-            out = new BufferedOutputStream(conn.getOutputStream());
-            writer = new BufferedWriter(new OutputStreamWriter(out, "UTF-8"));
-
-            writer.write(getQuery(params));
-            writer.flush();
-            writer.close();
-
-            in = new BufferedInputStream(conn.getInputStream());
-
-            int status = getStatusCode(conn);
-            if (status != HttpURLConnection.HTTP_OK) {
-                throw new HttpException(conn.getResponseMessage(), status);
-            }
-            return readStream(in);
-        } finally {
-            if (conn != null) {
-                conn.disconnect();
-            }
-            FileUtil.close(out);
-            FileUtil.close(in);
-        }
-    }
-
     private static int getStatusCode(@NonNull HttpURLConnection conn) throws IOException {
         try {
             return conn.getResponseCode();
@@ -145,20 +103,6 @@ public class HttpUtil {
             // able to retrieve it.
             return conn.getResponseCode();
         }
-    }
-
-    @NonNull
-    private static String getQuery(@Nullable Map<String, String> params) {
-        if (params == null) {
-            return "";
-        }
-
-        StringBuilder builder = new StringBuilder();
-        for (Entry<String, String> param : params.entrySet()) {
-            builder.append("&").append(param.getKey()).append("=").append(param.getValue());
-        }
-        // Skip the first "&", if found.
-        return builder.length() > 0 ? builder.substring(1) : builder.toString();
     }
 
     private static String readStream(@NonNull InputStream in) throws IOException {

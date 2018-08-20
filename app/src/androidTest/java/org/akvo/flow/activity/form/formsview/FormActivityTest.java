@@ -82,8 +82,9 @@ import static org.akvo.flow.activity.form.FormActivityTestUtil.getDateEditText;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.getDoubleEntryInput;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.getFormActivityIntent;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.getFreeTextInput;
+import static org.akvo.flow.activity.form.FormActivityTestUtil.getGalleryButton;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.getGeoButton;
-import static org.akvo.flow.activity.form.FormActivityTestUtil.getMediaButton;
+import static org.akvo.flow.activity.form.FormActivityTestUtil.getCameraButton;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.getOptionView;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.getQuestionHeader;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.selectAndVerifyTab;
@@ -365,18 +366,27 @@ public class FormActivityTest {
     }
 
     private void verifyPhotoQuestionView(Question question) {
-        verifyMediaButton(question, R.string.takephoto);
+        verifyCameraButton(question);
+        verifyGalleryButton(question);
     }
 
-    private void verifyMediaButton(Question question, int textResId) {
-        ViewInteraction mediaButton = getMediaButton(question);
+    private void verifyCameraButton(Question question) {
+        ViewInteraction mediaButton = getCameraButton(question);
         mediaButton.perform(scrollTo());
-        mediaButton.check(matches(withText(textResId)));
+        mediaButton.check(matches(withText(R.string.media_from_camera)));
+        mediaButton.check(matches(isDisplayed()));
+    }
+
+    private void verifyGalleryButton(Question question) {
+        ViewInteraction mediaButton = getGalleryButton(question);
+        mediaButton.perform(scrollTo());
+        mediaButton.check(matches(withText(R.string.media_from_gallery)));
         mediaButton.check(matches(isDisplayed()));
     }
 
     private void verifyVideoQuestionView(Question question) {
-        verifyMediaButton(question, R.string.takevideo);
+        verifyCameraButton(question);
+        verifyGalleryButton(question);
     }
 
     private void verifyGeoQuestionView(Question question) {

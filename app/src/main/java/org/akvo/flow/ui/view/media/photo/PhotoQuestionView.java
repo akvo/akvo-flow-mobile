@@ -21,12 +21,12 @@
 package org.akvo.flow.ui.view.media.photo;
 
 import android.content.Context;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -77,8 +77,8 @@ public class PhotoQuestionView extends QuestionView implements
     @Inject
     PhotoQuestionPresenter presenter;
 
-    @BindView(R.id.media_btn)
-    Button mMediaButton;
+    @BindView(R.id.acquire_media_ll)
+    View mediaLayout;
 
     @BindView(R.id.image)
     ImageView mImageView;
@@ -110,9 +110,8 @@ public class PhotoQuestionView extends QuestionView implements
         presenter.setView(this);
 
         imageLoader = new GlideImageLoader(getContext());
-        mMediaButton.setText(R.string.takephoto);
         if (isReadOnly()) {
-            mMediaButton.setVisibility(GONE);
+            mediaLayout.setVisibility(GONE);
         }
 
         mMedia = null;
@@ -136,9 +135,14 @@ public class PhotoQuestionView extends QuestionView implements
         }
     }
 
-    @OnClick(R.id.media_btn)
+    @OnClick(R.id.camera_btn)
     void onTakePictureClicked() {
         notifyQuestionListeners(QuestionInteractionEvent.TAKE_PHOTO_EVENT);
+    }
+
+    @OnClick(R.id.gallery_btn)
+    void onGetPictureClicked() {
+        notifyQuestionListeners(QuestionInteractionEvent.GET_PHOTO_EVENT);
     }
 
     @OnClick(R.id.media_download)
@@ -162,11 +166,13 @@ public class PhotoQuestionView extends QuestionView implements
      */
     @Override
     public void questionComplete(Bundle mediaData) {
-        presenter.onImageReady(getImagePath(mediaData));
-    }
-
-    private String getImagePath(Bundle mediaData) {
-        return mediaData != null ? mediaData.getString(ConstantUtil.IMAGE_FILE_KEY) : null;
+        Uri imagePath =
+                mediaData != null ?
+                        (Uri) mediaData.getParcelable(ConstantUtil.IMAGE_FILE_KEY) : null;
+        boolean deleteOriginal =
+                mediaData != null && mediaData
+                        .getBoolean(ConstantUtil.PARAM_REMOVE_ORIGINAL, false);
+        presenter.onImageReady(imagePath, deleteOriginal);
     }
 
     @Override
@@ -185,6 +191,11 @@ public class PhotoQuestionView extends QuestionView implements
             mLocationListener.start();
         }
         displayLocationInfo();
+    }
+
+    @Override
+    public void hideLoading() {
+        mProgressBar.setVisibility(GONE);
     }
 
     @Override
@@ -342,6 +353,7 @@ public class PhotoQuestionView extends QuestionView implements
     /**
      * File paths cannot be trusted so we need to get the name of the file and rebuild the path.
      * All media files should be located in the same folder
+     *
      * @return File with the correct file path on the device
      */
     @Nullable

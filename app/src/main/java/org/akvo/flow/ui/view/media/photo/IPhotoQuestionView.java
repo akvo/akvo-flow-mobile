@@ -26,6 +26,8 @@ public interface IPhotoQuestionView {
 
     void displayImage(String mediaFilePath);
 
+    void hideLoading();
+
     void showErrorGettingMedia();
 
     void updateResponse(String localFilePath);

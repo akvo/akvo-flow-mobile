@@ -29,6 +29,7 @@ import org.akvo.flow.data.util.FileHelper;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -71,6 +72,19 @@ public class FileDataSource {
         try {
             File destinationFile = new File(destinationFilePath);
             String copiedFilePath = fileHelper.copyFile(originalFile, destinationFile);
+            if (copiedFilePath == null) {
+                return Observable.error(new Exception("Error copying video file"));
+            }
+            return Observable.just(true);
+        } catch (IOException e) {
+            return Observable.error(e);
+        }
+    }
+
+    public Observable<Boolean> copyFile(String destinationFilePath, InputStream inputStream) {
+        try {
+            File destinationFile = new File(destinationFilePath);
+            String copiedFilePath = fileHelper.copyFile(destinationFile, inputStream);
             if (copiedFilePath == null) {
                 return Observable.error(new Exception("Error copying video file"));
             }
@@ -228,19 +242,13 @@ public class FileDataSource {
         return Observable.just(fileHelper.deleteFile(originFilePath));
     }
 
-    public Observable<String> copyVideo(final String videoFilePath) {
+    public Observable<String> copyVideo(InputStream inputStream) {
         final String copiedVideoPath = flowFileBrowser.getVideoFilePath();
-        return copyFile(videoFilePath, copiedVideoPath)
-                .flatMap(new Function<Boolean, Observable<String>>() {
+        return copyFile(copiedVideoPath, inputStream)
+                .map(new Function<Boolean, String>() {
                     @Override
-                    public Observable<String> apply(Boolean ignored) {
-                        return deleteFile(videoFilePath)
-                                .map(new Function<Boolean, String>() {
-                                    @Override
-                                    public String apply(Boolean ignored) {
-                                        return copiedVideoPath;
-                                    }
-                                });
+                    public String apply(Boolean ignored) {
+                        return copiedVideoPath;
                     }
                 });
     }

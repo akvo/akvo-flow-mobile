@@ -102,6 +102,7 @@ public class ConstantUtil {
      */
     public static final String IMAGE_FILE_KEY = "image_path";
     public static final String VIDEO_FILE_KEY = "video_path";
+    public static final String PARAM_REMOVE_ORIGINAL = "remove_original";
 
     public static final String SIGNATURE_NAME_EXTRA = "signature_name";
     public static final String SIGNATURE_QUESTION_ID_EXTRA = "signature_question_id";
@@ -245,6 +246,8 @@ public class ConstantUtil {
     public static final int PLOTTING_REQUEST = 6;
     public static final int SIGNATURE_REQUEST = 7;
     public static final int FORM_FILLING_REQUEST = 8;
+    public static final int GET_PHOTO_ACTIVITY_REQUEST = 9;
+    public static final int GET_VIDEO_ACTIVITY_REQUEST = 10;
 
 
     //view tags
@@ -253,6 +256,8 @@ public class ConstantUtil {
     public static final int READ_ONLY_TAG_KEY = R.integer.finishedkey;
 
     public static final int SNACK_BAR_DURATION_IN_MS = 4000;
+
+    public static final String FILE_PROVIDER_AUTHORITY = "org.akvo.flow.fileprovider";
 
     /**
      * prevent instantiation

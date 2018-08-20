@@ -28,15 +28,12 @@ import android.support.annotation.Nullable;
 import org.akvo.flow.util.files.FileBrowser;
 
 import java.io.File;
-import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
 import javax.inject.Inject;
-
-import timber.log.Timber;
 
 public class MediaFileHelper {
 
@@ -60,21 +57,15 @@ public class MediaFileHelper {
     }
 
     @Nullable
-    public File getImageTmpFile() {
-        return getTempMediaFile(TEMP_PHOTO_NAME_PREFIX, IMAGE_SUFFIX);
-    }
-
-    @Nullable
-    private File getTempMediaFile(String prefix, String suffix) {
+    public File getTemporaryImageFile() {
         String timeStamp = dateFormat.format(new Date());
-        String imageFileName = prefix + timeStamp + "_";
-        File storageDir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-        try {
-            return File.createTempFile(imageFileName, suffix, storageDir);
-        } catch (IOException e) {
-            Timber.e(e, "Unable to create image file");
+        String imageFileName = TEMP_PHOTO_NAME_PREFIX + timeStamp + "_";
+        File storageDir = Environment
+                .getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
+        if (!storageDir.exists()) {
+            storageDir.mkdirs();
         }
-        return null;
+        return new File(storageDir, imageFileName + IMAGE_SUFFIX);
     }
 
     @NonNull

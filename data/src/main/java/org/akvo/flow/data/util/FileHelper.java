@@ -122,7 +122,29 @@ public class FileHelper {
         return destinationPath;
     }
 
-    public void close(Closeable closeable) {
+    @Nullable
+    public String copyFile(File destinationFile, InputStream inputStream) throws IOException {
+        String destinationPath = null;
+        OutputStream out = null;
+        try {
+            out = new FileOutputStream(destinationFile);
+            byte[] buffer = new byte[1024];
+            int read;
+            while ((read = inputStream.read(buffer)) != -1) {
+                out.write(buffer, 0, read);
+            }
+            out.flush();
+            destinationPath = destinationFile.getAbsolutePath();
+        } catch (FileNotFoundException e) {
+            Timber.e(e);
+        } finally {
+            close(inputStream);
+            close(out);
+        }
+        return destinationPath;
+    }
+
+   public void close(Closeable closeable) {
         if (closeable != null) {
             try {
                 closeable.close();

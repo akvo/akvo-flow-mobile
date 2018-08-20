@@ -25,6 +25,8 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.graphics.RectF;
+import android.net.Uri;
+import android.os.ParcelFileDescriptor;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.media.ExifInterface;
@@ -35,9 +37,11 @@ import org.akvo.flow.data.util.ImageSize;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileDescriptor;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Arrays;
 
@@ -56,13 +60,13 @@ public class ImageDataSource {
     private static final int RESIZED_IMAGE_HEIGHT = 240;
     private static final int QUALITY_FULL = 100;
 
-    private final Context context;
     private final FileHelper fileHelper;
+    private final Context context;
 
     @Inject
-    public ImageDataSource(Context context, FileHelper fileHelper) {
-        this.context = context;
+    public ImageDataSource(FileHelper fileHelper, Context context) {
         this.fileHelper = fileHelper;
+        this.context = context;
     }
 
     public Observable<Boolean> saveImages(Bitmap bitmap, String originalFilePath,
@@ -77,20 +81,15 @@ public class ImageDataSource {
                 });
     }
 
-    public Observable<Boolean> saveResizedImage(final String originalImagePath,
-            final String resizedImagePath, int imageSize) {
+    public Observable<Boolean> saveResizedImage(final Uri originalImagePath,
+            final String resizedImagePath, int imageSize, final InputStream inputStream) {
         return resizeImage(originalImagePath, resizedImagePath, imageSize)
                 .concatMap(new Function<Boolean, Observable<Boolean>>() {
                     @Override
                     public Observable<Boolean> apply(Boolean result) {
-                        return updateExifOrientationData(originalImagePath, resizedImagePath);
+                        return updateExifOrientationData(inputStream, resizedImagePath);
                     }
                 });
-    }
-
-    public Observable<Boolean> duplicateImageFound(String filepath, String lastImagePath) {
-        return Observable.just(!filepath.equals(lastImagePath) && compareImages(filepath,
-                lastImagePath));
     }
 
     private Observable<Boolean> saveImage(@Nullable Bitmap bitmap, String filename) {
@@ -121,17 +120,28 @@ public class ImageDataSource {
         return saveImage(resizedBitmap, absolutePath);
     }
 
-    private Observable<Boolean> resizeImage(String origFilename, String outFilename,
-            int sizePreference) {
-        BitmapFactory.Options options = prepareBitmapOptions(origFilename, sizePreference);
-        return saveImage(BitmapFactory.decodeFile(origFilename, options), outFilename);
+    private Observable<Boolean> resizeImage(Uri uri, String outFilename, int sizePreference) {
+        try {
+            ParcelFileDescriptor parcelFileDescriptor =
+                    context.getContentResolver().openFileDescriptor(uri, "r");
+            if (parcelFileDescriptor != null) {
+                FileDescriptor fileDescriptor = parcelFileDescriptor.getFileDescriptor();
+                BitmapFactory.Options options = prepareBitmapOptions(fileDescriptor, sizePreference);
+                Bitmap bitmap = BitmapFactory.decodeFileDescriptor(fileDescriptor, null, options);
+                parcelFileDescriptor.close();
+                return saveImage(bitmap, outFilename);
+            }
+        } catch (IOException e) {
+            Timber.e(e);
+        }
+        return Observable.error(new Exception("Error getting bitmap from uri: " + uri));
     }
 
     @NonNull
-    private BitmapFactory.Options prepareBitmapOptions(String origFilename, int sizePreference) {
+    private BitmapFactory.Options prepareBitmapOptions(FileDescriptor origFilename, int sizePreference) {
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = true;
-        BitmapFactory.decodeFile(origFilename, options);
+        BitmapFactory.decodeFileDescriptor(origFilename, null, options);
         Timber.d("Orig Image size: %d x %d", options.outWidth, options.outHeight);
 
         ImageSize imageSize = getTargetImageSize(sizePreference, options);
@@ -211,18 +221,19 @@ public class ImageDataSource {
         return inSampleSize;
     }
 
-    private Observable<Boolean> updateExifOrientationData(String originalImage,
-            String resizedImage) {
+    private Observable<Boolean> updateExifOrientationData(InputStream originalImageInputStream,
+            String resizedImagePath) {
         try {
 
-            final String orientation1 = getExifOrientationTag(originalImage);
-            final String orientation2 = getExifOrientationTag(resizedImage);
+            final String orientation1 = getExifOrientationTag(originalImageInputStream);
+            final String orientation2 = getExifOrientationTag(resizedImagePath);
 
             if (!TextUtils.isEmpty(orientation1) && !orientation1.equals(orientation2)) {
                 Timber.d("Exif orientation in resized image will be updated");
-                updateExifOrientation(orientation1, resizedImage);
+                updateExifOrientation(orientation1, resizedImagePath);
 
             }
+            originalImageInputStream.close();
         } catch (IOException e) {
             Timber.e(e);
         }
@@ -233,6 +244,11 @@ public class ImageDataSource {
         ExifInterface exif = new ExifInterface(filename);
         exif.setAttribute(ExifInterface.TAG_ORIENTATION, orientation);
         exif.saveAttributes();
+    }
+
+    private String getExifOrientationTag(InputStream inputStream) throws IOException {
+        ExifInterface exif = new ExifInterface(inputStream);
+        return exif.getAttribute(ExifInterface.TAG_ORIENTATION);
     }
 
     private String getExifOrientationTag(String filename) throws IOException {

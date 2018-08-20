@@ -20,6 +20,7 @@
 
 package org.akvo.flow.ui.view.media.photo;
 
+import android.net.Uri;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
@@ -36,6 +37,8 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import timber.log.Timber;
+
 public class PhotoQuestionPresenter implements Presenter {
 
     private final UseCase saveResizedImage;
@@ -43,7 +46,7 @@ public class PhotoQuestionPresenter implements Presenter {
     private IPhotoQuestionView view;
 
     @Inject
-    public PhotoQuestionPresenter(@Named("saveResizedImage") UseCase saveResizedImage,
+    public PhotoQuestionPresenter(@Named("copyResizedImage") UseCase saveResizedImage,
             MediaFileHelper mediaFileHelper) {
         this.saveResizedImage = saveResizedImage;
         this.mediaFileHelper = mediaFileHelper;
@@ -73,13 +76,14 @@ public class PhotoQuestionPresenter implements Presenter {
         return mediaFileHelper.getMediaFile(filename);
     }
 
-    void onImageReady(@Nullable final String originalFilePath) {
-        if (!TextUtils.isEmpty(originalFilePath)) {
+    void onImageReady(@Nullable final Uri originalFilePath, boolean deleteOriginal) {
+        if (originalFilePath != null) {
             view.showLoading();
             final String resizedImageFilePath = mediaFileHelper.getImageFilePath();
-            Map<String, Object> params = new HashMap<>(4);
+            Map<String, Object> params = new HashMap<>(6);
             params.put(SaveResizedImage.ORIGINAL_FILE_NAME_PARAM, originalFilePath);
             params.put(SaveResizedImage.RESIZED_FILE_NAME_PARAM, resizedImageFilePath);
+            params.put(SaveResizedImage.REMOVE_ORIGINAL_IMAGE_PARAM, deleteOriginal);
             saveResizedImage.execute(new DefaultObserver<Boolean>() {
                 @Override
                 public void onNext(Boolean aBoolean) {
@@ -88,6 +92,8 @@ public class PhotoQuestionPresenter implements Presenter {
 
                 @Override
                 public void onError(Throwable e) {
+                    Timber.e(e);
+                    view.hideLoading();
                     view.showErrorGettingMedia();
                 }
             }, params);

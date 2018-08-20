@@ -198,8 +198,14 @@ public class FormActivityTestUtil {
     }
 
     @NonNull
-    public static ViewInteraction getMediaButton(Question question) {
-        return onView(allOf(withId(R.id.media_btn),
+    public static ViewInteraction getCameraButton(Question question) {
+        return onView(allOf(withId(R.id.camera_btn),
+                withQuestionViewParent(question, QuestionView.class)));
+    }
+
+    @NonNull
+    public static ViewInteraction getGalleryButton(Question question) {
+        return onView(allOf(withId(R.id.gallery_btn),
                 withQuestionViewParent(question, QuestionView.class)));
     }
 

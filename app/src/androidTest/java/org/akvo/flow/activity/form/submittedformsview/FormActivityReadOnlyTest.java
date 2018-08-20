@@ -87,8 +87,9 @@ import static org.akvo.flow.activity.form.FormActivityTestUtil.getDateEditText;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.getDoubleEntryInput;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.getFormActivityIntent;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.getFreeTextInput;
+import static org.akvo.flow.activity.form.FormActivityTestUtil.getGalleryButton;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.getGeoButton;
-import static org.akvo.flow.activity.form.FormActivityTestUtil.getMediaButton;
+import static org.akvo.flow.activity.form.FormActivityTestUtil.getCameraButton;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.getOptionView;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.selectAndVerifyTab;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.verifyAccuracyLabel;
@@ -329,17 +330,24 @@ public class FormActivityReadOnlyTest {
     }
 
     private void verifyPhotoQuestionView(Question question) {
-        verifyMediaButton(question);
+        verifyCameraButton(question);
+        verifyGalleryButton(question);
         verifyMediaContent(question);
     }
 
-    private void verifyMediaButton(Question question) {
-        ViewInteraction mediaButton = getMediaButton(question);
+    private void verifyCameraButton(Question question) {
+        ViewInteraction mediaButton = getCameraButton(question);
+        mediaButton.check(matches(not(isDisplayed())));
+    }
+
+    private void verifyGalleryButton(Question question) {
+        ViewInteraction mediaButton = getGalleryButton(question);
         mediaButton.check(matches(not(isDisplayed())));
     }
 
     private void verifyVideoQuestionView(Question question) {
-        verifyMediaButton(question);
+        verifyCameraButton(question);
+        verifyGalleryButton(question);
         verifyMediaContent(question);
     }
 

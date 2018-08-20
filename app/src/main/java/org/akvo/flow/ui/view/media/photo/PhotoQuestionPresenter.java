@@ -37,6 +37,8 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import timber.log.Timber;
+
 public class PhotoQuestionPresenter implements Presenter {
 
     private final UseCase saveResizedImage;
@@ -90,6 +92,7 @@ public class PhotoQuestionPresenter implements Presenter {
 
                 @Override
                 public void onError(Throwable e) {
+                    Timber.e(e);
                     view.hideLoading();
                     view.showErrorGettingMedia();
                 }

@@ -41,7 +41,7 @@ public class MediaDataSource {
         this.context = context;
     }
 
-    public Observable<Boolean> notifyMediaDelete(final Uri uri) {
+    public Observable<Boolean> deleteMedia(final Uri uri) {
         context.getContentResolver().delete(uri, null, null);
         return Observable.just(true);
     }

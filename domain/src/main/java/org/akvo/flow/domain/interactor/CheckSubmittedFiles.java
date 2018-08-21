@@ -93,7 +93,7 @@ public class CheckSubmittedFiles extends UseCase {
                     @Override
                     public Observable<Boolean> apply(Pair<InstanceIdUuid, File> idUuidPair) {
                         long surveyInstanceId = idUuidPair.first.getId();
-                        Timber.d("Exported file for survey %s not found. It's status " +
+                        Timber.d("Exported file for survey instance %s not found. It's status " +
                                         "will be set to 'submitted', and will be reprocessed",
                                 surveyInstanceId);
                         return surveyRepository.setInstanceStatusToRequested(surveyInstanceId);

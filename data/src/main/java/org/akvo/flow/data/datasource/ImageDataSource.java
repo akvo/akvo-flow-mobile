@@ -36,14 +36,12 @@ import org.akvo.flow.data.util.FileHelper;
 import org.akvo.flow.data.util.ImageSize;
 
 import java.io.BufferedOutputStream;
-import java.io.File;
 import java.io.FileDescriptor;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Arrays;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -254,54 +252,5 @@ public class ImageDataSource {
     private String getExifOrientationTag(String filename) throws IOException {
         ExifInterface exif = new ExifInterface(filename);
         return exif.getAttribute(ExifInterface.TAG_ORIENTATION);
-    }
-
-    /**
-     * Compare to images to determine if their content is the same. To state
-     * that the two of them are the same, the datetime contained in their exif
-     * metadata will be compared. If the exif does not contain a datetime, the
-     * MD5 checksum of the images will be compared.
-     *
-     * @param image1 Absolute path to the first image
-     * @param image2 Absolute path to the second image
-     * @return true if their datetime is the same, false otherwise
-     */
-    private boolean compareImages(String image1, String image2) {
-        boolean equals = false;
-        try {
-            ExifInterface exif1 = new ExifInterface(image1);
-            ExifInterface exif2 = new ExifInterface(image2);
-
-            final String datetime1 = exif1.getAttribute(ExifInterface.TAG_DATETIME);
-            final String datetime2 = exif2.getAttribute(ExifInterface.TAG_DATETIME);
-
-            if (!TextUtils.isEmpty(datetime1) && !TextUtils.isEmpty(datetime2)) {
-                equals = datetime1.equals(datetime2);
-            } else {
-                Timber.d("Datetime is null or empty. The MD5 checksum will be compared");
-                equals = compareFilesChecksum(image1, image2);
-            }
-        } catch (IOException e) {
-            Timber.e(e);
-        }
-
-        return equals;
-    }
-
-    /**
-     * Compare two files to determine if their content is the same. To state that
-     * the two of them are the same, the MD5 checksum will be compared. Note
-     * that if any of the files does not exist, or if its checksum cannot be
-     * computed, false will be returned.
-     *
-     * @param path1 Absolute path to the first file
-     * @param path2 Absolute path to the second file
-     * @return true if their MD5 checksum is the same, false otherwise.
-     */
-    private boolean compareFilesChecksum(String path1, String path2) {
-        final byte[] checksum1 = fileHelper.getMD5Checksum(new File(path1));
-        final byte[] checksum2 = fileHelper.getMD5Checksum(new File(path2));
-
-        return Arrays.equals(checksum1, checksum2);
     }
 }

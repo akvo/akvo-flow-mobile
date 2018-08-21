@@ -101,14 +101,13 @@ public class BriteSurveyDbAdapter {
                 break;
         }
 
-        String[] whereValues = new String[] { String.valueOf(surveyGroupId) };
         List<String> tables = new ArrayList<>(2);
         tables.add(Tables.RECORD);
         tables.add(Tables.SURVEY_INSTANCE);
         return briteDatabase
-                .createQuery(tables, queryString + whereClause + groupBy + orderByStr, whereValues)
-                .concatMap(
-                        new Function<SqlBrite.Query, Observable<Cursor>>() {
+                .createQuery(tables, queryString + whereClause + groupBy + orderByStr,
+                        String.valueOf(surveyGroupId))
+                .concatMap(new Function<SqlBrite.Query, Observable<Cursor>>() {
                             @Override
                             public Observable<Cursor> apply(SqlBrite.Query query) {
                                 return Observable.just(query.run());
@@ -147,8 +146,8 @@ public class BriteSurveyDbAdapter {
                 "SELECT * FROM " + Tables.RECORD + " WHERE " + RecordColumns.SURVEY_GROUP_ID
                         + " = ?";
         return briteDatabase.createQuery(Tables.RECORD, sqlQuery,
-                String.valueOf(surveyGroupId)).concatMap(
-                new Function<SqlBrite.Query, Observable<? extends Cursor>>() {
+                String.valueOf(surveyGroupId))
+                .concatMap(new Function<SqlBrite.Query, Observable<? extends Cursor>>() {
                     @Override
                     public Observable<? extends Cursor> apply(SqlBrite.Query query) {
                         return Observable.just(query.run());

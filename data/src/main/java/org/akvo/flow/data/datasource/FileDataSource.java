@@ -81,7 +81,7 @@ public class FileDataSource {
         }
     }
 
-    public Observable<Boolean> copyFile(String destinationFilePath, InputStream inputStream) {
+    private Observable<Boolean> copyFile(String destinationFilePath, InputStream inputStream) {
         try {
             File destinationFile = new File(destinationFilePath);
             String copiedFilePath = fileHelper.copyFile(destinationFile, inputStream);
@@ -236,10 +236,6 @@ public class FileDataSource {
         } catch (IOException e) {
             return Observable.error(e);
         }
-    }
-
-    public Observable<Boolean> deleteFile(String originFilePath) {
-        return Observable.just(fileHelper.deleteFile(originFilePath));
     }
 
     public Observable<String> copyVideo(InputStream inputStream) {

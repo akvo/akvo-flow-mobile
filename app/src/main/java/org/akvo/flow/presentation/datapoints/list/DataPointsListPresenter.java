@@ -147,9 +147,9 @@ public class DataPointsListPresenter implements Presenter {
 
                 @Override
                 public void onNext(List<DataPoint> dataPoints) {
-                    List<ListDataPoint> mapDataPoints = mapper.transform(dataPoints);
-                    view.displayData(mapDataPoints);
-                    if (mapDataPoints.isEmpty()) {
+                    List<ListDataPoint> listDataPoints = mapper.transform(dataPoints);
+                    view.displayData(listDataPoints);
+                    if (listDataPoints.isEmpty()) {
                         view.displayNoSearchResultsFound();
                     }
                 }

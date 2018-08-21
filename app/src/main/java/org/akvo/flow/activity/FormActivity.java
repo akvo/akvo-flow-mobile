@@ -672,6 +672,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
 
     @Override
     public void dismiss() {
+        mReadOnly = true;
         //for data syncing to start
         Intent i = new Intent(ConstantUtil.DATA_AVAILABLE_INTENT);
         sendBroadcast(i);

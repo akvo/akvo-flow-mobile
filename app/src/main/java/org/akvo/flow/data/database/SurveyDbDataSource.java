@@ -29,6 +29,7 @@ import android.text.TextUtils;
 
 import com.squareup.sqlbrite2.BriteDatabase;
 
+import org.akvo.flow.data.entity.FormIdMapper;
 import org.akvo.flow.data.migration.FlowMigrationListener;
 import org.akvo.flow.data.migration.languages.MigrationLanguageMapper;
 import org.akvo.flow.data.preference.Prefs;
@@ -39,7 +40,6 @@ import org.akvo.flow.database.SurveyDbAdapter;
 import org.akvo.flow.database.SurveyGroupColumns;
 import org.akvo.flow.database.SurveyInstanceColumns;
 import org.akvo.flow.database.SurveyInstanceStatus;
-import org.akvo.flow.database.TransmissionStatus;
 import org.akvo.flow.database.britedb.BriteSurveyDbAdapter;
 import org.akvo.flow.domain.FileTransmission;
 import org.akvo.flow.domain.QuestionResponse;
@@ -65,6 +65,7 @@ public class SurveyDbDataSource {
     private final BriteSurveyDbAdapter briteSurveyDbAdapter;
     private final SurveyMapper surveyMapper = new SurveyMapper();
     private final TransmissionsMapper transmissionsMapper = new TransmissionsMapper();
+    private final FormIdMapper surveyIdMapper = new FormIdMapper();
 
     @Inject
     public SurveyDbDataSource(Context context, BriteDatabase briteDatabase) {
@@ -317,15 +318,6 @@ public class SurveyDbDataSource {
         return transmissionsMapper.getFileTransmissions(cursor);
     }
 
-    /**
-     * Get the list of queued, in progress and failed transmissions
-     */
-    @NonNull
-    public List<FileTransmission> getUnSyncedTransmissions() {
-        Cursor cursor = surveyDbAdapter.getUnSyncedTransmissions();
-        return transmissionsMapper.getFileTransmissions(cursor);
-    }
-
     public void addSurveyGroup(SurveyGroup surveyGroup) {
         ContentValues values = new ContentValues();
         values.put(SurveyGroupColumns.SURVEY_GROUP_ID, surveyGroup.getId());
@@ -344,7 +336,7 @@ public class SurveyDbDataSource {
             return getSurvey(formId);
         }
         Survey s = null;
-        Cursor c = briteSurveyDbAdapter.getSurveys(sg.getId());
+        Cursor c = briteSurveyDbAdapter.getForms(sg.getId());
         if (c != null) {
             if (c.moveToFirst()) {
                 s = surveyMapper.getSurvey(c);
@@ -381,8 +373,7 @@ public class SurveyDbDataSource {
      * To get the Cursor result, use getSurveys(surveyGroupId)
      */
     public List<Survey> getSurveyList(long surveyGroupId) {
-        // Reuse getSurveys() method
-        Cursor cursor = briteSurveyDbAdapter.getSurveys(surveyGroupId);
+        Cursor cursor = briteSurveyDbAdapter.getForms(surveyGroupId);
 
         ArrayList<Survey> surveys = new ArrayList<>();
 
@@ -445,8 +436,9 @@ public class SurveyDbDataSource {
         briteSurveyDbAdapter.markSurveyHelpDownloaded(sid, b);
     }
 
-    public String[] getSurveyIds() {
-        return briteSurveyDbAdapter.getSurveyIds();
+    public List<String> getSurveyIds() {
+        Cursor cursor = briteSurveyDbAdapter.getFormIds();
+        return surveyIdMapper.mapToFormId(cursor);
     }
 
     public void deleteAllSurveys() {
@@ -481,8 +473,8 @@ public class SurveyDbDataSource {
         return surveyDbAdapter.getFormInstance(mSurveyInstanceId);
     }
 
-    public void updateSurveyStatus(long mSurveyInstanceId, int saved) {
-        surveyDbAdapter.updateSurveyStatus(mSurveyInstanceId, saved);
+    public void updateSurveyInstanceStatus(long surveyInstanceId, int status) {
+        briteSurveyDbAdapter.updateSurveyInstanceStatus(surveyInstanceId, status);
     }
 
     public void updateRecordModifiedDate(String recordId, long timestamp) {
@@ -501,38 +493,8 @@ public class SurveyDbDataSource {
         surveyDbAdapter.deleteResponse(mSurveyInstanceId, questionId);
     }
 
-    public void createTransmission(long surveyInstanceId, String formId, String filename) {
-        briteSurveyDbAdapter
-                .createTransmission(surveyInstanceId, formId, filename, TransmissionStatus.QUEUED);
-    }
-
-    public void setFileTransmissionFailed(String filename) {
-        int rows = briteSurveyDbAdapter
-                .updateFailedTransmission(filename, TransmissionStatus.FAILED);
-        if (rows == 0) {
-            // Use a dummy "-1" as survey_instance_id, as the database needs that attribute
-            briteSurveyDbAdapter.createTransmission(-1, null, filename, TransmissionStatus.FAILED);
-        }
-    }
-
-    public void updateTransmissionStatus(long id, int status) {
-        briteSurveyDbAdapter.updateTransmissionStatus(id, status);
-    }
-
     public void deleteResponse(long mSurveyInstanceId, String questionId, String iteration) {
         surveyDbAdapter.deleteResponse(mSurveyInstanceId, questionId, iteration);
-    }
-
-    public Cursor getResponsesData(long surveyInstanceId) {
-        return surveyDbAdapter.getResponsesData(surveyInstanceId);
-    }
-
-    public Cursor getSurveyInstancesByStatus(int status) {
-        return surveyDbAdapter.getSurveyInstancesByStatus(status);
-    }
-
-    public void deleteSurvey(String id) {
-        briteSurveyDbAdapter.deleteSurvey(id);
     }
 
     public String createSurveyedLocale(long id) {

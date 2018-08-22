@@ -72,7 +72,7 @@ import org.akvo.flow.ui.Navigator;
 import org.akvo.flow.ui.fragment.DatapointsFragment;
 import org.akvo.flow.ui.fragment.RecordListListener;
 import org.akvo.flow.util.ConstantUtil;
-import org.akvo.flow.util.GsonMapper;
+import org.akvo.flow.domain.util.GsonMapper;
 import org.akvo.flow.util.PlatformUtil;
 import org.akvo.flow.util.StatusUtil;
 import org.akvo.flow.util.ViewUtil;

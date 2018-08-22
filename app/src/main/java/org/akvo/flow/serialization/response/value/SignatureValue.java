@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015,2017 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2015,2017,2018 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -23,7 +23,7 @@ import android.text.TextUtils;
 import com.google.gson.JsonIOException;
 import com.google.gson.JsonSyntaxException;
 
-import org.akvo.flow.util.GsonMapper;
+import org.akvo.flow.domain.util.GsonMapper;
 import org.akvo.flow.domain.response.value.Signature;
 
 import timber.log.Timber;

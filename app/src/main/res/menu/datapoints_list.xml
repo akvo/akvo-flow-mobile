@@ -15,7 +15,9 @@
             flowapp:showAsAction="always">
 
         <menu>
-
+            <item
+                    android:id="@+id/upload"
+                    android:title="@string/upload"/>
             <item
                     android:id="@+id/order_by"
                     android:title="@string/sort"/>

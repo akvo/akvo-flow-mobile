@@ -29,6 +29,7 @@ platform :android do
     branch = git_branch
     puts branch
     sh "git checkout #{branch}"
+    sh "git pull"
     increment_android_version_code(path: "app/version.properties")
     gradle(task: "clean assembleFlowRelease")
     crashlytics(

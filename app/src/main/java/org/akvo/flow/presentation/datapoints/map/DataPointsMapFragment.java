@@ -284,6 +284,9 @@ public class DataPointsMapFragment extends SupportMapFragment implements OnInfoW
             case R.id.download:
                 presenter.onSyncRecordsPressed();
                 return true;
+            case R.id.upload:
+                presenter.onUploadPressed();
+                return true;
             default:
                 return false;
         }

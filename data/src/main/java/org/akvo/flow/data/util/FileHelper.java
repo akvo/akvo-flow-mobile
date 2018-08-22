@@ -18,8 +18,13 @@
  *
  */
 
-package org.akvo.flow.data.datasource;
+package org.akvo.flow.data.util;
 
+import android.support.annotation.Nullable;
+import android.text.TextUtils;
+import android.util.Base64;
+
+import java.io.BufferedInputStream;
 import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
@@ -28,19 +33,63 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.zip.Adler32;
+import java.util.zip.CheckedOutputStream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import javax.inject.Inject;
 
-import io.reactivex.annotations.Nullable;
 import timber.log.Timber;
 
-class FileHelper {
+public class FileHelper {
+
+    private static final int BUFFER_SIZE = 2048;
 
     @Inject
     FileHelper() {
     }
 
-    String copyFileToFolder(File originalFile, File destinationFolder) throws IOException {
+    /**
+     * Compute MD5 checksum of the given file
+     */
+    @Nullable
+    public byte[] getMD5Checksum(File file) {
+        InputStream in = null;
+        MessageDigest md;
+        try {
+            md = MessageDigest.getInstance("MD5");
+            in = new BufferedInputStream(new FileInputStream(file));
+
+            byte[] buffer = new byte[BUFFER_SIZE];
+
+            int read;
+            while ((read = in.read(buffer)) != -1) {
+                md.update(buffer, 0, read);
+            }
+
+            return md.digest();
+        } catch (NoSuchAlgorithmException | IOException e) {
+            Timber.e(e.getMessage());
+        } finally {
+            close(in);
+        }
+
+        return null;
+    }
+
+    public String getMd5Base64(File file) {
+        byte[] md5Checksum = getMD5Checksum(file);
+        if (md5Checksum != null) {
+            return Base64.encodeToString(md5Checksum, Base64.NO_WRAP);
+        } else {
+            return "";
+        }
+    }
+
+    public String copyFileToFolder(File originalFile, File destinationFolder) throws IOException {
         File file = new File(destinationFolder, originalFile.getName());
         return copyFile(originalFile, file);
     }
@@ -50,8 +99,7 @@ class FileHelper {
      *
      * @return the destination file path if copy succeeded, null otherwise
      */
-    @Nullable
-    String copyFile(File originalFile, File destinationFile) throws IOException {
+    public String copyFile(File originalFile, File destinationFile) throws IOException {
         String destinationPath = null;
         InputStream in = null;
         OutputStream out = null;
@@ -75,7 +123,7 @@ class FileHelper {
     }
 
     @Nullable
-    String copyFile(File destinationFile, InputStream inputStream) throws IOException {
+    public String copyFile(File destinationFile, InputStream inputStream) throws IOException {
         String destinationPath = null;
         OutputStream out = null;
         try {
@@ -96,7 +144,7 @@ class FileHelper {
         return destinationPath;
     }
 
-    void close(Closeable closeable) {
+   public void close(Closeable closeable) {
         if (closeable != null) {
             try {
                 closeable.close();
@@ -111,7 +159,7 @@ class FileHelper {
      * directory itself if the "deleteFlag" is true
      */
     @SuppressWarnings({ "unchecked", "ResultOfMethodCallIgnored" })
-    void deleteFilesInDirectory(File folder, boolean deleteFolder) {
+    public void deleteFilesInDirectory(File folder, boolean deleteFolder) {
         if (folder != null && folder.exists() && folder.isDirectory()) {
             File[] files = folder.listFiles();
             if (files != null) {
@@ -129,5 +177,35 @@ class FileHelper {
                 folder.delete();
             }
         }
+    }
+
+    @Nullable
+    public String getFilenameFromPath(@Nullable String filePath) {
+        String filename = null;
+        if (!TextUtils.isEmpty(filePath) && filePath.contains(File.separator)
+                && filePath.contains(".")) {
+            filename = filePath.substring(filePath.lastIndexOf(File.separator) + 1);
+        }
+        return filename;
+    }
+
+    public void writeZipFile(File zipFolder, String zipFileName, String formInstanceData)
+            throws IOException {
+        File zipFile = new File(zipFolder, zipFileName);
+        Timber.d("Writing zip to file " + zipFile.getName());
+        FileOutputStream fout = new FileOutputStream(zipFile);
+        CheckedOutputStream checkedOutStream = new CheckedOutputStream(fout, new Adler32());
+        ZipOutputStream zos = new ZipOutputStream(checkedOutStream);
+        zos.putNextEntry(new ZipEntry(Constants.SURVEY_DATA_FILE_JSON));
+        byte[] allBytes = formInstanceData.getBytes(Constants.UTF_8_CHARSET);
+        zos.write(allBytes, 0, allBytes.length);
+        zos.closeEntry();
+        zos.close();
+        fout.close();
+    }
+
+    public boolean deleteFile(String path) {
+        File file = new File(path);
+        return file.exists() && file.delete();
     }
 }

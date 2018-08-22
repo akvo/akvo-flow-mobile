@@ -224,7 +224,7 @@ public class FileDataSource {
 
     public Observable<File> getZipFile(String uuid) {
         String name = uuid + Constants.ARCHIVE_SUFFIX;
-        return Observable.just(new File(flowFileBrowser.getAppExternalFolder(FlowFileBrowser.DIR_DATA),
+        return Observable.just(new File(flowFileBrowser.getInternalFolder(FlowFileBrowser.DIR_DATA),
                 name));
     }
 

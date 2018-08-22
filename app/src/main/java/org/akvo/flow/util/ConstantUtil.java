@@ -32,9 +32,6 @@ public class ConstantUtil {
      */
     public static final String FILE_SURVEY_LOCATION_TYPE = "file";
     public static final String ARCHIVE_SUFFIX = ".zip";
-    public static final String JPG_SUFFIX = ".jpg";
-    public static final String PNG_SUFFIX = ".png";
-    public static final String VIDEO_SUFFIX = ".mp4";
     public static final String XML_SUFFIX = ".xml";
     public static final String BOOTSTRAP_DB_FILE = "dbinstructions.sql";
     public static final String PROCESSED_OK_SUFFIX = ".processed";
@@ -105,6 +102,7 @@ public class ConstantUtil {
      */
     public static final String IMAGE_FILE_KEY = "image_path";
     public static final String VIDEO_FILE_KEY = "video_path";
+    public static final String PARAM_REMOVE_ORIGINAL = "remove_original";
 
     public static final String SIGNATURE_NAME_EXTRA = "signature_name";
     public static final String SIGNATURE_QUESTION_ID_EXTRA = "signature_question_id";
@@ -171,7 +169,6 @@ public class ConstantUtil {
     /**
      * S3 bucket directories (object prefixes)
      */
-    public static final String S3_DATA_DIR = "devicezip/";
     public static final String S3_IMAGE_DIR = "images/";
     public static final String S3_SURVEYS_DIR = "surveys/";
 
@@ -240,11 +237,6 @@ public class ConstantUtil {
      */
     public static final int UPDATE_NOTIFICATION_DELAY_IN_MS = 7 * 60 * 60 * 24 * 1000;
 
-    /**
-     * 1 day
-     */
-    public static final int DINO_NOTIFICATION_DELAY_IN_MS = 1 * 60 * 60 * 24 * 1000;
-
     //requests
     public static final int PHOTO_ACTIVITY_REQUEST = 1;
     public static final int VIDEO_ACTIVITY_REQUEST = 2;
@@ -254,6 +246,8 @@ public class ConstantUtil {
     public static final int PLOTTING_REQUEST = 6;
     public static final int SIGNATURE_REQUEST = 7;
     public static final int FORM_FILLING_REQUEST = 8;
+    public static final int GET_PHOTO_ACTIVITY_REQUEST = 9;
+    public static final int GET_VIDEO_ACTIVITY_REQUEST = 10;
 
 
     //view tags
@@ -262,6 +256,8 @@ public class ConstantUtil {
     public static final int READ_ONLY_TAG_KEY = R.integer.finishedkey;
 
     public static final int SNACK_BAR_DURATION_IN_MS = 4000;
+
+    public static final String FILE_PROVIDER_AUTHORITY = "org.akvo.flow.fileprovider";
 
     /**
      * prevent instantiation

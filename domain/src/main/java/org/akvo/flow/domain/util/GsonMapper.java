@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -18,7 +18,7 @@
  *
  */
 
-package org.akvo.flow.util;
+package org.akvo.flow.domain.util;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -29,19 +29,23 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Type;
 
+import javax.inject.Inject;
+
 import timber.log.Timber;
 
 public class GsonMapper {
 
-    private final Gson mapper;
+    private final Gson gson;
 
+    @Inject
     public GsonMapper() {
-        this.mapper = new GsonBuilder().create();
+        //TODO: inject this
+        this.gson = new GsonBuilder().create();
     }
 
     public <T> T read(final String content, final Class<T> type) throws JsonSyntaxException {
         try {
-            return this.mapper.fromJson(content, type);
+            return this.gson.fromJson(content, type);
         } catch (JsonSyntaxException e) {
             Timber.e("Error mapping json to class '" + type + "' with contents: '" + content + "'");
             throw e;
@@ -50,7 +54,7 @@ public class GsonMapper {
 
     public <T> T read(final String content, final Type type) throws JsonSyntaxException {
         try {
-            return this.mapper.fromJson(content, type);
+            return this.gson.fromJson(content, type);
         } catch (JsonSyntaxException e) {
             Timber.e("Error mapping json to class '" + type + "' with contents: '" + content + "'");
             throw e;
@@ -59,7 +63,7 @@ public class GsonMapper {
 
     public <T> T read(final InputStream content, final Class<T> type) throws JsonIOException, JsonSyntaxException {
         try {
-            return this.mapper.fromJson(new InputStreamReader(content), type);
+            return this.gson.fromJson(new InputStreamReader(content), type);
         } catch (JsonIOException | JsonSyntaxException e) {
             Timber.e("Error mapping json to class '" + type + "' with contents: '" + content + "'");
             throw e;
@@ -68,7 +72,7 @@ public class GsonMapper {
 
     public <T> String write(final T content) {
         try {
-            return this.mapper.toJson(content);
+            return this.gson.toJson(content);
         } catch (JsonIOException | JsonSyntaxException e) {
             Timber.e(e, "Error mapping class to json with contents: '" + content + "'");
             throw e;
@@ -77,7 +81,7 @@ public class GsonMapper {
 
     public <T> String write(final T content, final Class<T> type) {
         try {
-            return this.mapper.toJson(content, type);
+            return this.gson.toJson(content, type);
         } catch (JsonIOException | JsonSyntaxException e) {
             Timber.e(e, "Error mapping class '" + type + "' to json with contents: '" + content + "'");
             throw e;

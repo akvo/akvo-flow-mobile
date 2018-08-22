@@ -198,8 +198,14 @@ public class FormActivityTestUtil {
     }
 
     @NonNull
-    public static ViewInteraction getMediaButton(Question question) {
-        return onView(allOf(withId(R.id.media_btn),
+    public static ViewInteraction getCameraButton(Question question) {
+        return onView(allOf(withId(R.id.camera_btn),
+                withQuestionViewParent(question, QuestionView.class)));
+    }
+
+    @NonNull
+    public static ViewInteraction getGalleryButton(Question question) {
+        return onView(allOf(withId(R.id.gallery_btn),
                 withQuestionViewParent(question, QuestionView.class)));
     }
 
@@ -213,8 +219,7 @@ public class FormActivityTestUtil {
     public static ViewInteraction getDateEditText(Question question) {
         return onView(
                 allOf(withId(R.id.date_et),
-                        withQuestionViewParent(question, DateQuestionView.class)))
-                .perform(scrollTo());
+                        withQuestionViewParent(question, DateQuestionView.class)));
     }
 
     @NonNull

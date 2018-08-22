@@ -23,6 +23,7 @@ package org.akvo.flow.domain.repository;
 import android.graphics.Bitmap;
 import android.net.Uri;
 
+import java.io.File;
 import java.util.List;
 
 import io.reactivex.Observable;
@@ -32,7 +33,8 @@ public interface FileRepository {
 
     Observable<Boolean> saveImage(Bitmap bitmap, String fileName, String resizedFilePath);
 
-    Observable<Boolean> saveResizedImage(String fileName, String resizedFilePath, int imageSize);
+    Observable<Boolean> copyResizedImage(Uri fileName, String resizedFilePath, int imageSize,
+            boolean removeDuplicate);
 
     Observable<Boolean> moveFiles();
 
@@ -48,5 +50,9 @@ public interface FileRepository {
 
     Observable<Boolean> isExternalStorageFull();
 
-    Observable<String> copyVideo(Uri uri);
+    Observable<String> copyVideo(Uri uri, boolean removeOriginal);
+
+    Observable<File> getZipFile(String uuid);
+
+    Observable<Boolean> createDataZip(String zipFileName, String formInstanceData);
 }

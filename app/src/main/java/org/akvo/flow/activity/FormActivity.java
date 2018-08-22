@@ -38,6 +38,7 @@ import android.view.SubMenu;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import org.akvo.flow.R;
@@ -61,6 +62,9 @@ import org.akvo.flow.event.SurveyListener;
 import org.akvo.flow.injector.component.ApplicationComponent;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
+import org.akvo.flow.presentation.SnackBarManager;
+import org.akvo.flow.presentation.form.FormPresenter;
+import org.akvo.flow.presentation.form.FormView;
 import org.akvo.flow.ui.Navigator;
 import org.akvo.flow.ui.adapter.LanguageAdapter;
 import org.akvo.flow.ui.adapter.SurveyTabAdapter;
@@ -70,11 +74,11 @@ import org.akvo.flow.ui.view.QuestionView;
 import org.akvo.flow.ui.view.geolocation.GeoFieldsResetConfirmDialogFragment;
 import org.akvo.flow.ui.view.geolocation.GeoQuestionView;
 import org.akvo.flow.util.ConstantUtil;
-import org.akvo.flow.util.files.FormFileBrowser;
 import org.akvo.flow.util.MediaFileHelper;
 import org.akvo.flow.util.PlatformUtil;
 import org.akvo.flow.util.StorageHelper;
 import org.akvo.flow.util.ViewUtil;
+import org.akvo.flow.util.files.FormFileBrowser;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -93,7 +97,7 @@ import timber.log.Timber;
 import static org.akvo.flow.util.ViewUtil.showConfirmDialog;
 
 public class FormActivity extends BackActivity implements SurveyListener,
-        QuestionInteractionListener,
+        QuestionInteractionListener, FormView,
         GeoFieldsResetConfirmDialogFragment.GeoFieldsResetConfirmListener {
 
     @Inject
@@ -108,6 +112,12 @@ public class FormActivity extends BackActivity implements SurveyListener,
     @Inject
     Prefs prefs;
 
+    @Inject
+    FormPresenter presenter;
+
+    @Inject
+    SnackBarManager snackBarManager;
+
     private final Navigator navigator = new Navigator();
     private final StorageHelper storageHelper = new StorageHelper();
 
@@ -119,6 +129,8 @@ public class FormActivity extends BackActivity implements SurveyListener,
 
     private ViewPager mPager;
     private SurveyTabAdapter mAdapter;
+    private ProgressBar progressBar;
+    private View rootView;
 
     /**
      * flag to represent whether the Survey can be edited or not
@@ -138,13 +150,14 @@ public class FormActivity extends BackActivity implements SurveyListener,
     private Map<String, QuestionResponse> mQuestionResponses; // QuestionId - QuestionResponse
     private String surveyId;
 
-    private String imagePath;
+    private Uri imagePath;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.form_activity);
         initializeInjector();
+        presenter.setView(this);
         // Read all the params. Note that the survey instance id is now mandatory
         Intent intent = getIntent();
         surveyId = intent.getStringExtra(ConstantUtil.FORM_ID_EXTRA);
@@ -181,6 +194,8 @@ public class FormActivity extends BackActivity implements SurveyListener,
             mAdapter = new SurveyTabAdapter(this, mPager, this, this);
             mPager.setAdapter(mAdapter);
 
+            progressBar = (ProgressBar) findViewById(R.id.progressBar);
+            rootView = findViewById(R.id.coordinator_layout);
             // Initialize new survey or load previous responses
             Map<String, QuestionResponse> responses = mDatabase.getResponses(mSurveyInstanceId);
             if (!responses.isEmpty()) {
@@ -320,7 +335,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
 
     private void saveState() {
         if (!mReadOnly) {
-            mDatabase.updateSurveyStatus(mSurveyInstanceId, SurveyInstanceStatus.SAVED);
+            mDatabase.updateSurveyInstanceStatus(mSurveyInstanceId, SurveyInstanceStatus.SAVED);
             mDatabase.updateRecordModifiedDate(mRecordId, System.currentTimeMillis());
 
             // Record meta-data, if applies
@@ -408,13 +423,14 @@ public class FormActivity extends BackActivity implements SurveyListener,
 
     @Override
     public void onDestroy() {
-        super.onDestroy();
         if (mAdapter != null) {
             mAdapter.onDestroy();
         }
         if (mDatabase != null) {
             mDatabase.close();
         }
+        presenter.destroy();
+        super.onDestroy();
     }
 
     @Override
@@ -549,10 +565,15 @@ public class FormActivity extends BackActivity implements SurveyListener,
 
         switch (requestCode) {
             case ConstantUtil.PHOTO_ACTIVITY_REQUEST:
-                onImageAcquired(imagePath);
+                onImageTaken();
                 break;
             case ConstantUtil.VIDEO_ACTIVITY_REQUEST:
-
+                onVideoTaken(intent.getData());
+                break;
+            case ConstantUtil.GET_PHOTO_ACTIVITY_REQUEST:
+                onImageAcquired(intent.getData());
+                break;
+            case ConstantUtil.GET_VIDEO_ACTIVITY_REQUEST:
                 onVideoAcquired(intent.getData());
                 break;
             case ConstantUtil.EXTERNAL_SOURCE_REQUEST:
@@ -565,17 +586,31 @@ public class FormActivity extends BackActivity implements SurveyListener,
                 break;
         }
 
-        mRequestQuestionId = null;// Reset the tmp reference
-    }
-
-    private void onImageAcquired(String absolutePath) {
-        Bundle mediaData = new Bundle();
-        mediaData.putString(ConstantUtil.IMAGE_FILE_KEY, absolutePath);
-        mAdapter.onQuestionComplete(mRequestQuestionId, mediaData);
+        mRequestQuestionId = null;
     }
 
     private void onVideoAcquired(Uri uri) {
         Bundle mediaData = new Bundle();
+        mediaData.putParcelable(ConstantUtil.VIDEO_FILE_KEY, uri);
+        mAdapter.onQuestionComplete(mRequestQuestionId, mediaData);
+    }
+
+    private void onImageAcquired(Uri imageUri) {
+        Bundle mediaData = new Bundle();
+        mediaData.putParcelable(ConstantUtil.IMAGE_FILE_KEY, imageUri);
+        mAdapter.onQuestionComplete(mRequestQuestionId, mediaData);
+    }
+
+    private void onImageTaken() {
+        Bundle mediaData = new Bundle();
+        mediaData.putParcelable(ConstantUtil.IMAGE_FILE_KEY, imagePath);
+        mediaData.putBoolean(ConstantUtil.PARAM_REMOVE_ORIGINAL, true);
+        mAdapter.onQuestionComplete(mRequestQuestionId, mediaData);
+    }
+
+    private void onVideoTaken(Uri uri) {
+        Bundle mediaData = new Bundle();
+        mediaData.putBoolean(ConstantUtil.PARAM_REMOVE_ORIGINAL, true);
         mediaData.putParcelable(ConstantUtil.VIDEO_FILE_KEY, uri);
         mAdapter.onQuestionComplete(mRequestQuestionId, mediaData);
     }
@@ -619,17 +654,35 @@ public class FormActivity extends BackActivity implements SurveyListener,
         saveState();
 
         // if we have no missing responses, submit the survey
-        mDatabase.updateSurveyStatus(mSurveyInstanceId, SurveyInstanceStatus.SUBMIT_REQUESTED);
+        mDatabase.updateSurveyInstanceStatus(mSurveyInstanceId,
+                SurveyInstanceStatus.SUBMIT_REQUESTED);
 
-        // Make the current survey immutable
+        presenter.onSubmitPressed(mSurveyInstanceId);
+    }
+
+    @Override
+    public void showLoading() {
+        progressBar.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void hideLoading() {
+        progressBar.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void dismiss() {
         mReadOnly = true;
-
-        // send a broadcast message indicating new data is available
+        //for data syncing to start
         Intent i = new Intent(ConstantUtil.DATA_AVAILABLE_INTENT);
         sendBroadcast(i);
-
         setResult(RESULT_OK);
         finish();
+    }
+
+    @Override
+    public void showErrorExport() {
+        snackBarManager.displaySnackBar(rootView, R.string.form_submit_error, this);
     }
 
     @Override
@@ -693,8 +746,12 @@ public class FormActivity extends BackActivity implements SurveyListener,
     public void onQuestionInteraction(QuestionInteractionEvent event) {
         if (QuestionInteractionEvent.TAKE_PHOTO_EVENT.equals(event.getEventType())) {
             takePhoto(event);
+        } else if (QuestionInteractionEvent.GET_PHOTO_EVENT.equals(event.getEventType())) {
+            navigateToGetPhoto(event);
         } else if (QuestionInteractionEvent.TAKE_VIDEO_EVENT.equals(event.getEventType())) {
             navigateToTakeVideo(event);
+        } else if (QuestionInteractionEvent.GET_VIDEO_EVENT.equals(event.getEventType())) {
+            navigateToGetVideo(event);
         } else if (QuestionInteractionEvent.SCAN_BARCODE_EVENT.equals(event.getEventType())) {
             navigateToBarcodeScanner(event);
         } else if (QuestionInteractionEvent.QUESTION_CLEAR_EVENT.equals(event.getEventType())) {
@@ -710,6 +767,16 @@ public class FormActivity extends BackActivity implements SurveyListener,
         } else if (QuestionInteractionEvent.ADD_SIGNATURE_EVENT.equals(event.getEventType())) {
             navigateToSignatureActivity(event);
         }
+    }
+
+    private void navigateToGetVideo(QuestionInteractionEvent event) {
+        recordSourceId(event);
+        navigator.navigateToGetVideo(this);
+    }
+
+    private void navigateToGetPhoto(QuestionInteractionEvent event) {
+        recordSourceId(event);
+        navigator.navigateToGetPhoto(this);
     }
 
     private void navigateToSignatureActivity(QuestionInteractionEvent event) {
@@ -784,10 +851,10 @@ public class FormActivity extends BackActivity implements SurveyListener,
 
     private void takePhoto(QuestionInteractionEvent event) {
         recordSourceId(event);
-        File imageTmpFile = mediaFileHelper.getImageTmpFile();
+        File imageTmpFile = mediaFileHelper.getTemporaryImageFile();
         if (imageTmpFile != null) {
-            imagePath = imageTmpFile.getAbsolutePath();
-            navigator.navigateToTakePhoto(this, Uri.fromFile(imageTmpFile));
+            imagePath = Uri.fromFile(imageTmpFile);
+            navigator.navigateToTakePhoto(this, imagePath);
         }
         //TODO: notify error taking pictures
     }

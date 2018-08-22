@@ -44,8 +44,6 @@ import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.LocationValidator;
 import org.akvo.flow.util.PlatformUtil;
 
-import timber.log.Timber;
-
 /**
  * Question that can handle geographic location input. This question can also
  * listen to location updates from the GPS sensor on the device.
@@ -60,7 +58,6 @@ public class GeoQuestionView extends QuestionView
     private static final int POSITION_LATITUDE = 0;
     private static final int POSITION_LONGITUDE = 1;
     private static final int POSITION_ALTITUDE = 2;
-    private static final int POSITION_CODE = 3;
 
     private final TimedLocationListener mLocationListener;
     private final LocationValidator locationValidator = new LocationValidator();
@@ -70,7 +67,6 @@ public class GeoQuestionView extends QuestionView
     private View geoLoading;
     private GeoInputContainer geoInputContainer;
 
-    private String mCode = "";
     private float mLastAccuracy;
 
     public GeoQuestionView(Context context, Question q, SurveyListener surveyListener) {
@@ -118,7 +114,7 @@ public class GeoQuestionView extends QuestionView
     public void startListeningToLocation() {
         resetQuestion(true);
         showLocationListenerStarted();
-        resetResponseValues();
+        resetAccuracy();
         startLocation();
     }
 
@@ -158,17 +154,8 @@ public class GeoQuestionView extends QuestionView
         mGeoButton.setText(R.string.cancelbutton);
     }
 
-    private void resetResponseValues() {
-        resetCode();
-        resetAccuracy();
-    }
-
     private void resetAccuracy() {
         mLastAccuracy = UNKNOWN_ACCURACY;
-    }
-
-    private void resetCode() {
-        mCode = "";
     }
 
     private void startLocation() {
@@ -177,22 +164,6 @@ public class GeoQuestionView extends QuestionView
 
     private void stopLocation() {
         mLocationListener.stop();
-    }
-
-    /**
-     * generates a unique code based on the lat/lon passed in. Current algorithm
-     * returns the concatenation of the integer portion of 1000 times absolute
-     * value of lat and lon in base 36
-     */
-    private String generateCode(double lat, double lon) {
-        try {
-            Long code = Long.parseLong((int) ((Math.abs(lat) * 100000d)) + ""
-                    + (int) ((Math.abs(lon) * 10000d)));
-            return Long.toString(code, 36);
-        } catch (NumberFormatException e) {
-            Timber.e(e, "Location response code cannot be generated: %s", e.getMessage());
-            return "";
-        }
     }
 
     @Override
@@ -204,7 +175,6 @@ public class GeoQuestionView extends QuestionView
             String longitude = getLongitudeFromToken(tokens);
             String altitude = getAltitudeFromToken(tokens);
             geoInputContainer.displayCoordinates(latitude, longitude, altitude);
-            mCode = getCodeFromToken(tokens);
         }
     }
 
@@ -232,14 +202,6 @@ public class GeoQuestionView extends QuestionView
         return token[POSITION_ALTITUDE];
     }
 
-    @NonNull
-    private String getCodeFromToken(String[] token) {
-        if (token == null || token.length <= POSITION_CODE) {
-            return "";
-        }
-        return token[POSITION_CODE];
-    }
-
     @Override
     public void questionComplete(Bundle data) {
         //EMPTY
@@ -251,7 +213,7 @@ public class GeoQuestionView extends QuestionView
     @Override
     public void resetQuestion(boolean fireEvent) {
         super.resetQuestion(fireEvent);
-        resetResponseValues();
+        resetAccuracy();
         geoInputContainer.displayCoordinates("", "", "");
     }
 
@@ -280,12 +242,8 @@ public class GeoQuestionView extends QuestionView
             float accuracy) {
         geoInputContainer
                 .displayCoordinates(latitude + "", longitude + "", altitude + "", accuracy);
-        updateCode(latitude, longitude);
     }
 
-    private void updateCode(double latitude, double longitude) {
-        mCode = generateCode(latitude, longitude);
-    }
 
     @Override
     public void onTimeout() {
@@ -296,7 +254,7 @@ public class GeoQuestionView extends QuestionView
                 new OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        resetResponseValues();
+                        resetAccuracy();
                         startLocation();
                         showLocationListenerStarted();
                     }
@@ -319,10 +277,8 @@ public class GeoQuestionView extends QuestionView
         final String lat = geoInputContainer.getLatitudeText();
         final String lon = geoInputContainer.getLongitudeText();
         if (locationValidator.validCoordinates(lat, lon)) {
-            updateCode(Double.parseDouble(lat), Double.parseDouble(lon));
             setGeoQuestionResponse(lat, lon);
         } else {
-            resetCode();
             setResponse(null);
         }
     }
@@ -350,7 +306,7 @@ public class GeoQuestionView extends QuestionView
     @NonNull
     private String getResponse(String lat, String lon) {
         return lat + RESPONSE_DELIMITER + lon + RESPONSE_DELIMITER + geoInputContainer
-                .getElevationText() + RESPONSE_DELIMITER + mCode;
+                .getElevationText();
     }
 
     @Override
@@ -363,5 +319,16 @@ public class GeoQuestionView extends QuestionView
         if (mLocationListener != null && mLocationListener.isListening()) {
             mLocationListener.stop();
         }
+    }
+
+    @Override
+    public boolean isValid() {
+        final String lat = geoInputContainer.getLatitudeText();
+        final String lon = geoInputContainer.getLongitudeText();
+        if (!super.isValid() || !locationValidator.validCoordinates(lat, lon)) {
+            setError(getResources().getString(R.string.error_question_mandatory));
+            return false;
+        }
+        return true;
     }
 }

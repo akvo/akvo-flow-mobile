@@ -23,10 +23,13 @@ package org.akvo.flow.data.datasource;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
+import org.akvo.flow.data.util.Constants;
 import org.akvo.flow.data.util.ExternalStorageHelper;
+import org.akvo.flow.data.util.FileHelper;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -69,6 +72,19 @@ public class FileDataSource {
         try {
             File destinationFile = new File(destinationFilePath);
             String copiedFilePath = fileHelper.copyFile(originalFile, destinationFile);
+            if (copiedFilePath == null) {
+                return Observable.error(new Exception("Error copying video file"));
+            }
+            return Observable.just(true);
+        } catch (IOException e) {
+            return Observable.error(e);
+        }
+    }
+
+    private Observable<Boolean> copyFile(String destinationFilePath, InputStream inputStream) {
+        try {
+            File destinationFile = new File(destinationFilePath);
+            String copiedFilePath = fileHelper.copyFile(destinationFile, inputStream);
             if (copiedFilePath == null) {
                 return Observable.error(new Exception("Error copying video file"));
             }
@@ -206,23 +222,29 @@ public class FileDataSource {
         return Observable.just(externalStorageHelper.getExternalStorageAvailableSpaceInMb());
     }
 
-    public Observable<Boolean> deleteFile(String originFilePath) {
-        return Observable.just(fileHelper.deleteFile(originFilePath));
+    public Observable<File> getZipFile(String uuid) {
+        String name = uuid + Constants.ARCHIVE_SUFFIX;
+        return Observable.just(new File(flowFileBrowser.getInternalFolder(FlowFileBrowser.DIR_DATA),
+                name));
     }
 
-    public Observable<String> copyVideo(final String videoFilePath) {
+    public Observable<Boolean> writeDataToZipFile(String zipFileName, String formInstanceData) {
+        File folder = flowFileBrowser.getExistingAppExternalFolder(FlowFileBrowser.DIR_DATA);
+        try {
+            fileHelper.writeZipFile(folder, zipFileName, formInstanceData);
+            return Observable.just(true);
+        } catch (IOException e) {
+            return Observable.error(e);
+        }
+    }
+
+    public Observable<String> copyVideo(InputStream inputStream) {
         final String copiedVideoPath = flowFileBrowser.getVideoFilePath();
-        return copyFile(videoFilePath, copiedVideoPath)
-                .flatMap(new Function<Boolean, Observable<String>>() {
+        return copyFile(copiedVideoPath, inputStream)
+                .map(new Function<Boolean, String>() {
                     @Override
-                    public Observable<String> apply(Boolean ignored) {
-                        return deleteFile(videoFilePath)
-                                .map(new Function<Boolean, String>() {
-                                    @Override
-                                    public String apply(Boolean ignored) {
-                                        return copiedVideoPath;
-                                    }
-                                });
+                    public String apply(Boolean ignored) {
+                        return copiedVideoPath;
                     }
                 });
     }

@@ -27,14 +27,16 @@ import org.akvo.flow.data.datasource.DataSourceFactory;
 import org.akvo.flow.data.datasource.MediaDataSource;
 import org.akvo.flow.domain.repository.FileRepository;
 
+import java.io.File;
+import java.io.InputStream;
 import java.util.List;
 
 import javax.inject.Inject;
 
 import io.reactivex.Observable;
 import io.reactivex.annotations.NonNull;
-import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
+import timber.log.Timber;
 
 public class FileDataRepository implements FileRepository {
 
@@ -53,37 +55,44 @@ public class FileDataRepository implements FileRepository {
     }
 
     @Override
-    public Observable<Boolean> saveResizedImage(final String originalImagePath,
-            String resizedImagePath, int imageSize) {
-        return dataSourceFactory.getImageDataSource()
-                .saveResizedImage(originalImagePath, resizedImagePath, imageSize)
-                .concatMap(new Function<Boolean, Observable<Boolean>>() {
+    public Observable<Boolean> copyResizedImage(final Uri uri, final String resizedImagePath,
+            final int imageSize, final boolean removeDuplicate) {
+        return dataSourceFactory.getMediaDataSource().getInputStreamFromUri(uri)
+                .concatMap(new Function<InputStream, Observable<Boolean>>() {
                     @Override
-                    public Observable<Boolean> apply(Boolean aBoolean) {
-                        return cleanupDuplicateImage(
-                                originalImagePath);
+                    public Observable<Boolean> apply(final InputStream inputStream) {
+                        return saveResizedImage(uri, resizedImagePath, imageSize)
+                                .concatMap(new Function<Boolean, Observable<Boolean>>() {
+                                    @Override
+                                    public Observable<Boolean> apply(Boolean result) {
+                                        if (removeDuplicate) {
+                                            return removeDuplicateImage(uri);
+                                        } else {
+                                            return Observable.just(result);
+                                        }
+                                    }
+                                });
                     }
                 });
     }
 
-    private Observable<Boolean> cleanupDuplicateImage(final String originalImagePath) {
-        final MediaDataSource mediaDataSource = dataSourceFactory.getMediaDataSource();
-        return mediaDataSource.getLastImageTaken()
-                .concatMap(new Function<String, Observable<Boolean>>() {
+    private Observable<Boolean> removeDuplicateImage(final Uri uri) {
+        try {
+            new File(uri.getPath()).delete();
+        } catch (Exception e) {
+            Timber.e(e);
+        }
+        return Observable.just(true);
+    }
+
+    private Observable<Boolean> saveResizedImage(final Uri uri, final String resizedImagePath,
+            final int imageSize) {
+        return dataSourceFactory.getMediaDataSource().getInputStreamFromUri(uri)
+                .concatMap(new Function<InputStream, Observable<Boolean>>() {
                     @Override
-                    public Observable<Boolean> apply(final String lastImageTaken) {
+                    public Observable<Boolean> apply(InputStream inputStream) {
                         return dataSourceFactory.getImageDataSource()
-                                .duplicateImageFound(originalImagePath, lastImageTaken)
-                                .concatMap(new Function<Boolean, Observable<Boolean>>() {
-                                    @Override
-                                    public Observable<Boolean> apply(Boolean duplicate) {
-                                        if (duplicate) {
-                                            mediaDataSource.deleteImage(lastImageTaken);
-                                        }
-                                        return dataSourceFactory.getFileDataSource()
-                                                .deleteFile(originalImagePath);
-                                    }
-                                });
+                                .saveResizedImage(uri, resizedImagePath, imageSize, inputStream);
                     }
                 });
     }
@@ -137,17 +146,31 @@ public class FileDataRepository implements FileRepository {
     }
 
     @Override
-    public Observable<String> copyVideo(final Uri uri) {
+    public Observable<File> getZipFile(String uuid) {
+        return dataSourceFactory.getFileDataSource().getZipFile(uuid);
+    }
+
+    @Override
+    public Observable<Boolean> createDataZip(String zipFileName,
+            String formInstanceData) {
+        return dataSourceFactory.getFileDataSource().writeDataToZipFile(zipFileName, formInstanceData);
+    }
+
+    @Override
+    public Observable<String> copyVideo(final Uri uri, final boolean removeOriginal) {
         final MediaDataSource mediaDataSource = dataSourceFactory.getMediaDataSource();
-        return mediaDataSource.getVideoFilePath(uri)
-                .concatMap(new Function<String, Observable<String>>() {
+        return mediaDataSource.getInputStreamFromUri(uri)
+                .concatMap(new Function<InputStream, Observable<String>>() {
                     @Override
-                    public Observable<String> apply(final String videoFilePath) {
-                        return dataSourceFactory.getFileDataSource().copyVideo(videoFilePath)
-                                .doOnNext(new Consumer<String>() {
+                    public Observable<String> apply(InputStream inputStream) {
+                        return dataSourceFactory.getFileDataSource().copyVideo(inputStream)
+                                .flatMap(new Function<String, Observable<String>>() {
                                     @Override
-                                    public void accept(String ignored) {
-                                        mediaDataSource.notifyMediaDelete(uri);
+                                    public Observable<String> apply(String videoPath) {
+                                        if (removeOriginal) {
+                                            mediaDataSource.deleteMedia(uri);
+                                        }
+                                        return Observable.just(videoPath);
                                     }
                                 });
                     }

@@ -6,8 +6,6 @@
     <string name="lowcardspacetitle">Low Storage Space</string>
     <string name="nocardspacedialog">The SD card on this device is full and you can no longer collect data. You must clear space on the SD card in order to continue.</string>
     <string name="lowcardspacedialog">You have %%% MB of storage space left on this device\'s SD card. Once the SD card is full, you will no longer be able to collect data.</string>
-    <string name="takephoto">Take Photo</string>
-    <string name="takevideo">Take Video</string>
     <string name="getgeo">Check Geo Location</string>
     <string name="lat">Lat</string>
     <string name="lon">Lon</string>
@@ -298,5 +296,12 @@
     <string name="submit_tab_description">You can view but not edit submitted responses</string>
     <string name="snackbar_submitted">Submitted</string>
     <string name="form_id_hint">Form id</string>
+
+    <string name="sync_service_notification_title">Syncing data</string>
+    <string name="sync_service_notification_ticker">Syncing</string>
+    <string name="form_submit_error">Error submitting form, please try again</string>
+
+    <string name="media_from_camera">Camera</string>
+    <string name="media_from_gallery">Gallery</string>
 
 </resources>

@@ -75,8 +75,15 @@ public class FlowApp extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+
+        if (LeakCanary.isInAnalyzerProcess(this)) {
+            // This process is dedicated to LeakCanary for heap analysis.
+            // You should not init your app in this process.
+            return;
+        }
+
+        installLeakCanary();
         initializeInjector();
-        LeakCanary.install(this);
         initFabric();
         initLogging();
         updateLocale();
@@ -85,6 +92,10 @@ public class FlowApp extends Application {
         updateLoggingInfo();
         registerReceiver(new SyncDataReceiver(), new IntentFilter(SyncDataReceiver.CONNECTIVITY_ACTION));
         saveConfig();
+    }
+
+    protected void installLeakCanary() {
+        LeakCanary.install(this);
     }
 
     private void initFabric() {

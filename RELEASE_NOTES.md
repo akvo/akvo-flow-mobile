@@ -1,5 +1,12 @@
 Akvo FLOW app release notes
 ===========================
+# ver 2.6.0.1
+Date: 23 August 2018
+
+# Resolved issues
+* **App version.properties got converted to CRLF** - [#1191](https://github.com/akvo/akvo-flow-mobile/issues/1191) Fix the version.properties file.
+
+---------------
 # ver 2.6.0
 Date: 22 August 2018
 

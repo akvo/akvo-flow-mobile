@@ -25,7 +25,7 @@
     <color name="background_alternate">#f1eae4</color>
 
     <!-- Text -->
-    <color name="text_primary">@color/black_main</color>
+    <color name="text_primary">@color/dark_grey</color>
     <color name="text_primary_disabled">@color/black_disabled</color>
 
     <color name="red">#FF0000</color>

@@ -19,6 +19,7 @@
         <item name="android:textColorPrimary">@color/text_color_primary</item>
         <item name="android:textColorSecondary">@color/text_color_primary</item>
         <item name="android:textColorTertiary">@color/text_color_primary</item>
+        <item name="buttonStyle">@style/primaryButtonStyle</item>
     </style>
 
     <style name="Theme.AppCompat.Translucent" parent="@style/Theme.AppCompat.Light">

@@ -38,17 +38,15 @@
                 android:layout_margin="8dp"
                 android:visibility="gone"
                 android:textSize="16sp"
-                android:text="@string/repeat_group"
-                style="@style/button_secondary"/>
+                android:text="@string/repeat_group"/>
 
             <Button
                 android:id="@+id/next_btn"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="8dp"
-                android:textSize="16sp"
                 android:text="@string/nextbutton"
-                style="@style/button_tertiary"/>
+                android:theme="@style/CustomButton"/>
 
         </LinearLayout>
 

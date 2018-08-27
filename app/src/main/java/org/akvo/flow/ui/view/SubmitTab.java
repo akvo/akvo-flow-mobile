@@ -20,14 +20,13 @@
 package org.akvo.flow.ui.view;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.support.annotation.VisibleForTesting;
+import android.support.v7.widget.AppCompatButton;
 import android.view.Gravity;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -47,7 +46,7 @@ public class SubmitTab extends ListView implements OnClickListener {
     private SurveyListener mListener;
 
     private TextView mHeaderView;
-    private Button mSubmitButton;
+    private AppCompatButton mSubmitButton;
 
     public SubmitTab(Context context, SurveyListener listener) {
         super(context);
@@ -64,12 +63,10 @@ public class SubmitTab extends ListView implements OnClickListener {
         mHeaderView.setGravity(Gravity.CENTER);
         mHeaderView.setTextSize(18);
         mHeaderView.setClickable(false);
-        mSubmitButton = new Button(context);
+        mSubmitButton = new AppCompatButton(context);
         mSubmitButton.setId(R.id.submit_tab_button);
         mSubmitButton.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT,
                 LayoutParams.WRAP_CONTENT));
-        mSubmitButton.setTextColor(Color.WHITE);
-        mSubmitButton.setBackgroundResource(R.drawable.button_primary);
         mSubmitButton.setText(context.getString(R.string.submitbutton));
         mSubmitButton.setOnClickListener(this);
 

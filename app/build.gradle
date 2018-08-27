@@ -209,7 +209,7 @@ dependencies {
     implementation 'com.squareup.okhttp3:logging-interceptor:3.6.0'
     implementation 'com.google.code.gson:gson:2.8.2'
     implementation('com.crashlytics.sdk.android:crashlytics:2.9.2@aar') {
-        transitive = true;
+        transitive = true
     }
     debugImplementation "com.squareup.leakcanary:leakcanary-android:${rootProject.ext.leakCanaryVersion}"
     releaseImplementation "com.squareup.leakcanary:leakcanary-android-no-op:${rootProject.ext.leakCanaryVersion}"

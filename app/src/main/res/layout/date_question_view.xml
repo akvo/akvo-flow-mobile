@@ -18,7 +18,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="16sp"
-        android:text="@string/pickdate"
-        style="@style/button_primary"/>
+        android:text="@string/pickdate"/>
 
 </merge>

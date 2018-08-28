@@ -19,7 +19,6 @@
         <item name="android:textColorPrimary">@color/text_color_primary</item>
         <item name="android:textColorSecondary">@color/text_color_primary</item>
         <item name="android:textColorTertiary">@color/text_color_primary</item>
-        <item name="buttonStyle">@style/primaryButtonStyle</item>
     </style>
 
     <style name="Theme.AppCompat.Translucent" parent="@style/Theme.AppCompat.Light">
@@ -28,6 +27,11 @@
         <item name="android:colorBackgroundCacheHint">@null</item>
         <item name="android:windowIsTranslucent">true</item>
         <item name="android:windowAnimationStyle">@android:style/Animation</item>
+    </style>
+
+    <style name="GreyButtonTheme" parent="ThemeOverlay.AppCompat.Dark">
+        <item name="colorButtonNormal">@color/light_grey</item>
+        <item name="colorAccent">@color/dark_grey</item>
     </style>
 
 </resources>

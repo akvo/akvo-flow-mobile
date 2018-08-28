@@ -50,6 +50,7 @@
             android:layout_marginTop="20dp"
             android:enabled="false"
             android:text="@string/nextbutton"
+            style="@style/PrimaryButtonStyle"
             />
 
     </LinearLayout>

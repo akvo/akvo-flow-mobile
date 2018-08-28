@@ -24,6 +24,8 @@
                 android:layout_alignParentRight="true"
                 android:layout_alignParentEnd="true"
                 android:layout_margin="4dp"
+                android:theme="@style/GreyButtonTheme"
+                style="@style/PrimaryButtonStyle"
                 android:text="@string/clearbutton"/>
 
         <View
@@ -68,6 +70,8 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:layout_margin="4dp"
+                android:theme="@style/GreyButtonTheme"
+                style="@style/PrimaryButtonStyle"
                 android:text="@string/cancelbutton"/>
 
         <Button
@@ -77,6 +81,7 @@
                 android:layout_weight="1"
                 android:layout_margin="4dp"
                 android:enabled="false"
+                style="@style/PrimaryButtonStyle"
                 android:text="@string/savebutton"/>
 
     </LinearLayout>

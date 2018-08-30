@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2018 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -110,12 +110,16 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
                     "Subclasses must inflate the common question header before calling this method.");
         }
 
+        displayContent();
+    }
+
+    protected void displayContent() {
         mQuestionText.setText(formText(), BufferType.SPANNABLE);
 
         // if there is a tip for this question, construct an alert dialog box with the data
         final int tips = mQuestion.getHelpTypeCount();
         if (tips > 0) {
-            mTipImage.setVisibility(View.VISIBLE);// GONE by default
+            mTipImage.setVisibility(View.VISIBLE);
             mTipImage.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -135,6 +139,8 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
                     }
                 }
             });
+        } else {
+            mTipImage.setVisibility(View.GONE);
         }
 
         if (!isReadOnly()) {

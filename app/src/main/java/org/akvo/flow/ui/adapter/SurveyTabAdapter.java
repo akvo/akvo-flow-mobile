@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2014-2017 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2014-2018 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -65,7 +65,7 @@ public class SurveyTabAdapter extends PagerAdapter implements ViewPager.OnPageCh
         }
 
         if (!surveyListener.isReadOnly()) {
-            mSubmitTab = new SubmitTab(context, surveyListener);
+            mSubmitTab = new SubmitTab(context);
         }
 
         mPager.addOnPageChangeListener(this);

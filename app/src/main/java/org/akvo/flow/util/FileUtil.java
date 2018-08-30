@@ -173,7 +173,7 @@ public class FileUtil {
     /**
      * Compute MD5 checksum of the given file
      */
-    public static byte[] getMD5Checksum(File file) {
+    private static byte[] getMD5Checksum(File file) {
         InputStream in = null;
         MessageDigest md;
         try {
@@ -197,7 +197,7 @@ public class FileUtil {
         return null;
     }
 
-    public static String hexMd5(byte[] rawHash) {
+    private static String hexMd5(byte[] rawHash) {
         if (rawHash != null) {
             StringBuilder builder = new StringBuilder();
             for (byte b : rawHash) {

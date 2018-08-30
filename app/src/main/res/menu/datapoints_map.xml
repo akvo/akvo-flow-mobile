@@ -12,6 +12,9 @@
         <menu>
 
             <item
+                    android:id="@+id/upload"
+                    android:title="@string/upload"/>
+            <item
                     android:id="@+id/stats"
                     android:title="@string/stats"/>
 

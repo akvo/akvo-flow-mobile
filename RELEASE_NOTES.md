@@ -1,5 +1,33 @@
 Akvo FLOW app release notes
 ===========================
+# ver 2.6.0.1
+Date: 23 August 2018
+
+# Resolved issues
+* **App version.properties got converted to CRLF** - [#1191](https://github.com/akvo/akvo-flow-mobile/issues/1191) Fix the version.properties file.
+
+---------------
+# ver 2.6.0
+Date: 22 August 2018
+
+# New and noteworthy
+* **Update sentry** - [#1083](https://github.com/akvo/akvo-flow-mobile/issues/1083) Update the crash reporting library.
+* **Send form version inside data.json** - [#1133](https://github.com/akvo/akvo-flow-mobile/issues/1133) Each submission will now have the form version included.
+* **Refactor data export and sync** - [#1152](https://github.com/akvo/akvo-flow-mobile/issues/1152) Data export logic has been improved.
+* **Datapoint submission should generate data zip file** - [#1090](https://github.com/akvo/akvo-flow-mobile/issues/1090) Zip file is now generated right after the form is submitted.
+* **Upload datapoints from one survey** - [#1138](https://github.com/akvo/akvo-flow-mobile/issues/1138) Add an entry to the menu to be able to upload datapoints from the datapoints list or map.
+* **Take photo/video or select an existing one from your gallery** - [#1136](https://github.com/akvo/akvo-flow-mobile/issues/1136) Photo and video questions now accept media files from the device library.
+* **Update leak canary** - [#1171](https://github.com/akvo/akvo-flow-mobile/issues/1171) Update the memory leaks tracking library.
+
+# Resolved issues
+* **Form viewing cascades** - [#979](https://github.com/akvo/akvo-flow-mobile/issues/979) Improve the cascades question view.
+* **Remove geocode** - [#990](https://github.com/akvo/akvo-flow-mobile/issues/990) Remove unnecessary field.
+* **Date UI confusing** - [#1074](https://github.com/akvo/akvo-flow-mobile/issues/1074) Improve the date question view.
+* **Location validation does not prevent submitting** - [#1101](https://github.com/akvo/akvo-flow-mobile/issues/1101) An invalid location can no longer be submitted.
+* **Non monitoring forms cannot be uploaded** - [#1184](https://github.com/akvo/akvo-flow-mobile/issues/1184) Uploading is enabled for both monitoring or non monitoring surveys.
+* **Small issue with beta deploys** - [#1187](https://github.com/akvo/akvo-flow-mobile/issues/1187) Fixed the 'fetch first' error when deploying betas with fastlane.
+
+---------------
 # ver 2.5.2
 Date: 06 August 2018
 

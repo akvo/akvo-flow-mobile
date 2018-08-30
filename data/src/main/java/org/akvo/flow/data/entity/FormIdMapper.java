@@ -18,35 +18,40 @@
  *
  */
 
-package org.akvo.flow.util.files;
+package org.akvo.flow.data.entity;
 
-import android.content.Context;
+import android.database.Cursor;
 
-import org.akvo.flow.util.ConstantUtil;
+import org.akvo.flow.database.SurveyColumns;
 
-import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.inject.Inject;
 
-public class ZipFileBrowser {
-
-    private static final String DIR_DATA = "akvoflow/data/files";
-
-    private final FileBrowser fileBrowser;
-    private final Context context;
+public class FormIdMapper {
 
     @Inject
-    public ZipFileBrowser(FileBrowser fileBrowser, Context context) {
-        this.fileBrowser = fileBrowser;
-        this.context = context;
+    public FormIdMapper() {
     }
 
-    public File getSurveyInstanceFile(String uuid) {
-        return new File(fileBrowser.getExistingAppInternalFolder(context, DIR_DATA),
-                uuid + ConstantUtil.ARCHIVE_SUFFIX);
+    public List<String> mapToFormId(Cursor cursor) {
+        int size = cursor == null ? 0 : cursor.getCount();
+        List<String> formIds = new ArrayList<>(size);
+        if (cursor != null && cursor.moveToFirst()) {
+            do {
+                formIds.add(getFormId(cursor));
+            } while (cursor.moveToNext());
+        }
+        if (cursor != null) {
+            cursor.close();
+        }
+        return formIds;
     }
 
-    public File getZipFile(String filename) {
-        return new File(fileBrowser.getExistingAppInternalFolder(context, DIR_DATA), filename);
+
+    private String getFormId(Cursor cursor) {
+        return cursor
+                .getString(cursor.getColumnIndexOrThrow(SurveyColumns.SURVEY_ID));
     }
 }

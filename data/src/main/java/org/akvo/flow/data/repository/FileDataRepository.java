@@ -146,6 +146,17 @@ public class FileDataRepository implements FileRepository {
     }
 
     @Override
+    public Observable<File> getZipFile(String uuid) {
+        return dataSourceFactory.getFileDataSource().getZipFile(uuid);
+    }
+
+    @Override
+    public Observable<Boolean> createDataZip(String zipFileName,
+            String formInstanceData) {
+        return dataSourceFactory.getFileDataSource().writeDataToZipFile(zipFileName, formInstanceData);
+    }
+
+    @Override
     public Observable<String> copyVideo(final Uri uri, final boolean removeOriginal) {
         final MediaDataSource mediaDataSource = dataSourceFactory.getMediaDataSource();
         return mediaDataSource.getInputStreamFromUri(uri)

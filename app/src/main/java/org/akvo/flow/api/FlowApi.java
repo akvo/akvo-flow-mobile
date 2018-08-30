@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2013-2017 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2013-2018 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -22,13 +22,11 @@ package org.akvo.flow.api;
 import android.content.Context;
 import android.net.Uri;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import org.akvo.flow.BuildConfig;
 import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.domain.Survey;
-import org.akvo.flow.exception.HttpException;
 import org.akvo.flow.serialization.form.SurveyMetaParser;
 import org.akvo.flow.util.HttpUtil;
 import org.akvo.flow.util.PlatformUtil;
@@ -37,7 +35,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -46,17 +43,15 @@ import timber.log.Timber;
 
 public class FlowApi {
 
+    private static final String HTTPS_PREFIX = "https";
+    private static final String HTTP_PREFIX = "http";
+
     private final String phoneNumber;
     private final String imei;
     private final String androidId;
-
     private final String deviceIdentifier;
-
-    private static final int ERROR_UNKNOWN = -1;
-
-    private static final String HTTPS_PREFIX = "https";
-    private static final String HTTP_PREFIX = "http";
     private final String baseUrl;
+
 
     public FlowApi(Context context) {
         this.baseUrl = BuildConfig.SERVER_BASE;
@@ -93,36 +88,6 @@ public class FlowApi {
         Uri.Builder builder = Uri.parse(serverBase).buildUpon();
         builder.appendPath(Path.TIME_CHECK);
         builder.appendQueryParameter(Param.TIMESTAMP, System.currentTimeMillis() + "");
-        return builder.build().toString();
-    }
-
-    /**
-     * Request the notifications GAE has ready for us, like the list of missing files.
-     *
-     * @return String body of the HTTP response
-     * @throws Exception
-     */
-    @Nullable
-    public JSONObject getDeviceNotification(@NonNull String[] surveyIds)
-            throws Exception {
-        // Send the list of surveys we've got downloaded, getting notified of the deleted ones
-        String url = buildDeviceNotificationUrl(baseUrl, surveyIds);
-        String response = HttpUtil.httpGet(url);
-        if (!TextUtils.isEmpty(response)) {
-            return new JSONObject(response);
-        }
-        return null;
-    }
-
-    @NonNull
-    private String buildDeviceNotificationUrl(@NonNull String serverBase,
-            @NonNull String[] surveyIds) {
-        Uri.Builder builder = Uri.parse(serverBase).buildUpon();
-        builder.appendPath(Path.DEVICE_NOTIFICATION);
-        appendDeviceParams(builder);
-        for (String id : surveyIds) {
-            builder.appendQueryParameter(Param.FORM_ID, id);
-        }
         return builder.build().toString();
     }
 
@@ -166,39 +131,6 @@ public class FlowApi {
         return builder.build().toString();
     }
 
-    /**
-     * Notify GAE back-end that data is available
-     * Sends a message to the service with the file name that was just uploaded
-     * so it can start processing the file
-     */
-    public int sendProcessingNotification(@NonNull String formId, @NonNull String action,
-            @NonNull String fileName) {
-        String url = buildProcessingNotificationUrl(baseUrl, formId, action, fileName);
-        try {
-            HttpUtil.httpGet(url);
-            return HttpURLConnection.HTTP_OK;
-        } catch (HttpException e) {
-            Timber.e(e.getStatus() + " response for formId: " + formId);
-            return e.getStatus();
-        } catch (Exception e) {
-            Timber.e("GAE sync notification failed for file: " + fileName);
-            return ERROR_UNKNOWN;
-        }
-    }
-
-    @NonNull
-    private String buildProcessingNotificationUrl(@NonNull String serverBaseUrl,
-            @NonNull String formId, @NonNull
-            String action, @NonNull String fileName) {
-        Uri.Builder builder = Uri.parse(serverBaseUrl).buildUpon();
-        builder.appendPath(Path.NOTIFICATION);
-        builder.appendQueryParameter(Param.PARAM_ACTION, action);
-        builder.appendQueryParameter(Param.FORM_ID, formId);
-        builder.appendQueryParameter(Param.FILENAME, fileName);
-        appendDeviceParams(builder);
-        return builder.build().toString();
-    }
-
     private void appendDeviceParams(@NonNull Uri.Builder builder) {
         builder.appendQueryParameter(Param.PHONE_NUMBER, phoneNumber);
         builder.appendQueryParameter(Param.ANDROID_ID, androidId);
@@ -208,11 +140,8 @@ public class FlowApi {
     }
 
     interface Path {
-
-        String NOTIFICATION = "processor";
         String SURVEY_LIST_SERVICE = "surveymanager";
         String SURVEY_HEADER_SERVICE = "surveymanager";
-        String DEVICE_NOTIFICATION = "devicenotification";
         String TIME_CHECK = "devicetimerest";
     }
 
@@ -226,9 +155,7 @@ public class FlowApi {
         String ANDROID_ID = "androidId";
 
         String PARAM_ACTION = "action";
-        String FORM_ID = "formID";
         String SURVEY_ID = "surveyId";
-        String FILENAME = "fileName";
 
         String VALUE_HEADER = "getSurveyHeader";
         String VALUE_SURVEY = "getAvailableSurveysDevice";

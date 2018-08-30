@@ -23,7 +23,9 @@ package org.akvo.flow.data.datasource;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
+import org.akvo.flow.data.util.Constants;
 import org.akvo.flow.data.util.ExternalStorageHelper;
+import org.akvo.flow.data.util.FileHelper;
 
 import java.io.File;
 import java.io.IOException;
@@ -79,7 +81,7 @@ public class FileDataSource {
         }
     }
 
-    public Observable<Boolean> copyFile(String destinationFilePath, InputStream inputStream) {
+    private Observable<Boolean> copyFile(String destinationFilePath, InputStream inputStream) {
         try {
             File destinationFile = new File(destinationFilePath);
             String copiedFilePath = fileHelper.copyFile(destinationFile, inputStream);
@@ -218,6 +220,22 @@ public class FileDataSource {
 
     public Observable<Long> getAvailableStorage() {
         return Observable.just(externalStorageHelper.getExternalStorageAvailableSpaceInMb());
+    }
+
+    public Observable<File> getZipFile(String uuid) {
+        String name = uuid + Constants.ARCHIVE_SUFFIX;
+        return Observable.just(new File(flowFileBrowser.getInternalFolder(FlowFileBrowser.DIR_DATA),
+                name));
+    }
+
+    public Observable<Boolean> writeDataToZipFile(String zipFileName, String formInstanceData) {
+        File folder = flowFileBrowser.getExistingAppExternalFolder(FlowFileBrowser.DIR_DATA);
+        try {
+            fileHelper.writeZipFile(folder, zipFileName, formInstanceData);
+            return Observable.just(true);
+        } catch (IOException e) {
+            return Observable.error(e);
+        }
     }
 
     public Observable<String> copyVideo(InputStream inputStream) {

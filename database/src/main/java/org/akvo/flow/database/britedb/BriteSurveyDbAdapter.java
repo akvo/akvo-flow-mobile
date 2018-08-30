@@ -22,7 +22,9 @@ package org.akvo.flow.database.britedb;
 
 import android.content.ContentValues;
 import android.database.Cursor;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 
 import com.squareup.sqlbrite2.BriteDatabase;
 import com.squareup.sqlbrite2.SqlBrite;
@@ -32,6 +34,7 @@ import org.akvo.flow.database.ResponseColumns;
 import org.akvo.flow.database.SurveyColumns;
 import org.akvo.flow.database.SurveyGroupColumns;
 import org.akvo.flow.database.SurveyInstanceColumns;
+import org.akvo.flow.database.SurveyInstanceStatus;
 import org.akvo.flow.database.SyncTimeColumns;
 import org.akvo.flow.database.Tables;
 import org.akvo.flow.database.TransmissionColumns;
@@ -54,6 +57,10 @@ import static org.akvo.flow.database.Constants.ORDER_BY_STATUS;
 public class BriteSurveyDbAdapter {
 
     private static final int DOES_NOT_EXIST = -1;
+
+    private static final String SURVEY_INSTANCE_JOIN_RESPONSE_USER = "survey_instance "
+            + "LEFT OUTER JOIN response ON survey_instance._id=response.survey_instance_id "
+            + "LEFT OUTER JOIN user ON survey_instance.user_id=user._id";
 
     private final BriteDatabase briteDatabase;
 
@@ -94,14 +101,13 @@ public class BriteSurveyDbAdapter {
                 break;
         }
 
-        String[] whereValues = new String[] { String.valueOf(surveyGroupId) };
         List<String> tables = new ArrayList<>(2);
         tables.add(Tables.RECORD);
         tables.add(Tables.SURVEY_INSTANCE);
         return briteDatabase
-                .createQuery(tables, queryString + whereClause + groupBy + orderByStr, whereValues)
-                .concatMap(
-                        new Function<SqlBrite.Query, Observable<Cursor>>() {
+                .createQuery(tables, queryString + whereClause + groupBy + orderByStr,
+                        String.valueOf(surveyGroupId))
+                .concatMap(new Function<SqlBrite.Query, Observable<Cursor>>() {
                             @Override
                             public Observable<Cursor> apply(SqlBrite.Query query) {
                                 return Observable.just(query.run());
@@ -140,8 +146,8 @@ public class BriteSurveyDbAdapter {
                 "SELECT * FROM " + Tables.RECORD + " WHERE " + RecordColumns.SURVEY_GROUP_ID
                         + " = ?";
         return briteDatabase.createQuery(Tables.RECORD, sqlQuery,
-                String.valueOf(surveyGroupId)).concatMap(
-                new Function<SqlBrite.Query, Observable<? extends Cursor>>() {
+                String.valueOf(surveyGroupId))
+                .concatMap(new Function<SqlBrite.Query, Observable<? extends Cursor>>() {
                     @Override
                     public Observable<? extends Cursor> apply(SqlBrite.Query query) {
                         return Observable.just(query.run());
@@ -189,6 +195,45 @@ public class BriteSurveyDbAdapter {
         briteDatabase.insert(Tables.SYNC_TIME, values);
     }
 
+    /**
+     * updates the status of a survey instance to the status passed in.
+     * Status must be one of the 'SurveyInstanceStatus' one. The corresponding
+     * Date column will be updated with the current timestamp.
+     */
+    public void updateSurveyInstanceStatus(long surveyInstanceId, int status) {
+        String dateColumn;
+        switch (status) {
+            case SurveyInstanceStatus.DOWNLOADED:
+            case SurveyInstanceStatus.UPLOADED:
+                dateColumn = SurveyInstanceColumns.SYNC_DATE;
+                break;
+            case SurveyInstanceStatus.SUBMITTED:
+                dateColumn = SurveyInstanceColumns.EXPORTED_DATE;
+                break;
+            case SurveyInstanceStatus.SUBMIT_REQUESTED:
+                dateColumn = SurveyInstanceColumns.SUBMITTED_DATE;
+                break;
+            case SurveyInstanceStatus.SAVED:
+                dateColumn = SurveyInstanceColumns.SAVED_DATE;
+                break;
+            default:
+                return;
+        }
+
+        ContentValues updatedValues = new ContentValues();
+        updatedValues.put(SurveyInstanceColumns.STATUS, status);
+        updatedValues.put(dateColumn, System.currentTimeMillis());
+
+        final int rows = briteDatabase.update(Tables.SURVEY_INSTANCE,
+                updatedValues,
+                SurveyInstanceColumns._ID + " = ?",
+                String.valueOf(surveyInstanceId));
+
+        if (rows < 1) {
+            Timber.e("Could not update status for Survey Instance: %d", surveyInstanceId);
+        }
+    }
+
     public long syncSurveyInstance(ContentValues values, String surveyInstanceUuid) {
         String sql =
                 "SELECT " + SurveyInstanceColumns._ID + "," + SurveyInstanceColumns.UUID + " FROM "
@@ -210,6 +255,34 @@ public class BriteSurveyDbAdapter {
             id = briteDatabase.insert(Tables.SURVEY_INSTANCE, values);
         }
         return id;
+    }
+
+    public Cursor getSurveyInstancesByStatus(int status) {
+        String sql = "SELECT " + SurveyInstanceColumns._ID + ", " + SurveyInstanceColumns.UUID
+                + " FROM " + Tables.SURVEY_INSTANCE
+                + " WHERE " + SurveyInstanceColumns.STATUS + " = ?";
+        return briteDatabase.query(sql, String.valueOf(status));
+    }
+
+    public Cursor getResponses(long surveyInstanceId) {
+        String sql = "SELECT " + SurveyInstanceColumns.SURVEY_ID + ", "
+                + SurveyInstanceColumns.SUBMITTED_DATE + ", "
+                + SurveyInstanceColumns.UUID + ", "
+                + SurveyInstanceColumns.START_DATE + ", "
+                + SurveyInstanceColumns.RECORD_ID + ", "
+                + SurveyInstanceColumns.DURATION + ", "
+                + SurveyInstanceColumns.VERSION + ", "
+                + ResponseColumns.ANSWER + ", "
+                + ResponseColumns.TYPE + ", "
+                + ResponseColumns.QUESTION_ID + ", "
+                + ResponseColumns.FILENAME + ", "
+                + UserColumns.NAME + ", "
+                + UserColumns.EMAIL + ", "
+                + ResponseColumns.ITERATION
+                + " FROM " + SURVEY_INSTANCE_JOIN_RESPONSE_USER
+                + " WHERE " + ResponseColumns.SURVEY_INSTANCE_ID + " = ? AND "
+                + ResponseColumns.INCLUDE + " = 1";
+        return briteDatabase.query(sql, String.valueOf(surveyInstanceId));
     }
 
     public BriteDatabase.Transaction beginTransaction() {
@@ -340,9 +413,8 @@ public class BriteSurveyDbAdapter {
                 });
     }
 
-    public Cursor getSurveys(long surveyGroupId) {
-        String sqlQuery = "SELECT "
-                + SurveyColumns._ID + ", "
+    public Cursor getForms(long surveyId) {
+        String columns = SurveyColumns._ID + ", "
                 + SurveyColumns.SURVEY_ID + ", "
                 + SurveyColumns.NAME + ", "
                 + SurveyColumns.FILENAME + ", "
@@ -350,14 +422,16 @@ public class BriteSurveyDbAdapter {
                 + SurveyColumns.LANGUAGE + ", "
                 + SurveyColumns.HELP_DOWNLOADED + ", "
                 + SurveyColumns.VERSION + ", "
-                + SurveyColumns.LOCATION
+                + SurveyColumns.LOCATION;
+        String sqlQuery = "SELECT "
+                + columns
                 + " FROM " + Tables.SURVEY;
         String whereClause = SurveyColumns.DELETED + " <> 1";
         String[] whereParams = new String[0];
-        if (surveyGroupId > 0) {
+        if (surveyId > 0) {
             whereClause += " AND " + SurveyColumns.SURVEY_GROUP_ID + " = ?";
             whereParams = new String[] {
-                    String.valueOf(surveyGroupId)
+                    String.valueOf(surveyId)
             };
         }
         sqlQuery += " WHERE " + whereClause;
@@ -365,24 +439,34 @@ public class BriteSurveyDbAdapter {
     }
 
     @Nullable
-    public String[] getSurveyIds() {
-        String sqlQuery = "SELECT "
-                + SurveyColumns.SURVEY_ID
-                + " FROM " + Tables.SURVEY
-                + " WHERE " + SurveyColumns.DELETED + " <> ?";
-        Cursor c = briteDatabase.query(sqlQuery, "1");
-        if (c != null) {
-            String[] ids = new String[c.getCount()];
-            if (c.moveToFirst()) {
-                do {
-                    ids[c.getPosition()] = c
-                            .getString(c.getColumnIndexOrThrow(SurveyColumns.SURVEY_ID));
-                } while (c.moveToNext());
-            }
-            c.close();
-            return ids;
+    public Cursor getFormIds() {
+        String columns = SurveyColumns.SURVEY_ID;
+        return queryForms(columns, "", null);
+    }
+
+    public Cursor getFormIds(@Nullable String surveyId) {
+        if (surveyId == null) {
+            return getFormIds();
         }
-        return null;
+        String columns = SurveyColumns.SURVEY_ID;
+        String whereClause = SurveyColumns.SURVEY_GROUP_ID + " = ?";
+        List<String> surveyIds = new ArrayList<>(1);
+        surveyIds.add(surveyId);
+        return queryForms(columns, whereClause, surveyIds);
+    }
+
+    private Cursor queryForms(String columns, String whereClause, List<String> whereParams) {
+        String defaultWhereClause = " WHERE " + SurveyColumns.DELETED + " <> ?";
+        List<String> params = new ArrayList<>();
+        params.add("1");
+        if (!TextUtils.isEmpty(whereClause)) {
+            defaultWhereClause += " AND " + whereClause;
+        }
+        String sqlQuery = "SELECT " + columns + " FROM " + Tables.SURVEY + defaultWhereClause;
+        if (whereParams != null) {
+            params.addAll(whereParams);
+        }
+        return briteDatabase.query(sqlQuery, params.toArray(new String[params.size()]));
     }
 
     public void addSurveyGroup(ContentValues values) {
@@ -584,5 +668,40 @@ public class BriteSurveyDbAdapter {
         contentValues.put(TransmissionColumns.STATUS, status);
         String where = TransmissionColumns.FILENAME + " = ? ";
         return briteDatabase.update(Tables.TRANSMISSION, contentValues, where, filename);
+    }
+
+    public Cursor getUnSyncedTransmissions() {
+        String column =
+                TransmissionColumns._ID + ", "
+                        + TransmissionColumns.SURVEY_INSTANCE_ID + ", "
+                        + TransmissionColumns.SURVEY_ID + ", "
+                        + TransmissionColumns.FILENAME;
+        String whereClause =
+                TransmissionColumns.STATUS + " IN (?, ?, ?) AND " + TransmissionColumns.FILENAME
+                        + " LIKE '%.%'";
+        String[] selectionArgs = new String[] {
+                String.valueOf(TransmissionStatus.QUEUED),
+                String.valueOf(TransmissionStatus.IN_PROGRESS),
+                String.valueOf(TransmissionStatus.FAILED),
+        };
+        return queryTransmissions(column, whereClause, selectionArgs);
+    }
+
+    public Cursor getUnSyncedTransmissions(@NonNull String formId) {
+        String column =
+                TransmissionColumns._ID + ", "
+                        + TransmissionColumns.SURVEY_INSTANCE_ID + ", "
+                        + TransmissionColumns.SURVEY_ID + ", "
+                        + TransmissionColumns.FILENAME;
+        String whereClause =
+                TransmissionColumns.STATUS + " IN (?, ?, ?) AND " + TransmissionColumns.FILENAME
+                        + " LIKE '%.%' AND " + TransmissionColumns.SURVEY_ID + " = ?";
+        String[] selectionArgs = new String[] {
+                String.valueOf(TransmissionStatus.QUEUED),
+                String.valueOf(TransmissionStatus.IN_PROGRESS),
+                String.valueOf(TransmissionStatus.FAILED),
+                formId
+        };
+        return queryTransmissions(column, whereClause, selectionArgs);
     }
 }

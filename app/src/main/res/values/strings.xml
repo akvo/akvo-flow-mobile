@@ -297,6 +297,10 @@
     <string name="snackbar_submitted">Submitted</string>
     <string name="form_id_hint">Form id</string>
 
+    <string name="sync_service_notification_title">Syncing data</string>
+    <string name="sync_service_notification_ticker">Syncing</string>
+    <string name="form_submit_error">Error submitting form, please try again</string>
+
     <string name="media_from_camera">Camera</string>
     <string name="media_from_gallery">Gallery</string>
 

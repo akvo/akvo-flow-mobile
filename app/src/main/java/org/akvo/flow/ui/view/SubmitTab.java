@@ -58,8 +58,8 @@ public class SubmitTab extends ListView implements OnClickListener {
         }
         mListener = (SurveyListener) context;
         setId(R.id.submit_tab);
-        final int listPadding = (int) PlatformUtil.dp2Pixel(context, 16);
-        setPadding(listPadding, listPadding, listPadding, listPadding);
+        final int listPadding = (int) PlatformUtil.dp2Pixel(context, 24);
+        setPadding(listPadding, 0, listPadding, listPadding);
 
         mHeaderView = (TextView) LayoutInflater.from(context)
                 .inflate(R.layout.submit_tab_header, this, false);

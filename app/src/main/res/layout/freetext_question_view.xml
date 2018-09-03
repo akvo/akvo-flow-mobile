@@ -30,7 +30,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/use_external_source"
-            style="@style/PrimaryButtonStyle"/>
+            style="@style/FormButtonStyle"/>
 
 </merge>
 

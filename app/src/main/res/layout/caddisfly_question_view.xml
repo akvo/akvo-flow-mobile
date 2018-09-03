@@ -17,6 +17,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/caddisfly_test"
-        style="@style/PrimaryButtonStyle" />
+        style="@style/FormButtonStyle" />
 
 </merge>

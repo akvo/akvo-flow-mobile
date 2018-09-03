@@ -58,7 +58,7 @@
                     android:layout_marginLeft="24dp"
                     android:layout_marginRight="24dp"
                     android:layout_marginEnd="24dp"
-                    style="@style/PrimaryButtonStyle"
+                    style="@style/FormButtonStyle"
                     android:text="@string/repeat_group"/>
         </FrameLayout>
 

@@ -111,11 +111,11 @@ public class QuestionGroupTab extends LinearLayout implements QuestionGroupItera
         });
         next.setVisibility(mSurveyListener.isReadOnly() ? GONE : VISIBLE);
 
-        View repeatBtn = findViewById(R.id.repeat_btn_layout);
+        View repeatBtnLayout = findViewById(R.id.repeat_btn_layout);
         if (mQuestionGroup.isRepeatable()) {
             mRepetitionsText.setVisibility(VISIBLE);
-            repeatBtn.setVisibility(mSurveyListener.isReadOnly() ? GONE : VISIBLE);
-            repeatBtn.setOnClickListener(new OnClickListener() {
+            repeatBtnLayout.setVisibility(mSurveyListener.isReadOnly() ? GONE : VISIBLE);
+            findViewById(R.id.repeat_btn).setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     loadGroup();
@@ -123,7 +123,7 @@ public class QuestionGroupTab extends LinearLayout implements QuestionGroupItera
                 }
             });
         }
-        int paddingBottom = repeatBtn.getVisibility() == VISIBLE ?
+        int paddingBottom = repeatBtnLayout.getVisibility() == VISIBLE ?
                 getDimension(R.dimen.scroll_bottom_padding_when_repeatable_group) :
                 getDimension(R.dimen.scroll_bottom_padding);
         mScroller.setPadding(mScroller.getPaddingLeft(), mScroller.getPaddingTop(),

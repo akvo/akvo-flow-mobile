@@ -17,7 +17,7 @@
             android:id="@+id/date_btn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            style="@style/PrimaryButtonStyle"
+            style="@style/FormButtonStyle"
             android:text="@string/pickdate"/>
 
 </merge>

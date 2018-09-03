@@ -111,9 +111,9 @@ public class QuestionGroupTab extends LinearLayout implements QuestionGroupItera
         });
         next.setVisibility(mSurveyListener.isReadOnly() ? GONE : VISIBLE);
 
+        View repeatBtn = findViewById(R.id.repeat_btn_layout);
         if (mQuestionGroup.isRepeatable()) {
             mRepetitionsText.setVisibility(VISIBLE);
-            View repeatBtn = findViewById(R.id.repeat_btn);
             repeatBtn.setVisibility(mSurveyListener.isReadOnly() ? GONE : VISIBLE);
             repeatBtn.setOnClickListener(new OnClickListener() {
                 @Override
@@ -123,7 +123,16 @@ public class QuestionGroupTab extends LinearLayout implements QuestionGroupItera
                 }
             });
         }
+        int paddingBottom = repeatBtn.getVisibility() == VISIBLE ?
+                getDimension(R.dimen.scroll_bottom_padding_when_repeatable_group) :
+                getDimension(R.dimen.scroll_bottom_padding);
+        mScroller.setPadding(mScroller.getPaddingLeft(), mScroller.getPaddingTop(),
+                mScroller.getPaddingRight(), paddingBottom);
         setTag(mQuestionGroup.getOrder());
+    }
+
+    private int getDimension(int dimensionRes) {
+        return (int) getResources().getDimension(dimensionRes);
     }
 
     /**
@@ -192,12 +201,12 @@ public class QuestionGroupTab extends LinearLayout implements QuestionGroupItera
             Collection<QuestionGroupIterationHeader> iterationHeaders = groupIterationHeaders
                     .values();
             for (QuestionGroupIterationHeader header : iterationHeaders) {
-                header.enableDeleteButton();
+                header.showDeleteIcon();
             }
         } else if (groupIterationHeaders.size() == 1) {
             QuestionGroupIterationHeader header = groupIterationHeaders.entrySet().iterator().next()
                     .getValue();
-            header.disableDeleteButton();
+            header.hideDeleteIcon();
         }
     }
 
@@ -323,10 +332,22 @@ public class QuestionGroupTab extends LinearLayout implements QuestionGroupItera
 
             mQuestionViews.put(q.getId(), questionView);// Store the reference to the View
 
-            // Add divider (within the View)
-            inflate(getContext(), R.layout.divider, questionView);
-            mContainer.addView(questionView);
+            mContainer.addView(questionView, generateLayoutParamsForQuestionView());
         }
+    }
+
+    private LayoutParams generateLayoutParamsForQuestionView() {
+        int orientation = mContainer.getOrientation();
+        LayoutParams layoutParams;
+        if (orientation == HORIZONTAL) {
+            layoutParams = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+        } else {
+            layoutParams = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
+        }
+        int margin = getDimension(R.dimen.form_left_right_padding);
+        layoutParams.leftMargin = margin;
+        layoutParams.rightMargin = margin;
+        return layoutParams;
     }
 
     private int getRepetitionId(int index) {

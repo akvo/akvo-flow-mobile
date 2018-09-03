@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015-2017 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2015-2018 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -23,12 +23,10 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.drawable.Drawable;
 import android.support.v4.content.ContextCompat;
-import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
 
 import org.akvo.flow.R;
-import org.akvo.flow.util.PlatformUtil;
 import org.akvo.flow.util.ViewUtil;
 
 public class QuestionGroupIterationHeader extends android.support.v7.widget.AppCompatTextView
@@ -52,18 +50,20 @@ public class QuestionGroupIterationHeader extends android.support.v7.widget.AppC
         mTitle = title;
         mListener = listener;
 
-        int padding = (int) PlatformUtil.dp2Pixel(context, 8);
-        setPadding(padding, padding, padding, padding);
-        setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
-        setText(mTitle + " - " + pos);
+        int padding = (int)getResources().getDimension(R.dimen.group_iteration_padding);
+        int paddingLeft = (int)getResources().getDimension(R.dimen.form_left_right_padding);
+        setPadding(paddingLeft, padding, padding, padding);
+        setTextSize(20);
         setTextColor(ContextCompat.getColor(context, R.color.repetitions_text_color));
         setBackgroundColor(ContextCompat.getColor(context, R.color.background_alternate));
+        showTitleWithPosition(pos);
     }
 
-    /**
-     * Show 'delete' icon
-     */
-    public void enableDeleteButton() {
+    private void showTitleWithPosition(int pos) {
+        setText(getContext().getString(R.string.repeated_group_title, mTitle, pos));
+    }
+
+    public void showDeleteIcon() {
         if (mListener != null) {
             Drawable deleteIcon = ContextCompat.getDrawable(getContext(), R.drawable.ic_trash);
             setCompoundDrawablesWithIntrinsicBounds(null, null, deleteIcon, null);
@@ -72,13 +72,13 @@ public class QuestionGroupIterationHeader extends android.support.v7.widget.AppC
     }
 
 
-    public void disableDeleteButton() {
+    public void hideDeleteIcon() {
         setCompoundDrawablesWithIntrinsicBounds(null, null, null, null);
         setOnTouchListener(null);
     }
 
     public void decreasePosition() {
-        setText(mTitle + " - " + --mPosition);
+        showTitleWithPosition(--mPosition);
     }
 
     @Override

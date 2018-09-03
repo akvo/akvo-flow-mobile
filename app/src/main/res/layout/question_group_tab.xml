@@ -1,16 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<merge xmlns:android="http://schemas.android.com/apk/res/android"
-       xmlns:tools="http://schemas.android.com/tools"
-       android:layout_width="match_parent"
-       android:layout_height="wrap_content">
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
 
     <TextView
             android:id="@+id/repeat_header"
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:gravity="start|center_vertical"
-            android:background="@color/record_name_background"
-            android:padding="6dp"
+            android:background="@color/light_grey"
+            android:padding="8dp"
+            android:paddingLeft="24dp"
+            android:paddingStart="24dp"
             tools:visibility="visible"
             tools:text="Repetitions:1"
             android:textSize="16sp"
@@ -18,40 +20,79 @@
 
     <ScrollView
             android:id="@+id/scroller"
+            android:layout_below="@+id/repeat_header"
+            android:paddingBottom="176dp"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
         <LinearLayout
+                android:id="@+id/question_list"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:orientation="vertical"/>
 
-            <LinearLayout
-                    android:id="@+id/question_list"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"/>
+    </ScrollView>
+
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:orientation="vertical">
+
+        <FrameLayout
+                android:id="@+id/repeat_btn_layout"
+                android:background="@color/light_grey"
+                android:visibility="gone"
+                tools:visibility="visible"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
 
             <Button
                     android:id="@+id/repeat_btn"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="8dp"
-                    android:visibility="gone"
+                    android:layout_height="56dp"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginBottom="16dp"
+                    android:layout_marginStart="24dp"
+                    android:layout_marginLeft="24dp"
+                    android:layout_marginRight="24dp"
+                    android:layout_marginEnd="24dp"
                     style="@style/PrimaryButtonStyle"
                     android:text="@string/repeat_group"/>
+        </FrameLayout>
+
+        <include layout="@layout/divider"/>
+
+        <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="24dp"
+                android:layout_marginLeft="24dp"
+                android:layout_marginRight="24dp"
+                android:layout_marginEnd="24dp">
+
+            <TextView
+                    android:id="@+id/group_counter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginBottom="16dp"
+                    android:gravity="center_vertical"
+                    android:layout_gravity="start|center_vertical"
+                    android:text="1 / 12"
+                    />
 
             <Button
                     android:id="@+id/next_btn"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="8dp"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginBottom="16dp"
+                    android:layout_width="86dp"
+                    android:layout_height="56dp"
                     android:text="@string/nextbutton"
+                    android:layout_gravity="end"
                     style="@style/PrimaryButtonStyle"
                     android:theme="@style/GreyButtonTheme"/>
-
-        </LinearLayout>
-
-    </ScrollView>
-
-</merge>
+        </FrameLayout>
+    </LinearLayout>
+</RelativeLayout>

@@ -7,5 +7,9 @@
     <dimen name="survey_version_text_size">18sp</dimen>
     <dimen name="survey_title_text_size">22sp</dimen>
     <dimen name="tabs_height">48dp</dimen>
+    <dimen name="group_iteration_padding">8dp</dimen>
+    <dimen name="form_left_right_padding">24dp</dimen>
+    <dimen name="scroll_bottom_padding">98dp</dimen>
+    <dimen name="scroll_bottom_padding_when_repeatable_group">176dp</dimen>
 
 </resources>

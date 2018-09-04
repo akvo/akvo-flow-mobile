@@ -12,6 +12,7 @@
 
     <!-- Buttons -->
 
+    <color name="record_name_background">#cec6bc</color>
     <color name="feature_menu_background">#e0736357</color>
 
     <color name="colorPrimary">#2BB5E5</color>

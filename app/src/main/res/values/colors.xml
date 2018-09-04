@@ -30,9 +30,6 @@
 
     <color name="red">#FF0000</color>
 
-    <color name="record_name_background">#cec6bc</color>
-    <color name="feature_menu_background">#e0736357</color>
-
     <color name="colorPrimary">@color/orange_main</color>
     <color name="colorPrimaryDark">@color/orange_dark</color>
     <color name="colorAccent">@color/green</color>

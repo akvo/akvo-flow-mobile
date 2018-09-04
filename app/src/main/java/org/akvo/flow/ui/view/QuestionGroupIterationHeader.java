@@ -21,6 +21,8 @@ package org.akvo.flow.ui.view;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffColorFilter;
 import android.graphics.drawable.Drawable;
 import android.support.v4.content.ContextCompat;
 import android.view.MotionEvent;
@@ -35,6 +37,7 @@ public class QuestionGroupIterationHeader extends android.support.v7.widget.AppC
     private String mTitle;
     private int mID, mPosition;
     private OnDeleteListener mListener;
+    private final int color;
 
     public interface OnDeleteListener {
 
@@ -50,12 +53,15 @@ public class QuestionGroupIterationHeader extends android.support.v7.widget.AppC
         mTitle = title;
         mListener = listener;
 
-        int padding = (int)getResources().getDimension(R.dimen.group_iteration_padding);
-        int paddingLeft = (int)getResources().getDimension(R.dimen.form_left_right_padding);
-        setPadding(paddingLeft, padding, padding, padding);
+        int paddingTopBottom = (int)getResources().getDimension(R.dimen.group_iteration_padding);
+        int paddingLeftRight = (int)getResources().getDimension(R.dimen.form_left_right_padding);
+        setCompoundDrawablePadding(paddingTopBottom);
+        setPadding(paddingLeftRight, paddingTopBottom, paddingLeftRight, paddingTopBottom);
         setTextSize(20);
-        setTextColor(ContextCompat.getColor(context, R.color.repetitions_text_color));
-        setBackgroundColor(ContextCompat.getColor(context, R.color.background_alternate));
+        color = ContextCompat.getColor(context, R.color.repetitions_text_color);
+        setTextColor(color);
+
+        //setBackgroundColor(ContextCompat.getColor(context, R.color.background_alternate));
         showTitleWithPosition(pos);
     }
 
@@ -67,10 +73,18 @@ public class QuestionGroupIterationHeader extends android.support.v7.widget.AppC
         if (mListener != null) {
             Drawable deleteIcon = ContextCompat.getDrawable(getContext(), R.drawable.ic_trash);
             setCompoundDrawablesWithIntrinsicBounds(null, null, deleteIcon, null);
+            setTextViewDrawableColor();
             setOnTouchListener(this);
         }
     }
 
+    private void setTextViewDrawableColor() {
+        for (Drawable drawable : getCompoundDrawables()) {
+            if (drawable != null) {
+                drawable.setColorFilter(new PorterDuffColorFilter(color, PorterDuff.Mode.SRC_IN));
+            }
+        }
+    }
 
     public void hideDeleteIcon() {
         setCompoundDrawablesWithIntrinsicBounds(null, null, null, null);

@@ -10,9 +10,12 @@
             android:layout_height="50dp"
             android:gravity="start|center_vertical"
             android:background="@color/light_grey"
-            android:padding="8dp"
-            android:paddingLeft="24dp"
-            android:paddingStart="24dp"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
+            android:paddingLeft="@dimen/form_left_right_padding"
+            android:paddingStart="@dimen/form_left_right_padding"
+            android:paddingEnd="@dimen/form_left_right_padding"
+            android:paddingRight="@dimen/form_left_right_padding"
             tools:visibility="visible"
             tools:text="Repetitions:1"
             android:textSize="16sp"
@@ -54,10 +57,10 @@
                     android:layout_height="56dp"
                     android:layout_marginTop="16dp"
                     android:layout_marginBottom="16dp"
-                    android:layout_marginStart="24dp"
-                    android:layout_marginLeft="24dp"
-                    android:layout_marginRight="24dp"
-                    android:layout_marginEnd="24dp"
+                    android:layout_marginStart="@dimen/form_left_right_padding"
+                    android:layout_marginLeft="@dimen/form_left_right_padding"
+                    android:layout_marginRight="@dimen/form_left_right_padding"
+                    android:layout_marginEnd="@dimen/form_left_right_padding"
                     style="@style/FormButtonStyle"
                     android:text="@string/repeat_group"/>
         </FrameLayout>
@@ -67,10 +70,10 @@
         <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="24dp"
-                android:layout_marginLeft="24dp"
-                android:layout_marginRight="24dp"
-                android:layout_marginEnd="24dp">
+                android:layout_marginStart="@dimen/form_left_right_padding"
+                android:layout_marginLeft="@dimen/form_left_right_padding"
+                android:layout_marginRight="@dimen/form_left_right_padding"
+                android:layout_marginEnd="@dimen/form_left_right_padding">
 
             <TextView
                     android:id="@+id/group_counter"

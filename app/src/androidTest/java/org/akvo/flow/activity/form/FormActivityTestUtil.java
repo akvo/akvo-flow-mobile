@@ -100,7 +100,7 @@ public class FormActivityTestUtil {
     }
 
     public static void clickNext() {
-        onView(withId(R.id.next_btn)).perform(scrollTo()).perform(click());
+        onView(withId(R.id.next_btn)).perform(click());
     }
 
     public static void fillFreeTextQuestion(String text) {

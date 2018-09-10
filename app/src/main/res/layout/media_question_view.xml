@@ -58,7 +58,7 @@
             <Button
                     android:id="@+id/camera_btn"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="@dimen/button_height"
                     android:layout_weight="1"
                     style="@style/FormButtonStyle"
                     android:text="@string/media_from_camera"
@@ -68,7 +68,7 @@
                     android:id="@+id/gallery_btn"
                     android:layout_width="0dp"
                     android:layout_weight="1"
-                    android:layout_height="wrap_content"
+                    android:layout_height="@dimen/button_height"
                     style="@style/FormButtonStyle"
                     android:text="@string/media_from_gallery"
                     android:layout_marginLeft="8dp"

@@ -54,7 +54,7 @@
             <Button
                     android:id="@+id/repeat_btn"
                     android:layout_width="match_parent"
-                    android:layout_height="56dp"
+                    android:layout_height="@dimen/button_height"
                     android:layout_marginTop="16dp"
                     android:layout_marginBottom="16dp"
                     android:layout_marginStart="@dimen/form_left_right_padding"
@@ -75,23 +75,12 @@
                 android:layout_marginRight="@dimen/form_left_right_padding"
                 android:layout_marginEnd="@dimen/form_left_right_padding">
 
-            <TextView
-                    android:id="@+id/group_counter"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:layout_marginTop="16dp"
-                    android:layout_marginBottom="16dp"
-                    android:gravity="center_vertical"
-                    android:layout_gravity="start|center_vertical"
-                    android:text="1 / 12"
-                    />
-
             <Button
                     android:id="@+id/next_btn"
                     android:layout_marginTop="16dp"
                     android:layout_marginBottom="16dp"
-                    android:layout_width="86dp"
-                    android:layout_height="56dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/button_height"
                     android:text="@string/nextbutton"
                     android:layout_gravity="end"
                     style="@style/PrimaryButtonStyle"

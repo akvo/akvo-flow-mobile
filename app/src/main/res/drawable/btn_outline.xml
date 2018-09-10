@@ -4,12 +4,12 @@
         android:shape="rectangle">
 
     <stroke
-            android:width="2dp"
+            android:width="@dimen/button_border_width"
             android:color="@color/dark_grey">
     </stroke>
     <solid android:color="@android:color/transparent"/>
     <corners
-            android:radius="5dp">
+            android:radius="@dimen/button_corner">
     </corners>
 
 </shape>

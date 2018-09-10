@@ -34,7 +34,6 @@ import android.widget.TextView;
 import org.akvo.flow.R;
 import org.akvo.flow.domain.Question;
 import org.akvo.flow.event.SurveyListener;
-import org.akvo.flow.util.PlatformUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,7 +57,7 @@ public class SubmitTab extends ListView implements OnClickListener {
         }
         mListener = (SurveyListener) context;
         setId(R.id.submit_tab);
-        final int listPadding = (int) PlatformUtil.dp2Pixel(context, 24);
+        final int listPadding = (int)getResources().getDimension(R.dimen.form_left_right_padding);
         setPadding(listPadding, 0, listPadding, listPadding);
 
         mHeaderView = (TextView) LayoutInflater.from(context)

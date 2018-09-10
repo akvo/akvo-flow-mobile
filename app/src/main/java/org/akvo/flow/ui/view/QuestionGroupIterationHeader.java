@@ -21,8 +21,6 @@ package org.akvo.flow.ui.view;
 
 import android.content.Context;
 import android.content.DialogInterface;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffColorFilter;
 import android.graphics.drawable.Drawable;
 import android.support.v4.content.ContextCompat;
 import android.view.MotionEvent;
@@ -37,7 +35,7 @@ public class QuestionGroupIterationHeader extends android.support.v7.widget.AppC
     private String mTitle;
     private int mID, mPosition;
     private OnDeleteListener mListener;
-    private final int color;
+    private final int paddingLeftRight;
 
     public interface OnDeleteListener {
 
@@ -54,14 +52,13 @@ public class QuestionGroupIterationHeader extends android.support.v7.widget.AppC
         mListener = listener;
 
         int paddingTopBottom = (int)getResources().getDimension(R.dimen.group_iteration_padding);
-        int paddingLeftRight = (int)getResources().getDimension(R.dimen.form_left_right_padding);
+        paddingLeftRight = (int)getResources().getDimension(R.dimen.form_left_right_padding);
         setCompoundDrawablePadding(paddingTopBottom);
         setPadding(paddingLeftRight, paddingTopBottom, paddingLeftRight, paddingTopBottom);
+        
         setTextSize(20);
-        color = ContextCompat.getColor(context, R.color.repetitions_text_color);
-        setTextColor(color);
-
-        //setBackgroundColor(ContextCompat.getColor(context, R.color.background_alternate));
+        setTextColor(ContextCompat.getColor(context, R.color.repetitions_text_color));
+        setBackgroundColor(ContextCompat.getColor(context, R.color.background_alternate));
         showTitleWithPosition(pos);
     }
 
@@ -73,16 +70,7 @@ public class QuestionGroupIterationHeader extends android.support.v7.widget.AppC
         if (mListener != null) {
             Drawable deleteIcon = ContextCompat.getDrawable(getContext(), R.drawable.ic_trash);
             setCompoundDrawablesWithIntrinsicBounds(null, null, deleteIcon, null);
-            setTextViewDrawableColor();
             setOnTouchListener(this);
-        }
-    }
-
-    private void setTextViewDrawableColor() {
-        for (Drawable drawable : getCompoundDrawables()) {
-            if (drawable != null) {
-                drawable.setColorFilter(new PorterDuffColorFilter(color, PorterDuff.Mode.SRC_IN));
-            }
         }
     }
 
@@ -101,21 +89,27 @@ public class QuestionGroupIterationHeader extends android.support.v7.widget.AppC
             case MotionEvent.ACTION_DOWN:
                 return true;
             case MotionEvent.ACTION_UP:
-                int x = getRight() - getCompoundDrawables()[2].getBounds().width();
-                if (event.getRawX() < x) {
-                    return false;
+                if (isDeleteButtonPressed(event)) {
+                    ViewUtil.showConfirmDialog(R.string.delete_group_title,
+                            R.string.delete_group_text,
+                            getContext(), true, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    mListener.onDeleteRepetition(mID);
+                                }
+                            });
+                    return true;
                 }
-                ViewUtil.showConfirmDialog(R.string.delete_group_title, R.string.delete_group_text,
-                        getContext(), true, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                mListener.onDeleteRepetition(mID);
-                            }
-                        });
-                return true;
+                return false;
             default:
                 return false;
         }
+    }
+
+    private boolean isDeleteButtonPressed(MotionEvent event) {
+        int x = getRight() - getCompoundDrawables()[2].getBounds().width()
+                - (paddingLeftRight * 2);
+        return event.getRawX() > x;
     }
 
 }

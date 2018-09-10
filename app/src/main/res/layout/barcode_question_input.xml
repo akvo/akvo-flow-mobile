@@ -53,7 +53,7 @@
     <Button
             android:id="@+id/scan_btn"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="@dimen/button_height"
             android:text="@string/scanbarcode"
             style="@style/FormButtonStyle"
             />

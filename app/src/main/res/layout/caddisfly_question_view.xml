@@ -15,7 +15,7 @@
     <Button
         android:id="@+id/caddisfly_button"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="@dimen/button_height"
         android:text="@string/caddisfly_test"
         style="@style/FormButtonStyle" />
 

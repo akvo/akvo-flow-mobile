@@ -23,6 +23,7 @@ import android.animation.LayoutTransition;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.constraint.ConstraintLayout;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -54,7 +55,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class QuestionGroupTab extends LinearLayout implements QuestionGroupIterationHeader.OnDeleteListener {
+public class QuestionGroupTab extends ConstraintLayout implements QuestionGroupIterationHeader.OnDeleteListener {
 
     private final QuestionGroup mQuestionGroup;
     private final QuestionInteractionListener mQuestionListener;
@@ -89,7 +90,7 @@ public class QuestionGroupTab extends LinearLayout implements QuestionGroupItera
     }
 
     private void init() {
-        setOrientation(VERTICAL);
+        //setOrientation(VERTICAL);
         setDescendantFocusability(FOCUS_BEFORE_DESCENDANTS);
         setFocusable(true);
         setFocusableInTouchMode(true);
@@ -123,11 +124,6 @@ public class QuestionGroupTab extends LinearLayout implements QuestionGroupItera
                 }
             });
         }
-        int paddingBottom = repeatBtnLayout.getVisibility() == VISIBLE ?
-                getDimension(R.dimen.scroll_bottom_padding_when_repeatable_group) :
-                getDimension(R.dimen.scroll_bottom_padding);
-        mScroller.setPadding(mScroller.getPaddingLeft(), mScroller.getPaddingTop(),
-                mScroller.getPaddingRight(), paddingBottom);
         setTag(mQuestionGroup.getOrder());
     }
 
@@ -339,7 +335,7 @@ public class QuestionGroupTab extends LinearLayout implements QuestionGroupItera
     private LayoutParams generateLayoutParamsForQuestionView() {
         int orientation = mContainer.getOrientation();
         LayoutParams layoutParams;
-        if (orientation == HORIZONTAL) {
+        if (orientation == LinearLayout.HORIZONTAL) {
             layoutParams = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
         } else {
             layoutParams = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);

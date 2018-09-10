@@ -62,25 +62,6 @@ android {
             keyAlias RELEASE_KEY_ALIAS
             keyPassword RELEASE_KEY_PASSWORD
         }
-
-        buildTypes {
-            release {
-                minifyEnabled true
-                proguardFile 'proguard-files/proguard-rules.pro'
-                proguardFile 'proguard-files/proguard-butterknife.pro'
-                proguardFile 'proguard-files/proguard-glide.pro'
-                proguardFile 'proguard-files/proguard-google-play-services.pro'
-                proguardFile 'proguard-files/proguard-gson.pro'
-                proguardFile 'proguard-files/proguard-maps-utils.pro'
-                proguardFile 'proguard-files/proguard-prettytime.pro'
-                proguardFile 'proguard-files/proguard-rxjava.pro'
-                proguardFile 'proguard-files/proguard-sentry.pro'
-                proguardFile 'proguard-files/proguard-square-retrofit.pro'
-                proguardFile 'proguard-files/proguard-support-v7-appcompat.pro'
-                proguardFile getDefaultProguardFile('proguard-android.txt')
-                signingConfig signingConfigs.flowRelease
-            }
-        }
     }
 
     buildTypes {
@@ -105,8 +86,40 @@ android {
             it.buildConfigField "String", "SIGNING_KEY", "\"\""
             it.buildConfigField "String", "BUILD_YEAR", "\"${buildYear}\""
         }
+
+        release {
+            minifyEnabled true
+            proguardFile 'proguard-files/proguard-rules.pro'
+            proguardFile 'proguard-files/proguard-butterknife.pro'
+            proguardFile 'proguard-files/proguard-glide.pro'
+            proguardFile 'proguard-files/proguard-google-play-services.pro'
+            proguardFile 'proguard-files/proguard-gson.pro'
+            proguardFile 'proguard-files/proguard-maps-utils.pro'
+            proguardFile 'proguard-files/proguard-prettytime.pro'
+            proguardFile 'proguard-files/proguard-rxjava.pro'
+            proguardFile 'proguard-files/proguard-sentry.pro'
+            proguardFile 'proguard-files/proguard-square-retrofit.pro'
+            proguardFile 'proguard-files/proguard-support-v7-appcompat.pro'
+            proguardFile getDefaultProguardFile('proguard-android.txt')
+            signingConfig signingConfigs.flowRelease
+        }
         debug {
             ext.enableCrashlytics = false
+            minifyEnabled true
+            multiDexEnabled true
+            useProguard false
+            proguardFile 'proguard-files/proguard-rules.pro'
+            proguardFile 'proguard-files/proguard-butterknife.pro'
+            proguardFile 'proguard-files/proguard-glide.pro'
+            proguardFile 'proguard-files/proguard-google-play-services.pro'
+            proguardFile 'proguard-files/proguard-gson.pro'
+            proguardFile 'proguard-files/proguard-maps-utils.pro'
+            proguardFile 'proguard-files/proguard-prettytime.pro'
+            proguardFile 'proguard-files/proguard-rxjava.pro'
+            proguardFile 'proguard-files/proguard-sentry.pro'
+            proguardFile 'proguard-files/proguard-square-retrofit.pro'
+            proguardFile 'proguard-files/proguard-support-v7-appcompat.pro'
+            proguardFile getDefaultProguardFile('proguard-android.txt')
         }
     }
 
@@ -195,6 +208,7 @@ dependencies {
     implementation "com.android.support:recyclerview-v7:${rootProject.ext.supportVersion}"
     implementation "com.android.support:support-annotations:${rootProject.ext.supportVersion}"
     implementation "com.android.support:design:${rootProject.ext.supportVersion}"
+    implementation 'com.android.support.constraint:constraint-layout:1.1.3'
     implementation 'com.google.android.gms:play-services-maps:7.5.0'
     implementation 'com.google.android.gms:play-services-gcm:7.5.0'
     implementation 'org.ocpsoft.prettytime:prettytime:3.2.4.Final'

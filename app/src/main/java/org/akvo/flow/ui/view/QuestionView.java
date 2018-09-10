@@ -47,7 +47,6 @@ import org.akvo.flow.event.QuestionInteractionListener;
 import org.akvo.flow.event.SurveyListener;
 import org.akvo.flow.injector.component.ApplicationComponent;
 import org.akvo.flow.util.ConstantUtil;
-import org.akvo.flow.util.PlatformUtil;
 import org.akvo.flow.util.ViewUtil;
 
 import java.util.ArrayList;
@@ -78,8 +77,9 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
     public QuestionView(final Context context, Question q, SurveyListener surveyListener) {
         super(context);
         setOrientation(VERTICAL);
-        final int padding = (int) PlatformUtil.dp2Pixel(getContext(), PADDING_DIP);
-        setPadding(padding, padding, padding, padding);
+        final int topBottomPadding = (int)getResources().getDimension(R.dimen.small_padding);
+        final int leftRightPadding = (int)getResources().getDimension(R.dimen.form_left_right_padding);
+        setPadding(leftRightPadding, topBottomPadding, leftRightPadding, topBottomPadding);
         if (sColors == null) {
             // must have enough colors for all enabled languages
             sColors = context.getResources().getStringArray(R.array.colors);

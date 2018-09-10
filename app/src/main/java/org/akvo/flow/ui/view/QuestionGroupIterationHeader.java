@@ -51,11 +51,11 @@ public class QuestionGroupIterationHeader extends android.support.v7.widget.AppC
         mTitle = title;
         mListener = listener;
 
-        int paddingTopBottom = (int)getResources().getDimension(R.dimen.group_iteration_padding);
+        int paddingTopBottom = (int)getResources().getDimension(R.dimen.small_padding);
         paddingLeftRight = (int)getResources().getDimension(R.dimen.form_left_right_padding);
         setCompoundDrawablePadding(paddingTopBottom);
         setPadding(paddingLeftRight, paddingTopBottom, paddingLeftRight, paddingTopBottom);
-        
+
         setTextSize(20);
         setTextColor(ContextCompat.getColor(context, R.color.repetitions_text_color));
         setBackgroundColor(ContextCompat.getColor(context, R.color.background_alternate));
@@ -111,5 +111,4 @@ public class QuestionGroupIterationHeader extends android.support.v7.widget.AppC
                 - (paddingLeftRight * 2);
         return event.getRawX() > x;
     }
-
 }

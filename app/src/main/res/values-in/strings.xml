@@ -6,8 +6,6 @@
   <string name="lowcardspacetitle">Media Penyimpanan Menipis</string>
   <string name="nocardspacedialog">Memori SD card penuh dan tidak bisa digunakan untuk menyimpan data. Untuk melanjutkan, hapus atau kosongi memori tersebut.</string>
   <string name="lowcardspacedialog">Anda mempunyai %%% MB dari total kapasitas memori pada piranti ini. Saat memori penuh, anda tidak dapat lagi mengumpulkan data.</string>
-  <string name="takephoto">Ambil Foto</string>
-  <string name="takevideo">Ambil Video</string>
   <string name="getgeo">Periksa Koordinat GPS</string>
   <string name="lat">Garis Lintang</string>
   <string name="lon">Garis Bujur</string>
@@ -70,12 +68,8 @@
   <string name="clear_data_success">Data telah dihapus dari perangkat secara sukses.</string>
   <string name="clear_data_error">Ada kesalahan dalam menghapus data dari perangkat</string>
   <string name="search">Cari</string>
-  <string name="download">Sinkronisasi</string>
   <string name="sort">Sortir</string>
   <string name="stats">Statistik</string>
-  <string name="data_points_sync_error_message_network">Sinkronisasi gagal. Tidak ada koneksi.</string>
-  <string name="data_points_sync_error_message_assignment">Sinkronisasi gagal. Penugasan tidak ditemukan.</string>
-  <string name="data_points_sync_error_message_default">Sinkronisasi gagal</string>
   <string name="prefill_title">Mengisi respons awal</string>
   <string name="prefill_text">Mengisi formulir dengan jawaban sebelumnya?</string>
   <!--Data sync-->
@@ -147,7 +141,6 @@
   <!--Form & transmission status-->
   <string name="status_queued">Dalam antrian</string>
   <string name="status_in_progress">Dalam proses</string>
-  <string name="status_uploaded">Tersinkronisasi</string>
   <string name="status_failed">Gagal</string>
   <string name="status_saved">Tersimpan</string>
   <string name="status_submitted">Terkirim</string>
@@ -237,7 +230,6 @@
   <string name="preference_app_language">Bahasa aplikasi</string>
   <string name="preference_image_size">Ukuran gambar</string>
   <string name="preferences_data_section">Data</string>
-  <string name="preference_sync_datapoints">Kirim titik data yang terkumpul ke sistem Flow</string>
   <string name="preference_delete_collected_data">Hapus data dan gambar yang telah dikumpulkan</string>
   <string name="preference_delete_everything">Hapus semua</string>
   <string name="preferences_configuration_section">Konfigurasi</string>
@@ -248,14 +240,9 @@
   <string name="preference_instance_name">Nama instansi</string>
   <string name="data_points_sync_error_mobile_data_sync">Sinkronisasi data perangkat dimatikan</string>
   <string name="action_settings">Pengaturan</string>
-  <string name="no_records_subtitle_monitored">Tekan \'+\' untuk menambahkan data baru atau \'Sinkroninasi\' untuk mengambil data dari server.</string>
   <string name="no_records_subtitle_non_monitored">Gunakan \'+\' untuk merekam data.</string>
   <!--Verify if this works for transifex-->
-  <plurals name="data_points_sync_success_message">
-    <item quantity="other">%1$d poin data tersinkronisasi</item>
-  </plurals>
   <string name="no_gps_status_message">Aplikasi GPS Status tidak terpasang di perangkat ini. Apakah anda mau memasangnya?</string>
-  <string name="data_points_sync_no_data_points">Tidak ada poin data untuk disinkronisasi</string>
   <string name="app_update_dialog_title">Versi Akvo Flow terbaru tersedia</string>
   <string name="app_update_dialog_subtitle">Perbarui aplikasi Akvo Flow anda untuk mendapatkan fungsi terkini</string>
   <string name="error_getting_media">Terdapat kesalahan mengunduh media, silakan coba lagi.</string>

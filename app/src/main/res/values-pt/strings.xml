@@ -8,8 +8,6 @@ Sem espaço para armazenamento
   <string name="lowcardspacetitle">Pouco espaço de armazenamento</string>
   <string name="nocardspacedialog">O cartão de memória do dispositivo está cheio e você não poderá colectar mais dados. Para continuar, você deve limpar o espaço no cartão de memória.</string>
   <string name="lowcardspacedialog">Você tem %%% MB de espaço de armazenamento no cartão de memória deste dispositivo. Uma vez que o cartão está cheio, não poderá mais colectar dados.</string>
-  <string name="takephoto">Tirar foto</string>
-  <string name="takevideo">Fazer vídeo</string>
   <string name="getgeo">Verificar Geo Localização</string>
   <string name="lat">Lat</string>
   <string name="lon">Long</string>
@@ -72,12 +70,8 @@ Sem espaço para armazenamento
   <string name="clear_data_success">Dados apagados do dispositivo com sucesso </string>
   <string name="clear_data_error">Erro ao apagar os dados do dispositivo</string>
   <string name="search">Procurar</string>
-  <string name="download">Sincronizar</string>
   <string name="sort">Ordenar</string>
   <string name="stats">Estatísticas</string>
-  <string name="data_points_sync_error_message_network"> Falhou a sincronização. Não tem conexão.</string>
-  <string name="data_points_sync_error_message_assignment"> Falhou a sincronização. Falta Atribuição.</string>
-  <string name="data_points_sync_error_message_default"> Falhou a sincronização</string>
   <string name="prefill_title">Preencher novamente as respostas</string>
   <string name="prefill_text">Preencher antecipadamente o formulário com respostas anteriores?</string>
   <!--Data sync-->
@@ -151,7 +145,6 @@ Sem espaço para armazenamento
   <!--Form & transmission status-->
   <string name="status_queued">Em espera</string>
   <string name="status_in_progress">Em progresso</string>
-  <string name="status_uploaded">Sincronizado</string>
   <string name="status_failed">Falhou</string>
   <string name="status_saved">Gravado</string>
   <string name="status_submitted">Submetido</string>
@@ -244,7 +237,6 @@ Sem espaço para armazenamento
   <string name="preference_app_language">Idioma da Aplicação </string>
   <string name="preference_image_size">Tamanho das imagens</string>
   <string name="preferences_data_section">Dados</string>
-  <string name="preference_sync_datapoints">Enviar pontos de dados submetidos para a instância de Flow</string>
   <string name="preference_delete_collected_data">Deletar imagens e dados colectados</string>
   <string name="preference_delete_everything">Deletar tudo</string>
   <string name="preferences_configuration_section">Configuração</string>
@@ -255,13 +247,8 @@ Sem espaço para armazenamento
   <string name="preference_instance_name">Nome da instância</string>
   <string name="data_points_sync_error_mobile_data_sync">Sincronização de dados móveis desativada</string>
   <string name="action_settings">Configurações</string>
-  <string name="no_records_subtitle_monitored">Use \'+\' para capturar dados ou \'Sincronizar\' para obter dados existentes</string>
   <string name="no_records_subtitle_non_monitored">Use \'+\' para capturar dados</string>
   <!--Verify if this works for transifex-->
-  <plurals name="data_points_sync_success_message">
-    <item quantity="one">%1$d punto de dados sincronizado</item>
-    <item quantity="other">%1$d puntos de dados sincronizados</item>
-  </plurals>
   <string name="surveys_error">Erro ao carregar pesquisas</string>
   <string name="users_error">Erro ao carregar usuários</string>
   <string name="survey_delete_error">Erro ao excluir a pesquisa</string>
@@ -272,7 +259,6 @@ Sem espaço para armazenamento
   <string name="add_user_message">O novo usuário será selecionado automaticamente</string>
   <string name="survey">pesquisa</string>
   <string name="no_gps_status_message">O aplicativo estado do GPS não está instalado neste dispositivo. Deseja instalar-o agora?</string>
-  <string name="data_points_sync_no_data_points">Não ha pontos de dados para sincronizar</string>
   <string name="app_update_dialog_title">Uma nova versão do aplicativo esá disponível</string>
   <string name="app_update_dialog_subtitle">Atualize para tirar o máximo proveito do seu aplicativo Flow</string>
   <string name="error_getting_media">Erro ao obter mídia, tente novamente.</string>

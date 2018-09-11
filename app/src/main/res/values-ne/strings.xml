@@ -6,8 +6,6 @@
   <string name="lowcardspacetitle">डाटाको ठाउँ कम छ</string>
   <string name="nocardspacedialog">एस डि कार्ड भरिएको हुनाले डाटा सकंलन गर्न मिल्दैन। डाटा सकंलन गर्न कार्डबाट केही हटाएर खाली ठाउँ बनाउनु होला।  </string>
   <string name="lowcardspacedialog">तपाईं सँग एस डि कार्डमा %%% MB मात्र खाली ठाउँ छ। एकपल्ट एस डि कार्ड भरिए पछि डाटा सकंलन गर्न मिल्ने छैन। </string>
-  <string name="takephoto">फोटो लिनुहोस्</string>
-  <string name="takevideo">भिडियो लिनुहोस्</string>
   <string name="getgeo">जि.पि.एस् स्थान जाँच्नुहोस्</string>
   <string name="lat">अक्षांश</string>
   <string name="lon">देशान्तर</string>
@@ -68,7 +66,6 @@
   <string name="clear_data_success">डिभाइसबाट डाटा सफलतापुर्वक हटाइयो।</string>
   <string name="clear_data_error">डिभाइसबाट डाटा हटाउन त्रुटि भएको छ। </string>
   <string name="search">खोजी गर्नुहोस्</string>
-  <string name="download">सिन्क गर्नुहोस्</string>
   <string name="sort">क्रममा मिलाउनुहोस्</string>
   <string name="stats">तथ्यान्क</string>
   <string name="prefill_title">पहिले नै भरिएका उतरहरु</string>
@@ -136,7 +133,6 @@
   <!--Form & transmission status-->
   <string name="status_queued">लाममा छ</string>
   <string name="status_in_progress">सफल हुन सकेन।</string>
-  <string name="status_uploaded">सिँक सफल भयो।</string>
   <string name="status_failed">सफल हुन सकेन।</string>
   <string name="status_saved">सेभ भयो।</string>
   <string name="status_submitted">बुझाईयो।</string>
@@ -216,7 +212,6 @@
   <string name="preference_app_language">एप्पको भाषा</string>
   <string name="preference_image_size">फोटोको साइज</string>
   <string name="preferences_data_section">डाटा</string>
-  <string name="preference_sync_datapoints">बुझाईएका डाटा प्वाइन्टहरु फ्लो इन्स्ट्यान्स् मा पठाउनुहोस्</string>
   <string name="preference_delete_collected_data">सन्कलन गरिएका डाटा र फोटोहरु हटाउनुहोस्</string>
   <string name="preference_delete_everything">सबै हटाउनुहोस्</string>
   <string name="preferences_configuration_section">कन्फिगरेसन् </string>
@@ -227,10 +222,8 @@
   <string name="preference_instance_name">इन्स्ट्यान्स् को नाम</string>
   <string name="data_points_sync_error_mobile_data_sync">मोबाइल डाटा सिन्क बन्द गरिएको छ</string>
   <string name="action_settings">सेटिङ्स्</string>
-  <string name="no_records_subtitle_monitored">डाटा संकलनको लागि \'+\' को प्रयोग गर्नुहोस् अथवा हालको डाटा प्राप्त गर्नका लागि \'सिन्क\' छान्नुहोस्</string>
   <string name="no_records_subtitle_non_monitored">डाटा संकलनको लागि \'+\' को प्रयोग गर्नुहोस्</string>
   <!--Verify if this works for transifex-->
-  <string name="data_points_sync_no_data_points">सिन्क गर्न कुनै डाटा प्वाइन्ट छैन</string>
   <string name="app_update_dialog_title">नयाँ फ्लो भर्सन उपलब्ध छ</string>
   <string name="app_update_dialog_subtitle">आफ्नो फ्लो एप्पको अधिकतम प्रयोग गर्न एप्प अप्डेट गर्नुहोस्</string>
 </resources>

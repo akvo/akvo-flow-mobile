@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <merge xmlns:android="http://schemas.android.com/apk/res/android"
-                                             xmlns:app="http://schemas.android.com/apk/res-auto"
-                                             xmlns:tools="http://schemas.android.com/tools"
-                                             android:layout_width="match_parent"
-                                             android:layout_height="match_parent"
-                                             android:id="@+id/relativeLayout">
+       xmlns:app="http://schemas.android.com/apk/res-auto"
+       xmlns:tools="http://schemas.android.com/tools"
+       android:layout_width="match_parent"
+       android:layout_height="match_parent"
+       android:id="@+id/relativeLayout">
 
     <TextView
             android:id="@+id/repeat_header"
@@ -31,7 +31,7 @@
             app:layout_constraintTop_toBottomOf="@id/repeat_header"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintBottom_toTopOf="@+id/repeat_btn_layout">
+            app:layout_constraintBottom_toTopOf="@id/repeat_btn_layout">
 
         <LinearLayout
                 android:id="@+id/question_list"
@@ -48,7 +48,7 @@
             tools:visibility="visible"
             android:layout_width="match_parent"
             android:layout_height="88dp"
-            app:layout_constraintBottom_toTopOf="@+id/include">
+            app:layout_constraintBottom_toTopOf="@id/include">
 
         <Button
                 android:id="@+id/repeat_btn"
@@ -69,7 +69,7 @@
             android:layout_height="1dp"
             android:layout_width="match_parent"
             android:id="@+id/include"
-            app:layout_constraintBottom_toTopOf="@+id/next_btn"/>
+            app:layout_constraintBottom_toTopOf="@id/next_btn"/>
 
     <Button
             android:id="@+id/next_btn"
@@ -78,13 +78,13 @@
             android:text="@string/nextbutton"
             style="@style/PrimaryButtonStyle"
             android:theme="@style/GreyButtonTheme"
-            android:layout_marginBottom="8dp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginEnd="8dp"
-            android:layout_marginRight="8dp"
             app:layout_constraintStart_toStartOf="parent"
-            android:layout_marginLeft="8dp"
-            android:layout_marginStart="8dp"/>
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginBottom="@dimen/form_left_right_padding"
+            android:layout_marginEnd="@dimen/form_left_right_padding"
+            android:layout_marginRight="@dimen/form_left_right_padding"
+            android:layout_marginLeft="@dimen/form_left_right_padding"
+            android:layout_marginStart="@dimen/form_left_right_padding"/>
 
 </merge>

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -54,6 +54,7 @@ import org.junit.runner.RunWith;
 
 import java.text.DecimalFormat;
 
+import static android.support.test.espresso.Espresso.closeSoftKeyboard;
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.action.ViewActions.replaceText;
@@ -117,14 +118,16 @@ public class LockedGeoQuestionViewTest {
     }
 
     @Test
-    public void ensureGeoQuestionProgressDisplayedOnButtonClick() throws Exception {
+    public void ensureGeoQuestionProgressDisplayedOnButtonClick() {
+        closeSoftKeyboard();
         clickGeoButton();
 
         verifyProgressDisplayed();
     }
 
     @Test
-    public void ensureErrorSnackBarDisplayedUponTimeout() throws Exception {
+    public void ensureErrorSnackBarDisplayedUponTimeout() {
+        closeSoftKeyboard();
         clickGeoButton();
 
         simulateLocationTimeout();
@@ -133,7 +136,7 @@ public class LockedGeoQuestionViewTest {
     }
 
     @Test
-    public void ensureSnackBarRetryShowsProgress() throws Exception {
+    public void ensureSnackBarRetryShowsProgress() {
         clickGeoButton();
 
         simulateLocationTimeout();
@@ -144,7 +147,7 @@ public class LockedGeoQuestionViewTest {
     }
 
     @Test
-    public void ensureLocationValuesDisplayedCorrectly() throws Exception {
+    public void ensureLocationValuesDisplayedCorrectly() {
         clickGeoButton();
         addExecutionDelay(100);
         provideMockLocation(MOCK_ACCURACY_ACCURATE);
@@ -157,7 +160,7 @@ public class LockedGeoQuestionViewTest {
     }
 
     @Test
-    public void ensureLocationValuesDisplayedCorrectlyIfInAccurate() throws Exception {
+    public void ensureLocationValuesDisplayedCorrectlyIfInAccurate() {
         clickGeoButton();
         addExecutionDelay(100);
 
@@ -168,10 +171,12 @@ public class LockedGeoQuestionViewTest {
     }
 
     @Test
-    public void ensureFieldsResetWhenGeoButtonPress() throws Exception {
+    public void ensureFieldsResetWhenGeoButtonPress() {
         onView(withId(R.id.lat_et)).perform(replaceText(MOCK_LATITUDE + ""));
         onView(withId(R.id.lon_et)).perform(replaceText(MOCK_LONGITUDE + ""));
         onView(withId(R.id.height_et)).perform(replaceText(MOCK_ALTITUDE + ""));
+        closeSoftKeyboard();
+
         ViewInteraction accuracyTv = onView(withId(R.id.acc_tv));
         accuracyTv.perform(replaceTextInTextView(getString(R.string.geo_location_accuracy, rule,
                 accuracyFormat.format(MOCK_ACCURACY_ACCURATE))));
@@ -192,6 +197,7 @@ public class LockedGeoQuestionViewTest {
         onView(withId(R.id.lat_et)).perform(replaceText(""));
         onView(withId(R.id.lon_et)).perform(replaceText(""));
         onView(withId(R.id.height_et)).perform(replaceText(""));
+        closeSoftKeyboard();
 
         clickGeoButton();
         addExecutionDelay(100);

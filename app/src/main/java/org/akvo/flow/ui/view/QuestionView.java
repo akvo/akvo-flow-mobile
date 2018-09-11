@@ -55,7 +55,6 @@ import java.util.Map;
 import java.util.StringTokenizer;
 
 public abstract class QuestionView extends LinearLayout implements QuestionInteractionListener {
-    private static final int PADDING_DIP = 8;
     protected static String[] sColors = null;
     final ErrorMessageFormatter errorMessageFormatter = new ErrorMessageFormatter();
 
@@ -77,8 +76,8 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
     public QuestionView(final Context context, Question q, SurveyListener surveyListener) {
         super(context);
         setOrientation(VERTICAL);
-        final int topBottomPadding = (int)getResources().getDimension(R.dimen.small_padding);
-        final int leftRightPadding = (int)getResources().getDimension(R.dimen.form_left_right_padding);
+        final int topBottomPadding = getDimension(R.dimen.small_padding);
+        final int leftRightPadding = getDimension(R.dimen.form_left_right_padding);
         setPadding(leftRightPadding, topBottomPadding, leftRightPadding, topBottomPadding);
         if (sColors == null) {
             // must have enough colors for all enabled languages
@@ -87,7 +86,11 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
         mQuestion = q;
         setTag(q.getId());
         mSurveyListener = surveyListener;
-        mError = null;// so far so good.
+        mError = null;
+    }
+
+    private int getDimension(int resId) {
+        return (int) getResources().getDimension(resId);
     }
 
     /**

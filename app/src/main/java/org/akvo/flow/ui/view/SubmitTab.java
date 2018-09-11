@@ -57,14 +57,12 @@ public class SubmitTab extends ListView implements OnClickListener {
         }
         mListener = (SurveyListener) context;
         setId(R.id.submit_tab);
-        final int listPadding = (int)getResources().getDimension(R.dimen.form_left_right_padding);
+        final int listPadding = (int) getResources().getDimension(R.dimen.form_left_right_padding);
         setPadding(listPadding, 0, listPadding, listPadding);
 
-        mHeaderView = (TextView) LayoutInflater.from(context)
-                .inflate(R.layout.submit_tab_header, this, false);
+        mHeaderView = (TextView) inflate(context, R.layout.submit_tab_header);
 
-        mSubmitButton = (Button) LayoutInflater.from(context)
-                .inflate(R.layout.submit_tab_footer, this, false);
+        mSubmitButton = (Button) inflate(context, R.layout.submit_tab_footer);
         mSubmitButton.setOnClickListener(this);
 
         addHeaderView(mHeaderView);
@@ -72,6 +70,10 @@ public class SubmitTab extends ListView implements OnClickListener {
         adapter = new QuestionListAdapter();
         setAdapter(adapter);
         refresh(adapter.questions);
+    }
+
+    private View inflate(Context context, int layoutResId) {
+        return LayoutInflater.from(context).inflate(layoutResId, this, false);
     }
 
     public void refresh(List<Question> invalidQuestions) {

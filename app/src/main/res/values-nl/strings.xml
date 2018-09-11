@@ -6,8 +6,6 @@
   <string name="lowcardspacetitle">Weinig opslagruimte</string>
   <string name="nocardspacedialog">De SD kaart in dit apparaat is vol en kan niet langer data opslaan. U dient ruimte op de SD kaart vrij te maken om verder te gaan.</string>
   <string name="lowcardspacedialog">U heeft  %%%  MB opslagruimte over op de SD kaart in dit apparaat. Als de kaart vol is, kunt u niet langer data verzamelen.</string>
-  <string name="takephoto">Neem een foto</string>
-  <string name="takevideo">Neem een video op</string>
   <string name="getgeo">Controleer geolocatie</string>
   <string name="lat">Breedtegraad</string>
   <string name="lon">Lengtegraad</string>
@@ -69,12 +67,8 @@
   <string name="clear_data_success">Data succesvol verwijderd van het apparaat</string>
   <string name="clear_data_error">Fout bij het verwijderen van data van het apparaat</string>
   <string name="search">Zoek</string>
-  <string name="download">Synchroniseer </string>
   <string name="sort">Sorteer</string>
   <string name="stats">Statistieken</string>
-  <string name="data_points_sync_error_message_network"> Synchronisatie mislukt. Geen verbinding.</string>
-  <string name="data_points_sync_error_message_assignment"> Synchronisatie mislukt. Toewijzing ontbreekt.</string>
-  <string name="data_points_sync_error_message_default"> Synchronisatie mislukt.</string>
   <string name="prefill_title">Vooraf invullen antwoorden</string>
   <string name="prefill_text">Vul het formulier in met eerder gegeven antwoorden?</string>
   <!--Data sync-->
@@ -145,7 +139,6 @@
   <!--Form & transmission status-->
   <string name="status_queued">In de rij gezet</string>
   <string name="status_in_progress">In behandeling</string>
-  <string name="status_uploaded">Gesynchroniseerd</string>
   <string name="status_failed">Mislukt</string>
   <string name="status_saved">Opgeslagen</string>
   <string name="status_submitted">Ingediend</string>
@@ -234,7 +227,6 @@
   <string name="preference_app_language">Taal van de app</string>
   <string name="preference_image_size">Grootte van de afbeelding</string>
   <string name="preferences_data_section">Data</string>
-  <string name="preference_sync_datapoints">Stuur ingediende data punten naar Flow instance</string>
   <string name="preference_delete_collected_data">Verwijder verzamelde data en afbeeldingen</string>
   <string name="preference_delete_everything">Verwijder alles</string>
   <string name="preferences_configuration_section">Configuratie</string>
@@ -245,15 +237,9 @@
   <string name="preference_instance_name">Naam van de instance</string>
   <string name="data_points_sync_error_mobile_data_sync">Mobiele data synchronisatie uitgeschakeld.</string>
   <string name="action_settings">Instellingen</string>
-  <string name="no_records_subtitle_monitored"> Gebruik \'+\" om data te verzamelen of \"synchroniseer\" om bestaande data te zien.</string>
   <string name="no_records_subtitle_non_monitored"> Gebruik \'+\" om data te verzamelen.</string>
   <!--Verify if this works for transifex-->
-  <plurals name="data_points_sync_success_message">
-    <item quantity="one">%1$d data punt gesynchroniseerd</item>
-    <item quantity="other">%1$d data punten gesynchroniseerd</item>
-  </plurals>
   <string name="no_gps_status_message"> GPS status is niet geinstalleerd op dit apparaat. Wilt u het installeren?</string>
-  <string name="data_points_sync_no_data_points"> Geen datapunten om te synchroniseren.</string>
   <string name="app_update_dialog_title"> Nieuwe versie van Flow beschikbaar.</string>
   <string name="app_update_dialog_subtitle"> Update om het maximale uit uw Flow app te halen.</string>
 </resources>

@@ -6,8 +6,6 @@
   <string name="lowcardspacetitle">Bộ nhớ trong sắp đầy dữ liệu</string>
   <string name="nocardspacedialog">Thẻ nhớ của thiết bị này đã đầy dữ liệu và bạn không thể thu thập thêm dữ liệu. Bạn phải xóa bớt dữ liệu trên thẻ nhớ để có thể tiếp tục lưu trữ dữ liệu khác</string>
   <string name="lowcardspacedialog">Bạn còn %%% MB không gian lưu trữ dữ liệu trên thẻ nhớ của thiết bị này. Ngay khi thẻ nhớ đầy dữ liệu, bạn sẽ không thể thu thập thêm dữ liệu</string>
-  <string name="takephoto">Chụp ảnh</string>
-  <string name="takevideo">Quay video</string>
   <string name="getgeo">Kiểm tra tọa độ địa lý</string>
   <string name="lat">Vĩ độ</string>
   <string name="lon">Kinh độ</string>
@@ -67,7 +65,6 @@
   <string name="clear_data_success">Dữ liệu đã được xóa khỏi thiết bị</string>
   <string name="clear_data_error">Lỗi xảy ra trong quá trình xóa dữ liệu khỏi thiết bị</string>
   <string name="search">Search</string>
-  <string name="download">Đồng bộ hóa dữ liệu</string>
   <string name="sort">Sắp xếp theo</string>
   <string name="stats">Thống kê điều tra</string>
   <string name="prefill_title">Những câu trả lời trước đây</string>
@@ -137,7 +134,6 @@
   <!--Form & transmission status-->
   <string name="status_queued">Sắp xếp</string>
   <string name="status_in_progress">Đang được tiến hành</string>
-  <string name="status_uploaded">Đã đồng bộ hóa</string>
   <string name="status_failed">Bị lỗi</string>
   <string name="status_saved">Đã lưu</string>
   <string name="status_submitted">Đã đệ trình</string>
@@ -226,7 +222,6 @@
   <string name="preference_app_language">Ngôn ngữ ứng dụng</string>
   <string name="preference_image_size">Kích thước ảnh</string>
   <string name="preferences_data_section">Dữ liệu</string>
-  <string name="preference_sync_datapoints">Chuyển dữ liệu đã đệ trình tới trường Flow</string>
   <string name="preference_delete_collected_data">Xóa những hình ảnh và dữ liệu đã thu thập</string>
   <string name="preference_delete_everything">Xóa tất cả mọi thứ. Hình ảnh, dữ liệu và bộ câu hỏi.</string>
   <string name="preferences_configuration_section">Cấu hình</string>

@@ -90,7 +90,6 @@ public class QuestionGroupTab extends ConstraintLayout implements QuestionGroupI
     }
 
     private void init() {
-        //setOrientation(VERTICAL);
         setDescendantFocusability(FOCUS_BEFORE_DESCENDANTS);
         setFocusable(true);
         setFocusableInTouchMode(true);

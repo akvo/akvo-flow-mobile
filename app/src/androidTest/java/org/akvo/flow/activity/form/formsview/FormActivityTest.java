@@ -44,7 +44,6 @@ import org.akvo.flow.ui.view.CaddisflyQuestionView;
 import org.akvo.flow.ui.view.CascadeQuestionView;
 import org.akvo.flow.ui.view.GeoshapeQuestionView;
 import org.akvo.flow.ui.view.QuestionGroupTab;
-import org.akvo.flow.ui.view.QuestionHeaderView;
 import org.akvo.flow.ui.view.QuestionView;
 import org.akvo.flow.ui.view.SubmitTab;
 import org.akvo.flow.ui.view.barcode.BarcodeQuestionViewMultiple;
@@ -181,7 +180,6 @@ public class FormActivityTest {
         } else {
             ViewInteraction submitTabHeader = onView(withId(R.id.submit_tab_header));
             submitTabHeader.check(matches(withText(R.string.error_responses)));
-            verifyErrorFields(mandatoryQuestions);
         }
 
         DataInteraction submitButton = onData(isFooter()).inAdapterView(withId(R.id.submit_tab));
@@ -191,27 +189,6 @@ public class FormActivityTest {
 
     private Matcher<Object> isFooter() {
         return allOf(is(instanceOf(String.class)), Matchers.<Object>is(SubmitTab.FOOTER));
-    }
-
-    private void verifyErrorFields(List<Question> mandatoryQuestions) {
-        for (Question question : mandatoryQuestions) {
-            verifyQuestionErrorTip(question);
-            verifyQuestionErrorEditButton(question);
-        }
-    }
-
-    private void verifyQuestionErrorEditButton(Question question) {
-        ViewInteraction questionHelpTip = onView(allOf(withId(R.id.invalid_question_open_btn),
-                withQuestionViewParent(question, QuestionHeaderView.class)));
-        questionHelpTip.check(matches(allOf(isDisplayed(), isEnabled())));
-    }
-
-    private void verifyQuestionErrorTip(Question question) {
-        if (question.getHelpTypeCount() > 0) {
-            ViewInteraction questionHelpTip = onView(allOf(withId(R.id.tip_ib),
-                    withQuestionViewParent(question, QuestionHeaderView.class)));
-            questionHelpTip.check(matches(allOf(isDisplayed(), isEnabled())));
-        }
     }
 
     private void verifyQuestionDisplayed(Question question, int questionPosition) {

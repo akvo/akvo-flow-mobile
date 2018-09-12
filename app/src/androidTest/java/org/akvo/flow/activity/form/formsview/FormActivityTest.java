@@ -44,7 +44,6 @@ import org.akvo.flow.ui.view.CaddisflyQuestionView;
 import org.akvo.flow.ui.view.CascadeQuestionView;
 import org.akvo.flow.ui.view.GeoshapeQuestionView;
 import org.akvo.flow.ui.view.QuestionGroupTab;
-import org.akvo.flow.ui.view.QuestionHeaderView;
 import org.akvo.flow.ui.view.QuestionView;
 import org.akvo.flow.ui.view.SubmitTab;
 import org.akvo.flow.ui.view.barcode.BarcodeQuestionViewMultiple;
@@ -81,6 +80,7 @@ import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withTagValue;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static org.akvo.flow.activity.ChildPositionMatcher.childAtPosition;
+import static org.akvo.flow.activity.form.FormActivityTestUtil.getCameraButton;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.getDateButton;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.getDateEditText;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.getDoubleEntryInput;
@@ -88,9 +88,7 @@ import static org.akvo.flow.activity.form.FormActivityTestUtil.getFormActivityIn
 import static org.akvo.flow.activity.form.FormActivityTestUtil.getFreeTextInput;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.getGalleryButton;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.getGeoButton;
-import static org.akvo.flow.activity.form.FormActivityTestUtil.getCameraButton;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.getOptionView;
-import static org.akvo.flow.activity.form.FormActivityTestUtil.getQuestionHeader;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.selectAndVerifyTab;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.verifyAccuracyLabel;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.verifyDoubleEntryTitle;
@@ -182,7 +180,6 @@ public class FormActivityTest {
         } else {
             ViewInteraction submitTabHeader = onView(withId(R.id.submit_tab_header));
             submitTabHeader.check(matches(withText(R.string.error_responses)));
-            verifyErrorFields(mandatoryQuestions);
         }
 
         DataInteraction submitButton = onData(isFooter()).inAdapterView(withId(R.id.submit_tab));
@@ -192,35 +189,6 @@ public class FormActivityTest {
 
     private Matcher<Object> isFooter() {
         return allOf(is(instanceOf(String.class)), Matchers.<Object>is(SubmitTab.FOOTER));
-    }
-
-    private void verifyErrorFields(List<Question> mandatoryQuestions) {
-        for (Question question : mandatoryQuestions) {
-            verifyQuestionErrorHeader(question);
-            verifyQuestionErrorTip(question);
-            verifyQuestionErrorEditButton(question);
-        }
-    }
-
-    private void verifyQuestionErrorEditButton(Question question) {
-        ViewInteraction questionHelpTip = onView(allOf(withId(R.id.invalid_question_open_btn),
-                withQuestionViewParent(question, QuestionHeaderView.class)));
-        questionHelpTip.check(matches(allOf(isDisplayed(), isEnabled())));
-    }
-
-    private void verifyQuestionErrorTip(Question question) {
-        if (question.getHelpTypeCount() > 0) {
-            ViewInteraction questionHelpTip = onView(allOf(withId(R.id.tip_ib),
-                    withQuestionViewParent(question, QuestionHeaderView.class)));
-            questionHelpTip.check(matches(allOf(isDisplayed(), isEnabled())));
-        }
-    }
-
-    private void verifyQuestionErrorHeader(Question question) {
-        String questionHeader = getQuestionHeader(question);
-        ViewInteraction questionHeaderView = onView(allOf(withId(R.id.question_tv),
-                withQuestionViewParent(question, QuestionHeaderView.class)));
-        questionHeaderView.check(matches(allOf(isDisplayed(), withText(questionHeader))));
     }
 
     private void verifyQuestionDisplayed(Question question, int questionPosition) {

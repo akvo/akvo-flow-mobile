@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015-2017 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2015-2018 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -23,12 +23,10 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.drawable.Drawable;
 import android.support.v4.content.ContextCompat;
-import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
 
 import org.akvo.flow.R;
-import org.akvo.flow.util.PlatformUtil;
 import org.akvo.flow.util.ViewUtil;
 
 public class QuestionGroupIterationHeader extends android.support.v7.widget.AppCompatTextView
@@ -37,6 +35,7 @@ public class QuestionGroupIterationHeader extends android.support.v7.widget.AppC
     private String mTitle;
     private int mID, mPosition;
     private OnDeleteListener mListener;
+    private final int paddingLeftRight;
 
     public interface OnDeleteListener {
 
@@ -52,18 +51,26 @@ public class QuestionGroupIterationHeader extends android.support.v7.widget.AppC
         mTitle = title;
         mListener = listener;
 
-        int padding = (int) PlatformUtil.dp2Pixel(context, 8);
-        setPadding(padding, padding, padding, padding);
-        setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
-        setText(mTitle + " - " + pos);
+        int paddingTopBottom = getDimension(R.dimen.small_padding);
+        paddingLeftRight = getDimension(R.dimen.form_left_right_padding);
+        setCompoundDrawablePadding(paddingTopBottom);
+        setPadding(paddingLeftRight, paddingTopBottom, paddingLeftRight, paddingTopBottom);
+
+        setTextSize(20);
         setTextColor(ContextCompat.getColor(context, R.color.repetitions_text_color));
         setBackgroundColor(ContextCompat.getColor(context, R.color.background_alternate));
+        showTitleWithPosition(pos);
     }
 
-    /**
-     * Show 'delete' icon
-     */
-    public void enableDeleteButton() {
+    private int getDimension(int resId) {
+        return (int) getResources().getDimension(resId);
+    }
+
+    private void showTitleWithPosition(int pos) {
+        setText(getContext().getString(R.string.repeated_group_title, mTitle, pos));
+    }
+
+    public void showDeleteIcon() {
         if (mListener != null) {
             Drawable deleteIcon = ContextCompat.getDrawable(getContext(), R.drawable.ic_trash);
             setCompoundDrawablesWithIntrinsicBounds(null, null, deleteIcon, null);
@@ -71,14 +78,13 @@ public class QuestionGroupIterationHeader extends android.support.v7.widget.AppC
         }
     }
 
-
-    public void disableDeleteButton() {
+    public void hideDeleteIcon() {
         setCompoundDrawablesWithIntrinsicBounds(null, null, null, null);
         setOnTouchListener(null);
     }
 
     public void decreasePosition() {
-        setText(mTitle + " - " + --mPosition);
+        showTitleWithPosition(--mPosition);
     }
 
     @Override
@@ -87,21 +93,26 @@ public class QuestionGroupIterationHeader extends android.support.v7.widget.AppC
             case MotionEvent.ACTION_DOWN:
                 return true;
             case MotionEvent.ACTION_UP:
-                int x = getRight() - getCompoundDrawables()[2].getBounds().width();
-                if (event.getRawX() < x) {
-                    return false;
+                if (isDeleteButtonPressed(event)) {
+                    ViewUtil.showConfirmDialog(R.string.delete_group_title,
+                            R.string.delete_group_text,
+                            getContext(), true, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    mListener.onDeleteRepetition(mID);
+                                }
+                            });
+                    return true;
                 }
-                ViewUtil.showConfirmDialog(R.string.delete_group_title, R.string.delete_group_text,
-                        getContext(), true, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                mListener.onDeleteRepetition(mID);
-                            }
-                        });
-                return true;
+                return false;
             default:
                 return false;
         }
     }
 
+    private boolean isDeleteButtonPressed(MotionEvent event) {
+        int x = getRight() - getCompoundDrawables()[2].getBounds().width()
+                - (paddingLeftRight * 2);
+        return event.getRawX() > x;
+    }
 }

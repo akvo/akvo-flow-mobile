@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -23,7 +23,6 @@ package org.akvo.flow.activity.form.formfill;
 import android.content.Context;
 import android.content.Intent;
 import android.support.test.InstrumentationRegistry;
-import android.support.test.espresso.Espresso;
 import android.support.test.filters.MediumTest;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
@@ -39,6 +38,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import static android.support.test.espresso.Espresso.closeSoftKeyboard;
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.typeText;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
@@ -90,8 +90,9 @@ public class ManualGeoQuestionViewTest {
     }
 
     @Test
-    public void ensureUnableToSubmitIfLatitudeMissing() throws Exception {
+    public void ensureUnableToSubmitIfLatitudeMissing() {
         onView(withId(R.id.lon_et)).perform(typeText(MOCK_LONGITUDE + ""));
+        closeSoftKeyboard();
 
         clickNext();
 
@@ -99,8 +100,9 @@ public class ManualGeoQuestionViewTest {
     }
 
     @Test
-    public void ensureUnableToSubmitIfLongitudeMissing() throws Exception {
+    public void ensureUnableToSubmitIfLongitudeMissing() {
         onView(withId(R.id.lat_et)).perform(typeText(MOCK_LATITUDE + ""));
+        closeSoftKeyboard();
 
         clickNext();
 
@@ -108,64 +110,64 @@ public class ManualGeoQuestionViewTest {
     }
 
     @Test
-    public void ensureErrorShownWhenLatitudeTooSmall() throws Exception {
+    public void ensureErrorShownWhenLatitudeTooSmall() {
         onView(withId(R.id.lat_et)).perform(typeText(-333 + ""));
-        Espresso.closeSoftKeyboard();
+        closeSoftKeyboard();
 
         onView(withId(R.id.lat_et))
                 .check(matches(hasErrorText(getString(R.string.invalid_latitude, rule))));
     }
 
     @Test
-    public void ensureErrorShownWhenLatitudeTooLarge() throws Exception {
+    public void ensureErrorShownWhenLatitudeTooLarge() {
         onView(withId(R.id.lat_et)).perform(typeText(333 + ""));
-        Espresso.closeSoftKeyboard();
+        closeSoftKeyboard();
 
         onView(withId(R.id.lat_et))
                 .check(matches(hasErrorText(getString(R.string.invalid_latitude, rule))));
     }
 
     @Test
-    public void ensureErrorShownWhenLongitudeTooSmall() throws Exception {
+    public void ensureErrorShownWhenLongitudeTooSmall() {
         onView(withId(R.id.lon_et)).perform(typeText(-333 + ""));
-        Espresso.closeSoftKeyboard();
+        closeSoftKeyboard();
 
         onView(withId(R.id.lon_et))
                 .check(matches(hasErrorText(getString(R.string.invalid_longitude, rule))));
     }
 
     @Test
-    public void ensureErrorShownWhenLongitudeTooLarge() throws Exception {
+    public void ensureErrorShownWhenLongitudeTooLarge() {
         onView(withId(R.id.lon_et)).perform(typeText(333 + ""));
-        Espresso.closeSoftKeyboard();
+        closeSoftKeyboard();
 
         onView(withId(R.id.lon_et))
                 .check(matches(hasErrorText(getString(R.string.invalid_longitude, rule))));
     }
 
     @Test
-    public void ensureErrorShownWhenAltitudeTooSmall() throws Exception {
+    public void ensureErrorShownWhenAltitudeTooSmall() {
         onView(withId(R.id.height_et)).perform(typeText(-33333 + ""));
-        Espresso.closeSoftKeyboard();
+        closeSoftKeyboard();
 
         onView(withId(R.id.height_et))
                 .check(matches(hasErrorText(getString(R.string.invalid_elevation, rule))));
     }
 
     @Test
-    public void ensureErrorShownWhenAltitudeTooLarge() throws Exception {
+    public void ensureErrorShownWhenAltitudeTooLarge() {
         onView(withId(R.id.height_et)).perform(typeText(33333 + ""));
-        Espresso.closeSoftKeyboard();
+        closeSoftKeyboard();
 
         onView(withId(R.id.height_et))
                 .check(matches(hasErrorText(getString(R.string.invalid_elevation, rule))));
     }
 
     @Test
-    public void ensureCanSubmitCorrectValues() throws Exception {
+    public void ensureCanSubmitCorrectValues() {
         onView(withId(R.id.lat_et)).perform(typeText(MOCK_LATITUDE + ""));
         onView(withId(R.id.lon_et)).perform(typeText(MOCK_LONGITUDE + ""));
-
+        closeSoftKeyboard();
         onView(withId(R.id.acc_tv))
                 .check(matches(withText(R.string.geo_location_accuracy_default)));
 

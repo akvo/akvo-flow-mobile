@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2018 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -47,7 +47,6 @@ import org.akvo.flow.event.QuestionInteractionListener;
 import org.akvo.flow.event.SurveyListener;
 import org.akvo.flow.injector.component.ApplicationComponent;
 import org.akvo.flow.util.ConstantUtil;
-import org.akvo.flow.util.PlatformUtil;
 import org.akvo.flow.util.ViewUtil;
 
 import java.util.ArrayList;
@@ -56,7 +55,6 @@ import java.util.Map;
 import java.util.StringTokenizer;
 
 public abstract class QuestionView extends LinearLayout implements QuestionInteractionListener {
-    private static final int PADDING_DIP = 8;
     protected static String[] sColors = null;
     final ErrorMessageFormatter errorMessageFormatter = new ErrorMessageFormatter();
 
@@ -78,8 +76,9 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
     public QuestionView(final Context context, Question q, SurveyListener surveyListener) {
         super(context);
         setOrientation(VERTICAL);
-        final int padding = (int) PlatformUtil.dp2Pixel(getContext(), PADDING_DIP);
-        setPadding(padding, padding, padding, padding);
+        final int topBottomPadding = getDimension(R.dimen.small_padding);
+        final int leftRightPadding = getDimension(R.dimen.form_left_right_padding);
+        setPadding(leftRightPadding, topBottomPadding, leftRightPadding, topBottomPadding);
         if (sColors == null) {
             // must have enough colors for all enabled languages
             sColors = context.getResources().getStringArray(R.array.colors);
@@ -87,7 +86,11 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
         mQuestion = q;
         setTag(q.getId());
         mSurveyListener = surveyListener;
-        mError = null;// so far so good.
+        mError = null;
+    }
+
+    private int getDimension(int resId) {
+        return (int) getResources().getDimension(resId);
     }
 
     /**
@@ -110,12 +113,16 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
                     "Subclasses must inflate the common question header before calling this method.");
         }
 
+        displayContent();
+    }
+
+    protected void displayContent() {
         mQuestionText.setText(formText(), BufferType.SPANNABLE);
 
         // if there is a tip for this question, construct an alert dialog box with the data
         final int tips = mQuestion.getHelpTypeCount();
         if (tips > 0) {
-            mTipImage.setVisibility(View.VISIBLE);// GONE by default
+            mTipImage.setVisibility(View.VISIBLE);
             mTipImage.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -135,6 +142,8 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
                     }
                 }
             });
+        } else {
+            mTipImage.setVisibility(View.GONE);
         }
 
         if (!isReadOnly()) {

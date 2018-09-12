@@ -43,7 +43,7 @@
 
             <Button
                     android:id="@+id/cancel_btn"
-                    style="@style/Widget.AppCompat.Button.Borderless.Colored"
+                    style="@style/SecondaryButtonStyle"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
@@ -51,7 +51,7 @@
 
             <Button
                     android:id="@+id/install_btn"
-                    style="@style/Widget.AppCompat.Button.Borderless.Colored"
+                    style="@style/SecondaryButtonStyle"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"

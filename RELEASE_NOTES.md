@@ -1,5 +1,12 @@
 Akvo FLOW app release notes
 ===========================
+# ver 2.6.1
+Date: 13 September 2018
+
+# New and noteworthy
+* **Form layout redesign** - [#1103](https://github.com/akvo/akvo-flow-mobile/issues/1103) Improvement to form layout with cleaner and simplified design using material theme.
+
+---------------
 # ver 2.6.0.1
 Date: 23 August 2018
 

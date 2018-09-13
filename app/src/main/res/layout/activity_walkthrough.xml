@@ -43,6 +43,7 @@
             android:layout_marginBottom="16dp"
             android:layout_gravity="top|center_horizontal"
             style="@style/SecondaryButtonStyle"
+            android:textColor="@color/colorAccent"
             android:id="@+id/button_next"/>
     <Button
             android:text="@string/okbutton"

@@ -49,6 +49,7 @@ import org.hamcrest.core.IsInstanceOf;
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.action.ViewActions.scrollTo;
+import static android.support.test.espresso.action.ViewActions.swipeLeft;
 import static android.support.test.espresso.action.ViewActions.typeText;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.hasDescendant;
@@ -98,7 +99,7 @@ public class FormActivityTestUtil {
     }
 
     public static void clickNext() {
-        onView(withId(R.id.next_btn)).perform(click());
+        onView(withId(R.id.pager)).perform(swipeLeft());
     }
 
     public static void fillFreeTextQuestion(String text) {

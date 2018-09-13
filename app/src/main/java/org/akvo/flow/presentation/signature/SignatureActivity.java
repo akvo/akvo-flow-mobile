@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017,2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -20,7 +20,6 @@
 
 package org.akvo.flow.presentation.signature;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
@@ -31,10 +30,9 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import org.akvo.flow.R;
-import org.akvo.flow.app.FlowApp;
-import org.akvo.flow.injector.component.ApplicationComponent;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
+import org.akvo.flow.presentation.BaseActivity;
 import org.akvo.flow.ui.view.signature.SignatureDrawView;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.ViewUtil;
@@ -53,7 +51,7 @@ import butterknife.OnTextChanged;
 
 import static org.akvo.flow.R.id.signature;
 
-public class SignatureActivity extends Activity implements SignatureDrawView.SignatureViewListener,
+public class SignatureActivity extends BaseActivity implements SignatureDrawView.SignatureViewListener,
         SignatureView {
 
     @BindView(signature)
@@ -90,10 +88,6 @@ public class SignatureActivity extends Activity implements SignatureDrawView.Sig
         ViewComponent viewComponent = DaggerViewComponent.builder()
                 .applicationComponent(getApplicationComponent()).build();
         viewComponent.inject(this);
-    }
-
-    private ApplicationComponent getApplicationComponent() {
-        return ((FlowApp) getApplication()).getApplicationComponent();
     }
 
     @Override

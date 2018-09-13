@@ -5,6 +5,5 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/submitbutton"
-        style="@style/PrimaryButtonStyle"
-        android:theme="@style/GreyButtonTheme">
+        style="@style/PrimaryButtonStyle">
 </Button>

@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2014 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2014,2018 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -19,9 +19,9 @@
 
 package org.akvo.flow.activity;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
@@ -35,7 +35,7 @@ import org.akvo.flow.service.TimeCheckService;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class TimeCheckActivity extends Activity {
+public class TimeCheckActivity extends AppCompatActivity {
     private static final String PATTERN = "HH:mm, yyyy-MM-dd (zzzz)";
 
     @Override

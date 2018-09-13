@@ -164,7 +164,6 @@ public class FormActivityTest {
             }
             verifyQuestionDisplayed(question, j);
         }
-        verifyNextButton(group);
     }
 
     private void verifySubmitTab(List<QuestionGroup> questionGroups,
@@ -195,12 +194,6 @@ public class FormActivityTest {
         verifyQuestionHeader(question);
         verifyHelpTip(question);
         verifyQuestionView(question, questionPosition);
-    }
-
-    private void verifyNextButton(QuestionGroup group) {
-        ViewInteraction nextButton = onView(
-                allOf(withId(R.id.next_btn), withQuestionGroupViewParent(group)));
-        nextButton.check(matches(allOf(isEnabled(), withText(R.string.nextbutton))));
     }
 
     private void verifyQuestionView(Question question, int questionPosition) {

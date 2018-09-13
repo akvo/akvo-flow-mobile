@@ -49,13 +49,13 @@ import org.hamcrest.core.IsInstanceOf;
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.action.ViewActions.scrollTo;
+import static android.support.test.espresso.action.ViewActions.swipeLeft;
 import static android.support.test.espresso.action.ViewActions.typeText;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.hasDescendant;
 import static android.support.test.espresso.matcher.ViewMatchers.isDescendantOfA;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.isEnabled;
-import static android.support.test.espresso.matcher.ViewMatchers.withClassName;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withTagValue;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
@@ -64,7 +64,6 @@ import static org.akvo.flow.activity.ToolBarTitleSubtitleMatcher.withToolbarSubt
 import static org.akvo.flow.activity.ToolBarTitleSubtitleMatcher.withToolbarTitle;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.allOf;
-import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.not;
 
 public class FormActivityTestUtil {
@@ -86,12 +85,12 @@ public class FormActivityTestUtil {
     }
 
     public static void verifySubmitButtonEnabled() {
-        onView(allOf(withClassName(endsWith("Button")), withText(R.string.submitbutton)))
+        onView(allOf(withId(R.id.submit_tab_button), withText(R.string.submitbutton)))
                 .check(matches(isEnabled()));
     }
 
     public static void verifySubmitButtonDisabled() {
-        onView(allOf(withClassName(endsWith("Button")), withText(R.string.submitbutton)))
+        onView(allOf(withId(R.id.submit_tab_button), withText(R.string.submitbutton)))
                 .check(matches(not(isEnabled())));
     }
 
@@ -100,7 +99,7 @@ public class FormActivityTestUtil {
     }
 
     public static void clickNext() {
-        onView(withId(R.id.next_btn)).perform(scrollTo()).perform(click());
+        onView(withId(R.id.pager)).perform(swipeLeft());
     }
 
     public static void fillFreeTextQuestion(String text) {

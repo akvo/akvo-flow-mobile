@@ -23,6 +23,7 @@ import android.animation.LayoutTransition;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.constraint.ConstraintLayout;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -54,7 +55,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class QuestionGroupTab extends LinearLayout implements QuestionGroupIterationHeader.OnDeleteListener {
+public class QuestionGroupTab extends ConstraintLayout
+        implements QuestionGroupIterationHeader.OnDeleteListener {
 
     private final QuestionGroup mQuestionGroup;
     private final QuestionInteractionListener mQuestionListener;
@@ -89,7 +91,6 @@ public class QuestionGroupTab extends LinearLayout implements QuestionGroupItera
     }
 
     private void init() {
-        setOrientation(VERTICAL);
         setDescendantFocusability(FOCUS_BEFORE_DESCENDANTS);
         setFocusable(true);
         setFocusableInTouchMode(true);
@@ -102,20 +103,11 @@ public class QuestionGroupTab extends LinearLayout implements QuestionGroupItera
         // Animate view additions/removals if possible
         mContainer.setLayoutTransition(new LayoutTransition());
 
-        View next = findViewById(R.id.next_btn);
-        next.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mSurveyListener.nextTab();
-            }
-        });
-        next.setVisibility(mSurveyListener.isReadOnly() ? GONE : VISIBLE);
-
         if (mQuestionGroup.isRepeatable()) {
             mRepetitionsText.setVisibility(VISIBLE);
-            View repeatBtn = findViewById(R.id.repeat_btn);
-            repeatBtn.setVisibility(mSurveyListener.isReadOnly() ? GONE : VISIBLE);
-            repeatBtn.setOnClickListener(new OnClickListener() {
+            View repeatButton = findViewById(R.id.repeat_btn);
+            repeatButton.setVisibility(mSurveyListener.isReadOnly() ? GONE : VISIBLE);
+            repeatButton.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     loadGroup();
@@ -124,6 +116,10 @@ public class QuestionGroupTab extends LinearLayout implements QuestionGroupItera
             });
         }
         setTag(mQuestionGroup.getOrder());
+    }
+
+    private int getDimension(int dimensionRes) {
+        return (int) getResources().getDimension(dimensionRes);
     }
 
     /**
@@ -192,12 +188,12 @@ public class QuestionGroupTab extends LinearLayout implements QuestionGroupItera
             Collection<QuestionGroupIterationHeader> iterationHeaders = groupIterationHeaders
                     .values();
             for (QuestionGroupIterationHeader header : iterationHeaders) {
-                header.enableDeleteButton();
+                header.showDeleteIcon();
             }
         } else if (groupIterationHeaders.size() == 1) {
             QuestionGroupIterationHeader header = groupIterationHeaders.entrySet().iterator().next()
                     .getValue();
-            header.disableDeleteButton();
+            header.hideDeleteIcon();
         }
     }
 
@@ -292,7 +288,8 @@ public class QuestionGroupTab extends LinearLayout implements QuestionGroupItera
 
             QuestionView questionView;
             if (ConstantUtil.OPTION_QUESTION_TYPE.equalsIgnoreCase(q.getType())) {
-                questionView = OptionQuestionFactory.createOptionQuestion(context, q, mSurveyListener);
+                questionView = OptionQuestionFactory
+                        .createOptionQuestion(context, q, mSurveyListener);
             } else if (ConstantUtil.FREE_QUESTION_TYPE.equalsIgnoreCase(q.getType())) {
                 questionView = new FreetextQuestionView(context, q, mSurveyListener);
             } else if (ConstantUtil.PHOTO_QUESTION_TYPE.equalsIgnoreCase(q.getType())) {
@@ -323,10 +320,22 @@ public class QuestionGroupTab extends LinearLayout implements QuestionGroupItera
 
             mQuestionViews.put(q.getId(), questionView);// Store the reference to the View
 
-            // Add divider (within the View)
-            inflate(getContext(), R.layout.divider, questionView);
-            mContainer.addView(questionView);
+            mContainer.addView(questionView, generateLayoutParamsForQuestionView());
         }
+    }
+
+    private LayoutParams generateLayoutParamsForQuestionView() {
+        int orientation = mContainer.getOrientation();
+        LayoutParams layoutParams;
+        if (orientation == LinearLayout.HORIZONTAL) {
+            layoutParams = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+        } else {
+            layoutParams = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
+        }
+        int margin = getDimension(R.dimen.form_left_right_padding);
+        layoutParams.leftMargin = margin;
+        layoutParams.rightMargin = margin;
+        return layoutParams;
     }
 
     private int getRepetitionId(int index) {
@@ -415,7 +424,6 @@ public class QuestionGroupTab extends LinearLayout implements QuestionGroupItera
          * The populated list will contain the IDs of existing repetitions.
          * Although IDs are auto-incremented numeric values, there might be
          * gaps caused by deleted iterations.
-         *
          */
         void loadIDs(Set<String> questions, Collection<QuestionResponse> questionResponses) {
             Set<Integer> reps = new HashSet<>();

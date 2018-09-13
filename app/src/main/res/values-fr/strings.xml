@@ -6,8 +6,6 @@
   <string name="lowcardspacetitle">Stockage disponible réduit</string>
   <string name="nocardspacedialog">La carte mémoire de cet appareil est pleine et n\'est plus en mesure de stocker des données. Veuillez effacer des données afin de pouvoir continuer.</string>
   <string name="lowcardspacedialog">Vous avez %%% MB de stockage restant sur la carte SD de cet appareil. Une fois la carte SD pleine, vous ne pourrez plus collecter de données.</string>
-  <string name="takephoto">Prendre une photo</string>
-  <string name="takevideo">Prendre une vidéo</string>
   <string name="getgeo">Prendre la géolocalisation</string>
   <string name="lat">Lat</string>
   <string name="lon">Lon</string>
@@ -70,12 +68,8 @@
   <string name="clear_data_success">Les données ont été effacées de l\'appareil avec succès</string>
   <string name="clear_data_error">Des erreurs se sont produites lors de l\'effacement des données de l\'appareil</string>
   <string name="search">Recherche</string>
-  <string name="download">Sync</string>
   <string name="sort">Trier</string>
   <string name="stats">Stats</string>
-  <string name="data_points_sync_error_message_network">La synchronisation a échoué. Pas de connection.</string>
-  <string name="data_points_sync_error_message_assignment">La synchronisation a échoué. Affectation manquante.</string>
-  <string name="data_points_sync_error_message_default">La synchronisation a échoué.</string>
   <string name="prefill_title">Pré-remplir les réponses</string>
   <string name="prefill_text">Pré-remplir les réponses avec les valeurs précédentes de la même question</string>
   <!--Data sync-->
@@ -148,7 +142,6 @@
   <!--Form & transmission status-->
   <string name="status_queued">En attente</string>
   <string name="status_in_progress">En cours</string>
-  <string name="status_uploaded">Synchronisé</string>
   <string name="status_failed">Échec</string>
   <string name="status_saved">Enregistré</string>
   <string name="status_submitted">Envoyé</string>
@@ -241,7 +234,6 @@
   <string name="preference_app_language">Langage App</string>
   <string name="preference_image_size">Taille de l\'image</string>
   <string name="preferences_data_section">Données</string>
-  <string name="preference_sync_datapoints">Envoyer les points de données dans l\'intance Flow</string>
   <string name="preference_delete_collected_data">Effacer les données et images collectées</string>
   <string name="preference_delete_everything">Tout supprimer</string>
   <string name="preferences_configuration_section">Configuration</string>
@@ -252,13 +244,8 @@
   <string name="preference_instance_name">Nom de l\'instance</string>
   <string name="data_points_sync_error_mobile_data_sync">La synchronisation via données mobiles est désactivée</string>
   <string name="action_settings">Paramètres</string>
-  <string name="no_records_subtitle_monitored">Utilisez \'+\' pour capturer des données ou \'Syncronizer\' pour obtenir des données existantes</string>
   <string name="no_records_subtitle_non_monitored">Utilisez \'+\' pour capturer des données.</string>
   <!--Verify if this works for transifex-->
-  <plurals name="data_points_sync_success_message">
-    <item quantity="one">%1$d enregistrement synchronisé</item>
-    <item quantity="other">%1$d enregistrements synchronisés</item>
-  </plurals>
   <string name="surveys_error">Erreur de chargement des enquêtes</string>
   <string name="users_error">Erreur de chargement des utilisateurs</string>
   <string name="survey_delete_error">Erreur lors de la suppression d\'enquête</string>
@@ -269,7 +256,6 @@
   <string name="add_user_message">Le nouvel utilisateur sera automatiquement sélectionné</string>
   <string name="survey">enquête</string>
   <string name="no_gps_status_message">GPS Status n\'est pas installé sur cet appareil. Voulez-vous l\'installer maintenant?</string>
-  <string name="data_points_sync_no_data_points">Aucun enregistrement à synchroniser</string>
   <string name="app_update_dialog_title">Une nouvelle version de Flow est disponible</string>
   <string name="app_update_dialog_subtitle">Effectuez la mise à jour afin de tirer le meilleur parti de votre application Flow</string>
   <string name="error_getting_media">Erreur d\'obtention de fichiers media, veuillez réessayer.</string>

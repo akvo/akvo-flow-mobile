@@ -4,8 +4,6 @@
   <string name="lowcardspacetitle">មានលំហស្តុកទុកតិច</string>
   <string name="nocardspacedialog">SD card ក្នុងឧបករណ៍នេះបានពេញ ដូចនេះអ្នកមិនអាចប្រមូលទិន្នន័យបានទៀតឡើយ។ អ្នកត្រូវតែសំអាតចន្លោះក្នុងSD card ដើម្បីអាចបន្តការប្រមូលពត៌មានតទៀត។</string>
   <string name="lowcardspacedialog">អ្នកមានចន្លោះស្តុកឯកសារនៅសល់ក្នុងឧបករណ៍\ក្នុងSD card នេះចំនួន %%%មេហ្គាបៃ។ នៅពេលដែល SD card ពេញ អ្នកនឹងមិនអាចប្រមូលទិន្នន័យបានទៀតទេ។</string>
-  <string name="takephoto">ថតរូបភាព</string>
-  <string name="takevideo">ថតវីដេអូ</string>
   <string name="getgeo">ស្វែងរកទីតាំងជីភីអេស</string>
   <string name="lat">រយៈទទឹង </string>
   <string name="lon">រយៈបណ្តោយ </string>
@@ -59,7 +57,6 @@
   <string name="clear_data_success">ទិន្នន័យត្រូវបានលុបចេញពីឧបករណ៍នេះដោយជោគជ័យ</string>
   <string name="clear_data_error">កំហុសឆ្គងលុបទិន្នន័យពីឧបករណ៍ </string>
   <string name="search">ស្វែងរក </string>
-  <string name="download">ធ្វើឲ្យចេញដំណាលគ្នា</string>
   <string name="sort">ដាក់ទៅតាមប្រភេទ </string>
   <string name="stats">ស្ថានភាព </string>
   <string name="prefill_title">បំពេញចម្លើយជាមុន </string>
@@ -125,7 +122,6 @@
   <!--Form & transmission status-->
   <string name="status_queued">បានរង់ចាំ </string>
   <string name="status_in_progress">កំពុងដំណើរការ </string>
-  <string name="status_uploaded">បានដាក់ឲ្យចេញដំណាលគ្នា </string>
   <string name="status_failed">មិនបានសម្រេច </string>
   <string name="status_saved">បានរក្សាទុក</string>
   <string name="status_submitted">បានបញ្ជូនចេញ </string>

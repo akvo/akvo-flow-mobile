@@ -60,11 +60,8 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:textSize="16sp"
+                    style="@style/FormButtonStyle"
                     android:text="@string/media_from_camera"
-                    style="@style/button_primary"
-                    android:layout_marginLeft="16dp"
-                    android:layout_marginStart="16dp"
                     android:layout_marginRight="8dp"
                     android:layout_marginEnd="8dp"/>
             <Button
@@ -72,13 +69,10 @@
                     android:layout_width="0dp"
                     android:layout_weight="1"
                     android:layout_height="wrap_content"
-                    android:textSize="16sp"
+                    style="@style/FormButtonStyle"
                     android:text="@string/media_from_gallery"
                     android:layout_marginLeft="8dp"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginRight="16dp"
-                    android:layout_marginEnd="16dp"
-                    style="@style/button_primary"/>
+                    android:layout_marginStart="8dp"/>
         </LinearLayout>
 
 

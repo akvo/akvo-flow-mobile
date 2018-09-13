@@ -6,8 +6,6 @@
   <string name="lowcardspacetitle">कम जगह है </string>
   <string name="nocardspacedialog">SD कार्ड पूरी तरह भर चूका है, अधिक डेटा एकत्रित करने के लिए कार्ड में जगह नहीं है | आगे बढ़ने के लिए, SD कार्ड पर जगह बनाएं ।</string>
   <string name="lowcardspacedialog">आपके SD कार्ड पर %% जगह उपलब्द है | SD कार्ड के भर जाने के बाद आप और अधिक डेटा जमा नहीं कर पाएंगे।   </string>
-  <string name="takephoto">फोटो खींचे </string>
-  <string name="takevideo">वीडियो बनाएँ  </string>
   <string name="getgeo">भौगोलिक स्थिति जांचे</string>
   <string name="lat">लैटिट्यूड</string>
   <string name="lon">लोंगिट्यूड</string>
@@ -70,12 +68,8 @@
   <string name="clear_data_success">डेटा आपके फ़ोन अथवा टेबलेट से सफलता पूर्ण हटा दिया गया है </string>
   <string name="clear_data_error">फ़ोन से डेटा हटाने में त्रुटि</string>
   <string name="search">खोज </string>
-  <string name="download">सिंक </string>
   <string name="sort">छाँटिएन </string>
   <string name="stats">आंकड़े</string>
-  <string name="data_points_sync_error_message_network">सिंक असफल: इंटरनेट पहुंच से बाहर है</string>
-  <string name="data_points_sync_error_message_assignment">सिंक असफल: असाइनमेंट अनुपलब्ध </string>
-  <string name="data_points_sync_error_message_default">सिंक असफल</string>
   <string name="prefill_title">पूर्व दिए उत्तर </string>
   <string name="prefill_text">पूर्व भरे फॉर्म, पिछले दिए गय उत्तरों के साथ ?</string>
   <!--Data sync-->
@@ -148,7 +142,6 @@
   <!--Form & transmission status-->
   <string name="status_queued">कतार में है </string>
   <string name="status_in_progress">प्रक्रिया जारी है </string>
-  <string name="status_uploaded">सिंक्ड </string>
   <string name="status_failed"> विफल</string>
   <string name="status_saved">सुरक्षित </string>
   <string name="status_submitted">जमा हो चूका है </string>
@@ -234,7 +227,6 @@
   <string name="preference_app_language">ऐप की भाषा</string>
   <string name="preference_image_size">फोटो की लम्बाई - चौड़ाई</string>
   <string name="preferences_data_section">डाटा</string>
-  <string name="preference_sync_datapoints">जमा किए गये डाटा पॉइंट को Flow डैशबोर्ड के साथ सिंक करो</string>
   <string name="preference_delete_collected_data">एकत्रित डाटा और फोटो को हटाएँ</string>
   <string name="preference_delete_everything">सब कुछ हटाएँ</string>
   <string name="preferences_configuration_section">समाकृति</string>
@@ -245,13 +237,8 @@
   <string name="preference_instance_name">डैशबोर्ड का नाम</string>
   <string name="data_points_sync_error_mobile_data_sync">मोबाईल डाटा सिंक की आज्ञा नहीं है</string>
   <string name="action_settings">सेटिंग्स</string>
-  <string name="no_records_subtitle_monitored">नया डाटा पॉइंट एकत्रित करने के लिए \'+\' दबाएं, या डैशबोर्ड पर मौजूदा डाटा लोड करने के लिए \'सिंक\' दबाएं</string>
   <string name="no_records_subtitle_non_monitored">डाटा एकत्रित करने के लिए \'+\' दबाएं</string>
   <!--Verify if this works for transifex-->
-  <plurals name="data_points_sync_success_message">
-    <item quantity="one">%1$dडाटा पॉइंट सिंक हो गया है</item>
-    <item quantity="other">%1$dडाटा पॉइंट सिंक हो गए हैं</item>
-  </plurals>
   <string name="surveys_error">सर्वे लोड करने में त्रुटि</string>
   <string name="users_error">प्रयोगकर्ता लोड करने में त्रुटि</string>
   <string name="survey_delete_error">सर्वे हटाने में त्रुटि</string>
@@ -262,7 +249,6 @@
   <string name="add_user_message">नया प्रयोगकर्ता अपने आप चुना जाएगा</string>
   <string name="survey">सर्वे</string>
   <string name="no_gps_status_message">जी.पी.एस. स्टेटस ऐप फ़ोन इनस्टॉल नहीं है। क्या आप इसे इनस्टॉल करना चाहते हैं ?</string>
-  <string name="data_points_sync_no_data_points">कोई डाटा पॉइंट सिंक करने के लिए नहीं है</string>
   <string name="app_update_dialog_title">Flow ऐप का नया संस्करण उपलब्ध है</string>
   <string name="app_update_dialog_subtitle">बेहतर सेवायें प्राप्त करने के लिए Flow ऐप को अपडेट करें</string>
   <string name="error_getting_media">चित्र लोड करने में त्रुटि। कृपया पुन: प्रयास करें</string>

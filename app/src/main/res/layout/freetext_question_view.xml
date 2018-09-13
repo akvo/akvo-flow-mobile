@@ -28,7 +28,7 @@
     <Button
             android:id="@+id/external_source_btn"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/button_height"
+            android:layout_height="wrap_content"
             android:text="@string/use_external_source"
             style="@style/FormButtonStyle"/>
 

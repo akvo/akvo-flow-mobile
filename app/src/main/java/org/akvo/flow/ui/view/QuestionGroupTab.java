@@ -55,7 +55,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class QuestionGroupTab extends ConstraintLayout implements QuestionGroupIterationHeader.OnDeleteListener {
+public class QuestionGroupTab extends ConstraintLayout
+        implements QuestionGroupIterationHeader.OnDeleteListener {
 
     private final QuestionGroup mQuestionGroup;
     private final QuestionInteractionListener mQuestionListener;
@@ -102,20 +103,11 @@ public class QuestionGroupTab extends ConstraintLayout implements QuestionGroupI
         // Animate view additions/removals if possible
         mContainer.setLayoutTransition(new LayoutTransition());
 
-        View next = findViewById(R.id.next_btn);
-        next.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mSurveyListener.nextTab();
-            }
-        });
-        next.setVisibility(mSurveyListener.isReadOnly() ? GONE : VISIBLE);
-
-        View repeatBtnLayout = findViewById(R.id.repeat_btn_layout);
         if (mQuestionGroup.isRepeatable()) {
             mRepetitionsText.setVisibility(VISIBLE);
-            repeatBtnLayout.setVisibility(mSurveyListener.isReadOnly() ? GONE : VISIBLE);
-            findViewById(R.id.repeat_btn).setOnClickListener(new OnClickListener() {
+            View repeatButton = findViewById(R.id.repeat_btn);
+            repeatButton.setVisibility(mSurveyListener.isReadOnly() ? GONE : VISIBLE);
+            repeatButton.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     loadGroup();
@@ -296,7 +288,8 @@ public class QuestionGroupTab extends ConstraintLayout implements QuestionGroupI
 
             QuestionView questionView;
             if (ConstantUtil.OPTION_QUESTION_TYPE.equalsIgnoreCase(q.getType())) {
-                questionView = OptionQuestionFactory.createOptionQuestion(context, q, mSurveyListener);
+                questionView = OptionQuestionFactory
+                        .createOptionQuestion(context, q, mSurveyListener);
             } else if (ConstantUtil.FREE_QUESTION_TYPE.equalsIgnoreCase(q.getType())) {
                 questionView = new FreetextQuestionView(context, q, mSurveyListener);
             } else if (ConstantUtil.PHOTO_QUESTION_TYPE.equalsIgnoreCase(q.getType())) {
@@ -431,7 +424,6 @@ public class QuestionGroupTab extends ConstraintLayout implements QuestionGroupI
          * The populated list will contain the IDs of existing repetitions.
          * Although IDs are auto-incremented numeric values, there might be
          * gaps caused by deleted iterations.
-         *
          */
         void loadIDs(Set<String> questions, Collection<QuestionResponse> questionResponses) {
             Set<Integer> reps = new HashSet<>();

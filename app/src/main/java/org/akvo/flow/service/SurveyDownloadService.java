@@ -34,16 +34,15 @@ import org.akvo.flow.data.database.SurveyDbDataSource;
 import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionGroup;
-import org.akvo.flow.domain.QuestionHelp;
 import org.akvo.flow.domain.Survey;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.util.ConnectivityStateManager;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.FileUtil;
-import org.akvo.flow.util.files.FormFileBrowser;
-import org.akvo.flow.util.files.FormResourcesFileBrowser;
 import org.akvo.flow.util.HttpUtil;
 import org.akvo.flow.util.NotificationHelper;
+import org.akvo.flow.util.files.FormFileBrowser;
+import org.akvo.flow.util.files.FormResourcesFileBrowser;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -268,13 +267,6 @@ public class SurveyDownloadService extends IntentService {
             Set<String> resources = new HashSet<>();
             for (QuestionGroup group : hydratedSurvey.getQuestionGroups()) {
                 for (Question question : group.getQuestions()) {
-                    if (!question.getHelpByType(ConstantUtil.VIDEO_HELP_TYPE).isEmpty()) {
-                        resources.add(question.getHelpByType(ConstantUtil.VIDEO_HELP_TYPE)
-                                .get(0).getValue());
-                    }
-                    for (QuestionHelp help : question.getHelpByType(ConstantUtil.IMAGE_HELP_TYPE)) {
-                        resources.add(help.getValue());
-                    }
                     // Question src data (i.e. cascading question resources)
                     if (question.getSrc() != null) {
                         resources.add(question.getSrc());

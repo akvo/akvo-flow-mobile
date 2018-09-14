@@ -22,7 +22,6 @@ package org.akvo.flow.ui.view;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.text.Html;
@@ -105,8 +104,8 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
         LayoutInflater inflater = LayoutInflater.from(getContext());
         inflater.inflate(layoutRes, this, true);
 
-        mQuestionText = (TextView) findViewById(R.id.question_tv);
-        mTipImage = (ImageButton) findViewById(R.id.tip_ib);
+        mQuestionText = findViewById(R.id.question_tv);
+        mTipImage = findViewById(R.id.tip_ib);
 
         if (mQuestionText == null || mTipImage == null) {
             throw new RuntimeException(
@@ -118,33 +117,7 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
 
     protected void displayContent() {
         mQuestionText.setText(formText(), BufferType.SPANNABLE);
-
-        // if there is a tip for this question, construct an alert dialog box with the data
-        final int tips = mQuestion.getHelpTypeCount();
-        if (tips > 0) {
-            mTipImage.setVisibility(View.VISIBLE);
-            mTipImage.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (tips > 1) {
-                        displayHelpChoices();
-                    } else {
-                        if (mQuestion.getHelpByType(ConstantUtil.TIP_HELP_TYPE)
-                                .size() > 0) {
-                            displayHelp(ConstantUtil.TIP_HELP_TYPE);
-                        } else if (mQuestion.getHelpByType(
-                                ConstantUtil.VIDEO_HELP_TYPE).size() > 0) {
-                            displayHelp(ConstantUtil.VIDEO_HELP_TYPE);
-                        } else if (mQuestion.getHelpByType(
-                                ConstantUtil.IMAGE_HELP_TYPE).size() > 0) {
-                            displayHelp(ConstantUtil.IMAGE_HELP_TYPE);
-                        }
-                    }
-                }
-            });
-        } else {
-            mTipImage.setVisibility(View.GONE);
-        }
+        displayTip();
 
         if (!isReadOnly()) {
             mQuestionText.setLongClickable(true);
@@ -161,6 +134,24 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
         // if this question has 1 or more dependencies, then it needs to be invisible initially
         if (mQuestion.getDependencies() != null && mQuestion.getDependencies().size() > 0) {
             setVisibility(View.GONE);
+        }
+    }
+
+    private void displayTip() {
+        // if there is a tip for this question, construct an alert dialog box with the data
+        final int tips = mQuestion.getHelpTypeCount();
+        if (tips > 0) {
+            mTipImage.setVisibility(View.VISIBLE);
+            mTipImage.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                        if (mQuestion.getHelpByType(ConstantUtil.TIP_HELP_TYPE).size() > 0) {
+                            displayHelp();
+                    }
+                }
+            });
+        } else {
+            mTipImage.setVisibility(View.GONE);
         }
     }
 
@@ -225,105 +216,50 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
     }
 
     /**
-     * displays a dialog box with options for each of the help types that have
-     * been initialized for this particular question.
-     */
-    @SuppressWarnings("rawtypes")
-    private void displayHelpChoices() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        builder.setTitle(R.string.helpheading);
-        final CharSequence[] items = new CharSequence[mQuestion
-                .getHelpTypeCount()];
-        final Resources resources = getResources();
-        int itemIndex = 0;
-        List tempList = mQuestion.getHelpByType(ConstantUtil.IMAGE_HELP_TYPE);
-
-        if (tempList != null && tempList.size() > 0) {
-            items[itemIndex++] = resources.getString(R.string.photohelpoption);
-        }
-        tempList = mQuestion.getHelpByType(ConstantUtil.VIDEO_HELP_TYPE);
-        if (tempList != null && tempList.size() > 0) {
-            items[itemIndex++] = resources.getString(R.string.videohelpoption);
-        }
-        tempList = mQuestion.getHelpByType(ConstantUtil.TIP_HELP_TYPE);
-        if (tempList != null && tempList.size() > 0) {
-            items[itemIndex++] = resources.getString(R.string.texthelpoption);
-        }
-
-        builder.setItems(items, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                String val = items[id].toString();
-                if (resources.getString(R.string.texthelpoption).equals(val)) {
-                    displayHelp(ConstantUtil.TIP_HELP_TYPE);
-                } else if (resources.getString(R.string.videohelpoption)
-                        .equals(val)) {
-                    displayHelp(ConstantUtil.VIDEO_HELP_TYPE);
-                } else if (resources.getString(R.string.photohelpoption)
-                        .equals(val)) {
-                    displayHelp(ConstantUtil.IMAGE_HELP_TYPE);
-                }
-                if (dialog != null) {
-                    dialog.dismiss();
-                }
-            }
-        });
-        builder.show();
-    }
-
-    /**
      * displays the selected help type
      *
-     * @param type
      */
-    private void displayHelp(String type) {
-        if (ConstantUtil.VIDEO_HELP_TYPE.equals(type)) {
-            notifyQuestionListeners(QuestionInteractionEvent.VIDEO_TIP_VIEW);
-        } else if (ConstantUtil.TIP_HELP_TYPE.equals(type)) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-            StringBuilder textBuilder = new StringBuilder();
-            List<QuestionHelp> helpItems = mQuestion.getHelpByType(type);
-            boolean isFirst = true;
-            String[] langs = getLanguages();
-            String language = getDefaultLang();
-            if (helpItems != null) {
-                for (int i = 0; i < helpItems.size(); i++) {
-                    if (i > 0) {
-                        textBuilder.append("<br>");
+    private void displayHelp() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        StringBuilder textBuilder = new StringBuilder();
+        List<QuestionHelp> helpItems = mQuestion.getHelpByType(ConstantUtil.TIP_HELP_TYPE);
+        boolean isFirst = true;
+        String[] langs = getLanguages();
+        String language = getDefaultLang();
+        if (helpItems != null) {
+            for (int i = 0; i < helpItems.size(); i++) {
+                if (i > 0) {
+                    textBuilder.append("<br>");
+                }
+
+                for (int j = 0; j < langs.length; j++) {
+                    if (language.equalsIgnoreCase(langs[j])) {
+                        textBuilder.append(helpItems.get(i).getText());
+                        isFirst = false;
                     }
 
-                    for (int j = 0; j < langs.length; j++) {
-                        if (language.equalsIgnoreCase(langs[j])) {
-                            textBuilder.append(helpItems.get(i).getText());
+                    AltText aText = helpItems.get(i).getAltText(langs[j]);
+                    if (aText != null) {
+                        if (!isFirst) {
+                            textBuilder.append(" / ");
+                        } else {
                             isFirst = false;
                         }
 
-                        AltText aText = helpItems.get(i).getAltText(langs[j]);
-                        if (aText != null) {
-                            if (!isFirst) {
-                                textBuilder.append(" / ");
-                            } else {
-                                isFirst = false;
-                            }
-
-                            textBuilder.append("<font color='").append(sColors[j]).append("'>")
-                                    .append(aText.getText()).append("</font>");
-                        }
+                        textBuilder.append("<font color='").append(sColors[j]).append("'>")
+                                .append(aText.getText()).append("</font>");
                     }
                 }
             }
-            builder.setMessage(Html.fromHtml(textBuilder.toString()));
-            builder.setPositiveButton(R.string.okbutton,
-                    new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                            dialog.cancel();
-                        }
-                    });
-            builder.show();
-        } else if (ConstantUtil.IMAGE_HELP_TYPE.equals(type)) {
-            notifyQuestionListeners(QuestionInteractionEvent.PHOTO_TIP_VIEW);
-        } else {
-            notifyQuestionListeners(QuestionInteractionEvent.ACTIVITY_TIP_VIEW);
         }
+        builder.setMessage(Html.fromHtml(textBuilder.toString()));
+        builder.setPositiveButton(R.string.okbutton,
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.cancel();
+                    }
+                });
+        builder.show();
     }
 
     /**
@@ -531,15 +467,6 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
 
     public void setTextSize(float size) {
         mQuestionText.setTextSize(size);
-    }
-
-    /**
-     * hides or shows the tips button
-     *
-     * @param isSuppress
-     */
-    public void suppressHelp(boolean isSuppress) {
-        mTipImage.setVisibility(isSuppress ? View.GONE : View.VISIBLE);
     }
 
     protected String getDefaultLang() {

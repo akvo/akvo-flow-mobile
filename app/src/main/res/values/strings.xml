@@ -303,5 +303,7 @@
 
     <string name="media_from_camera">Camera</string>
     <string name="media_from_gallery">Gallery</string>
+    <string name="error_username_required">A username is required</string>
+    <string name="error_device_id_required">A device id is required</string>
 
 </resources>

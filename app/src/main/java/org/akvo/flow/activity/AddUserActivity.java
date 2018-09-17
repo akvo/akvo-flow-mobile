@@ -115,17 +115,28 @@ public class AddUserActivity extends BaseActivity {
     private void saveUserData() {
         String username = nameEt.getText().toString().trim();
         String deviceId = deviceIdEt.getText().toString().trim();
-        surveyDbDataSource.open();
-        long userId = surveyDbDataSource.createOrUpdateUser(null, username);
-        surveyDbDataSource.close();
+        boolean emptyUserName = TextUtils.isEmpty(username);
+        boolean emptyDeviceId = TextUtils.isEmpty(deviceId);
+        if (emptyUserName) {
+            nameEt.setError(getString(R.string.error_username_required));
+        }
+        if (emptyDeviceId) {
+            deviceIdEt.setError(getString(R.string.error_device_id_required));
+        }
+        if (!emptyUserName && !emptyDeviceId && nextBt.isEnabled()) {
+            nextBt.setEnabled(false);
+            surveyDbDataSource.open();
+            long userId = surveyDbDataSource.createOrUpdateUser(null, username);
+            surveyDbDataSource.close();
 
-        prefs.setString(Prefs.KEY_DEVICE_IDENTIFIER, deviceId);
-        prefs.setBoolean(Prefs.KEY_SETUP, true);
+            prefs.setString(Prefs.KEY_DEVICE_IDENTIFIER, deviceId);
+            prefs.setBoolean(Prefs.KEY_SETUP, true);
 
-        // Select the newly created user, and exit the Activity
-        prefs.setLong(Prefs.KEY_USER_ID, userId);
-        helper.initLoginData(username, deviceId);
-        navigateToSurvey();
+            // Select the newly created user, and exit the Activity
+            prefs.setLong(Prefs.KEY_USER_ID, userId);
+            helper.initLoginData(username, deviceId);
+            navigateToSurvey();
+        }
     }
 
     @OnTextChanged(value = { R.id.username, R.id.device_id }, callback = AFTER_TEXT_CHANGED)

@@ -223,7 +223,7 @@ public class Question {
     }
 
     public List<QuestionHelp> getHelpByType(String type) {
-        List<QuestionHelp> help = new ArrayList<QuestionHelp>();
+        List<QuestionHelp> help = new ArrayList<>();
         if (questionHelp != null && type != null) {
             for (int i = 0; i < questionHelp.size(); i++) {
                 if (type.equalsIgnoreCase(questionHelp.get(i).getType())) {
@@ -259,18 +259,11 @@ public class Question {
 
     /**
      * counts the number of non-empty help tip types
-     * 
-     * @return
+     *
      */
     public int getHelpTypeCount() {
         int count = 0;
-        if (getHelpByType(ConstantUtil.IMAGE_HELP_TYPE).size() > 0) {
-            count++;
-        }
         if (getHelpByType(ConstantUtil.TIP_HELP_TYPE).size() > 0) {
-            count++;
-        }
-        if (getHelpByType(ConstantUtil.VIDEO_HELP_TYPE).size() > 0) {
             count++;
         }
         return count;

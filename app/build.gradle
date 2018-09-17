@@ -202,58 +202,57 @@ configurations.all { config ->
 }
 
 dependencies {
-    implementation fileTree(include: '*.jar', dir: 'libs')
     implementation "com.android.support:appcompat-v7:${rootProject.ext.supportVersion}"
     implementation "com.android.support:exifinterface:${rootProject.ext.supportVersion}"
     implementation "com.android.support:recyclerview-v7:${rootProject.ext.supportVersion}"
     implementation "com.android.support:support-annotations:${rootProject.ext.supportVersion}"
     implementation "com.android.support:design:${rootProject.ext.supportVersion}"
-    implementation 'com.android.support.constraint:constraint-layout:1.1.3'
-    implementation 'com.google.android.gms:play-services-maps:7.5.0'
-    implementation 'com.google.android.gms:play-services-gcm:7.5.0'
-    implementation 'org.ocpsoft.prettytime:prettytime:3.2.4.Final'
-    implementation 'com.google.maps.android:android-maps-utils:0.4'
-    implementation 'com.jakewharton.timber:timber:4.5.1'
-    implementation 'com.google.dagger:dagger:2.8'
-    annotationProcessor 'com.google.dagger:dagger-compiler:2.8'
-    implementation 'com.jakewharton:butterknife:8.5.1'
-    annotationProcessor 'com.jakewharton:butterknife-compiler:8.5.1'
-    implementation 'io.sentry:sentry-android:1.7.5'
-    implementation 'com.github.bumptech.glide:glide:3.5.2'
-    implementation 'com.squareup.sqlbrite2:sqlbrite:2.0.0'
-    implementation 'io.reactivex.rxjava2:rxandroid:2.0.1'
-    implementation 'io.reactivex.rxjava2:rxjava:2.1.0'
-    implementation 'com.squareup.okhttp3:logging-interceptor:3.6.0'
-    implementation 'com.google.code.gson:gson:2.8.2'
-    implementation('com.crashlytics.sdk.android:crashlytics:2.9.2@aar') {
+    implementation "com.android.support.constraint:constraint-layout:${rootProject.ext.constraintLayoutVersion}"
+    implementation "com.google.android.gms:play-services-maps:${rootProject.ext.gmsVersion}"
+    implementation "com.google.android.gms:play-services-gcm:${rootProject.ext.gmsVersion}"
+    implementation "com.google.maps.android:android-maps-utils:${rootProject.ext.mapUtilsVersion}"
+    implementation "org.ocpsoft.prettytime:prettytime:${rootProject.ext.prettyTimeVersion}"
+    implementation "com.jakewharton.timber:timber:${rootProject.ext.timberVersion}"
+    implementation "com.google.dagger:dagger:${rootProject.ext.daggerVersion}"
+    annotationProcessor "com.google.dagger:dagger-compiler:${rootProject.ext.daggerVersion}"
+    implementation "com.jakewharton:butterknife:${rootProject.ext.butterKnifeVersion}"
+    annotationProcessor "com.jakewharton:butterknife-compiler:${rootProject.ext.butterKnifeVersion}"
+    implementation "io.sentry:sentry-android:${rootProject.ext.sentryVersion}"
+    implementation "com.github.bumptech.glide:glide:${rootProject.ext.glideVersion}"
+    implementation "com.squareup.sqlbrite2:sqlbrite:${rootProject.ext.sqlbriteVersion}"
+    implementation "io.reactivex.rxjava2:rxandroid:${rootProject.ext.rxAndroidVersion}"
+    implementation "io.reactivex.rxjava2:rxjava:${rootProject.ext.rxJavaVersion}"
+    implementation "com.squareup.okhttp3:logging-interceptor:${rootProject.ext.loggingInterceptorVersion}"
+    implementation "com.google.code.gson:gson:${rootProject.ext.gsonVersion}"
+    implementation("com.crashlytics.sdk.android:crashlytics:${rootProject.ext.crashlyticsVersion}") {
         transitive = true
     }
     debugImplementation "com.squareup.leakcanary:leakcanary-android:${rootProject.ext.leakCanaryVersion}"
     releaseImplementation "com.squareup.leakcanary:leakcanary-android-no-op:${rootProject.ext.leakCanaryVersion}"
     debugImplementation "com.squareup.leakcanary:leakcanary-support-fragment:${rootProject.ext.leakCanaryVersion}"
 
-    testImplementation 'junit:junit:4.12'
-    testImplementation 'org.mockito:mockito-core:1.10.19'
-    testImplementation 'org.powermock:powermock-module-junit4:1.6.2'
-    testImplementation 'org.powermock:powermock-module-junit4-rule:1.6.2'
-    testImplementation 'org.powermock:powermock-api-mockito:1.6.2'
-    testImplementation 'org.powermock:powermock-classloading-xstream:1.6.2'
+    testImplementation "junit:junit:${rootProject.ext.jUnitVersion}"
+    testImplementation "org.mockito:mockito-core:${rootProject.ext.mockitoCoreVersion}"
+    testImplementation "org.powermock:powermock-module-junit4:${rootProject.ext.powerMockVersion}"
+    testImplementation "org.powermock:powermock-module-junit4-rule:${rootProject.ext.powerMockVersion}"
+    testImplementation "org.powermock:powermock-api-mockito:${rootProject.ext.powerMockVersion}"
+    testImplementation "org.powermock:powermock-classloading-xstream:${rootProject.ext.powerMockVersion}"
 
-    androidTestImplementation 'com.google.dexmaker:dexmaker:1.2'
-    androidTestImplementation 'com.google.dexmaker:dexmaker-mockito:1.2'
-    androidTestImplementation('com.android.support.test:rules:0.5') {
+    androidTestImplementation "com.google.dexmaker:dexmaker:${rootProject.ext.dexMakerVersion}"
+    androidTestImplementation "com.google.dexmaker:dexmaker-mockito:${rootProject.ext.dexMakerVersion}"
+    androidTestImplementation("com.android.support.test:rules:${rootProject.ext.supportTestRulesVersion}") {
         exclude module: 'support-annotations'
         exclude group: 'com.android.support', module: 'appcompat'
         exclude group: 'com.android.support', module: 'support-v4'
         exclude module: 'recyclerview-v7'
     }
-    androidTestImplementation('com.android.support.test.espresso:espresso-core:2.2.2') {
+    androidTestImplementation("com.android.support.test.espresso:espresso-core:${rootProject.ext.espressoCoreVersion}") {
         exclude module: 'support-annotations'
         exclude group: 'com.android.support', module: 'appcompat'
         exclude group: 'com.android.support', module: 'support-v4'
         exclude module: 'recyclerview-v7'
     }
-    androidTestImplementation('com.android.support.test.espresso:espresso-contrib:2.2.1') {
+    androidTestImplementation("com.android.support.test.espresso:espresso-contrib:${rootProject.ext.espressoContribVersion}") {
         exclude module: 'support-annotations'
         exclude group: 'com.android.support', module: 'appcompat'
         exclude group: 'com.android.support', module: 'support-v4'

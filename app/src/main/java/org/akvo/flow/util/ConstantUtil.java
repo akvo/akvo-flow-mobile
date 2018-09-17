@@ -70,8 +70,6 @@ public class ConstantUtil {
     /**
      * help types
      */
-    public static final String VIDEO_HELP_TYPE = "video";
-    public static final String IMAGE_HELP_TYPE = "image";
     public static final String TIP_HELP_TYPE = "tip";
 
     /**

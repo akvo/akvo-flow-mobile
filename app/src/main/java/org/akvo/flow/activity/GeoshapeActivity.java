@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2015-2018 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -184,6 +184,7 @@ public class GeoshapeActivity extends BackActivity
     private void addPoint(LatLng point) {
         mCurrentFeature.addPoint(point);
         mClearPointBtn.setEnabled(true);
+        supportInvalidateOptionsMenu();
     }
 
     @Override
@@ -202,6 +203,10 @@ public class GeoshapeActivity extends BackActivity
         }
         if (!mAllowPolygon) {
             menu.findItem(R.id.add_polygon).setVisible(false);
+        }
+        MenuItem item = menu.findItem(R.id.save);
+        if (item != null) {
+            item.setVisible(isValidShape());
         }
         return super.onCreateOptionsMenu(menu);
     }
@@ -234,9 +239,7 @@ public class GeoshapeActivity extends BackActivity
                 mFeatures.add(mCurrentFeature);
                 break;
             case R.id.save:
-                Intent intent = new Intent();
-                intent.putExtra(ConstantUtil.GEOSHAPE_RESULT, geoJson());
-                setResult(RESULT_OK, intent);
+                setShapeResult();
                 finish();
                 break;
             case android.R.id.home:
@@ -247,9 +250,14 @@ public class GeoshapeActivity extends BackActivity
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
+    private void setShapeResult() {
+        Intent intent = new Intent();
+        if (isValidShape()) {
+            intent.putExtra(ConstantUtil.GEOSHAPE_RESULT, geoJson());
+            setResult(RESULT_OK, intent);
+        } else {
+            setResult(RESULT_CANCELED, intent);
+        }
     }
 
     private View.OnClickListener mFeatureMenuListener = new View.OnClickListener() {
@@ -350,6 +358,15 @@ public class GeoshapeActivity extends BackActivity
             return null;
         }
         return jObject.toString();
+    }
+
+    private boolean isValidShape() {
+        for (Feature feature : mFeatures) {
+            if (feature!= null && !feature.getPoints().isEmpty()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -496,11 +513,13 @@ public class GeoshapeActivity extends BackActivity
     public void deletePoint() {
         mCurrentFeature.removePoint();
         selectFeature(mCurrentFeature, null);
+        supportInvalidateOptionsMenu();
     }
 
     @Override
     public void deleteShape() {
         mCurrentFeature.delete();
         selectFeature(null, null);
+        supportInvalidateOptionsMenu();
     }
 }

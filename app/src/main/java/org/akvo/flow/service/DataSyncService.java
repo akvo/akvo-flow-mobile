@@ -66,10 +66,6 @@ public class DataSyncService extends Service {
     @Inject
     UseCase upload;
 
-    @Named("allowedToConnect")
-    @Inject
-    UseCase allowedToConnect;
-
     @Named("checkDeviceNotification")
     @Inject
     UseCase checkDeviceNotification;
@@ -94,7 +90,6 @@ public class DataSyncService extends Service {
         super.onDestroy();
         makeDataPrivate.dispose();
         upload.dispose();
-        allowedToConnect.dispose();
         checkDeviceNotification.dispose();
         checkPublishedFiles.dispose();
         exportSurveyInstances.dispose();
@@ -147,32 +142,13 @@ public class DataSyncService extends Service {
             @Override
             public void onComplete() {
                 broadcastDataPointStatusChange();
-                sync();
+                checkDeviceNotification();
             }
 
             @Override
             public void onError(Throwable e) {
                 broadcastDataPointStatusChange();
-                sync();
-            }
-        }, null);
-    }
-
-    private void sync() {
-        allowedToConnect.execute(new DefaultObserver<Boolean>() {
-            @Override
-            public void onNext(Boolean connectAllowed) {
-                if (connectAllowed) {
-                    checkDeviceNotification();
-                } else {
-                    stopService();
-                }
-            }
-
-            @Override
-            public void onError(Throwable e) {
-                Timber.e(e);
-                stopService();
+                checkDeviceNotification();
             }
         }, null);
     }

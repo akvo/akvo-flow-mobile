@@ -32,9 +32,8 @@ import com.google.android.gms.gcm.TaskParams;
 import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.domain.apkupdate.ApkUpdateStore;
 import org.akvo.flow.domain.apkupdate.ViewApkData;
-import org.akvo.flow.util.ConnectivityStateManager;
-import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.domain.util.GsonMapper;
+import org.akvo.flow.util.ConstantUtil;
 
 import timber.log.Timber;
 
@@ -123,19 +122,13 @@ public class ApkUpdateService extends GcmTaskService {
                 ConstantUtil.FLEX_INTERVAL_IN_SECONDS);
         Context applicationContext = getApplicationContext();
         apkUpdateHelper = new ApkUpdateHelper();
-        ConnectivityStateManager connectivityStateManager = new ConnectivityStateManager(
-                applicationContext);
-        Prefs prefs = new Prefs(applicationContext);
-        if (!syncOverMobileNetworksAllowed(prefs) && !connectivityStateManager.isWifiConnected()) {
-            Timber.d("No available authorised connection. Can't perform the requested operation");
-            return GcmNetworkManager.RESULT_SUCCESS;
-        }
 
         try {
             Pair<Boolean, ViewApkData> booleanApkDataPair = apkUpdateHelper.shouldUpdate();
             if (booleanApkDataPair.first) {
                 //save to shared preferences
-                ApkUpdateStore store = new ApkUpdateStore(new GsonMapper(), prefs);
+                ApkUpdateStore store = new ApkUpdateStore(new GsonMapper(),
+                        new Prefs(applicationContext));
                 store.updateApkData(booleanApkDataPair.second);
             }
             return GcmNetworkManager.RESULT_SUCCESS;
@@ -143,10 +136,5 @@ public class ApkUpdateService extends GcmTaskService {
             Timber.e(e, "Error with apk version service");
             return GcmNetworkManager.RESULT_FAILURE;
         }
-    }
-
-    private boolean syncOverMobileNetworksAllowed(Prefs prefs) {
-        return prefs.getBoolean(Prefs.KEY_CELL_UPLOAD,
-                Prefs.DEFAULT_VALUE_CELL_UPLOAD);
     }
 }

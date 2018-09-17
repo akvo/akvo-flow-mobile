@@ -30,11 +30,10 @@ import org.akvo.flow.injector.PerActivity;
 import org.akvo.flow.injector.module.ViewModule;
 import org.akvo.flow.presentation.AboutActivity;
 import org.akvo.flow.presentation.AppDownloadDialogFragment;
-import org.akvo.flow.presentation.main.MainActivity;
 import org.akvo.flow.presentation.datapoints.list.DataPointsListFragment;
 import org.akvo.flow.presentation.datapoints.map.DataPointsMapFragment;
-import org.akvo.flow.presentation.help.HelpActivity;
 import org.akvo.flow.presentation.legal.LegalNoticesActivity;
+import org.akvo.flow.presentation.main.MainActivity;
 import org.akvo.flow.presentation.navigation.FlowNavigationView;
 import org.akvo.flow.presentation.settings.PreferenceActivity;
 import org.akvo.flow.presentation.settings.publish.PublishFilesPreferenceView;
@@ -71,8 +70,6 @@ public interface ViewComponent {
     void inject(AboutActivity aboutActivity);
 
     void inject(ResponseListFragment responseListFragment);
-
-    void inject(HelpActivity activity);
 
     void inject(PreferenceActivity preferenceActivity);
 

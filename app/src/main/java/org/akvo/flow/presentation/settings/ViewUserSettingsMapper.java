@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -44,15 +44,15 @@ public class ViewUserSettingsMapper {
             @NonNull List<String> languages) {
         if (userSettings == null) {
             int englishPosition = getEnglishLanguagePosition(languages);
-            return new ViewUserSettings(false, false, englishPosition, 0, "");
+            return new ViewUserSettings(false, englishPosition, 0, "");
         }
         String language = userSettings.getLanguage();
         if (TextUtils.isEmpty(language)) {
             language = Locale.getDefault().getLanguage();
         }
         int languagePosition = getLanguagePosition(languages, language);
-        return new ViewUserSettings(userSettings.isScreenOn(), userSettings.isDataEnabled(),
-                languagePosition, userSettings.getImageSize(), userSettings.getIdentifier());
+        return new ViewUserSettings(userSettings.isScreenOn(), languagePosition,
+                userSettings.getImageSize(), userSettings.getIdentifier());
     }
 
     private int getLanguagePosition(@NonNull List<String> languages, String language) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -23,7 +23,6 @@ package org.akvo.flow.presentation.settings;
 import org.akvo.flow.domain.entity.UserSettings;
 import org.akvo.flow.domain.interactor.DefaultObserver;
 import org.akvo.flow.domain.interactor.SaveAppLanguage;
-import org.akvo.flow.domain.interactor.SaveEnableMobileData;
 import org.akvo.flow.domain.interactor.SaveImageSize;
 import org.akvo.flow.domain.interactor.SaveKeepScreenOn;
 import org.akvo.flow.domain.interactor.UseCase;
@@ -43,7 +42,6 @@ public class PreferencePresenter implements Presenter {
 
     private final UseCase getUserSettings;
     private final UseCase saveAppLanguage;
-    private final UseCase saveEnableMobileData;
     private final UseCase saveImageSize;
     private final UseCase saveKeepScreenOn;
     private final UseCase unSyncedTransmissionsExist;
@@ -57,7 +55,6 @@ public class PreferencePresenter implements Presenter {
     @Inject
     public PreferencePresenter(@Named("getUserSettings") UseCase getUserSettings,
             @Named("saveAppLanguage") UseCase saveAppLanguage,
-            @Named("saveEnableMobileData") UseCase saveEnableMobileData,
             @Named("saveImageSize") UseCase saveImageSize,
             @Named("saveKeepScreenOn") UseCase saveKeepScreenOn,
             @Named("unSyncedTransmissionsExist") UseCase unSyncedTransmissionsExist,
@@ -66,7 +63,6 @@ public class PreferencePresenter implements Presenter {
             ViewUserSettingsMapper mapper, LoggingHelper helper) {
         this.getUserSettings = getUserSettings;
         this.saveAppLanguage = saveAppLanguage;
-        this.saveEnableMobileData = saveEnableMobileData;
         this.saveImageSize = saveImageSize;
         this.saveKeepScreenOn = saveKeepScreenOn;
         this.unSyncedTransmissionsExist = unSyncedTransmissionsExist;
@@ -109,17 +105,6 @@ public class PreferencePresenter implements Presenter {
         }, params);
     }
 
-    public void saveEnableMobileData(boolean enable) {
-        Map<String, Object> params = new HashMap<>(2);
-        params.put(SaveEnableMobileData.PARAM_ENABLE_MOBILE_DATA, enable);
-        saveEnableMobileData.execute(new DefaultObserver<Boolean>() {
-            @Override
-            public void onError(Throwable e) {
-                Timber.e(e);
-            }
-        }, params);
-    }
-
     public void saveImageSize(int size) {
         Map<String, Object> params = new HashMap<>(2);
         params.put(SaveImageSize.PARAM_IMAGE_SIZE, size);
@@ -146,7 +131,6 @@ public class PreferencePresenter implements Presenter {
     public void destroy() {
         getUserSettings.dispose();
         saveAppLanguage.dispose();
-        saveEnableMobileData.dispose();
         saveImageSize.dispose();
         saveKeepScreenOn.dispose();
         unSyncedTransmissionsExist.dispose();

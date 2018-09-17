@@ -37,13 +37,12 @@ import org.akvo.flow.domain.QuestionGroup;
 import org.akvo.flow.domain.QuestionHelp;
 import org.akvo.flow.domain.Survey;
 import org.akvo.flow.domain.SurveyGroup;
-import org.akvo.flow.util.ConnectivityStateManager;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.FileUtil;
-import org.akvo.flow.util.files.FormFileBrowser;
-import org.akvo.flow.util.files.FormResourcesFileBrowser;
 import org.akvo.flow.util.HttpUtil;
 import org.akvo.flow.util.NotificationHelper;
+import org.akvo.flow.util.files.FormFileBrowser;
+import org.akvo.flow.util.files.FormResourcesFileBrowser;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -88,9 +87,6 @@ public class SurveyDownloadService extends IntentService {
 
     @Inject
     Prefs prefs;
-
-    @Inject
-    ConnectivityStateManager connectivityStateManager;
 
     public SurveyDownloadService() {
         super(TAG);
@@ -145,12 +141,6 @@ public class SurveyDownloadService extends IntentService {
      * on the device, the surveys will be replaced with the new ones.
      */
     private void checkAndDownload(@Nullable String[] surveyIds) {
-        if (!connectivityStateManager.isConnectionAvailable(
-                prefs.getBoolean(Prefs.KEY_CELL_UPLOAD, Prefs.DEFAULT_VALUE_CELL_UPLOAD))) {
-            //No internet or not allowed to sync
-            return;
-        }
-
         List<Survey> surveys;
         if (surveyIds != null && surveyIds.length > 0) {
             surveys = getSurveyHeaders(surveyIds);

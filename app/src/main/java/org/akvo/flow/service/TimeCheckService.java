@@ -1,5 +1,5 @@
 /*
-* Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
+* Copyright (C) 2010-2018 Stichting Akvo (Akvo Foundation)
 *
  *  This file is part of Akvo Flow.
  *
@@ -24,13 +24,12 @@ import android.content.Intent;
 
 import org.akvo.flow.activity.TimeCheckActivity;
 import org.akvo.flow.api.FlowApi;
-import org.akvo.flow.data.preference.Prefs;
-import org.akvo.flow.util.ConnectivityStateManager;
 
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Locale;
 import java.util.TimeZone;
 
 import timber.log.Timber;
@@ -43,27 +42,16 @@ public class TimeCheckService extends IntentService {
     private static final String PATTERN = "yyyy-MM-dd'T'HH:mm:ss'Z'";// ISO 8601
     private static final String TIMEZONE = "UTC";
 
-    private ConnectivityStateManager connectivityStateManager;
-    private Prefs prefs;
-
     public TimeCheckService() {
         super(TAG);
     }
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        this.connectivityStateManager = new ConnectivityStateManager(getApplicationContext());
-        this.prefs = new Prefs(getApplicationContext());
         checkTime();
     }
 
     private void checkTime() {
-        if (!connectivityStateManager.isConnectionAvailable(
-                prefs.getBoolean(Prefs.KEY_CELL_UPLOAD, Prefs.DEFAULT_VALUE_CELL_UPLOAD))) {
-            Timber.d("No internet connection available. Can't perform the time check.");
-            return;
-        }
-
         // Since a misconfigured date/time might be considering the SSL certificate as expired,
         // we'll use HTTP by default, instead of HTTPS
         try {
@@ -71,7 +59,7 @@ public class TimeCheckService extends IntentService {
             String time = flowApi.getServerTime();
 
             if (isValid(time)) {
-                DateFormat df = new SimpleDateFormat(PATTERN);
+                DateFormat df = new SimpleDateFormat(PATTERN, Locale.getDefault());
                 df.setTimeZone(TimeZone.getTimeZone(TIMEZONE));
                 final long remote = df.parse(time).getTime();
                 final long local = System.currentTimeMillis();

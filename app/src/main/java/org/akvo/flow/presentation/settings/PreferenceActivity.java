@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -89,9 +89,6 @@ public class PreferenceActivity extends BackActivity implements PreferenceView,
 
     @BindView(R.id.switch_screen_on)
     SwitchCompat screenOnSc;
-
-    @BindView(R.id.switch_enable_data)
-    SwitchCompat enableDataSc;
 
     @BindView(R.id.preference_language)
     Spinner appLanguageSp;
@@ -221,13 +218,6 @@ public class PreferenceActivity extends BackActivity implements PreferenceView,
         navigator.navigateToStorageSettings(this);
     }
 
-    @OnCheckedChanged(R.id.switch_enable_data)
-    void onDataCheckChanged(boolean checked) {
-        if (trackChanges) {
-            presenter.saveEnableMobileData(checked);
-        }
-    }
-
     @OnCheckedChanged(R.id.switch_screen_on)
     void onScreenOnCheckChanged(boolean checked) {
         if (trackChanges) {
@@ -262,7 +252,6 @@ public class PreferenceActivity extends BackActivity implements PreferenceView,
         instanceNameTv.setText(BuildConfig.INSTANCE_URL);
         deviceIdentifierTv.setText(viewUserSettings.getIdentifier());
         screenOnSc.setChecked(viewUserSettings.isScreenOn());
-        enableDataSc.setChecked(viewUserSettings.isDataEnabled());
         appLanguageSp.setSelection(viewUserSettings.getLanguage());
         imageSizeSp.setSelection(viewUserSettings.getImageSize());
         delayListeners();

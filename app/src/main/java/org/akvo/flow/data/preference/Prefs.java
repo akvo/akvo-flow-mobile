@@ -40,7 +40,6 @@ public class Prefs {
     public static final String KEY_USER_ID = "userId";
     public static final String KEY_SETUP = "setup";
     public static final String KEY_LOCALE = "pref.locale";
-    public static final String KEY_CELL_UPLOAD = "data.cellular.upload";
     public static final String KEY_SCREEN_ON = "screen.keepon";
     public static final String KEY_DEVICE_IDENTIFIER = "device.identifier";
     private static final String KEY_MAX_IMG_SIZE = "media.img.maxsize";
@@ -51,7 +50,6 @@ public class Prefs {
 
     public static final String DEFAULT_VALUE_DEVICE_IDENTIFIER = "unset";
     public static final int DEFAULT_VALUE_IMAGE_SIZE = ConstantUtil.IMAGE_SIZE_320_240;
-    public static final boolean DEFAULT_VALUE_CELL_UPLOAD = false;
     public static final boolean DEFAULT_VALUE_SCREEN_ON = true;
     public static final long DEF_VALUE_SPACE_AVAILABLE = 101L;
     public static final long DEFAULT_VALUE_USER_ID = -1;
@@ -107,11 +105,6 @@ public class Prefs {
         String deviceIdentifier = insertablePreferences.getDeviceIdentifier();
         if (!TextUtils.isEmpty(deviceIdentifier)) {
             setString(KEY_DEVICE_IDENTIFIER, deviceIdentifier);
-        }
-
-        if (DEFAULT_VALUE_CELL_UPLOAD != insertablePreferences.isCellularDataEnabled()) {
-            setBoolean(KEY_CELL_UPLOAD,
-                    insertablePreferences.isCellularDataEnabled());
         }
 
         if (DEFAULT_VALUE_SCREEN_ON != insertablePreferences.isScreenOn()) {

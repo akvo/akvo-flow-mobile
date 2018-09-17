@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -24,8 +24,6 @@ import io.reactivex.Observable;
 
 public interface UserRepository {
 
-    Observable<Boolean> mobileSyncAllowed();
-
     Observable<Boolean> keepScreenOn();
 
     Observable<String> getAppLanguage();
@@ -35,8 +33,6 @@ public interface UserRepository {
     Observable<String> getDeviceId();
 
     Observable<Boolean> saveScreenOnPreference(Boolean keepScreenOn);
-
-    Observable<Boolean> saveEnableMobileDataPreference(Boolean enable);
 
     Observable<Boolean> saveLanguagePreference(String language);
 

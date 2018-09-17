@@ -40,11 +40,9 @@ public class SharedPreferencesDataSource {
     private static final String DEFAULT_VALUE_DEVICE_IDENTIFIER = "unset";
     private static final int DEFAULT_VALUE_IMAGE_SIZE = 0;
     private static final boolean DEFAULT_VALUE_SCREEN_ON = true;
-    private static final String KEY_CELL_UPLOAD = "data.cellular.upload";
     private static final String KEY_SURVEY_GROUP_ID = "surveyGroupId";
     private static final String KEY_USER_ID = "userId";
     private static final String KEY_SECURITY_WALKTHROUGH_SEEN = "security_walkthrough_seen";
-    private static final boolean DEFAULT_VALUE_CELL_UPLOAD = false;
     private static final long LONG_VALUE_UNSET = -1;
 
     private final SharedPreferences preferences;
@@ -52,10 +50,6 @@ public class SharedPreferencesDataSource {
     @Inject
     public SharedPreferencesDataSource(SharedPreferences prefs) {
         this.preferences = prefs;
-    }
-
-    public Observable<Boolean> mobileSyncEnabled() {
-        return Observable.just(getBoolean(KEY_CELL_UPLOAD, DEFAULT_VALUE_CELL_UPLOAD));
     }
 
     public Observable<Boolean> keepScreenOn() {
@@ -135,11 +129,6 @@ public class SharedPreferencesDataSource {
 
     public Observable<Boolean> saveScreenOn(Boolean keepScreenOn) {
         setBoolean(KEY_SCREEN_ON, keepScreenOn);
-        return Observable.just(true);
-    }
-
-    public Observable<Boolean> saveEnableMobileData(Boolean enable) {
-        setBoolean(KEY_CELL_UPLOAD, enable);
         return Observable.just(true);
     }
 

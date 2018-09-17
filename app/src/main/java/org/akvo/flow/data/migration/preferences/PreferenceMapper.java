@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -34,10 +34,6 @@ public class PreferenceMapper {
         }
 
         String deviceIdentifier = migratablePreferences.getDeviceIdentifier();
-        boolean cellularUpload = Prefs.DEFAULT_VALUE_CELL_UPLOAD;
-        if (!TextUtils.isEmpty(migratablePreferences.getCellularDataUpload())) {
-            cellularUpload = "true".equals(migratablePreferences.getCellularDataUpload());
-        }
         boolean screenOn = Prefs.DEFAULT_VALUE_SCREEN_ON;
         if (!TextUtils.isEmpty(migratablePreferences.getScreenOn())) {
             screenOn = "true".equals(migratablePreferences.getScreenOn());
@@ -46,6 +42,6 @@ public class PreferenceMapper {
         if (!TextUtils.isEmpty(migratablePreferences.getImageSize())) {
             imgSize = Integer.parseInt(migratablePreferences.getImageSize());
         }
-        return new InsertablePreferences(deviceIdentifier, cellularUpload, screenOn, imgSize);
+        return new InsertablePreferences(deviceIdentifier, screenOn, imgSize);
     }
 }

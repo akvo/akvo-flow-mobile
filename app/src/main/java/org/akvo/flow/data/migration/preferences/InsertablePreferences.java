@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2010-2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -29,14 +29,12 @@ public class InsertablePreferences {
 
     @Nullable
     private final String deviceIdentifier;
-    private final boolean cellularDataEnabled;
     private final boolean screenOn;
     private final int imageSize;
 
-    public InsertablePreferences(@Nullable String deviceIdentifier, boolean cellularDataEnabled,
-            boolean screenOn, int imageSize) {
+    public InsertablePreferences(@Nullable String deviceIdentifier, boolean screenOn,
+            int imageSize) {
         this.deviceIdentifier = deviceIdentifier;
-        this.cellularDataEnabled = cellularDataEnabled;
         this.screenOn = screenOn;
         this.imageSize = imageSize;
     }
@@ -44,10 +42,6 @@ public class InsertablePreferences {
     @Nullable
     public String getDeviceIdentifier() {
         return deviceIdentifier;
-    }
-
-    public boolean isCellularDataEnabled() {
-        return cellularDataEnabled;
     }
 
     public boolean isScreenOn() {

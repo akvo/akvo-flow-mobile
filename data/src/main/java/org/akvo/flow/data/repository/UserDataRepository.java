@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -37,11 +37,6 @@ public class UserDataRepository implements UserRepository {
     }
 
     @Override
-    public Observable<Boolean> mobileSyncAllowed() {
-        return dataSourceFactory.getSharedPreferencesDataSource().mobileSyncEnabled();
-    }
-
-    @Override
     public Observable<Boolean> keepScreenOn() {
         return dataSourceFactory.getSharedPreferencesDataSource().keepScreenOn();
     }
@@ -64,11 +59,6 @@ public class UserDataRepository implements UserRepository {
     @Override
     public Observable<Boolean> saveScreenOnPreference(Boolean keepScreenOn) {
         return dataSourceFactory.getSharedPreferencesDataSource().saveScreenOn(keepScreenOn);
-    }
-
-    @Override
-    public Observable<Boolean> saveEnableMobileDataPreference(Boolean enable) {
-        return dataSourceFactory.getSharedPreferencesDataSource().saveEnableMobileData(enable);
     }
 
     @Override

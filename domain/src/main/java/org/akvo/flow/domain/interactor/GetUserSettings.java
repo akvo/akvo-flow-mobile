@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -30,7 +30,7 @@ import java.util.Map;
 import javax.inject.Inject;
 
 import io.reactivex.Observable;
-import io.reactivex.functions.Function5;
+import io.reactivex.functions.Function4;
 
 public class GetUserSettings extends UseCase {
 
@@ -45,15 +45,13 @@ public class GetUserSettings extends UseCase {
 
     @Override
     protected <T> Observable buildUseCaseObservable(Map<String, T> parameters) {
-        return Observable.zip(userRepository.keepScreenOn(), userRepository.mobileSyncAllowed(),
-                userRepository.getAppLanguage(), userRepository.getImageSize(),
-                userRepository.getDeviceId(),
-                new Function5<Boolean, Boolean, String, Integer, String, UserSettings>() {
+        return Observable.zip(userRepository.keepScreenOn(), userRepository.getAppLanguage(),
+                userRepository.getImageSize(), userRepository.getDeviceId(),
+                new Function4<Boolean, String, Integer, String, UserSettings>() {
                     @Override
-                    public UserSettings apply(Boolean screenOn, Boolean mobileSync, String language,
-                            Integer imageSize, String deviceId) {
-                        return new UserSettings(screenOn, mobileSync, language, imageSize,
-                                deviceId);
+                    public UserSettings apply(Boolean screenOn, String language, Integer imageSize,
+                            String deviceId) {
+                        return new UserSettings(screenOn, language, imageSize, deviceId);
                     }
                 });
     }

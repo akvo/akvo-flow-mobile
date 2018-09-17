@@ -44,10 +44,10 @@ public class TimeCheckActivity extends AppCompatActivity {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.time_check_activity);
 
-        TextView tv = (TextView)findViewById(R.id.local_time_tv);
+        TextView tv = findViewById(R.id.local_time_tv);
         tv.setText(new SimpleDateFormat(PATTERN).format(new Date()));
 
-        Button b = (Button)findViewById(R.id.adjust_btn);
+        Button b = findViewById(R.id.adjust_btn);
         b.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -65,5 +65,4 @@ public class TimeCheckActivity extends AppCompatActivity {
         startService(new Intent(this, TimeCheckService.class));// Re-check time setting status
         finish();
     }
-
 }

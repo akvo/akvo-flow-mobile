@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -22,15 +22,13 @@ package org.akvo.flow.presentation.settings;
 
 public class ViewUserSettings {
     private final boolean screenOn;
-    private final boolean dataEnabled;
     private final int language;
     private final int imageSize;
     private final String identifier;
 
-    public ViewUserSettings(boolean screenOn, boolean dataEnabled, int language, int imageSize,
+    public ViewUserSettings(boolean screenOn, int language, int imageSize,
             String identifier) {
         this.screenOn = screenOn;
-        this.dataEnabled = dataEnabled;
         this.language = language;
         this.imageSize = imageSize;
         this.identifier = identifier;
@@ -38,10 +36,6 @@ public class ViewUserSettings {
 
     public boolean isScreenOn() {
         return screenOn;
-    }
-
-    public boolean isDataEnabled() {
-        return dataEnabled;
     }
 
     public int getLanguage() {

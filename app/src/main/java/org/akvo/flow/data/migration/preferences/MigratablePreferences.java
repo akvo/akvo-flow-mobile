@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2010-2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -26,24 +26,17 @@ package org.akvo.flow.data.migration.preferences;
 public class MigratablePreferences {
 
     private final String deviceIdentifier;
-    private final String cellularDataUpload;
     private final String screenOn;
     private final String imageSize;
 
-    public MigratablePreferences(String deviceIdentifier, String cellularDataUpload,
-            String screenOn, String imageSize) {
+    public MigratablePreferences(String deviceIdentifier, String screenOn, String imageSize) {
         this.deviceIdentifier = deviceIdentifier;
-        this.cellularDataUpload = cellularDataUpload;
         this.screenOn = screenOn;
         this.imageSize = imageSize;
     }
 
     public String getDeviceIdentifier() {
         return deviceIdentifier;
-    }
-
-    public String getCellularDataUpload() {
-        return cellularDataUpload;
     }
 
     public String getScreenOn() {

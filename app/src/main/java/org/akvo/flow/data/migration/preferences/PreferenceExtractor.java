@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2016-2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -35,10 +35,8 @@ public class PreferenceExtractor {
     public MigratablePreferences retrievePreferences(SQLiteDatabase db) {
         String deviceIdentifier = preferenceHandler
                 .findPreference(db, ConstantUtil.DEVICE_IDENT_KEY);
-        String cellularData = preferenceHandler
-                .findPreference(db, ConstantUtil.CELL_UPLOAD_SETTING_KEY);
         String screenOn = preferenceHandler.findPreference(db, ConstantUtil.SCREEN_ON_KEY);
         String imageSize = preferenceHandler.findPreference(db, ConstantUtil.MAX_IMG_SIZE);
-        return new MigratablePreferences(deviceIdentifier, cellularData, screenOn, imageSize);
+        return new MigratablePreferences(deviceIdentifier, screenOn, imageSize);
     }
 }

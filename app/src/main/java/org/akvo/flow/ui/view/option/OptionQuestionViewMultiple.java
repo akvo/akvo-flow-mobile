@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -27,6 +27,7 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.TextView;
 
+import org.akvo.flow.R;
 import org.akvo.flow.domain.Option;
 import org.akvo.flow.domain.Question;
 import org.akvo.flow.event.SurveyListener;
@@ -50,7 +51,7 @@ public class OptionQuestionViewMultiple extends OptionQuestionView {
         if (mOptions != null) {
             for (int i = 0; i < mOptions.size(); i++) {
                 Option option = mOptions.get(i);
-                View view = newCheckbox(option);
+                View view = newCheckbox(option, i);
                 mCheckBoxes.add((CheckBox) view);
                 addView(view);
                 view.setEnabled(!isReadOnly());
@@ -59,9 +60,14 @@ public class OptionQuestionViewMultiple extends OptionQuestionView {
         }
     }
 
-    private View newCheckbox(Option option) {
+    private View newCheckbox(Option option, int i) {
         CheckBox box = new CheckBox(getContext());
-        box.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
+        LayoutParams params = new LayoutParams(LayoutParams.MATCH_PARENT,
+                LayoutParams.WRAP_CONTENT);
+        if (i != 0) {
+            params.topMargin = getDimension(R.dimen.small_padding);
+        }
+        box.setLayoutParams(params);
         box.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {

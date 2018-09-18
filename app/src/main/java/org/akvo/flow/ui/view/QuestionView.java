@@ -88,7 +88,7 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
         mError = null;
     }
 
-    private int getDimension(int resId) {
+    protected int getDimension(int resId) {
         return (int) getResources().getDimension(resId);
     }
 

@@ -1,5 +1,8 @@
 Akvo FLOW app release notes
 ===========================
+# ver 2.6.2
+Date: ...
+
 # ver 2.6.1
 Date: 13 September 2018
 

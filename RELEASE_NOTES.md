@@ -1,7 +1,14 @@
 Akvo FLOW app release notes
 ===========================
 # ver 2.6.2
-Date: ...
+Date: 03 October 2018
+
+# Resolved issues
+* **Option questions layout** - Increase spacing between options [#1225]
+* **Support libraries** - Update some libraries in order to support use of Mapbox maps [#1222]
+* **Empty fields** - Prevent possibility of empty user name and device ID [#1211]
+* **Code cleanup** - Remove unused video and image help types [#928]
+* **Empty geoshapes** - Disable saving empty geoshapes [#745]
 
 # ver 2.6.1
 Date: 13 September 2018

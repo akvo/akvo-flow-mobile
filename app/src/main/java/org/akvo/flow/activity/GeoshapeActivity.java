@@ -250,6 +250,12 @@ public class GeoshapeActivity extends BackActivity
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void onBackPressed() {
+        setShapeResult();
+        super.onBackPressed();
+    }
+
     private void setShapeResult() {
         Intent intent = new Intent();
         if (isValidShape()) {

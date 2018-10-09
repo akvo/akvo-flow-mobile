@@ -1,5 +1,21 @@
 Akvo FLOW app release notes
 ===========================
+# ver 2.6.2
+Date: 09 October 2018
+
+# New and noteworthy
+* **Extract library versions to root build.gradle file** - [#845](https://github.com/akvo/akvo-flow-mobile/issues/845) Libraries versions are now all in the same file.
+* **Auto Save for geoshapes** - [#1199](https://github.com/akvo/akvo-flow-mobile/issues/1199) When pressing back button, the non-empty geoshape will be automatically saved.
+* **Update gms and maps libraries** - [#1222](https://github.com/akvo/akvo-flow-mobile/issues/1222) Update some libraries in order to support use of Mapbox maps.
+
+# Resolved issues
+* **Empty geoshapes allowed** - [#745](https://github.com/akvo/akvo-flow-mobile/issues/745) Disable saving empty geoshapes.
+* **Empty username and deviceId allowed** - [#1211](https://github.com/akvo/akvo-flow-mobile/issues/1211) Prevent possibility of empty user name and device ID when logging in.
+* **Option questions need more spacing** - [#1225](https://github.com/akvo/akvo-flow-mobile/issues/1225) Increase spacing between options.
+* **TimeCheckActivity crashes** - [#1229](https://github.com/akvo/akvo-flow-mobile/issues/1229) Fixed crash when showing dialog informing about a mis-configured time on the device.
+* **Code cleanup** - [#928](https://github.com/akvo/akvo-flow-mobile/issues/928) Remove unused video and image help types. 
+
+---------------
 # ver 2.6.1
 Date: 13 September 2018
 

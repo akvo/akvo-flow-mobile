@@ -111,11 +111,13 @@ public class Navigator {
 
     public void navigateToTakePhoto(@NonNull Activity activity, Uri uri) {
         Intent i = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
-        if (i.resolveActivity(activity.getPackageManager()) != null) {
+        PackageManager packageManager = activity.getPackageManager();
+        if (packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY) && i.resolveActivity(
+                packageManager) != null) {
             i.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, uri);
             activity.startActivityForResult(i, ConstantUtil.PHOTO_ACTIVITY_REQUEST);
         } else {
-            Timber.e(new Exception("No app found to take pictures"));
+            Timber.e(new Exception("No camera on device or no app found to take pictures"));
             //TODO: notify user
         }
     }

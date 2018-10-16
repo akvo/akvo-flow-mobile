@@ -19,9 +19,11 @@
 
 package org.akvo.flow.activity;
 
+import android.Manifest;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
@@ -143,7 +145,9 @@ public class GeoshapeActivity extends BackActivity
 
     private void initMap() {
         if (mMap != null) {
-            mMap.setMyLocationEnabled(true);
+            if (isLocationAllowed()) {
+                mMap.setMyLocationEnabled(true);
+            }
             mMap.setOnMarkerClickListener(this);
             mMap.setOnMyLocationChangeListener(this);
             if (mManualInput) {
@@ -151,6 +155,11 @@ public class GeoshapeActivity extends BackActivity
                 mMap.setOnMarkerDragListener(this);
             }
         }
+    }
+
+    private boolean isLocationAllowed() {
+        return ContextCompat.checkSelfPermission(this,
+                Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED;
     }
 
     private void updateMapCenter() {
@@ -275,7 +284,7 @@ public class GeoshapeActivity extends BackActivity
 
             switch (v.getId()) {
                 case R.id.add_point_btn:
-                    Location location = mMap == null? null : mMap.getMyLocation();
+                    Location location = mMap == null || !isLocationAllowed()? null : mMap.getMyLocation();
                     if (location != null && location.getAccuracy() <= ACCURACY_THRESHOLD) {
                         addPoint(new LatLng(location.getLatitude(), location.getLongitude()));
                     } else {

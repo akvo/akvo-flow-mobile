@@ -109,7 +109,7 @@ public class SignatureQuestionView extends QuestionView {
     }
 
     @Override
-    public void questionComplete(Bundle data) {
+    public void onQuestionResultReceived(Bundle data) {
         if (data != null) {
             final String name = data.getString(ConstantUtil.SIGNATURE_NAME_EXTRA);
             mSignature.setName(name);

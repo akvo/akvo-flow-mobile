@@ -28,6 +28,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
@@ -62,6 +63,7 @@ import org.akvo.flow.event.SurveyListener;
 import org.akvo.flow.injector.component.ApplicationComponent;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
+import org.akvo.flow.presentation.PermissionRationaleDialogFragment;
 import org.akvo.flow.presentation.SnackBarManager;
 import org.akvo.flow.presentation.form.FormPresenter;
 import org.akvo.flow.presentation.form.FormView;
@@ -98,6 +100,7 @@ import static org.akvo.flow.util.ViewUtil.showConfirmDialog;
 
 public class FormActivity extends BackActivity implements SurveyListener,
         QuestionInteractionListener, FormView,
+        PermissionRationaleDialogFragment.PermissionRequestListener,
         GeoFieldsResetConfirmDialogFragment.GeoFieldsResetConfirmListener {
 
     @Inject
@@ -582,37 +585,53 @@ public class FormActivity extends BackActivity implements SurveyListener,
             case ConstantUtil.PLOTTING_REQUEST:
             case ConstantUtil.SIGNATURE_REQUEST:
             default:
-                mAdapter.onQuestionComplete(mRequestQuestionId, intent.getExtras());
+                mAdapter.onQuestionResultReceived(mRequestQuestionId, intent.getExtras());
                 break;
         }
 
         mRequestQuestionId = null;
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+            @NonNull int[] grantResults) {
+        if (mRequestQuestionId == null) {
+            return;
+        }
+        mAdapter.onRequestPermissionsResult(mRequestQuestionId, permissions, grantResults);
+        mRequestQuestionId = null;
+    }
+
+    @Override
+    public void requestPermissions(String[] permissions, int code, String questionId) {
+        mRequestQuestionId = questionId;
+        ActivityCompat.requestPermissions(this, permissions, code);
+    }
+
     private void onVideoAcquired(Uri uri) {
         Bundle mediaData = new Bundle();
         mediaData.putParcelable(ConstantUtil.VIDEO_FILE_KEY, uri);
-        mAdapter.onQuestionComplete(mRequestQuestionId, mediaData);
+        mAdapter.onQuestionResultReceived(mRequestQuestionId, mediaData);
     }
 
     private void onImageAcquired(Uri imageUri) {
         Bundle mediaData = new Bundle();
         mediaData.putParcelable(ConstantUtil.IMAGE_FILE_KEY, imageUri);
-        mAdapter.onQuestionComplete(mRequestQuestionId, mediaData);
+        mAdapter.onQuestionResultReceived(mRequestQuestionId, mediaData);
     }
 
     private void onImageTaken() {
         Bundle mediaData = new Bundle();
         mediaData.putParcelable(ConstantUtil.IMAGE_FILE_KEY, imagePath);
         mediaData.putBoolean(ConstantUtil.PARAM_REMOVE_ORIGINAL, true);
-        mAdapter.onQuestionComplete(mRequestQuestionId, mediaData);
+        mAdapter.onQuestionResultReceived(mRequestQuestionId, mediaData);
     }
 
     private void onVideoTaken(Uri uri) {
         Bundle mediaData = new Bundle();
         mediaData.putBoolean(ConstantUtil.PARAM_REMOVE_ORIGINAL, true);
         mediaData.putParcelable(ConstantUtil.VIDEO_FILE_KEY, uri);
-        mAdapter.onQuestionComplete(mRequestQuestionId, mediaData);
+        mAdapter.onQuestionResultReceived(mRequestQuestionId, mediaData);
     }
 
     @NonNull
@@ -625,7 +644,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
     private void loadLanguages() {
         Set<String> languagePreferences = surveyLanguagesDataSource
                 .getLanguagePreferences(mSurveyGroup.getId());
-        mLanguages = languagePreferences.toArray(new String[languagePreferences.size()]);
+        mLanguages = languagePreferences.toArray(new String[0]);
     }
 
     @Override

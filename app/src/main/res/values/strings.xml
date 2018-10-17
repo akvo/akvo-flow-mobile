@@ -301,5 +301,8 @@
     <string name="media_from_gallery">Gallery</string>
     <string name="error_username_required">A username is required</string>
     <string name="error_device_id_required">A device id is required</string>
+    <string name="location_permission_explanation">Flow app requires location permission in order to answer this question.</string>
+    <string name="default_permission_explanation">Flow app requires this permission to function correctly.</string>
+    <string name="location_permission_refused">Please accept the location permission in order to get the device location.</string>
 
 </resources>

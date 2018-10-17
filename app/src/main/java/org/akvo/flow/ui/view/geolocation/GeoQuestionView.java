@@ -20,12 +20,16 @@
 
 package org.akvo.flow.ui.view.geolocation;
 
+import android.Manifest;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.View;
@@ -33,10 +37,12 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 
 import org.akvo.flow.R;
+import org.akvo.flow.activity.FormActivity;
 import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionResponse;
 import org.akvo.flow.event.SurveyListener;
 import org.akvo.flow.event.TimedLocationListener;
+import org.akvo.flow.presentation.PermissionRationaleDialogFragment;
 import org.akvo.flow.presentation.SnackBarManager;
 import org.akvo.flow.ui.fragment.GpsDisabledDialogFragment;
 import org.akvo.flow.ui.view.QuestionView;
@@ -82,9 +88,9 @@ public class GeoQuestionView extends QuestionView
     private void init() {
         setQuestionView(R.layout.geo_question_view);
         setId(R.id.geo_question_view);
-        mGeoButton = (Button) findViewById(R.id.geo_btn);
+        mGeoButton = findViewById(R.id.geo_btn);
         geoLoading = findViewById(R.id.auto_geo_location_progress);
-        geoInputContainer = (GeoInputContainer) findViewById(R.id.manual_geo_input_container);
+        geoInputContainer = findViewById(R.id.manual_geo_input_container);
 
         geoInputContainer.setTextWatchers(this);
         mGeoButton.setOnClickListener(this);
@@ -159,7 +165,51 @@ public class GeoQuestionView extends QuestionView
     }
 
     private void startLocation() {
-        mLocationListener.start();
+        if (isLocationPermissionGranted()) {
+            mLocationListener.start();
+        } else {
+            FormActivity activity = (FormActivity) getContext();
+            String[] permissions = { Manifest.permission.ACCESS_FINE_LOCATION };
+                String questionId = getQuestion().getQuestionId();
+            if (ActivityCompat.shouldShowRequestPermissionRationale(activity,
+                    Manifest.permission.ACCESS_FINE_LOCATION)) {
+                DialogFragment fragment = PermissionRationaleDialogFragment
+                        .newInstance(permissions, ConstantUtil.LOCATION_PERMISSION_CODE, questionId);
+                fragment.show(activity.getSupportFragmentManager(),
+                        PermissionRationaleDialogFragment.TAG);
+            } else {
+                activity.requestPermissions(permissions, ConstantUtil.LOCATION_PERMISSION_CODE,
+                        questionId);
+            }
+        }
+    }
+
+    private boolean isLocationPermissionGranted() {
+        return ContextCompat.checkSelfPermission(getContext(),
+                Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
+    }
+
+    @Override
+    public void onRequestPermissionsResult(String[] permissions, int[] grantResults) {
+        for (int i = 0; i < permissions.length; ++i) {
+            if (Manifest.permission.ACCESS_FINE_LOCATION.equals(permissions[i])) {
+                if (grantResults[i] == PackageManager.PERMISSION_GRANTED) {
+                    mLocationListener.start();
+                } else {
+                    View coordinatorLayout = getRootView().findViewById(R.id.coordinator_layout);
+                    snackBarManager.displaySnackBarWithAction(coordinatorLayout,
+                            R.string.location_permission_refused,
+                            R.string.action_retry,
+                            new OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    startLocation();
+                                }
+                            }, getContext());
+                }
+                break;
+            }
+        }
     }
 
     private void stopLocation() {
@@ -203,7 +253,7 @@ public class GeoQuestionView extends QuestionView
     }
 
     @Override
-    public void questionComplete(Bundle data) {
+    public void onQuestionResultReceived(Bundle data) {
         //EMPTY
     }
 

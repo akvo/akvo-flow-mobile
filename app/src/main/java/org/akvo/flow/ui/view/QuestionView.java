@@ -299,11 +299,15 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
     }
 
     /**
-     * method that can be overridden by sub classes if they want to have some
-     * sort of visual response to a question interaction.
+     * Receiving question input from other apps or activities such as image, video, barcode
+     * By default this does nothing
      */
-    public void questionComplete(Bundle data) {
-        // do nothing
+    public void onQuestionResultReceived(Bundle data) {
+        // EMPTY
+    }
+
+    public void onRequestPermissionsResult(String[] permissions, int[] grantResults) {
+        // EMTPY
     }
 
     /**
@@ -544,6 +548,5 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
         }
         return true;
     }
-
 }
 

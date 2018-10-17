@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015-2017 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2015-2018 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -78,7 +78,7 @@ public class GeoshapeQuestionView extends QuestionView implements OnClickListene
     }
 
     @Override
-    public void questionComplete(Bundle data) {
+    public void onQuestionResultReceived(Bundle data) {
         if (data != null) {
             mValue = data.getString(ConstantUtil.GEOSHAPE_RESULT);
             displayResponseView();

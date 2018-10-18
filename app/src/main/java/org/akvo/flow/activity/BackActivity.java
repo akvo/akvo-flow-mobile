@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2018 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -19,6 +19,9 @@
 
 package org.akvo.flow.activity;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -47,5 +50,10 @@ public abstract class BackActivity extends AppCompatActivity {
 
     protected ApplicationComponent getApplicationComponent() {
         return ((FlowApp) getApplication()).getApplicationComponent();
+    }
+
+    protected boolean isLocationAllowed() {
+        return ContextCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
     }
 }

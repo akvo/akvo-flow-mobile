@@ -47,7 +47,7 @@ public class GeoshapeQuestionView extends QuestionView implements OnClickListene
     private void init() {
         setQuestionView(R.layout.geoshape_question_view);
         mResponseView = findViewById(R.id.response_view);
-        mMapBtn = (Button)findViewById(R.id.capture_shape_btn);
+        mMapBtn = findViewById(R.id.capture_shape_btn);
         mMapBtn.setOnClickListener(this);
         if (isReadOnly()) {
             mMapBtn.setText(R.string.view_shape);

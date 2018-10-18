@@ -19,17 +19,14 @@
 
 package org.akvo.flow.activity;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.pm.PackageManager;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.LoaderManager;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.content.Loader;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -83,11 +80,6 @@ public class MapActivity extends BackActivity implements OnMapReadyCallback,
             googleMap.setMyLocationEnabled(true);
         }
         loadDataPoint();
-    }
-
-    private boolean isLocationAllowed() {
-        return ContextCompat.checkSelfPermission(this,
-                Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED;
     }
 
     private void addDataPointMarker() {
@@ -146,13 +138,13 @@ public class MapActivity extends BackActivity implements OnMapReadyCallback,
         positionMap(position);
     }
 
-    @Override
+    @NonNull @Override
     public Loader<SurveyedLocale> onCreateLoader(int id, Bundle args) {
         return new SurveyedLocaleItemLoader(this, datapointId);
     }
 
     @Override
-    public void onLoadFinished(Loader<SurveyedLocale> loader, SurveyedLocale data) {
+    public void onLoadFinished(@NonNull Loader<SurveyedLocale> loader, SurveyedLocale data) {
         this.datapoint  = data;
         updateTitle();
         addDataPointMarker();

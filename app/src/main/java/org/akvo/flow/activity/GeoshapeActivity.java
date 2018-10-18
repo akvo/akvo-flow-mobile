@@ -19,11 +19,9 @@
 
 package org.akvo.flow.activity;
 
-import android.Manifest;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
@@ -155,11 +153,6 @@ public class GeoshapeActivity extends BackActivity
                 mMap.setOnMarkerDragListener(this);
             }
         }
-    }
-
-    private boolean isLocationAllowed() {
-        return ContextCompat.checkSelfPermission(this,
-                Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED;
     }
 
     private void updateMapCenter() {

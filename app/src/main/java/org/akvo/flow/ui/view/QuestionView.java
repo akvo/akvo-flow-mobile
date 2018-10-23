@@ -306,7 +306,7 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
         // EMPTY
     }
 
-    public void onRequestPermissionsResult(String[] permissions, int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         // EMTPY
     }
 

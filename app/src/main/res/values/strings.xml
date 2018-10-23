@@ -304,5 +304,6 @@
     <string name="location_permission_explanation">Flow app requires location permission in order to answer this question.</string>
     <string name="default_permission_explanation">Flow app requires this permission to function correctly.</string>
     <string name="location_permission_refused">Please accept the location permission in order to get the device location.</string>
+    <string name="action_enable">Enable</string>
 
 </resources>

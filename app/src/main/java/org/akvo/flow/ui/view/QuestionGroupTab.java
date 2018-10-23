@@ -145,11 +145,11 @@ public class QuestionGroupTab extends ConstraintLayout
     }
 
 
-    public void onRequestPermissionsResult(String questionId, String[] permissions,
+    public void onRequestPermissionsResult(int requestCode, String questionId, String[] permissions,
             int[] grantResults) {
         QuestionView qv = mQuestionViews.get(questionId);
         if (qv != null) {
-            qv.onRequestPermissionsResult(permissions, grantResults);
+            qv.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
     }
 

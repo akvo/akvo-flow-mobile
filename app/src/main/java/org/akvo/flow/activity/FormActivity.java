@@ -598,14 +598,22 @@ public class FormActivity extends BackActivity implements SurveyListener,
         if (mRequestQuestionId == null) {
             return;
         }
-        mAdapter.onRequestPermissionsResult(mRequestQuestionId, permissions, grantResults);
+        mAdapter.onRequestPermissionsResult(requestCode, mRequestQuestionId, permissions,
+                grantResults);
         mRequestQuestionId = null;
     }
 
     @Override
-    public void requestPermissions(String[] permissions, int code, String questionId) {
+    public void requestPermissions(String[] permissions, int requestCode, String questionId) {
         mRequestQuestionId = questionId;
-        ActivityCompat.requestPermissions(this, permissions, code);
+        ActivityCompat.requestPermissions(this, permissions, requestCode);
+    }
+
+    @Override
+    public void requestPermissionsCancelled(String[] permissions, int requestCode, String questionId) {
+        mAdapter.onRequestPermissionsResult(requestCode, questionId, permissions,
+                new int[0]);
+        mRequestQuestionId = null;
     }
 
     private void onVideoAcquired(Uri uri) {

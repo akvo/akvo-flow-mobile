@@ -143,10 +143,10 @@ public class SurveyTabAdapter extends PagerAdapter implements ViewPager.OnPageCh
     }
 
 
-    public void onRequestPermissionsResult(String questionId, String[] permissions,
+    public void onRequestPermissionsResult(int requestCode, String questionId, String[] permissions,
             int[] grantResults) {
         for (QuestionGroupTab questionGroupTab : mQuestionGroupTabs) {
-            questionGroupTab.onRequestPermissionsResult(questionId, permissions, grantResults);
+            questionGroupTab.onRequestPermissionsResult(requestCode, questionId, permissions, grantResults);
         }
     }
 

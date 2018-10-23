@@ -199,7 +199,7 @@ public class DataPointsMapFragment extends SupportMapFragment implements OnInfoW
     private boolean isLocationAllowed() {
         FragmentActivity activity = getActivity();
         return activity != null && ContextCompat.checkSelfPermission(activity,
-                Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED;
+                Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
     }
 
     private void cluster() {

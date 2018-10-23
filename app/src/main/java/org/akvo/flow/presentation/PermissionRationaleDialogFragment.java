@@ -87,7 +87,13 @@ public class PermissionRationaleDialogFragment extends DialogFragment {
                         permissionRequestListener.requestPermissions(permissions, code, questionId);
                     }
                 })
-                .setNegativeButton(R.string.cancelbutton, null)
+                .setNegativeButton(R.string.cancelbutton, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        permissionRequestListener
+                                .requestPermissionsCancelled(permissions, code, questionId);
+                    }
+                })
                 .create();
     }
 
@@ -109,5 +115,7 @@ public class PermissionRationaleDialogFragment extends DialogFragment {
     public interface PermissionRequestListener {
 
         void requestPermissions(String [] permissions, int code, String questionId);
+
+        void requestPermissionsCancelled(String[] permissions, int requestCode, String questionId);
     }
 }

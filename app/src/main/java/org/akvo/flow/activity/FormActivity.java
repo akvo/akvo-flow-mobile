@@ -28,7 +28,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
@@ -63,7 +62,6 @@ import org.akvo.flow.event.SurveyListener;
 import org.akvo.flow.injector.component.ApplicationComponent;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
-import org.akvo.flow.presentation.PermissionRationaleDialogFragment;
 import org.akvo.flow.presentation.SnackBarManager;
 import org.akvo.flow.presentation.form.FormPresenter;
 import org.akvo.flow.presentation.form.FormView;
@@ -100,7 +98,6 @@ import static org.akvo.flow.util.ViewUtil.showConfirmDialog;
 
 public class FormActivity extends BackActivity implements SurveyListener,
         QuestionInteractionListener, FormView,
-        PermissionRationaleDialogFragment.PermissionRequestListener,
         GeoFieldsResetConfirmDialogFragment.GeoFieldsResetConfirmListener {
 
     @Inject
@@ -191,13 +188,13 @@ public class FormActivity extends BackActivity implements SurveyListener,
             getSupportActionBar().setTitle(mSurvey.getName());
             getSupportActionBar().setSubtitle("v " + getVersion());
 
-            mPager = (ViewPager) findViewById(R.id.pager);
-            TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
+            mPager = findViewById(R.id.pager);
+            TabLayout tabLayout = findViewById(R.id.tabs);
             tabLayout.setupWithViewPager(mPager);
             mAdapter = new SurveyTabAdapter(this, mPager, this, this);
             mPager.setAdapter(mAdapter);
 
-            progressBar = (ProgressBar) findViewById(R.id.progressBar);
+            progressBar = findViewById(R.id.progressBar);
             rootView = findViewById(R.id.coordinator_layout);
             // Initialize new survey or load previous responses
             Map<String, QuestionResponse> responses = mDatabase.getResponses(mSurveyInstanceId);
@@ -600,19 +597,6 @@ public class FormActivity extends BackActivity implements SurveyListener,
         }
         mAdapter.onRequestPermissionsResult(requestCode, mRequestQuestionId, permissions,
                 grantResults);
-        mRequestQuestionId = null;
-    }
-
-    @Override
-    public void requestPermissions(String[] permissions, int requestCode, String questionId) {
-        mRequestQuestionId = questionId;
-        ActivityCompat.requestPermissions(this, permissions, requestCode);
-    }
-
-    @Override
-    public void requestPermissionsCancelled(String[] permissions, int requestCode, String questionId) {
-        mAdapter.onRequestPermissionsResult(requestCode, questionId, permissions,
-                new int[0]);
         mRequestQuestionId = null;
     }
 

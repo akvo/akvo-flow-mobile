@@ -23,12 +23,9 @@ package org.akvo.flow.event;
 import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.DialogFragment;
 import android.support.v4.content.ContextCompat;
 
 import org.akvo.flow.activity.FormActivity;
-import org.akvo.flow.presentation.PermissionRationaleDialogFragment;
 import org.akvo.flow.util.ConstantUtil;
 
 public class PermissionAwareLocationListener {
@@ -74,17 +71,8 @@ public class PermissionAwareLocationListener {
 
     private void requestLocationPermission() {
         FormActivity activity = (FormActivity) context;
-        String[] permissions = { Manifest.permission.ACCESS_FINE_LOCATION };
-        if (ActivityCompat.shouldShowRequestPermissionRationale(activity,
-                Manifest.permission.ACCESS_FINE_LOCATION)) {
-            DialogFragment fragment = PermissionRationaleDialogFragment
-                    .newInstance(permissions, ConstantUtil.LOCATION_PERMISSION_CODE, questionId);
-            fragment.show(activity.getSupportFragmentManager(),
-                    PermissionRationaleDialogFragment.TAG);
-        } else {
-            activity.requestPermissions(permissions, ConstantUtil.LOCATION_PERMISSION_CODE,
-                    questionId);
-        }
+        activity.requestPermissions(new String[] { Manifest.permission.ACCESS_FINE_LOCATION },
+                ConstantUtil.LOCATION_PERMISSION_CODE, questionId);
     }
 
     private boolean isLocationPermissionGranted() {

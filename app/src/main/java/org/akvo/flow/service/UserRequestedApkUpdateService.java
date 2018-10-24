@@ -1,5 +1,5 @@
 /*
-* Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
+* Copyright (C) 2010-2018 Stichting Akvo (Akvo Foundation)
 *
  *  This file is part of Akvo Flow.
  *
@@ -29,8 +29,8 @@ import org.akvo.flow.R;
 import org.akvo.flow.activity.AppUpdateActivity;
 import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.domain.apkupdate.ViewApkData;
+import org.akvo.flow.domain.util.ConnectivityStateManager;
 import org.akvo.flow.ui.Navigator;
-import org.akvo.flow.util.ConnectivityStateManager;
 import org.akvo.flow.util.ViewUtil;
 
 import timber.log.Timber;

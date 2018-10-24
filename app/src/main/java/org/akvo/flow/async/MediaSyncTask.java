@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015-2017 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2015-2018 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -25,7 +25,7 @@ import android.util.Log;
 
 import org.akvo.flow.api.S3Api;
 import org.akvo.flow.data.preference.Prefs;
-import org.akvo.flow.util.ConnectivityStateManager;
+import org.akvo.flow.domain.util.ConnectivityStateManager;
 import org.akvo.flow.util.ConstantUtil;
 
 import java.io.File;

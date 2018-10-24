@@ -32,9 +32,9 @@ import com.google.android.gms.gcm.TaskParams;
 import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.domain.apkupdate.ApkUpdateStore;
 import org.akvo.flow.domain.apkupdate.ViewApkData;
-import org.akvo.flow.util.ConnectivityStateManager;
-import org.akvo.flow.util.ConstantUtil;
+import org.akvo.flow.domain.util.ConnectivityStateManager;
 import org.akvo.flow.domain.util.GsonMapper;
+import org.akvo.flow.util.ConstantUtil;
 
 import timber.log.Timber;
 

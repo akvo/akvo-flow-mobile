@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2014-2017 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2014-2018 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -32,11 +32,11 @@ import android.widget.Toast;
 
 import org.akvo.flow.R;
 import org.akvo.flow.data.preference.Prefs;
+import org.akvo.flow.domain.util.ConnectivityStateManager;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
 import org.akvo.flow.presentation.BaseActivity;
 import org.akvo.flow.ui.Navigator;
-import org.akvo.flow.util.ConnectivityStateManager;
 import org.akvo.flow.util.FileUtil;
 import org.akvo.flow.util.files.ApkFileBrowser;
 import org.akvo.flow.util.files.FileBrowser;

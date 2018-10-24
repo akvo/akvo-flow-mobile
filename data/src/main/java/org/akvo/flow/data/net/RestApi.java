@@ -33,6 +33,7 @@ import org.akvo.flow.data.net.gae.DeviceFilesService;
 import org.akvo.flow.data.net.gae.ProcessingNotificationService;
 import org.akvo.flow.data.net.s3.AwsS3;
 import org.akvo.flow.data.util.ApiUrls;
+import org.akvo.flow.domain.util.DeviceHelper;
 
 import java.text.DateFormat;
 import java.util.Date;

@@ -27,10 +27,9 @@ import android.text.TextUtils;
 import org.akvo.flow.BuildConfig;
 import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.domain.Survey;
+import org.akvo.flow.domain.util.DeviceHelper;
 import org.akvo.flow.serialization.form.SurveyMetaParser;
 import org.akvo.flow.util.HttpUtil;
-import org.akvo.flow.util.PlatformUtil;
-import org.akvo.flow.util.StatusUtil;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -52,12 +51,12 @@ public class FlowApi {
     private final String deviceIdentifier;
     private final String baseUrl;
 
-
     public FlowApi(Context context) {
+        DeviceHelper deviceHelper = new DeviceHelper(context);
         this.baseUrl = BuildConfig.SERVER_BASE;
-        this.phoneNumber = StatusUtil.getPhoneNumber(context);
-        this.imei = StatusUtil.getImei(context);
-        this.androidId = PlatformUtil.getAndroidID(context);
+        this.phoneNumber = deviceHelper.getPhoneNumber();
+        this.imei = deviceHelper.getImei();
+        this.androidId = deviceHelper.getAndroidId();
         Prefs prefs = new Prefs(context);
         this.deviceIdentifier = prefs
                 .getString(Prefs.KEY_DEVICE_IDENTIFIER, Prefs.DEFAULT_VALUE_DEVICE_IDENTIFIER);

@@ -33,7 +33,7 @@ import org.akvo.flow.data.datasource.preferences.SharedPreferencesDataSource;
 import org.akvo.flow.data.executor.JobExecutor;
 import org.akvo.flow.data.migration.FlowMigrationListener;
 import org.akvo.flow.data.migration.languages.MigrationLanguageMapper;
-import org.akvo.flow.data.net.DeviceHelper;
+import org.akvo.flow.domain.util.DeviceHelper;
 import org.akvo.flow.data.net.Encoder;
 import org.akvo.flow.data.net.RestApi;
 import org.akvo.flow.data.net.RestServiceFactory;

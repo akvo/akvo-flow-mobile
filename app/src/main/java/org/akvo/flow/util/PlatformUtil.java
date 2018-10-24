@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2013-2017 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2013-2018 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -20,12 +20,9 @@
 package org.akvo.flow.util;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.os.Build;
-import android.provider.Settings.Secure;
 import android.support.annotation.Nullable;
-import android.util.TypedValue;
 
 import java.util.UUID;
 
@@ -72,11 +69,6 @@ public class PlatformUtil {
         return false;
     }
 
-    public static float dp2Pixel(Context context, int dp) {
-        Resources r = context.getResources();
-        return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, r.getDisplayMetrics());
-    }
-
     public static int getResource(Context context, int attr) {
         TypedArray a = context.getTheme().obtainStyledAttributes(new int[] { attr });
         return a.getResourceId(0, 0);
@@ -91,10 +83,6 @@ public class PlatformUtil {
         // Put dashes between the 4-5 and 8-9 positions to increase readability
         return base32Id.substring(0, 4) + "-" + base32Id.substring(4, 8) + "-" + base32Id
                 .substring(8);
-    }
-
-    public static String getAndroidID(Context context) {
-        return Secure.getString(context.getContentResolver(), Secure.ANDROID_ID);
     }
 
     public static boolean isEmulator() {

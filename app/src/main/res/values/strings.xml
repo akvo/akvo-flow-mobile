@@ -247,7 +247,6 @@
     <string name="preferences_section_information">Information</string>
     <string name="preference_identifier">Device identifier</string>
     <string name="preference_instance_name">Instance name</string>
-    <string name="data_points_sync_error_mobile_data_sync">Mobile data sync disabled</string>
     <string name="action_settings">Settings</string>
     <string name="no_records_subtitle_monitored">Use \'+\' to capture data or \'Download\' to get existing data</string>
     <string name="no_records_subtitle_non_monitored">Use \'+\' to capture data.</string>

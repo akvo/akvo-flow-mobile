@@ -31,8 +31,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import org.akvo.flow.R;
-import org.akvo.flow.data.preference.Prefs;
-import org.akvo.flow.domain.util.ConnectivityStateManager;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
 import org.akvo.flow.presentation.BaseActivity;
@@ -89,8 +87,8 @@ public class AppUpdateActivity extends BaseActivity {
         mVersion = getIntent().getStringExtra(EXTRA_VERSION);
         mMd5Checksum = getIntent().getStringExtra(EXTRA_CHECKSUM);
 
-        mInstallBtn = (Button) findViewById(R.id.install_btn);
-        mProgress = (ProgressBar) findViewById(R.id.progress);
+        mInstallBtn = findViewById(R.id.install_btn);
+        mProgress = findViewById(R.id.progress);
         mProgress.setMax(MAX_PROGRESS_IN_PERCENT);
 
         final String newApkFilePath = apkFileBrowser
@@ -126,7 +124,7 @@ public class AppUpdateActivity extends BaseActivity {
     }
 
     private void displayInstallPrompt(final String newApkFilePath) {
-        TextView updateTV = (TextView) findViewById(R.id.update_text);
+        TextView updateTV = findViewById(R.id.update_text);
         updateTV.setText(R.string.clicktoinstall);
         mInstallBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -164,22 +162,17 @@ public class AppUpdateActivity extends BaseActivity {
 
     private static class UpdateAsyncTask extends AsyncTask<Void, Integer, String> {
 
-        private final Prefs prefs;
         private final String mUrl;
         private final String mVersion;
         private final WeakReference<AppUpdateActivity> activityWeakReference;
-        private final ConnectivityStateManager connectivityStateManager;
         private final ApkFileBrowser apkFileBrowser;
         private String mMd5Checksum;
 
-
         UpdateAsyncTask(AppUpdateActivity context, String mUrl, String mVersion,
                 String mMd5Checksum) {
-            this.prefs = new Prefs(context);
             this.mUrl = mUrl;
             this.mVersion = mVersion;
             this.activityWeakReference = new WeakReference<>(context);
-            this.connectivityStateManager = new ConnectivityStateManager(context);
             this.mMd5Checksum = mMd5Checksum;
             this.apkFileBrowser = new ApkFileBrowser(new FileBrowser());
         }
@@ -188,22 +181,15 @@ public class AppUpdateActivity extends BaseActivity {
         protected String doInBackground(Void... params) {
             cleanupDownloads();
 
-            boolean syncOver3GAllowed = prefs
-                    .getBoolean(Prefs.KEY_CELL_UPLOAD, Prefs.DEFAULT_VALUE_CELL_UPLOAD);
-            if (!connectivityStateManager.isConnectionAvailable(syncOver3GAllowed)) {
-                Timber.d("No internet connection available. Can't perform the requested operation");
-                //TODO: display something to the user
-            } else {
-                AppUpdateActivity appUpdateActivity = activityWeakReference.get();
-                if (appUpdateActivity != null) {
-                    String apkFileName = mUrl.substring(mUrl.lastIndexOf('/') + 1);
-                    Context context = appUpdateActivity.getApplicationContext();
-                    String apkFullPath = apkFileBrowser.getFileName(context, mVersion, apkFileName);
-                    if (apkFullPath != null && downloadApk(mUrl, apkFullPath) && !isCancelled()) {
-                        return apkFullPath;
-                    }
-                    cleanupDownloads();
+            AppUpdateActivity appUpdateActivity = activityWeakReference.get();
+            if (appUpdateActivity != null) {
+                String apkFileName = mUrl.substring(mUrl.lastIndexOf('/') + 1);
+                Context context = appUpdateActivity.getApplicationContext();
+                String apkFullPath = apkFileBrowser.getFileName(context, mVersion, apkFileName);
+                if (apkFullPath != null && downloadApk(mUrl, apkFullPath) && !isCancelled()) {
+                    return apkFullPath;
                 }
+                cleanupDownloads();
             }
             return null;
         }

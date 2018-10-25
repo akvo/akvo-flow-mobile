@@ -28,6 +28,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
@@ -598,6 +599,12 @@ public class FormActivity extends BackActivity implements SurveyListener,
         mAdapter.onRequestPermissionsResult(requestCode, mRequestQuestionId, permissions,
                 grantResults);
         mRequestQuestionId = null;
+    }
+
+    public void requestPermissions(@NonNull String[] permissions, int requestCode,
+            String questionId) {
+        mRequestQuestionId = questionId;
+        ActivityCompat.requestPermissions(this, permissions, requestCode);
     }
 
     private void onVideoAcquired(Uri uri) {

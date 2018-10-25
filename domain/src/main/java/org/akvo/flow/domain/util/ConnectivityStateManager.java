@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -49,27 +49,6 @@ public class ConnectivityStateManager {
                     if (NetworkInfo.State.CONNECTED == anInfoArr.getState()) {
                         return true;
                     }
-                }
-            }
-        }
-        return false;
-    }
-
-    public boolean isConnectionAvailable(boolean syncOver3GAllowed) {
-        if (syncOver3GAllowed) {
-            return isConnectionAvailable();
-        }
-        ConnectivityManager connMgr = (ConnectivityManager) context
-                .getSystemService(Context.CONNECTIVITY_SERVICE);
-        if (connMgr != null) {
-            NetworkInfo[] infoArr = connMgr.getAllNetworkInfo();
-            if (infoArr != null) {
-                for (NetworkInfo anInfoArr : infoArr) {
-                        // if we only want to use wifi, we need to check the type
-                        if (anInfoArr.getType() == ConnectivityManager.TYPE_WIFI
-                                && NetworkInfo.State.CONNECTED == anInfoArr.getState()) {
-                            return true;
-                        }
                 }
             }
         }

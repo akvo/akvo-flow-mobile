@@ -147,8 +147,7 @@ public class VideoQuestionView extends QuestionView
         mDownloadBtn.setVisibility(GONE);
         mProgressBar.setVisibility(VISIBLE);
 
-        MediaSyncTask downloadTask = new MediaSyncTask(getContext(),
-                new File(filePath), this);
+        MediaSyncTask downloadTask = new MediaSyncTask(new File(filePath), this);
         downloadTask.execute();
     }
 

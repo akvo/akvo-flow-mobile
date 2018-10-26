@@ -20,14 +20,17 @@
 
 package org.akvo.flow.presentation.datapoints.map;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -175,10 +178,13 @@ public class DataPointsMapFragment extends SupportMapFragment implements OnInfoW
 
     private void configMap() {
         if (mMap != null) {
-            mMap.setMyLocationEnabled(true);
+            FragmentActivity activity = getActivity();
+            if (isLocationAllowed()) {
+                mMap.setMyLocationEnabled(true);
+            }
             mMap.setOnInfoWindowClickListener(this);
-            mClusterManager = new ClusterManager<>(getActivity(), mMap);
-            mClusterManager.setRenderer(new PointRenderer(mMap, getActivity(), mClusterManager));
+            mClusterManager = new ClusterManager<>(activity, mMap);
+            mClusterManager.setRenderer(new PointRenderer(mMap, activity, mClusterManager));
             mMap.setOnMarkerClickListener(mClusterManager);
             mMap.setOnCameraChangeListener(new GoogleMap.OnCameraChangeListener() {
                 @Override
@@ -188,6 +194,12 @@ public class DataPointsMapFragment extends SupportMapFragment implements OnInfoW
             });
             centerMapOnUserLocation();
         }
+    }
+
+    private boolean isLocationAllowed() {
+        FragmentActivity activity = getActivity();
+        return activity != null && ContextCompat.checkSelfPermission(activity,
+                Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
     }
 
     private void cluster() {
@@ -232,7 +244,7 @@ public class DataPointsMapFragment extends SupportMapFragment implements OnInfoW
         Criteria criteria = new Criteria();
         criteria.setAccuracy(Criteria.ACCURACY_FINE);
         String provider = manager == null ? null : manager.getBestProvider(criteria, true);
-        if (provider != null) {
+        if (provider != null && isLocationAllowed()) {
             Location location = manager.getLastKnownLocation(provider);
             if (location != null) {
                 position = new LatLng(location.getLatitude(), location.getLongitude());

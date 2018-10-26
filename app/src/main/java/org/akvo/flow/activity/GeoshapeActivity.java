@@ -143,7 +143,9 @@ public class GeoshapeActivity extends BackActivity
 
     private void initMap() {
         if (mMap != null) {
-            mMap.setMyLocationEnabled(true);
+            if (isLocationAllowed()) {
+                mMap.setMyLocationEnabled(true);
+            }
             mMap.setOnMarkerClickListener(this);
             mMap.setOnMyLocationChangeListener(this);
             if (mManualInput) {
@@ -275,7 +277,7 @@ public class GeoshapeActivity extends BackActivity
 
             switch (v.getId()) {
                 case R.id.add_point_btn:
-                    Location location = mMap == null? null : mMap.getMyLocation();
+                    Location location = mMap == null || !isLocationAllowed()? null : mMap.getMyLocation();
                     if (location != null && location.getAccuracy() <= ACCURACY_THRESHOLD) {
                         addPoint(new LatLng(location.getLatitude(), location.getLongitude()));
                     } else {

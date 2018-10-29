@@ -165,7 +165,7 @@ public class PhotoQuestionView extends QuestionView implements
      * object
      */
     @Override
-    public void questionComplete(Bundle mediaData) {
+    public void onQuestionResultReceived(Bundle mediaData) {
         Uri imagePath =
                 mediaData != null ?
                         (Uri) mediaData.getParcelable(ConstantUtil.IMAGE_FILE_KEY) : null;

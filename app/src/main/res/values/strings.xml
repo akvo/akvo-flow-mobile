@@ -301,5 +301,7 @@
     <string name="media_from_gallery">Gallery</string>
     <string name="error_username_required">A username is required</string>
     <string name="error_device_id_required">A device id is required</string>
+    <string name="location_permission_refused">Location permission is required in order to get the device location.</string>
+    <string name="action_enable">Enable</string>
 
 </resources>

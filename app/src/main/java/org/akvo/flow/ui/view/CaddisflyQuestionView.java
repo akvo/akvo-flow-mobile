@@ -134,7 +134,7 @@ public class CaddisflyQuestionView extends QuestionView implements View.OnClickL
     }
 
     @Override
-    public void questionComplete(Bundle data) {
+    public void onQuestionResultReceived(Bundle data) {
         if (data != null) {
             mValue = data.getString(ConstantUtil.CADDISFLY_RESPONSE);
             caddisflyTestResults = caddisflyJsonMapper.transform(mValue);

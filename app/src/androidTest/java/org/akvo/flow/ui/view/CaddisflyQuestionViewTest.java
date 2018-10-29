@@ -23,7 +23,7 @@ public class CaddisflyQuestionViewTest extends AndroidTestCase {
         bundle.putString("response", TEST_JSON_RESPONSE);
         bundle.putString("image", "nonexistent image");
 
-        qv.questionComplete(bundle);
+        qv.onQuestionResultReceived(bundle);
 
         assertEquals(TEST_JSON_RESPONSE, qv.getResponse().getValue());
         assertNull(qv.getResponse().getFilename());

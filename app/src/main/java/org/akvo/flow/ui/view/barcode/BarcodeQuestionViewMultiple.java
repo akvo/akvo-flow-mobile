@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -68,7 +68,7 @@ public class BarcodeQuestionViewMultiple extends QuestionView implements
     }
 
     @Override
-    public void questionComplete(Bundle barcodeData) {
+    public void onQuestionResultReceived(Bundle barcodeData) {
         if (barcodeData != null) {
             String value = barcodeData.getString(ConstantUtil.BARCODE_CONTENT);
             barcodeQuestionAdapter.addBarcode(value);

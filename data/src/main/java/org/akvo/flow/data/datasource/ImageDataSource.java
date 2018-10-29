@@ -85,7 +85,7 @@ public class ImageDataSource {
                 .concatMap(new Function<Boolean, Observable<Boolean>>() {
                     @Override
                     public Observable<Boolean> apply(Boolean result) {
-                        return updateExifOrientationData(inputStream, resizedImagePath);
+                        return updateExifData(inputStream, resizedImagePath);
                     }
                 });
     }
@@ -124,7 +124,8 @@ public class ImageDataSource {
                     context.getContentResolver().openFileDescriptor(uri, "r");
             if (parcelFileDescriptor != null) {
                 FileDescriptor fileDescriptor = parcelFileDescriptor.getFileDescriptor();
-                BitmapFactory.Options options = prepareBitmapOptions(fileDescriptor, sizePreference);
+                BitmapFactory.Options options = prepareBitmapOptions(fileDescriptor,
+                        sizePreference);
                 Bitmap bitmap = BitmapFactory.decodeFileDescriptor(fileDescriptor, null, options);
                 parcelFileDescriptor.close();
                 return saveImage(bitmap, outFilename);
@@ -136,7 +137,8 @@ public class ImageDataSource {
     }
 
     @NonNull
-    private BitmapFactory.Options prepareBitmapOptions(FileDescriptor origFilename, int sizePreference) {
+    private BitmapFactory.Options prepareBitmapOptions(FileDescriptor origFilename,
+            int sizePreference) {
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = true;
         BitmapFactory.decodeFileDescriptor(origFilename, null, options);
@@ -219,18 +221,27 @@ public class ImageDataSource {
         return inSampleSize;
     }
 
-    private Observable<Boolean> updateExifOrientationData(InputStream originalImageInputStream,
+    private Observable<Boolean> updateExifData(InputStream originalImageInputStream,
             String resizedImagePath) {
         try {
+            ExifInterface originalImageExif = new ExifInterface(originalImageInputStream);
+            ExifInterface newImageExif = new ExifInterface(resizedImagePath);
+            final String originalImageOrientation = originalImageExif
+                    .getAttribute(ExifInterface.TAG_ORIENTATION);
+            final String newImageOrientation = newImageExif
+                    .getAttribute(ExifInterface.TAG_ORIENTATION);
 
-            final String orientation1 = getExifOrientationTag(originalImageInputStream);
-            final String orientation2 = getExifOrientationTag(resizedImagePath);
-
-            if (!TextUtils.isEmpty(orientation1) && !orientation1.equals(orientation2)) {
+            if (!TextUtils.isEmpty(originalImageOrientation) && !originalImageOrientation
+                    .equals(newImageOrientation)) {
                 Timber.d("Exif orientation in resized image will be updated");
-                updateExifOrientation(orientation1, resizedImagePath);
-
+                newImageExif.setAttribute(ExifInterface.TAG_ORIENTATION, originalImageOrientation);
             }
+
+            copyAttribute(originalImageExif, newImageExif, ExifInterface.TAG_GPS_LATITUDE);
+            copyAttribute(originalImageExif, newImageExif, ExifInterface.TAG_GPS_LATITUDE_REF);
+            copyAttribute(originalImageExif, newImageExif, ExifInterface.TAG_GPS_LONGITUDE);
+            copyAttribute(originalImageExif, newImageExif, ExifInterface.TAG_GPS_LONGITUDE_REF);
+            newImageExif.saveAttributes();
             originalImageInputStream.close();
         } catch (IOException e) {
             Timber.e(e);
@@ -238,19 +249,8 @@ public class ImageDataSource {
         return Observable.just(true);
     }
 
-    private void updateExifOrientation(String orientation, String filename) throws IOException {
-        ExifInterface exif = new ExifInterface(filename);
-        exif.setAttribute(ExifInterface.TAG_ORIENTATION, orientation);
-        exif.saveAttributes();
-    }
-
-    private String getExifOrientationTag(InputStream inputStream) throws IOException {
-        ExifInterface exif = new ExifInterface(inputStream);
-        return exif.getAttribute(ExifInterface.TAG_ORIENTATION);
-    }
-
-    private String getExifOrientationTag(String filename) throws IOException {
-        ExifInterface exif = new ExifInterface(filename);
-        return exif.getAttribute(ExifInterface.TAG_ORIENTATION);
+    private void copyAttribute(ExifInterface originalImageExif, ExifInterface newImageExif,
+            String attribute) {
+        newImageExif.setAttribute(attribute, originalImageExif.getAttribute(attribute));
     }
 }

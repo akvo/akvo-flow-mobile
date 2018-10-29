@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -26,8 +26,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.NonNull;
 
-import org.akvo.flow.database.migration.MigrationListener;
-
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -40,8 +38,8 @@ public class SurveyLanguagesDbDataSource implements SurveyLanguagesDataSource {
 
     private final DatabaseHelper databaseHelper;
 
-    public SurveyLanguagesDbDataSource(Context context, MigrationListener migrationListener) {
-        this.databaseHelper = new DatabaseHelper(context, new LanguageTable(), migrationListener);
+    public SurveyLanguagesDbDataSource(Context context) {
+        this.databaseHelper = new DatabaseHelper(context, new LanguageTable());
     }
 
     @Override

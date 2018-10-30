@@ -26,8 +26,6 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 
-import org.akvo.flow.database.migration.MigrationListener;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -62,7 +60,6 @@ public class SurveyDbAdapter {
     private SQLiteDatabase database;
 
     private final Context context;
-    private final MigrationListener migrationListener;
 
     /**
      * Constructor - takes the context to allow the database to be
@@ -70,9 +67,8 @@ public class SurveyDbAdapter {
      *
      * @param ctx the Context within which to work
      */
-    public SurveyDbAdapter(Context ctx, MigrationListener migrationListener) {
+    public SurveyDbAdapter(Context ctx) {
         this.context = ctx;
-        this.migrationListener = migrationListener;
     }
 
     /**
@@ -81,7 +77,7 @@ public class SurveyDbAdapter {
      * @throws SQLException if the database could be neither opened or created
      */
     public SurveyDbAdapter open() throws SQLException {
-        databaseHelper = new DatabaseHelper(context, new LanguageTable(), migrationListener);
+        databaseHelper = new DatabaseHelper(context, new LanguageTable());
         database = databaseHelper.getWritableDatabase();
         return this;
     }

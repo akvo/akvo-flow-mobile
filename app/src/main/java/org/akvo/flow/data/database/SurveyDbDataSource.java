@@ -30,9 +30,6 @@ import android.text.TextUtils;
 import com.squareup.sqlbrite2.BriteDatabase;
 
 import org.akvo.flow.data.entity.FormIdMapper;
-import org.akvo.flow.data.migration.FlowMigrationListener;
-import org.akvo.flow.data.migration.languages.MigrationLanguageMapper;
-import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.database.RecordColumns;
 import org.akvo.flow.database.ResponseColumns;
 import org.akvo.flow.database.SurveyColumns;
@@ -70,9 +67,7 @@ public class SurveyDbDataSource {
     @Inject
     public SurveyDbDataSource(Context context, BriteDatabase briteDatabase) {
         this.briteSurveyDbAdapter = new BriteSurveyDbAdapter(briteDatabase);
-        this.surveyDbAdapter = new SurveyDbAdapter(context,
-                new FlowMigrationListener(new Prefs(context),
-                        new MigrationLanguageMapper(context)));
+        this.surveyDbAdapter = new SurveyDbAdapter(context);
     }
 
     /**

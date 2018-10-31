@@ -35,11 +35,9 @@ import org.akvo.flow.R;
 import org.akvo.flow.async.MediaSyncTask;
 import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionResponse;
-import org.akvo.flow.domain.response.value.Location;
 import org.akvo.flow.domain.response.value.Media;
 import org.akvo.flow.event.QuestionInteractionEvent;
 import org.akvo.flow.event.SurveyListener;
-import org.akvo.flow.event.TimedLocationListener;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
 import org.akvo.flow.presentation.SnackBarManager;
@@ -65,8 +63,8 @@ import butterknife.OnClick;
  *
  * @author Christopher Fagiani
  */
-public class PhotoQuestionView extends QuestionView implements
-        TimedLocationListener.Listener, MediaSyncTask.DownloadListener, IPhotoQuestionView {
+public class PhotoQuestionView extends QuestionView
+        implements MediaSyncTask.DownloadListener, IPhotoQuestionView {
 
     @Inject
     SnackBarManager snackBarManager;
@@ -92,13 +90,11 @@ public class PhotoQuestionView extends QuestionView implements
     @BindView(R.id.location_info)
     TextView mLocationInfo;
 
-    private final TimedLocationListener mLocationListener;
     private Media mMedia;
     private ImageLoader imageLoader;
 
     public PhotoQuestionView(Context context, Question q, SurveyListener surveyListener) {
         super(context, q, surveyListener);
-        mLocationListener = new TimedLocationListener(context, this, !q.isLocked());
         init();
     }
 
@@ -183,13 +179,6 @@ public class PhotoQuestionView extends QuestionView implements
         captureResponse();
         displayThumbnail();
 
-        updateImageLocation(mediaFilePath);
-    }
-
-    private void updateImageLocation(String mediaFilePath) {
-        if (ImageUtil.getLocation(mediaFilePath) == null) {
-            mLocationListener.start();
-        }
         displayLocationInfo();
     }
 
@@ -234,7 +223,6 @@ public class PhotoQuestionView extends QuestionView implements
         mImageView.setImageDrawable(null);
         hideDownloadViews();
         mLocationInfo.setVisibility(GONE);
-        mLocationListener.stop();
     }
 
     @Override
@@ -256,9 +244,6 @@ public class PhotoQuestionView extends QuestionView implements
 
     @Override
     public void onDestroy() {
-        if (mLocationListener.isListening()) {
-            mLocationListener.stop();
-        }
         presenter.destroy();
     }
 
@@ -293,42 +278,6 @@ public class PhotoQuestionView extends QuestionView implements
     }
 
     @Override
-    public void onLocationReady(double latitude, double longitude, double altitude,
-            float accuracy) {
-        if (accuracy > TimedLocationListener.ACCURACY_DEFAULT) {
-            // This location is not accurate enough. Keep listening for updates
-            return;
-        }
-        mLocationListener.stop();
-        if (mMedia != null) {
-            Location location = new Location();
-            location.setLatitude(latitude);
-            location.setLongitude(longitude);
-            location.setAltitude(altitude);
-            location.setAccuracy(accuracy);
-
-            mMedia.setLocation(location);
-            File file = rebuildFilePath();
-            if (file != null && file.exists()) {
-                ImageUtil.setLocation(file.getAbsolutePath(), latitude, longitude);
-            }
-
-            captureResponse();
-            displayLocationInfo();
-        }
-    }
-
-    @Override
-    public void onTimeout() {
-        displayLocationInfo();
-    }
-
-    @Override
-    public void onGPSDisabled() {
-        displayLocationInfo();
-    }
-
-    @Override
     public void displayLocationInfo() {
         File file = rebuildFilePath();
         if (file != null && file.exists()) {
@@ -336,8 +285,6 @@ public class PhotoQuestionView extends QuestionView implements
             double[] location = ImageUtil.getLocation(file.getAbsolutePath());
             if (location != null) {
                 mLocationInfo.setText(R.string.image_location_saved);
-            } else if (mLocationListener.isListening()) {
-                mLocationInfo.setText(R.string.image_location_reading);
             } else {
                 mLocationInfo.setText(R.string.image_location_unknown);
             }

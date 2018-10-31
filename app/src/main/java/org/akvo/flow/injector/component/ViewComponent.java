@@ -32,6 +32,7 @@ import org.akvo.flow.presentation.AboutActivity;
 import org.akvo.flow.presentation.AppDownloadDialogFragment;
 import org.akvo.flow.presentation.datapoints.list.DataPointsListFragment;
 import org.akvo.flow.presentation.datapoints.map.DataPointsMapFragment;
+import org.akvo.flow.presentation.form.mobiledata.MobileDataSettingDialog;
 import org.akvo.flow.presentation.help.HelpActivity;
 import org.akvo.flow.presentation.legal.LegalNoticesActivity;
 import org.akvo.flow.presentation.main.MainActivity;
@@ -103,4 +104,6 @@ public interface ViewComponent {
     void inject(PublishFilesPreferenceView publishFilesPreferenceView);
 
     void inject(WalkThroughActivity walkThroughActivity);
+
+    void inject(MobileDataSettingDialog mobileDataSettingDialog);
 }

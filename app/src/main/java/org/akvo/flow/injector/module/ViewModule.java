@@ -35,6 +35,7 @@ import org.akvo.flow.domain.interactor.GetPublishDataTime;
 import org.akvo.flow.domain.interactor.GetSavedDataPoints;
 import org.akvo.flow.domain.interactor.GetUserSettings;
 import org.akvo.flow.domain.interactor.MakeDataPrivate;
+import org.akvo.flow.domain.interactor.MobileUploadSet;
 import org.akvo.flow.domain.interactor.PublishData;
 import org.akvo.flow.domain.interactor.SaveAppLanguage;
 import org.akvo.flow.domain.interactor.SaveEnableMobileData;
@@ -272,5 +273,11 @@ public class ViewModule {
     @Named("exportSurveyInstances")
     UseCase provideExportSurveyInstancesSync(ExportSurveyInstances exportSurveyInstances) {
         return exportSurveyInstances;
+    }
+
+    @Provides
+    @Named("mobileUploadSet")
+    UseCase provideMobileUploadSet(MobileUploadSet mobileUploadSet) {
+        return mobileUploadSet;
     }
 }

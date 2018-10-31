@@ -234,7 +234,7 @@
     <string name="error_loading_help">Error loading help content</string>
     <string name="error_mobile_data_sync">Mobile data sync disabled</string>
     <string name="preference_screen_on">Keep screen on during form input</string>
-    <string name="preference_mobile_data">Enable usage of mobile data</string>
+    <string name="preference_upload_mobile_data">Upload submissions over mobile data</string>
     <string name="preference_app_language">App language</string>
     <string name="preference_image_size">Image size</string>
     <string name="preferences_data_section">Data</string>
@@ -300,5 +300,6 @@
     <string name="media_from_gallery">Gallery</string>
     <string name="error_username_required">A username is required</string>
     <string name="error_device_id_required">A device id is required</string>
+    <string name="mobile_data_setting_dialog_message">Would you like your submissions to be sent over mobile data or via wifi (by default)</string>
 
 </resources>

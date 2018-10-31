@@ -190,4 +190,8 @@ public class SharedPreferencesDataSource {
     private void clearSetUp() {
         preferences.edit().remove(KEY_SETUP).apply();
     }
+
+    public Observable<Boolean> mobileUploadSet() {
+        return Observable.just(preferences.contains(KEY_CELL_UPLOAD));
+    }
 }

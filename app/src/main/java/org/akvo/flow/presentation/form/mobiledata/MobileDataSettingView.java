@@ -18,17 +18,9 @@
  *
  */
 
-package org.akvo.flow.presentation.form;
+package org.akvo.flow.presentation.form.mobiledata;
 
-public interface FormView {
+public interface MobileDataSettingView {
 
-    void showLoading();
-
-    void hideLoading();
-
-    void dismiss();
-
-    void showErrorExport();
-
-    void showMobileUploadSetting(long surveyInstanceId);
+    void dismissView();
 }

@@ -46,10 +46,7 @@
             <View
                     style="@style/PreferenceItemSeparator"/>
 
-            <android.support.v7.widget.SwitchCompat
-                    android:id="@+id/switch_enable_data"
-                    android:text="@string/preference_mobile_data"
-                    style="@style/PreferenceSwitch"/>
+            <include layout="@layout/mobile_setting"/>
 
             <View
                     style="@style/PreferenceItemSeparator"/>

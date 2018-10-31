@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_height="match_parent"
+              android:layout_width="match_parent">
+    <android.support.v7.widget.SwitchCompat
+            android:id="@+id/switch_enable_data"
+            android:text="@string/preference_upload_mobile_data"
+            android:textSize="16sp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:layout_marginTop="20dp"
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:checked="false"
+            android:gravity="center"
+            android:layout_gravity="center"
+            android:textColor="@color/black_main"/>
+</LinearLayout>

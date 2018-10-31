@@ -113,8 +113,7 @@ public class MobileDataSettingDialog extends DialogFragment implements MobileDat
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         final View view = LayoutInflater.from(getContext()).inflate(R.layout.mobile_setting, null);
-        builder.setTitle(R.string.mobile_data_setting_dialog_message)
-                .setView(view)
+        builder.setView(view)
                 .setCancelable(false)
                 .setPositiveButton(R.string.okbutton, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {

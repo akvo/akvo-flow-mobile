@@ -3,17 +3,32 @@
               android:orientation="vertical"
               android:layout_height="match_parent"
               android:layout_width="match_parent">
+
+    <TextView
+            android:layout_margin="16dp"
+            android:text="@string/mobile_data_setting_dialog_message"
+            android:textSize="18sp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
     <android.support.v7.widget.SwitchCompat
             android:id="@+id/switch_enable_data"
             android:text="@string/preference_upload_mobile_data"
             android:textSize="16sp"
-            android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp"
-            android:layout_marginTop="20dp"
+            android:layout_marginLeft="24dp"
+            android:layout_marginRight="24dp"
             android:layout_height="wrap_content"
             android:layout_width="match_parent"
             android:checked="false"
-            android:gravity="center"
-            android:layout_gravity="center"
             android:textColor="@color/black_main"/>
+
+    <TextView
+            android:layout_marginTop="16dp"
+            android:layout_marginLeft="24dp"
+            android:layout_marginRight="24dp"
+            android:textSize="12sp"
+            android:text="When disabled, submissions will only be sent when a wifi connection is available."
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/textView2"/>
 </LinearLayout>

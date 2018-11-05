@@ -29,9 +29,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
-import android.support.v7.widget.SwitchCompat;
-import android.view.LayoutInflater;
-import android.view.View;
 
 import org.akvo.flow.R;
 import org.akvo.flow.app.FlowApp;
@@ -112,13 +109,17 @@ public class MobileDataSettingDialog extends DialogFragment implements MobileDat
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        final View view = LayoutInflater.from(getContext()).inflate(R.layout.mobile_setting, null);
-        builder.setView(view)
-                .setCancelable(false)
-                .setPositiveButton(R.string.okbutton, new DialogInterface.OnClickListener() {
+        builder.setTitle(R.string.mobile_data_dialog_title)
+                .setMessage(R.string.mobile_data_dialog_subtitle)
+                .setNegativeButton(R.string.no_thanks_button, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        presenter.saveEnableMobileData(false);
+                    }
+                })
+                .setPositiveButton(R.string.enable_button, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        SwitchCompat viewById = view.findViewById(R.id.switch_enable_data);
-                        presenter.saveEnableMobileData(viewById.isChecked());
+                        presenter.saveEnableMobileData(true);
                     }
                 });
         return builder.create();

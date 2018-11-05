@@ -300,6 +300,9 @@
     <string name="media_from_gallery">Gallery</string>
     <string name="error_username_required">A username is required</string>
     <string name="error_device_id_required">A device id is required</string>
-    <string name="mobile_data_setting_dialog_message">Would you like your submissions to be sent over mobile data?</string>
+    <string name="no_thanks_button">No thanks</string>
+    <string name="mobile_data_dialog_title">Enable uploading submissions over mobile data?</string>
+    <string name="mobile_data_dialog_subtitle">When disabled submissions will only be uploaded when a wifi connection is available.</string>
+    <string name="enable_button">Enable</string>
 
 </resources>

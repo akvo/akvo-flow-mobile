@@ -27,6 +27,7 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 
+import org.akvo.flow.BuildConfig;
 import org.akvo.flow.R;
 import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionResponse;
@@ -163,6 +164,11 @@ public class CaddisflyQuestionView extends QuestionView implements View.OnClickL
         data.putString(ConstantUtil.CADDISFLY_DATAPOINT_ID, mSurveyListener.getDatapointId());
         data.putString(ConstantUtil.CADDISFLY_FORM_ID, mSurveyListener.getFormId());
         data.putString(ConstantUtil.CADDISFLY_LANGUAGE, Locale.getDefault().getLanguage());
+        String serverBase = BuildConfig.SERVER_BASE;
+        serverBase = serverBase.replaceFirst("https://","");
+        serverBase = serverBase.replaceFirst("http://","");
+        serverBase = serverBase.replace(".appspot.com", "");
+        data.putString(ConstantUtil.CADDISFLY_INSTANCE_NAME, serverBase);
         notifyQuestionListeners(QuestionInteractionEvent.CADDISFLY, data);
     }
 

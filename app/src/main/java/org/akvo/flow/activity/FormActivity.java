@@ -29,6 +29,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.FileProvider;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
@@ -871,7 +872,8 @@ public class FormActivity extends BackActivity implements SurveyListener,
         recordSourceId(event);
         File imageTmpFile = mediaFileHelper.getTemporaryImageFile();
         if (imageTmpFile != null) {
-            imagePath = Uri.fromFile(imageTmpFile);
+            imagePath = FileProvider.getUriForFile(this, ConstantUtil.FILE_PROVIDER_AUTHORITY,
+                    imageTmpFile);
             navigator.navigateToTakePhoto(this, imagePath);
         }
         //TODO: notify error taking pictures

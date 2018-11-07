@@ -59,7 +59,7 @@ public class MediaFileHelper {
     @Nullable
     public File getTemporaryImageFile() {
         String timeStamp = dateFormat.format(new Date());
-        String imageFileName = TEMP_PHOTO_NAME_PREFIX + timeStamp + "_";
+        String imageFileName = TEMP_PHOTO_NAME_PREFIX + "_" + timeStamp;
         File storageDir = Environment
                 .getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
         if (!storageDir.exists()) {

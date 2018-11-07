@@ -18,7 +18,7 @@
  *
  */
 
-package org.akvo.flow.data.datasource;
+package org.akvo.flow.data.datasource.files;
 
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
@@ -26,10 +26,10 @@ import android.text.TextUtils;
 import org.akvo.flow.data.util.Constants;
 import org.akvo.flow.data.util.ExternalStorageHelper;
 import org.akvo.flow.data.util.FileHelper;
+import org.akvo.flow.data.util.FlowFileBrowser;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,7 +37,6 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import io.reactivex.Observable;
-import io.reactivex.functions.Function;
 import timber.log.Timber;
 
 @Singleton
@@ -72,19 +71,6 @@ public class FileDataSource {
         try {
             File destinationFile = new File(destinationFilePath);
             String copiedFilePath = fileHelper.copyFile(originalFile, destinationFile);
-            if (copiedFilePath == null) {
-                return Observable.error(new Exception("Error copying video file"));
-            }
-            return Observable.just(true);
-        } catch (IOException e) {
-            return Observable.error(e);
-        }
-    }
-
-    private Observable<Boolean> copyFile(String destinationFilePath, InputStream inputStream) {
-        try {
-            File destinationFile = new File(destinationFilePath);
-            String copiedFilePath = fileHelper.copyFile(destinationFile, inputStream);
             if (copiedFilePath == null) {
                 return Observable.error(new Exception("Error copying video file"));
             }
@@ -191,7 +177,8 @@ public class FileDataSource {
     }
 
     public Observable<Boolean> deleteAllUserFiles() {
-        List<File> foldersToDelete = flowFileBrowser.findAllPossibleFolders(FlowFileBrowser.DIR_FORMS);
+        List<File> foldersToDelete = flowFileBrowser
+                .findAllPossibleFolders(FlowFileBrowser.DIR_FORMS);
         foldersToDelete.addAll(flowFileBrowser.findAllPossibleFolders(FlowFileBrowser.DIR_RES));
         File inboxFolder = flowFileBrowser.getPublicFolder(FlowFileBrowser.DIR_INBOX);
         if (inboxFolder != null && inboxFolder.exists()) {
@@ -205,7 +192,8 @@ public class FileDataSource {
     }
 
     public Observable<Boolean> deleteResponsesFiles() {
-        List<File> foldersToDelete = flowFileBrowser.findAllPossibleFolders(FlowFileBrowser.DIR_DATA);
+        List<File> foldersToDelete = flowFileBrowser
+                .findAllPossibleFolders(FlowFileBrowser.DIR_DATA);
         foldersToDelete.addAll(flowFileBrowser.findAllPossibleFolders(FlowFileBrowser.DIR_MEDIA));
         foldersToDelete.addAll(flowFileBrowser.findAllPossibleFolders(FlowFileBrowser.DIR_TMP));
         File exportedFolder = flowFileBrowser.getAppExternalFolder(FlowFileBrowser.DIR_PUBLISHED);
@@ -236,16 +224,5 @@ public class FileDataSource {
         } catch (IOException e) {
             return Observable.error(e);
         }
-    }
-
-    public Observable<String> copyVideo(InputStream inputStream) {
-        final String copiedVideoPath = flowFileBrowser.getVideoFilePath();
-        return copyFile(copiedVideoPath, inputStream)
-                .map(new Function<Boolean, String>() {
-                    @Override
-                    public String apply(Boolean ignored) {
-                        return copiedVideoPath;
-                    }
-                });
     }
 }

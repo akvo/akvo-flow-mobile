@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -18,19 +18,16 @@
  *
  */
 
-package org.akvo.flow.data.datasource;
+package org.akvo.flow.data.datasource.files;
 
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.graphics.RectF;
-import android.net.Uri;
+import android.os.Build;
 import android.os.ParcelFileDescriptor;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.media.ExifInterface;
-import android.text.TextUtils;
 
 import org.akvo.flow.data.util.FileHelper;
 import org.akvo.flow.data.util.ImageSize;
@@ -40,100 +37,66 @@ import java.io.FileDescriptor;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 
 import javax.inject.Inject;
-import javax.inject.Singleton;
 
-import io.reactivex.Observable;
-import io.reactivex.functions.BiFunction;
-import io.reactivex.functions.Function;
 import timber.log.Timber;
 
-@Singleton
-public class ImageDataSource {
-
+public class BitmapHelper {
     private static final int RESIZED_IMAGE_WIDTH = 320;
     private static final int RESIZED_IMAGE_HEIGHT = 240;
     private static final int QUALITY_FULL = 100;
 
     private final FileHelper fileHelper;
-    private final Context context;
 
     @Inject
-    public ImageDataSource(FileHelper fileHelper, Context context) {
+    public BitmapHelper(FileHelper fileHelper) {
         this.fileHelper = fileHelper;
-        this.context = context;
     }
 
-    public Observable<Boolean> saveImages(Bitmap bitmap, String originalFilePath,
-            String resizedFilePath) {
-        return Observable.zip(saveImage(bitmap, originalFilePath),
-                saveResizedImage(bitmap, resizedFilePath),
-                new BiFunction<Boolean, Boolean, Boolean>() {
-                    @Override
-                    public Boolean apply(Boolean savedImage, Boolean savedResizedImage) {
-                        return savedImage && savedResizedImage;
-                    }
-                });
-    }
-
-    public Observable<Boolean> saveResizedImage(final Uri originalImagePath,
-            final String resizedImagePath, int imageSize, final InputStream inputStream) {
-        return resizeImage(originalImagePath, resizedImagePath, imageSize)
-                .concatMap(new Function<Boolean, Observable<Boolean>>() {
-                    @Override
-                    public Observable<Boolean> apply(Boolean result) {
-                        return updateExifData(inputStream, resizedImagePath);
-                    }
-                });
-    }
-
-    private Observable<Boolean> saveImage(@Nullable Bitmap bitmap, String filename) {
+    boolean compressBitmap(@Nullable Bitmap bitmap, String filename) {
         if (bitmap == null) {
-            return Observable.just(false);
+            return false;
         }
         OutputStream out = null;
         try {
             out = new BufferedOutputStream(new FileOutputStream(filename));
             if (bitmap.compress(Bitmap.CompressFormat.JPEG, QUALITY_FULL, out)) {
-                return Observable.just(true);
+                return true;
             }
         } catch (FileNotFoundException e) {
             Timber.e(e);
         } finally {
             fileHelper.close(out);
         }
-        return Observable.error(new Exception("Error saving bitmap"));
+        return false;
     }
 
-    private Observable<Boolean> saveResizedImage(Bitmap bitmap, String absolutePath) {
+    Bitmap createResizedBitmap(Bitmap bitmap) {
         Matrix m = new Matrix();
         m.setRectToRect(new RectF(0, 0, bitmap.getWidth(), bitmap.getHeight()),
                 new RectF(0, 0, RESIZED_IMAGE_WIDTH, RESIZED_IMAGE_HEIGHT),
                 Matrix.ScaleToFit.CENTER);
-        Bitmap resizedBitmap = Bitmap
+        return Bitmap
                 .createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), m, true);
-        return saveImage(resizedBitmap, absolutePath);
     }
 
-    private Observable<Boolean> resizeImage(Uri uri, String outFilename, int sizePreference) {
-        try {
-            ParcelFileDescriptor parcelFileDescriptor =
-                    context.getContentResolver().openFileDescriptor(uri, "r");
-            if (parcelFileDescriptor != null) {
-                FileDescriptor fileDescriptor = parcelFileDescriptor.getFileDescriptor();
-                BitmapFactory.Options options = prepareBitmapOptions(fileDescriptor,
-                        sizePreference);
-                Bitmap bitmap = BitmapFactory.decodeFileDescriptor(fileDescriptor, null, options);
+    Bitmap getBitmap(int sizePreference, ParcelFileDescriptor parcelFileDescriptor) {
+        FileDescriptor fileDescriptor = parcelFileDescriptor.getFileDescriptor();
+        BitmapFactory.Options options = prepareBitmapOptions(fileDescriptor,
+                sizePreference);
+        Bitmap bitmap = BitmapFactory.decodeFileDescriptor(fileDescriptor, null, options);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+            fileHelper.close(parcelFileDescriptor);
+        } else {
+            try {
                 parcelFileDescriptor.close();
-                return saveImage(bitmap, outFilename);
+            } catch (IOException e) {
+                //ignore
             }
-        } catch (IOException e) {
-            Timber.e(e);
         }
-        return Observable.error(new Exception("Error getting bitmap from uri: " + uri));
+        return bitmap;
     }
 
     @NonNull
@@ -219,38 +182,5 @@ public class ImageDataSource {
             }
         }
         return inSampleSize;
-    }
-
-    private Observable<Boolean> updateExifData(InputStream originalImageInputStream,
-            String resizedImagePath) {
-        try {
-            ExifInterface originalImageExif = new ExifInterface(originalImageInputStream);
-            ExifInterface newImageExif = new ExifInterface(resizedImagePath);
-            final String originalImageOrientation = originalImageExif
-                    .getAttribute(ExifInterface.TAG_ORIENTATION);
-            final String newImageOrientation = newImageExif
-                    .getAttribute(ExifInterface.TAG_ORIENTATION);
-
-            if (!TextUtils.isEmpty(originalImageOrientation) && !originalImageOrientation
-                    .equals(newImageOrientation)) {
-                Timber.d("Exif orientation in resized image will be updated");
-                newImageExif.setAttribute(ExifInterface.TAG_ORIENTATION, originalImageOrientation);
-            }
-
-            copyAttribute(originalImageExif, newImageExif, ExifInterface.TAG_GPS_LATITUDE);
-            copyAttribute(originalImageExif, newImageExif, ExifInterface.TAG_GPS_LATITUDE_REF);
-            copyAttribute(originalImageExif, newImageExif, ExifInterface.TAG_GPS_LONGITUDE);
-            copyAttribute(originalImageExif, newImageExif, ExifInterface.TAG_GPS_LONGITUDE_REF);
-            newImageExif.saveAttributes();
-            originalImageInputStream.close();
-        } catch (IOException e) {
-            Timber.e(e);
-        }
-        return Observable.just(true);
-    }
-
-    private void copyAttribute(ExifInterface originalImageExif, ExifInterface newImageExif,
-            String attribute) {
-        newImageExif.setAttribute(attribute, originalImageExif.getAttribute(attribute));
     }
 }

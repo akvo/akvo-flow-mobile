@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2013-2017 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2013-2018 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -43,9 +43,6 @@ import android.widget.ListView;
 import org.akvo.flow.R;
 import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.data.loader.SurveyInstanceResponseLoader;
-import org.akvo.flow.data.migration.FlowMigrationListener;
-import org.akvo.flow.data.migration.languages.MigrationLanguageMapper;
-import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.database.SurveyDbAdapter;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.injector.component.ApplicationComponent;
@@ -206,9 +203,7 @@ public class ResponseListFragment extends ListFragment implements LoaderCallback
 
     private void deleteSurveyInstance(String surveyId, long surveyInstanceId) {
         Context context = getActivity().getApplicationContext();
-        SurveyDbAdapter db = new SurveyDbAdapter(context,
-                new FlowMigrationListener(new Prefs(context),
-                        new MigrationLanguageMapper(context)));
+        SurveyDbAdapter db = new SurveyDbAdapter(context);
         boolean nameResetNeeded = surveyId != null && surveyId
                 .equals(mSurveyGroup.getRegisterSurveyId());
         db.open();

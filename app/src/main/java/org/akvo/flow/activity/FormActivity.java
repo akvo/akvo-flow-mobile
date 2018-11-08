@@ -47,8 +47,6 @@ import org.akvo.flow.R;
 import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.data.dao.SurveyDao;
 import org.akvo.flow.data.database.SurveyDbDataSource;
-import org.akvo.flow.data.migration.FlowMigrationListener;
-import org.akvo.flow.data.migration.languages.MigrationLanguageMapper;
 import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.database.SurveyDbAdapter;
 import org.akvo.flow.database.SurveyInstanceStatus;
@@ -173,8 +171,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
 
         Context context = getApplicationContext();
         languageMapper = new LanguageMapper(context);
-        surveyLanguagesDataSource = new SurveyLanguagesDbDataSource(context,
-                new FlowMigrationListener(prefs, new MigrationLanguageMapper(context)));
+        surveyLanguagesDataSource = new SurveyLanguagesDbDataSource(context);
 
         //TODO: move all loading to worker thread
         loadSurvey(surveyId);

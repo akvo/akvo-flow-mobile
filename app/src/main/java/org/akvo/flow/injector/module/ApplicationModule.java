@@ -31,9 +31,6 @@ import org.akvo.flow.BuildConfig;
 import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.data.datasource.preferences.SharedPreferencesDataSource;
 import org.akvo.flow.data.executor.JobExecutor;
-import org.akvo.flow.data.migration.FlowMigrationListener;
-import org.akvo.flow.data.migration.languages.MigrationLanguageMapper;
-import org.akvo.flow.domain.util.DeviceHelper;
 import org.akvo.flow.data.net.Encoder;
 import org.akvo.flow.data.net.RestApi;
 import org.akvo.flow.data.net.RestServiceFactory;
@@ -54,6 +51,7 @@ import org.akvo.flow.domain.repository.SetupRepository;
 import org.akvo.flow.domain.repository.SurveyRepository;
 import org.akvo.flow.domain.repository.UserRepository;
 import org.akvo.flow.domain.util.ConnectivityStateManager;
+import org.akvo.flow.domain.util.DeviceHelper;
 import org.akvo.flow.thread.UIThread;
 import org.akvo.flow.util.logging.DebugLoggingHelper;
 import org.akvo.flow.util.logging.FlowAndroidSentryFactory;
@@ -136,9 +134,7 @@ public class ApplicationModule {
     @Provides
     @Singleton
     SQLiteOpenHelper provideOpenHelper() {
-        return new DatabaseHelper(application, new LanguageTable(),
-                new FlowMigrationListener(new Prefs(application),
-                        new MigrationLanguageMapper(application)));
+        return new DatabaseHelper(application, new LanguageTable());
     }
 
     @Provides

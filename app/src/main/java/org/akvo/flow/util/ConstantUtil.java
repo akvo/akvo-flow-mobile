@@ -132,15 +132,6 @@ public class ConstantUtil {
     public static final String VIEW_USER_EXTRA = "view_user";
 
     /**
-     * settings keys
-     */
-    public static final String SURVEY_LANG_SETTING_KEY = "survey.language";//user selected languages
-    public static final String CELL_UPLOAD_SETTING_KEY = "data.cellular.upload";
-    public static final String SCREEN_ON_KEY = "screen.keepon";
-    public static final String DEVICE_IDENT_KEY = "device.identifier";
-    public static final String MAX_IMG_SIZE = "media.img.maxsize";
-
-    /**
      * intents
      */
     public static final String DATA_AVAILABLE_INTENT = "org.akvo.flow.DATA_SUBMITTED";
@@ -190,12 +181,6 @@ public class ConstantUtil {
     public static final int ORDER_BY_DATE = 0;
     public static final int ORDER_BY_DISTANCE = 1;
 
-    /**
-     * Max picture size
-     * Values must match the ones set in arrays.
-     */
-    public static final int IMAGE_SIZE_320_240 = 0;
-
     public static final int NOTIFICATION_FORMS_SYNCED = 102;
     public static final int NOTIFICATION_ASSIGNMENT_ERROR = 103;
     public static final int NOTIFICATION_HEADER_ERROR = 104;
@@ -218,6 +203,7 @@ public class ConstantUtil {
     public static final String CADDISFLY_RESPONSE = "response";
     public static final String CADDISFLY_IMAGE = "image";
     public static final String CADDISFLY_MIME = "text/plain";
+    public static final String CADDISFLY_INSTANCE_NAME = "instanceName";
 
     //broadcasts
     public static final String ACTION_DATA_SYNC = "fieldsurvey.ACTION_DATA_SYNC";

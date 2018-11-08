@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -24,9 +24,6 @@ import android.database.Cursor;
 
 import org.akvo.flow.data.loader.base.AsyncLoader;
 import org.akvo.flow.data.loader.models.SurveyedLocaleMapper;
-import org.akvo.flow.data.migration.FlowMigrationListener;
-import org.akvo.flow.data.migration.languages.MigrationLanguageMapper;
-import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.database.SurveyDbAdapter;
 import org.akvo.flow.domain.SurveyedLocale;
 
@@ -44,8 +41,7 @@ public class SurveyedLocaleItemLoader extends AsyncLoader<SurveyedLocale> {
     @Override
     public SurveyedLocale loadInBackground() {
         Context context = getContext();
-        SurveyDbAdapter db = new SurveyDbAdapter(context, new FlowMigrationListener(
-                new Prefs(context), new MigrationLanguageMapper(context)));
+        SurveyDbAdapter db = new SurveyDbAdapter(context);
         db.open();
         SurveyedLocale datapoint = null;
         Cursor cursor = db.getSurveyedLocale(datapointId);

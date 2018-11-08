@@ -64,7 +64,7 @@ import timber.log.Timber;
 
 public class Navigator {
 
-    private static final String TERMS_URL = "http://akvo.org/help/akvo-policies-and-terms-2/akvo-flow-terms-of-use/";
+    private static final String TERMS_URL = "https://akvo.org/help/akvo-policies-and-terms-2/";
     private static final String RELEASE_NOTES_URL = "https://github.com/akvo/akvo-flow-mobile/releases";
 
     //TODO: inject activity

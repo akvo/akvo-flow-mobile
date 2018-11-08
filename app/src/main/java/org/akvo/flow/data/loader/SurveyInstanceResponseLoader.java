@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2010-2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -37,7 +37,7 @@ public class SurveyInstanceResponseLoader extends AsyncLoader<Cursor> {
 
     @Override
     public Cursor loadInBackground() {
-        SurveyDbAdapter database = new SurveyDbAdapter(getContext().getApplicationContext(), null);
+        SurveyDbAdapter database = new SurveyDbAdapter(getContext().getApplicationContext());
         database.open();
         Cursor formInstances = database.getFormInstancesWithResponses(surveyedLocaleId);
         database.close();

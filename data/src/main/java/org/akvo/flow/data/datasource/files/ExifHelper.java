@@ -20,7 +20,6 @@
 
 package org.akvo.flow.data.datasource.files;
 
-import android.support.annotation.Nullable;
 import android.support.media.ExifInterface;
 import android.text.TextUtils;
 
@@ -41,14 +40,13 @@ public class ExifHelper {
         try {
             ExifInterface originalImageExif = new ExifInterface(originalImageInputStream);
             ExifInterface newImageExif = new ExifInterface(resizedImagePath);
-            final String originalImageOrientation = originalImageExif
-                    .getAttribute(ExifInterface.TAG_ORIENTATION);
-            final String newImageOrientation = newImageExif
-                    .getAttribute(ExifInterface.TAG_ORIENTATION);
+            final String originalImageOrientation = getOrientation(originalImageExif);
+            final String newImageOrientation = getOrientation(newImageExif);
 
-            if (!TextUtils.isEmpty(originalImageOrientation) && !originalImageOrientation
-                    .equals(newImageOrientation)) {
-                Timber.d("Exif orientation in resized image will be updated");
+            boolean orientationNeedsUpdate =
+                    !TextUtils.isEmpty(originalImageOrientation) && !originalImageOrientation
+                            .equals(newImageOrientation);
+            if (orientationNeedsUpdate) {
                 newImageExif.setAttribute(ExifInterface.TAG_ORIENTATION, originalImageOrientation);
             }
 
@@ -57,31 +55,31 @@ public class ExifHelper {
             copyAttribute(originalImageExif, newImageExif, ExifInterface.TAG_GPS_LONGITUDE);
             copyAttribute(originalImageExif, newImageExif, ExifInterface.TAG_GPS_LONGITUDE_REF);
             newImageExif.saveAttributes();
-            originalImageInputStream.close();
         } catch (IOException e) {
             Timber.e(e);
         }
         return true;
     }
 
-    boolean areDatesEqual(InputStream inputStream, @Nullable String imagePath) {
-        boolean equals = false;
-        if (!TextUtils.isEmpty(imagePath)) {
-            try {
-                ExifInterface originalImageExif = new ExifInterface(inputStream);
-                ExifInterface newImageExif = new ExifInterface(imagePath);
-                String originalFileDate = originalImageExif
-                        .getAttribute(ExifInterface.TAG_DATETIME);
-                String duplicatedFileDate = newImageExif.getAttribute(ExifInterface.TAG_DATETIME);
-                Timber.d("original date: " + originalFileDate);
-                Timber.d("duplicated date: " + duplicatedFileDate);
-                equals = originalFileDate != null && originalFileDate.equals(duplicatedFileDate);
-            } catch (IOException e) {
-                Timber.e(e);
-            }
-        }
+    private String getOrientation(ExifInterface exifInterface) {
+        return exifInterface.getAttribute(ExifInterface.TAG_ORIENTATION);
+    }
 
+    boolean areDatesEqual(InputStream inputStream, InputStream duplicateInputStream) {
+        boolean equals = false;
+        try {
+            String originalFileDate = getExifDate(inputStream);
+            String duplicatedFileDate = getExifDate(duplicateInputStream);
+            equals = originalFileDate != null && originalFileDate.equals(duplicatedFileDate);
+        } catch (IOException e) {
+            Timber.e(e);
+        }
         return equals;
+    }
+
+    private String getExifDate(InputStream inputStream) throws IOException {
+        ExifInterface exifInterface = new ExifInterface(inputStream);
+        return exifInterface.getAttribute(ExifInterface.TAG_DATETIME);
     }
 
     private void copyAttribute(ExifInterface originalImageExif, ExifInterface newImageExif,

@@ -26,7 +26,11 @@ import android.net.Uri;
 import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 
+import org.akvo.flow.data.util.FileHelper;
+
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 
@@ -38,11 +42,13 @@ public class MediaResolverHelper {
 
     private final Context context;
     private final ExifHelper exifHelper;
+    private final FileHelper fileHelper;
 
     @Inject
-    public MediaResolverHelper(Context context, ExifHelper exifHelper) {
+    public MediaResolverHelper(Context context, ExifHelper exifHelper, FileHelper fileHelper) {
         this.context = context;
         this.exifHelper = exifHelper;
+        this.fileHelper = fileHelper;
     }
 
     boolean deleteMedia(final Uri uri) {
@@ -72,15 +78,28 @@ public class MediaResolverHelper {
     boolean removeDuplicateImage(Uri uri) {
         final InputStream inputStream = getInputStreamFromUri(uri);
         String imagePath = getLastImageTakenPath();
-        if (exifHelper.areDatesEqual(inputStream, imagePath)) {
-            deleteImageByPath(imagePath);
+        if (!TextUtils.isEmpty(imagePath)) {
+            FileInputStream fileInputStream = null;
+            try {
+                fileInputStream = new FileInputStream(imagePath);
+                if (exifHelper.areDatesEqual(inputStream, fileInputStream)) {
+                    deleteImageByPath(imagePath);
+                }
+            } catch (FileNotFoundException e) {
+                Timber.d(e);
+            } finally {
+                fileHelper.close(fileInputStream);
+            }
         }
+        fileHelper.close(inputStream);
         return deleteMedia(uri);
     }
 
     boolean updateExifData(Uri uri, String resizedImagePath) {
         final InputStream inputStream = getInputStreamFromUri(uri);
-        return exifHelper.updateExifData(inputStream, resizedImagePath);
+        final boolean dataUpdated = exifHelper.updateExifData(inputStream, resizedImagePath);
+        fileHelper.close(inputStream);
+        return dataUpdated;
     }
 
     private String getLastImageTakenPath() {
@@ -109,5 +128,4 @@ public class MediaResolverHelper {
         context.getContentResolver().delete(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
                 MediaStore.Images.ImageColumns.DATA + "=?", new String[] { path });
     }
-
 }

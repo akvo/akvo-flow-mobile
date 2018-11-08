@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2016-2018 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -28,6 +28,7 @@ import org.akvo.flow.BuildConfig;
 import org.akvo.flow.R;
 
 import io.sentry.Sentry;
+import io.sentry.android.AndroidSentryClientFactory;
 import io.sentry.event.UserBuilder;
 import timber.log.Timber;
 
@@ -37,18 +38,16 @@ public class ReleaseLoggingHelper implements LoggingHelper {
     private static final String DEVICE_ID_TAG_KEY = "flow.device.id";
 
     private final Context context;
-    private final FlowAndroidSentryFactory sentryFactory;
 
-    public ReleaseLoggingHelper(Context context, FlowAndroidSentryFactory flowAndroidSentryFactory) {
+    public ReleaseLoggingHelper(Context context) {
         this.context = context;
-        this.sentryFactory = flowAndroidSentryFactory;
     }
 
     @Override
     public void init() {
         String sentryDsn = getSentryDsn(context.getResources());
         if (!TextUtils.isEmpty(sentryDsn)) {
-            Sentry.init(sentryDsn, sentryFactory);
+            Sentry.init(sentryDsn, new AndroidSentryClientFactory(context));
             Sentry.getContext().addTag(GAE_INSTANCE_ID_TAG_KEY, BuildConfig.AWS_BUCKET);
             Timber.plant(new SentryTree());
         }

@@ -37,7 +37,6 @@ import org.akvo.flow.data.net.RestApi;
 import org.akvo.flow.data.net.RestServiceFactory;
 import org.akvo.flow.data.net.S3User;
 import org.akvo.flow.data.net.SignatureHelper;
-import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.data.repository.FileDataRepository;
 import org.akvo.flow.data.repository.SetupDataRepository;
 import org.akvo.flow.data.repository.SurveyDataRepository;
@@ -51,12 +50,9 @@ import org.akvo.flow.domain.repository.FileRepository;
 import org.akvo.flow.domain.repository.SetupRepository;
 import org.akvo.flow.domain.repository.SurveyRepository;
 import org.akvo.flow.domain.repository.UserRepository;
-import org.akvo.flow.domain.util.ConnectivityStateManager;
 import org.akvo.flow.thread.UIThread;
 import org.akvo.flow.util.logging.DebugLoggingHelper;
-import org.akvo.flow.util.logging.FlowAndroidSentryFactory;
 import org.akvo.flow.util.logging.LoggingHelper;
-import org.akvo.flow.util.logging.LoggingSendPermissionVerifier;
 import org.akvo.flow.util.logging.ReleaseLoggingHelper;
 
 import java.text.DateFormat;
@@ -104,12 +100,7 @@ public class ApplicationModule {
         if (BuildConfig.DEBUG) {
             return new DebugLoggingHelper();
         } else {
-            LoggingSendPermissionVerifier loggingSendPermissionVerifier =
-                    new LoggingSendPermissionVerifier(new ConnectivityStateManager(application),
-                            new Prefs(application));
-            FlowAndroidSentryFactory flowAndroidSentryFactory = new FlowAndroidSentryFactory(
-                    application, loggingSendPermissionVerifier);
-            return new ReleaseLoggingHelper(application, flowAndroidSentryFactory);
+            return new ReleaseLoggingHelper(application);
         }
     }
 

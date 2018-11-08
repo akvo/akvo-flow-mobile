@@ -369,16 +369,6 @@ public class DataPointsMapFragment extends SupportMapFragment implements OnInfoW
     }
 
     @Override
-    public void showErrorSyncNotAllowed() {
-        dataPointSyncSnackBarManager.showErrorSyncNotAllowed(getView(), new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                navigator.navigateToAppSettings(getActivity());
-            }
-        });
-    }
-
-    @Override
     public void showErrorNoNetwork() {
         dataPointSyncSnackBarManager.showErrorNoNetwork(getView(), new View.OnClickListener() {
             @Override

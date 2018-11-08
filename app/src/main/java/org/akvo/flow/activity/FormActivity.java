@@ -28,6 +28,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v4.view.ViewPager;
@@ -65,6 +66,7 @@ import org.akvo.flow.injector.component.ViewComponent;
 import org.akvo.flow.presentation.SnackBarManager;
 import org.akvo.flow.presentation.form.FormPresenter;
 import org.akvo.flow.presentation.form.FormView;
+import org.akvo.flow.presentation.form.mobiledata.MobileDataSettingDialog;
 import org.akvo.flow.ui.Navigator;
 import org.akvo.flow.ui.adapter.LanguageAdapter;
 import org.akvo.flow.ui.adapter.SurveyTabAdapter;
@@ -98,7 +100,8 @@ import static org.akvo.flow.util.ViewUtil.showConfirmDialog;
 
 public class FormActivity extends BackActivity implements SurveyListener,
         QuestionInteractionListener, FormView,
-        GeoFieldsResetConfirmDialogFragment.GeoFieldsResetConfirmListener {
+        GeoFieldsResetConfirmDialogFragment.GeoFieldsResetConfirmListener,
+        MobileDataSettingDialog.MobileDataSettingListener {
 
     @Inject
     FormFileBrowser formFileBrowser;
@@ -699,6 +702,17 @@ public class FormActivity extends BackActivity implements SurveyListener,
     @Override
     public void showErrorExport() {
         snackBarManager.displaySnackBar(rootView, R.string.form_submit_error, this);
+    }
+
+    @Override
+    public void showMobileUploadSetting(long surveyInstanceId) {
+        DialogFragment fragment = MobileDataSettingDialog.newInstance(surveyInstanceId);
+        fragment.show(getSupportFragmentManager(), MobileDataSettingDialog.TAG);
+    }
+
+    @Override
+    public void onMobileUploadSet(long instanceId) {
+        presenter.onSubmitPressed(instanceId);
     }
 
     @Override

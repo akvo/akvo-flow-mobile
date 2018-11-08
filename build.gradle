@@ -38,6 +38,7 @@ ext {
     sqlbriteVersion = "2.0.0"
     supportVersion = "27.1.1"
     timberVersion = "4.5.1"
+    multidexVersion = "1.0.3"
 
     jUnitVersion = "4.12"
 

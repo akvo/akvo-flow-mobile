@@ -48,7 +48,7 @@
 
             <android.support.v7.widget.SwitchCompat
                     android:id="@+id/switch_enable_data"
-                    android:text="@string/preference_mobile_data"
+                    android:text="@string/preference_upload_mobile_data"
                     style="@style/PreferenceSwitch"/>
 
             <View

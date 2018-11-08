@@ -145,8 +145,7 @@ public class PhotoQuestionView extends QuestionView
     void onImageDownloadClick() {
         showLoading();
 
-        MediaSyncTask downloadTask = new MediaSyncTask(getContext(),
-                new File(mMedia.getFilename()), this);
+        MediaSyncTask downloadTask = new MediaSyncTask(new File(mMedia.getFilename()), this);
         downloadTask.execute();
     }
 

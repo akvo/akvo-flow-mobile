@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -18,17 +18,9 @@
  *
  */
 
-package org.akvo.flow.presentation.help;
+package org.akvo.flow.presentation.form.mobiledata;
 
-public interface HelpView {
+public interface MobileDataSettingView {
 
-    void displayError();
-
-    void loadWebView();
-
-    void displayErrorDataSyncDisabled();
-
-    void hideProgress();
-
-    void showProgress();
+    void dismissView();
 }

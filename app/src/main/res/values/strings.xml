@@ -234,7 +234,7 @@
     <string name="error_loading_help">Error loading help content</string>
     <string name="error_mobile_data_sync">Mobile data sync disabled</string>
     <string name="preference_screen_on">Keep screen on during form input</string>
-    <string name="preference_mobile_data">Enable usage of mobile data</string>
+    <string name="preference_upload_mobile_data">Upload submissions over mobile data</string>
     <string name="preference_app_language">App language</string>
     <string name="preference_image_size">Image size</string>
     <string name="preferences_data_section">Data</string>
@@ -247,7 +247,6 @@
     <string name="preferences_section_information">Information</string>
     <string name="preference_identifier">Device identifier</string>
     <string name="preference_instance_name">Instance name</string>
-    <string name="data_points_sync_error_mobile_data_sync">Mobile data sync disabled</string>
     <string name="action_settings">Settings</string>
     <string name="no_records_subtitle_monitored">Use \'+\' to capture data or \'Download\' to get existing data</string>
     <string name="no_records_subtitle_non_monitored">Use \'+\' to capture data.</string>
@@ -301,6 +300,10 @@
     <string name="media_from_gallery">Gallery</string>
     <string name="error_username_required">A username is required</string>
     <string name="error_device_id_required">A device id is required</string>
+    <string name="no_thanks_button">No thanks</string>
+    <string name="mobile_data_dialog_title">Enable uploading submissions over mobile data?</string>
+    <string name="mobile_data_dialog_subtitle">When disabled submissions will only be uploaded when a wifi connection is available.</string>
+    <string name="enable_button">Enable</string>
     <string name="location_permission_refused">Location permission is required in order to get the device location.</string>
     <string name="action_enable">Enable</string>
 

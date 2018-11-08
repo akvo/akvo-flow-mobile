@@ -37,7 +37,6 @@ import org.akvo.flow.data.net.RestApi;
 import org.akvo.flow.data.net.RestServiceFactory;
 import org.akvo.flow.data.net.S3User;
 import org.akvo.flow.data.net.SignatureHelper;
-import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.data.repository.FileDataRepository;
 import org.akvo.flow.data.repository.SetupDataRepository;
 import org.akvo.flow.data.repository.SurveyDataRepository;

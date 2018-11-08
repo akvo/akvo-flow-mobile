@@ -33,7 +33,6 @@ import org.akvo.flow.domain.interactor.GetSavedDataPoints;
 import org.akvo.flow.domain.interactor.UseCase;
 import org.akvo.flow.domain.util.Constants;
 import org.akvo.flow.presentation.Presenter;
-import org.akvo.flow.presentation.datapoints.MobileDataObserver;
 import org.akvo.flow.presentation.datapoints.map.entity.MapDataPoint;
 import org.akvo.flow.presentation.datapoints.map.entity.MapDataPointMapper;
 
@@ -54,7 +53,6 @@ public class DataPointsMapPresenter implements Presenter {
     private final MapDataPointMapper mapper;
     private final DownloadDataPoints downloadDataPoints;
     private final UseCase getSavedDataPoints;
-    private final UseCase allowedToConnect;
     private final UseCase checkDeviceNotification;
     private final UseCase upload;
 
@@ -63,12 +61,11 @@ public class DataPointsMapPresenter implements Presenter {
 
     @Inject DataPointsMapPresenter(@Named("getSavedDataPoints") UseCase getSavedDataPoints,
             MapDataPointMapper mapper, DownloadDataPoints downloadDataPoints,
-            @Named("allowedToConnect") UseCase allowedToConnect, @Named("checkDeviceNotification")
-            UseCase checkDeviceNotification, @Named("uploadSync") UseCase upload) {
+            @Named("checkDeviceNotification") UseCase checkDeviceNotification,
+            @Named("uploadSync") UseCase upload) {
         this.getSavedDataPoints = getSavedDataPoints;
         this.mapper = mapper;
         this.downloadDataPoints = downloadDataPoints;
-        this.allowedToConnect = allowedToConnect;
         this.checkDeviceNotification = checkDeviceNotification;
         this.upload = upload;
     }
@@ -118,7 +115,6 @@ public class DataPointsMapPresenter implements Presenter {
     public void destroy() {
         getSavedDataPoints.dispose();
         downloadDataPoints.dispose();
-        allowedToConnect.dispose();
         checkDeviceNotification.dispose();
         upload.dispose();
     }
@@ -139,71 +135,6 @@ public class DataPointsMapPresenter implements Presenter {
     }
 
     private void syncRecords(final long surveyGroupId) {
-        verifyConnection(new MobileDataObserver() {
-            @Override
-            protected void onMobileDataNotAllowed() {
-                view.hideProgress();
-                view.showErrorSyncNotAllowed();
-            }
-
-            @Override
-            protected void onMobileDataAllowed() {
-                sync(surveyGroupId);
-            }
-        });
-    }
-
-    public void onUploadPressed() {
-        if (surveyGroup != null) {
-            view.showProgress();
-            verifyConnection(new MobileDataObserver() {
-                @Override
-                protected void onMobileDataNotAllowed() {
-                    view.hideProgress();
-                    view.showErrorSyncNotAllowed();
-                }
-
-                @Override
-                protected void onMobileDataAllowed() {
-                    final Map<String, Object> params = new HashMap<>(2);
-                    params.put(Constants.KEY_SURVEY_ID, surveyGroup.getId() + "");
-                    checkDeviceNotification.execute(new DefaultObserver<List<String>>() {
-                        @Override
-                        public void onError(Throwable e) {
-                            Timber.e(e);
-                            uploadDataPoints(params);
-                        }
-
-                        @Override
-                        public void onNext(List<String> strings) {
-                            uploadDataPoints(params);
-                        }
-                    }, params);
-                }
-            });
-        }
-    }
-
-    private void uploadDataPoints(Map<String, Object> params) {
-        upload.execute(new DefaultObserver<Set<String>>() {
-            @Override
-            public void onError(Throwable e) {
-                view.hideProgress();
-                Timber.e(e);
-            }
-
-            @Override
-            public void onComplete() {
-                view.hideProgress();
-            }
-        }, params);
-    }
-
-    private void verifyConnection(MobileDataObserver mobileDataObserver) {
-        allowedToConnect.execute(mobileDataObserver, null);
-    }
-
-    private void sync(final long surveyGroupId) {
         Map<String, Object> params = new HashMap<>(2);
         params.put(DownloadDataPoints.KEY_SURVEY_GROUP_ID, surveyGroupId);
         downloadDataPoints.execute(new DefaultFlowableObserver<DownloadResult>() {
@@ -242,6 +173,41 @@ public class DataPointsMapPresenter implements Presenter {
                 Timber.e(e, "Error syncing %s", surveyGroupId);
                 view.hideProgress();
                 view.showErrorSync();
+            }
+        }, params);
+    }
+
+    public void onUploadPressed() {
+        if (surveyGroup != null) {
+            view.showProgress();
+            final Map<String, Object> params = new HashMap<>(2);
+            params.put(Constants.KEY_SURVEY_ID, surveyGroup.getId() + "");
+            checkDeviceNotification.execute(new DefaultObserver<List<String>>() {
+                @Override
+                public void onError(Throwable e) {
+                    Timber.e(e);
+                    uploadDataPoints(params);
+                }
+
+                @Override
+                public void onNext(List<String> strings) {
+                    uploadDataPoints(params);
+                }
+            }, params);
+        }
+    }
+
+    private void uploadDataPoints(Map<String, Object> params) {
+        upload.execute(new DefaultObserver<Set<String>>() {
+            @Override
+            public void onError(Throwable e) {
+                view.hideProgress();
+                Timber.e(e);
+            }
+
+            @Override
+            public void onComplete() {
+                view.hideProgress();
             }
         }, params);
     }

@@ -20,9 +20,11 @@
 package org.akvo.flow.app;
 
 import android.app.Application;
+import android.content.Context;
 import android.content.IntentFilter;
 import android.content.res.Configuration;
 import android.support.annotation.Nullable;
+import android.support.multidex.MultiDex;
 import android.text.TextUtils;
 
 import com.crashlytics.android.Crashlytics;
@@ -73,9 +75,17 @@ public class FlowApp extends Application {
     UseCase saveSetup;
 
     @Override
+    protected void attachBaseContext(Context base) {
+        super.attachBaseContext(base);
+
+        if (BuildConfig.DEBUG) {
+            MultiDex.install(this);
+        }
+    }
+
+    @Override
     public void onCreate() {
         super.onCreate();
-
         if (LeakCanary.isInAnalyzerProcess(this)) {
             // This process is dedicated to LeakCanary for heap analysis.
             // You should not init your app in this process.

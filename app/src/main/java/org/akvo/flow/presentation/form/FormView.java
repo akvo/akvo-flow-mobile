@@ -29,4 +29,6 @@ public interface FormView {
     void dismiss();
 
     void showErrorExport();
+
+    void showMobileUploadSetting(long surveyInstanceId);
 }

@@ -22,7 +22,6 @@ package org.akvo.flow.activity;
 import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -32,6 +31,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.PermissionChecker;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
@@ -136,6 +136,7 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     private ApkUpdateStore apkUpdateStore;
     private long selectedSurveyId;
     private boolean activityJustCreated;
+    private boolean permissionsResults;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -287,8 +288,10 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
 
             showApkUpdateIfNeeded();
             updateAddDataPointFab();
-            //TODO: broken
-            handlePermissions();
+            if (!permissionsResults) {
+                handlePermissions();
+            }
+            permissionsResults = false;
         }
     }
 
@@ -302,26 +305,37 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
 
     private boolean isStorageAllowed() {
         return ContextCompat.checkSelfPermission(this,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
+                Manifest.permission.WRITE_EXTERNAL_STORAGE) == PermissionChecker.PERMISSION_GRANTED;
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
             @NonNull int[] grantResults) {
-       if (grantResults.length > 0 && requestCode == ConstantUtil.STORAGE_PERMISSION_CODE
+        permissionsResults = true;
+        if (grantResults.length > 0 && requestCode == ConstantUtil.STORAGE_PERMISSION_CODE
                 && Manifest.permission.WRITE_EXTERNAL_STORAGE.equals(permissions[0])
-                && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-           startServices();
-       } else {
-           snackBarManager.displaySnackBarWithAction(rootLayout,
-                   R.string.storage_permission_missing, R.string.action_retry,
-                   new View.OnClickListener() {
-                       @Override
-                       public void onClick(View v) {
-                           handlePermissions();
-                       }
-                   }, this);
-       }
+                && grantResults[0] == PermissionChecker.PERMISSION_GRANTED) {
+            startServices();
+        } else {
+            if (requestCode == ConstantUtil.STORAGE_PERMISSION_CODE) {
+                final boolean userPressedNeverAskAgain = !ActivityCompat
+                        .shouldShowRequestPermissionRationale(this,
+                                Manifest.permission.WRITE_EXTERNAL_STORAGE);
+                final View.OnClickListener retryListener = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if (userPressedNeverAskAgain) {
+                            navigator.navigateToAppSystemSettings(SurveyActivity.this);
+                        } else {
+                            handlePermissions();
+                        }
+                    }
+                };
+                snackBarManager
+                        .displaySnackBarWithAction(rootLayout, R.string.storage_permission_missing,
+                                R.string.action_retry, retryListener, this);
+            }
+        }
     }
 
     private void showApkUpdateIfNeeded() {

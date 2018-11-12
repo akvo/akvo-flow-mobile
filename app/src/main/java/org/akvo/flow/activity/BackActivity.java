@@ -20,8 +20,8 @@
 package org.akvo.flow.activity;
 
 import android.Manifest;
-import android.content.pm.PackageManager;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.PermissionChecker;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -54,6 +54,6 @@ public abstract class BackActivity extends AppCompatActivity {
 
     protected boolean isLocationAllowed() {
         return ContextCompat.checkSelfPermission(this,
-                Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
+                Manifest.permission.ACCESS_FINE_LOCATION) == PermissionChecker.PERMISSION_GRANTED;
     }
 }

@@ -22,8 +22,8 @@ package org.akvo.flow.event;
 
 import android.Manifest;
 import android.content.Context;
-import android.content.pm.PackageManager;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.PermissionChecker;
 
 import org.akvo.flow.activity.FormActivity;
 import org.akvo.flow.util.ConstantUtil;
@@ -62,7 +62,7 @@ public class PermissionAwareLocationListener {
             permissionListener.onPermissionNotGranted();
         } else if (requestCode == ConstantUtil.LOCATION_PERMISSION_CODE
                 && Manifest.permission.ACCESS_FINE_LOCATION.equals(permissions[0])
-                && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                && grantResults[0] == PermissionChecker.PERMISSION_GRANTED) {
             startLocation();
         } else {
             permissionListener.onPermissionNotGranted();
@@ -77,7 +77,7 @@ public class PermissionAwareLocationListener {
 
     private boolean isLocationPermissionGranted() {
         return ContextCompat.checkSelfPermission(context,
-                Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
+                Manifest.permission.ACCESS_FINE_LOCATION) == PermissionChecker.PERMISSION_GRANTED;
     }
 
     private void startLocation() {

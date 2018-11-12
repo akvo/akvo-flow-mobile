@@ -28,6 +28,7 @@ import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.provider.Settings;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.PermissionChecker;
 import android.telephony.TelephonyManager;
 
 import javax.inject.Inject;
@@ -111,6 +112,6 @@ public class DeviceHelper {
 
     private boolean isAllowedToReadPhoneState() {
         return ContextCompat.checkSelfPermission(context,
-                Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED;
+                Manifest.permission.READ_PHONE_STATE) == PermissionChecker.PERMISSION_GRANTED;
     }
 }

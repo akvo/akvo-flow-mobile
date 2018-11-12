@@ -306,5 +306,6 @@
     <string name="enable_button">Enable</string>
     <string name="location_permission_refused">Location permission is required in order to get the device location.</string>
     <string name="action_enable">Enable</string>
+    <string name="storage_permission_missing">Storage permission is necessary for the app to work correctly.</string>
 
 </resources>

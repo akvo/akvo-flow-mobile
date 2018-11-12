@@ -19,6 +19,7 @@
 
 package org.akvo.flow.activity;
 
+import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -26,6 +27,7 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.GravityCompat;
@@ -289,9 +291,17 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
             showApkUpdateIfNeeded();
             updateAddDataPointFab();
             if (!permissionsResults) {
-                storagePermissionsHelper.handlePermissions(this);
+                handlePermissions();
             }
             permissionsResults = false;
+        }
+    }
+
+    public void handlePermissions() {
+        if (!storagePermissionsHelper.isStorageAllowed()) {
+            ActivityCompat.requestPermissions(this,
+                    new String[] { Manifest.permission.WRITE_EXTERNAL_STORAGE },
+                    ConstantUtil.STORAGE_PERMISSION_CODE);
         }
     }
 
@@ -315,7 +325,7 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
                 if (storagePermissionsHelper.userPressedDoNotShowAgain(SurveyActivity.this)) {
                     navigator.navigateToAppSystemSettings(SurveyActivity.this);
                 } else {
-                    storagePermissionsHelper.handlePermissions(SurveyActivity.this);
+                    handlePermissions();
                 }
             }
         };

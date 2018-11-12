@@ -20,6 +20,7 @@
 
 package org.akvo.flow.ui.view.media.photo;
 
+import android.Manifest;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
@@ -32,6 +33,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import org.akvo.flow.R;
+import org.akvo.flow.activity.FormActivity;
 import org.akvo.flow.async.MediaSyncTask;
 import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionResponse;
@@ -46,6 +48,7 @@ import org.akvo.flow.ui.Navigator;
 import org.akvo.flow.ui.view.QuestionView;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.ImageUtil;
+import org.akvo.flow.util.StoragePermissionsHelper;
 import org.akvo.flow.util.image.GlideImageLoader;
 import org.akvo.flow.util.image.ImageLoader;
 
@@ -74,6 +77,9 @@ public class PhotoQuestionView extends QuestionView
 
     @Inject
     PhotoQuestionPresenter presenter;
+
+    @Inject
+    StoragePermissionsHelper storagePermissionsHelper;
 
     @BindView(R.id.acquire_media_ll)
     View mediaLayout;
@@ -133,7 +139,45 @@ public class PhotoQuestionView extends QuestionView
 
     @OnClick(R.id.camera_btn)
     void onTakePictureClicked() {
-        notifyQuestionListeners(QuestionInteractionEvent.TAKE_PHOTO_EVENT);
+        if (storagePermissionsHelper.isStorageAllowed()) {
+            notifyQuestionListeners(QuestionInteractionEvent.TAKE_PHOTO_EVENT);
+        } else {
+            requestStoragePermissions();
+        }
+    }
+
+    private void requestStoragePermissions() {
+        final FormActivity activity = (FormActivity) getContext();
+        activity.requestPermissions(new String[] { Manifest.permission.WRITE_EXTERNAL_STORAGE },
+                ConstantUtil.STORAGE_PERMISSION_CODE, getQuestion().getQuestionId());
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        if (requestCode == ConstantUtil.STORAGE_PERMISSION_CODE) {
+            if (storagePermissionsHelper.storagePermissionsGranted(permissions[0], grantResults)) {
+                notifyQuestionListeners(QuestionInteractionEvent.TAKE_PHOTO_EVENT);
+            } else {
+                storagePermissionNotGranted();
+            }
+        }
+    }
+
+    private void storagePermissionNotGranted() {
+        final View.OnClickListener retryListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (storagePermissionsHelper.userPressedDoNotShowAgain((FormActivity) getContext())) {
+                    navigator.navigateToAppSystemSettings(getContext());
+                } else {
+                    requestStoragePermissions();
+                }
+            }
+        };
+        snackBarManager
+                .displaySnackBarWithAction(this,
+                        R.string.storage_permission_missing,
+                        R.string.action_retry, retryListener, getContext());
     }
 
     @OnClick(R.id.gallery_btn)

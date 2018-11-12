@@ -39,14 +39,6 @@ public class StoragePermissionsHelper {
         this.context = context;
     }
 
-    public void handlePermissions(AppCompatActivity activity) {
-        if (!isStorageAllowed()) {
-            ActivityCompat.requestPermissions(activity,
-                    new String[] { Manifest.permission.WRITE_EXTERNAL_STORAGE },
-                    ConstantUtil.STORAGE_PERMISSION_CODE);
-        }
-    }
-
     public boolean storagePermissionsGranted(String permission, @NonNull int[] grantResults) {
         return grantResults.length > 0
                 && Manifest.permission.WRITE_EXTERNAL_STORAGE.equals(permission)
@@ -59,7 +51,7 @@ public class StoragePermissionsHelper {
                         Manifest.permission.WRITE_EXTERNAL_STORAGE);
     }
 
-    private boolean isStorageAllowed() {
+    public boolean isStorageAllowed() {
         return ContextCompat.checkSelfPermission(context,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE) == PermissionChecker.PERMISSION_GRANTED;
     }

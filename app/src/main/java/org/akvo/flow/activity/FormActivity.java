@@ -28,6 +28,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
@@ -45,8 +46,6 @@ import org.akvo.flow.R;
 import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.data.dao.SurveyDao;
 import org.akvo.flow.data.database.SurveyDbDataSource;
-import org.akvo.flow.data.migration.FlowMigrationListener;
-import org.akvo.flow.data.migration.languages.MigrationLanguageMapper;
 import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.database.SurveyDbAdapter;
 import org.akvo.flow.database.SurveyInstanceStatus;
@@ -65,6 +64,7 @@ import org.akvo.flow.injector.component.ViewComponent;
 import org.akvo.flow.presentation.SnackBarManager;
 import org.akvo.flow.presentation.form.FormPresenter;
 import org.akvo.flow.presentation.form.FormView;
+import org.akvo.flow.presentation.form.mobiledata.MobileDataSettingDialog;
 import org.akvo.flow.ui.Navigator;
 import org.akvo.flow.ui.adapter.LanguageAdapter;
 import org.akvo.flow.ui.adapter.SurveyTabAdapter;
@@ -98,7 +98,8 @@ import static org.akvo.flow.util.ViewUtil.showConfirmDialog;
 
 public class FormActivity extends BackActivity implements SurveyListener,
         QuestionInteractionListener, FormView,
-        GeoFieldsResetConfirmDialogFragment.GeoFieldsResetConfirmListener {
+        GeoFieldsResetConfirmDialogFragment.GeoFieldsResetConfirmListener,
+        MobileDataSettingDialog.MobileDataSettingListener {
 
     @Inject
     FormFileBrowser formFileBrowser;
@@ -171,8 +172,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
 
         Context context = getApplicationContext();
         languageMapper = new LanguageMapper(context);
-        surveyLanguagesDataSource = new SurveyLanguagesDbDataSource(context,
-                new FlowMigrationListener(prefs, new MigrationLanguageMapper(context)));
+        surveyLanguagesDataSource = new SurveyLanguagesDbDataSource(context);
 
         //TODO: move all loading to worker thread
         loadSurvey(surveyId);
@@ -683,6 +683,17 @@ public class FormActivity extends BackActivity implements SurveyListener,
     @Override
     public void showErrorExport() {
         snackBarManager.displaySnackBar(rootView, R.string.form_submit_error, this);
+    }
+
+    @Override
+    public void showMobileUploadSetting(long surveyInstanceId) {
+        DialogFragment fragment = MobileDataSettingDialog.newInstance(surveyInstanceId);
+        fragment.show(getSupportFragmentManager(), MobileDataSettingDialog.TAG);
+    }
+
+    @Override
+    public void onMobileUploadSet(long instanceId) {
+        presenter.onSubmitPressed(instanceId);
     }
 
     @Override

@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2018 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -28,7 +28,7 @@ import org.akvo.flow.util.ConstantUtil;
 public class QuestionResponse {
 
     public static final int NO_ITERATION = -1;
-    public static final int ONE_ITERATION = 0;
+    private static final int ONE_ITERATION = 0;
 
     private final String value;
     private final String type;
@@ -39,7 +39,7 @@ public class QuestionResponse {
     private final boolean includeFlag;
     private final int iteration;
 
-    QuestionResponse(String value, String type, Long id, Long surveyInstanceId,
+    private QuestionResponse(String value, String type, Long id, Long surveyInstanceId,
             String questionId, String filename, boolean includeFlag, int iteration) {
         this.value = value;
         this.type = type;
@@ -151,7 +151,6 @@ public class QuestionResponse {
     /**
      * The key is usually the questionId except for questions that belong to a repeatable group
      * whose key is composed by questionId|iteration
-     * @return
      */
     public String getResponseKey() {
         String responseKey = getQuestionId();
@@ -259,8 +258,6 @@ public class QuestionResponse {
 
         /**
          * Return new response object using ids from the existing response
-         * @param oldResponse
-         * @return
          */
         public QuestionResponse createFromQuestionResponse(@Nullable QuestionResponse oldResponse,
                 @Nullable QuestionResponse newResponse) {
@@ -269,7 +266,7 @@ public class QuestionResponse {
             } else if (oldResponse == null) {
                 return newResponse;
             } else if (newResponse == null) {
-                return oldResponse;
+                return null;
             } else {
                 return setId(oldResponse.getId())
                         .setValue(newResponse.getValue())

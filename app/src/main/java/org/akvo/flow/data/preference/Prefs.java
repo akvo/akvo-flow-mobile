@@ -22,11 +22,6 @@ package org.akvo.flow.data.preference;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.support.annotation.Nullable;
-import android.text.TextUtils;
-
-import org.akvo.flow.data.migration.preferences.InsertablePreferences;
-import org.akvo.flow.util.ConstantUtil;
 
 import javax.inject.Inject;
 
@@ -40,18 +35,14 @@ public class Prefs {
     public static final String KEY_USER_ID = "userId";
     public static final String KEY_SETUP = "setup";
     public static final String KEY_LOCALE = "pref.locale";
-    public static final String KEY_CELL_UPLOAD = "data.cellular.upload";
     public static final String KEY_SCREEN_ON = "screen.keepon";
     public static final String KEY_DEVICE_IDENTIFIER = "device.identifier";
-    private static final String KEY_MAX_IMG_SIZE = "media.img.maxsize";
     public static final String KEY_SPACE_AVAILABLE = "cardMBAvaliable";
 
     private static final String PREFS_NAME = "flow_prefs";
     private static final int PREFS_MODE = Context.MODE_PRIVATE;
 
     public static final String DEFAULT_VALUE_DEVICE_IDENTIFIER = "unset";
-    public static final int DEFAULT_VALUE_IMAGE_SIZE = ConstantUtil.IMAGE_SIZE_320_240;
-    public static final boolean DEFAULT_VALUE_CELL_UPLOAD = false;
     public static final boolean DEFAULT_VALUE_SCREEN_ON = true;
     public static final long DEF_VALUE_SPACE_AVAILABLE = 101L;
     public static final long DEFAULT_VALUE_USER_ID = -1;
@@ -91,36 +82,8 @@ public class Prefs {
         getPrefs().edit().putLong(key, value).apply();
     }
 
-    private void setInt(String key, int value) {
-        getPrefs().edit().putInt(key, value).apply();
-    }
-
     public void removePreference(String key) {
         getPrefs().edit().remove(key).apply();
-    }
-
-    public void insertUserPreferences(@Nullable InsertablePreferences insertablePreferences) {
-        if (insertablePreferences == null) {
-            return;
-        }
-
-        String deviceIdentifier = insertablePreferences.getDeviceIdentifier();
-        if (!TextUtils.isEmpty(deviceIdentifier)) {
-            setString(KEY_DEVICE_IDENTIFIER, deviceIdentifier);
-        }
-
-        if (DEFAULT_VALUE_CELL_UPLOAD != insertablePreferences.isCellularDataEnabled()) {
-            setBoolean(KEY_CELL_UPLOAD,
-                    insertablePreferences.isCellularDataEnabled());
-        }
-
-        if (DEFAULT_VALUE_SCREEN_ON != insertablePreferences.isScreenOn()) {
-            setBoolean(KEY_SCREEN_ON, insertablePreferences.isScreenOn());
-        }
-
-        if (DEFAULT_VALUE_IMAGE_SIZE != insertablePreferences.getImageSize()) {
-            setInt(KEY_MAX_IMG_SIZE, insertablePreferences.getImageSize());
-        }
     }
 }
 

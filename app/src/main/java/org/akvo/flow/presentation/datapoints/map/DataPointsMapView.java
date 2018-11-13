@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -35,8 +35,6 @@ interface DataPointsMapView {
     void showSyncedResults(int numberOfSyncedItems);
 
     void showErrorAssignmentMissing();
-
-    void showErrorSyncNotAllowed();
 
     void showErrorNoNetwork();
 

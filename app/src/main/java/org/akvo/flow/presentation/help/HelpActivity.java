@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -35,7 +35,6 @@ import org.akvo.flow.activity.BackActivity;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
 import org.akvo.flow.presentation.SnackBarManager;
-import org.akvo.flow.ui.Navigator;
 
 import java.lang.ref.WeakReference;
 
@@ -44,7 +43,7 @@ import javax.inject.Inject;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class HelpActivity extends BackActivity implements HelpView {
+public class HelpActivity extends BackActivity {
 
     private static final String SUPPORT_URL = "http://flowsupport.akvo.org/container/show/akvo-flow-app";
 
@@ -58,12 +57,6 @@ public class HelpActivity extends BackActivity implements HelpView {
     CoordinatorLayout rootView;
 
     @Inject
-    HelpPresenter presenter;
-
-    @Inject
-    Navigator navigator;
-
-    @Inject
     SnackBarManager snackBarManager;
 
     @Override
@@ -75,7 +68,7 @@ public class HelpActivity extends BackActivity implements HelpView {
         setupToolBar();
         showProgress();
         setUpWebView();
-        presenter.setView(this);
+        loadWebView();
     }
 
     private void initializeInjector() {
@@ -85,56 +78,29 @@ public class HelpActivity extends BackActivity implements HelpView {
         viewComponent.inject(this);
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        presenter.load();
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        presenter.destroy();
-    }
-
     private void setUpWebView() {
         helpWv.setWebViewClient(new HelpWebViewClient(this));
         helpWv.getSettings().setJavaScriptEnabled(true);
     }
 
-    @Override
     public void displayError() {
         snackBarManager.displaySnackBarWithAction(rootView, R.string.error_loading_help,
                 R.string.action_retry, new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        presenter.load();
+                       loadWebView();
                     }
                 }, this);
     }
 
-    @Override
     public void loadWebView() {
         helpWv.loadUrl(SUPPORT_URL);
     }
 
-    @Override
-    public void displayErrorDataSyncDisabled() {
-        snackBarManager.displaySnackBarWithAction(rootView, R.string.error_mobile_data_sync,
-                R.string.action_settings, new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        navigator.navigateToAppSettings(HelpActivity.this);
-                    }
-                }, this);
-    }
-
-    @Override
     public void hideProgress() {
         helpPb.setVisibility(View.GONE);
     }
 
-    @Override
     public void showProgress() {
         helpPb.setVisibility(View.VISIBLE);
     }

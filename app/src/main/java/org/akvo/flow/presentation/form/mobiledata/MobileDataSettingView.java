@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -18,24 +18,9 @@
  *
  */
 
-package org.akvo.flow.database.upgrade;
+package org.akvo.flow.presentation.form.mobiledata;
 
-import android.database.sqlite.SQLiteDatabase;
+public interface MobileDataSettingView {
 
-import org.akvo.flow.database.DatabaseHelper;
-
-public class PreferencesUpgrader implements DatabaseUpgrader {
-
-    private final DatabaseHelper helper;
-    private final SQLiteDatabase db;
-
-    public PreferencesUpgrader(DatabaseHelper helper, SQLiteDatabase db) {
-        this.helper = helper;
-        this.db = db;
-    }
-
-    @Override
-    public void upgrade() {
-        helper.upgradeFromPreferences(db);
-    }
+    void dismissView();
 }

@@ -31,9 +31,6 @@ import com.squareup.sqlbrite2.SqlBrite;
 
 import org.akvo.flow.data.database.SurveyDbDataSource;
 import org.akvo.flow.data.database.cascade.CascadeDB;
-import org.akvo.flow.data.migration.FlowMigrationListener;
-import org.akvo.flow.data.migration.languages.MigrationLanguageMapper;
-import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.database.DatabaseHelper;
 import org.akvo.flow.database.LanguageTable;
 import org.akvo.flow.domain.Node;
@@ -44,11 +41,11 @@ import org.akvo.flow.domain.Survey;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.SurveyMetadata;
 import org.akvo.flow.domain.entity.User;
+import org.akvo.flow.domain.util.GsonMapper;
 import org.akvo.flow.serialization.form.SaxSurveyParser;
 import org.akvo.flow.serialization.form.SurveyMetadataParser;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.FileUtil;
-import org.akvo.flow.domain.util.GsonMapper;
 import org.akvo.flow.util.files.FileBrowser;
 import org.akvo.flow.util.files.FormFileBrowser;
 import org.akvo.flow.util.files.FormResourcesFileBrowser;
@@ -79,9 +76,7 @@ public class SurveyInstaller {
 
     public SurveyInstaller(Context context) {
         SqlBrite sqlBrite = new SqlBrite.Builder().build();
-        DatabaseHelper databaseHelper = new DatabaseHelper(context, new LanguageTable(),
-                new FlowMigrationListener(new Prefs(context),
-                        new MigrationLanguageMapper(context)));
+        DatabaseHelper databaseHelper = new DatabaseHelper(context, new LanguageTable());
         BriteDatabase db = sqlBrite
                 .wrapDatabaseHelper(databaseHelper, AndroidSchedulers.mainThread());
         this.adapter = new SurveyDbDataSource(context, db);

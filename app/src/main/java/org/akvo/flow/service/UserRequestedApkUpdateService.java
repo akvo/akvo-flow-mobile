@@ -1,5 +1,5 @@
 /*
-* Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
+* Copyright (C) 2010-2018 Stichting Akvo (Akvo Foundation)
 *
  *  This file is part of Akvo Flow.
  *
@@ -20,17 +20,14 @@
 package org.akvo.flow.service;
 
 import android.app.IntentService;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
 import android.support.v4.util.Pair;
 
 import org.akvo.flow.R;
 import org.akvo.flow.activity.AppUpdateActivity;
-import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.domain.apkupdate.ViewApkData;
 import org.akvo.flow.ui.Navigator;
-import org.akvo.flow.util.ConnectivityStateManager;
 import org.akvo.flow.util.ViewUtil;
 
 import timber.log.Timber;
@@ -49,8 +46,6 @@ public class UserRequestedApkUpdateService extends IntentService {
 
     private ApkUpdateHelper apkUpdateHelper;
     private final Navigator navigator = new Navigator();
-    private ConnectivityStateManager connectivityStateManager;
-    private Prefs prefs;
 
     public UserRequestedApkUpdateService() {
         super(TAG);
@@ -66,9 +61,6 @@ public class UserRequestedApkUpdateService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        Context applicationContext = getApplicationContext();
-        this.connectivityStateManager = new ConnectivityStateManager(applicationContext);
-        this.prefs = new Prefs(applicationContext);
         this.apkUpdateHelper = new ApkUpdateHelper();
         checkUpdates();
     }
@@ -78,14 +70,6 @@ public class UserRequestedApkUpdateService extends IntentService {
      * we display {@link AppUpdateActivity}, requesting the user to download it.
      */
     private void checkUpdates() {
-        if (!connectivityStateManager.isConnectionAvailable(
-                prefs.getBoolean(Prefs.KEY_CELL_UPLOAD, Prefs.DEFAULT_VALUE_CELL_UPLOAD))) {
-            ViewUtil.displayToastFromService(
-                    getString(R.string.apk_update_service_error_no_internet), uiHandler,
-                    getApplicationContext());
-            return;
-        }
-
         try {
             Pair<Boolean, ViewApkData> booleanApkDataPair = apkUpdateHelper.shouldUpdate();
             if (booleanApkDataPair.first) {

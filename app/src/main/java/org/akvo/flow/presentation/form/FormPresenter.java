@@ -36,24 +36,48 @@ import timber.log.Timber;
 public class FormPresenter implements Presenter {
 
     private final UseCase exportSurveyInstances;
+    private final UseCase mobileUploadSet;
+
     private FormView view;
 
     @Inject
     public FormPresenter(@Named("exportSurveyInstances")
-            UseCase exportSurveyInstances) {
+            UseCase exportSurveyInstances, @Named("mobileUploadSet")
+            UseCase mobileUploadSet) {
         this.exportSurveyInstances = exportSurveyInstances;
+        this.mobileUploadSet = mobileUploadSet;
     }
 
     @Override
     public void destroy() {
         exportSurveyInstances.dispose();
+        mobileUploadSet.dispose();
     }
 
     public void setView(FormView view) {
         this.view = view;
     }
 
-    public void onSubmitPressed(long surveyInstanceId) {
+    public void onSubmitPressed(final long surveyInstanceId) {
+        mobileUploadSet.execute(new DefaultObserver<Boolean>() {
+            @Override
+            public void onNext(Boolean mobileUploadSet) {
+                if (!mobileUploadSet) {
+                    view.showMobileUploadSetting(surveyInstanceId);
+                } else {
+                    exportInstance(surveyInstanceId);
+                }
+            }
+
+            @Override
+            public void onError(Throwable e) {
+                Timber.e(e);
+                view.showMobileUploadSetting(surveyInstanceId);
+            }
+        }, null);
+    }
+
+    private void exportInstance(long surveyInstanceId) {
         view.showLoading();
         Map<String, Object> params = new HashMap<>(2);
         params.put(ExportSurveyInstances.SURVEY_INSTANCE_ID_PARAM, surveyInstanceId);

@@ -34,8 +34,6 @@ interface DataPointsListView {
 
     void showSyncedResults(int numberOfSyncedItems);
 
-    void showErrorSyncNotAllowed();
-
     void showErrorNoNetwork();
 
     void showErrorSync();

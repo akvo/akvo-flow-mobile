@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2010-2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -22,7 +22,6 @@ package org.akvo.flow.database;
 
 public class Tables {
 
-    public static final String PREFERENCES = "preferences";
     public static final String SURVEY = "survey";
     public static final String SURVEY_INSTANCE = "survey_instance";
     public static final String RESPONSE = "response";

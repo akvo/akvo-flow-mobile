@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -28,139 +28,10 @@ import org.mockito.runners.MockitoJUnitRunner;
 import java.util.List;
 
 import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertTrue;
 
 @RunWith(MockitoJUnitRunner.class)
 public class UpgraderFactoryTest {
-
-    @Test
-    public void createUpgraderShouldCreateCorrectUpgraderWhenBeforeLaunch() {
-        UpgraderFactory upgraderFactory = new UpgraderFactory();
-        UpgraderVisitor upgrader = (UpgraderVisitor) upgraderFactory.createUpgrader(77, null, null);
-
-        assertEquals(1, upgrader.getUpgraders().size());
-        assertTrue(upgrader.getUpgraders().get(0) instanceof BeforeLaunchUpgrader);
-    }
-
-    @Test
-    public void createUpgraderShouldCreateCorrectUpgraderWhenLaunch() {
-        UpgraderFactory upgraderFactory = new UpgraderFactory();
-        UpgraderVisitor upgrader = (UpgraderVisitor) upgraderFactory
-                .createUpgrader(DatabaseHelper.VER_LAUNCH, null, null);
-
-        assertEquals(8, upgrader.getUpgraders().size());
-        assertTrue(containsLaunchUpgrader(upgrader.getUpgraders()));
-        assertTrue(containsFormSubmitterUpgrader(upgrader.getUpgraders()));
-        assertTrue(containsFormCheckUpgrader(upgrader.getUpgraders()));
-        assertTrue(containsFormVersionUpgrader(upgrader.getUpgraders()));
-        assertTrue(containsCaddisflyUpgrader(upgrader.getUpgraders()));
-        assertTrue(containsPreferencesUpgrader(upgrader.getUpgraders()));
-        assertTrue(containsLanguagesUpgrader(upgrader.getUpgraders()));
-        assertTrue(containsResponsesUpgrader(upgrader.getUpgraders()));
-    }
-
-    @Test
-    public void createUpgraderShouldCreateCorrectUpgraderWhenFormSubmitter() {
-        UpgraderFactory upgraderFactory = new UpgraderFactory();
-        UpgraderVisitor upgrader = (UpgraderVisitor) upgraderFactory
-                .createUpgrader(DatabaseHelper.VER_FORM_SUBMITTER, null, null);
-
-        assertEquals(7, upgrader.getUpgraders().size());
-        assertFalse(containsLaunchUpgrader(upgrader.getUpgraders()));
-        assertTrue(containsFormSubmitterUpgrader(upgrader.getUpgraders()));
-        assertTrue(containsFormCheckUpgrader(upgrader.getUpgraders()));
-        assertTrue(containsFormVersionUpgrader(upgrader.getUpgraders()));
-        assertTrue(containsCaddisflyUpgrader(upgrader.getUpgraders()));
-        assertTrue(containsPreferencesUpgrader(upgrader.getUpgraders()));
-        assertTrue(containsLanguagesUpgrader(upgrader.getUpgraders()));
-        assertTrue(containsResponsesUpgrader(upgrader.getUpgraders()));
-    }
-
-    @Test
-    public void createUpgraderShouldCreateCorrectUpgraderWhenFormCheck() {
-        UpgraderFactory upgraderFactory = new UpgraderFactory();
-        UpgraderVisitor upgrader = (UpgraderVisitor) upgraderFactory
-                .createUpgrader(DatabaseHelper.VER_FORM_DEL_CHECK, null, null);
-
-        assertEquals(6, upgrader.getUpgraders().size());
-        assertFalse(containsLaunchUpgrader(upgrader.getUpgraders()));
-        assertFalse(containsFormSubmitterUpgrader(upgrader.getUpgraders()));
-        assertTrue(containsFormCheckUpgrader(upgrader.getUpgraders()));
-        assertTrue(containsFormVersionUpgrader(upgrader.getUpgraders()));
-        assertTrue(containsCaddisflyUpgrader(upgrader.getUpgraders()));
-        assertTrue(containsPreferencesUpgrader(upgrader.getUpgraders()));
-        assertTrue(containsLanguagesUpgrader(upgrader.getUpgraders()));
-        assertTrue(containsResponsesUpgrader(upgrader.getUpgraders()));
-    }
-
-    @Test
-    public void createUpgraderShouldCreateCorrectUpgraderWhenFormVersion() {
-        UpgraderFactory upgraderFactory = new UpgraderFactory();
-        UpgraderVisitor upgrader = (UpgraderVisitor) upgraderFactory
-                .createUpgrader(DatabaseHelper.VER_FORM_VERSION, null, null);
-
-        assertEquals(5, upgrader.getUpgraders().size());
-        assertFalse(containsLaunchUpgrader(upgrader.getUpgraders()));
-        assertFalse(containsFormSubmitterUpgrader(upgrader.getUpgraders()));
-        assertFalse(containsFormCheckUpgrader(upgrader.getUpgraders()));
-        assertTrue(containsFormVersionUpgrader(upgrader.getUpgraders()));
-        assertTrue(containsCaddisflyUpgrader(upgrader.getUpgraders()));
-        assertTrue(containsPreferencesUpgrader(upgrader.getUpgraders()));
-        assertTrue(containsLanguagesUpgrader(upgrader.getUpgraders()));
-        assertTrue(containsResponsesUpgrader(upgrader.getUpgraders()));
-    }
-
-    @Test
-    public void createUpgraderShouldCreateCorrectUpgraderWhenCaddisfly() {
-        UpgraderFactory upgraderFactory = new UpgraderFactory();
-        UpgraderVisitor upgrader = (UpgraderVisitor) upgraderFactory
-                .createUpgrader(DatabaseHelper.VER_CADDISFLY_QN, null, null);
-
-        assertEquals(4, upgrader.getUpgraders().size());
-        assertFalse(containsLaunchUpgrader(upgrader.getUpgraders()));
-        assertFalse(containsFormSubmitterUpgrader(upgrader.getUpgraders()));
-        assertFalse(containsFormCheckUpgrader(upgrader.getUpgraders()));
-        assertFalse(containsFormVersionUpgrader(upgrader.getUpgraders()));
-        assertTrue(containsCaddisflyUpgrader(upgrader.getUpgraders()));
-        assertTrue(containsPreferencesUpgrader(upgrader.getUpgraders()));
-        assertTrue(containsLanguagesUpgrader(upgrader.getUpgraders()));
-        assertTrue(containsResponsesUpgrader(upgrader.getUpgraders()));
-    }
-
-    @Test
-    public void createUpgraderShouldCreateCorrectUpgraderWhenPreferences() {
-        UpgraderFactory upgraderFactory = new UpgraderFactory();
-        UpgraderVisitor upgrader = (UpgraderVisitor) upgraderFactory
-                .createUpgrader(DatabaseHelper.VER_PREFERENCES_MIGRATE, null, null);
-
-        assertEquals(3, upgrader.getUpgraders().size());
-        assertFalse(containsLaunchUpgrader(upgrader.getUpgraders()));
-        assertFalse(containsFormSubmitterUpgrader(upgrader.getUpgraders()));
-        assertFalse(containsFormCheckUpgrader(upgrader.getUpgraders()));
-        assertFalse(containsFormVersionUpgrader(upgrader.getUpgraders()));
-        assertFalse(containsCaddisflyUpgrader(upgrader.getUpgraders()));
-        assertTrue(containsPreferencesUpgrader(upgrader.getUpgraders()));
-        assertTrue(containsLanguagesUpgrader(upgrader.getUpgraders()));
-        assertTrue(containsResponsesUpgrader(upgrader.getUpgraders()));
-    }
-
-    @Test
-    public void createUpgraderShouldCreateCorrectUpgraderWhenLanguages() {
-        UpgraderFactory upgraderFactory = new UpgraderFactory();
-        UpgraderVisitor upgrader = (UpgraderVisitor) upgraderFactory
-                .createUpgrader(DatabaseHelper.VER_LANGUAGES_MIGRATE, null, null);
-
-        assertEquals(2, upgrader.getUpgraders().size());
-        assertFalse(containsLaunchUpgrader(upgrader.getUpgraders()));
-        assertFalse(containsFormSubmitterUpgrader(upgrader.getUpgraders()));
-        assertFalse(containsFormCheckUpgrader(upgrader.getUpgraders()));
-        assertFalse(containsFormVersionUpgrader(upgrader.getUpgraders()));
-        assertFalse(containsCaddisflyUpgrader(upgrader.getUpgraders()));
-        assertFalse(containsPreferencesUpgrader(upgrader.getUpgraders()));
-        assertTrue(containsLanguagesUpgrader(upgrader.getUpgraders()));
-        assertTrue(containsResponsesUpgrader(upgrader.getUpgraders()));
-    }
 
     @Test
     public void createUpgraderShouldCreateCorrectUpgraderWhenResponse() {
@@ -169,13 +40,6 @@ public class UpgraderFactoryTest {
                 .createUpgrader(DatabaseHelper.VER_RESPONSE_ITERATION, null, null);
 
         assertEquals(1, upgrader.getUpgraders().size());
-        assertFalse(containsLaunchUpgrader(upgrader.getUpgraders()));
-        assertFalse(containsFormSubmitterUpgrader(upgrader.getUpgraders()));
-        assertFalse(containsFormCheckUpgrader(upgrader.getUpgraders()));
-        assertFalse(containsFormVersionUpgrader(upgrader.getUpgraders()));
-        assertFalse(containsCaddisflyUpgrader(upgrader.getUpgraders()));
-        assertFalse(containsPreferencesUpgrader(upgrader.getUpgraders()));
-        assertFalse(containsLanguagesUpgrader(upgrader.getUpgraders()));
         assertTrue(containsResponsesUpgrader(upgrader.getUpgraders()));
     }
 
@@ -186,69 +50,6 @@ public class UpgraderFactoryTest {
                 .createUpgrader(DatabaseHelper.VER_TRANSMISSION_ITERATION, null, null);
 
         assertEquals(0, upgrader.getUpgraders().size());
-    }
-
-    private boolean containsLaunchUpgrader(List<DatabaseUpgrader> upgraders) {
-        for (DatabaseUpgrader upgrader : upgraders) {
-            if (upgrader instanceof LaunchUpgrader) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private boolean containsFormSubmitterUpgrader(List<DatabaseUpgrader> upgraders) {
-        for (DatabaseUpgrader upgrader : upgraders) {
-            if (upgrader instanceof FormSubmitterUpgrader) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private boolean containsFormCheckUpgrader(List<DatabaseUpgrader> upgraders) {
-        for (DatabaseUpgrader upgrader : upgraders) {
-            if (upgrader instanceof FormCheckUpgrader) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private boolean containsFormVersionUpgrader(List<DatabaseUpgrader> upgraders) {
-        for (DatabaseUpgrader upgrader : upgraders) {
-            if (upgrader instanceof FormVersionUpgrader) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private boolean containsCaddisflyUpgrader(List<DatabaseUpgrader> upgraders) {
-        for (DatabaseUpgrader upgrader : upgraders) {
-            if (upgrader instanceof CaddisflyUpgrader) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private boolean containsPreferencesUpgrader(List<DatabaseUpgrader> upgraders) {
-        for (DatabaseUpgrader upgrader : upgraders) {
-            if (upgrader instanceof PreferencesUpgrader) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private boolean containsLanguagesUpgrader(List<DatabaseUpgrader> upgraders) {
-        for (DatabaseUpgrader upgrader : upgraders) {
-            if (upgrader instanceof LanguagesUpgrader) {
-                return true;
-            }
-        }
-        return false;
     }
 
     private boolean containsResponsesUpgrader(List<DatabaseUpgrader> upgraders) {

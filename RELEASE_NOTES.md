@@ -1,5 +1,19 @@
 Akvo FLOW app release notes
 ===========================
+# ver 2.6.3
+Date: 13 November 2018
+
+# New and noteworthy
+* **Setting about mobile data usage** - [#1220](https://github.com/akvo/akvo-flow-mobile/issues/1220) Mobile data setting now only used for uploading data.
+* **Update url under Terms of service** - [#1238](https://github.com/akvo/akvo-flow-mobile/issues/1238) Using the correct url for terms.
+* **Remove settings migration** - [#1243](https://github.com/akvo/akvo-flow-mobile/issues/1243) Removed old migration, no longer necessary.
+* **Send instance name to caddisfly** - [#1248](https://github.com/akvo/akvo-flow-mobile/issues/1248) Sending instance name to Caddisfly for statistics.
+* **Fix debug multidex on old devices** - [#1254](https://github.com/akvo/akvo-flow-mobile/issues/1254) Debug builds can now be run on older devices too.
+
+# Resolved issues
+* **Removing an answer to an option question allows to submit even if mandatory** - [#1247](https://github.com/akvo/akvo-flow-mobile/issues/1247) Fixed issue where after deleting a mandatory question answer, it did not show as missing.
+
+---------------
 # ver 2.6.2
 Date: 09 October 2018
 

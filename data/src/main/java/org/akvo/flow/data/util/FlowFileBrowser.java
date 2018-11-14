@@ -18,14 +18,12 @@
  *
  */
 
-package org.akvo.flow.data.datasource;
+package org.akvo.flow.data.util;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
-
-import org.akvo.flow.data.util.ExternalStorageHelper;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -38,14 +36,14 @@ public class FlowFileBrowser {
 
     public static final String DIR_MEDIA = "akvoflow/data/media";
     public static final String DIR_DATA = "akvoflow/data/files";
-    static final String CADDISFLY_OLD_FOLDER = "/result-images";
-    static final String DIR_PUBLISHED = "published";
-    static final String DIR_PUBLISHED_DATA = DIR_PUBLISHED + "/files";
-    static final String DIR_PUBLISHED_MEDIA = DIR_PUBLISHED + "/media";
-    static final String DIR_TMP = "tmp";
-    static final String DIR_RES = "res";
-    static final String DIR_FORMS = "forms";
-    static final String DIR_INBOX = "akvoflow/inbox";
+    public static final String CADDISFLY_OLD_FOLDER = "/result-images";
+    public static final String DIR_PUBLISHED = "published";
+    public static final String DIR_PUBLISHED_DATA = DIR_PUBLISHED + "/files";
+    public static final String DIR_PUBLISHED_MEDIA = DIR_PUBLISHED + "/media";
+    public static final String DIR_TMP = "tmp";
+    public static final String DIR_RES = "res";
+    public static final String DIR_FORMS = "forms";
+    public static final String DIR_INBOX = "akvoflow/inbox";
     private static final String VIDEO_SUFFIX = ".mp4";
 
     private final Context context;
@@ -82,8 +80,7 @@ public class FlowFileBrowser {
         return new File(path);
     }
 
-    @Nullable
-    File getPublicFolder(String folderName) {
+    @Nullable public File getPublicFolder(String folderName) {
         String externalStoragePath = externalStorageHelper.getExternalStoragePath();
         if (externalStoragePath == null) {
             return null;
@@ -91,8 +88,7 @@ public class FlowFileBrowser {
         return new File(externalStoragePath + File.separator + folderName);
     }
 
-    @Nullable
-    File getAppExternalFolder(String folderName) {
+    @Nullable public File getAppExternalFolder(String folderName) {
         String path = getAppExternalFolderPath(folderName);
         File folder = null;
         if (path != null) {
@@ -101,8 +97,7 @@ public class FlowFileBrowser {
         return folder;
     }
 
-    @Nullable
-    File getExistingAppExternalFolder(String folderName) {
+    @Nullable public File getExistingAppExternalFolder(String folderName) {
         String path = getInternalFolder(folderName).getAbsolutePath();
         File folder = new File(path);
         if (!folder.exists()) {
@@ -111,7 +106,7 @@ public class FlowFileBrowser {
         return folder;
     }
 
-    String getVideoFilePath() {
+    public String getVideoFilePath() {
         String filename = UUID.randomUUID().toString() + VIDEO_SUFFIX;
         File mediaFolder = getInternalFolder(DIR_MEDIA);
         if (!mediaFolder.exists()) {

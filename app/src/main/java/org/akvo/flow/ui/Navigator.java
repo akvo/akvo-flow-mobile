@@ -24,6 +24,7 @@ import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
@@ -55,6 +56,7 @@ import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.StringUtil;
 
 import java.io.File;
+import java.util.List;
 
 import javax.inject.Inject;
 
@@ -110,12 +112,18 @@ public class Navigator {
     }
 
     public void navigateToTakePhoto(@NonNull Activity activity, Uri uri) {
-        Intent i = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+        Intent intent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
         PackageManager packageManager = activity.getPackageManager();
-        if (packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY) && i.resolveActivity(
-                packageManager) != null) {
-            i.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, uri);
-            activity.startActivityForResult(i, ConstantUtil.PHOTO_ACTIVITY_REQUEST);
+        if (packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)
+                && intent.resolveActivity(packageManager) != null) {
+            final List<ResolveInfo> activities = packageManager
+                    .queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY);
+            for (ResolveInfo resolvedIntentInfo : activities) {
+                final String name = resolvedIntentInfo.activityInfo.packageName;
+                activity.grantUriPermission(name, uri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+            }
+            intent.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, uri);
+            activity.startActivityForResult(intent, ConstantUtil.PHOTO_ACTIVITY_REQUEST);
         } else {
             Timber.e(new Exception("No camera on device or no app found to take pictures"));
             //TODO: notify user

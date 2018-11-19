@@ -22,6 +22,7 @@ package org.akvo.flow.util;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -30,29 +31,47 @@ import android.support.v7.app.AppCompatActivity;
 
 import javax.inject.Inject;
 
-public class StoragePermissionsHelper {
+public class AppPermissionsHelper {
 
     private final Context context;
+    private final StoragePermissionsHelper storagePermissionsHelper;
 
     @Inject
-    public StoragePermissionsHelper(Context context) {
+    public AppPermissionsHelper(Context context,
+            StoragePermissionsHelper storagePermissionsHelper) {
         this.context = context;
+        this.storagePermissionsHelper = storagePermissionsHelper;
     }
 
-    public boolean storagePermissionsGranted(String permission, @NonNull int[] grantResults) {
-        return grantResults.length > 0
-                && Manifest.permission.WRITE_EXTERNAL_STORAGE.equals(permission)
-                && grantResults[0] == PermissionChecker.PERMISSION_GRANTED;
+    public boolean allPermissionsGranted(String[] permissions, @NonNull int[] grantResults) {
+        if (grantResults.length > 0 && permissions.length == grantResults.length) {
+            for (int grantResult : grantResults) {
+                if (grantResult != PackageManager.PERMISSION_GRANTED) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        return false;
     }
 
     public boolean userPressedDoNotShowAgain(AppCompatActivity activity) {
-        return !isStorageAllowed() && !ActivityCompat
-                .shouldShowRequestPermissionRationale(activity,
-                        Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        return storagePermissionsHelper.userPressedDoNotShowAgain(activity) ||
+                userPressedDoNotShowAgainForPhoneState(activity);
+    }
+
+    private boolean userPressedDoNotShowAgainForPhoneState(AppCompatActivity activity) {
+        return !isPhoneStateAllowed() &&
+               !ActivityCompat.shouldShowRequestPermissionRationale(activity,
+                        Manifest.permission.READ_PHONE_STATE);
     }
 
     public boolean isStorageAllowed() {
+        return storagePermissionsHelper.isStorageAllowed();
+    }
+
+    public boolean isPhoneStateAllowed() {
         return ContextCompat.checkSelfPermission(context,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE) == PermissionChecker.PERMISSION_GRANTED;
+                Manifest.permission.READ_PHONE_STATE) == PermissionChecker.PERMISSION_GRANTED;
     }
 }

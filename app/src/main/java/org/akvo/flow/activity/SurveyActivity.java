@@ -75,11 +75,14 @@ import org.akvo.flow.service.TimeCheckService;
 import org.akvo.flow.ui.Navigator;
 import org.akvo.flow.ui.fragment.DatapointsFragment;
 import org.akvo.flow.ui.fragment.RecordListListener;
+import org.akvo.flow.util.AppPermissionsHelper;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.PlatformUtil;
 import org.akvo.flow.util.StatusUtil;
-import org.akvo.flow.util.StoragePermissionsHelper;
 import org.akvo.flow.util.ViewUtil;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -130,7 +133,7 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     UseCase getSelectedUser;
 
     @Inject
-    StoragePermissionsHelper storagePermissionsHelper;
+    AppPermissionsHelper appPermissionsHelper;
 
     private SurveyGroup mSurveyGroup;
 
@@ -161,8 +164,6 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
             initNavigationDrawer();
             selectSurvey();
             initDataPointsFragment(savedInstanceState);
-
-            startServicesIfPossible();
 
             //When the app is restarted we need to display the current user
             if (savedInstanceState == null) {
@@ -297,11 +298,22 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
         }
     }
 
-    public void handlePermissions() {
-        if (!storagePermissionsHelper.isStorageAllowed()) {
-            ActivityCompat.requestPermissions(this,
-                    new String[] { Manifest.permission.WRITE_EXTERNAL_STORAGE },
-                    ConstantUtil.STORAGE_PERMISSION_CODE);
+    private void handlePermissions() {
+        List<String> permissionsList = new ArrayList<>(2);
+        if (!appPermissionsHelper.isStorageAllowed()) {
+            permissionsList.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        }
+
+        if (!appPermissionsHelper.isPhoneStateAllowed()) {
+            permissionsList.add(Manifest.permission.READ_PHONE_STATE);
+        }
+        if (permissionsList.isEmpty()) {
+            startServicesIfPossible();
+        } else {
+            final String[] permissions = permissionsList.toArray(new String[0]);
+            ActivityCompat
+                    .requestPermissions(this, permissions,
+                            ConstantUtil.STORAGE_AND_PHONE_STATE_PERMISSION_CODE);
         }
     }
 
@@ -309,20 +321,20 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
             @NonNull int[] grantResults) {
         permissionsResults = true;
-        if (requestCode == ConstantUtil.STORAGE_PERMISSION_CODE) {
-            if (storagePermissionsHelper.storagePermissionsGranted(permissions[0], grantResults)) {
-                startServices();
+        if (requestCode == ConstantUtil.STORAGE_AND_PHONE_STATE_PERMISSION_CODE) {
+            if (appPermissionsHelper.allPermissionsGranted(permissions, grantResults)) {
+                startServicesIfPossible();
             } else {
-                storagePermissionNotGranted();
+                permissionsNotGranted();
             }
         }
     }
 
-    void storagePermissionNotGranted() {
+    private void permissionsNotGranted() {
         final View.OnClickListener retryListener = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (storagePermissionsHelper.userPressedDoNotShowAgain(SurveyActivity.this)) {
+                if (appPermissionsHelper.userPressedDoNotShowAgain(SurveyActivity.this)) {
                     navigator.navigateToAppSystemSettings(SurveyActivity.this);
                 } else {
                     handlePermissions();
@@ -331,7 +343,7 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
         };
         snackBarManager
                 .displaySnackBarWithAction(rootLayout,
-                        R.string.storage_permission_missing,
+                        R.string.survey_permissions_missing,
                         R.string.action_retry, retryListener, this);
     }
 
@@ -379,10 +391,10 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     }
 
     private void startServicesIfPossible() {
-        if (!StatusUtil.hasExternalStorage()) {
-            checkStorage();
-        } else {
+        if (StatusUtil.hasExternalStorage()) {
             startServices();
+        } else {
+            displayExternalStorageMissing();
         }
     }
 
@@ -393,7 +405,7 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
         startService(new Intent(this, TimeCheckService.class));
     }
 
-    private void checkStorage() {
+    private void displayExternalStorageMissing() {
         ViewUtil.showConfirmDialog(R.string.checksd, R.string.sdmissing, this,
                 false,
                 new DialogInterface.OnClickListener() {

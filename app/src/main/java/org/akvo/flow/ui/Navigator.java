@@ -359,4 +359,13 @@ public class Navigator {
             activity.startActivityForResult(intent, ConstantUtil.GET_VIDEO_ACTIVITY_REQUEST);
         }
     }
+
+    public void navigateToAppSystemSettings(@Nullable Context context) {
+        if (context != null) {
+            Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                    Uri.fromParts("package", context.getPackageName(), null));
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            context.startActivity(intent);
+        }
+    }
 }

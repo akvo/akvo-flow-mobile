@@ -19,12 +19,15 @@
 
 package org.akvo.flow.activity;
 
+import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.GravityCompat;
@@ -53,6 +56,7 @@ import org.akvo.flow.domain.apkupdate.ViewApkData;
 import org.akvo.flow.domain.entity.User;
 import org.akvo.flow.domain.interactor.DefaultObserver;
 import org.akvo.flow.domain.interactor.UseCase;
+import org.akvo.flow.domain.util.GsonMapper;
 import org.akvo.flow.injector.component.ApplicationComponent;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
@@ -72,9 +76,9 @@ import org.akvo.flow.ui.Navigator;
 import org.akvo.flow.ui.fragment.DatapointsFragment;
 import org.akvo.flow.ui.fragment.RecordListListener;
 import org.akvo.flow.util.ConstantUtil;
-import org.akvo.flow.domain.util.GsonMapper;
 import org.akvo.flow.util.PlatformUtil;
 import org.akvo.flow.util.StatusUtil;
+import org.akvo.flow.util.StoragePermissionsHelper;
 import org.akvo.flow.util.ViewUtil;
 
 import javax.inject.Inject;
@@ -125,12 +129,16 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     @Named("getSelectedUser")
     UseCase getSelectedUser;
 
+    @Inject
+    StoragePermissionsHelper storagePermissionsHelper;
+
     private SurveyGroup mSurveyGroup;
 
     private ActionBarDrawerToggle mDrawerToggle;
     private ApkUpdateStore apkUpdateStore;
     private long selectedSurveyId;
     private boolean activityJustCreated;
+    private boolean permissionsResults;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -154,7 +162,7 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
             selectSurvey();
             initDataPointsFragment(savedInstanceState);
 
-            startServices();
+            startServicesIfPossible();
 
             //When the app is restarted we need to display the current user
             if (savedInstanceState == null) {
@@ -282,7 +290,49 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
 
             showApkUpdateIfNeeded();
             updateAddDataPointFab();
+            if (!permissionsResults) {
+                handlePermissions();
+            }
+            permissionsResults = false;
         }
+    }
+
+    public void handlePermissions() {
+        if (!storagePermissionsHelper.isStorageAllowed()) {
+            ActivityCompat.requestPermissions(this,
+                    new String[] { Manifest.permission.WRITE_EXTERNAL_STORAGE },
+                    ConstantUtil.STORAGE_PERMISSION_CODE);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+            @NonNull int[] grantResults) {
+        permissionsResults = true;
+        if (requestCode == ConstantUtil.STORAGE_PERMISSION_CODE) {
+            if (storagePermissionsHelper.storagePermissionsGranted(permissions[0], grantResults)) {
+                startServices();
+            } else {
+                storagePermissionNotGranted();
+            }
+        }
+    }
+
+    void storagePermissionNotGranted() {
+        final View.OnClickListener retryListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (storagePermissionsHelper.userPressedDoNotShowAgain(SurveyActivity.this)) {
+                    navigator.navigateToAppSystemSettings(SurveyActivity.this);
+                } else {
+                    handlePermissions();
+                }
+            }
+        };
+        snackBarManager
+                .displaySnackBarWithAction(rootLayout,
+                        R.string.storage_permission_missing,
+                        R.string.action_retry, retryListener, this);
     }
 
     private void showApkUpdateIfNeeded() {
@@ -328,23 +378,31 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
         mDrawerToggle.syncState();
     }
 
-    private void startServices() {
+    private void startServicesIfPossible() {
         if (!StatusUtil.hasExternalStorage()) {
-            ViewUtil.showConfirmDialog(R.string.checksd, R.string.sdmissing, this,
-                    false,
-                    new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            SurveyActivity.this.finish();
-                        }
-                    },
-                    null);
+            checkStorage();
         } else {
-            startService(new Intent(this, SurveyDownloadService.class));
-            startService(new Intent(this, DataSyncService.class));
-            startService(new Intent(this, BootstrapService.class));
-            startService(new Intent(this, TimeCheckService.class));
+            startServices();
         }
+    }
+
+    private void startServices() {
+        startService(new Intent(this, SurveyDownloadService.class));
+        startService(new Intent(this, DataSyncService.class));
+        startService(new Intent(this, BootstrapService.class));
+        startService(new Intent(this, TimeCheckService.class));
+    }
+
+    private void checkStorage() {
+        ViewUtil.showConfirmDialog(R.string.checksd, R.string.sdmissing, this,
+                false,
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        SurveyActivity.this.finish();
+                    }
+                },
+                null);
     }
 
     @Override

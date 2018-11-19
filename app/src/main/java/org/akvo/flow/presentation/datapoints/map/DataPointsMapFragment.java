@@ -31,6 +31,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.PermissionChecker;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -199,7 +200,7 @@ public class DataPointsMapFragment extends SupportMapFragment implements OnInfoW
     private boolean isLocationAllowed() {
         FragmentActivity activity = getActivity();
         return activity != null && ContextCompat.checkSelfPermission(activity,
-                Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
+                Manifest.permission.ACCESS_FINE_LOCATION) == PermissionChecker.PERMISSION_GRANTED;
     }
 
     private void cluster() {

@@ -244,6 +244,7 @@ public class ConstantUtil {
     public static final String FILE_PROVIDER_AUTHORITY = "org.akvo.flow.fileprovider";
 
     public static final int LOCATION_PERMISSION_CODE = 1;
+    public static final int STORAGE_PERMISSION_CODE = 2;
 
     /**
      * prevent instantiation

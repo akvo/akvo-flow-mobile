@@ -16,6 +16,7 @@
     <uses-feature android:name="android.hardware.camera" android:required="false"/>
 
     <application
+            android:allowBackup="false"
             android:name=".app.FlowApp"
             android:hasCode="true"
             android:icon="@mipmap/ic_launcher"

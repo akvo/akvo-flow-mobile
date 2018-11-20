@@ -245,6 +245,7 @@ public class ConstantUtil {
 
     public static final int LOCATION_PERMISSION_CODE = 1;
     public static final int STORAGE_PERMISSION_CODE = 2;
+    public static final int STORAGE_AND_PHONE_STATE_PERMISSION_CODE = 3;
 
     /**
      * prevent instantiation

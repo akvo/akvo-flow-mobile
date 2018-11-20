@@ -307,5 +307,6 @@
     <string name="location_permission_refused">Location permission is required in order to get the device location.</string>
     <string name="action_enable">Enable</string>
     <string name="storage_permission_missing">Storage permission is necessary for the app to work correctly.</string>
+    <string name="survey_permissions_missing">Storage and Phone State permissions are necessary for the app to work correctly.</string>
 
 </resources>

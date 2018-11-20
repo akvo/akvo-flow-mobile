@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -25,12 +25,16 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.support.v4.app.Fragment;
 import android.util.Base64;
+import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.RequestManager;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.load.resource.drawable.GlideDrawable;
+import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
+import com.bumptech.glide.request.target.Target;
 
 import java.io.File;
 
@@ -66,18 +70,37 @@ public class GlideImageLoader implements ImageLoader {
     }
 
     @Override
-    public void loadFromBase64String(String base64ImageString, final ImageLoaderListener listener) {
-        requestManager
-                .load(Base64.decode(base64ImageString, Base64.DEFAULT))
-                .asBitmap()
+    public void loadFromFile(File file, ImageView imageView) {
+        requestManager.load(file)
                 .skipMemoryCache(true)
                 .diskCacheStrategy(DiskCacheStrategy.NONE)
-                .into(new SimpleTarget<Bitmap>() {
+                .into(imageView);
+    }
+
+    @Override
+    public void loadFromBase64String(String image, ImageView imageView,
+            final ImageLoaderListener listener) {
+        requestManager
+                .load(Base64.decode(image, Base64.DEFAULT))
+                .listener(new RequestListener<byte[], GlideDrawable>() {
                     @Override
-                    public void onResourceReady(Bitmap bitmap,
-                            GlideAnimation<? super Bitmap> glideAnimation) {
-                        listener.onImageReady(bitmap);
+                    public boolean onException(Exception e, byte[] model,
+                            Target<GlideDrawable> target,
+                            boolean isFirstResource) {
+                        return false;
                     }
-                });
+
+                    @Override
+                    public boolean onResourceReady(GlideDrawable resource, byte[] model,
+                            Target<GlideDrawable> target, boolean isFromMemoryCache,
+                            boolean isFirstResource) {
+                        listener.onImageReady(null);
+                        return false;
+                    }
+                })
+                .skipMemoryCache(true)
+                .diskCacheStrategy(DiskCacheStrategy.NONE)
+                .into(imageView);
+
     }
 }

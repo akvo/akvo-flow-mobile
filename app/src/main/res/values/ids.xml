@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="submit_tab" type="id"/>
+    <item name="other_option_input" type="id"/>
+    <item name="other_option_text" type="id"/>
+    <item name="geo_question_view" type="id"/>
+</resources>

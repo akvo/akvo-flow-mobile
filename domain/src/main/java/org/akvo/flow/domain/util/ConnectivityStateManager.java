@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -38,7 +38,6 @@ public class ConnectivityStateManager {
     /**
      * checks whether or not we have a usable data connection
      *
-     * @return
      */
     public boolean isConnectionAvailable() {
         ConnectivityManager connMgr = (ConnectivityManager) context
@@ -46,8 +45,8 @@ public class ConnectivityStateManager {
         if (connMgr != null) {
             NetworkInfo[] infoArr = connMgr.getAllNetworkInfo();
             if (infoArr != null) {
-                for (int i = 0; i < infoArr.length; i++) {
-                    if (NetworkInfo.State.CONNECTED == infoArr[i].getState()) {
+                for (NetworkInfo anInfoArr : infoArr) {
+                    if (NetworkInfo.State.CONNECTED == anInfoArr.getState()) {
                         return true;
                     }
                 }
@@ -59,8 +58,8 @@ public class ConnectivityStateManager {
     public boolean isWifiConnected() {
         ConnectivityManager connectionManager = (ConnectivityManager) context
                 .getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo wifiCheck = connectionManager
-                .getNetworkInfo(ConnectivityManager.TYPE_WIFI);
-        return wifiCheck.isConnected();
+        NetworkInfo wifiCheck = connectionManager != null ? connectionManager
+                .getNetworkInfo(ConnectivityManager.TYPE_WIFI) : null;
+        return wifiCheck != null && wifiCheck.isConnected();
     }
 }

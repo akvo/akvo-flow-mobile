@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015-2017 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2015-2018 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -39,6 +39,8 @@ import java.util.Date;
 
 public class ResponseListAdapter extends CursorAdapter {
 
+    private static final String DEFAULT_USERNAME = "IMPORTER";
+
     private final int[] backgrounds = new int[2];
 
     public ResponseListAdapter(Context activityContext) {
@@ -58,18 +60,21 @@ public class ResponseListAdapter extends CursorAdapter {
 
         switch (status) {
             case SurveyInstanceStatus.SAVED:
+            case SurveyInstanceStatus.SUBMIT_REQUESTED:
                 icon = R.drawable.form_saved_icn;
                 statusText = context.getString(R.string.status_saved) + ": ";
                 displayDate = cursor.getLong(SurveyDbAdapter.FormInstanceQuery.SAVED_DATE);
                 break;
             case SurveyInstanceStatus.SUBMITTED:
-            case SurveyInstanceStatus.EXPORTED:
-                icon = R.drawable.exported_icn;
+                icon = R.drawable.submitted_icn;
                 break;
-            case SurveyInstanceStatus.SYNCED:
+            case SurveyInstanceStatus.UPLOADED:
             case SurveyInstanceStatus.DOWNLOADED:
                 icon = R.drawable.checkmark;
                 break;
+            default:
+                break;
+
         }
 
         TextView userView = (TextView) view.findViewById(R.id.username);
@@ -77,11 +82,9 @@ public class ResponseListAdapter extends CursorAdapter {
 
         String username = cursor.getString(SurveyDbAdapter.FormInstanceQuery.SUBMITTER);
         if (TextUtils.isEmpty(username)) {
-            userView.setVisibility(View.GONE);
-        } else {
-            userView.setVisibility(View.VISIBLE);
-            userView.setText(username);
+            username = DEFAULT_USERNAME;
         }
+        userView.setText(username);
 
         // Format the date string
         Date date = new Date(displayDate);

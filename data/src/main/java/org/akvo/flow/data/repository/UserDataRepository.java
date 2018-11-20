@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -25,7 +25,7 @@ import org.akvo.flow.domain.repository.UserRepository;
 
 import javax.inject.Inject;
 
-import rx.Observable;
+import io.reactivex.Observable;
 
 public class UserDataRepository implements UserRepository {
 
@@ -39,6 +39,116 @@ public class UserDataRepository implements UserRepository {
     @Override
     public Observable<Boolean> mobileSyncAllowed() {
         return dataSourceFactory.getSharedPreferencesDataSource().mobileSyncEnabled();
+    }
+
+    @Override
+    public Observable<Boolean> keepScreenOn() {
+        return dataSourceFactory.getSharedPreferencesDataSource().keepScreenOn();
+    }
+
+    @Override
+    public Observable<String> getAppLanguage() {
+        return dataSourceFactory.getSharedPreferencesDataSource().getAppLanguage();
+    }
+
+    @Override
+    public Observable<Integer> getImageSize() {
+        return dataSourceFactory.getSharedPreferencesDataSource().getImageSize();
+    }
+
+    @Override
+    public Observable<String> getDeviceId() {
+        return dataSourceFactory.getSharedPreferencesDataSource().getDeviceId();
+    }
+
+    @Override
+    public Observable<Boolean> saveScreenOnPreference(Boolean keepScreenOn) {
+        return dataSourceFactory.getSharedPreferencesDataSource().saveScreenOn(keepScreenOn);
+    }
+
+    @Override
+    public Observable<Boolean> saveEnableMobileDataPreference(Boolean enable) {
+        return dataSourceFactory.getSharedPreferencesDataSource().saveEnableMobileData(enable);
+    }
+
+    @Override
+    public Observable<Boolean> saveLanguagePreference(String language) {
+        return dataSourceFactory.getSharedPreferencesDataSource().saveLanguage(language);
+    }
+
+    @Override
+    public Observable<Boolean> saveImageSizePreference(Integer size) {
+        return dataSourceFactory.getSharedPreferencesDataSource().saveImageSize(size);
+    }
+
+    @Override
+    public Observable<Long> getSelectedSurvey() {
+        return dataSourceFactory.getSharedPreferencesDataSource().getSelectedSurvey();
+    }
+
+    @Override
+    public Observable<Boolean> clearSelectedSurvey() {
+        return dataSourceFactory.getSharedPreferencesDataSource().clearSelectedSurvey();
+    }
+
+    @Override
+    public Observable<Boolean> setSelectedSurvey(long surveyGroupId) {
+        return dataSourceFactory.getSharedPreferencesDataSource().setSelectedSurvey(surveyGroupId);
+    }
+
+    @Override
+    public Observable<Long> getSelectedUser() {
+        return dataSourceFactory.getSharedPreferencesDataSource().getSelectedUser();
+    }
+
+    @Override
+    public Observable<Boolean> clearSelectedUser() {
+        return dataSourceFactory.getSharedPreferencesDataSource().clearSelectedUser();
+    }
+
+    @Override
+    public Observable<Boolean> setSelectedUser(long userId) {
+        return dataSourceFactory.getSharedPreferencesDataSource().setSelectedUser(userId);
+    }
+
+    @Override
+    public Observable<Long> getPublishDataTime() {
+        return dataSourceFactory.getSharedPreferencesDataSource().getPublishDataTime();
+    }
+
+    @Override
+    public Observable<Boolean> setPublishDataTime() {
+        return dataSourceFactory.getSharedPreferencesDataSource().setPublishDataTime();
+    }
+
+    @Override
+    public Observable<Boolean> clearPublishDataTime() {
+        return dataSourceFactory.getSharedPreferencesDataSource().clearPublishDataTime();
+    }
+
+    @Override
+    public Observable<Boolean> clearUserPreferences() {
+        return dataSourceFactory.getSharedPreferencesDataSource().clearUserPreferences();
+    }
+
+    @Override
+    public Observable<Boolean> isDeviceSetUp() {
+        return dataSourceFactory.getSharedPreferencesDataSource().isDeviceSetup();
+    }
+
+    @Override
+    public Observable<Boolean> wasWalkThroughSeen() {
+        return dataSourceFactory.getSharedPreferencesDataSource().wasSecurityWalkThroughSeen();
+    }
+
+    @Override
+    public Observable<Boolean> setWalkThroughSeen() {
+        return dataSourceFactory.getSharedPreferencesDataSource().setSecurityWalkThroughSeen();
+    }
+
+    @Override
+    public Observable<Boolean> mobileUploadSet() {
+        return dataSourceFactory.getSharedPreferencesDataSource().mobileUploadSet();
     }
 
     @Override

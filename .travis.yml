@@ -3,35 +3,61 @@ sudo: required
 env:
   global:
     - ADB_INSTALL_TIMEOUT=8 # 8 minutes (2 minutes by default)
+    - GITHUB_USER=valllllll2000
+    - secure: "bh/ISP3IKy+eoWOY3mWjPn3lEoc8bUCZGbSl92/QXUMQQfiCZJRgVmsZfuCBnByzl2t9F/wTZQfnTTsYF0fpX9wCrp+S9nfmlujhFTkN1uc2SVJrh0Ecf2adWZun18SXuUaI6vuNNwVBDu+YAm22BggM5/9IH0dgER9+Zb3z+rc="
+    - secure: "Okh2Xw70CDccPKQsHa0LP44QD4fguY53EsKlkj4Gh7uu2+HQohoGYF7o4naD18tuHL2Kpg0uM/i4IJvq53OCwTK0ZNhE+OzjQpD4kh0PMYi5/NQNckaHdOtPaeAw+8x+/MEmuHCji3figTYeRtC35LRD0UYT0hw0t/Kp6OfWesc="
+    - secure: "U1bHOcp7gWC5rhFqjBScm+oMcmbtfGFajlgr0RNqbHFsvnL9Zf20gCCGYzPmzsfJKlISwYZo7XCJCYrkW5/jaBvllJLW4rNbTh6Tuj7Lt2GDcHH1nmtbsU5Vw7b8HiLXU2y/6YWgZeoKgdSWdbuCZVm8X44N7HJRtI3TuMJlgPY="
 
 jdk:
   - oraclejdk8
 
+addons:
+  apt_packages:
+    - pandoc
+
 android:
   components:
     - tools
-    - build-tools-25.0.1
-    - android-25
+    - build-tools-26.0.2
+    - android-27
+    - android-21
     - extra-android-support
     - extra-google-m2repository
     - extra-android-m2repository
-    - sys-img-armeabi-v7a-android-19
+    - sys-img-armeabi-v7a-android-21
+
+before_install:
+  - openssl aes-256-cbc -K $encrypted_b2f5a33a8343_key -iv $encrypted_b2f5a33a8343_iv -in build_config.enc -out build_config -d
+  - tar xvf build_config
+  - gem install fastlane --no-rdoc --no-ri --no-document --quiet
+  - git remote set-url origin https://$GITHUB_USER:$GITHUB_API_KEY@github.com/akvo/akvo-flow-mobile.git
+  - chmod +x fastlane/deploy_beta.sh
+  - chmod +x travis/deploy_release.sh
 
 before_script:
-    - mkdir app/src/main/res/raw
-    - mkdir data/src/main/res/
-    - mkdir data/src/main/res/raw
-    - mv app/config/survey.properties.template app/src/main/res/raw/survey.properties
-    - cp app/src/main/res/raw/survey.properties data/src/main/res/raw/survey.properties
-    - mv app/gradle.properties.template app/gradle.properties
-    - echo no | android create avd --force -n test -t android-19 --abi armeabi-v7a
-    - emulator -avd test -no-audio -no-window &
+    - echo no | android create avd --force -n test -t android-21 --abi armeabi-v7a -c 2048M
+    - mksdcard -l sdcard 2048M sdcard
+    - emulator -avd test -no-audio -no-window -sdcard sdcard &
     - android-wait-for-emulator
     - adb shell settings put global window_animation_scale 0 &
     - adb shell settings put global transition_animation_scale 0 &
     - adb shell settings put global animator_duration_scale 0 &
+    - adb shell settings put secure long_press_timeout 1500 &
     - adb shell input keyevent 82 &
 
 script:
-  - ./gradlew check --continue --stacktrace
-  - ./gradlew connectedFlowDebugAndroidTest --continue --stacktrace
+  - ./gradlew check --continue connectedFlowDebugAndroidTest -Pnodexcount=true --continue
+
+after_failure:
+  - pandoc app/build/reports/androidTests/connected/flavors/FLOW/org.akvo.flow.activity.form.formfill.CascadeQuestionViewTest.html -t plain
+  - pandoc app/build/reports/androidTests/connected/flavors/FLOW/org.akvo.flow.activity.form.formfill.OptionsQuestionViewSingleTest.html -t plain
+  - pandoc app/build/reports/androidTests/connected/flavors/FLOW/org.akvo.flow.activity.form.formfill.LockedGeoQuestionViewTest.html -t plain
+  - pandoc app/build/reports/androidTests/connected/flavors/FLOW/org.akvo.flow.activity.form.formfill.CascadeQuestionViewTest.html -t plain
+  - pandoc app/build/reports/androidTests/connected/flavors/FLOW/org.akvo.flow.activity.form.formsview.FormActivityTest.html -t plain
+
+after_success:
+  - ./fastlane/deploy_beta.sh
+
+notifications:
+  slack:
+    secure: OiWLWDEXvCwsYENslrKRTh3JPky1WaokDqFEA23kRd/jD616n4uKCRCsOeslGcV7dJX98k7GsS2XC7xKIonV/3IE99dztyxJAXdWW6h4I2ztJt9LZ/14NevU2k927FKyKOg3kbnHEGVYOb0HTDQztoj/TBXhLEWKjUzCp66ojxs=

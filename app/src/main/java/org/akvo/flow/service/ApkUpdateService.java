@@ -1,5 +1,5 @@
 /*
-* Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
+* Copyright (C) 2010-2018 Stichting Akvo (Akvo Foundation)
 *
  *  This file is part of Akvo Flow.
  *
@@ -20,6 +20,7 @@
 package org.akvo.flow.service;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.annotation.Nullable;
 
 import com.google.android.gms.gcm.GcmNetworkManager;
@@ -32,16 +33,13 @@ import org.akvo.flow.BuildConfig;
 import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.domain.entity.ApkData;
-import org.akvo.flow.domain.interactor.DefaultSubscriber;
-import org.akvo.flow.domain.interactor.GetApkData;
+import org.akvo.flow.domain.interactor.DefaultObserver;
 import org.akvo.flow.domain.interactor.SaveApkData;
 import org.akvo.flow.domain.interactor.UseCase;
 import org.akvo.flow.domain.util.VersionHelper;
 import org.akvo.flow.presentation.entity.ViewApkData;
 import org.akvo.flow.presentation.entity.ViewApkMapper;
-import org.akvo.flow.util.ConnectivityStateManager;
 import org.akvo.flow.util.ConstantUtil;
-import org.akvo.flow.util.ServerManager;
 import org.akvo.flow.util.StringUtil;
 
 import java.util.HashMap;
@@ -81,17 +79,22 @@ public class ApkUpdateService extends GcmTaskService {
     ViewApkMapper mapper;
 
     @Inject
-    ServerManager serverManager;
-
-    @Inject
-    ConnectivityStateManager connectivityStateManager;
-
-    @Inject
     Prefs prefs;
 
     public static void scheduleFirstTask(Context context) {
         schedulePeriodicTask(context, ConstantUtil.FIRST_REPEAT_INTERVAL_IN_SECONDS,
                 ConstantUtil.FIRST_FLEX_INTERVAL_IN_SECOND);
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        if (intent == null) {
+            // GcmTaskService doesn't check for null intent
+            Timber.w("Invalid GcmTask null intent.");
+            stopSelf();
+            return START_NOT_STICKY;
+        }
+        return super.onStartCommand(intent, flags, startId);
     }
 
     private static void schedulePeriodicTask(Context context, int repeatIntervalInSeconds,
@@ -135,8 +138,8 @@ public class ApkUpdateService extends GcmTaskService {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        getApkData.unSubscribe();
-        saveApkData.unSubscribe();
+        getApkData.dispose();
+        saveApkData.dispose();
     }
 
     /**
@@ -159,16 +162,7 @@ public class ApkUpdateService extends GcmTaskService {
         //after the first time the task is run we reschedule to a higher interval
         schedulePeriodicTask(this, ConstantUtil.REPEAT_INTERVAL_IN_SECONDS,
                 ConstantUtil.FLEX_INTERVAL_IN_SECONDS);
-        //TODO: move those to domain logic
-        if (!syncOverMobileNetworksAllowed(prefs) && !connectivityStateManager.isWifiConnected()) {
-            Timber.d("No available authorised connection. Can't perform the requested operation");
-            return GcmNetworkManager.RESULT_SUCCESS;
-        }
-
-        Map<String, String> params = new HashMap<>(1);
-        //TODO: very ugly, have datasource for server base url
-        params.put(GetApkData.BASE_URL_KEY, serverManager.getServerBase());
-        getApkData.execute(new DefaultSubscriber<ApkData>() {
+        getApkData.execute(new DefaultObserver<ApkData>() {
             @Override
             public void onError(Throwable e) {
                 //TODO: verify which exception can be ignored and which not
@@ -181,7 +175,7 @@ public class ApkUpdateService extends GcmTaskService {
                 if (shouldAppBeUpdated(viewApkData)) {
                     Map<String, Object> params = new HashMap<>(1);
                     params.put(SaveApkData.KEY_APK_DATA, apkData);
-                    saveApkData.execute(new DefaultSubscriber<Boolean>() {
+                    saveApkData.execute(new DefaultObserver<Boolean>() {
                         @Override
                         public void onError(Throwable e) {
                             super.onError(e);
@@ -190,14 +184,9 @@ public class ApkUpdateService extends GcmTaskService {
                     }, params);
                 }
             }
-        }, params);
+        }, null);
 
         return GcmNetworkManager.RESULT_SUCCESS;
-    }
-
-    private boolean syncOverMobileNetworksAllowed(Prefs prefs) {
-        return prefs.getBoolean(Prefs.KEY_CELL_UPLOAD,
-                Prefs.DEFAULT_VALUE_CELL_UPLOAD);
     }
 
     private boolean shouldAppBeUpdated(@Nullable ViewApkData data) {

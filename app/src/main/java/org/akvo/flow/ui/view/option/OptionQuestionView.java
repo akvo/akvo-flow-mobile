@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -104,6 +104,7 @@ public abstract class OptionQuestionView extends QuestionView {
     private void appendOtherView() {
         if (mQuestion.isAllowOther()) {
             mOtherText = new TextView(getContext());
+            mOtherText.setId(R.id.other_option_text);
             mOtherText.setLayoutParams(
                     new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
             addView(mOtherText);
@@ -181,6 +182,7 @@ public abstract class OptionQuestionView extends QuestionView {
         if (!TextUtils.isEmpty(mLatestOtherText)) {
             inputView.append(mLatestOtherText);
         }
+        inputView.setId(R.id.other_option_input);
         main.addView(inputView);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());

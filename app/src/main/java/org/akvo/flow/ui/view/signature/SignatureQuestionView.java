@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -20,10 +20,10 @@
 
 package org.akvo.flow.ui.view.signature;
 
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
@@ -37,27 +37,34 @@ import org.akvo.flow.domain.QuestionResponse;
 import org.akvo.flow.domain.response.value.Signature;
 import org.akvo.flow.event.QuestionInteractionEvent;
 import org.akvo.flow.event.SurveyListener;
+import org.akvo.flow.injector.component.DaggerViewComponent;
+import org.akvo.flow.injector.component.ViewComponent;
 import org.akvo.flow.serialization.response.value.SignatureValue;
 import org.akvo.flow.ui.view.QuestionView;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.ImageUtil;
-import org.akvo.flow.util.MediaFileHelper;
+import org.akvo.flow.util.files.SignatureFileBrowser;
 import org.akvo.flow.util.image.GlideImageLoader;
 import org.akvo.flow.util.image.ImageLoader;
 import org.akvo.flow.util.image.ImageLoaderListener;
 
-import static org.akvo.flow.util.MediaFileHelper.RESIZED_SUFFIX;
+import java.io.File;
+
+import javax.inject.Inject;
+
+import static org.akvo.flow.util.files.SignatureFileBrowser.RESIZED_SUFFIX;
 
 public class SignatureQuestionView extends QuestionView {
+
+    @Inject
+    SignatureFileBrowser signatureFileBrowser;
 
     private EditText mName;
     private ImageView mImage;
     private Button signButton;
     private TextView nameLabel;
-
-    private Signature mSignature;
     private ImageLoader imageLoader;
-    private MediaFileHelper mediaFileHelper;
+    private Signature mSignature;
 
     public SignatureQuestionView(Context context, Question q, SurveyListener surveyListener) {
         super(context, q, surveyListener);
@@ -66,19 +73,18 @@ public class SignatureQuestionView extends QuestionView {
 
     private void init() {
         setQuestionView(R.layout.signature_question_view);
+        initialiseInjector();
 
         mSignature = new Signature();
 
-        mName = (EditText)findViewById(R.id.name);
-        nameLabel = (TextView)findViewById(R.id.name_label);
-        mImage = (ImageView)findViewById(R.id.image);
-        signButton = (Button)findViewById(R.id.sign_btn);
-        Context context = getContext();
-        imageLoader = new GlideImageLoader(context);
-        mediaFileHelper = new MediaFileHelper(context);
+        mName = (EditText) findViewById(R.id.signature_name);
+        nameLabel = (TextView) findViewById(R.id.signature_name_label);
+        mImage = (ImageView) findViewById(R.id.signature_image);
+        signButton = (Button) findViewById(R.id.sign_btn);
+        imageLoader = new GlideImageLoader((Activity) getContext());
 
         if (isReadOnly()) {
-            signButton.setEnabled(false);
+            signButton.setVisibility(GONE);
         } else {
             signButton.setOnClickListener(new OnClickListener() {
                 @Override
@@ -95,16 +101,28 @@ public class SignatureQuestionView extends QuestionView {
         }
     }
 
+    private void initialiseInjector() {
+        ViewComponent viewComponent =
+                DaggerViewComponent.builder().applicationComponent(getApplicationComponent())
+                        .build();
+        viewComponent.inject(this);
+    }
+
     @Override
-    public void questionComplete(Bundle data) {
+    public void onQuestionResultReceived(Bundle data) {
         if (data != null) {
             final String name = data.getString(ConstantUtil.SIGNATURE_NAME_EXTRA);
             mSignature.setName(name);
-            imageLoader.loadFromFile(mediaFileHelper.getImageFile(RESIZED_SUFFIX, mQuestion.getId(),
-                    mSurveyListener.getDatapointId()), new ImageLoaderListener() {
+            setUpName(name);
+            File imageFile = signatureFileBrowser
+                    .getSignatureImageFile(RESIZED_SUFFIX, mQuestion.getId(),
+                            mSurveyListener.getDatapointId());
+            //noinspection unchecked
+            imageLoader.loadFromFile(imageFile, new ImageLoaderListener() {
                 @Override
-                public void onImageReady(@Nullable Bitmap bitmap) {
-                    displayResponse(name, bitmap);
+                public void onImageReady(Bitmap bitmap) {
+                    setUpImage(bitmap);
+                    updateSignButton();
                     if (bitmap != null) {
                         mSignature.setImage(ImageUtil.encodeBase64(bitmap));
                     }
@@ -118,24 +136,26 @@ public class SignatureQuestionView extends QuestionView {
     public void rehydrate(QuestionResponse resp) {
         super.rehydrate(resp);
 
-        if (getResponse() == null || TextUtils.isEmpty(getResponse().getValue())) {
+        QuestionResponse response = getResponse();
+        String value = response == null ? null : response.getValue();
+        if (response == null || TextUtils.isEmpty(value)) {
             return;
         }
 
-        mSignature = SignatureValue.deserialize(getResponse().getValue());
-        String name = mSignature == null ? "" : mSignature.getName();
+        mSignature = SignatureValue.deserialize(value);
+        final String name = mSignature == null ? "" : mSignature.getName();
         String base64ImageString = mSignature == null ? "" : mSignature.getImage();
         if (!TextUtils.isEmpty(base64ImageString)) {
             setUpName(name);
-            imageLoader.loadFromBase64String(base64ImageString, new ImageLoaderListener() {
+            imageLoader.loadFromBase64String(base64ImageString, mImage, new ImageLoaderListener() {
                 @Override
-                public void onImageReady(@Nullable Bitmap bitmap) {
-                    setUpImage(bitmap);
+                public void onImageReady(Bitmap bitmap) {
+                    mImage.setVisibility(VISIBLE);
                     updateSignButton();
                 }
             });
         } else {
-            displayResponse(name, null);
+            resetResponse(name);
         }
 
     }
@@ -144,7 +164,7 @@ public class SignatureQuestionView extends QuestionView {
     public void resetQuestion(boolean fireEvent) {
         super.resetQuestion(fireEvent);
         mSignature = new Signature();
-        displayResponse("", null);
+        resetResponse("");
     }
 
     @Override
@@ -158,9 +178,9 @@ public class SignatureQuestionView extends QuestionView {
         setResponse(questionResponse);
     }
 
-    private void displayResponse(String name, Bitmap imageBitmap) {
+    private void resetResponse(String name) {
         setUpName(name);
-        setUpImage(imageBitmap);
+        setUpImage(null);
         updateSignButton();
     }
 

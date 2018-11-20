@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2018 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -35,7 +35,6 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import org.akvo.flow.R;
-import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionResponse;
 import org.akvo.flow.domain.ValidationRule;
@@ -43,6 +42,8 @@ import org.akvo.flow.event.QuestionInteractionEvent;
 import org.akvo.flow.event.SurveyListener;
 import org.akvo.flow.exception.ValidationException;
 import org.akvo.flow.util.ConstantUtil;
+
+import java.util.Locale;
 
 /**
  * Question that supports free-text input via the keyboard
@@ -61,7 +62,6 @@ public class FreetextQuestionView extends QuestionView implements View.OnClickLi
 
     private void init() {
         setQuestionView(R.layout.freetext_question_view);
-
         mEditText = (EditText)findViewById(R.id.input_et);
         mDoubleEntryText = (EditText)findViewById(R.id.double_entry_et);
 
@@ -73,8 +73,8 @@ public class FreetextQuestionView extends QuestionView implements View.OnClickLi
         }
 
         if (isReadOnly()) {
-            mEditText.setFocusable(false);
-            mDoubleEntryText.setFocusable(false);
+            mEditText.setEnabled(false);
+            mDoubleEntryText.setEnabled(false);
         }
 
         int maxLength = ValidationRule.DEFAULT_MAX_LENGTH;
@@ -244,7 +244,7 @@ public class FreetextQuestionView extends QuestionView implements View.OnClickLi
     }
 
     @Override
-    public void questionComplete(Bundle data) {
+    public void onQuestionResultReceived(Bundle data) {
         if (data != null && data.containsKey(ConstantUtil.CADDISFLY_RESPONSE)) {
             Question question = getQuestion();
             setResponse(new QuestionResponse.QuestionResponseBuilder()
@@ -265,7 +265,7 @@ public class FreetextQuestionView extends QuestionView implements View.OnClickLi
             data.putString(ConstantUtil.CADDISFLY_QUESTION_TITLE, q.getText());
             data.putString(ConstantUtil.CADDISFLY_DATAPOINT_ID, mSurveyListener.getDatapointId());
             data.putString(ConstantUtil.CADDISFLY_FORM_ID, mSurveyListener.getFormId());
-            data.putString(ConstantUtil.CADDISFLY_LANGUAGE, FlowApp.getApp().getAppLanguageCode());
+            data.putString(ConstantUtil.CADDISFLY_LANGUAGE, Locale.getDefault().getLanguage());
             notifyQuestionListeners(QuestionInteractionEvent.EXTERNAL_SOURCE_EVENT, data);
         }
     }

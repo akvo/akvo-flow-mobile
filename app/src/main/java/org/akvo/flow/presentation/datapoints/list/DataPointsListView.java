@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -34,15 +34,11 @@ interface DataPointsListView {
 
     void showSyncedResults(int numberOfSyncedItems);
 
-    void showErrorSyncNotAllowed();
-
     void showErrorNoNetwork();
 
     void showErrorSync();
 
-    void displayData(List<ListDataPoint> mapDataPoints);
-
-    void displayMenu(boolean monitored);
+    void displayData(List<ListDataPoint> listDataPoints);
 
     void showErrorMissingLocation();
 
@@ -51,4 +47,14 @@ interface DataPointsListView {
     void showOrderByDialog(int orderBy);
 
     void showErrorAssignmentMissing();
+
+    void displayNoSearchResultsFound();
+
+    void showNoDataPointsToSync();
+
+    void hideMenu();
+
+    void showNonMonitoredMenu();
+
+    void showMonitoredMenu();
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -20,11 +20,55 @@
 
 package org.akvo.flow.domain.repository;
 
-import rx.Observable;
+import io.reactivex.Observable;
 
 public interface UserRepository {
 
     Observable<Boolean> mobileSyncAllowed();
+
+    Observable<Boolean> keepScreenOn();
+
+    Observable<String> getAppLanguage();
+
+    Observable<Integer> getImageSize();
+
+    Observable<String> getDeviceId();
+
+    Observable<Boolean> saveScreenOnPreference(Boolean keepScreenOn);
+
+    Observable<Boolean> saveEnableMobileDataPreference(Boolean enable);
+
+    Observable<Boolean> saveLanguagePreference(String language);
+
+    Observable<Boolean> saveImageSizePreference(Integer size);
+
+    Observable<Long> getSelectedSurvey();
+
+    Observable<Boolean> clearSelectedSurvey();
+
+    Observable<Boolean> setSelectedSurvey(long surveyGroupId);
+
+    Observable<Long> getSelectedUser();
+
+    Observable<Boolean> clearSelectedUser();
+
+    Observable<Boolean> setSelectedUser(long userId);
+
+    Observable<Long> getPublishDataTime();
+
+    Observable<Boolean> setPublishDataTime();
+
+    Observable<Boolean> clearPublishDataTime();
+
+    Observable<Boolean> clearUserPreferences();
+
+    Observable<Boolean> isDeviceSetUp();
+
+    Observable<Boolean> wasWalkThroughSeen();
+
+    Observable<Boolean> setWalkThroughSeen();
+
+    Observable<Boolean> mobileUploadSet();
 
     Observable<Boolean> clearAppUpdateNotified();
 }

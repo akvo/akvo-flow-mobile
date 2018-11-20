@@ -1,36 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="horizontal"
-    android:gravity="center_vertical">
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:orientation="horizontal"
+              android:layout_marginTop="4dp"
+              android:layout_marginBottom="4dp"
+              android:gravity="center_vertical">
 
     <TextView
-        android:id="@+id/question_tv"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:textSize="18sp"
-        android:focusable="true"
-        android:focusableInTouchMode="true"
-        android:textStyle="bold"/>
+            android:id="@+id/question_tv"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textSize="18sp"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:textStyle="bold"/>
 
     <ImageButton
-        android:id="@+id/tip_ib"
-        android:layout_width="30dp"
-        android:layout_height="wrap_content"
-        android:adjustViewBounds="true"
-        android:scaleType="centerInside"
-        android:visibility="gone"
-        android:background="@android:color/transparent"
-        android:src="@drawable/info"/>
+            android:id="@+id/tip_ib"
+            android:layout_width="30dp"
+            android:layout_height="wrap_content"
+            android:adjustViewBounds="true"
+            android:scaleType="centerInside"
+            android:visibility="gone"
+            android:background="@android:color/transparent"
+            android:src="@drawable/info"/>
 
     <ImageView
-        android:id="@+id/open_btn"
-        android:layout_width="30dp"
-        android:layout_height="wrap_content"
-        android:adjustViewBounds="true"
-        android:src="@drawable/ic_edit"/>
+            android:id="@+id/invalid_question_open_btn"
+            android:layout_marginLeft="8dp"
+            android:layout_width="30dp"
+            android:layout_height="wrap_content"
+            android:adjustViewBounds="true"
+            android:src="@drawable/ic_edit"/>
 
 </LinearLayout>

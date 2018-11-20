@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -27,6 +27,7 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
+import org.akvo.flow.R;
 import org.akvo.flow.domain.Option;
 import org.akvo.flow.domain.Question;
 import org.akvo.flow.event.SurveyListener;
@@ -60,7 +61,7 @@ public class OptionQuestionViewSingle extends OptionQuestionView {
             for (int i = 0; i < mOptions.size(); i++) {
                 Option option = mOptions.get(i);
                 View view;
-                view = newRadioButton(option);
+                view = newRadioButton(option, i);
                 mOptionGroup.addView(view);
                 view.setEnabled(!isReadOnly());
                 view.setId(i); // View ID will match option position within the array
@@ -68,10 +69,15 @@ public class OptionQuestionViewSingle extends OptionQuestionView {
         }
     }
 
-    private View newRadioButton(Option option) {
+    private View newRadioButton(Option option, int i) {
         RadioButton rb = new RadioButton(getContext());
-        rb.setLayoutParams(new RadioGroup.LayoutParams(RadioGroup.LayoutParams.MATCH_PARENT,
-                LayoutParams.WRAP_CONTENT));
+        RadioGroup.LayoutParams params = new RadioGroup.LayoutParams(
+                RadioGroup.LayoutParams.MATCH_PARENT,
+                LayoutParams.WRAP_CONTENT);
+        if (i != 0) {
+            params.topMargin = getDimension(R.dimen.small_padding);
+        }
+        rb.setLayoutParams(params);
         rb.setLongClickable(true);
         rb.setOnLongClickListener(new OnLongClickListener() {
             @Override

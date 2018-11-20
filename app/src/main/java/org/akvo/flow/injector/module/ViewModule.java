@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2016-2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -21,12 +21,43 @@
 package org.akvo.flow.injector.module;
 
 import org.akvo.flow.domain.interactor.AllowedToConnect;
+import org.akvo.flow.domain.interactor.CheckDeviceNotifications;
+import org.akvo.flow.domain.interactor.CheckSubmittedFiles;
+import org.akvo.flow.domain.interactor.ClearAllData;
+import org.akvo.flow.domain.interactor.ClearResponses;
+import org.akvo.flow.domain.interactor.CopyFile;
+import org.akvo.flow.domain.interactor.CopyVideo;
+import org.akvo.flow.domain.interactor.DeleteSurvey;
+import org.akvo.flow.domain.interactor.ExportSurveyInstances;
+import org.akvo.flow.domain.interactor.GetAllSurveys;
+import org.akvo.flow.domain.interactor.GetIsDeviceSetUp;
+import org.akvo.flow.domain.interactor.GetPublishDataTime;
 import org.akvo.flow.domain.interactor.GetApkData;
 import org.akvo.flow.domain.interactor.GetSavedDataPoints;
+import org.akvo.flow.domain.interactor.GetUserSettings;
+import org.akvo.flow.domain.interactor.MakeDataPrivate;
+import org.akvo.flow.domain.interactor.MobileUploadSet;
+import org.akvo.flow.domain.interactor.PublishData;
+import org.akvo.flow.domain.interactor.SaveAppLanguage;
+import org.akvo.flow.domain.interactor.SaveEnableMobileData;
 import org.akvo.flow.domain.interactor.SaveApkData;
 import org.akvo.flow.domain.interactor.SaveImage;
-import org.akvo.flow.domain.interactor.SyncDataPoints;
+import org.akvo.flow.domain.interactor.SaveImageSize;
+import org.akvo.flow.domain.interactor.SaveKeepScreenOn;
+import org.akvo.flow.domain.interactor.SaveResizedImage;
+import org.akvo.flow.domain.interactor.SaveSelectedSurvey;
+import org.akvo.flow.domain.interactor.SetWalkthroughSeen;
+import org.akvo.flow.domain.interactor.UnSyncedTransmissionsExist;
+import org.akvo.flow.domain.interactor.UploadDataPoints;
 import org.akvo.flow.domain.interactor.UseCase;
+import org.akvo.flow.domain.interactor.WasWalkthroughSeen;
+import org.akvo.flow.domain.interactor.setup.SaveSetup;
+import org.akvo.flow.domain.interactor.users.CreateUser;
+import org.akvo.flow.domain.interactor.users.DeleteUser;
+import org.akvo.flow.domain.interactor.users.EditUser;
+import org.akvo.flow.domain.interactor.users.GetSelectedUser;
+import org.akvo.flow.domain.interactor.users.GetUsers;
+import org.akvo.flow.domain.interactor.users.SelectUser;
 
 import javax.inject.Named;
 
@@ -49,15 +80,207 @@ public class ViewModule {
     }
 
     @Provides
-    @Named("syncDataPoints")
-    UseCase provideSyncDataPointsUseCase(SyncDataPoints syncDataPoints) {
-        return syncDataPoints;
-    }
-
-    @Provides
     @Named("allowedToConnect")
     UseCase provideAllowedToConnect(AllowedToConnect allowedToConnect) {
         return allowedToConnect;
+    }
+
+    @Provides
+    @Named("getUserSettings")
+    UseCase provideGetUserSettings(GetUserSettings getUserSettings) {
+        return getUserSettings;
+    }
+
+    @Provides
+    @Named("saveAppLanguage")
+    UseCase provideSaveAppLanguage(SaveAppLanguage saveAppLanguage) {
+        return saveAppLanguage;
+    }
+
+    @Provides
+    @Named("saveEnableMobileData")
+    UseCase provideSaveEnableMobileData(SaveEnableMobileData saveEnableMobileData) {
+        return saveEnableMobileData;
+    }
+
+    @Provides
+    @Named("saveImageSize")
+    UseCase provideSaveImageSize(SaveImageSize saveImageSize) {
+        return saveImageSize;
+    }
+
+    @Provides
+    @Named("saveKeepScreenOn")
+    UseCase provideSaveKeepScreenOn(SaveKeepScreenOn saveKeepScreenOn) {
+        return saveKeepScreenOn;
+    }
+
+    @Provides
+    @Named("getAllSurveys")
+    UseCase provideGetAllSurveys(GetAllSurveys getAllSurveys) {
+        return getAllSurveys;
+    }
+
+    @Provides
+    @Named("deleteSurvey")
+    UseCase provideDeleteSurvey(DeleteSurvey deleteSurvey) {
+        return deleteSurvey;
+    }
+
+    @Provides
+    @Named("saveSelectedSurvey")
+    UseCase provideSaveSelectedSurvey(SaveSelectedSurvey saveSelectedSurvey) {
+        return saveSelectedSurvey;
+    }
+
+    @Provides
+    @Named("getUsers")
+    UseCase provideGetUsers(GetUsers getUsers) {
+        return getUsers;
+    }
+
+    @Provides
+    @Named("editUser")
+    UseCase provideEditUser(EditUser editUser) {
+        return editUser;
+    }
+
+    @Provides
+    @Named("deleteUser")
+    UseCase provideDeleteUser(DeleteUser deleteUser) {
+        return deleteUser;
+    }
+
+    @Provides
+    @Named("selectUser")
+    UseCase provideSelectedUser(SelectUser selectUser) {
+        return selectUser;
+    }
+
+    @Provides
+    @Named("createUser")
+    UseCase provideCreateUser(CreateUser createUser) {
+        return createUser;
+    }
+
+    @Provides
+    @Named("getSelectedUser")
+    UseCase provideGetSelectedUser(GetSelectedUser getSelectedUser) {
+        return getSelectedUser;
+    }
+
+    @Provides
+    @Named("copyResizedImage")
+    UseCase provideSaveResizedImage(SaveResizedImage saveResizedImage) {
+        return saveResizedImage;
+    }
+
+    @Provides
+    @Named("copyVideo")
+    UseCase provideCopyVideo(CopyVideo copyVideo) {
+        return copyVideo;
+    }
+
+    @Provides
+    @Named("getPublishDataTime")
+    UseCase provideGetPublishDataTime(GetPublishDataTime getPublishDataTime) {
+        return getPublishDataTime;
+    }
+
+    @Provides
+    @Named("publishData")
+    UseCase provideMakeDataPublic(PublishData publishData) {
+        return publishData;
+    }
+
+    @Provides
+    @Named("unSyncedTransmissionsExist")
+    UseCase provideUnSyncedTransmissionsExist(UnSyncedTransmissionsExist transmissionsExist) {
+        return transmissionsExist;
+    }
+
+    @Provides
+    @Named("clearResponses")
+    UseCase provideClearResponses(ClearResponses clearResponses) {
+        return clearResponses;
+    }
+
+    @Provides
+    @Named("clearAllData")
+    UseCase provideClearAllData(ClearAllData clearAllData) {
+        return clearAllData;
+    }
+
+    @Provides
+    @Named("getIsDeviceSetUp")
+    UseCase provideIsDeviceSetup(GetIsDeviceSetUp isDeviceSetUp) {
+        return isDeviceSetUp;
+    }
+
+    @Provides
+    @Named("wasWalkthroughSeen")
+    UseCase provideWasWalkthroughSeen(WasWalkthroughSeen wasWalkthroughSeen) {
+        return wasWalkthroughSeen;
+    }
+
+    @Provides
+    @Named("setWalkthroughSeen")
+    UseCase provideSetWalkthroughSeen(SetWalkthroughSeen setWalkthroughSeen) {
+        return setWalkthroughSeen;
+    }
+
+    @Provides
+    @Named("saveSetup")
+    UseCase provideSaveConfig(SaveSetup saveSetup) {
+        return saveSetup;
+    }
+
+    @Provides
+    @Named("copyFile")
+    UseCase provideCopyFile(CopyFile copyFile) {
+        return copyFile;
+    }
+
+    @Provides
+    @Named("makeDataPrivate")
+    UseCase provideMakeDataPrivate(MakeDataPrivate makeDataPrivate) {
+        return makeDataPrivate;
+    }
+
+    @Provides
+    @Named("uploadSync")
+    UseCase provideUploadSync(UploadDataPoints uploadDataPoints) {
+        return uploadDataPoints;
+    }
+
+    @Provides
+    @Named("uploadAsync")
+    UseCase provideUploadAsync(UploadDataPoints uploadDataPoints) {
+        return uploadDataPoints;
+    }
+
+    @Provides
+    @Named("checkDeviceNotification")
+    UseCase provideDeviceNotificationSync(CheckDeviceNotifications checkDeviceNotifications) {
+        return checkDeviceNotifications;
+    }
+
+    @Provides
+    @Named("checkSubmittedFiles")
+    UseCase provideSubmittedFilesSync(CheckSubmittedFiles checkSubmittedFiles) {
+        return checkSubmittedFiles;
+    }
+
+    @Provides
+    @Named("exportSurveyInstances")
+    UseCase provideExportSurveyInstancesSync(ExportSurveyInstances exportSurveyInstances) {
+        return exportSurveyInstances;
+    }
+
+    @Provides
+    @Named("mobileUploadSet")
+    UseCase provideMobileUploadSet(MobileUploadSet mobileUploadSet) {
+        return mobileUploadSet;
     }
 
     @Provides

@@ -26,7 +26,6 @@ import org.akvo.flow.BuildConfig;
 import org.akvo.flow.api.service.ApkApiService;
 import org.akvo.flow.domain.apkupdate.ApkUpdateMapper;
 import org.akvo.flow.domain.apkupdate.ViewApkData;
-import org.akvo.flow.util.ServerManager;
 import org.akvo.flow.util.StringUtil;
 import org.akvo.flow.util.VersionHelper;
 import org.json.JSONException;
@@ -42,19 +41,17 @@ public class ApkUpdateHelper {
     private final ApkApiService apkApiService;
     private final ApkUpdateMapper apkUpdateMapper;
     private final VersionHelper versionHelper;
-    private final ServerManager serverManager;
 
     @Inject
     public ApkUpdateHelper(ApkApiService apkApiService, ApkUpdateMapper apkUpdateMapper,
-            VersionHelper versionHelper, ServerManager serverManager) {
+            VersionHelper versionHelper) {
         this.apkApiService = apkApiService;
         this.apkUpdateMapper = apkUpdateMapper;
         this.versionHelper = versionHelper;
-        this.serverManager = serverManager;
     }
 
     Pair<Boolean, ViewApkData> shouldUpdate() throws IOException, JSONException {
-        JSONObject json = apkApiService.getApkDataObject(serverManager.getServerBase());
+        JSONObject json = apkApiService.getApkDataObject(BuildConfig.SERVER_BASE);
         ViewApkData data = apkUpdateMapper.transform(json);
         return new Pair<>(shouldAppBeUpdated(data), data);
     }
@@ -66,7 +63,7 @@ public class ApkUpdateHelper {
         String remoteVersionName = data.getVersion();
         String currentVersionName = BuildConfig.VERSION_NAME;
         return StringUtil.isValid(remoteVersionName)
-            && versionHelper.isNewerVersion(currentVersionName, remoteVersionName)
-            && StringUtil.isValid(data.getFileUrl());
+                && versionHelper.isNewerVersion(currentVersionName, remoteVersionName)
+                && StringUtil.isValid(data.getFileUrl());
     }
 }

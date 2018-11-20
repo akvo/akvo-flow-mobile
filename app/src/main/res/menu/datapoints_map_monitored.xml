@@ -12,13 +12,11 @@
         <menu>
 
             <item
-                    android:id="@+id/search"
-                    android:title="@string/search"/>
-
+                    android:id="@+id/download"
+                    android:title="@string/download"/>
             <item
-                    android:id="@+id/sync_records"
-                    android:title="@string/sync"/>
-
+                    android:id="@+id/upload"
+                    android:title="@string/upload"/>
             <item
                     android:id="@+id/stats"
                     android:title="@string/stats"/>

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -20,20 +20,25 @@
 
 package org.akvo.flow.presentation.datapoints.list;
 
-import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v7.widget.SearchView;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -42,6 +47,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -60,6 +66,7 @@ import org.akvo.flow.ui.fragment.OrderByDialogFragment;
 import org.akvo.flow.ui.fragment.OrderByDialogFragment.OrderByDialogListener;
 import org.akvo.flow.ui.fragment.RecordListListener;
 import org.akvo.flow.util.ConstantUtil;
+import org.akvo.flow.util.WeakLocationListener;
 
 import java.lang.ref.WeakReference;
 import java.util.List;
@@ -71,23 +78,6 @@ import timber.log.Timber;
 public class DataPointsListFragment extends Fragment implements LocationListener,
         OnItemClickListener, OrderByDialogListener, DataPointsListView {
 
-    private LocationManager mLocationManager;
-    private Double mLatitude = null;
-    private Double mLongitude = null;
-
-    private DataPointListAdapter mAdapter;
-    private RecordListListener mListener;
-
-    private TextView emptyTitleTv;
-    private TextView emptySubTitleTv;
-    private ProgressBar progressBar;
-
-    /**
-     * BroadcastReceiver to notify of data synchronisation. This should be
-     * fired from {@link org.akvo.flow.service.DataSyncService}
-     */
-    private final BroadcastReceiver dataSyncReceiver = new DataSyncBroadcastReceiver(this);
-
     @Inject
     DataPointSyncSnackBarManager dataPointSyncSnackBarManager;
 
@@ -97,7 +87,26 @@ public class DataPointsListFragment extends Fragment implements LocationListener
     @Inject
     DataPointsListPresenter presenter;
 
-    private boolean displayMonitoredMenu;
+    private LocationManager mLocationManager;
+    private WeakLocationListener weakLocationListener;
+    private Double mLatitude = null;
+    private Double mLongitude = null;
+
+    private DataPointListAdapter mAdapter;
+    private RecordListListener mListener;
+
+    private TextView emptyTitleTv;
+    private TextView emptySubTitleTv;
+    private ImageView emptyIv;
+    private ProgressBar progressBar;
+    private SearchView searchView;
+    private Integer menuRes = null;
+
+    /**
+     * BroadcastReceiver to notify of data synchronisation. This should be
+     * fired from {@link org.akvo.flow.service.DataSyncService}
+     */
+    private final BroadcastReceiver dataSyncReceiver = new DataSyncBroadcastReceiver(this);
 
     public static DataPointsListFragment newInstance(SurveyGroup surveyGroup) {
         DataPointsListFragment fragment = new DataPointsListFragment();
@@ -114,11 +123,12 @@ public class DataPointsListFragment extends Fragment implements LocationListener
     }
 
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
+    public void onAttach(Context context) {
+        super.onAttach(context);
 
         // This makes sure that the container activity has implemented
         // the callback interface. If not, it throws an exception
+        FragmentActivity activity = getActivity();
         try {
             mListener = (RecordListListener) activity;
         } catch (ClassCastException e) {
@@ -130,29 +140,43 @@ public class DataPointsListFragment extends Fragment implements LocationListener
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.surveyed_locales_list_fragment, container, false);
+        return inflater.inflate(R.layout.data_points_list_fragment, container, false);
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        mLocationManager = (LocationManager) getActivity()
+        mLocationManager = (LocationManager) getActivity().getApplicationContext()
                 .getSystemService(Context.LOCATION_SERVICE);
+        weakLocationListener = new WeakLocationListener(this);
         View view = getView();
         ListView listView = (ListView) view.findViewById(R.id.locales_lv);
         View emptyView = view.findViewById(R.id.empty_view);
         listView.setEmptyView(emptyView);
         emptyTitleTv = (TextView) view.findViewById(R.id.empty_title_tv);
         emptySubTitleTv = (TextView) view.findViewById(R.id.empty_subtitle_tv);
+        emptyIv = (ImageView) view.findViewById(R.id.empty_iv);
         SurveyGroup surveyGroup = (SurveyGroup) getArguments()
                 .getSerializable(ConstantUtil.SURVEY_GROUP_EXTRA);
         mAdapter = new DataPointListAdapter(getActivity(), mLatitude, mLongitude, surveyGroup);
         listView.setAdapter(mAdapter);
         listView.setOnItemClickListener(this);
         progressBar = (ProgressBar) view.findViewById(R.id.progress);
+        updateProgressDrawable();
         initializeInjector();
         presenter.setView(this);
         presenter.onDataReady(surveyGroup);
+    }
+
+    private void updateProgressDrawable() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+            Drawable progressDrawable = progressBar.getIndeterminateDrawable();
+            if (progressDrawable != null) {
+                progressDrawable
+                        .setColorFilter(ContextCompat.getColor(getActivity(), R.color.colorAccent),
+                                PorterDuff.Mode.MULTIPLY);
+            }
+        }
     }
 
     private void initializeInjector() {
@@ -175,14 +199,13 @@ public class DataPointsListFragment extends Fragment implements LocationListener
     public void onResume() {
         super.onResume();
 
-        // try to find out where we are
-        updateLocation();
-
-        // Listen for data sync updates, so we can update the UI accordingly
         LocalBroadcastManager.getInstance(getActivity()).registerReceiver(dataSyncReceiver,
                 new IntentFilter(ConstantUtil.ACTION_DATA_SYNC));
 
-        presenter.loadDataPoints();
+        if (searchView == null || searchView.isIconified()) {
+            updateLocation();
+            presenter.loadDataPoints();
+        }
     }
 
     private void updateLocation() {
@@ -197,7 +220,7 @@ public class DataPointsListFragment extends Fragment implements LocationListener
                 mAdapter.updateLocation(mLatitude, mLongitude);
                 presenter.onLocationReady(mLatitude, mLongitude);
             }
-            mLocationManager.requestLocationUpdates(provider, 1000, 0, this);
+            mLocationManager.requestLocationUpdates(provider, 1000, 0, weakLocationListener);
         }
     }
 
@@ -205,7 +228,13 @@ public class DataPointsListFragment extends Fragment implements LocationListener
     public void onPause() {
         super.onPause();
         LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(dataSyncReceiver);
-        mLocationManager.removeUpdates(this);
+        mLocationManager.removeUpdates(weakLocationListener);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        mLocationManager.removeUpdates(weakLocationListener);
     }
 
     @Override
@@ -246,6 +275,7 @@ public class DataPointsListFragment extends Fragment implements LocationListener
                 R.string.no_records_subtitle_monitored :
                 R.string.no_records_subtitle_non_monitored;
         emptySubTitleTv.setText(subtitleResource);
+        emptyIv.setImageResource(R.drawable.ic_format_list_bulleted);
     }
 
     @Override
@@ -273,12 +303,49 @@ public class DataPointsListFragment extends Fragment implements LocationListener
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        if (displayMonitoredMenu) {
-            inflater.inflate(R.menu.datapoints_list_monitored, menu);
-        } else {
-            inflater.inflate(R.menu.datapoints_list, menu);
+        if (menuRes != null) {
+            inflater.inflate(menuRes, menu);
+            setUpSearchView(menu);
         }
         super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    private void setUpSearchView(final Menu menu) {
+        MenuItem searchMenuItem = menu.findItem(R.id.search);
+        searchView = (SearchView) searchMenuItem.getActionView();
+        searchView.setIconifiedByDefault(true);
+        searchView.setQueryHint(getString(R.string.search_hint));
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                // Empty
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                if (!TextUtils.isEmpty(newText)) {
+                    presenter.getFilteredDataPoints(newText);
+                } else {
+                    presenter.loadDataPoints();
+                }
+                return false;
+            }
+        });
+        searchMenuItem.setOnActionExpandListener(
+                new MenuItem.OnActionExpandListener() {
+                    @Override
+                    public boolean onMenuItemActionExpand(MenuItem item) {
+                        // EMPTY
+                        return true;
+                    }
+
+                    @Override
+                    public boolean onMenuItemActionCollapse(MenuItem item) {
+                        presenter.loadDataPoints();
+                        return true;
+                    }
+                });
     }
 
     @Override
@@ -287,8 +354,11 @@ public class DataPointsListFragment extends Fragment implements LocationListener
             case R.id.order_by:
                 presenter.onOrderByClicked();
                 return true;
-            case R.id.sync_records:
-                presenter.onSyncRecordsPressed();
+            case R.id.download:
+                presenter.onDownloadPressed();
+                return true;
+            case R.id.upload:
+                presenter.onUploadPressed();
                 return true;
             default:
                 return false;
@@ -307,7 +377,7 @@ public class DataPointsListFragment extends Fragment implements LocationListener
     @Override
     public void onLocationChanged(Location location) {
         // a single location is all we need
-        mLocationManager.removeUpdates(this);
+        mLocationManager.removeUpdates(weakLocationListener);
         mLatitude = location.getLatitude();
         mLongitude = location.getLongitude();
         presenter.onLocationReady(mLatitude, mLongitude);
@@ -347,8 +417,24 @@ public class DataPointsListFragment extends Fragment implements LocationListener
     }
 
     @Override
-    public void displayMenu(boolean monitored) {
-        displayMonitoredMenu = monitored;
+    public void showNonMonitoredMenu() {
+        menuRes = R.menu.datapoints_list;
+        reloadMenu();
+    }
+
+    @Override
+    public void showMonitoredMenu() {
+        menuRes = R.menu.datapoints_list_monitored;
+        reloadMenu();
+    }
+
+    @Override
+    public void hideMenu() {
+        menuRes = null;
+        reloadMenu();
+    }
+
+    private void reloadMenu() {
         FragmentActivity activity = getActivity();
         if (activity != null) {
             activity.supportInvalidateOptionsMenu();
@@ -366,21 +452,11 @@ public class DataPointsListFragment extends Fragment implements LocationListener
     }
 
     @Override
-    public void showErrorSyncNotAllowed() {
-        dataPointSyncSnackBarManager.showErrorSyncNotAllowed(getView(), new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                navigator.navigateToPreferences(getActivity());
-            }
-        });
-    }
-
-    @Override
     public void showErrorNoNetwork() {
         dataPointSyncSnackBarManager.showErrorNoNetwork(getView(), new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                presenter.onSyncRecordsPressed();
+                presenter.onDownloadPressed();
             }
         });
     }
@@ -390,12 +466,30 @@ public class DataPointsListFragment extends Fragment implements LocationListener
         dataPointSyncSnackBarManager.showErrorSync(getView(), new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                presenter.onSyncRecordsPressed();
+                presenter.onDownloadPressed();
             }
         });
     }
 
-    //TODO: once we insert data using brite database this will no longer be necessary either
+    @Override
+    public void displayNoSearchResultsFound() {
+        if (emptyTitleTv != null) {
+            emptyTitleTv.setText(R.string.no_search_results_error_text);
+        }
+        if (emptySubTitleTv != null) {
+            emptySubTitleTv.setText("");
+        }
+        if (emptyIv != null) {
+            emptyIv.setImageResource(R.drawable.ic_search_results_error);
+        }
+    }
+
+    @Override
+    public void showNoDataPointsToSync() {
+        dataPointSyncSnackBarManager.showNoDataPointsToSync(getView());
+    }
+
+//TODO: once we insert data using brite database this will no longer be necessary either
     public static class DataSyncBroadcastReceiver extends BroadcastReceiver {
 
         private final WeakReference<DataPointsListFragment> fragmentWeakRef;

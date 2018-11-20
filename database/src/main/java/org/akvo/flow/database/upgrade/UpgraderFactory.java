@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -31,27 +31,11 @@ public class UpgraderFactory {
     public DatabaseUpgrader createUpgrader(int upgradingFromVersion, DatabaseHelper helper,
             SQLiteDatabase db) {
         UpgraderVisitor databaseUpgrader = new UpgraderVisitor();
-        if (upgradingFromVersion < DatabaseHelper.VER_LAUNCH) {
-            databaseUpgrader.addUpgrader(new BeforeLaunchUpgrader(helper, db));
-        } else {
-            switch (upgradingFromVersion) {
-                case DatabaseHelper.VER_LAUNCH:
-                    databaseUpgrader.addUpgrader(new LaunchUpgrader(helper, db));
-                case DatabaseHelper.VER_FORM_SUBMITTER:
-                    databaseUpgrader.addUpgrader(new FormSubmitterUpgrader(helper, db));
-                case DatabaseHelper.VER_FORM_DEL_CHECK:
-                    databaseUpgrader.addUpgrader(new FormCheckUpgrader(helper, db));
-                case DatabaseHelper.VER_FORM_VERSION:
-                    databaseUpgrader.addUpgrader(new FormVersionUpgrader(helper, db));
-                case DatabaseHelper.VER_CADDISFLY_QN:
-                    databaseUpgrader.addUpgrader(new CaddisflyUpgrader(helper, db));
-                case DatabaseHelper.VER_PREFERENCES_MIGRATE:
-                    databaseUpgrader.addUpgrader(new PreferencesUpgrader(helper, db));
-                case DatabaseHelper.VER_LANGUAGES_MIGRATE:
-                    databaseUpgrader.addUpgrader(new LanguagesUpgrader(helper, db));
-                default:
-                    break;
-            }
+        switch (upgradingFromVersion) {
+            case DatabaseHelper.VER_RESPONSE_ITERATION:
+                databaseUpgrader.addUpgrader(new ResponsesUpgrader(helper, db));
+            default:
+                break;
         }
         return databaseUpgrader;
     }

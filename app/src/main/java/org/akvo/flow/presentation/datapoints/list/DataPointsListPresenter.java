@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -24,11 +24,14 @@ import android.support.annotation.NonNull;
 
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.entity.DataPoint;
-import org.akvo.flow.domain.entity.SyncResult;
-import org.akvo.flow.domain.interactor.DefaultSubscriber;
+import org.akvo.flow.domain.entity.DownloadResult;
+import org.akvo.flow.domain.interactor.DefaultFlowableObserver;
+import org.akvo.flow.domain.interactor.DefaultObserver;
+import org.akvo.flow.domain.interactor.DownloadDataPoints;
+import org.akvo.flow.domain.interactor.ErrorComposable;
 import org.akvo.flow.domain.interactor.GetSavedDataPoints;
-import org.akvo.flow.domain.interactor.SyncDataPoints;
 import org.akvo.flow.domain.interactor.UseCase;
+import org.akvo.flow.domain.util.Constants;
 import org.akvo.flow.presentation.Presenter;
 import org.akvo.flow.presentation.datapoints.list.entity.ListDataPoint;
 import org.akvo.flow.presentation.datapoints.list.entity.ListDataPointMapper;
@@ -38,18 +41,21 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 
 import timber.log.Timber;
 
-import static org.akvo.flow.domain.entity.SyncResult.ResultCode.SUCCESS;
+import static org.akvo.flow.domain.entity.DownloadResult.ResultCode.SUCCESS;
 
 public class DataPointsListPresenter implements Presenter {
 
     private final UseCase getSavedDataPoints;
-    private final UseCase syncDataPoints;
+    private final DownloadDataPoints downloadDataPoints;
+    private final UseCase checkDeviceNotification;
+    private final UseCase upload;
     private final ListDataPointMapper mapper;
 
     private DataPointsListView view;
@@ -60,10 +66,14 @@ public class DataPointsListPresenter implements Presenter {
 
     @Inject
     DataPointsListPresenter(@Named("getSavedDataPoints") UseCase getSavedDataPoints,
-            ListDataPointMapper mapper, @Named("syncDataPoints") UseCase syncDataPoints) {
+            ListDataPointMapper mapper, DownloadDataPoints downloadDataPoints,
+            @Named("checkDeviceNotification")
+            UseCase checkDeviceNotification, @Named("uploadSync") UseCase upload) {
         this.getSavedDataPoints = getSavedDataPoints;
         this.mapper = mapper;
-        this.syncDataPoints = syncDataPoints;
+        this.downloadDataPoints = downloadDataPoints;
+        this.checkDeviceNotification = checkDeviceNotification;
+        this.upload = upload;
     }
 
     public void setView(@NonNull DataPointsListView view) {
@@ -72,18 +82,27 @@ public class DataPointsListPresenter implements Presenter {
 
     void onDataReady(SurveyGroup surveyGroup) {
         this.surveyGroup = surveyGroup;
-        boolean monitored = surveyGroup != null && surveyGroup.isMonitored();
-        view.displayMenu(monitored);
+        if (surveyGroup == null) {
+            view.hideMenu();
+        } else {
+            if (surveyGroup.isMonitored()) {
+                view.showMonitoredMenu();
+            } else {
+                view.showNonMonitoredMenu();
+            }
+        }
     }
 
     void loadDataPoints() {
+        getSavedDataPoints.dispose();
         if (surveyGroup != null) {
             Map<String, Object> params = new HashMap<>(8);
             params.put(GetSavedDataPoints.KEY_SURVEY_GROUP_ID, surveyGroup.getId());
             params.put(GetSavedDataPoints.KEY_ORDER_BY, orderBy);
             params.put(GetSavedDataPoints.KEY_LATITUDE, latitude);
             params.put(GetSavedDataPoints.KEY_LONGITUDE, longitude);
-            getSavedDataPoints.execute(new DefaultSubscriber<List<DataPoint>>() {
+            getSavedDataPoints.execute(new DefaultObserver<List<DataPoint>>() {
+
                 @Override
                 public void onError(Throwable e) {
                     Timber.e(e, "Error loading saved datapoints");
@@ -101,55 +120,77 @@ public class DataPointsListPresenter implements Presenter {
                 }
             }, params);
         } else {
-            //noinspection unchecked
-            view.displayData(Collections.EMPTY_LIST);
-            view.showNoSurveySelected();
+            noSurveySelected();
+        }
+    }
+
+    void getFilteredDataPoints(String filter) {
+        getSavedDataPoints.dispose();
+        if (surveyGroup != null) {
+            Map<String, Object> params = new HashMap<>(8);
+            params.put(GetSavedDataPoints.KEY_SURVEY_GROUP_ID, surveyGroup.getId());
+            params.put(GetSavedDataPoints.KEY_ORDER_BY, orderBy);
+            params.put(GetSavedDataPoints.KEY_LATITUDE, latitude);
+            params.put(GetSavedDataPoints.KEY_LONGITUDE, longitude);
+            params.put(GetSavedDataPoints.KEY_FILTER, filter);
+            getSavedDataPoints.execute(new DefaultObserver<List<DataPoint>>() {
+
+                @Override
+                public void onError(Throwable e) {
+                    Timber.e(e, "Error loading saved datapoints");
+                    view.displayData(Collections.EMPTY_LIST);
+                    view.displayNoSearchResultsFound();
+                }
+
+                @Override
+                public void onNext(List<DataPoint> dataPoints) {
+                    List<ListDataPoint> listDataPoints = mapper.transform(dataPoints);
+                    view.displayData(listDataPoints);
+                    if (listDataPoints.isEmpty()) {
+                        view.displayNoSearchResultsFound();
+                    }
+                }
+            }, params);
+        } else {
+            noSurveySelected();
         }
     }
 
     @Override
     public void destroy() {
-        getSavedDataPoints.unSubscribe();
-        syncDataPoints.unSubscribe();
+        getSavedDataPoints.dispose();
+        downloadDataPoints.dispose();
+        checkDeviceNotification.dispose();
+        upload.dispose();
     }
 
-    void onSyncRecordsPressed() {
+    void onDownloadPressed() {
         if (surveyGroup != null) {
             view.showLoading();
-            syncRecords(surveyGroup.getId());
+            downloadDataPoints(surveyGroup.getId());
         }
     }
 
-    private void syncRecords(final long surveyGroupId) {
-        Map<String, Long> params = new HashMap<>(2);
-        params.put(SyncDataPoints.KEY_SURVEY_GROUP_ID, surveyGroupId);
-        syncDataPoints.execute(new DefaultSubscriber<SyncResult>() {
 
+    private void downloadDataPoints(final long surveyGroupId) {
+        Map<String, Object> params = new HashMap<>(2);
+        params.put(DownloadDataPoints.KEY_SURVEY_GROUP_ID, surveyGroupId);
+        downloadDataPoints.execute(new DefaultFlowableObserver<DownloadResult>() {
             @Override
-            public void onCompleted() {
+            public void onComplete() {
                 view.hideLoading();
             }
 
             @Override
-            public void onError(Throwable e) {
-                Timber.e(e, "Error syncing %s", surveyGroupId);
-                view.hideLoading();
-                view.showErrorSync();
-            }
-
-            @Override
-            public void onNext(SyncResult result) {
-                Timber.d("onNext datapoint sync: synced : %d", result.getNumberOfSyncedItems());
-
+            public void onNext(DownloadResult result) {
                 if (result.getResultCode() == SUCCESS) {
                     if (result.getNumberOfSyncedItems() > 0) {
                         view.showSyncedResults(result.getNumberOfSyncedItems());
+                    } else {
+                        view.showNoDataPointsToSync();
                     }
                 } else {
                     switch (result.getResultCode()) {
-                        case ERROR_SYNC_NOT_ALLOWED_OVER_3G:
-                            view.showErrorSyncNotAllowed();
-                            break;
                         case ERROR_NO_NETWORK:
                             view.showErrorNoNetwork();
                             break;
@@ -162,12 +203,20 @@ public class DataPointsListPresenter implements Presenter {
                     }
                 }
             }
+        }, new ErrorComposable() {
+            @Override
+            public void onError(Throwable e) {
+                Timber.e(e, "Error syncing %s", surveyGroupId);
+                view.hideLoading();
+                view.showErrorSync();
+            }
         }, params);
     }
 
     void onOrderByClick(int order) {
         if (orderBy != order) {
-            if (order == ConstantUtil.ORDER_BY_DISTANCE && (latitude == null || longitude == null)) {
+            if (order == ConstantUtil.ORDER_BY_DISTANCE && (latitude == null
+                    || longitude == null)) {
                 // Warn user that the location is unknown
                 view.showErrorMissingLocation();
                 return;
@@ -186,11 +235,51 @@ public class DataPointsListPresenter implements Presenter {
         view.showOrderByDialog(orderBy);
     }
 
-    public void onNewSurveySelected(SurveyGroup surveyGroup) {
-        getSavedDataPoints.unSubscribe();
-        syncDataPoints.unSubscribe();
+    void onNewSurveySelected(SurveyGroup surveyGroup) {
+        getSavedDataPoints.dispose();
+        downloadDataPoints.dispose();
         view.hideLoading();
         onDataReady(surveyGroup);
         loadDataPoints();
+    }
+
+    private void noSurveySelected() {
+        view.displayData(Collections.EMPTY_LIST);
+        view.showNoSurveySelected();
+    }
+
+    public void onUploadPressed() {
+        if (surveyGroup != null) {
+            view.showLoading();
+            final Map<String, Object> params = new HashMap<>(2);
+            params.put(Constants.KEY_SURVEY_ID, surveyGroup.getId() + "");
+            checkDeviceNotification.execute(new DefaultObserver<List<String>>() {
+                @Override
+                public void onError(Throwable e) {
+                    Timber.e(e);
+                    uploadDataPoints(params);
+                }
+
+                @Override
+                public void onNext(List<String> strings) {
+                    uploadDataPoints(params);
+                }
+            }, params);
+        }
+    }
+
+    private void uploadDataPoints(Map<String, Object> params) {
+        upload.execute(new DefaultObserver<Set<String>>() {
+            @Override
+            public void onError(Throwable e) {
+                view.hideLoading();
+                Timber.e(e);
+            }
+
+            @Override
+            public void onComplete() {
+                view.hideLoading();
+            }
+        }, params);
     }
 }

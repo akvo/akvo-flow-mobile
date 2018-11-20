@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -20,6 +20,10 @@
 
 package org.akvo.flow.data.datasource;
 
+import org.akvo.flow.data.datasource.files.FileDataSource;
+import org.akvo.flow.data.datasource.files.ImageDataSource;
+import org.akvo.flow.data.datasource.files.VideoDataSource;
+import org.akvo.flow.data.datasource.preferences.SecureSharedPreferencesDataSource;
 import org.akvo.flow.data.datasource.apk.NetworkApkDataSource;
 import org.akvo.flow.data.datasource.preferences.SharedPreferencesDataSource;
 
@@ -32,18 +36,25 @@ public class DataSourceFactory {
     private final SharedPreferencesDataSource sharedPreferencesDataSource;
     private final ImageDataSource imageDataSource;
     private final DatabaseDataSource dataBaseDataSource;
-    private final PropertiesDataSource propertiesDataSource;
+    private final FileDataSource fileDataSource;
+    private final SecureSharedPreferencesDataSource secureSharedPreferencesDataSource;
+    private final VideoDataSource videoDataSource;
     private final NetworkApkDataSource networkApkDataSource;
 
     @Inject
     public DataSourceFactory(SharedPreferencesDataSource sharedPreferencesDataSource,
             ImageDataSource imageDataSource, DatabaseDataSource dataBaseDataSource,
-            PropertiesDataSource propertiesDataSource, NetworkApkDataSource networkApkDataSource) {
+            NetworkApkDataSource networkApkDataSource,
+            SecureSharedPreferencesDataSource secureSharedPreferencesDataSource,
+            FileDataSource fileDataSource,
+            VideoDataSource videoDataSource) {
         this.sharedPreferencesDataSource = sharedPreferencesDataSource;
         this.imageDataSource = imageDataSource;
         this.dataBaseDataSource = dataBaseDataSource;
-        this.propertiesDataSource = propertiesDataSource;
         this.networkApkDataSource = networkApkDataSource;
+        this.secureSharedPreferencesDataSource = secureSharedPreferencesDataSource;
+            this.fileDataSource = fileDataSource;
+            this.videoDataSource = videoDataSource;
     }
 
     public NetworkApkDataSource getNetworkDataSource() {
@@ -54,6 +65,10 @@ public class DataSourceFactory {
         return sharedPreferencesDataSource;
     }
 
+    public SecureSharedPreferencesDataSource getSecureSharedPreferencesDataSource() {
+        return secureSharedPreferencesDataSource;
+    }
+
     public ImageDataSource getImageDataSource() {
         return imageDataSource;
     }
@@ -62,7 +77,11 @@ public class DataSourceFactory {
         return dataBaseDataSource;
     }
 
-    public PropertiesDataSource getPropertiesDataSource() {
-        return propertiesDataSource;
+    public FileDataSource getFileDataSource() {
+        return fileDataSource;
+    }
+
+    public VideoDataSource getVideoDataSource() {
+        return videoDataSource;
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -25,7 +25,7 @@ import android.database.Cursor;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import com.squareup.sqlbrite.BriteDatabase;
+import com.squareup.sqlbrite2.BriteDatabase;
 
 import org.akvo.flow.data.entity.ApiDataPoint;
 import org.akvo.flow.data.entity.ApiQuestionAnswer;
@@ -38,13 +38,15 @@ import org.akvo.flow.database.SurveyInstanceStatus;
 import org.akvo.flow.database.SyncTimeColumns;
 import org.akvo.flow.database.TransmissionStatus;
 import org.akvo.flow.database.britedb.BriteSurveyDbAdapter;
+import org.akvo.flow.domain.entity.User;
 
-import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import javax.inject.Inject;
 
-import rx.Observable;
+import io.reactivex.Observable;
+import io.reactivex.functions.Function;
 
 public class DatabaseDataSource {
 
@@ -55,6 +57,14 @@ public class DatabaseDataSource {
         this.briteSurveyDbAdapter = new BriteSurveyDbAdapter(db);
     }
 
+    public Observable<Cursor> getSurveys() {
+        return briteSurveyDbAdapter.getSurveys();
+    }
+
+    public Observable<Boolean> deleteSurvey(long surveyId) {
+        return briteSurveyDbAdapter.deleteSurveyAndGroup(surveyId);
+    }
+
     public Observable<Cursor> getDataPoints(@NonNull Long surveyGroupId, @Nullable Double latitude,
             @Nullable Double longitude, @Nullable Integer orderBy) {
         if (isRequestFiltered(orderBy)) {
@@ -63,29 +73,13 @@ public class DatabaseDataSource {
         } else {
             return briteSurveyDbAdapter.getDataPoints(surveyGroupId);
         }
-
-    }
-
-    private boolean isRequestFiltered(@Nullable Integer orderBy) {
-        return orderBy != null && (orderBy == Constants.ORDER_BY_DISTANCE ||
-                orderBy ==  Constants.ORDER_BY_DATE ||
-                orderBy ==  Constants.ORDER_BY_STATUS ||
-                orderBy ==  Constants.ORDER_BY_NAME);
     }
 
     public Cursor getSyncedTime(long surveyGroupId) {
         return briteSurveyDbAdapter.getSyncTime(surveyGroupId);
     }
 
-    public Observable<List<ApiDataPoint>> syncDataPoints(List<ApiDataPoint> apiDataPoints) {
-        if (apiDataPoints == null) {
-            return Observable.<List<ApiDataPoint>>just(Collections.EMPTY_LIST);
-        }
-        syncDataPointsWithDataBase(apiDataPoints);
-        return Observable.just(apiDataPoints);
-    }
-
-    private void syncDataPointsWithDataBase(@Nullable List<ApiDataPoint> apiDataPoints) {
+    public void syncDataPoints(List<ApiDataPoint> apiDataPoints) {
         if (apiDataPoints == null || apiDataPoints.size() == 0) {
             return;
         }
@@ -111,13 +105,22 @@ public class DatabaseDataSource {
         }
     }
 
+    private boolean isRequestFiltered(@Nullable Integer orderBy) {
+        return orderBy != null && (orderBy == Constants.ORDER_BY_DISTANCE ||
+                orderBy == Constants.ORDER_BY_DATE ||
+                orderBy == Constants.ORDER_BY_STATUS ||
+                orderBy == Constants.ORDER_BY_NAME);
+    }
+
     /**
      * JSON array responses are ordered to have the latest updated datapoint last so
      * we record it to make the next query using it
-     * @param apiDataPoints
+     *
      */
     private void updateLastUpdatedDateTime(@NonNull List<ApiDataPoint> apiDataPoints) {
-        ApiDataPoint apiDataPoint = apiDataPoints.isEmpty()? null : apiDataPoints.get(apiDataPoints.size() - 1);
+        ApiDataPoint apiDataPoint = apiDataPoints.isEmpty() ?
+                null :
+                apiDataPoints.get(apiDataPoints.size() - 1);
         if (apiDataPoint != null) {
             String syncTime = String.valueOf(apiDataPoint.getLastModified());
             setSyncTime(apiDataPoint.getSurveyGroupId(), syncTime);
@@ -151,13 +154,6 @@ public class DatabaseDataSource {
             long id = briteSurveyDbAdapter.syncSurveyInstance(values, surveyInstance.getUuid());
 
             syncResponses(surveyInstance.getQasList(), id);
-
-            // The filename is a unique column in the transmission table, and as we do not have
-            // a file to hold this data, we set the value to the instance UUID
-            briteSurveyDbAdapter
-                    .createTransmission(id, String.valueOf(surveyInstance.getSurveyId()),
-                            surveyInstance.getUuid(),
-                            TransmissionStatus.SYNCED);
         }
         briteSurveyDbAdapter.deleteEmptyRecords();
     }
@@ -189,5 +185,168 @@ public class DatabaseDataSource {
 
             briteSurveyDbAdapter.syncResponse(surveyInstanceId, values, response.getQuestionId());
         }
+    }
+
+    public Observable<Cursor> getUsers() {
+        return briteSurveyDbAdapter.getUsers();
+    }
+
+    public Observable<Cursor> getUser(Long userId) {
+        return Observable.just(briteSurveyDbAdapter.getUser(userId));
+    }
+
+    public Observable<Boolean> editUser(User user) {
+        briteSurveyDbAdapter.updateUser(user.getId(), user.getName());
+        return Observable.just(true);
+    }
+
+    public Observable<Boolean> deleteUser(User user) {
+        briteSurveyDbAdapter.deleteUser(user.getId());
+        return Observable.just(true);
+    }
+
+    public Observable<Long> createUser(String userName) {
+        return Observable.just(briteSurveyDbAdapter.createUser(userName));
+    }
+
+    public Observable<Boolean> clearCollectedData() {
+        briteSurveyDbAdapter.clearCollectedData();
+        return Observable.just(true);
+    }
+
+    public Observable<Boolean> clearAllData() {
+        briteSurveyDbAdapter.clearAllData();
+        return Observable.just(true);
+    }
+
+    public Observable<Boolean> unSyncedTransmissionsExist() {
+        return Observable.just(briteSurveyDbAdapter.unSyncedTransmissionsExist());
+    }
+
+    public Observable<Cursor> getAllTransmissions() {
+        return Observable.just(briteSurveyDbAdapter.getAllTransmissions());
+    }
+
+    public Observable<Cursor> getFormIds(String surveyId) {
+        return Observable.just(briteSurveyDbAdapter.getFormIds(surveyId));
+    }
+
+    public Observable<Boolean> setFileTransmissionFailed(@Nullable List<String> filenames) {
+        if (filenames == null || filenames.isEmpty()) {
+            return Observable.just(true);
+        }
+        for (String filename: filenames) {
+            int rows = briteSurveyDbAdapter
+                    .updateFailedTransmission(filename, TransmissionStatus.FAILED);
+            if (rows == 0) {
+                // Use a dummy "-1" as survey_instance_id, as the database needs that attribute
+                briteSurveyDbAdapter
+                        .createTransmission(-1, null, filename, TransmissionStatus.FAILED);
+            }
+        }
+        return Observable.just(true);
+    }
+
+    public Observable<Boolean> setDeletedForms(@Nullable List<String> deletedFormIds) {
+        if (deletedFormIds != null) {
+            for (String formId: deletedFormIds) {
+               briteSurveyDbAdapter.deleteSurvey(formId);
+            }
+        }
+        return Observable.just(true);
+    }
+
+    public Observable<Cursor> getUnSyncedTransmissions(String formId) {
+        return Observable.just(briteSurveyDbAdapter.getUnSyncedTransmissions(formId));
+    }
+
+    public Observable<Cursor> getUnSyncedTransmissions() {
+        return Observable.just(briteSurveyDbAdapter.getUnSyncedTransmissions());
+    }
+
+    public void setFileTransmissionSucceeded(Long id) {
+        briteSurveyDbAdapter
+                .updateTransmissionStatus(id, TransmissionStatus.SYNCED);
+    }
+
+    public void setFileTransmissionFailed(Long id) {
+        briteSurveyDbAdapter
+                .updateTransmissionStatus(id, TransmissionStatus.FAILED);
+    }
+
+    public void setFileTransmissionFormDeleted(long id) {
+        briteSurveyDbAdapter
+                .updateTransmissionStatus(id, TransmissionStatus.FORM_DELETED);
+    }
+
+    public Observable<Boolean> updateFailedSubmissions(Set<Long> failedSubmissions) {
+        BriteDatabase.Transaction transaction = briteSurveyDbAdapter.beginTransaction();
+        try {
+            for (long submission : failedSubmissions) {
+                briteSurveyDbAdapter
+                        .updateSurveyInstanceStatus(submission, SurveyInstanceStatus.SUBMITTED);
+            }
+            transaction.markSuccessful();
+        } finally {
+            transaction.end();
+        }
+        return Observable.just(true);
+    }
+
+    public Observable<Boolean> updateSuccessfulSubmissions(Set<Long> successfulSubmissions) {
+        BriteDatabase.Transaction transaction = briteSurveyDbAdapter.beginTransaction();
+        try {
+            for (long submission : successfulSubmissions) {
+                briteSurveyDbAdapter
+                        .updateSurveyInstanceStatus(submission, SurveyInstanceStatus.UPLOADED);
+            }
+            transaction.markSuccessful();
+        } finally {
+            transaction.end();
+        }
+        return Observable.just(true);
+    }
+
+    public Observable<Cursor> getSubmittedInstances() {
+        return Observable.just(briteSurveyDbAdapter
+                .getSurveyInstancesByStatus(SurveyInstanceStatus.SUBMITTED));
+    }
+
+    public Observable<Boolean> setInstanceStatusToRequested(long id) {
+        briteSurveyDbAdapter.updateSurveyInstanceStatus(id, SurveyInstanceStatus.SUBMIT_REQUESTED);
+        return Observable.just(true);
+    }
+
+    public Observable<Cursor> getPendingSurveyInstances() {
+        return Observable.just(briteSurveyDbAdapter
+                .getSurveyInstancesByStatus(SurveyInstanceStatus.SUBMIT_REQUESTED));
+    }
+
+    public Observable<Boolean> setInstanceStatusToSubmitted(long id) {
+        briteSurveyDbAdapter.updateSurveyInstanceStatus(id, SurveyInstanceStatus.SUBMITTED);
+        return Observable.just(true);
+    }
+
+    public Observable<Cursor> getResponses(Long surveyInstanceId) {
+        return Observable.just(briteSurveyDbAdapter.getResponses(surveyInstanceId));
+    }
+
+
+    public Observable<List<Boolean>> createTransmissions(final Long instanceId, final String formId,
+            Set<String> filenames) {
+        return Observable.fromIterable(filenames)
+                .concatMap(new Function<String, Observable<Boolean>>() {
+                    @Override
+                    public Observable<Boolean> apply(final String filename) {
+                        return insertTransmission(instanceId, formId, filename);
+                    }
+                })
+                .toList().toObservable();
+    }
+
+    private Observable<Boolean> insertTransmission(Long instanceId, String formId, String filename) {
+        briteSurveyDbAdapter
+                .createTransmission(instanceId, formId, filename, TransmissionStatus.QUEUED);
+        return Observable.just(true);
     }
 }

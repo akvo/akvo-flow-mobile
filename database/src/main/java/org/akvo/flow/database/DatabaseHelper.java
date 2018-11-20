@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2010-2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -20,17 +20,12 @@
 
 package org.akvo.flow.database;
 
-import android.content.ContentValues;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Pair;
 
-import org.akvo.flow.database.migration.MigrationListener;
-import org.akvo.flow.database.migration.ResponseMigrationHelper;
+import org.akvo.flow.database.migration.TransmissionMigrationHelper;
 import org.akvo.flow.database.upgrade.UpgraderFactory;
-
-import java.util.Map;
 
 import timber.log.Timber;
 
@@ -43,27 +38,18 @@ import timber.log.Timber;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "surveydata";
-    public static final int VER_LAUNCH = 78;
-    public static final int VER_FORM_SUBMITTER = 79;
-    public static final int VER_FORM_DEL_CHECK = 80;
-    public static final int VER_FORM_VERSION = 81;
-    public static final int VER_CADDISFLY_QN = 82;
-    public static final int VER_PREFERENCES_MIGRATE = 83;
-    public static final int VER_LANGUAGES_MIGRATE = 84;
     public static final int VER_RESPONSE_ITERATION = 85;
-    static final int DATABASE_VERSION = VER_RESPONSE_ITERATION;
+    public static final int VER_TRANSMISSION_ITERATION = 86;
+    static final int DATABASE_VERSION = VER_TRANSMISSION_ITERATION;
 
     private static SQLiteDatabase database;
     private static final Object LOCK_OBJ = new Object();
     private volatile static int instanceCount = 0;
-    private final MigrationListener migrationListener;
     private final LanguageTable languageTable;
 
-    public DatabaseHelper(Context context, LanguageTable languageTable,
-            MigrationListener migrationListener) {
+    public DatabaseHelper(Context context, LanguageTable languageTable) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
         this.languageTable = languageTable;
-        this.migrationListener = migrationListener;
     }
 
     @Override
@@ -158,34 +144,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         new UpgraderFactory().createUpgrader(oldVersion, this, db).upgrade();
     }
 
-    public void upgradeFromPreferences(SQLiteDatabase db) {
-        languageTable.onCreate(db);
-        migrationListener.migrateLanguages(db);
-        db.execSQL("DROP TABLE IF EXISTS " + Tables.PREFERENCES);
-    }
-
-    public void upgradeFromCaddisfly(SQLiteDatabase db) {
-        migrationListener.migratePreferences(db);
-    }
-
-    public void upgradeFromFormVersion(SQLiteDatabase db) {
-        db.execSQL("ALTER TABLE " + Tables.RESPONSE
-                + " ADD COLUMN " + ResponseColumns.FILENAME + " TEXT");
-    }
-
-    public void upgradeFromFormCheck(SQLiteDatabase db) {
-        db.execSQL("ALTER TABLE " + Tables.SURVEY_INSTANCE
-                + " ADD COLUMN " + SurveyInstanceColumns.VERSION + " REAL");
-    }
-
-    public void upgradeFromFormSubmitter(SQLiteDatabase db) {
-        db.execSQL("ALTER TABLE " + Tables.TRANSMISSION
-                + " ADD COLUMN " + TransmissionColumns.SURVEY_ID + " TEXT");
-    }
-
-    public void upgradeFromLaunch(SQLiteDatabase db) {
-        db.execSQL("ALTER TABLE " + Tables.SURVEY_INSTANCE
-                + " ADD COLUMN " + SurveyInstanceColumns.SUBMITTER + " TEXT");
+    public void upgradeFromResponses(SQLiteDatabase db) {
+        TransmissionMigrationHelper helper = new TransmissionMigrationHelper();
+        helper.migrateTransmissions(db);
     }
 
     /**
@@ -196,16 +157,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     @Override
     public SQLiteDatabase getReadableDatabase() {
         return getWritableDatabase();
-    }
-
-
-    public void upgradeFromLanguages(SQLiteDatabase db) {
-        db.execSQL("ALTER TABLE " + Tables.RESPONSE
-                + " ADD COLUMN " + ResponseColumns.ITERATION + " INTEGER NOT NULL DEFAULT 0");
-        ResponseMigrationHelper responseMigrationHelper = new ResponseMigrationHelper();
-        Map<Pair<String, String>, ContentValues> responseMigrationData = responseMigrationHelper
-                .obtainResponseMigrationData(db);
-        responseMigrationHelper.migrateResponses(responseMigrationData, db);
     }
 
     @Override
@@ -250,17 +201,5 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 + "(" + SurveyInstanceColumns.STATUS + ")");
         db.execSQL("CREATE INDEX response_modified_idx ON " + Tables.SURVEY_INSTANCE
                 + "(" + SurveyInstanceColumns.SUBMITTED_DATE + ")");
-    }
-
-    public void dropAllTables(SQLiteDatabase db) {
-        db.execSQL("DROP TABLE IF EXISTS " + Tables.RESPONSE);
-        db.execSQL("DROP TABLE IF EXISTS " + Tables.SYNC_TIME);
-        db.execSQL("DROP TABLE IF EXISTS " + Tables.SURVEY);
-        db.execSQL("DROP TABLE IF EXISTS " + Tables.PREFERENCES);
-        db.execSQL("DROP TABLE IF EXISTS " + Tables.USER);
-        db.execSQL("DROP TABLE IF EXISTS " + Tables.SURVEY_GROUP);
-        db.execSQL("DROP TABLE IF EXISTS " + Tables.SURVEY_INSTANCE);
-        db.execSQL("DROP TABLE IF EXISTS " + Tables.RECORD);
-        db.execSQL("DROP TABLE IF EXISTS " + Tables.TRANSMISSION);
     }
 }

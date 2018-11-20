@@ -1,39 +1,51 @@
 apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion "25.0.1"
+    compileSdkVersion rootProject.ext.compileSdkVersion
 
     defaultConfig {
-        minSdkVersion 10
-        targetSdkVersion 21
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
         versionName "1.0"
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-
     }
+
+    packagingOptions {
+        exclude 'META-INF/DEPENDENCIES'
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/license.txt'
+        exclude 'META-INF/NOTICE'
+        exclude 'META-INF/NOTICE.txt'
+        exclude 'META-INF/notice.txt'
+        exclude 'META-INF/ASL2.0'
+        exclude '.readme'
+    }
+
     buildTypes {
         release {
             minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
     lintOptions {
         abortOnError false
+        ignore 'InvalidPackage'
     }
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.jakewharton.timber:timber:4.3.1'
-    compile 'com.android.support:support-annotations:25.0.1'
-    compile 'com.squareup.sqlbrite:sqlbrite:1.1.1'
+    implementation "com.jakewharton.timber:timber:${rootProject.ext.timberVersion}"
+    implementation "com.squareup.sqlbrite2:sqlbrite:${rootProject.ext.sqlbriteVersion}"
+    implementation "io.reactivex.rxjava2:rxandroid:${rootProject.ext.rxAndroidVersion}"
+    implementation "io.reactivex.rxjava2:rxjava:${rootProject.ext.rxJavaVersion}"
 
-    testCompile 'junit:junit:4.12'
-    testCompile 'org.mockito:mockito-core:1.10.19'
-    testCompile 'org.powermock:powermock-module-junit4:1.6.2'
-    testCompile 'org.powermock:powermock-module-junit4-rule:1.6.2'
-    testCompile 'org.powermock:powermock-api-mockito:1.6.2'
-    testCompile 'org.powermock:powermock-classloading-xstream:1.6.2'
+    testImplementation "junit:junit:${rootProject.ext.jUnitVersion}"
+    testImplementation "org.mockito:mockito-core:${rootProject.ext.mockitoCoreVersion}"
+    testImplementation "org.powermock:powermock-module-junit4:${rootProject.ext.powerMockVersion}"
+    testImplementation "org.powermock:powermock-module-junit4-rule:${rootProject.ext.powerMockVersion}"
+    testImplementation "org.powermock:powermock-api-mockito:${rootProject.ext.powerMockVersion}"
+    testImplementation "org.powermock:powermock-classloading-xstream:${rootProject.ext.powerMockVersion}"
 }

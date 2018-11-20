@@ -1,5 +1,332 @@
 Akvo FLOW app release notes
 ===========================
+# ver 2.6.3
+Date: 13 November 2018
+
+# New and noteworthy
+* **Setting about mobile data usage** - [#1220](https://github.com/akvo/akvo-flow-mobile/issues/1220) Mobile data setting now only used for uploading data.
+* **Update url under Terms of service** - [#1238](https://github.com/akvo/akvo-flow-mobile/issues/1238) Using the correct url for terms.
+* **Remove settings migration** - [#1243](https://github.com/akvo/akvo-flow-mobile/issues/1243) Removed old migration, no longer necessary.
+* **Send instance name to caddisfly** - [#1248](https://github.com/akvo/akvo-flow-mobile/issues/1248) Sending instance name to Caddisfly for statistics.
+* **Fix debug multidex on old devices** - [#1254](https://github.com/akvo/akvo-flow-mobile/issues/1254) Debug builds can now be run on older devices too.
+
+# Resolved issues
+* **Removing an answer to an option question allows to submit even if mandatory** - [#1247](https://github.com/akvo/akvo-flow-mobile/issues/1247) Fixed issue where after deleting a mandatory question answer, it did not show as missing.
+
+---------------
+# ver 2.6.2
+Date: 09 October 2018
+
+# New and noteworthy
+* **Extract library versions to root build.gradle file** - [#845](https://github.com/akvo/akvo-flow-mobile/issues/845) Libraries versions are now all in the same file.
+* **Auto Save for geoshapes** - [#1199](https://github.com/akvo/akvo-flow-mobile/issues/1199) When pressing back button, the non-empty geoshape will be automatically saved.
+* **Update gms and maps libraries** - [#1222](https://github.com/akvo/akvo-flow-mobile/issues/1222) Update some libraries in order to support use of Mapbox maps.
+
+# Resolved issues
+* **Empty geoshapes allowed** - [#745](https://github.com/akvo/akvo-flow-mobile/issues/745) Disable saving empty geoshapes.
+* **Empty username and deviceId allowed** - [#1211](https://github.com/akvo/akvo-flow-mobile/issues/1211) Prevent possibility of empty user name and device ID when logging in.
+* **Option questions need more spacing** - [#1225](https://github.com/akvo/akvo-flow-mobile/issues/1225) Increase spacing between options.
+* **TimeCheckActivity crashes** - [#1229](https://github.com/akvo/akvo-flow-mobile/issues/1229) Fixed crash when showing dialog informing about a mis-configured time on the device.
+* **Code cleanup** - [#928](https://github.com/akvo/akvo-flow-mobile/issues/928) Remove unused video and image help types. 
+
+---------------
+# ver 2.6.1
+Date: 13 September 2018
+
+# New and noteworthy
+* **Form layout redesign** - [#1103](https://github.com/akvo/akvo-flow-mobile/issues/1103) Improvement to form layout with cleaner and simplified design using material theme.
+
+---------------
+# ver 2.6.0.1
+Date: 23 August 2018
+
+# Resolved issues
+* **App version.properties got converted to CRLF** - [#1191](https://github.com/akvo/akvo-flow-mobile/issues/1191) Fix the version.properties file.
+
+---------------
+# ver 2.6.0
+Date: 22 August 2018
+
+# New and noteworthy
+* **Update sentry** - [#1083](https://github.com/akvo/akvo-flow-mobile/issues/1083) Update the crash reporting library.
+* **Send form version inside data.json** - [#1133](https://github.com/akvo/akvo-flow-mobile/issues/1133) Each submission will now have the form version included.
+* **Refactor data export and sync** - [#1152](https://github.com/akvo/akvo-flow-mobile/issues/1152) Data export logic has been improved.
+* **Datapoint submission should generate data zip file** - [#1090](https://github.com/akvo/akvo-flow-mobile/issues/1090) Zip file is now generated right after the form is submitted.
+* **Upload datapoints from one survey** - [#1138](https://github.com/akvo/akvo-flow-mobile/issues/1138) Add an entry to the menu to be able to upload datapoints from the datapoints list or map.
+* **Take photo/video or select an existing one from your gallery** - [#1136](https://github.com/akvo/akvo-flow-mobile/issues/1136) Photo and video questions now accept media files from the device library.
+* **Update leak canary** - [#1171](https://github.com/akvo/akvo-flow-mobile/issues/1171) Update the memory leaks tracking library.
+
+# Resolved issues
+* **Form viewing cascades** - [#979](https://github.com/akvo/akvo-flow-mobile/issues/979) Improve the cascades question view.
+* **Remove geocode** - [#990](https://github.com/akvo/akvo-flow-mobile/issues/990) Remove unnecessary field.
+* **Date UI confusing** - [#1074](https://github.com/akvo/akvo-flow-mobile/issues/1074) Improve the date question view.
+* **Location validation does not prevent submitting** - [#1101](https://github.com/akvo/akvo-flow-mobile/issues/1101) An invalid location can no longer be submitted.
+* **Non monitoring forms cannot be uploaded** - [#1184](https://github.com/akvo/akvo-flow-mobile/issues/1184) Uploading is enabled for both monitoring or non monitoring surveys.
+* **Small issue with beta deploys** - [#1187](https://github.com/akvo/akvo-flow-mobile/issues/1187) Fixed the 'fetch first' error when deploying betas with fastlane.
+
+---------------
+# ver 2.5.2
+Date: 06 August 2018
+
+# New and noteworthy
+* **CI deploy for all instances** - [#1125](https://github.com/akvo/akvo-flow-mobile/issues/1125) We can now deploy using Travis CI.
+
+# Resolved issues
+* **Caddisfly images folder issue** - [#1129](https://github.com/akvo/akvo-flow-mobile/issues/1129) An unexpected old caddisfly images folder was preventing the copying and removal of media files.
+* **Videos taken with the flow app are "added" to library** - [#1145](https://github.com/akvo/akvo-flow-mobile/issues/1145) Video files taken for the Flow app are no longer added to the device public library.
+* **Caddisfly images are lost with recent version of the app** - [#1160](https://github.com/akvo/akvo-flow-mobile/issues/1160) Caddisfly images are now uploaded correctly.
+
+---------------
+# ver 2.5.1.1
+Date: 10 July 2018
+
+# Resolved issues
+* **Data processing request includes the entire file path** - [#1147](https://github.com/akvo/akvo-flow-mobile/issues/1147) Fix for newly submitted data points to be processed correctly.
+* **Remove unused method for old gps app** - [#1143](https://github.com/akvo/akvo-flow-mobile/issues/1143) Remove an unused method.
+
+---------------
+# ver 2.5.1
+Date: 05 July 2018
+
+# New and noteworthy
+* **CI deployment of release branch on uat1 for testing** - [#976](https://github.com/akvo/akvo-flow-mobile/issues/976) Now all commits to release trigger beta builds.
+
+# Resolved issues
+* **Transmission keeps absolute path to files** - [#1084](https://github.com/akvo/akvo-flow-mobile/issues/1084) Fixed issue where files were not found due to full path kept in database transmission table.
+* **Syncing in data points** - [#1116](https://github.com/akvo/akvo-flow-mobile/issues/1116) Getting existing datapoints is now called "Download".
+* **Media files in saved forms** - [#1130](https://github.com/akvo/akvo-flow-mobile/issues/1130) Fixed saved submission images were lost if updated to 2.5.0 before submitting.
+* **Remove transmission item for synced in datapoints** - [#1132](https://github.com/akvo/akvo-flow-mobile/issues/1132) Removed display of confusing UUID which did not correspond to an actual file.
+
+---------------
+# ver 2.5.0
+Date: 4 June 2018
+
+# New and noteworthy
+* **Secure collected data and images** - [#977](https://github.com/akvo/akvo-flow-mobile/issues/977) Collected data and media files are now stored in the app private storage.
+* **Add walkthrough for data storage privacy changes** - [#984](https://github.com/akvo/akvo-flow-mobile/issues/984) Added an introduction to explain the changes made to the storage of collected data and images.
+* **Exported data has to be saved to private app storage.** - [#991](https://github.com/akvo/akvo-flow-mobile/issues/991) Zip files are now generated in the application's private folder.
+* **Create a service to make existing public data private (move data from public to private storage)** - [#992](https://github.com/akvo/akvo-flow-mobile/issues/992) Old collected data was moved from public to private storage.
+* **Settings to temporary publish data - UI** - [#993](https://github.com/akvo/akvo-flow-mobile/issues/993) Added a section to the app settings to allow temporarily publishing collected data and media for manually upload to the dashboard.
+* **Media needs to be saved in private app storage** - [#1009](https://github.com/akvo/akvo-flow-mobile/issues/1009) Videos and images are now saved to private app storage.
+* **Settings to temporary publish data - Logic** - [#1038](https://github.com/akvo/akvo-flow-mobile/issues/1038) Added the logic to allow publishing of private files for manual data upload to the dashboard.
+* **Published files when device reboots** - [#1044](https://github.com/akvo/akvo-flow-mobile/issues/1044) When device reboots, make sure the timeout for published files is not lost.
+* **Service to remove public data files** - [#1046](https://github.com/akvo/akvo-flow-mobile/issues/1046) Once time runs out, published files are removed.
+* **Show loading while data is being published** - [#1048](https://github.com/akvo/akvo-flow-mobile/issues/1048) Display a "loading" widget while the files are being published.
+* **Delete collected data and published files** - [#1049](https://github.com/akvo/akvo-flow-mobile/issues/1049) When deleting collected data or deleting everything in settings, we also delete the published data.
+* **Update the ui with the latest progress** - [#1050](https://github.com/akvo/akvo-flow-mobile/issues/1050) Display the remaining minutes left until the files are automatically unpublished.
+* **Secure data and images: filter out "saved" images when publishing** - [#1052](https://github.com/akvo/akvo-flow-mobile/issues/1052) Images from "saved" submissions will not be published.
+* **Exported files folder** - [#1053](https://github.com/akvo/akvo-flow-mobile/issues/1053) Published files will be located in the app public folder, different from where the original public files were located.
+* **Logic for deleting files and data** - [#1058](https://github.com/akvo/akvo-flow-mobile/issues/1058) Added the logic for deleting the published media and collected data.
+* **Increase minSdkVersion to 15** - [#1071](https://github.com/akvo/akvo-flow-mobile/issues/1071) The minimum supported version is now API level 15 or Ice Cream Sandwich (4.0.3)
+* **Move published files to app public storage** - [#1080](https://github.com/akvo/akvo-flow-mobile/issues/1080) The published files are now located in the public folder /Android/data/org.akvo.flow/files/. 
+* **Update translations** - [#1119](https://github.com/akvo/akvo-flow-mobile/issues/1119) Translations for French, Portuguese and Spanish have been updated.
+
+# Resolved issues
+* **Fix video viewing** - [#1015](https://github.com/akvo/akvo-flow-mobile/issues/1015) Video viewing has been fixed after moving media files to private storage.
+* **Errors when publishing private data** - [#1040](https://github.com/akvo/akvo-flow-mobile/issues/1040) The expected error messages will be displayed when an error occurs during the data publishing.
+* **Videos can no longer be opened on devices with Android 8** - [#1042](https://github.com/akvo/akvo-flow-mobile/issues/1042) Fixed the issue with video files on Android 8.0 devices.
+* **Improve user handing in FlowApp** - [#1056](https://github.com/akvo/akvo-flow-mobile/issues/1056) The handling of current user has been improved and cleaned.
+* **Cleanup SurveyDbAdapter and SurveyDbDataSource** - [#1059](https://github.com/akvo/akvo-flow-mobile/issues/1059) Some unused methods have been removed.
+* **Publish data not available when minute 0 is still running** - [#1106](https://github.com/akvo/akvo-flow-mobile/issues/1106) The remaining time is shown correctly until time runs out and data can be published again.
+* **Download form with ID and Redownload all switched** - [#1108](https://github.com/akvo/akvo-flow-mobile/issues/1108) Fixed the issue where both settings had been switched.
+* **Replace image loading library** - [#1114](https://github.com/akvo/akvo-flow-mobile/issues/1114) Using the glide image loading library which will reduce the number of OOM Exceptions.
+* **Remove unused resources** - [#1120](https://github.com/akvo/akvo-flow-mobile/issues/1120) Removed some unused resources from the app.
+
+---------------
+# ver 2.4.8
+Date: 24 April 2018
+
+# New and noteworthy
+* **Old devices and apk updates** - [#1093](https://github.com/akvo/akvo-flow-mobile/issues/1093) Display a dialog for old devices that we will soon stop supporting.
+* **Save BuildConfig settings for the dashboard** - [#1092](https://github.com/akvo/akvo-flow-mobile/issues/1092) Save settings for basic dashboard configuration.
+* **Add android build version code to deviceapprest call** - [#1091](https://github.com/akvo/akvo-flow-mobile/issues/1091) Sending android build version to the backend.
+* **Add dexcount plugin** - [#1082](https://github.com/akvo/akvo-flow-mobile/issues/1082) Checking dex file size when building the app.
+
+# Resolved issues
+* **Inconsistent datapoint states** - [#618](https://github.com/akvo/akvo-flow-mobile/issues/618) Datapoint states are now easier to understand.
+* **Confusing dialog after survey submission** - [#617](https://github.com/akvo/akvo-flow-mobile/issues/617) Removed the dialog which was shown after pressing submit.
+
+---------------
+# ver 2.4.7
+Date: 03 April 2018
+
+# New and noteworthy
+* **Add Pijin and Tok Pisin to languages list** - [#1062](https://github.com/akvo/akvo-flow-mobile/issues/1062) These 2 new languages can now be used in the app.
+
+---------------
+# ver 2.4.6
+Date: 08 March 2018
+
+# New and noteworthy
+* **Split MediaQuestionView into Video and Image** - [#1000](https://github.com/akvo/akvo-flow-mobile/issues/1000) Separated video and photo question types in 2 different views.
+* **Remove SurveySyncBroadcastReceiver** - [#898](https://github.com/akvo/akvo-flow-mobile/issues/898) After the navigation drawer refactor, this class could be removed.
+* **Create user dialog layout** - [#817](https://github.com/akvo/akvo-flow-mobile/issues/817) New layout for creating users.
+* **Create user behaviour** - [#816](https://github.com/akvo/akvo-flow-mobile/issues/816) Improved the logic behind user creation.
+* **Edit user dialog layout** - [#815](https://github.com/akvo/akvo-flow-mobile/issues/815) New layout for editing users.
+* **Rules around deleting a user** - [#814](https://github.com/akvo/akvo-flow-mobile/issues/814) Improved logic for deleting users.
+* **Navigation drawer layout - add divider** - [#809](https://github.com/akvo/akvo-flow-mobile/issues/809) Added divider between the 2 navigation drawer sections.
+* **Navigation drawer refactor** - [#808](https://github.com/akvo/akvo-flow-mobile/issues/808) The navigation drawer logic and layout has been refactored for a cleaner logic and an improved layout.
+* **Improve survey deletion dialog** - [#705](https://github.com/akvo/akvo-flow-mobile/issues/705) Improved logic and layout of survey deletion dialog.
+* **New users layout** - [#670](https://github.com/akvo/akvo-flow-mobile/issues/670) The user header of the navigation drawer layout has been improved.
+
+# Resolved issues
+* **Selecting surveys and users is hard** - [#1031](https://github.com/akvo/akvo-flow-mobile/issues/1031) Increased the clickable area of the survey and user items for easier clicking.
+* **MapFragment centerMap method needs improvement** - [#1028](https://github.com/akvo/akvo-flow-mobile/issues/1028) Refactored a method in map fragment.
+* **When first logging in the menu is not displayed correctly** - [#1027](https://github.com/akvo/akvo-flow-mobile/issues/1027) Fixed the menu not being displayed correctly after the first login.
+* **When Caddislfy result is empty or a String the app crashes with JsonSyntaxException** - [#1024](https://github.com/akvo/akvo-flow-mobile/issues/1024) Fixed a crash related to an unexpected caddisfly answer.
+* **Unable to start gcm Task due to null intent** - [#1021](https://github.com/akvo/akvo-flow-mobile/issues/1021) Fixed crash related to Gcm Tasks.
+* **Improve image resizing to mitigate OOM** - [#1005](https://github.com/akvo/akvo-flow-mobile/issues/1005) Improved the image resizing logic after a picture is taken.
+* **Sync data receiver is not secure** - [#996](https://github.com/akvo/akvo-flow-mobile/issues/996) Secured data sync receiver.
+* **Full photo not shown in full screen** - [#989](https://github.com/akvo/akvo-flow-mobile/issues/989) Fixed the full size photo display.
+* **After deleting everything and logging back in, the old survey is still selected** - [#912](https://github.com/akvo/akvo-flow-mobile/issues/912) After deleting everything, the views are now reset.
+
+---------------
+# ver 2.4.5
+Date: 15 February 2018
+
+# New and noteworthy
+* **Pull latest strings for the app** - [#1013](https://github.com/akvo/akvo-flow-mobile/issues/1013) Updated strings for French, Spanish and Portuguese.
+* **App settings changes** - [#994](https://github.com/akvo/akvo-flow-mobile/issues/994) Made the settings title and section more consistent.
+* **Flow app UI testing** - [#930](https://github.com/akvo/akvo-flow-mobile/issues/930) Added Flow ui app testing for the forms section.
+* **Add leak canary library to debug builds** - [#850](https://github.com/akvo/akvo-flow-mobile/issues/850) Added new tool to track memory leaks in debug builds.
+
+# Resolved issues
+* **Remove ScoringRule** - [#975](https://github.com/akvo/akvo-flow-mobile/issues/975) Removed unused class.
+* **Move signature temp files to internal storage** - [#970](https://github.com/akvo/akvo-flow-mobile/issues/970) Signature image files now secure in app private storage.
+
+---------------
+# ver 2.4.4
+Date: 25 January 2018
+
+# New and noteworthy
+* **Pull latest strings for the app** - [#985](https://github.com/akvo/akvo-flow-mobile/issues/985) Translations for some languages have been updated.
+* **Confirm overwriting geolocation data** - [#981](https://github.com/akvo/akvo-flow-mobile/issues/981) Before overwriting existing gps data we will request user confirmation to prevent accidental deletions of location.
+* **Update copyright to 2018** - [#980](https://github.com/akvo/akvo-flow-mobile/issues/980) Copyright year has been updated to use current year generated at build time.
+* **View filled survey responses improvements** - [#949](https://github.com/akvo/akvo-flow-mobile/issues/949) Removed unnecessary buttons from read-only response viewing screen.
+
+# Resolved issues
+* **If Image or Video taking fails nothing is displayed** - [#972](https://github.com/akvo/akvo-flow-mobile/issues/972) Show an error message when image or video acquisition fails.
+* **Use app dedicated public storage for apk files** - [#968](https://github.com/akvo/akvo-flow-mobile/issues/968) APK files are now stored in app dedicated public storage.
+* **Form files seem to have been deleted from the device** - [#959](https://github.com/akvo/akvo-flow-mobile/issues/959) Form files are now stored inside app private storage (not accessible to other apps).
+* **Video file not found on sony experia** - [#612](https://github.com/akvo/akvo-flow-mobile/issues/612) Fixed error when on sometimes the video URI was not correct.
+
+---------------
+# ver 2.4.3
+Date: 14 December 2017
+
+# New and noteworthy
+* **login screen tests** - [#936](https://github.com/akvo/akvo-flow-mobile/issues/936) Added tests to the login screen.
+* **Improve copy for new update message** - [#903](https://github.com/akvo/akvo-flow-mobile/issues/903) The message inviting to update the app is now shorter and clearer.
+* **Update Sentry Android SDK** - [#789](https://github.com/akvo/akvo-flow-mobile/issues/789) Using the new sentry library to send error logs.
+
+# Resolved issues
+* **Improve upload-apk module** - [#946](https://github.com/akvo/akvo-flow-mobile/issues/946) The upload-sdk module has been improved.
+
+---------------
+# ver 2.4.2.1
+Date: 06 December 2017
+
+# Resolved issues
+* **Revert reload all surveys setting** - [#953](https://github.com/akvo/akvo-flow-mobile/issues/953) The reload all surveys setting has been reverted to previous state which will allow the user to recover from missing forms error by force reloading all the forms.
+
+---------------
+# ver 2.4.2
+Date: 23 November 2017
+
+# New and noteworthy
+* **Inform the user when there are no data points to sync in** - [#922](https://github.com/akvo/akvo-flow-mobile/issues/922) A SnackBar message is now displayed when there are no datapoints to sync.
+* **Build config changes for android studio 3.0 update** - [#913](https://github.com/akvo/akvo-flow-mobile/issues/913) Updated build scripts for faster builds.
+* **Add tests for response viewing** - [#907](https://github.com/akvo/akvo-flow-mobile/issues/907) Viewing responses is now covered by unit tests.
+* **Survey bootstrap should be triggered automatically if possible** - [#635](https://github.com/akvo/akvo-flow-mobile/issues/635) When new surveys are pasted in the inbox folder, the bootstrap processing starts automatically without the user having to restart the app.
+
+# Resolved issues
+* **Fix build scripts after gradle update** - [#932](https://github.com/akvo/akvo-flow-mobile/issues/932) Some fixes were required after android studio update.
+* **Reload all forms (phase 1)** - [#923](https://github.com/akvo/akvo-flow-mobile/issues/923) The option 'Reload all forms', inside 'Settings', now works the same way as restarting the app and no longer requires a code.
+* **Script app/sh/install.sh** - [#811](https://github.com/akvo/akvo-flow-mobile/issues/811) Removed unused file.
+
+---------------
+# ver 2.4.1
+Date: 02 November 2017
+
+# New and noteworthy
+* **View image in full screen** - [#833](https://github.com/akvo/akvo-flow-mobile/issues/833) Images from image questions can now be viewed in full screen.
+* **Simplify delete dialogues in geoshape editor** - [#787](https://github.com/akvo/akvo-flow-mobile/issues/787) Geoshapes delete dialog messages have been simplified.
+* **Search - no results found** - [#752](https://github.com/akvo/akvo-flow-mobile/issues/752) The whole search data points interface has been redesigned.
+* **What to do when GPS Status is not installed** - [#517](https://github.com/akvo/akvo-flow-mobile/issues/517) If the GPS Status app is not installed, the user will be offered the possibility to install it.
+
+# Resolved issues
+* **Translations for 2.4.1** - [#909](https://github.com/akvo/akvo-flow-mobile/issues/909) Spanish and Portuguese translations have been updated.
+* **Pre-fill not working** - [#904](https://github.com/akvo/akvo-flow-mobile/issues/904) The pre-fill option issue has been fixed.
+* **Wrong exception throwing when assignment missing** - [#895](https://github.com/akvo/akvo-flow-mobile/issues/895) When the assignment is missing, the user will see a specific error message.
+* **App flickering on certain devices** - [#847](https://github.com/akvo/akvo-flow-mobile/issues/847) The issue of the application starting to flicker on some devices has been fixed.
+* **Imported data shows "null" for submitter** - [#620](https://github.com/akvo/akvo-flow-mobile/issues/620) The data imported via the importer, will now display IMPORTER as username.
+
+---------------
+# ver 2.4.0.2
+Date: 18 October 2017
+
+# Resolved issues
+* **Missing datapoint history** - [#899](https://github.com/akvo/akvo-flow-mobile/issues/899) Fixed answers missing in point history.
+* **Unable to delete saved answers (crash)** - [#893](https://github.com/akvo/akvo-flow-mobile/issues/893) Fixed a crash when deleting saved entry in history tab.
+
+---------------
+# ver 2.4.0.1
+Date: 16 October 2017
+
+# New and noteworthy
+* **Update French translations** - [#885](https://github.com/akvo/akvo-flow-mobile/issues/885) Updated French translations.
+* **Improve the way dashboard configuration is stored/used** - [#848](https://github.com/akvo/akvo-flow-mobile/issues/848) Avoid constantly reading config file for any immutable dashboard configuration.
+* **Improve UI for syncing in data points - progress spinner** - [#822](https://github.com/akvo/akvo-flow-mobile/issues/822) Progress bar showing data points are being loaded has an improved design.
+* **Display user friendly dashboard url in Settings** - [#804](https://github.com/akvo/akvo-flow-mobile/issues/804) The url displayed now includes the dashboard name.
+* **Simplify Check SD Card State** - [#803](https://github.com/akvo/akvo-flow-mobile/issues/803) Simplified the way remaining memory space is displayed.
+* **Reorganize the settings screen in a logical way** - [#501](https://github.com/akvo/akvo-flow-mobile/issues/501) The settings screen has been redesigned.
+
+# Resolved issues
+* **Unable to install app 2.4.0.1 on old devices** - [#882](https://github.com/akvo/akvo-flow-mobile/issues/882) Fixed the issue where the application could not be installed on devices with android 2.3.x.
+* **Data point History shows no answers** - [#873](https://github.com/akvo/akvo-flow-mobile/issues/873) Fixed some answers were missing from the data point history.
+* **Toolbar back navigation is slow to respond on some older devices** - [#863](https://github.com/akvo/akvo-flow-mobile/issues/863) Fixed toolbar touches slow to respond on devices with android 2.3.x.
+* **When deleting collected data selected survey still displays datapoints on map** - [#846](https://github.com/akvo/akvo-flow-mobile/issues/846) Fixed map not updated after all collected data was deleted.
+* **More than 1000 datapoints crashes with OOME** - [#844](https://github.com/akvo/akvo-flow-mobile/issues/844) Optimized data point syncing performance to avoid crashes.
+* **Endless syncing in data points for large survey forms** - [#843](https://github.com/akvo/akvo-flow-mobile/issues/843) Fixed issue where data point sync never stopped.
+* **Datapoints from wrong survey are sometimes displayed** - [#841](https://github.com/akvo/akvo-flow-mobile/issues/841) Fixed data points from wrong survey displayed after another survey was selected.
+* **After deleting everything, users and surveys, the previous survey title still shows** - [#790](https://github.com/akvo/akvo-flow-mobile/issues/790) After deleting everything, the user is now taken to the login screen.
+
+---------------
+# ver 2.3.7.1
+Date: 06 September 2017
+
+# Resolved issues
+* **For only monitoring assignments, cannot submit a form if no previous monitoring ones submitted** - [#855](https://github.com/akvo/akvo-flow-mobile/issues/855) Once the registration form has been submitted, you can create monitoring forms even if the registration form has not been assigned to your device.
+
+---------------
+# ver 2.3.7
+Date: 31 August 2017
+
+# New and noteworthy
+* **Add Dutch as a new language for the app** - [#812](https://github.com/akvo/akvo-flow-mobile/issues/812) From now on, the app is also available in Dutch.
+* **Add help section** - [#798](https://github.com/akvo/akvo-flow-mobile/issues/798) Direct access to the support website from the navigation drawer.
+* **Basic survey question test** - [#613](https://github.com/akvo/akvo-flow-mobile/issues/613) Basic question type surveys are now tested.
+
+# Resolved issues
+* **Portrait photo shown in app UI as landscape** - [#832](https://github.com/akvo/akvo-flow-mobile/issues/832) Photos are now displayed correctly for both portrait and landscape images.
+
+---------------
+# ver 2.4.0 (Pre-release)
+Date: 10 August 2017
+
+# New and noteworthy
+* **Add help section** - [#798](https://github.com/akvo/akvo-flow-mobile/issues/798) Direct access to the support website from the navigation drawer.
+* **New screen for empty surveys** - [#621](https://github.com/akvo/akvo-flow-mobile/issues/621) The datapoints list empty screen has been redesigned.
+* **Improve datapoint sync layout** - [#583](https://github.com/akvo/akvo-flow-mobile/issues/583) The datapoint display and sync layout has been redesigned.
+
+# Resolved issues
+* **Viewing single data point on map UI** - [#821](https://github.com/akvo/akvo-flow-mobile/issues/821) Fixed issue when datapoint map had no toolbar.
+* **When adding new datapoints they do not show on the map** - [#728](https://github.com/akvo/akvo-flow-mobile/issues/728) When adding a new datapoint, it will be displayed on the map correctly.
+* **Repeated groups delete button can delete the questions of the whole group** - [#651](https://github.com/akvo/akvo-flow-mobile/issues/651) Deleting the last iteration of a repeated group no longer deletes all the group questions.
+* **DatabaseHelper upgrade method** - [#646](https://github.com/akvo/akvo-flow-mobile/issues/646) Improved the code of the database helper upgrade method.
+* **Answers in repeated groups not shown in point History** - [#600](https://github.com/akvo/akvo-flow-mobile/issues/600) All the answers are now displayed correctly.
+
+---------------
 # ver 2.3.6
 Date: 20 July 2017
 

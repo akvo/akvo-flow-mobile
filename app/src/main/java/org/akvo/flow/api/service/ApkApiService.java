@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2018 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -19,6 +19,7 @@
 
 package org.akvo.flow.api.service;
 
+import android.os.Build;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
@@ -33,15 +34,15 @@ import javax.inject.Inject;
 public class ApkApiService {
 
     private static final String APK_VERSION_SERVICE_PATH =
-        "/deviceapprest?action=getLatestVersion&deviceType=androidPhone&appCode=flowapp";
+            "/deviceapprest?action=getLatestVersion&deviceType=androidPhone&appCode=flowapp&androidBuildVersion=";
 
     @Inject
     public ApkApiService() {
     }
 
     @Nullable
-    public JSONObject getApkDataObject(String serverBase) throws IOException, JSONException {
-        final String url = serverBase + APK_VERSION_SERVICE_PATH;
+    public JSONObject getApkDataObject(String baseUrl) throws IOException, JSONException {
+        final String url = baseUrl + APK_VERSION_SERVICE_PATH + Build.VERSION.SDK_INT;
         String response = HttpUtil.httpGet(url);
         if (!TextUtils.isEmpty(response)) {
             return new JSONObject(response);

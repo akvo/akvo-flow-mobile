@@ -20,15 +20,24 @@
 
 package org.akvo.flow.domain.interactor;
 
+import android.text.TextUtils;
+
+import org.akvo.flow.domain.entity.DataPoint;
 import org.akvo.flow.domain.executor.PostExecutionThread;
 import org.akvo.flow.domain.executor.ThreadExecutor;
 import org.akvo.flow.domain.repository.SurveyRepository;
 
+import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
 
-import rx.Observable;
+import io.reactivex.Observable;
+import io.reactivex.ObservableSource;
+import io.reactivex.annotations.NonNull;
+import io.reactivex.annotations.Nullable;
+import io.reactivex.functions.Function;
+import io.reactivex.functions.Predicate;
 
 public class GetSavedDataPoints extends UseCase {
 
@@ -36,6 +45,7 @@ public class GetSavedDataPoints extends UseCase {
     public static final String KEY_LATITUDE = "latitude";
     public static final String KEY_LONGITUDE = "longitude";
     public static final String KEY_ORDER_BY = "order_by";
+    public static final String KEY_FILTER = "filter";
 
     private final SurveyRepository surveyRepository;
 
@@ -55,6 +65,49 @@ public class GetSavedDataPoints extends UseCase {
         Double latitude = (Double) parameters.get(KEY_LATITUDE);
         Double longitude = (Double) parameters.get(KEY_LONGITUDE);
         Integer orderBy = (Integer) parameters.get(KEY_ORDER_BY);
-        return surveyRepository.getDataPoints(surveyGroupId, latitude, longitude, orderBy);
+        final String filter = (String) parameters.get(KEY_FILTER);
+        if (TextUtils.isEmpty(filter)) {
+            return surveyRepository.getDataPoints(surveyGroupId, latitude, longitude, orderBy);
+        } else {
+            return getFilteredDataPoints(surveyGroupId, latitude, longitude, orderBy, filter);
+        }
+    }
+
+    private Observable<List<DataPoint>> getFilteredDataPoints(Long surveyGroupId, Double latitude,
+            Double longitude, Integer orderBy, @NonNull final String filter) {
+        return surveyRepository.getDataPoints(surveyGroupId, latitude, longitude, orderBy)
+                .flatMap(new Function<List<DataPoint>, ObservableSource<List<DataPoint>>>() {
+                    @Override
+                    public ObservableSource<List<DataPoint>> apply(
+                            @NonNull List<DataPoint> dataPoints) throws Exception {
+                        return filterDataPoints(dataPoints, filter);
+                    }
+                });
+
+    }
+
+    private Observable<List<DataPoint>> filterDataPoints(@NonNull List<DataPoint> dataPoints,
+            @NonNull final String filter) {
+        return Observable
+                .fromIterable(dataPoints)
+                .filter(new Predicate<DataPoint>() {
+                    @Override
+                    public boolean test(@NonNull DataPoint dataPoint) throws Exception {
+                        String name = dataPoint.getName();
+                        String id = dataPoint.getId();
+                        return (fieldContains(name, filter)
+                                || fieldContains(id, filter));
+                    }
+                })
+                .toList()
+                .toObservable();
+    }
+
+    private boolean fieldContains(@Nullable String field, @NonNull String filter) {
+        if (field != null) {
+            field = field.toLowerCase();
+        }
+        return field != null && field
+                .contains(filter.toLowerCase());
     }
 }

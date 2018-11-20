@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2013-2017 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2013-2018 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -20,15 +20,10 @@
 package org.akvo.flow.util;
 
 import android.content.Context;
-import android.content.Intent;
-import android.content.res.Resources;
 import android.content.res.TypedArray;
-import android.net.Uri;
-import android.provider.Settings.Secure;
+import android.os.Build;
 import android.support.annotation.Nullable;
-import android.util.TypedValue;
 
-import java.io.File;
 import java.util.UUID;
 
 /**
@@ -44,8 +39,6 @@ public class PlatformUtil {
      * Versions are expected to be formatted in a dot-decimal notation: X.Y.Z,
      * being X, Y, and Z integers, and each number separated by a full stop (dot).
      *
-     * @param installedVersion
-     * @param newVersion
      * @return true if the second version is newer than the first one, false otherwise
      */
     public static boolean isNewerVersion(@Nullable String installedVersion,
@@ -54,7 +47,7 @@ public class PlatformUtil {
             return false;
         }
         // Ensure the Strings are properly formatted
-        final String regex = "^\\d+(\\.\\d+)*$";// Check dot-decimal notation
+        final String regex = "^\\d+(\\.\\d+)*$"; // Check dot-decimal notation
         if (!installedVersion.matches(regex) || !newVersion.matches(regex)) {
             return false;
         }
@@ -67,39 +60,18 @@ public class PlatformUtil {
             int newPart = i < newPartsParts.length ? Integer.parseInt(newPartsParts[i]) : 0;
 
             if (currentPart < newPart) {
-                return true;// Newer version
+                return true; // Newer version
             } else if (newPart < currentPart) {
-                return false;// Older version
+                return false; // Older version
             }
         }
 
-        return false;// Same version
-    }
-
-    public static float dp2Pixel(Context context, int dp) {
-        Resources r = context.getResources();
-        return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, r.getDisplayMetrics());
+        return false;
     }
 
     public static int getResource(Context context, int attr) {
         TypedArray a = context.getTheme().obtainStyledAttributes(new int[] { attr });
         return a.getResourceId(0, 0);
-    }
-
-    /**
-     * Install the newest version of the app. This method will be called
-     * either after the file download is completed, or upon the app being started,
-     * if the newest version is found in the filesystem.
-     *
-     * @param context  Context
-     * @param filename Absolute path to the newer APK
-     */
-    public static void installAppUpdate(Context context, String filename) {
-        Intent intent = new Intent(Intent.ACTION_VIEW);
-        intent.setDataAndType(Uri.fromFile(new File(filename)),
-                "application/vnd.android.package-archive");
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        context.startActivity(intent);
     }
 
     public static String uuid() {
@@ -113,7 +85,14 @@ public class PlatformUtil {
                 .substring(8);
     }
 
-    public static String getAndroidID(Context context) {
-        return Secure.getString(context.getContentResolver(), Secure.ANDROID_ID);
+    public static boolean isEmulator() {
+        return Build.FINGERPRINT.startsWith("generic")
+                || Build.FINGERPRINT.startsWith("unknown")
+                || Build.MODEL.contains("google_sdk")
+                || Build.MODEL.contains("Emulator")
+                || Build.MODEL.contains("Android SDK built for x86")
+                || Build.MANUFACTURER.contains("Genymotion")
+                || (Build.BRAND.startsWith("generic") && Build.DEVICE.startsWith("generic"))
+                || "google_sdk".equals(Build.PRODUCT);
     }
 }

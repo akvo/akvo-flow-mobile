@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2014 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2014,2018 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -24,6 +24,7 @@ import android.content.Context;
 import android.content.Intent;
 
 import org.akvo.flow.service.DataSyncService;
+import org.akvo.flow.util.ConstantUtil;
 
 /**
  * this class will listen to any Broadcast messages fired by the system and will
@@ -34,8 +35,19 @@ import org.akvo.flow.service.DataSyncService;
  */
 public class SyncDataReceiver extends BroadcastReceiver {
 
+    public static final String CONNECTIVITY_ACTION = "android.net.conn.CONNECTIVITY_CHANGE";
+
     public void onReceive(Context context, Intent intent) {
-        // Launch Sync Service
-        context.startService(new Intent(context, DataSyncService.class));
+        if (isIntentActionExpected(intent.getAction())) {
+            context.startService(new Intent(context, DataSyncService.class));
+        }
+    }
+
+    /**
+     * Make sure the intent action is not spoofed
+     */
+    private boolean isIntentActionExpected(String action) {
+        return ConstantUtil.DATA_AVAILABLE_INTENT.equals(action)
+                || CONNECTIVITY_ACTION.equals(action);
     }
 }

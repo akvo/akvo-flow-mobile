@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -21,13 +21,19 @@
 package org.akvo.flow.data.repository;
 
 import android.graphics.Bitmap;
+import android.net.Uri;
 
 import org.akvo.flow.data.datasource.DataSourceFactory;
 import org.akvo.flow.domain.repository.FileRepository;
 
+import java.io.File;
+import java.util.List;
+
 import javax.inject.Inject;
 
-import rx.Observable;
+import io.reactivex.Observable;
+import io.reactivex.annotations.NonNull;
+import io.reactivex.functions.Function;
 
 public class FileDataRepository implements FileRepository {
 
@@ -43,5 +49,76 @@ public class FileDataRepository implements FileRepository {
             String resizedFilePath) {
         return dataSourceFactory.getImageDataSource()
                 .saveImages(bitmap, originalFilePath, resizedFilePath);
+    }
+
+    @Override
+    public Observable<Boolean> copyResizedImage(final Uri uri, final String resizedImagePath,
+            final int imageSize, final boolean removeDuplicate) {
+        return dataSourceFactory.getImageDataSource()
+                .copyResizedImage(uri, resizedImagePath, imageSize, removeDuplicate);
+    }
+
+    @Override
+    public Observable<Boolean> moveFiles() {
+        return Observable.merge(dataSourceFactory.getFileDataSource().moveZipFiles(),
+                dataSourceFactory.getFileDataSource().moveMediaFiles())
+                .concatMap(new Function<List<String>, Observable<Boolean>>() {
+                    @Override
+                    public Observable<Boolean> apply(List<String> movedFiles) {
+                        return Observable.just(true);
+                    }
+                });
+    }
+
+    @Override
+    public Observable<Boolean> publishFiles(@NonNull List<String> fileNames) {
+        return dataSourceFactory.getFileDataSource().publishFiles(fileNames);
+    }
+
+    @Override
+    public Observable<Boolean> copyFile(String originFilePath, String destinationFilePath) {
+        return dataSourceFactory.getFileDataSource().copyFile(originFilePath, destinationFilePath);
+    }
+
+    @Override
+    public Observable<Boolean> unPublishData() {
+        return dataSourceFactory.getFileDataSource().removePublishedFiles();
+    }
+
+    @Override
+    public Observable<Boolean> clearResponseFiles() {
+        return dataSourceFactory.getFileDataSource().deleteResponsesFiles();
+    }
+
+    @Override
+    public Observable<Boolean> clearAllUserFiles() {
+        return dataSourceFactory.getFileDataSource().deleteAllUserFiles();
+    }
+
+    @Override
+    public Observable<Boolean> isExternalStorageFull() {
+        return dataSourceFactory.getFileDataSource().getAvailableStorage()
+                .map(new Function<Long, Boolean>() {
+                    @Override
+                    public Boolean apply(Long availableMb) {
+                        return availableMb < 100;
+                    }
+                });
+    }
+
+    @Override
+    public Observable<File> getZipFile(String uuid) {
+        return dataSourceFactory.getFileDataSource().getZipFile(uuid);
+    }
+
+    @Override
+    public Observable<Boolean> createDataZip(String zipFileName, String formInstanceData) {
+        return dataSourceFactory.getFileDataSource()
+                .writeDataToZipFile(zipFileName, formInstanceData);
+    }
+
+    @Override
+    public Observable<String> copyVideo(final Uri uri, final boolean removeOriginal) {
+        return dataSourceFactory.getVideoDataSource().copyVideo(uri, removeOriginal);
     }
 }

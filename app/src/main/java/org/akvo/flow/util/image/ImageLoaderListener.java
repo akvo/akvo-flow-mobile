@@ -21,9 +21,8 @@
 package org.akvo.flow.util.image;
 
 import android.graphics.Bitmap;
-import android.support.annotation.Nullable;
 
 public interface ImageLoaderListener {
 
-    void onImageReady(@Nullable Bitmap bitmap);
+    void onImageReady(Bitmap bitmap);
 }

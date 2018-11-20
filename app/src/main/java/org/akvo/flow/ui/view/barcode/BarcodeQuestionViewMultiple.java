@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -51,12 +51,12 @@ public class BarcodeQuestionViewMultiple extends QuestionView implements
 
     private void init() {
         setQuestionView(R.layout.barcode_question_view_multiple);
-        RecyclerView responses = (RecyclerView) findViewById(R.id.responses_recycler_view);
+        RecyclerView responses = (RecyclerView) findViewById(R.id.barcode_responses_recycler_view);
         responses.setLayoutManager(new LinearLayoutManager(getContext()));
         barcodeQuestionAdapter = new BarcodeQuestionAdapter(new ArrayList<String>(), this);
         responses.setAdapter(barcodeQuestionAdapter);
-        boolean isQuestionLocked = mQuestion.isLocked();
-        if (isQuestionLocked) {
+        boolean manualInputDisabled = mQuestion.isLocked();
+        if (manualInputDisabled) {
             questionInput = new MultipleLockedBarcodeQuestionInput(getContext());
         } else {
             questionInput = new MultipleBarcodeQuestionInput(getContext());
@@ -68,7 +68,7 @@ public class BarcodeQuestionViewMultiple extends QuestionView implements
     }
 
     @Override
-    public void questionComplete(Bundle barcodeData) {
+    public void onQuestionResultReceived(Bundle barcodeData) {
         if (barcodeData != null) {
             String value = barcodeData.getString(ConstantUtil.BARCODE_CONTENT);
             barcodeQuestionAdapter.addBarcode(value);

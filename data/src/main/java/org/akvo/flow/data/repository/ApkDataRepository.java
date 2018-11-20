@@ -27,8 +27,8 @@ import org.akvo.flow.domain.repository.ApkRepository;
 
 import javax.inject.Inject;
 
-import rx.Observable;
-import rx.functions.Func1;
+import io.reactivex.Observable;
+import io.reactivex.functions.Function;
 
 public class ApkDataRepository implements ApkRepository {
 
@@ -44,9 +44,9 @@ public class ApkDataRepository implements ApkRepository {
     @Override
     public Observable<ApkData> loadApkData(@NonNull String baseUrl) {
         return dataSourceFactory.getNetworkDataSource().getApkData(baseUrl)
-                .map(new Func1<ApiApkData, ApkData>() {
+                .map(new Function<ApiApkData, ApkData>() {
                     @Override
-                    public ApkData call(ApiApkData apiApkData) {
+                    public ApkData apply(ApiApkData apiApkData) {
                         return mapper.transform(apiApkData);
                     }
                 });

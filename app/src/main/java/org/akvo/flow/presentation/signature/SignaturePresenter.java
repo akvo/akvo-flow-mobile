@@ -24,11 +24,11 @@ import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
-import org.akvo.flow.domain.interactor.DefaultSubscriber;
+import org.akvo.flow.domain.interactor.DefaultObserver;
 import org.akvo.flow.domain.interactor.SaveImage;
 import org.akvo.flow.domain.interactor.UseCase;
 import org.akvo.flow.presentation.Presenter;
-import org.akvo.flow.util.MediaFileHelper;
+import org.akvo.flow.util.files.SignatureFileBrowser;
 
 import java.io.File;
 import java.util.HashMap;
@@ -39,13 +39,13 @@ import javax.inject.Named;
 
 import timber.log.Timber;
 
-import static org.akvo.flow.util.MediaFileHelper.ORIGINAL_SUFFIX;
-import static org.akvo.flow.util.MediaFileHelper.RESIZED_SUFFIX;
+import static org.akvo.flow.util.files.SignatureFileBrowser.ORIGINAL_SUFFIX;
+import static org.akvo.flow.util.files.SignatureFileBrowser.RESIZED_SUFFIX;
 
 public class SignaturePresenter implements Presenter {
 
     private final UseCase saveImage;
-    private final MediaFileHelper mediaFileHelper;
+    private final SignatureFileBrowser signatureFileBrowser;
 
     private String questionId;
     private String datapointId;
@@ -53,24 +53,24 @@ public class SignaturePresenter implements Presenter {
 
     @Inject
     public SignaturePresenter(@Named("saveImage") UseCase saveImage,
-            MediaFileHelper mediaFileHelper) {
+            SignatureFileBrowser signatureFileBrowser) {
         this.saveImage = saveImage;
-        this.mediaFileHelper = mediaFileHelper;
+        this.signatureFileBrowser = signatureFileBrowser;
     }
 
     @Override
     public void destroy() {
-        saveImage.unSubscribe();
+        saveImage.dispose();
     }
 
     @NonNull
     File getOriginalSignatureFile() {
-        return mediaFileHelper.getImageFile(ORIGINAL_SUFFIX, questionId, datapointId);
+        return signatureFileBrowser.getSignatureImageFile(ORIGINAL_SUFFIX, questionId, datapointId);
     }
 
     @NonNull
     private File getResizedSignatureFile() {
-        return mediaFileHelper.getImageFile(RESIZED_SUFFIX, questionId, datapointId);
+        return signatureFileBrowser.getSignatureImageFile(RESIZED_SUFFIX, questionId, datapointId);
     }
 
     public void setExtras(String questionId, String datapointId, String name) {
@@ -105,7 +105,7 @@ public class SignaturePresenter implements Presenter {
             params.put(SaveImage.ORIGINAL_FILE_NAME_PARAM,
                     getOriginalSignatureFile().getAbsolutePath());
             params.put(SaveImage.IMAGE_BITMAP_PARAM, bitmap);
-            saveImage.execute(new DefaultSubscriber() {
+            saveImage.execute(new DefaultObserver() {
                 @Override
                 public void onError(Throwable e) {
                     Timber.e(e, "Error saving image");

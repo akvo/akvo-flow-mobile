@@ -31,9 +31,9 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
-import rx.Observable;
-import rx.functions.Func1;
-import rx.functions.Func2;
+import io.reactivex.Observable;
+import io.reactivex.functions.BiFunction;
+import io.reactivex.functions.Function;
 
 public class SaveApkData extends UseCase {
 
@@ -44,7 +44,8 @@ public class SaveApkData extends UseCase {
 
     @Inject
     protected SaveApkData(ThreadExecutor threadExecutor, PostExecutionThread postExecutionThread,
-            ApkRepository apkRepository, UserRepository userRepository, VersionHelper versionHelper) {
+            ApkRepository apkRepository, UserRepository userRepository,
+            VersionHelper versionHelper) {
         super(threadExecutor, postExecutionThread);
         this.apkRepository = apkRepository;
         this.userRepository = userRepository;
@@ -58,26 +59,27 @@ public class SaveApkData extends UseCase {
         }
 
         final ApkData apkData = (ApkData) parameters.get(KEY_APK_DATA);
-        return apkRepository.getApkDataPreference().concatMap(new Func1<ApkData, Observable<Boolean>>() {
-            @Override
-            public Observable call(ApkData savedApkData) {
-                if (savedApkData == null || versionHelper
-                        .isNewerVersion(savedApkData.getVersion(), apkData.getVersion())) {
-                    return Observable.zip(apkRepository
-                                    .saveApkDataPreference((ApkData) parameters.get(KEY_APK_DATA)),
-                            userRepository.clearAppUpdateNotified(),
-                            new Func2<Boolean, Boolean, Boolean>() {
-                                @Override
-                                public Boolean call(Boolean first, Boolean second) {
-                                    if (first == null || second == null) {
-                                        return false;
-                                    }
-                                    return first && second;
-                                }
-                            });
-                }
-                return Observable.just(false);
-            }
-        });
+        return apkRepository.getApkDataPreference()
+                .concatMap(new Function<ApkData, Observable<Boolean>>() {
+                    @Override
+                    public Observable<Boolean> apply(ApkData savedApkData) {
+                        if (savedApkData == null || versionHelper
+                                .isNewerVersion(savedApkData.getVersion(), apkData.getVersion())) {
+                            return Observable.zip(apkRepository
+                                            .saveApkDataPreference((ApkData) parameters.get(KEY_APK_DATA)),
+                                    userRepository.clearAppUpdateNotified(),
+                                    new BiFunction<Boolean, Boolean, Boolean>() {
+                                        @Override
+                                        public Boolean apply(Boolean first, Boolean second) {
+                                            if (first == null || second == null) {
+                                                return false;
+                                            }
+                                            return first && second;
+                                        }
+                                    });
+                        }
+                        return Observable.just(false);
+                    }
+                });
     }
 }

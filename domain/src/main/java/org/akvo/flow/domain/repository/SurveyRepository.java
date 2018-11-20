@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -20,16 +20,62 @@
 
 package org.akvo.flow.domain.repository;
 
+import android.support.annotation.Nullable;
+
 import org.akvo.flow.domain.entity.DataPoint;
+import org.akvo.flow.domain.entity.FormInstanceMetadata;
+import org.akvo.flow.domain.entity.InstanceIdUuid;
+import org.akvo.flow.domain.entity.Survey;
+import org.akvo.flow.domain.entity.User;
 
 import java.util.List;
+import java.util.Set;
 
-import rx.Observable;
+import io.reactivex.Flowable;
+import io.reactivex.Observable;
 
 public interface SurveyRepository {
+
+    Observable<List<Survey>> getSurveys();
 
     Observable<List<DataPoint>> getDataPoints(Long surveyGroupId, Double latitude,
             Double longitude, Integer orderBy);
 
-    Observable<Integer> syncRemoteDataPoints(long surveyGroupId);
+    Flowable<Integer> downloadDataPoints(long surveyGroupId);
+
+    Observable<Boolean> deleteSurvey(long surveyToDeleteId);
+
+    Observable<List<User>> getUsers();
+
+    Observable<Boolean> editUser(User user);
+
+    Observable<Boolean> deleteUser(User user);
+
+    Observable<Long> createUser(String userName);
+
+    Observable<User> getUser(Long userId);
+
+    Observable<Boolean> clearResponses();
+
+    Observable<Boolean> clearAllData();
+
+    Observable<Boolean> unSyncedTransmissionsExist();
+
+    Observable<List<String>> getAllTransmissionFileNames();
+
+    Observable<List<String>> getFormIds(@Nullable String surveyId);
+
+    Observable<List<String>> downloadMissingAndDeleted(List<String> formIds, String deviceId);
+
+    Observable<Set<String>> processTransmissions(String deviceId, String surveyId);
+
+    Observable<List<InstanceIdUuid>> getSubmittedInstances();
+
+    Observable<Boolean> setInstanceStatusToRequested(long id);
+
+    Observable<List<Long>> getPendingSurveyInstances();
+
+    Observable<FormInstanceMetadata> getFormInstanceData(Long instanceId, String deviceId);
+
+    Observable<Boolean> createTransmissions(Long instanceId, String formId, Set<String> fileNames);
 }

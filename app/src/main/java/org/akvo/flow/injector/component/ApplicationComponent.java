@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2016-2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -22,19 +22,29 @@ package org.akvo.flow.injector.component;
 
 import android.content.Context;
 
-import com.squareup.sqlbrite.BriteDatabase;
+import com.google.gson.Gson;
+import com.squareup.sqlbrite2.BriteDatabase;
 
 import org.akvo.flow.app.FlowApp;
+import org.akvo.flow.broadcast.BootReceiver;
+import org.akvo.flow.broadcast.DataTimeoutReceiver;
+import org.akvo.flow.data.net.RestApi;
 import org.akvo.flow.data.util.GsonMapper;
 import org.akvo.flow.domain.executor.PostExecutionThread;
 import org.akvo.flow.domain.executor.ThreadExecutor;
 import org.akvo.flow.domain.repository.ApkRepository;
 import org.akvo.flow.domain.repository.FileRepository;
+import org.akvo.flow.domain.repository.SetupRepository;
 import org.akvo.flow.domain.repository.SurveyRepository;
 import org.akvo.flow.domain.repository.UserRepository;
 import org.akvo.flow.injector.module.ApplicationModule;
 import org.akvo.flow.injector.module.ViewModule;
 import org.akvo.flow.presentation.BaseActivity;
+import org.akvo.flow.service.BootstrapService;
+import org.akvo.flow.service.DataSyncService;
+import org.akvo.flow.service.FileChangeTrackingService;
+import org.akvo.flow.service.SurveyDownloadService;
+import org.akvo.flow.service.UnPublishDataService;
 import org.akvo.flow.service.ApkUpdateService;
 import org.akvo.flow.service.UserRequestedApkUpdateService;
 import org.akvo.flow.util.logging.LoggingHelper;
@@ -68,6 +78,26 @@ public interface ApplicationComponent {
     FileRepository fileRepository();
 
     UserRepository userRepository();
+
+    SetupRepository setupRepository();
+
+    Gson gson();
+
+    RestApi restApi();
+
+    void inject(FileChangeTrackingService fileChangeTrackingService);
+
+    void inject(SurveyDownloadService surveyDownloadService);
+
+    void inject(BootstrapService bootstrapService);
+
+    void inject(DataSyncService dataSyncService);
+
+    void inject(DataTimeoutReceiver dataTimeoutReceiver);
+
+    void inject(BootReceiver bootReceiver);
+
+    void inject(UnPublishDataService unPublishDataService);
 
     void inject(UserRequestedApkUpdateService userRequestedApkUpdateService);
 

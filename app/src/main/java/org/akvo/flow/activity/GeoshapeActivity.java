@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2015-2018 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -48,6 +48,8 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 
 import org.akvo.flow.R;
+import org.akvo.flow.presentation.geoshape.DeletePointDialog;
+import org.akvo.flow.presentation.geoshape.DeleteShapeDialog;
 import org.akvo.flow.ui.map.Feature;
 import org.akvo.flow.ui.map.PointsFeature;
 import org.akvo.flow.ui.map.PolygonFeature;
@@ -66,7 +68,9 @@ import timber.log.Timber;
 
 public class GeoshapeActivity extends BackActivity
         implements OnMapLongClickListener, OnMarkerDragListener, OnMarkerClickListener,
-        OnMyLocationChangeListener, OnMapReadyCallback {
+        OnMyLocationChangeListener, OnMapReadyCallback,
+        DeletePointDialog.PointDeleteListener,
+        DeleteShapeDialog.ShapeDeleteListener {
 
     private static final String JSON_TYPE = "type";
     private static final String JSON_GEOMETRY = "geometry";
@@ -139,7 +143,9 @@ public class GeoshapeActivity extends BackActivity
 
     private void initMap() {
         if (mMap != null) {
-            mMap.setMyLocationEnabled(true);
+            if (isLocationAllowed()) {
+                mMap.setMyLocationEnabled(true);
+            }
             mMap.setOnMarkerClickListener(this);
             mMap.setOnMyLocationChangeListener(this);
             if (mManualInput) {
@@ -180,6 +186,7 @@ public class GeoshapeActivity extends BackActivity
     private void addPoint(LatLng point) {
         mCurrentFeature.addPoint(point);
         mClearPointBtn.setEnabled(true);
+        supportInvalidateOptionsMenu();
     }
 
     @Override
@@ -198,6 +205,10 @@ public class GeoshapeActivity extends BackActivity
         }
         if (!mAllowPolygon) {
             menu.findItem(R.id.add_polygon).setVisible(false);
+        }
+        MenuItem item = menu.findItem(R.id.save);
+        if (item != null) {
+            item.setVisible(isValidShape());
         }
         return super.onCreateOptionsMenu(menu);
     }
@@ -230,9 +241,7 @@ public class GeoshapeActivity extends BackActivity
                 mFeatures.add(mCurrentFeature);
                 break;
             case R.id.save:
-                Intent intent = new Intent();
-                intent.putExtra(ConstantUtil.GEOSHAPE_RESULT, geoJson());
-                setResult(RESULT_OK, intent);
+                setShapeResult();
                 finish();
                 break;
             case android.R.id.home:
@@ -244,8 +253,19 @@ public class GeoshapeActivity extends BackActivity
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
+    public void onBackPressed() {
+        setShapeResult();
+        super.onBackPressed();
+    }
+
+    private void setShapeResult() {
+        Intent intent = new Intent();
+        if (isValidShape()) {
+            intent.putExtra(ConstantUtil.GEOSHAPE_RESULT, geoJson());
+            setResult(RESULT_OK, intent);
+        } else {
+            setResult(RESULT_CANCELED, intent);
+        }
     }
 
     private View.OnClickListener mFeatureMenuListener = new View.OnClickListener() {
@@ -257,7 +277,7 @@ public class GeoshapeActivity extends BackActivity
 
             switch (v.getId()) {
                 case R.id.add_point_btn:
-                    Location location = mMap == null? null : mMap.getMyLocation();
+                    Location location = mMap == null || !isLocationAllowed()? null : mMap.getMyLocation();
                     if (location != null && location.getAccuracy() <= ACCURACY_THRESHOLD) {
                         addPoint(new LatLng(location.getLatitude(), location.getLongitude()));
                     } else {
@@ -267,24 +287,12 @@ public class GeoshapeActivity extends BackActivity
                     }
                     break;
                 case R.id.clear_point_btn:
-                    ViewUtil.showConfirmDialog(R.string.clear_point_title, R.string.clear_point_text,
-                                               GeoshapeActivity.this, true, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                mCurrentFeature.removePoint();
-                                selectFeature(mCurrentFeature, null);
-                            }
-                        });
+                    DeletePointDialog pointDelete = DeletePointDialog.newInstance();
+                    pointDelete.show(getSupportFragmentManager(), DeletePointDialog.TAG);
                     break;
                 case R.id.clear_feature_btn:
-                    ViewUtil.showConfirmDialog(R.string.clear_feature_title, R.string.clear_feature_text,
-                                               GeoshapeActivity.this, true, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                mCurrentFeature.delete();
-                                selectFeature(null, null);
-                            }
-                        });
+                    DeleteShapeDialog shapeDelete = DeleteShapeDialog.newInstance();
+                    shapeDelete.show(getSupportFragmentManager(), DeleteShapeDialog.TAG);
                     break;
                 case R.id.properties:
                     displayProperties();
@@ -358,6 +366,15 @@ public class GeoshapeActivity extends BackActivity
             return null;
         }
         return jObject.toString();
+    }
+
+    private boolean isValidShape() {
+        for (Feature feature : mFeatures) {
+            if (feature!= null && !feature.getPoints().isEmpty()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -498,5 +515,19 @@ public class GeoshapeActivity extends BackActivity
             mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(position, MAP_ZOOM_LEVEL));
             mCentered = true;
         }
+    }
+
+    @Override
+    public void deletePoint() {
+        mCurrentFeature.removePoint();
+        selectFeature(mCurrentFeature, null);
+        supportInvalidateOptionsMenu();
+    }
+
+    @Override
+    public void deleteShape() {
+        mCurrentFeature.delete();
+        selectFeature(null, null);
+        supportInvalidateOptionsMenu();
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010-2016 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2010-2016,2018 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -63,6 +63,16 @@ public class SurveyedLocale implements Serializable, ClusterItem {
     @Override
     public LatLng getPosition() {
         return mLatLng;
+    }
+
+    @Override
+    public String getTitle() {
+        return mId;
+    }
+
+    @Override
+    public String getSnippet() {
+        return mName;
     }
 
     public long getSurveyGroupId() {

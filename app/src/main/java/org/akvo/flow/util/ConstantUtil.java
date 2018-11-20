@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2010-2018 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -32,9 +32,6 @@ public class ConstantUtil {
      */
     public static final String FILE_SURVEY_LOCATION_TYPE = "file";
     public static final String ARCHIVE_SUFFIX = ".zip";
-    public static final String JPG_SUFFIX = ".jpg";
-    public static final String PNG_SUFFIX = ".png";
-    public static final String VIDEO_SUFFIX = ".mp4";
     public static final String XML_SUFFIX = ".xml";
     public static final String BOOTSTRAP_DB_FILE = "dbinstructions.sql";
     public static final String PROCESSED_OK_SUFFIX = ".processed";
@@ -73,8 +70,6 @@ public class ConstantUtil {
     /**
      * help types
      */
-    public static final String VIDEO_HELP_TYPE = "video";
-    public static final String IMAGE_HELP_TYPE = "image";
     public static final String TIP_HELP_TYPE = "tip";
 
     /**
@@ -96,12 +91,6 @@ public class ConstantUtil {
     public static final String NUMERIC_VALIDATION_TYPE = "numeric";
 
     /**
-     * scoring types
-     */
-    public static final String NUMERIC_SCORING = "numeric";
-    public static final String TEXT_MATCH_SCORING = "textmatch";
-
-    /**
      * survey types
      */
     public static final String SURVEY_TYPE = "survey";
@@ -109,7 +98,9 @@ public class ConstantUtil {
     /**
      * media question support
      */
-    public static final String MEDIA_FILE_KEY = "filename";
+    public static final String IMAGE_FILE_KEY = "image_path";
+    public static final String VIDEO_FILE_KEY = "video_path";
+    public static final String PARAM_REMOVE_ORIGINAL = "remove_original";
 
     public static final String SIGNATURE_NAME_EXTRA = "signature_name";
     public static final String SIGNATURE_QUESTION_ID_EXTRA = "signature_question_id";
@@ -133,21 +124,20 @@ public class ConstantUtil {
     public static final String SURVEY_GROUP_EXTRA = "survey_group";
     public static final String SURVEYED_LOCALE_ID_EXTRA = "surveyed_locale_id";
     public static final String RECORD_ID_EXTRA = "record_id";
-
-    /**
-     * settings keys
-     */
-    public static final String SURVEY_LANG_SETTING_KEY = "survey.language";//user selected languages
-    public static final String CELL_UPLOAD_SETTING_KEY = "data.cellular.upload";
-    public static final String SCREEN_ON_KEY = "screen.keepon";
-    public static final String DEVICE_IDENT_KEY = "device.identifier";
-    public static final String MAX_IMG_SIZE = "media.img.maxsize";
+    public static final String SURVEY_GROUP_ID_EXTRA = "survey_group_id";
+    public static final String IMAGE_URL_EXTRA = "image_url";
+    public static final String FORM_TITLE_EXTRA = "title";
+    public static final String FORM_SUBTITLE_EXTRA = "subtitle";
+    public static final String QUESTION_ID_EXTRA = "question_id";
+    public static final String VIEW_USER_EXTRA = "view_user";
 
     /**
      * intents
      */
     public static final String DATA_AVAILABLE_INTENT = "org.akvo.flow.DATA_SUBMITTED";
-    public static final String GPS_STATUS_INTENT = "com.eclipsim.gpsstatus.VIEW";
+    public static final String BOOTSTRAP_INTENT = "org.akvo.flow.BOOTSTRAP_NEEDED";
+    public static final String GPS_STATUS_PACKAGE_V2 = "com.eclipsim.gpsstatus2";
+    public static final String GPS_STATUS_PACKAGE_V1 = "com.eclipsim.gpsstatus";
     public static final String BARCODE_SCAN_INTENT = "com.google.zxing.client.android.SCAN";
 
     /**
@@ -166,17 +156,8 @@ public class ConstantUtil {
     public static final String ADMIN_AUTH_CODE = "12345";
 
     /**
-     * property file keys
-     */
-    public static final String SERVER_BASE = "serverBase";
-    public static final String S3_BUCKET = "awsBucket";
-    public static final String S3_ACCESSKEY = "awsAccessKeyId";
-    public static final String S3_SECRET = "awsSecretKey";
-
-    /**
      * S3 bucket directories (object prefixes)
      */
-    public static final String S3_DATA_DIR = "devicezip/";
     public static final String S3_IMAGE_DIR = "images/";
     public static final String S3_SURVEYS_DIR = "surveys/";
 
@@ -200,15 +181,6 @@ public class ConstantUtil {
     public static final int ORDER_BY_DATE = 0;
     public static final int ORDER_BY_DISTANCE = 1;
 
-    /**
-     * Max picture size
-     * Values must match the ones set in arrays.
-     * TODO: Preferences should be managed with SharedPreferences api, to avoid this error prone references
-     */
-    public static final int IMAGE_SIZE_320_240 = 0;
-    public static final int IMAGE_SIZE_640_480 = 1;
-    public static final int IMAGE_SIZE_1280_960 = 2;
-
     public static final int NOTIFICATION_FORMS_SYNCED = 102;
     public static final int NOTIFICATION_ASSIGNMENT_ERROR = 103;
     public static final int NOTIFICATION_HEADER_ERROR = 104;
@@ -231,10 +203,10 @@ public class ConstantUtil {
     public static final String CADDISFLY_RESPONSE = "response";
     public static final String CADDISFLY_IMAGE = "image";
     public static final String CADDISFLY_MIME = "text/plain";
+    public static final String CADDISFLY_INSTANCE_NAME = "instanceName";
 
     //broadcasts
     public static final String ACTION_DATA_SYNC = "fieldsurvey.ACTION_DATA_SYNC";
-    public static final String ACTION_SURVEY_SYNC = "fieldsurvey.ACTION_SURVEYS_SYNC";
 
     //apk update
     public static final int REPEAT_INTERVAL_IN_SECONDS = 1 * 60 * 60 * 24; //every 24Hrs
@@ -250,7 +222,6 @@ public class ConstantUtil {
     public static final int UPDATE_NOTIFICATION_DELAY_IN_MS = 7 * 60 * 60 * 24 * 1000;
 
     //requests
-    public static final int REQUEST_ADD_USER = 0;
     public static final int PHOTO_ACTIVITY_REQUEST = 1;
     public static final int VIDEO_ACTIVITY_REQUEST = 2;
     public static final int SCAN_ACTIVITY_REQUEST = 3;
@@ -258,6 +229,10 @@ public class ConstantUtil {
     public static final int CADDISFLY_REQUEST = 5;
     public static final int PLOTTING_REQUEST = 6;
     public static final int SIGNATURE_REQUEST = 7;
+    public static final int FORM_FILLING_REQUEST = 8;
+    public static final int GET_PHOTO_ACTIVITY_REQUEST = 9;
+    public static final int GET_VIDEO_ACTIVITY_REQUEST = 10;
+
 
     //view tags
     public static final int SURVEY_ID_TAG_KEY = R.integer.surveyidkey;
@@ -265,6 +240,12 @@ public class ConstantUtil {
     public static final int READ_ONLY_TAG_KEY = R.integer.finishedkey;
 
     public static final int SNACK_BAR_DURATION_IN_MS = 4000;
+
+    public static final String FILE_PROVIDER_AUTHORITY = "org.akvo.flow.fileprovider";
+
+    public static final int LOCATION_PERMISSION_CODE = 1;
+    public static final int STORAGE_PERMISSION_CODE = 2;
+    public static final int STORAGE_AND_PHONE_STATE_PERMISSION_CODE = 3;
 
     /**
      * prevent instantiation

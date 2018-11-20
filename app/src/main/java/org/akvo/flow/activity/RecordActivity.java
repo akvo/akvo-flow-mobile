@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2013-2017 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2013-2018 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -24,21 +24,25 @@ import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v4.view.ViewPager;
+import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
 import org.akvo.flow.R;
-import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.data.database.SurveyDbDataSource;
 import org.akvo.flow.data.loader.SurveyedLocaleItemLoader;
 import org.akvo.flow.database.SurveyInstanceStatus;
 import org.akvo.flow.domain.Survey;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.SurveyedLocale;
-import org.akvo.flow.domain.User;
+import org.akvo.flow.domain.entity.User;
+import org.akvo.flow.domain.interactor.DefaultObserver;
+import org.akvo.flow.domain.interactor.UseCase;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
+import org.akvo.flow.presentation.SnackBarManager;
 import org.akvo.flow.service.BootstrapService;
 import org.akvo.flow.ui.Navigator;
 import org.akvo.flow.ui.adapter.RecordTabsAdapter;
@@ -47,30 +51,46 @@ import org.akvo.flow.ui.fragment.ResponseListFragment;
 import org.akvo.flow.util.ConstantUtil;
 
 import javax.inject.Inject;
+import javax.inject.Named;
+
+import timber.log.Timber;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
 
 public class RecordActivity extends BackActivity implements FormListFragment.SurveyListListener,
         ResponseListFragment.ResponseListListener, LoaderManager.LoaderCallbacks<SurveyedLocale> {
 
-    private static final int REQUEST_FORM = 0;
-
-    private User mUser;
     private SurveyGroup mSurveyGroup;
-    private SurveyDbDataSource mDatabase;
     private String recordId;
 
     @Inject
+    SurveyDbDataSource mDatabase;
+
+    @Inject
     Navigator navigator;
+
+    @Inject
+    @Named("getSelectedUser")
+    UseCase getSelectedUser;
+
+    @Inject
+    SnackBarManager snackBarManager;
+
+    @BindView(R.id.record_root_layout)
+    View rootLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.record_activity);
         initializeInjector();
+        ButterKnife.bind(this);
+
         ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
         RecordTabsAdapter recordTabsAdapter = new RecordTabsAdapter(getSupportFragmentManager(),
                 getResources().getStringArray(R.array.record_tabs));
         viewPager.setAdapter(recordTabsAdapter);
-        mDatabase = new SurveyDbDataSource(this, null);
 
         mSurveyGroup = (SurveyGroup) getIntent().getSerializableExtra(
                 ConstantUtil.SURVEY_GROUP_EXTRA);
@@ -89,7 +109,6 @@ public class RecordActivity extends BackActivity implements FormListFragment.Sur
         super.onResume();
         mDatabase.open();
 
-        mUser = FlowApp.getApp().getUser();
         recordId = getIntent().getStringExtra(ConstantUtil.RECORD_ID_EXTRA);
         getSupportLoaderManager().restartLoader(0, null, this);
     }
@@ -102,8 +121,8 @@ public class RecordActivity extends BackActivity implements FormListFragment.Sur
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_FORM && resultCode == RESULT_OK) {
-            finish();
+        if (requestCode == ConstantUtil.FORM_FILLING_REQUEST && resultCode == RESULT_OK) {
+            snackBarManager.displaySnackBar(rootLayout, R.string.snackbar_submitted, this);
         }
     }
 
@@ -113,22 +132,39 @@ public class RecordActivity extends BackActivity implements FormListFragment.Sur
             Toast.makeText(this, R.string.pleasewaitforbootstrap, Toast.LENGTH_LONG).show();
             return;
         }
-        Survey survey = mDatabase.getSurvey(formId);
+        final Survey survey = mDatabase.getSurvey(formId);
         if (!survey.isHelpDownloaded()) {
             Toast.makeText(this, R.string.error_missing_cascade, Toast.LENGTH_LONG).show();
             return;
         }
 
+        getSelectedUser.execute(new DefaultObserver<User>() {
+            @Override
+            public void onError(Throwable e) {
+                Timber.e(e);
+            }
+
+            @Override
+            public void onNext(User user) {
+                String userName = user.getName();
+                if (!TextUtils.isEmpty(userName)) {
+                    displayForm(user, formId, survey);
+                }
+            }
+        }, null);
+
+
+    }
+
+    private void displayForm(User user, String formId, Survey survey) {
         // Check if there are saved (non-submitted) responses for this Survey, and take the 1st one
-        long[] instances = mDatabase.getFormInstances(recordId, formId,
-                SurveyInstanceStatus.SAVED);
+        long[] instances = mDatabase.getFormInstances(recordId, formId, SurveyInstanceStatus.SAVED);
         long formInstanceId = instances.length > 0 ?
                 instances[0] :
-                mDatabase.createSurveyRespondent(formId, survey.getVersion(), mUser,
-                        recordId);
+                mDatabase.createSurveyRespondent(formId, survey.getVersion(), user, recordId);
 
-        navigator.navigateToFormActivity(this, recordId, formId,
-                formInstanceId, false, mSurveyGroup);
+        navigator.navigateToFormActivity(this, recordId, formId, formInstanceId, false,
+                mSurveyGroup);
     }
 
     @Override
@@ -142,7 +178,7 @@ public class RecordActivity extends BackActivity implements FormListFragment.Sur
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.datapoint_activity, menu);
+        getMenuInflater().inflate(R.menu.record_activity, menu);
         return super.onCreateOptionsMenu(menu);
     }
 

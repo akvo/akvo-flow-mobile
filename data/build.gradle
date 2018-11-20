@@ -1,9 +1,7 @@
 apply plugin: 'com.android.library'
-apply plugin: 'com.neenbedankt.android-apt'
 
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
-    buildToolsVersion rootProject.ext.buildToolsVersion
 
     defaultConfig {
         minSdkVersion rootProject.ext.minSdkVersion
@@ -12,32 +10,46 @@ android {
         versionName "1.0"
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-
     }
+
+    packagingOptions {
+        exclude 'META-INF/DEPENDENCIES'
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/license.txt'
+        exclude 'META-INF/NOTICE'
+        exclude 'META-INF/NOTICE.txt'
+        exclude 'META-INF/notice.txt'
+        exclude 'META-INF/ASL2.0'
+        exclude '.readme'
+    }
+
     buildTypes {
         release {
             minifyEnabled false
         }
     }
+
     lintOptions {
         abortOnError false
+        ignore 'InvalidPackage'
     }
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile project(path: ':domain')
-    compile project(path: ':database')
+    implementation project(path: ':domain')
+    implementation project(path: ':database')
 
-    apt 'com.google.dagger:dagger-compiler:2.4'
-    compile 'com.google.dagger:dagger:2.4'
-    compile 'io.reactivex:rxandroid:1.0.1'
-    compile 'com.android.support:support-annotations:25.3.0'
-    compile 'com.squareup.retrofit2:converter-gson:2.2.0'
-    compile 'com.squareup.okhttp3:logging-interceptor:3.4.1'
-    compile 'com.squareup.retrofit2:adapter-rxjava:2.2.0'
-    compile 'com.jakewharton.timber:timber:4.3.1'
-    compile 'com.squareup.sqlbrite:sqlbrite:1.1.1'
-
-    testCompile 'junit:junit:4.12'
+    implementation "com.google.dagger:dagger:${rootProject.ext.daggerVersion}"
+    annotationProcessor "com.google.dagger:dagger-compiler:${rootProject.ext.daggerVersion}"
+    implementation "com.android.support:support-annotations:${rootProject.ext.supportVersion}"
+    implementation "com.android.support:appcompat-v7:${rootProject.ext.supportVersion}"
+    implementation "com.android.support:exifinterface:${rootProject.ext.supportVersion}"
+    implementation "com.squareup.okhttp3:logging-interceptor:${rootProject.ext.loggingInterceptorVersion}"
+    implementation "com.squareup.retrofit2:adapter-rxjava2:${rootProject.ext.adapterRxJava2Version}"
+    implementation "com.squareup.retrofit2:converter-gson:${rootProject.ext.converterGsonVersion}"
+    implementation "com.jakewharton.timber:timber:${rootProject.ext.timberVersion}"
+    implementation "com.squareup.sqlbrite2:sqlbrite:${rootProject.ext.sqlbriteVersion}"
+    implementation "io.reactivex.rxjava2:rxandroid:${rootProject.ext.rxAndroidVersion}"
+    implementation "io.reactivex.rxjava2:rxjava:${rootProject.ext.rxJavaVersion}"
 }

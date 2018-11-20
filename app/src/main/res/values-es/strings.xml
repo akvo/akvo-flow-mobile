@@ -1,13 +1,11 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
   <string name="geo_location_accuracy_default">Precisión: desconocida</string>
   <string name="geo_location_accuracy">Precisión: %1$s m</string>
   <string name="nocardspacetitle">No hay espacio de almacenamiento</string>
   <string name="lowcardspacetitle">Poco espacio de almacenamiento</string>
   <string name="nocardspacedialog">La tarjeta SD está llena y no se pueden recopilar más datos. Debe liberar espacio para poder continuar.</string>
   <string name="lowcardspacedialog">Dispone de %%% MB de almacenamiento en la tarjeta SD. Una vez llena, no podrá seguir recopilando datos.</string>
-  <string name="takephoto">Sacar foto</string>
-  <string name="takevideo">Sacar video</string>
   <string name="getgeo">Buscar geolocalización</string>
   <string name="lat">Lat</string>
   <string name="lon">Lon</string>
@@ -15,23 +13,8 @@
   <string name="submitbutton">Enviar</string>
   <string name="geodialog">Habilita el acceso a la ubicación</string>
   <string name="settings">Ajustes</string>
-  <string name="resize_large_images">Reducir imágenes grandes</string>
-  <string name="settingslabel">Ajustes</string>
-  <string name="nouser">¡No hay usuarios!</string>
-  <string name="exportcomplete">Los datos han sido exportados a la tarjeta SD</string>
-  <string name="prefoptlabel">Ajustes</string>
-  <string name="prefoptdesc">Seleccionar el idioma predeterminado y otras opciones</string>
-  <string name="sendoptlabel">Sincronizar datos</string>
-  <string name="sendoptdesc">Sincronizar los datos recopilados. Debe tener conexión a internet (datos o Wi-Fi) para realizar esta operacición.</string>
-  <string name="poweroptlabel">Controlar batería</string>
-  <string name="poweroptdesc">Activar/Desactivar la señal Wi-Fi para una batería más duradera.</string>
-  <string name="screenoptlabel">Mantener la pantalla activa durante la recopilación de datos</string>
-  <string name="screenoptdesc">Evitar que la pantalla se apague durante la introducción de datos. Asegúrese de apagar la pantalla (o cerrar la aplicación) cuando no esté en uso, para reducir el consumo de batería.</string>
+  <string name="preferences_general_section">General</string>
   <string name="aboutlabel">Acerca de</string>
-  <string name="aboutdesc">Muestra información sobre la versión actual</string>
-  <string name="gpsstatuslabel">Estado del GPS</string>
-  <string name="gpsstatusdesc">Abrir la aplicación GPS Status si la tiene instalada en este dispositivo.</string>
-  <string name="nogpsstatus">GPS Status no está instalada en este dispositivo. Por favor, instale la aplicación a través de Google Play Store.</string>
   <string name="otherinstructions">Por favor, introduzca una descripción</string>
   <string name="texthelpoption">Ver ayuda texto</string>
   <string name="videohelpoption">Ver ayuda video</string>
@@ -39,34 +22,27 @@
   <string name="helpheading">Opciones de ayuda</string>
   <string name="deleteresponse">Eliminar respuesta</string>
   <string name="othertext">Otros...</string>
-  <string name="savelastuserlabel">Mantener entre sesiones el último usuario activo </string>
-  <string name="uploadoptionlabel">Enviar datos mediante red móvil</string>
   <string name="surveylanglabel">Idiomas de la encuesta</string>
   <string name="scanbarcode">Escanear código de barras</string>
   <string name="toosmallerr">El valor es demasiado pequeño. Valor mínimo: </string>
   <string name="toolargeerr">El valor es demasiado grande. Valor máximo: </string>
   <string name="baddatatypeerr">La respuesta ha de ser numérica</string>
-  <string name="serverlabel">Servidor de datos (cambiar sólo en caso de instrucción)</string>
   <string name="reloadsurveyslabel">Actualizar todas las encuestas</string>
   <string name="reloadsurveysdesc">Borrar y descargar de nuevo las encuestas asignadas (sólo en caso de instrucción)</string>
   <string name="conftitle">Por favor, confirme</string>
   <string name="reloadconftext">¿Está seguro de querer borrar y descargar todo de nuevo?</string>
-  <string name="submitcompletetitle">Encuesta enviada</string>
-  <string name="submitcompletetext">Las respuestas de la encuesta serán enviadas al servidor.</string>
-  <string name="optiontext">Opción</string>
   <string name="langoption">Idiomas</string>
   <string name="langmandatorytitle">Selección no válida</string>
   <string name="langmandatorytext">Debe elegir al menos un idioma</string>
-  <string name="pleasewait">Por favor, espere</string>
+  <string name="preference_download_form_title">Descargar formulario usando su ID</string>
+  <string name="preference_download_form_subtitle">Solo ejecute en caso de instrucción</string>
   <string name="downloadsurveylabel">Descargar formulario</string>
-  <string name="downloadsurveydesc">Descargar una encuesta particular (sólo en caso de instrucción)</string>
   <string name="downloadsurveyinstr">Introduzca el ID del formulario que desea descargar</string>
   <string name="deletealldatawarning">Esta acción borrará permanentemente todos los datos (encuestas, respuestas, imágenes y usuarios) en el dispositivo. Esta operación no es reversible. Pulse OK para continuar o Cancelar para salir.</string>
   <string name="delete_responses_warning">Esta acción borrará permanentemente las respuestas, imágenes y archivos zip del dispositivo. Esta operación no es reversible. Pulse OK para continuar o Cancelar para salir.</string>
   <string name="unsentdatawarning">Algunas respuestas no han sido enviadas. Asegúrese de exportarlas antes de borrarlas. Esta operación no es reversible. Pulse OK para continuar o Cancelar para salir.</string>
   <string name="deleteonewarning">Esta acción borrará permanentemente esta respuesta. Pulse OK para continuar o Cancelar para salir.</string>
   <string name="nextbutton">Siguiente</string>
-  <string name="submittext">Si ha terminado con el formulario, pulse Enviar para mandar los datos. Una vez pulsado Enviar, podrá revisar los datos, pero no podrá editarlos.</string>
   <string name="cleartitle">Borrar respuestas</string>
   <string name="cleardesc">¿Está seguro de querer borrar las respuestas?</string>
   <string name="authtitle">Autorización necesaria</string>
@@ -76,7 +52,6 @@
   <string name="clearquestion">Borrar respuesta</string>
   <string name="clearquestiondesc">¿Quiere borrar la respuesta de esta pregunta?</string>
   <string name="identlabel">Identificador de dispositivo</string>
-  <string name="setidentlabel">Establecer identificador de dispositivo</string>
   <string name="bootstrapstart">Cargando datos de la encuesta desde la tarjeta SD</string>
   <string name="bootstrapcomplete">Datos cargados desde la tarjeta SD</string>
   <string name="bootstraperror">Ha ocurrido un error procesando el archivo zip bootstrap</string>
@@ -84,65 +59,43 @@
   <string name="transmissionhist">Historial de transmisión</string>
   <string name="transstartdate">Inicio:</string>
   <string name="transenddate">Fin:</string>
-  <string name="confirmchangetitle">¿Cambiar respuesta?</string>
-  <string name="confirmchangetext">¿Quiere cambiar su respuesta?</string>
-  <string name="resetall">Borrar todo (usuarios, encuestas, y todos los datos recolectados)</string>
   <string name="resetalldesc">Borrar permanentemente todas las encuentas, respuestas (incluyendo imágenes y archivos zip exportados) y usuarios</string>
-  <string name="reset_responses">Borrar datos recolectados e imágenes</string>
   <string name="reset_responses_desc">Borrar permanentemente todas las respuestas (incluyendo imágenes y archivos zip exportados)</string>
-  <string name="checksd">Estado de la tarjeta SD</string>
-  <string name="checksddesc">Chequea el estado de la tarjeta SD para ver si está correctamente montada y muestra el espacio disponible.</string>
+  <string name="checksd">Memória disponible</string>
   <string name="sdmissing">La tarjeta SD no está montada correctamente. Asegúrese de haber desactivado la opción \"Copia de archivos USB\"</string>
-  <string name="sdmounted">La tarjeta SD está montada correctamente.</string>
-  <string name="sdcardspace">Espacio disponible (MB):</string>
   <string name="pickdate">Seleccione fecha</string>
   <string name="pleasewaitforbootstrap">Por favor, espere a que el archivo bootstrap haya sido procesado.</string>
   <string name="clear_data_success">Los datos han sido correctamente eliminados del dispositivo</string>
   <string name="clear_data_error">Ha ocurrido un error borrando los datos</string>
-  <string name="configuring_languages">Configurando los idiomas de las encuestas...</string>
   <string name="search">Buscar</string>
-  <string name="sync">Sincronizar</string>
   <string name="sort">Ordenar</string>
   <string name="stats">Estadísticas</string>
-  <string name="syncing_records">Sincronizando Puntos de Datos...</string>
-  <string name="sync_finished">Los Puntos de Datos han sido sincronizados</string>
-  <string name="synced_records">%1$d Puntos de Datos sincronizados</string>
-  <string name="sync_error">Sincronización de Puntos de Datos fallida</string>
-  <string name="syncing_corrupted_data_points_error">Vuelva a sincronizar.</string>
-  <string name="network_error">Error de conexión</string>
-  <string name="loading">Cargando...</string>
   <string name="prefill_title">Pre-llenar respuestas</string>
   <string name="prefill_text">Pre-llenar respuestas con previos valores de las mismas preguntas</string>
-  <string name="error_assignment_text">Ha de crear una asignación en el Panel de Control Flow</string>
   <!--Data sync-->
-  <string name="data_sync_title">Sincronización de datos</string>
-  <string name="data_sync_text">Sincronizando datos. Por favor, espere...</string>
   <string name="data_sync_all">Formularios sincronizados: %1$d - Fallidos: %2$d</string>
   <string name="data_sync_synced">Formularios sincronizados: %1$d</string>
   <string name="data_sync_error_form_deleted_title">Formulario borrado</string>
   <string name="data_sync_error_form_deleted_text">El formulario %1$s ha sido borrado</string>
   <!--Localization-->
-  <string name="app_language">Idioma de la aplicación</string>
   <string name="please_restart">Por favor, reinicie la aplicación</string>
   <!--Empty Views-->
-  <string name="no_surveys_text">No tiene encuestas asignadas. Las encuestas han de ser asignadas en el Panel de Control Flow</string>
-  <string name="no_records_text">Aún no dispone de puntos de datos. Clique \'+\' en el menú de arriba para añadir un nuevo punto de datos</string>
+  <string name="no_datapoints_error_text">No hay puntos de datos.</string>
+  <string name="no_search_results_error_text">No se han encontrado resultados</string>
   <string name="no_survey_selected_text">No ha seleccionado ninguna Encuesta. Abra el menú lateral para seleccionar una.</string>
-  <!--Activity Labels-->
-  <string name="survey_groups_activity">Encuestas</string>
-  <string name="record_list_activity">Seleccionar Punto de Datos</string>
-  <!--ActionBar-->
+  <!--ToolBar-->
   <string name="more">Más</string>
   <!--Search-->
   <string name="search_hint">Buscar Punto de Datos</string>
   <!--Project List (Survey Group) Activity-->
-  <string name="delete_project_text">Esta acción borrará permanentemente esta encuesta. Pulse OK para continuar o Cancelar para anular la operación.</string>
+  <string name="delete_survey_dialog_message">Borrar %1$s?</string>
   <!--Survey Activity-->
   <string name="error_responses">Algunas respuestas contienen errores. Ha de revisar las siguientes preguntas antes de finalizar:</string>
   <string name="error_question_mandatory">Esta respuesta es obligatoria</string>
   <string name="repeat_answer">Por favor, repita la respuesta</string>
   <string name="error_answer_match">Las respuestas no son iguales</string>
   <string name="error_img_preview">La imagen no pude ser cargada</string>
+  <string name="error_video_preview">Error al cargar la vista previa del video</string>
   <string name="use_external_source">Utilizar aplicación externa</string>
   <string name="caddisfly_test">Ir a la prueba</string>
   <string name="error_empty_form">Un formulario sin respuestas no puede ser enviado. Por favor, responda a las preguntas antes de enviar.</string>
@@ -152,24 +105,21 @@
   <string name="or">o</string>
   <string name="capture_shape">capturar figura</string>
   <string name="view_shape">ver figura</string>
-  <string name="clear_point_title">Borrar punto</string>
-  <string name="clear_point_text">¿Quiere borrar este punto?</string>
-  <string name="clear_feature_title">Borrar figura</string>
-  <string name="clear_feature_text">¿Quiere borrar esta figura?</string>
+  <string name="delete_point_title">Borrar punto?</string>
+  <string name="delete_shape_title">Borrar figura?</string>
   <string name="repeat_group">Repetir grupo</string>
   <string name="repetitions">Repeticiones:</string>
-  <string name="view_responses">Ver respuestas</string>
   <string name="view_map">Ver mapa</string>
   <string name="delete_group_title">Eliminar grupo</string>
   <string name="delete_group_text">¿Está seguro de que desea eliminar este grupo?</string>
   <string name="add_signature">Añadir firma</string>
+  <string name="modify_signature">Editar firma</string>
   <string name="signed_by">Firmado por:</string>
   <string name="signature_terms">Entiendo que esta es una representación electrónica de mi firma</string>
   <string name="image_location_unknown">Geolocalización no conocida</string>
   <string name="image_location_reading">Leyendo geolocalización</string>
   <string name="image_location_saved">Geolocalización guardada</string>
   <!--RecordList Activity-->
-  <string name="add_data_point">Añadir punto de datos</string>
   <string name="stats_total">Número total de puntos de datos:</string>
   <string name="stats_week">Últimos 7 días:</string>
   <string name="stats_today">Hoy:</string>
@@ -192,14 +142,11 @@
   <!--Form & transmission status-->
   <string name="status_queued">En espera</string>
   <string name="status_in_progress">En curso</string>
-  <string name="status_synced">Sincronizado</string>
   <string name="status_failed">Fallido</string>
   <string name="status_saved">Guardado</string>
   <string name="status_submitted">Finalizado</string>
-  <string name="status_exported">Exportado</string>
   <!--APK update-->
   <string name="app_update_activity">Actualización Akvo Flow</string>
-  <string name="app_update">Hay una nueva versión de la aplicación Flow disponible. Pulse \'Actualizar\' para descargar e instalar la nueva versión.</string>
   <string name="update">Actualizar</string>
   <string name="not_now">Ahora no</string>
   <string name="clicktoinstall">La nueva versión de Flow está descargada. ¿Quiere instalarla ahora?</string>
@@ -228,19 +175,18 @@
   <string name="add_point_title">Añadir punto</string>
   <string name="add_point_text">¿Quiere añadir un punto en esta posición?</string>
   <!--Navigation Drawer-->
-  <string name="select_user">Seleccionar usuario</string>
   <string name="add_user">Añadir usuario</string>
   <string name="new_user">+ Usuario</string>
   <string name="edit_user">Modificar usuario</string>
   <string name="delete_user">Borrar usuario</string>
-  <string name="empty_user_warning">El nombre de usuario no puede estar vacío</string>
-  <string name="delete_user_confirmation">¿Está seguro de que quiere borrar este usuario?</string>
+  <string name="delete_user_confirmation">¿Borrar usuario?</string>
   <string name="username">Nombre de usuario</string>
   <string name="mustselectuser">Por favor, seleccione un usuario antes de continuar</string>
   <string name="surveys">Encuestas</string>
   <string name="logged_in_as">Conectado como</string>
   <!--Misc-->
   <string name="okbutton">OK</string>
+  <string name="delete_button">Borrar</string>
   <string name="cancelbutton">Cancelar</string>
   <string name="savebutton">Guardar</string>
   <string name="clearbutton">Borrar</string>
@@ -248,7 +194,6 @@
   <string name="no">No</string>
   <string name="action_retry">Reintentar</string>
   <string name="delete">Borrar</string>
-  <string name="error_value_required">Este campo no puede ser dejado en blanco</string>
   <string name="drawer_open">Abrir menú</string>
   <string name="drawer_close">Cerrar menú</string>
   <!--app update service-->
@@ -276,4 +221,60 @@
   <string name="apache_licence_title">Apache License 2.0</string>
   <string name="eclipse_licence_title">Eclipse Public License 1.0</string>
   <string name="mit_licence_title">MIT License</string>
+  <string name="barcode_scanner_missing_error">No hay ninguna aplicación de escáner instalada en este dispositivo. ¿Quiere instalar una ahora?</string>
+  <string name="install">Instalar</string>
+  <string name="signature_name_hint">Por favor, escribe su nombre</string>
+  <string name="saving">Guardando...</string>
+  <string name="error_saving_signature">Error al guardar la firma, intente de nuevo.</string>
+  <string name="help">Ayuda</string>
+  <string name="error_loading_help">Error al cargar el contenido de ayuda</string>
+  <string name="error_mobile_data_sync">Sincronización vía datos móviles deshabilitada</string>
+  <string name="preference_screen_on">Mantener la pantalla activa durante la recopilación de datos</string>
+  <string name="preference_mobile_data">Habilitar el uso de datos móviles</string>
+  <string name="preference_app_language">Idioma de la aplicación</string>
+  <string name="preference_image_size">Tamaño de las imágenes</string>
+  <string name="preferences_data_section">Datos</string>
+  <string name="preference_delete_collected_data">Borrar datos recolectados e imágenes</string>
+  <string name="preference_delete_everything">Borrar todo</string>
+  <string name="preferences_configuration_section">Configuración</string>
+  <string name="preference_gps">Arreglos de GPS</string>
+  <string name="preference_storage">Memória disponible</string>
+  <string name="preferences_section_information">Información</string>
+  <string name="preference_identifier">Identificador de dispositivo</string>
+  <string name="preference_instance_name">Nombre de instancia</string>
+  <string name="data_points_sync_error_mobile_data_sync">Sincronización vía datos móviles deshabilitada</string>
+  <string name="action_settings">Ajustes</string>
+  <string name="no_records_subtitle_non_monitored">Use \'+\' para capturar datos</string>
+  <!--Verify if this works for transifex-->
+  <string name="surveys_error">Error al cargar las encuestas</string>
+  <string name="users_error">Error al cargar usuarios</string>
+  <string name="survey_delete_error">Ha ocurrido un error al borrar la encuesta</string>
+  <string name="survey_select_error">Error al seleccionar la encuesta</string>
+  <string name="user_edit_error">Error al modificar el usuario</string>
+  <string name="user_delete_error">Error al borrar el usuario</string>
+  <string name="user_select_error">Error al seleccionar el usuario</string>
+  <string name="add_user_message">El nuevo usuario será seleccionado automáticamente</string>
+  <string name="survey">encuesta</string>
+  <string name="no_gps_status_message">GPS Status no está instalada en este dispositivo. ¿Quiere instalar la ahora?</string>
+  <string name="app_update_dialog_title">Hay una nueva version de Flow disponible</string>
+  <string name="app_update_dialog_subtitle">Actualiza para aprovechar al máximo tu aplicación Flow</string>
+  <string name="error_getting_media">Error al obtener ficheros de midia, por favor intente de nuevo.</string>
+  <string name="geo_fields_update_title">¿Actualizar las coordenadas de GPS?</string>
+  <string name="cascade_error_message">Error al cargar el recurso de la cascada: %1$s</string>
+  <string name="preference_publish_data_title">Publicar datos</string>
+  <string name="preference_publish_data_subtitle">Hacer que los datos estén disponibles en la carpeta pública para carga masiva</string>
+  <string name="preference_publish_data_subtitle_publishing">Publicando los datos para que estén disponibles en la carpeta pública para carga masiva</string>
+  <string name="preference_publish_data_subtitle_published">Los datos estarán disponibles para la carga masiva durante</string>
+  <string name="preference_publish_data_time_left">%1$d mins</string>
+  <string name="preference_publish_data_error_no_data">No hay datos disponibles para la carga masiva.</string>
+  <string name="preference_publish_data_error_generic">Error al publicar datos, por favor intente de nuevo.</string>
+  <string name="preference_publish_data_error_no_space">Error al publicar datos por falta de espacio de almacenamiento. Por favor, elimine los archivos innecesarios y vuelva a intentarlo.</string>
+  <string name="pass_code">Código de acceso</string>
+  <string name="secure_data_walkthrough_title">Almacenamiento de datos</string>
+  <string name="walthrough_next_button">Siguiente</string>
+  <string name="secure_collected_walkthrough_page1_subtitle">A partir de ahora, los datos colectados con la aplicación Flow, se almacenan de forma privada en el dispositivo.</string>
+  <string name="secure_collected_walkthrough_page2_subtitle">Use la opción Publicar datos en Ajustes para que los datos recolectados sin conexión estén disponibles para la carga masiva.</string>
+  <string name="submit_tab_description">Las respuestas enviadas pueden ser consultadas pero no modificadas.</string>
+  <string name="snackbar_submitted">Enviado</string>
+  <string name="form_id_hint">ID de formulario</string>
 </resources>

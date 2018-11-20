@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2018 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -73,8 +73,11 @@ public class DateQuestionView extends QuestionView implements View.OnClickListen
         mDateTextEdit = (EditText) findViewById(R.id.date_et);
 
         View pickButton = findViewById(R.id.date_btn);
-        pickButton.setOnClickListener(this);
-        pickButton.setEnabled(!isReadOnly());
+        if (isReadOnly()) {
+            pickButton.setVisibility(GONE);
+        } else {
+            pickButton.setOnClickListener(this);
+        }
     }
 
     @Override
@@ -98,6 +101,7 @@ public class DateQuestionView extends QuestionView implements View.OnClickListen
     private void displayFormattedDate() {
         String formattedTime = userDisplayedDateFormat.format(mLocalCalendar.getTime());
         mDateTextEdit.setText(formattedTime);
+        mDateTextEdit.setVisibility(VISIBLE);
     }
 
     @Override

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -46,14 +46,6 @@ public class DataPointSyncSnackBarManager {
         }
     }
 
-    public void showErrorSyncNotAllowed(View rootView, View.OnClickListener onClickListener) {
-        if (rootView != null) {
-            snackBarManager.displaySnackBarWithAction(rootView,
-                    R.string.data_points_sync_error_mobile_data_sync, R.string.action_settings,
-                    onClickListener, rootView.getContext());
-        }
-    }
-
     public void showErrorNoNetwork(View rootView, View.OnClickListener onClickListener) {
         displaySnackBarWithRetry(R.string.data_points_sync_error_message_network, rootView,
                 onClickListener);
@@ -82,6 +74,13 @@ public class DataPointSyncSnackBarManager {
         if (rootView != null) {
             snackBarManager.displaySnackBarWithAction(rootView, errorMessage, R.string.action_retry,
                     onClickListener, rootView.getContext());
+        }
+    }
+
+    public void showNoDataPointsToSync(View rootView) {
+        if (rootView != null) {
+            displaySnackBar(rootView.getContext()
+                    .getString(R.string.data_points_sync_no_data_points), rootView);
         }
     }
 }

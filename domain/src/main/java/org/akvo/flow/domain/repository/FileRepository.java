@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -21,10 +21,38 @@
 package org.akvo.flow.domain.repository;
 
 import android.graphics.Bitmap;
+import android.net.Uri;
 
-import rx.Observable;
+import java.io.File;
+import java.util.List;
+
+import io.reactivex.Observable;
+import io.reactivex.annotations.NonNull;
 
 public interface FileRepository {
 
     Observable<Boolean> saveImage(Bitmap bitmap, String fileName, String resizedFilePath);
+
+    Observable<Boolean> copyResizedImage(Uri fileName, String resizedFilePath, int imageSize,
+            boolean removeDuplicate);
+
+    Observable<Boolean> moveFiles();
+
+    Observable<Boolean> publishFiles(@NonNull List<String> fileNames);
+
+    Observable<Boolean> copyFile(String originFilePath, String destinationFilePath);
+
+    Observable<Boolean> unPublishData();
+
+    Observable<Boolean> clearResponseFiles();
+
+    Observable<Boolean> clearAllUserFiles();
+
+    Observable<Boolean> isExternalStorageFull();
+
+    Observable<String> copyVideo(Uri uri, boolean removeOriginal);
+
+    Observable<File> getZipFile(String uuid);
+
+    Observable<Boolean> createDataZip(String zipFileName, String formInstanceData);
 }

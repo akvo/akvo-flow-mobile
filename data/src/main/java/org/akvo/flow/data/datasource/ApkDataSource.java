@@ -21,7 +21,7 @@ import android.support.annotation.NonNull;
 
 import org.akvo.flow.data.entity.ApiApkData;
 
-import rx.Observable;
+import io.reactivex.Observable;
 
 public interface ApkDataSource {
 

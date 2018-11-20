@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015-2017 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2015-2018 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -19,13 +19,9 @@
 
 package org.akvo.flow.async;
 
-import android.content.Context;
 import android.os.AsyncTask;
-import android.util.Log;
 
 import org.akvo.flow.api.S3Api;
-import org.akvo.flow.data.preference.Prefs;
-import org.akvo.flow.util.ConnectivityStateManager;
 import org.akvo.flow.util.ConstantUtil;
 
 import java.io.File;
@@ -38,44 +34,27 @@ import timber.log.Timber;
  * Download media files (images, videos) from synced forms.
  */
 public class MediaSyncTask extends AsyncTask<Void, Void, Boolean> {
-    private static final String TAG = MediaSyncTask.class.getSimpleName();
-
-    public interface DownloadListener {
-        void onResourceDownload(boolean done);
-    }
 
     private final WeakReference<DownloadListener> mListener;
-    private final Context mContext;
     private final File mFile;
-    private final ConnectivityStateManager connectivityStateManager;
-    private final Prefs prefs;
 
     /**
      * Download a media file. Provided file must be already updated to use the local filesystem path.
      */
-    public MediaSyncTask(Context context, File file, DownloadListener listener) {
-        this.mContext = context.getApplicationContext();
+    public MediaSyncTask(File file, DownloadListener listener) {
         this.mListener = new WeakReference<>(listener);
         this.mFile = file;
-        this.connectivityStateManager = new ConnectivityStateManager(mContext);
-        this.prefs = new Prefs(mContext);
     }
 
     @Override
     protected Boolean doInBackground(Void... params) {
-        if (!connectivityStateManager.isConnectionAvailable(
-                prefs.getBoolean(Prefs.KEY_CELL_UPLOAD, Prefs.DEFAULT_VALUE_CELL_UPLOAD))) {
-            Log.d(TAG, "No internet connection available. Can't perform the requested operation");
-            return false;
-        }
-
         try {
             // Download resource and return success status
-            S3Api s3 = new S3Api(mContext);
+            S3Api s3 = new S3Api();
             s3.get(ConstantUtil.S3_IMAGE_DIR + mFile.getName(), mFile);
             return true;
         } catch (IOException e) {
-            Timber.e(e.getMessage());
+            Timber.e(e);
             if (mFile.exists()) {
                 mFile.delete();
             }
@@ -91,4 +70,7 @@ public class MediaSyncTask extends AsyncTask<Void, Void, Boolean> {
         }
     }
 
+    public interface DownloadListener {
+        void onResourceDownload(boolean done);
+    }
 }

@@ -17,29 +17,28 @@
 
 package org.akvo.flow.data.datasource.apk;
 
-
 import android.support.annotation.NonNull;
 
 import org.akvo.flow.data.datasource.ApkDataSource;
 import org.akvo.flow.data.entity.ApiApkData;
-import org.akvo.flow.data.net.FlowRestApi;
+import org.akvo.flow.data.net.RestApi;
 
 import javax.inject.Inject;
 
-import rx.Observable;
+import io.reactivex.Observable;
 
 public class NetworkApkDataSource implements ApkDataSource {
 
-    private final FlowRestApi restApi;
+    private final RestApi restApi;
 
     @Inject
-    public NetworkApkDataSource(FlowRestApi restApi) {
+    public NetworkApkDataSource(RestApi restApi) {
         this.restApi = restApi;
     }
 
     //TODO: baseUrl should be injected
     @Override
     public Observable<ApiApkData> getApkData(@NonNull String baseUrl) {
-        return restApi.loadApkData(baseUrl);
+        return restApi.loadApkData();
     }
 }

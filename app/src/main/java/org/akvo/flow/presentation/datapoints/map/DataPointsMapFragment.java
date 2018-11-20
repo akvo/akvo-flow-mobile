@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -20,14 +20,18 @@
 
 package org.akvo.flow.presentation.datapoints.map;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.content.PermissionChecker;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -71,19 +75,6 @@ public class DataPointsMapFragment extends SupportMapFragment implements OnInfoW
     private static final int MAP_ZOOM_LEVEL = 10;
     private static final String MAP_OPTIONS = "MapOptions";
 
-    @Nullable
-    private RecordListListener mListener;
-
-    private List<MapDataPoint> mItems;
-
-    private boolean displayMonitoredMenu;
-
-    @Nullable
-    private ProgressBar progressBar;
-
-    @Nullable
-    private GoogleMap mMap;
-
     @Inject
     DataPointSyncSnackBarManager dataPointSyncSnackBarManager;
 
@@ -93,7 +84,20 @@ public class DataPointsMapFragment extends SupportMapFragment implements OnInfoW
     @Inject
     Navigator navigator;
 
+    @Nullable
+    private RecordListListener mListener;
+
+    private List<MapDataPoint> mItems;
+
+    @Nullable
+    private ProgressBar progressBar;
+
+    @Nullable
+    private GoogleMap mMap;
+
     private ClusterManager<MapDataPoint> mClusterManager;
+    private boolean activityJustCreated;
+    private Integer menuRes = null;
 
     public static DataPointsMapFragment newInstance(SurveyGroup surveyGroup) {
         DataPointsMapFragment fragment = new DataPointsMapFragment();
@@ -147,6 +151,7 @@ public class DataPointsMapFragment extends SupportMapFragment implements OnInfoW
                 .getSerializable(ConstantUtil.SURVEY_GROUP_EXTRA);
         presenter.onDataReady(surveyGroup);
         getMapAsync(this);
+        activityJustCreated = true;
     }
 
     private void initializeInjector() {
@@ -174,10 +179,13 @@ public class DataPointsMapFragment extends SupportMapFragment implements OnInfoW
 
     private void configMap() {
         if (mMap != null) {
-            mMap.setMyLocationEnabled(true);
+            FragmentActivity activity = getActivity();
+            if (isLocationAllowed()) {
+                mMap.setMyLocationEnabled(true);
+            }
             mMap.setOnInfoWindowClickListener(this);
-            mClusterManager = new ClusterManager<>(getActivity(), mMap);
-            mClusterManager.setRenderer(new PointRenderer(mMap, getActivity(), mClusterManager));
+            mClusterManager = new ClusterManager<>(activity, mMap);
+            mClusterManager.setRenderer(new PointRenderer(mMap, activity, mClusterManager));
             mMap.setOnMarkerClickListener(mClusterManager);
             mMap.setOnCameraChangeListener(new GoogleMap.OnCameraChangeListener() {
                 @Override
@@ -185,8 +193,14 @@ public class DataPointsMapFragment extends SupportMapFragment implements OnInfoW
                     cluster();
                 }
             });
-            centerMap();
+            centerMapOnUserLocation();
         }
+    }
+
+    private boolean isLocationAllowed() {
+        FragmentActivity activity = getActivity();
+        return activity != null && ContextCompat.checkSelfPermission(activity,
+                Manifest.permission.ACCESS_FINE_LOCATION) == PermissionChecker.PERMISSION_GRANTED;
     }
 
     private void cluster() {
@@ -220,23 +234,18 @@ public class DataPointsMapFragment extends SupportMapFragment implements OnInfoW
         mClusterManager.cluster();
     }
 
-    /**
-     * Center the map in the given record's coordinates. If no record is provided,
-     * the user's location will be used.
-     */
-    private void centerMap() {
+    private void centerMapOnUserLocation() {
         if (mMap == null) {
-            return; // Not ready yet
+            return;
         }
 
         LatLng position = null;
-        // When multiple points are shown, center the map in user's location
-        LocationManager manager = (LocationManager) getActivity()
+        LocationManager manager = (LocationManager) getActivity().getApplicationContext()
                 .getSystemService(Context.LOCATION_SERVICE);
         Criteria criteria = new Criteria();
         criteria.setAccuracy(Criteria.ACCURACY_FINE);
-        String provider = manager.getBestProvider(criteria, true);
-        if (provider != null) {
+        String provider = manager == null ? null : manager.getBestProvider(criteria, true);
+        if (provider != null && isLocationAllowed()) {
             Location location = manager.getLastKnownLocation(provider);
             if (location != null) {
                 position = new LatLng(location.getLatitude(), location.getLongitude());
@@ -251,10 +260,10 @@ public class DataPointsMapFragment extends SupportMapFragment implements OnInfoW
     @Override
     public void onResume() {
         super.onResume();
-        if (mItems.isEmpty()) {
-            // Make sure we only fetch the data and center the map once
+        if (!activityJustCreated) {
             presenter.loadDataPoints();
         }
+        activityJustCreated = false;
     }
 
     @Override
@@ -276,10 +285,8 @@ public class DataPointsMapFragment extends SupportMapFragment implements OnInfoW
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        if (displayMonitoredMenu) {
-            inflater.inflate(R.menu.datapoints_map_monitored, menu);
-        } else {
-            inflater.inflate(R.menu.datapoints_map, menu);
+        if (menuRes != null) {
+            inflater.inflate(menuRes, menu);
         }
         super.onCreateOptionsMenu(menu, inflater);
     }
@@ -287,8 +294,11 @@ public class DataPointsMapFragment extends SupportMapFragment implements OnInfoW
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.sync_records:
+            case R.id.download:
                 presenter.onSyncRecordsPressed();
+                return true;
+            case R.id.upload:
+                presenter.onUploadPressed();
                 return true;
             default:
                 return false;
@@ -325,8 +335,24 @@ public class DataPointsMapFragment extends SupportMapFragment implements OnInfoW
     }
 
     @Override
-    public void displayMenu(boolean monitored) {
-        displayMonitoredMenu = monitored;
+    public void showNonMonitoredMenu() {
+        menuRes = R.menu.datapoints_map;
+        reloadMenu();
+    }
+
+    @Override
+    public void showMonitoredMenu() {
+        menuRes = R.menu.datapoints_map_monitored;
+        reloadMenu();
+    }
+
+    @Override
+    public void hideMenu() {
+        menuRes = null;
+        reloadMenu();
+    }
+
+    private void reloadMenu() {
         FragmentActivity activity = getActivity();
         if (activity != null) {
             activity.supportInvalidateOptionsMenu();
@@ -341,16 +367,6 @@ public class DataPointsMapFragment extends SupportMapFragment implements OnInfoW
     @Override
     public void showErrorAssignmentMissing() {
         dataPointSyncSnackBarManager.showErrorAssignmentMissing(getView());
-    }
-
-    @Override
-    public void showErrorSyncNotAllowed() {
-        dataPointSyncSnackBarManager.showErrorSyncNotAllowed(getView(), new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                navigator.navigateToPreferences(getActivity());
-            }
-        });
     }
 
     @Override
@@ -371,5 +387,10 @@ public class DataPointsMapFragment extends SupportMapFragment implements OnInfoW
                 presenter.onSyncRecordsPressed();
             }
         });
+    }
+
+    @Override
+    public void showNoDataPointsToSync() {
+        dataPointSyncSnackBarManager.showNoDataPointsToSync(getView());
     }
 }

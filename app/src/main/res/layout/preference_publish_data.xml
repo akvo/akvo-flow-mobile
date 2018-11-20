@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+       xmlns:tools="http://schemas.android.com/tools"
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       android:orientation="vertical">
+
+    <TextView
+            android:id="@+id/preference_publish_data_title"
+            android:text="@string/preference_publish_data_title"
+            style="@style/PreferenceTitleStyle"
+            android:paddingBottom="4dp"/>
+
+    <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginBottom="16dp">
+
+        <TextView
+                android:id="@+id/preference_publish_data_subtitle"
+                android:text="@string/preference_publish_data_subtitle"
+                android:layout_weight="1"
+                android:layout_gravity="center_vertical"
+                style="@style/PreferenceSubtitleStyle"
+                android:layout_width="0dp"/>
+
+        <FrameLayout
+                android:id="@+id/preferenceProgressLayout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                tools:visibility="visible"
+                android:layout_gravity="center"
+                android:layout_marginRight="16dp"
+                android:layout_marginEnd="16dp">
+
+            <ProgressBar
+                    android:id="@+id/preferenceProgress"
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:layout_width="64dp"
+                    android:layout_height="64dp"
+                    android:indeterminate="false"
+                    android:max="90"
+                    android:progressDrawable="@drawable/circle_progress_drawable"
+                    android:indeterminateDrawable="@drawable/circle_progress_drawable_moving" />
+
+            <TextView
+                    tools:text="89 mins"
+                    android:gravity="center"
+                    android:layout_gravity="center"
+                    android:layout_width="32dp"
+                    android:textSize="12dp"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/preferenceProgressText"/>
+        </FrameLayout>
+
+    </LinearLayout>
+
+</merge>

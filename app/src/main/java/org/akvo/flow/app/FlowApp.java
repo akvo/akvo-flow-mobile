@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2013-2017 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2013-2018 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -21,54 +21,118 @@ package org.akvo.flow.app;
 
 import android.app.Application;
 import android.content.Context;
+import android.content.IntentFilter;
 import android.content.res.Configuration;
-import android.database.Cursor;
 import android.support.annotation.Nullable;
+import android.support.multidex.MultiDex;
 import android.text.TextUtils;
-import android.widget.Toast;
 
-import org.akvo.flow.R;
-import org.akvo.flow.data.migration.FlowMigrationListener;
-import org.akvo.flow.data.migration.languages.MigrationLanguageMapper;
+import com.crashlytics.android.Crashlytics;
+import com.crashlytics.android.core.CrashlyticsCore;
+import com.squareup.leakcanary.LeakCanary;
+
+import org.akvo.flow.BuildConfig;
+import org.akvo.flow.broadcast.SyncDataReceiver;
 import org.akvo.flow.data.preference.Prefs;
-import org.akvo.flow.database.SurveyDbAdapter;
-import org.akvo.flow.database.UserColumns;
-import org.akvo.flow.domain.User;
+import org.akvo.flow.domain.entity.User;
+import org.akvo.flow.domain.interactor.DefaultObserver;
+import org.akvo.flow.domain.interactor.UseCase;
+import org.akvo.flow.domain.interactor.setup.SaveSetup;
+import org.akvo.flow.domain.interactor.setup.SetUpParams;
 import org.akvo.flow.injector.component.ApplicationComponent;
 import org.akvo.flow.injector.component.DaggerApplicationComponent;
 import org.akvo.flow.injector.module.ApplicationModule;
 import org.akvo.flow.service.ApkUpdateService;
-import org.akvo.flow.util.ConstantUtil;
+import org.akvo.flow.service.FileChangeTrackingService;
 import org.akvo.flow.util.logging.LoggingHelper;
 
-import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 import javax.inject.Inject;
+import javax.inject.Named;
+
+import io.fabric.sdk.android.Fabric;
+import timber.log.Timber;
 
 public class FlowApp extends Application {
-    private static FlowApp app;// Singleton
-
-    //TODO: use shared pref?
-    private Locale mLocale;
-
-    private User mUser;
-    private Prefs prefs;
-
-    private ApplicationComponent applicationComponent;
 
     @Inject
     LoggingHelper loggingHelper;
 
+    @Inject
+    Prefs prefs;
+
+    @Inject
+    @Named("getSelectedUser")
+    UseCase getSelectedUser;
+
+    private ApplicationComponent applicationComponent;
+
+    @Inject
+    @Named("saveSetup")
+    UseCase saveSetup;
+
+    @Override
+    protected void attachBaseContext(Context base) {
+        super.attachBaseContext(base);
+
+        if (BuildConfig.DEBUG) {
+            MultiDex.install(this);
+        }
+    }
+
     @Override
     public void onCreate() {
         super.onCreate();
+        if (LeakCanary.isInAnalyzerProcess(this)) {
+            // This process is dedicated to LeakCanary for heap analysis.
+            // You should not init your app in this process.
+            return;
+        }
+
+        installLeakCanary();
         initializeInjector();
-        prefs = new Prefs(getApplicationContext());
+        initFabric();
         initLogging();
-        init();
+        updateLocale();
         startUpdateService();
-        app = this;
+        startBootstrapFolderTracker();
+        updateLoggingInfo();
+        registerReceiver(new SyncDataReceiver(), new IntentFilter(SyncDataReceiver.CONNECTIVITY_ACTION));
+        saveConfig();
+    }
+
+    protected void installLeakCanary() {
+        LeakCanary.install(this);
+    }
+
+    private void initFabric() {
+        CrashlyticsCore crashlyticsCore = new CrashlyticsCore.Builder()
+                .disabled(true)
+                .build();
+        Fabric.with(this, new Crashlytics.Builder().core(crashlyticsCore).build());
+    }
+
+    private void saveConfig() {
+        Map<String, Object> params = new HashMap<>(2);
+        params.put(SaveSetup.PARAM_SETUP,
+                new SetUpParams(BuildConfig.API_KEY, BuildConfig.AWS_ACCESS_KEY_ID,
+                        BuildConfig.AWS_BUCKET, BuildConfig.AWS_SECRET_KEY,
+                        BuildConfig.INSTANCE_URL, BuildConfig.SERVER_BASE,
+                        BuildConfig.SIGNING_KEY));
+        saveSetup.execute(new DefaultObserver<Boolean>() {
+            @Override
+            public void onError(Throwable e) {
+                Timber.e(e);
+            }
+
+        }, params);
+    }
+
+    private void startBootstrapFolderTracker() {
+        FileChangeTrackingService.scheduleVerifier(this);
     }
 
     private void startUpdateService() {
@@ -87,11 +151,23 @@ public class FlowApp extends Application {
     }
 
     private void initLogging() {
-       loggingHelper.init();
+        loggingHelper.init();
     }
 
-    public static FlowApp getApp() {
-        return app;
+    private void updateLoggingInfo() {
+        getSelectedUser.execute(new DefaultObserver<User>() {
+            @Override
+            public void onError(Throwable e) {
+                Timber.e(e);
+            }
+
+            @Override
+            public void onNext(User user) {
+                String deviceId = prefs.getString(Prefs.KEY_DEVICE_IDENTIFIER, null);
+                loggingHelper.initLoginData(user.getName(), deviceId);
+            }
+        }, null);
+
     }
 
     @Override
@@ -102,111 +178,45 @@ public class FlowApp extends Application {
         // to enable our custom locale again. Note that this approach
         // is not very 'clean', but Android makes it really hard to
         // customize an application wide locale.
-        if (mLocale != null && !mLocale.getLanguage().equalsIgnoreCase(
-                newConfig.locale.getLanguage())) {
+        Locale savedLocale = getSavedLocale();
+        if (localeNeedsUpdating(savedLocale, newConfig.locale)) {
             // Re-enable our custom locale, using this newConfig reference
-            newConfig.locale = mLocale;
-            Locale.setDefault(mLocale);
-            getBaseContext().getResources().updateConfiguration(newConfig, null);
+            Locale.setDefault(savedLocale);
+            updateConfiguration(savedLocale, newConfig);
         }
     }
 
-    private void init() {
-        // Load custom locale into the app. If the locale has not previously been configured
-        // check if the device has a compatible language active. Otherwise, fall back to English
-        String language = loadLocalePref();
-
-        //TODO: this is not necessary as by default locale is english anyway
-        if (TextUtils.isEmpty(language)) {
-            language = Locale.getDefault().getLanguage();
-            // Is that available in our language list?
-            if (!Arrays.asList(getResources().getStringArray(R.array.app_language_codes))
-                    .contains(language)) {
-                language = ConstantUtil.ENGLISH_CODE;// TODO: Move this constant to @strings
-            }
+    private void updateLocale() {
+        Locale savedLocale = getSavedLocale();
+        Locale currentLocale = Locale.getDefault();
+        if (localeNeedsUpdating(savedLocale, currentLocale)) {
+            Locale.setDefault(savedLocale);
+            updateConfiguration(savedLocale, new Configuration());
         }
-        //TODO: only set the language if it is different than the device locale
-        setAppLanguage(language, false);
-
-        loadLastUser();
     }
 
-    public void setUser(User user) {
-        mUser = user;
-        prefs.setLong(Prefs.KEY_USER_ID, mUser != null ? mUser.getId() : -1);
+    private boolean localeNeedsUpdating(Locale savedLocale, Locale currentLocale) {
+        return savedLocale != null && currentLocale != null && !currentLocale.getLanguage()
+                .equalsIgnoreCase(savedLocale.getLanguage());
     }
 
-    public User getUser() {
-        return mUser;
-    }
-
-    public String getAppLanguageCode() {
-        return mLocale.getLanguage();
-    }
-
-    public String getAppDisplayLanguage() {
-        String lang = mLocale.getDisplayLanguage();
-        if (!TextUtils.isEmpty(lang)) {
-            // Ensure the first letter is upper case
-            char[] strArray = lang.toCharArray();
-            strArray[0] = Character.toUpperCase(strArray[0]);
-            lang = new String(strArray);
-        }
-        return lang;
-    }
-
-    /**
-     * Checks if the user preference to persist logged-in users is set and, if
-     * so, loads the last logged-in user from the DB
-     */
-    private void loadLastUser() {
-        Context context = getApplicationContext();
-        SurveyDbAdapter database = new SurveyDbAdapter(context,
-                new FlowMigrationListener(new Prefs(context), new MigrationLanguageMapper(context)));
-        database.open();
-
-        // Consider the app set up if the DB contains users. This is relevant for v2.2.0 app upgrades
-        if (!prefs.getBoolean(Prefs.KEY_SETUP, false)) {
-            prefs.setBoolean(Prefs.KEY_SETUP, database.getUsers().getCount() > 0);
-        }
-
-        long id = prefs.getLong(Prefs.KEY_USER_ID, -1);
-        if (id != -1) {
-            Cursor cur = database.getUser(id);
-            if (cur.moveToFirst()) {
-                String userName = cur.getString(cur.getColumnIndexOrThrow(UserColumns.NAME));
-                mUser = new User(id, userName);
-                cur.close();
-            }
-        }
-
-        database.close();
-    }
-
-    public void setAppLanguage(String language, boolean requireRestart) {
-        // Override system locale
-        mLocale = new Locale(language);
-        Locale.setDefault(mLocale);
-        Configuration config = getBaseContext().getResources().getConfiguration();
-        config.locale = mLocale;
+    private void updateConfiguration(Locale savedLocale, Configuration config) {
+        config.locale = savedLocale;
         getBaseContext().getResources().updateConfiguration(config, null);
+    }
 
-        // Save it in the preferences
-        saveLocalePref(language);
-
-        if (requireRestart) {
-            Toast.makeText(this, R.string.please_restart, Toast.LENGTH_LONG)
-                    .show();
+    @Nullable
+    private Locale getSavedLocale() {
+        String languageCode = loadLocalePref();
+        Locale savedLocale = null;
+        if (!TextUtils.isEmpty(languageCode)) {
+            savedLocale = new Locale(languageCode);
         }
+        return savedLocale;
     }
 
     @Nullable
     private String loadLocalePref() {
         return prefs.getString(Prefs.KEY_LOCALE, null);
     }
-
-    private void saveLocalePref(String language) {
-        prefs.setString(Prefs.KEY_LOCALE, language);
-    }
-
 }

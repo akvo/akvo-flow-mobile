@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2016-2107 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2016-2018 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -19,6 +19,7 @@
 
 package org.akvo.flow.event;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.location.Location;
 import android.location.LocationListener;
@@ -27,6 +28,9 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 
+import org.akvo.flow.util.WeakLocationListener;
+
+import java.lang.ref.WeakReference;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -42,30 +46,37 @@ public class TimedLocationListener implements LocationListener {
     private static final float ACCURACY_UNRELIABLE = 0f;
 
     private final Handler mHandler = new Handler();
-    private final Listener mListener;
+    private final WeakReference<Listener> listenerWeakReference;
     private final LocationManager mLocationManager;
     private final boolean mAllowMockupLocations;
+    private final WeakLocationListener weakLocationListener;
 
     private Timer mTimer;
     private boolean mListeningLocation;
 
     public TimedLocationListener(Context context, Listener listener, boolean allowMockupLocations) {
-        mLocationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
-        mListener = listener;
+        mLocationManager = (LocationManager) context.getApplicationContext()
+                .getSystemService(Context.LOCATION_SERVICE);
+        listenerWeakReference = new WeakReference<>(listener);
         mListeningLocation = false;
         mAllowMockupLocations = allowMockupLocations;
+        weakLocationListener = new WeakLocationListener(this);
     }
 
+    @SuppressLint("MissingPermission")
     public void start() {
         if (!mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-            mListener.onGPSDisabled();
+            Listener listener = listenerWeakReference.get();
+            if (listener != null) {
+                listener.onGPSDisabled();
+            }
             return;
         }
 
-        mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
+        mLocationManager
+                .requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, weakLocationListener);
         mListeningLocation = true;
 
-        // Ensure no pending tasks are running
         if (mTimer != null) {
             mTimer.cancel();
         }
@@ -79,7 +90,10 @@ public class TimedLocationListener implements LocationListener {
                     public void run() {
                         if (mListeningLocation) {
                             stop();
-                            mListener.onTimeout();
+                            Listener listener = listenerWeakReference.get();
+                            if (listener != null) {
+                                listener.onTimeout();
+                            }
                         }
                     }
                 });
@@ -91,7 +105,7 @@ public class TimedLocationListener implements LocationListener {
         if (mTimer != null) {
             mTimer.cancel();
         }
-        mLocationManager.removeUpdates(this);
+        mLocationManager.removeUpdates(weakLocationListener);
         mListeningLocation = false;
     }
 
@@ -102,22 +116,30 @@ public class TimedLocationListener implements LocationListener {
     @Override
     public void onLocationChanged(Location location) {
         if (isValid(location) && mListeningLocation) {
-            mListener.onLocationReady(location.getLatitude(), location.getLongitude(),
-                    location.getAltitude(), location.getAccuracy());
+            Listener listener = listenerWeakReference.get();
+            if (listener != null) {
+                listener.onLocationReady(location.getLatitude(), location.getLongitude(),
+                        location.getAltitude(), location.getAccuracy());
+            }
         }
     }
 
     public void onProviderDisabled(String provider) {
         if (LocationManager.GPS_PROVIDER.equals(provider) && mListeningLocation) {
-            stop();// Cancel task and ensure state is updated before passing on the event
-            mListener.onGPSDisabled();
+            stop();
+            Listener listener = listenerWeakReference.get();
+            if (listener != null) {
+                listener.onGPSDisabled();
+            }
         }
     }
 
     public void onProviderEnabled(String provider) {
+        // EMPTY
     }
 
     public void onStatusChanged(String provider, int status, Bundle extras) {
+        // EMPTY
     }
 
     private boolean isValid(Location location) {
@@ -129,11 +151,8 @@ public class TimedLocationListener implements LocationListener {
     }
 
     private boolean isLocationProviderValid(Location location) {
-        if (mAllowMockupLocations) {
-            return true;
-        }
-        return Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN_MR2 || !location
-                .isFromMockProvider();
+        return mAllowMockupLocations || Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN_MR2
+                || !location.isFromMockProvider();
     }
 
     public interface Listener {

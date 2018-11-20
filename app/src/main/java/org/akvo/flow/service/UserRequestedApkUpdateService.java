@@ -1,5 +1,5 @@
 /*
-* Copyright (C) 2016-2017 Stichting Akvo (Akvo Foundation)
+* Copyright (C) 2010-2018 Stichting Akvo (Akvo Foundation)
 *
  *  This file is part of Akvo Flow.
  *
@@ -30,7 +30,6 @@ import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.domain.apkupdate.ViewApkData;
 import org.akvo.flow.ui.Navigator;
-import org.akvo.flow.util.ConnectivityStateManager;
 import org.akvo.flow.util.ViewUtil;
 
 import javax.inject.Inject;
@@ -53,12 +52,6 @@ public class UserRequestedApkUpdateService extends IntentService {
 
     @Inject
     Navigator navigator;
-
-    @Inject
-    ConnectivityStateManager connectivityStateManager;
-
-    @Inject
-    Prefs prefs;
 
     public UserRequestedApkUpdateService() {
         super(TAG);
@@ -84,14 +77,6 @@ public class UserRequestedApkUpdateService extends IntentService {
      * we display {@link AppUpdateActivity}, requesting the user to download it.
      */
     private void checkUpdates() {
-        if (!connectivityStateManager.isConnectionAvailable(
-                prefs.getBoolean(Prefs.KEY_CELL_UPLOAD, Prefs.DEFAULT_VALUE_CELL_UPLOAD))) {
-            ViewUtil.displayToastFromService(
-                    getString(R.string.apk_update_service_error_no_internet), uiHandler,
-                    getApplicationContext());
-            return;
-        }
-
         try {
             Pair<Boolean, ViewApkData> result = apkUpdateHelper.shouldUpdate();
             // There is a newer version. Fire the 'Download and Install' Activity.

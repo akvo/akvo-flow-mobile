@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -29,7 +29,7 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -41,26 +41,25 @@ import org.akvo.flow.util.GeoUtil;
 import org.akvo.flow.util.PlatformUtil;
 import org.ocpsoft.prettytime.PrettyTime;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-/**
- * List Adapter to bind the Surveyed Locales into the list items
- */
-class DataPointListAdapter extends ArrayAdapter<ListDataPoint> {
+class DataPointListAdapter extends BaseAdapter {
 
     private Double latitude;
     private Double longitude;
     private final LayoutInflater inflater;
     private final String dataLabel;
+    private final List<ListDataPoint> dataPoints;
 
     DataPointListAdapter(Context context, @Nullable Double latitude,
             @Nullable Double longitude, SurveyGroup surveyGroup) {
-        super(context, R.layout.surveyed_locale_item);
         this.latitude = latitude;
         this.longitude = longitude;
         this.inflater = LayoutInflater.from(context);
         this.dataLabel = context.getString(getDateLabel(surveyGroup));
+        dataPoints = new ArrayList<>();
     }
 
     @StringRes
@@ -72,12 +71,28 @@ class DataPointListAdapter extends ArrayAdapter<ListDataPoint> {
         }
     }
 
+    @Override
+    public int getCount() {
+        return dataPoints.size();
+    }
+
+    @NonNull
+    @Override
+    public ListDataPoint getItem(int position) {
+        return dataPoints.get(position);
+    }
+
+    @Override
+    public long getItemId(int position) {
+        return position;
+    }
+
     @NonNull
     @Override
     public View getView(int position, View convertView, @NonNull ViewGroup parent) {
         View view;
         if (convertView == null) {
-            view = inflater.inflate(R.layout.surveyed_locale_item, parent, false);
+            view = inflater.inflate(R.layout.datapoint_list_item, parent, false);
         } else {
             view = convertView;
         }
@@ -101,18 +116,18 @@ class DataPointListAdapter extends ArrayAdapter<ListDataPoint> {
         String statusText = null;
         switch (status) {
             case SurveyInstanceStatus.SAVED:
+            case SurveyInstanceStatus.SUBMIT_REQUESTED:
                 statusRes = R.drawable.record_saved_icn;
                 statusText = context.getString(R.string.status_saved);
                 break;
             case SurveyInstanceStatus.SUBMITTED:
-            case SurveyInstanceStatus.EXPORTED:
-                statusRes = R.drawable.record_exported_icn;
-                statusText = context.getString(R.string.status_exported);
+                statusRes = R.drawable.record_submitted_icn;
+                statusText = context.getString(R.string.status_submitted);
                 break;
-            case SurveyInstanceStatus.SYNCED:
+            case SurveyInstanceStatus.UPLOADED:
             case SurveyInstanceStatus.DOWNLOADED:
                 statusRes = R.drawable.record_synced_icn;
-                statusText = context.getString(R.string.status_synced);
+                statusText = context.getString(R.string.status_uploaded);
                 break;
             default:
                 //wrong state
@@ -165,10 +180,8 @@ class DataPointListAdapter extends ArrayAdapter<ListDataPoint> {
     }
 
     void setDataPoints(List<ListDataPoint> dataPoints) {
-        clear();
-        for (ListDataPoint sl : dataPoints) {
-            add(sl);
-        }
+        this.dataPoints.clear();
+        this.dataPoints.addAll(dataPoints);
         notifyDataSetChanged();
     }
 

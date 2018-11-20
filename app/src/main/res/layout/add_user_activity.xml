@@ -48,9 +48,10 @@
             android:layout_height="wrap_content"
             android:layout_gravity="end"
             android:layout_marginTop="20dp"
+            android:enabled="false"
             android:text="@string/nextbutton"
-            android:textSize="16sp"
-            style="@style/button_primary"/>
+            style="@style/PrimaryButtonStyle"
+            />
 
     </LinearLayout>
 

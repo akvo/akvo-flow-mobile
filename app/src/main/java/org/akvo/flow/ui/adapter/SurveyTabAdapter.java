@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2014-2017 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2014-2018 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -21,6 +21,7 @@ package org.akvo.flow.ui.adapter;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.View;
@@ -65,7 +66,7 @@ public class SurveyTabAdapter extends PagerAdapter implements ViewPager.OnPageCh
         }
 
         if (!surveyListener.isReadOnly()) {
-            mSubmitTab = new SubmitTab(context, surveyListener);
+            mSubmitTab = new SubmitTab(context);
         }
 
         mPager.addOnPageChangeListener(this);
@@ -135,9 +136,16 @@ public class SurveyTabAdapter extends PagerAdapter implements ViewPager.OnPageCh
         }
     }
 
-    public void onQuestionComplete(String questionId, Bundle data) {
+    public void onQuestionResultReceived(String questionId, Bundle data) {
         for (QuestionGroupTab questionGroupTab : mQuestionGroupTabs) {
-            questionGroupTab.onQuestionComplete(questionId, data);
+            questionGroupTab.onQuestionResultReceived(questionId, data);
+        }
+    }
+
+    public void onRequestPermissionsResult(int requestCode, String questionId, String[] permissions,
+            int[] grantResults) {
+        for (QuestionGroupTab questionGroupTab : mQuestionGroupTabs) {
+            questionGroupTab.onRequestPermissionsResult(requestCode, questionId, permissions, grantResults);
         }
     }
 
@@ -168,8 +176,9 @@ public class SurveyTabAdapter extends PagerAdapter implements ViewPager.OnPageCh
         }
     }
 
+    @NonNull
     @Override
-    public Object instantiateItem(ViewGroup container, int position) {
+    public Object instantiateItem(@NonNull ViewGroup container, int position) {
         View view;
         if (position < mQuestionGroupTabs.size()) {
             view = mQuestionGroupTabs.get(position);// Already instantiated
@@ -240,4 +249,5 @@ public class SurveyTabAdapter extends PagerAdapter implements ViewPager.OnPageCh
 
         return invalidQuestions;
     }
+
 }

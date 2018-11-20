@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2018 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -19,26 +19,25 @@
 
 package org.akvo.flow.activity;
 
-import android.content.BroadcastReceiver;
-import android.content.Context;
+import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.view.Gravity;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
@@ -52,37 +51,55 @@ import org.akvo.flow.database.SurveyDbAdapter;
 import org.akvo.flow.database.SurveyInstanceStatus;
 import org.akvo.flow.domain.Survey;
 import org.akvo.flow.domain.SurveyGroup;
-import org.akvo.flow.domain.User;
 import org.akvo.flow.domain.apkupdate.ApkUpdateStore;
-import org.akvo.flow.domain.apkupdate.GsonMapper;
 import org.akvo.flow.domain.apkupdate.ViewApkData;
+import org.akvo.flow.domain.entity.User;
+import org.akvo.flow.domain.interactor.DefaultObserver;
+import org.akvo.flow.domain.interactor.UseCase;
+import org.akvo.flow.domain.util.GsonMapper;
+import org.akvo.flow.injector.component.ApplicationComponent;
+import org.akvo.flow.injector.component.DaggerViewComponent;
+import org.akvo.flow.injector.component.ViewComponent;
+import org.akvo.flow.presentation.SnackBarManager;
+import org.akvo.flow.presentation.UserDeleteConfirmationDialog;
+import org.akvo.flow.presentation.navigation.CreateUserDialog;
+import org.akvo.flow.presentation.navigation.EditUserDialog;
+import org.akvo.flow.presentation.navigation.FlowNavigationView;
+import org.akvo.flow.presentation.navigation.SurveyDeleteConfirmationDialog;
+import org.akvo.flow.presentation.navigation.UserOptionsDialog;
+import org.akvo.flow.presentation.navigation.ViewUser;
 import org.akvo.flow.service.BootstrapService;
 import org.akvo.flow.service.DataSyncService;
 import org.akvo.flow.service.SurveyDownloadService;
 import org.akvo.flow.service.TimeCheckService;
 import org.akvo.flow.ui.Navigator;
 import org.akvo.flow.ui.fragment.DatapointsFragment;
-import org.akvo.flow.ui.fragment.DrawerFragment;
 import org.akvo.flow.ui.fragment.RecordListListener;
+import org.akvo.flow.util.AppPermissionsHelper;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.PlatformUtil;
 import org.akvo.flow.util.StatusUtil;
 import org.akvo.flow.util.ViewUtil;
 
-import java.lang.ref.WeakReference;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.inject.Inject;
+import javax.inject.Named;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import timber.log.Timber;
 
-import static org.akvo.flow.util.ConstantUtil.ACTION_SURVEY_SYNC;
-
 public class SurveyActivity extends AppCompatActivity implements RecordListListener,
-        DrawerFragment.DrawerListener, DatapointsFragment.DatapointFragmentListener {
+        FlowNavigationView.DrawerNavigationListener,
+        SurveyDeleteConfirmationDialog.SurveyDeleteListener, UserOptionsDialog.UserOptionListener,
+        UserDeleteConfirmationDialog.UserDeleteListener, EditUserDialog.EditUserListener,
+        CreateUserDialog.CreateUserListener {
 
+    public static final int NAVIGATION_DRAWER_DELAY_MILLIS = 250;
     private static final String DATA_POINTS_FRAGMENT_TAG = "datapoints_fragment";
-    private static final String DRAWER_FRAGMENT_TAG = "f";
 
     @BindView(R.id.toolbar)
     Toolbar toolbar;
@@ -93,64 +110,104 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     @BindView(R.id.add_data_point_fab)
     FloatingActionButton addDataPointFab;
 
-    @Nullable
-    private SurveyDbDataSource mDatabase;
+    @BindView(R.id.nav_view)
+    FlowNavigationView navigationView;
+
+    @BindView(R.id.survey_root_layout)
+    View rootLayout;
+
+    @Inject
+    SurveyDbDataSource mDatabase;
+
+    @Inject
+    Prefs prefs;
+
+    @Inject
+    Navigator navigator;
+
+    @Inject
+    SnackBarManager snackBarManager;
+
+    @Inject
+    @Named("getSelectedUser")
+    UseCase getSelectedUser;
+
+    @Inject
+    AppPermissionsHelper appPermissionsHelper;
+
     private SurveyGroup mSurveyGroup;
 
     private ActionBarDrawerToggle mDrawerToggle;
-    private DrawerFragment mDrawer;
-    private Navigator navigator = new Navigator();
-    private Prefs prefs;
     private ApkUpdateStore apkUpdateStore;
-
     private long selectedSurveyId;
-
-    /**
-     * BroadcastReceiver to notify of surveys synchronisation. This should be
-     * fired from {@link SurveyDownloadService}.
-     */
-    private final BroadcastReceiver mSurveysSyncReceiver = new SurveySyncBroadcastReceiver(this);
+    private boolean activityJustCreated;
+    private boolean permissionsResults;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.survey_activity);
-
+        initializeInjector();
         ButterKnife.bind(this);
 
         initializeToolBar();
 
-        mDatabase = new SurveyDbDataSource(this, null);
-        mDatabase.open();
+        if (!deviceSetUpCompleted()) {
+            navigateToSetUp();
+        } else {
 
-        prefs = new Prefs(getApplicationContext());
+            mDatabase.open();
+
+            updateSelectedSurvey();
+            apkUpdateStore = new ApkUpdateStore(new GsonMapper(), prefs);
+
+            initNavigationDrawer();
+            selectSurvey();
+            initDataPointsFragment(savedInstanceState);
+
+            //When the app is restarted we need to display the current user
+            if (savedInstanceState == null) {
+                showSelectedUser();
+            }
+            activityJustCreated = true;
+            setNavigationView();
+        }
+    }
+
+    private boolean deviceSetUpCompleted() {
+        return prefs.getBoolean(Prefs.KEY_SETUP, false);
+    }
+
+    private void navigateToSetUp() {
+        navigator.navigateToAddUser(this);
+        finish();
+    }
+
+    private void updateSelectedSurvey() {
         selectedSurveyId = prefs.getLong(Prefs.KEY_SURVEY_GROUP_ID, SurveyGroup.ID_NONE);
         if (selectedSurveyId != SurveyGroup.ID_NONE) {
             mSurveyGroup = mDatabase.getSurveyGroup(selectedSurveyId);
         }
-        apkUpdateStore = new ApkUpdateStore(new GsonMapper(), prefs);
+    }
 
-        // Init navigation drawer
-        initNavigationDrawer();
+    private void setNavigationView() {
+        navigationView.setDrawerNavigationListener(this);
+    }
 
-        initDataPointsFragment(savedInstanceState);
+    private void initializeInjector() {
+        ViewComponent viewComponent =
+                DaggerViewComponent.builder().applicationComponent(getApplicationComponent())
+                        .build();
+        viewComponent.inject(this);
+    }
 
-        prefs = new Prefs(getApplicationContext());
-        apkUpdateStore = new ApkUpdateStore(new GsonMapper(), prefs);
-        // Start the setup Activity if necessary.
-        boolean noDevIdYet = false;
-        if (!prefs.getBoolean(Prefs.KEY_SETUP, false)) {
-            noDevIdYet = true;
-            navigator.navigateToAddUser(this);
-        }
-
-        startServices(noDevIdYet);
-
-        //When the app is restarted we need to display the current user
-        if (savedInstanceState == null) {
-            displaySelectedUser();
-        }
-
+    /**
+     * Get the Main Application component for dependency injection.
+     *
+     * @return {@link ApplicationComponent}
+     */
+    protected ApplicationComponent getApplicationComponent() {
+        return ((FlowApp) getApplication()).getApplicationComponent();
     }
 
     private void initializeToolBar() {
@@ -162,8 +219,6 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     }
 
     private void initNavigationDrawer() {
-        FragmentManager supportFragmentManager = getSupportFragmentManager();
-        mDrawer = (DrawerFragment) supportFragmentManager.findFragmentByTag(DRAWER_FRAGMENT_TAG);
         mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout,
                 R.string.drawer_open, R.string.drawer_close) {
 
@@ -171,8 +226,6 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
             @Override
             public void onDrawerClosed(View drawerView) {
                 super.onDrawerClosed(drawerView);
-                mDrawer.onDrawerClosed();
-                supportInvalidateOptionsMenu();
             }
 
             /**
@@ -181,25 +234,24 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
             @Override
             public void onDrawerOpened(View drawerView) {
                 super.onDrawerOpened(drawerView);
-                //prevent the back icon from showing
-                super.onDrawerSlide(drawerView, 0);
-                supportInvalidateOptionsMenu();
             }
 
             @Override
             public void onDrawerSlide(View drawerView, float slideOffset) {
-                //disable drawer animation
-                super.onDrawerSlide(drawerView, 0);
+                super.onDrawerSlide(drawerView, slideOffset);
             }
         };
 
         mDrawerLayout.addDrawerListener(mDrawerToggle);
+        if (mSurveyGroup == null) {
+            mDrawerLayout.openDrawer(GravityCompat.START);
+        }
+    }
 
+    private void selectSurvey() {
         // Automatically select the survey
         if (mSurveyGroup != null) {
             onSurveySelected(mSurveyGroup);
-        } else {
-            mDrawerLayout.openDrawer(GravityCompat.START);
         }
     }
 
@@ -215,34 +267,87 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        switch (requestCode) {
-            case ConstantUtil.REQUEST_ADD_USER:
-                if (resultCode == RESULT_OK) {
-                    displaySelectedUser();
-                    prefs.setBoolean(Prefs.KEY_SETUP, true);
-                    // Trigger the delayed services, so the first
-                    // backend connections uses the new Device ID
-                    startService(new Intent(this, SurveyDownloadService.class));
-                    startService(new Intent(this, DataSyncService.class));
-                } else if (!prefs.getBoolean(Prefs.KEY_SETUP, false)) {
-                    finish();
-                }
-                break;
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == ConstantUtil.FORM_FILLING_REQUEST && resultCode == RESULT_OK) {
+            snackBarManager.displaySnackBar(rootLayout, R.string.snackbar_submitted, this);
         }
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        // Delete empty responses, if any
-        mDatabase.deleteEmptySurveyInstances();
-        mDatabase.deleteEmptyRecords();
-        LocalBroadcastManager.getInstance(this)
-                .registerReceiver(mSurveysSyncReceiver, new IntentFilter(ACTION_SURVEY_SYNC));
+        if (isFinishing()) {
+            return;
+        }
+        if (!activityJustCreated && !deviceSetUpCompleted()) {
+            navigateToSetUp();
+        } else {
+            activityJustCreated = false;
+            // Delete empty responses, if any
+            if (mDatabase != null) {
+                mDatabase.deleteEmptySurveyInstances();
+                mDatabase.deleteEmptyRecords();
+            }
 
+            showApkUpdateIfNeeded();
+            updateAddDataPointFab();
+            if (!permissionsResults) {
+                handlePermissions();
+            }
+            permissionsResults = false;
+        }
+    }
+
+    private void handlePermissions() {
+        List<String> permissionsList = new ArrayList<>(2);
+        if (!appPermissionsHelper.isStorageAllowed()) {
+            permissionsList.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        }
+
+        if (!appPermissionsHelper.isPhoneStateAllowed()) {
+            permissionsList.add(Manifest.permission.READ_PHONE_STATE);
+        }
+        if (permissionsList.isEmpty()) {
+            startServicesIfPossible();
+        } else {
+            final String[] permissions = permissionsList.toArray(new String[0]);
+            ActivityCompat
+                    .requestPermissions(this, permissions,
+                            ConstantUtil.STORAGE_AND_PHONE_STATE_PERMISSION_CODE);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+            @NonNull int[] grantResults) {
+        permissionsResults = true;
+        if (requestCode == ConstantUtil.STORAGE_AND_PHONE_STATE_PERMISSION_CODE) {
+            if (appPermissionsHelper.allPermissionsGranted(permissions, grantResults)) {
+                startServicesIfPossible();
+            } else {
+                permissionsNotGranted();
+            }
+        }
+    }
+
+    private void permissionsNotGranted() {
+        final View.OnClickListener retryListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (appPermissionsHelper.userPressedDoNotShowAgain(SurveyActivity.this)) {
+                    navigator.navigateToAppSystemSettings(SurveyActivity.this);
+                } else {
+                    handlePermissions();
+                }
+            }
+        };
+        snackBarManager
+                .displaySnackBarWithAction(rootLayout,
+                        R.string.survey_permissions_missing,
+                        R.string.action_retry, retryListener, this);
+    }
+
+    private void showApkUpdateIfNeeded() {
         ViewApkData apkData = apkUpdateStore.getApkData();
         boolean shouldNotifyUpdate = apkUpdateStore.shouldNotifyNewVersion();
         if (apkData != null && shouldNotifyUpdate && PlatformUtil
@@ -250,7 +355,6 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
             apkUpdateStore.saveAppUpdateNotifiedTime();
             navigator.navigateToAppUpdate(this, apkData);
         }
-        updateAddDataPointFab();
     }
 
     private void updateAddDataPointFab() {
@@ -264,7 +368,7 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
 
     @Override
     public void onBackPressed() {
-        if (mDrawerLayout != null && mDrawerLayout.isDrawerOpen(Gravity.START)) {
+        if (mDrawerLayout.isDrawerOpen(Gravity.START)) {
             mDrawerLayout.closeDrawer(Gravity.START);
         } else {
             super.onBackPressed();
@@ -272,15 +376,11 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     }
 
     @Override
-    public void onPause() {
-        super.onPause();
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(mSurveysSyncReceiver);
-    }
-
-    @Override
     public void onDestroy() {
         super.onDestroy();
-        mDatabase.close();
+        if (mDatabase != null) {
+            mDatabase.close();
+        }
     }
 
     @Override
@@ -290,25 +390,31 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
         mDrawerToggle.syncState();
     }
 
-    private void startServices(boolean waitForDeviceId) {
-        if (!StatusUtil.hasExternalStorage()) {
-            ViewUtil.showConfirmDialog(R.string.checksd, R.string.sdmissing, this,
-                    false,
-                    new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            SurveyActivity.this.finish();
-                        }
-                    },
-                    null);
+    private void startServicesIfPossible() {
+        if (StatusUtil.hasExternalStorage()) {
+            startServices();
         } else {
-            if (!waitForDeviceId) {
-                startService(new Intent(this, SurveyDownloadService.class));
-                startService(new Intent(this, DataSyncService.class));
-            }
-            startService(new Intent(this, BootstrapService.class));
-            startService(new Intent(this, TimeCheckService.class));
+            displayExternalStorageMissing();
         }
+    }
+
+    private void startServices() {
+        startService(new Intent(this, SurveyDownloadService.class));
+        startService(new Intent(this, DataSyncService.class));
+        startService(new Intent(this, BootstrapService.class));
+        startService(new Intent(this, TimeCheckService.class));
+    }
+
+    private void displayExternalStorageMissing() {
+        ViewUtil.showConfirmDialog(R.string.checksd, R.string.sdmissing, this,
+                false,
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        SurveyActivity.this.finish();
+                    }
+                },
+                null);
     }
 
     @Override
@@ -321,33 +427,67 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     }
 
     @Override
-    public void onUserSelected(User user) {
-        FlowApp.getApp().setUser(user);
-        mDrawer.load();
-        mDrawerLayout.closeDrawers();
-        displaySelectedUser();
-    }
-
-    @Override
     public void onSurveySelected(SurveyGroup surveyGroup) {
         mSurveyGroup = surveyGroup;
 
-        CharSequence title =
-                mSurveyGroup != null ? mSurveyGroup.getName() : getString(R.string.app_name);
-        setTitle(title);
+        updateActivityTitle();
 
         selectedSurveyId = mSurveyGroup != null ? mSurveyGroup.getId() : SurveyGroup.ID_NONE;
-        prefs.setLong(Prefs.KEY_SURVEY_GROUP_ID, selectedSurveyId);
 
         DatapointsFragment f = (DatapointsFragment) getSupportFragmentManager().findFragmentByTag(
                 DATA_POINTS_FRAGMENT_TAG);
         if (f != null) {
             f.refresh(mSurveyGroup);
         }
-        supportInvalidateOptionsMenu();
-        mDrawer.load();
         mDrawerLayout.closeDrawers();
+        invalidateOptionsMenu();
+
         updateAddDataPointFab();
+    }
+
+    private void updateActivityTitle() {
+        CharSequence title =
+                mSurveyGroup != null ? mSurveyGroup.getName() : getString(R.string.app_name);
+        setTitle(title);
+    }
+
+    @Override
+    public void onSurveyDeleted(long surveyGroupId) {
+        if (selectedSurveyId == surveyGroupId) {
+            onSurveySelected(null);
+        }
+    }
+
+    @Override
+    public void onSurveyDeleteConfirmed(long surveyGroupId) {
+        navigationView.onSurveyDeleteConfirmed(surveyGroupId);
+    }
+
+    @Override
+    public void onEditUser(ViewUser viewUser) {
+        DialogFragment fragment = EditUserDialog.newInstance(viewUser);
+        fragment.show(getSupportFragmentManager(), EditUserDialog.TAG);
+    }
+
+    @Override
+    public void editUser(ViewUser viewUser) {
+        navigationView.editUser(viewUser);
+    }
+
+    @Override
+    public void onDeleteUser(ViewUser viewUser) {
+        DialogFragment fragment = UserDeleteConfirmationDialog.newInstance(viewUser);
+        fragment.show(getSupportFragmentManager(), UserDeleteConfirmationDialog.TAG);
+    }
+
+    @Override
+    public void onUserDeleteConfirmed(ViewUser viewUser) {
+        navigationView.deleteUser(viewUser);
+    }
+
+    @Override
+    public void createUser(String userName) {
+        navigationView.createUser(userName);
     }
 
     @Override
@@ -357,35 +497,36 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     }
 
     @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
-        boolean showItems =
-                !mDrawerLayout.isDrawerOpen(GravityCompat.START) && mSurveyGroup != null;
-        for (int i = 0; i < menu.size(); i++) {
-            menu.getItem(i).setVisible(showItems);
-        }
-        return super.onPrepareOptionsMenu(menu);
-    }
-
-    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         return mDrawerToggle.onOptionsItemSelected(item) || super.onOptionsItemSelected(item);
     }
 
     @Override
-    public void onRecordSelected(String surveyedLocaleId) {
-        final User user = FlowApp.getApp().getUser();
-        // Ensure user is logged in
-        if (user == null) {
-            Toast.makeText(SurveyActivity.this, R.string.mustselectuser,
-                    Toast.LENGTH_LONG).show();
-            return;
-        }
+    public void onRecordSelected(final String surveyedLocaleId) {
+        getSelectedUser.execute(new DefaultObserver<User>() {
+            @Override
+            public void onError(Throwable e) {
+                Timber.e(e);
+                showMissingUserError();
+            }
 
-        if (mSurveyGroup != null && mSurveyGroup.isMonitored()) {
-            displayRecord(surveyedLocaleId);
-        } else {
-            displayForm(surveyedLocaleId, user);
-        }
+            @Override
+            public void onNext(User user) {
+                if (user.getName() == null) {
+                    showMissingUserError();
+                } else {
+                    if (mSurveyGroup != null && mSurveyGroup.isMonitored()) {
+                        displayRecord(surveyedLocaleId);
+                    } else {
+                        displayForm(surveyedLocaleId, user);
+                    }
+                }
+            }
+        }, null);
+    }
+
+    private void showMissingUserError() {
+        Toast.makeText(this, R.string.mustselectuser, Toast.LENGTH_LONG).show();
     }
 
     private void displayRecord(String surveyedLocaleId) {
@@ -393,7 +534,8 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     }
 
     private void displayForm(String surveyedLocaleId, User user) {
-        Survey registrationForm = mDatabase.getRegistrationForm(mSurveyGroup);
+        Survey registrationForm =
+                mDatabase != null ? mDatabase.getRegistrationForm(mSurveyGroup) : null;
         if (registrationForm == null) {
             Toast.makeText(this, R.string.error_missing_form, Toast.LENGTH_LONG).show();
             return;
@@ -422,45 +564,68 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
                 formInstanceId, readOnly, mSurveyGroup);
     }
 
-    private void displaySelectedUser() {
-        User user = FlowApp.getApp().getUser();
-        if (user != null) {
-            Toast.makeText(this, getString(R.string.logged_in_as) + " " + user.getName(),
-                    Toast.LENGTH_LONG).show();
-        }
+    private void showSelectedUser() {
+        getSelectedUser.execute(new DefaultObserver<User>() {
+            @Override
+            public void onError(Throwable e) {
+                Timber.e(e);
+            }
+
+            @Override
+            public void onNext(User user) {
+                String userName = user.getName();
+                if (!TextUtils.isEmpty(userName)) {
+                    showMessage(getString(R.string.logged_in_as) + " " + userName);
+                }
+            }
+        }, null);
+    }
+
+    private void showMessage(String message) {
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show();
     }
 
     @Override
-    public boolean onSearchTap() {
-        return onSearchRequested();
+    public void navigateToHelp() {
+        navigate(new Runnable() {
+            @Override
+            public void run() {
+                navigator.navigateToHelp(SurveyActivity.this);
+            }
+        });
     }
 
-    private void reloadDrawer() {
-        mDrawer.load();
+    @Override
+    public void navigateToAbout() {
+        navigate(new Runnable() {
+            @Override
+            public void run() {
+                navigator.navigateToAbout(SurveyActivity.this);
+            }
+        });
+    }
+
+    @Override
+    public void navigateToSettings() {
+        navigate(new Runnable() {
+            @Override
+            public void run() {
+                navigator.navigateToAppSettings(SurveyActivity.this);
+            }
+        });
+    }
+
+    private void navigate(Runnable runnable) {
+        mDrawerLayout.closeDrawers();
+        mDrawerLayout.postDelayed(runnable, NAVIGATION_DRAWER_DELAY_MILLIS);
     }
 
     @OnClick(R.id.add_data_point_fab)
     void onAddDataPointTap() {
-        addDataPointFab.setEnabled(false);
-        String newLocaleId = mDatabase.createSurveyedLocale(mSurveyGroup.getId());
-        onRecordSelected(newLocaleId);
-    }
-
-    static class SurveySyncBroadcastReceiver extends BroadcastReceiver {
-
-        private final WeakReference<SurveyActivity> activityWeakReference;
-
-        SurveySyncBroadcastReceiver(SurveyActivity activity) {
-            this.activityWeakReference = new WeakReference<>(activity);
-        }
-
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            Timber.i("Surveys have been synchronised. Refreshing data...");
-            SurveyActivity surveyActivity = activityWeakReference.get();
-            if (surveyActivity != null) {
-                surveyActivity.reloadDrawer();
-            }
+        if (mDatabase != null) {
+            addDataPointFab.setEnabled(false);
+            String newLocaleId = mDatabase.createSurveyedLocale(mSurveyGroup.getId());
+            onRecordSelected(newLocaleId);
         }
     }
 }

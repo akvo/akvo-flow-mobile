@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -32,15 +32,19 @@ interface DataPointsMapView {
 
     void displayData(List<MapDataPoint> surveyedLocales);
 
-    void displayMenu(boolean monitored);
-
     void showSyncedResults(int numberOfSyncedItems);
 
     void showErrorAssignmentMissing();
 
-    void showErrorSyncNotAllowed();
-
     void showErrorNoNetwork();
 
     void showErrorSync();
+
+    void showNoDataPointsToSync();
+
+    void hideMenu();
+
+    void showMonitoredMenu();
+
+    void showNonMonitoredMenu();
 }

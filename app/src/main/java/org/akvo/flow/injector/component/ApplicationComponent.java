@@ -29,7 +29,6 @@ import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.broadcast.BootReceiver;
 import org.akvo.flow.broadcast.DataTimeoutReceiver;
 import org.akvo.flow.data.net.RestApi;
-import org.akvo.flow.data.util.GsonMapper;
 import org.akvo.flow.domain.executor.PostExecutionThread;
 import org.akvo.flow.domain.executor.ThreadExecutor;
 import org.akvo.flow.domain.repository.ApkRepository;

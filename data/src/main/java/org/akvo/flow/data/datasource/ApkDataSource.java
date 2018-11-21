@@ -17,13 +17,11 @@
 
 package org.akvo.flow.data.datasource;
 
-import android.support.annotation.NonNull;
-
 import org.akvo.flow.data.entity.ApiApkData;
 
 import io.reactivex.Observable;
 
 public interface ApkDataSource {
 
-    Observable<ApiApkData> getApkData(@NonNull String baseUrl);
+    Observable<ApiApkData> getApkData();
 }

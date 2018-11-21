@@ -31,6 +31,7 @@ import org.akvo.flow.data.entity.S3File;
 import org.akvo.flow.data.entity.Transmission;
 import org.akvo.flow.data.net.gae.DataPointDownloadService;
 import org.akvo.flow.data.net.gae.DeviceFilesService;
+import org.akvo.flow.data.net.gae.FlowApiService;
 import org.akvo.flow.data.net.gae.ProcessingNotificationService;
 import org.akvo.flow.data.net.s3.AwsS3;
 import org.akvo.flow.data.util.ApiUrls;

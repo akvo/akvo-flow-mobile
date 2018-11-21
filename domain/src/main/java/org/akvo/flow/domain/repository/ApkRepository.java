@@ -25,7 +25,7 @@ import io.reactivex.Observable;
 
 public interface ApkRepository {
 
-    Observable<ApkData> loadApkData(@NonNull String baseUrl);
+    Observable<ApkData> loadApkData();
 
     Observable<Boolean> saveApkDataPreference(@NonNull ApkData apkData);
 

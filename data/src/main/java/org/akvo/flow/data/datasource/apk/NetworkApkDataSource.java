@@ -17,8 +17,6 @@
 
 package org.akvo.flow.data.datasource.apk;
 
-import android.support.annotation.NonNull;
-
 import org.akvo.flow.data.datasource.ApkDataSource;
 import org.akvo.flow.data.entity.ApiApkData;
 import org.akvo.flow.data.net.RestApi;
@@ -36,9 +34,8 @@ public class NetworkApkDataSource implements ApkDataSource {
         this.restApi = restApi;
     }
 
-    //TODO: baseUrl should be injected
     @Override
-    public Observable<ApiApkData> getApkData(@NonNull String baseUrl) {
+    public Observable<ApiApkData> getApkData() {
         return restApi.loadApkData();
     }
 }

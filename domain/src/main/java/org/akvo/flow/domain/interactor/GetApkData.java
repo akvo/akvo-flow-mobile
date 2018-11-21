@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010-2016 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2016-2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo FLOW.
  *
@@ -31,8 +31,6 @@ public class GetApkData extends UseCase {
 
     private final ApkRepository apkRepository;
 
-    public static final String BASE_URL_KEY = "base_url_key";
-
     @Inject
     public GetApkData(ThreadExecutor threadExecutor, PostExecutionThread postExecutionThread,
             ApkRepository apkRepository) {
@@ -42,13 +40,6 @@ public class GetApkData extends UseCase {
 
     @Override
     protected <T> Observable buildUseCaseObservable(Map<String, T> parameters) {
-
-        //TODO: get base url from another repository
-        if (parameters == null || !parameters.containsKey(BASE_URL_KEY)) {
-            return Observable.error(new IllegalArgumentException("Base url not provided"));
-        }
-        //TODO: check if we are allowed to go online using 3G else throw exception
-        String baseUrl = (String) parameters.get(BASE_URL_KEY);
-        return apkRepository.loadApkData(baseUrl);
+        return apkRepository.loadApkData();
     }
 }

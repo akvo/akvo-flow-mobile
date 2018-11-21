@@ -31,8 +31,6 @@ public class Constants {
     public static final String PNG_CONTENT_TYPE = "image/png";
     public static final String VIDEO_CONTENT_TYPE = "video/mp4";
     public static final String VERSION = "ver";
-    public static final String APK_VERSION_SERVICE_PATH =
-            "/deviceapprest?action=getLatestVersion&deviceType=androidPhone&appCode=flowapp";
     static final String SURVEY_DATA_FILE_JSON = "data.json";
     static final String UTF_8_CHARSET = "UTF-8";
 }

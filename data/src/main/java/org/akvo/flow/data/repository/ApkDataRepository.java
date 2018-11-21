@@ -42,8 +42,8 @@ public class ApkDataRepository implements ApkRepository {
     }
 
     @Override
-    public Observable<ApkData> loadApkData(@NonNull String baseUrl) {
-        return dataSourceFactory.getNetworkDataSource().getApkData(baseUrl)
+    public Observable<ApkData> loadApkData() {
+        return dataSourceFactory.getNetworkDataSource().getApkData()
                 .map(new Function<ApiApkData, ApkData>() {
                     @Override
                     public ApkData apply(ApiApkData apiApkData) {

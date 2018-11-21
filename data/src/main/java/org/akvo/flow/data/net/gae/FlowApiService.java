@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -18,23 +18,16 @@
  *
  */
 
-package org.akvo.flow.activity.form.data;
+package org.akvo.flow.data.net.gae;
 
-import java.util.List;
+import org.akvo.flow.data.entity.ApiApkData;
+import org.akvo.flow.data.util.ApiUrls;
 
-public class TestDataPoint {
+import io.reactivex.Observable;
+import retrofit2.http.GET;
 
-    private List<TestResponse> responses;
+public interface FlowApiService {
 
-    public TestDataPoint(List<TestResponse> responses) {
-        this.responses = responses;
-    }
-
-    public List<TestResponse> getResponses() {
-        return responses;
-    }
-
-    public void setResponses(List<TestResponse> responses) {
-        this.responses = responses;
-    }
+    @GET(ApiUrls.APK_VERSION_SERVICE_PATH)
+    Observable<ApiApkData> loadApkData();
 }

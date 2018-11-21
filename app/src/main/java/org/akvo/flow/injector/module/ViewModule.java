@@ -32,7 +32,6 @@ import org.akvo.flow.domain.interactor.ExportSurveyInstances;
 import org.akvo.flow.domain.interactor.GetAllSurveys;
 import org.akvo.flow.domain.interactor.GetIsDeviceSetUp;
 import org.akvo.flow.domain.interactor.GetPublishDataTime;
-import org.akvo.flow.domain.interactor.GetApkData;
 import org.akvo.flow.domain.interactor.GetSavedDataPoints;
 import org.akvo.flow.domain.interactor.GetUserSettings;
 import org.akvo.flow.domain.interactor.MakeDataPrivate;
@@ -40,7 +39,6 @@ import org.akvo.flow.domain.interactor.MobileUploadSet;
 import org.akvo.flow.domain.interactor.PublishData;
 import org.akvo.flow.domain.interactor.SaveAppLanguage;
 import org.akvo.flow.domain.interactor.SaveEnableMobileData;
-import org.akvo.flow.domain.interactor.SaveApkData;
 import org.akvo.flow.domain.interactor.SaveImage;
 import org.akvo.flow.domain.interactor.SaveImageSize;
 import org.akvo.flow.domain.interactor.SaveKeepScreenOn;
@@ -281,17 +279,5 @@ public class ViewModule {
     @Named("mobileUploadSet")
     UseCase provideMobileUploadSet(MobileUploadSet mobileUploadSet) {
         return mobileUploadSet;
-    }
-
-    @Provides
-    @Named("getApkData")
-    UseCase provideGetApkDataUseCase(GetApkData getApkData) {
-        return getApkData;
-    }
-
-    @Provides
-    @Named("saveApkData")
-    UseCase provideSaveApkDataUseCase(SaveApkData saveApkData) {
-        return saveApkData;
     }
 }

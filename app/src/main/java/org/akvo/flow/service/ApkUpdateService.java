@@ -21,7 +21,6 @@ package org.akvo.flow.service;
 
 import android.content.Context;
 import android.content.Intent;
-import android.support.annotation.Nullable;
 
 import com.google.android.gms.gcm.GcmNetworkManager;
 import com.google.android.gms.gcm.GcmTaskService;
@@ -33,19 +32,13 @@ import org.akvo.flow.BuildConfig;
 import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.domain.entity.ApkData;
 import org.akvo.flow.domain.interactor.DefaultObserver;
-import org.akvo.flow.domain.interactor.SaveApkData;
-import org.akvo.flow.domain.interactor.UseCase;
-import org.akvo.flow.domain.util.VersionHelper;
-import org.akvo.flow.presentation.entity.ViewApkData;
-import org.akvo.flow.presentation.entity.ViewApkMapper;
+import org.akvo.flow.domain.interactor.RefreshApkData;
 import org.akvo.flow.util.ConstantUtil;
-import org.akvo.flow.util.StringUtil;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 
 import timber.log.Timber;
 
@@ -64,18 +57,7 @@ public class ApkUpdateService extends GcmTaskService {
     private static final String TAG = "APK_UPDATE_SERVICE";
 
     @Inject
-    @Named("getApkData")
-    UseCase getApkData;
-
-    @Inject
-    @Named("saveApkData")
-    UseCase saveApkData;
-
-    @Inject
-    VersionHelper versionHelper;
-
-    @Inject
-    ViewApkMapper mapper;
+    RefreshApkData refreshApkData;
 
     public static void scheduleFirstTask(Context context) {
         schedulePeriodicTask(context, ConstantUtil.FIRST_REPEAT_INTERVAL_IN_SECONDS,
@@ -134,8 +116,7 @@ public class ApkUpdateService extends GcmTaskService {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        getApkData.dispose();
-        saveApkData.dispose();
+        refreshApkData.dispose();
     }
 
     /**
@@ -158,41 +139,14 @@ public class ApkUpdateService extends GcmTaskService {
         //after the first time the task is run we reschedule to a higher interval
         schedulePeriodicTask(this, ConstantUtil.REPEAT_INTERVAL_IN_SECONDS,
                 ConstantUtil.FLEX_INTERVAL_IN_SECONDS);
-        getApkData.execute(new DefaultObserver<ApkData>() {
+        Map<String, String> params = new HashMap<>(2);
+        params.put(RefreshApkData.APP_VERSION_PARAM, BuildConfig.VERSION_NAME);
+        refreshApkData.execute(new DefaultObserver<ApkData>() {
             @Override
             public void onError(Throwable e) {
-                //TODO: verify which exception can be ignored and which not
                 Timber.e(e, "Could not call apk version service");
             }
-
-            @Override
-            public void onNext(ApkData apkData) {
-                final ViewApkData viewApkData = mapper.transform(apkData);
-                if (shouldAppBeUpdated(viewApkData)) {
-                    Map<String, Object> params = new HashMap<>(2);
-                    params.put(SaveApkData.KEY_APK_DATA, apkData);
-                    saveApkData.execute(new DefaultObserver<Boolean>() {
-                        @Override
-                        public void onError(Throwable e) {
-                            super.onError(e);
-                            Timber.e(e, "Error saving apk data");
-                        }
-                    }, params);
-                }
-            }
-        }, null);
-
+        }, params);
         return GcmNetworkManager.RESULT_SUCCESS;
-    }
-
-    private boolean shouldAppBeUpdated(@Nullable ViewApkData data) {
-        if (data == null) {
-            return false;
-        }
-        String remoteVersionName = data.getVersion();
-        String currentVersionName = BuildConfig.VERSION_NAME;
-        return StringUtil.isValid(remoteVersionName)
-                && versionHelper.isNewerVersion(currentVersionName, remoteVersionName)
-                && StringUtil.isValid(data.getFileUrl());
     }
 }

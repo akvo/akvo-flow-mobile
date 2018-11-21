@@ -21,6 +21,7 @@
 package org.akvo.flow.domain.util;
 
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 
 import javax.inject.Inject;
 
@@ -64,5 +65,9 @@ public class VersionHelper {
         }
 
         return false;
+    }
+
+    public boolean isValid(@Nullable String value) {
+        return !TextUtils.isEmpty(value) && !value.equalsIgnoreCase("null");
     }
 }

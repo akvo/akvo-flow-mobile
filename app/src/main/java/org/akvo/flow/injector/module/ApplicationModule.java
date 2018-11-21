@@ -24,7 +24,6 @@ import android.content.Context;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.squareup.sqlbrite2.BriteDatabase;
 import com.squareup.sqlbrite2.SqlBrite;
 
@@ -53,6 +52,7 @@ import org.akvo.flow.domain.repository.SetupRepository;
 import org.akvo.flow.domain.repository.SurveyRepository;
 import org.akvo.flow.domain.repository.UserRepository;
 import org.akvo.flow.domain.util.DeviceHelper;
+import org.akvo.flow.domain.util.GsonMapper;
 import org.akvo.flow.thread.UIThread;
 import org.akvo.flow.util.logging.DebugLoggingHelper;
 import org.akvo.flow.util.logging.LoggingHelper;
@@ -100,7 +100,7 @@ public class ApplicationModule {
     @Provides
     @Singleton
     GsonMapper provideGsonMapper() {
-        return new GsonMapper(new GsonBuilder().create());
+        return new GsonMapper();
     }
 
     @Provides
@@ -172,10 +172,9 @@ public class ApplicationModule {
 
     @Provides
     @Singleton
-    SharedPreferencesDataSource provideSharedPreferences() {
+    SharedPreferencesDataSource provideSharedPreferences(GsonMapper mapper) {
         return new SharedPreferencesDataSource(
-                application.getSharedPreferences(PREFS_NAME, PREFS_MODE),
-                new GsonMapper(new GsonBuilder().create()));
+                application.getSharedPreferences(PREFS_NAME, PREFS_MODE), mapper);
     }
 
     @Provides

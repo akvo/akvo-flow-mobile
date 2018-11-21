@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -70,7 +70,7 @@ public abstract class UseCase {
         }
     }
 
-    private void addDisposable(Disposable disposable) {
+    void addDisposable(Disposable disposable) {
         disposables.add(disposable);
     }
 }

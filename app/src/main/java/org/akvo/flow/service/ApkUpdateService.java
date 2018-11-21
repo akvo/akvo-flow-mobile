@@ -169,7 +169,7 @@ public class ApkUpdateService extends GcmTaskService {
             public void onNext(ApkData apkData) {
                 final ViewApkData viewApkData = mapper.transform(apkData);
                 if (shouldAppBeUpdated(viewApkData)) {
-                    Map<String, Object> params = new HashMap<>(1);
+                    Map<String, Object> params = new HashMap<>(2);
                     params.put(SaveApkData.KEY_APK_DATA, apkData);
                     saveApkData.execute(new DefaultObserver<Boolean>() {
                         @Override

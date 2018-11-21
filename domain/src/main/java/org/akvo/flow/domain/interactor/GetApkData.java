@@ -17,6 +17,8 @@
 
 package org.akvo.flow.domain.interactor;
 
+import android.os.Build;
+
 import org.akvo.flow.domain.executor.PostExecutionThread;
 import org.akvo.flow.domain.executor.ThreadExecutor;
 import org.akvo.flow.domain.repository.ApkRepository;
@@ -26,6 +28,7 @@ import java.util.Map;
 import javax.inject.Inject;
 
 import io.reactivex.Observable;
+import io.reactivex.observers.DisposableObserver;
 
 public class GetApkData extends UseCase {
 
@@ -38,8 +41,14 @@ public class GetApkData extends UseCase {
         this.apkRepository = apkRepository;
     }
 
+    @SuppressWarnings("unchecked")
+    @Override
+    public <T> void execute(DisposableObserver<T> observer, Map<String, Object> parameters) {
+        addDisposable(((Observable<T>) buildUseCaseObservable(parameters)).subscribeWith(observer));
+    }
+
     @Override
     protected <T> Observable buildUseCaseObservable(Map<String, T> parameters) {
-        return apkRepository.loadApkData();
+        return apkRepository.loadApkData(Build.VERSION.SDK_INT + "");
     }
 }

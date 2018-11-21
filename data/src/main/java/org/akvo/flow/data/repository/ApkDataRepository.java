@@ -46,8 +46,8 @@ public class ApkDataRepository implements ApkRepository {
     }
 
     @Override
-    public Observable<ApkData> loadApkData() {
-        return restApi.loadApkData()
+    public Observable<ApkData> loadApkData(String androidVersion) {
+        return restApi.loadApkData(androidVersion)
                 .map(new Function<ApiApkData, ApkData>() {
                     @Override
                     public ApkData apply(ApiApkData apiApkData) {

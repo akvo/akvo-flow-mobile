@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -63,22 +63,28 @@ public class SaveApkData extends UseCase {
                 .concatMap(new Function<ApkData, Observable<Boolean>>() {
                     @Override
                     public Observable<Boolean> apply(ApkData savedApkData) {
-                        if (savedApkData == null || versionHelper
-                                .isNewerVersion(savedApkData.getVersion(), apkData.getVersion())) {
-                            return Observable.zip(apkRepository
-                                            .saveApkDataPreference((ApkData) parameters.get(KEY_APK_DATA)),
-                                    userRepository.clearAppUpdateNotified(),
-                                    new BiFunction<Boolean, Boolean, Boolean>() {
-                                        @Override
-                                        public Boolean apply(Boolean first, Boolean second) {
-                                            if (first == null || second == null) {
-                                                return false;
-                                            }
-                                            return first && second;
-                                        }
-                                    });
+                        if (apkDataNeedsSaving(savedApkData, apkData)) {
+                            return saveNewApkVersion(parameters);
                         }
                         return Observable.just(false);
+                    }
+                });
+    }
+
+    private boolean apkDataNeedsSaving(ApkData savedApkData, ApkData apkData) {
+        final boolean apkDataUnset = ApkData.NOT_SET_VALUE.equals(savedApkData);
+        return apkDataUnset || versionHelper
+                .isNewerVersion(savedApkData.getVersion(), apkData.getVersion());
+    }
+
+    private <T> Observable<Boolean> saveNewApkVersion(Map<String, T> parameters) {
+        final ApkData apkData = (ApkData) parameters.get(KEY_APK_DATA);
+        return Observable.zip(apkRepository.saveApkDataPreference(apkData),
+                userRepository.clearAppUpdateNotified(),
+                new BiFunction<Boolean, Boolean, Boolean>() {
+                    @Override
+                    public Boolean apply(Boolean first, Boolean second) {
+                        return first && second;
                     }
                 });
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010-2016 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2016-2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo FLOW.
  *
@@ -18,6 +18,9 @@
 package org.akvo.flow.domain.entity;
 
 public class ApkData {
+
+    public static final ApkData NOT_SET_VALUE = new ApkData(null, null, null);
+
     private final String version;
     private final String fileUrl;
     private final String md5Checksum;

@@ -25,9 +25,10 @@ import org.akvo.flow.data.util.ApiUrls;
 
 import io.reactivex.Observable;
 import retrofit2.http.GET;
+import retrofit2.http.Query;
 
 public interface FlowApiService {
 
     @GET(ApiUrls.APK_VERSION_SERVICE_PATH)
-    Observable<ApiApkData> loadApkData();
+    Observable<ApiApkData> loadApkData(@Query("androidBuildVersion") String version);
 }

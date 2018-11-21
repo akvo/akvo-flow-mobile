@@ -113,9 +113,9 @@ public class RestApi {
         }
     }
 
-    public Observable<ApiApkData> loadApkData() {
+    public Observable<ApiApkData> loadApkData(String appVersion) {
         return serviceFactory.createRetrofitService(FlowApiService.class, apiUrls.getGaeUrl())
-                .loadApkData();
+                .loadApkData(appVersion);
     }
 
     private Observable<ResponseBody> uploadPublicFile(String date, S3File s3File) {

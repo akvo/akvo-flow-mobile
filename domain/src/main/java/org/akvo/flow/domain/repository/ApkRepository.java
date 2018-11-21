@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010-2016 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2016-2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo FLOW.
  *
@@ -25,7 +25,7 @@ import io.reactivex.Observable;
 
 public interface ApkRepository {
 
-    Observable<ApkData> loadApkData();
+    Observable<ApkData> loadApkData(String androidVersion);
 
     Observable<Boolean> saveApkDataPreference(@NonNull ApkData apkData);
 

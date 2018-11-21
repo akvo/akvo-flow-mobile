@@ -109,38 +109,6 @@ public class SharedPreferencesDataSource {
         return Observable.just(true);
     }
 
-    protected String getString(String key, String defaultValue) {
-        return preferences.getString(key, defaultValue);
-    }
-
-    protected void setString(String key, String value) {
-        preferences.edit().putString(key, value).apply();
-    }
-
-    private boolean getBoolean(String key, boolean defValue) {
-        return preferences.getBoolean(key, defValue);
-    }
-
-    private long getLong(String key, long defValue) {
-        return preferences.getLong(key, defValue);
-    }
-
-    private void setLong(String key, long value) {
-        preferences.edit().putLong(key, value).apply();
-    }
-
-    private int getInt(String key, int defValue) {
-        return preferences.getInt(key, defValue);
-    }
-
-    private void setBoolean(String key, boolean value) {
-        preferences.edit().putBoolean(key, value).apply();
-    }
-
-    private void setInt(String key, int value) {
-        preferences.edit().putInt(key, value).apply();
-    }
-
     public Observable<Boolean> saveScreenOn(Boolean keepScreenOn) {
         setBoolean(KEY_SCREEN_ON, keepScreenOn);
         return Observable.just(true);
@@ -195,10 +163,6 @@ public class SharedPreferencesDataSource {
         return Observable.just(true);
     }
 
-    private void clearSetUp() {
-        preferences.edit().remove(KEY_SETUP).apply();
-    }
-
     public Observable<Boolean> mobileUploadSet() {
         return Observable.just(preferences.contains(KEY_CELL_UPLOAD));
     }
@@ -213,15 +177,11 @@ public class SharedPreferencesDataSource {
         return Observable.just(true);
     }
 
-    private void removePreference(String key) {
-        preferences.edit().remove(key).apply();
-    }
-
     @Nullable
     public Observable<ApkData> getApkData() {
         String apkDataString = preferences.getString(KEY_APK_DATA, null);
         if (apkDataString == null) {
-            return null;
+            return Observable.just(ApkData.NOT_SET_VALUE);
         }
         return Observable.just(gsonMapper.read(apkDataString, ApkData.class));
     }
@@ -229,5 +189,45 @@ public class SharedPreferencesDataSource {
     public Observable<Boolean> saveAppUpdateNotifiedTime() {
         setLong(KEY_APP_UPDATE_LAST_NOTIFIED, System.currentTimeMillis());
         return Observable.just(true);
+    }
+
+    protected String getString(String key, String defaultValue) {
+        return preferences.getString(key, defaultValue);
+    }
+
+    protected void setString(String key, String value) {
+        preferences.edit().putString(key, value).apply();
+    }
+
+    private boolean getBoolean(String key, boolean defValue) {
+        return preferences.getBoolean(key, defValue);
+    }
+
+    private long getLong(String key, long defValue) {
+        return preferences.getLong(key, defValue);
+    }
+
+    private void setLong(String key, long value) {
+        preferences.edit().putLong(key, value).apply();
+    }
+
+    private int getInt(String key, int defValue) {
+        return preferences.getInt(key, defValue);
+    }
+
+    private void setInt(String key, int value) {
+        preferences.edit().putInt(key, value).apply();
+    }
+
+    private void setBoolean(String key, boolean value) {
+        preferences.edit().putBoolean(key, value).apply();
+    }
+
+    private void clearSetUp() {
+        removePreference(KEY_SETUP);
+    }
+
+    private void removePreference(String key) {
+        preferences.edit().remove(key).apply();
     }
 }

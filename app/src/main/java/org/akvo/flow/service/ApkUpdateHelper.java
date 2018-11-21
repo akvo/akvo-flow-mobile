@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2016 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2016-2018 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -26,8 +26,8 @@ import org.akvo.flow.BuildConfig;
 import org.akvo.flow.api.service.ApkApiService;
 import org.akvo.flow.domain.apkupdate.ApkUpdateMapper;
 import org.akvo.flow.domain.apkupdate.ViewApkData;
+import org.akvo.flow.domain.util.VersionHelper;
 import org.akvo.flow.util.StringUtil;
-import org.akvo.flow.util.VersionHelper;
 import org.json.JSONException;
 import org.json.JSONObject;
 

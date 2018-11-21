@@ -57,6 +57,7 @@ import org.akvo.flow.domain.entity.User;
 import org.akvo.flow.domain.interactor.DefaultObserver;
 import org.akvo.flow.domain.interactor.UseCase;
 import org.akvo.flow.domain.util.GsonMapper;
+import org.akvo.flow.domain.util.VersionHelper;
 import org.akvo.flow.injector.component.ApplicationComponent;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
@@ -77,7 +78,6 @@ import org.akvo.flow.ui.fragment.DatapointsFragment;
 import org.akvo.flow.ui.fragment.RecordListListener;
 import org.akvo.flow.util.AppPermissionsHelper;
 import org.akvo.flow.util.ConstantUtil;
-import org.akvo.flow.util.PlatformUtil;
 import org.akvo.flow.util.StatusUtil;
 import org.akvo.flow.util.ViewUtil;
 
@@ -135,6 +135,9 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     @Inject
     AppPermissionsHelper appPermissionsHelper;
 
+    @Inject
+    VersionHelper versionHelper;
+
     private SurveyGroup mSurveyGroup;
 
     private ActionBarDrawerToggle mDrawerToggle;
@@ -159,7 +162,7 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
             mDatabase.open();
 
             updateSelectedSurvey();
-            apkUpdateStore = new ApkUpdateStore(new GsonMapper(), prefs);
+            apkUpdateStore = new ApkUpdateStore(new GsonMapper(), prefs, versionHelper);
 
             initNavigationDrawer();
             selectSurvey();
@@ -350,7 +353,7 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     private void showApkUpdateIfNeeded() {
         ViewApkData apkData = apkUpdateStore.getApkData();
         boolean shouldNotifyUpdate = apkUpdateStore.shouldNotifyNewVersion();
-        if (apkData != null && shouldNotifyUpdate && PlatformUtil
+        if (apkData != null && shouldNotifyUpdate && versionHelper
                 .isNewerVersion(BuildConfig.VERSION_NAME, apkData.getVersion())) {
             apkUpdateStore.saveAppUpdateNotifiedTime();
             navigator.navigateToAppUpdate(this, apkData);

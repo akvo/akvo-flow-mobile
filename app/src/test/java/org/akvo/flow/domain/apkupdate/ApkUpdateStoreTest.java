@@ -61,7 +61,7 @@ public class ApkUpdateStoreTest {
     @Test
     public void updateApkData_ShouldUpdateIfSavedOutDated() throws Exception {
         apkDataWithVersion("2.2.8");
-        ApkUpdateStore sut = spy(new ApkUpdateStore(new GsonMapper(), mockPrefs));
+        ApkUpdateStore sut = spy(new ApkUpdateStore(new GsonMapper(), mockPrefs, versionHelper));
         ViewApkData newData = new ViewApkData("2.2.9", "", "");
 
         sut.updateApkData(newData);
@@ -83,7 +83,7 @@ public class ApkUpdateStoreTest {
     @Test
     public void updateApkData_ShouldUpdateIfSavedNull() throws Exception {
         nullStringApkData();
-        ApkUpdateStore sut = spy(new ApkUpdateStore(new GsonMapper(), mockPrefs));
+        ApkUpdateStore sut = spy(new ApkUpdateStore(new GsonMapper(), mockPrefs, versionHelper));
         ViewApkData newData = new ViewApkData("2.2.9", "", "");
 
         sut.updateApkData(newData);
@@ -104,7 +104,7 @@ public class ApkUpdateStoreTest {
     @Test
     public void updateApkData_ShouldNotUpdateIfSavedUpdated() throws Exception {
         apkDataWithVersion("2.2.9");
-        ApkUpdateStore sut = spy(new ApkUpdateStore(new GsonMapper(), mockPrefs));
+        ApkUpdateStore sut = spy(new ApkUpdateStore(new GsonMapper(), mockPrefs, versionHelper));
         ViewApkData newData = new ViewApkData("2.2.9", "", "");
 
         sut.updateApkData(newData);
@@ -116,7 +116,7 @@ public class ApkUpdateStoreTest {
     @Test
     public void updateApkData_ShouldNotUpdateIfSavedMoreRecent() throws Exception {
         apkDataWithVersion("2.2.10");
-        ApkUpdateStore sut = spy(new ApkUpdateStore(new GsonMapper(), mockPrefs));
+        ApkUpdateStore sut = spy(new ApkUpdateStore(new GsonMapper(), mockPrefs, versionHelper));
         ViewApkData newData = new ViewApkData("2.2.9", "", "");
 
         sut.updateApkData(newData);
@@ -128,7 +128,7 @@ public class ApkUpdateStoreTest {
     @Test
     public void getApkData_ShouldReturnNullIfUnset() throws Exception {
         nullStringApkData();
-        ApkUpdateStore sut = spy(new ApkUpdateStore(new GsonMapper(), mockPrefs));
+        ApkUpdateStore sut = spy(new ApkUpdateStore(new GsonMapper(), mockPrefs, versionHelper));
 
         ViewApkData newData = sut.getApkData();
 
@@ -138,7 +138,7 @@ public class ApkUpdateStoreTest {
     @Test
     public void getApkData_ShouldReturnCorrectApkData() throws Exception {
         prefilledApkData();
-        ApkUpdateStore sut = spy(new ApkUpdateStore(new GsonMapper(), mockPrefs));
+        ApkUpdateStore sut = spy(new ApkUpdateStore(new GsonMapper(), mockPrefs, versionHelper));
 
         ViewApkData newData = sut.getApkData();
 
@@ -160,7 +160,7 @@ public class ApkUpdateStoreTest {
 
     @Test
     public void shouldNotifyNewVersion_WhenPreferenceUnset() throws Exception {
-        ApkUpdateStore sut = spy(new ApkUpdateStore(new GsonMapper(), mockPrefs));
+        ApkUpdateStore sut = spy(new ApkUpdateStore(new GsonMapper(), mockPrefs, versionHelper));
         given(mockPrefs
                 .getLong(ApkUpdateStore.KEY_APP_UPDATE_LAST_NOTIFIED, ApkUpdateStore.NOT_NOTIFIED))
                 .willReturn(ApkUpdateStore.NOT_NOTIFIED);
@@ -172,7 +172,7 @@ public class ApkUpdateStoreTest {
 
     @Test
     public void shouldNotifyNewVersion_WhenPreferenceOutDated() throws Exception {
-        ApkUpdateStore sut = spy(new ApkUpdateStore(new GsonMapper(), mockPrefs));
+        ApkUpdateStore sut = spy(new ApkUpdateStore(new GsonMapper(), mockPrefs, versionHelper));
         given(mockPrefs
                 .getLong(ApkUpdateStore.KEY_APP_UPDATE_LAST_NOTIFIED, ApkUpdateStore.NOT_NOTIFIED))
                 .willReturn(
@@ -185,7 +185,7 @@ public class ApkUpdateStoreTest {
 
     @Test
     public void shouldNotNotifyNewVersion_WhenPreferenceRecent() throws Exception {
-        ApkUpdateStore sut = spy(new ApkUpdateStore(new GsonMapper(), mockPrefs));
+        ApkUpdateStore sut = spy(new ApkUpdateStore(new GsonMapper(), mockPrefs, versionHelper));
         given(mockPrefs
                 .getLong(ApkUpdateStore.KEY_APP_UPDATE_LAST_NOTIFIED, ApkUpdateStore.NOT_NOTIFIED))
                 .willReturn(System.currentTimeMillis());

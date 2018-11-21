@@ -36,7 +36,6 @@ import org.akvo.flow.domain.repository.FileRepository;
 import org.akvo.flow.domain.repository.SetupRepository;
 import org.akvo.flow.domain.repository.SurveyRepository;
 import org.akvo.flow.domain.repository.UserRepository;
-import org.akvo.flow.domain.util.GsonMapper;
 import org.akvo.flow.injector.module.ApplicationModule;
 import org.akvo.flow.injector.module.ViewModule;
 import org.akvo.flow.presentation.BaseActivity;
@@ -64,8 +63,6 @@ public interface ApplicationComponent {
     BriteDatabase provideDatabase();
 
     ApkRepository apkRepository();
-
-    GsonMapper gsonMapper();
 
     Context context();
 

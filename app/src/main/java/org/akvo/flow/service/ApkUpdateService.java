@@ -31,7 +31,6 @@ import com.google.android.gms.gcm.TaskParams;
 
 import org.akvo.flow.BuildConfig;
 import org.akvo.flow.app.FlowApp;
-import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.domain.entity.ApkData;
 import org.akvo.flow.domain.interactor.DefaultObserver;
 import org.akvo.flow.domain.interactor.SaveApkData;
@@ -77,9 +76,6 @@ public class ApkUpdateService extends GcmTaskService {
 
     @Inject
     ViewApkMapper mapper;
-
-    @Inject
-    Prefs prefs;
 
     public static void scheduleFirstTask(Context context) {
         schedulePeriodicTask(context, ConstantUtil.FIRST_REPEAT_INTERVAL_IN_SECONDS,

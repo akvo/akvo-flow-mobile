@@ -23,27 +23,30 @@ import android.support.annotation.Nullable;
 
 import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.domain.util.GsonMapper;
+import org.akvo.flow.domain.util.VersionHelper;
 import org.akvo.flow.util.ConstantUtil;
-import org.akvo.flow.util.PlatformUtil;
 
 @Deprecated
 public class ApkUpdateStore {
 
-    public static final String KEY_APK_DATA = "apk_data";
-    public static final String KEY_APP_UPDATE_LAST_NOTIFIED = "update_notified_last_time";
-    public static final long NOT_NOTIFIED = -1;
+    private static final String KEY_APK_DATA = "apk_data";
+    static final String KEY_APP_UPDATE_LAST_NOTIFIED = "update_notified_last_time";
+    static final long NOT_NOTIFIED = -1;
 
     private final GsonMapper gsonMapper;
     private final Prefs preferences;
+    private final VersionHelper versionHelper;
 
-    public ApkUpdateStore(GsonMapper gsonMapper, Prefs prefs) {
+    public ApkUpdateStore(GsonMapper gsonMapper, Prefs prefs,
+            VersionHelper versionHelper) {
         this.gsonMapper = gsonMapper;
         this.preferences = prefs;
+        this.versionHelper = versionHelper;
     }
 
     public void updateApkData(ViewApkData apkData) {
         ViewApkData savedApkData = getApkData();
-        if (savedApkData == null || PlatformUtil
+        if (savedApkData == null || versionHelper
                 .isNewerVersion(savedApkData.getVersion(), apkData.getVersion())) {
             saveApkData(apkData);
             clearAppUpdateNotified();

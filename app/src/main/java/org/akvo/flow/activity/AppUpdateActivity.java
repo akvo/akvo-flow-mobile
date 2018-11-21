@@ -31,6 +31,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import org.akvo.flow.R;
+import org.akvo.flow.domain.util.VersionHelper;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
 import org.akvo.flow.presentation.BaseActivity;
@@ -174,7 +175,7 @@ public class AppUpdateActivity extends BaseActivity {
             this.mVersion = mVersion;
             this.activityWeakReference = new WeakReference<>(context);
             this.mMd5Checksum = mMd5Checksum;
-            this.apkFileBrowser = new ApkFileBrowser(new FileBrowser());
+            this.apkFileBrowser = new ApkFileBrowser(new FileBrowser(), new VersionHelper());
         }
 
         @Override

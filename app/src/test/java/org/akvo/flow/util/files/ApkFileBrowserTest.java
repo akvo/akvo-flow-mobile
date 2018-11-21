@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -84,7 +84,7 @@ public class ApkFileBrowserTest {
 
     @Test
     public void testEnsureVerifyLatestApkFileReturnsNullWhenCheckSumNull() throws Exception {
-        ApkFileBrowser apkFileBrowser = new ApkFileBrowser(mockFileBrowser);
+        ApkFileBrowser apkFileBrowser = new ApkFileBrowser(mockFileBrowser, versionHelper);
 
         String path = apkFileBrowser.verifyLatestApkFile(mockContext, null);
 
@@ -93,7 +93,7 @@ public class ApkFileBrowserTest {
 
     @Test
     public void testEnsureVerifyLatestApkFileReturnsNullWhenFileIsNull() throws Exception {
-        ApkFileBrowser apkFileBrowser = spy(new ApkFileBrowser(mockFileBrowser));
+        ApkFileBrowser apkFileBrowser = spy(new ApkFileBrowser(mockFileBrowser, versionHelper));
 
         doReturn(null).when(apkFileBrowser).getLatestApkFile(any(Context.class));
 
@@ -104,7 +104,7 @@ public class ApkFileBrowserTest {
 
     @Test
     public void testEnsureVerifyLatestApkFileReturnsNullWhenCheckSumsDoNotMatch() throws Exception {
-        ApkFileBrowser apkFileBrowser = spy(new ApkFileBrowser(mockFileBrowser));
+        ApkFileBrowser apkFileBrowser = spy(new ApkFileBrowser(mockFileBrowser, versionHelper));
 
         doReturn(mockFile).when(apkFileBrowser).getLatestApkFile(any(Context.class));
 
@@ -115,7 +115,7 @@ public class ApkFileBrowserTest {
 
     @Test
     public void testEnsureVerifyLatestApkFileReturnsNonNullWhenCheckSumsMatch() throws Exception {
-        ApkFileBrowser apkFileBrowser = spy(new ApkFileBrowser(mockFileBrowser));
+        ApkFileBrowser apkFileBrowser = spy(new ApkFileBrowser(mockFileBrowser, versionHelper));
 
         doReturn(mockFile).when(apkFileBrowser).getLatestApkFile(any(Context.class));
 
@@ -126,7 +126,7 @@ public class ApkFileBrowserTest {
 
     @Test
     public void testEnsureGetLatestApkFileReturnsNullIfNullApkFolder() throws Exception {
-        ApkFileBrowser apkFileBrowser = spy(new ApkFileBrowser(mockFileBrowser));
+        ApkFileBrowser apkFileBrowser = spy(new ApkFileBrowser(mockFileBrowser, versionHelper));
 
         doReturn(null).when(apkFileBrowser).getApksFoldersList(any(Context.class));
 
@@ -137,7 +137,7 @@ public class ApkFileBrowserTest {
 
     @Test
     public void testEnsureGetLatestApkFileReturnsNullIfEmptyApkFolder() throws Exception {
-        ApkFileBrowser apkFileBrowser = spy(new ApkFileBrowser(mockFileBrowser));
+        ApkFileBrowser apkFileBrowser = spy(new ApkFileBrowser(mockFileBrowser, versionHelper));
 
         doReturn(new File[0]).when(apkFileBrowser).getApksFoldersList(any(Context.class));
 
@@ -148,7 +148,7 @@ public class ApkFileBrowserTest {
 
     @Test
     public void testEnsureGetLatestApkFileReturnsNonNullIfNewestApkFolder() throws Exception {
-        ApkFileBrowser apkFileBrowser = spy(new ApkFileBrowser(mockFileBrowser));
+        ApkFileBrowser apkFileBrowser = spy(new ApkFileBrowser(mockFileBrowser, versionHelper));
         File[] folderList = new File[] {
                 mockFolder
         };
@@ -165,7 +165,7 @@ public class ApkFileBrowserTest {
     @Test
     public void testEnsureGetLatestApkFileReturnsMostRecentIfMultipleApksFolders()
             throws Exception {
-        ApkFileBrowser apkFileBrowser = spy(new ApkFileBrowser(mockFileBrowser));
+        ApkFileBrowser apkFileBrowser = spy(new ApkFileBrowser(mockFileBrowser, versionHelper));
         File secondFolder = mock(File.class);
         File secondFile = mock(File.class);
         File[] folderList = new File[] {
@@ -189,7 +189,7 @@ public class ApkFileBrowserTest {
 
     @Test
     public void testEnsureGetLatestApkFileReturnsNullIfOldApkFolder() throws Exception {
-        ApkFileBrowser apkFileBrowser = spy(new ApkFileBrowser(mockFileBrowser));
+        ApkFileBrowser apkFileBrowser = spy(new ApkFileBrowser(mockFileBrowser, versionHelper));
         File[] folderList = new File[] {
                 mockFolder
         };
@@ -204,7 +204,7 @@ public class ApkFileBrowserTest {
 
     @Test
     public void testEnsureGetLatestApkFileReturnsNullIfOldApksFolders() throws Exception {
-        ApkFileBrowser apkFileBrowser = spy(new ApkFileBrowser(mockFileBrowser));
+        ApkFileBrowser apkFileBrowser = spy(new ApkFileBrowser(mockFileBrowser, versionHelper));
         File secondFolder = mock(File.class);
         File[] folderList = new File[] {
                 mockFolder,

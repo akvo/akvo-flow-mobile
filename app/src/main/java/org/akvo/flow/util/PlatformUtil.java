@@ -22,7 +22,6 @@ package org.akvo.flow.util;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.os.Build;
-import android.support.annotation.Nullable;
 
 import java.util.UUID;
 
@@ -30,44 +29,6 @@ import java.util.UUID;
  * Utilities class to provide Android related functionalities
  */
 public class PlatformUtil {
-
-    /**
-     * TODO: use versionCode to compare versions as versionName field does not have to be X.Y.Z
-     * format
-     *
-     * Check if a given version is newer than the current one.
-     * Versions are expected to be formatted in a dot-decimal notation: X.Y.Z,
-     * being X, Y, and Z integers, and each number separated by a full stop (dot).
-     *
-     * @return true if the second version is newer than the first one, false otherwise
-     */
-    public static boolean isNewerVersion(@Nullable String installedVersion,
-            @Nullable String newVersion) {
-        if (installedVersion == null || newVersion == null) {
-            return false;
-        }
-        // Ensure the Strings are properly formatted
-        final String regex = "^\\d+(\\.\\d+)*$"; // Check dot-decimal notation
-        if (!installedVersion.matches(regex) || !newVersion.matches(regex)) {
-            return false;
-        }
-
-        String[] currentParts = installedVersion.split("\\.");
-        String[] newPartsParts = newVersion.split("\\.");
-        int length = Math.max(currentParts.length, newPartsParts.length);
-        for (int i = 0; i < length; i++) {
-            int currentPart = i < currentParts.length ? Integer.parseInt(currentParts[i]) : 0;
-            int newPart = i < newPartsParts.length ? Integer.parseInt(newPartsParts[i]) : 0;
-
-            if (currentPart < newPart) {
-                return true; // Newer version
-            } else if (newPart < currentPart) {
-                return false; // Older version
-            }
-        }
-
-        return false;
-    }
 
     public static int getResource(Context context, int attr) {
         TypedArray a = context.getTheme().obtainStyledAttributes(new int[] { attr });

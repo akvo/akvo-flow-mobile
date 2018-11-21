@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -20,6 +20,8 @@
 
 package org.akvo.flow.domain.util;
 
+import android.support.annotation.Nullable;
+
 import javax.inject.Inject;
 
 public class VersionHelper {
@@ -37,7 +39,10 @@ public class VersionHelper {
      * @param newVersion
      * @return true if the second version is newer than the first one, false otherwise
      */
-    public boolean isNewerVersion(String installedVersion, String newVersion) {
+    public boolean isNewerVersion(@Nullable String installedVersion, @Nullable String newVersion) {
+        if (installedVersion == null || newVersion == null) {
+            return false;
+        }
         // Ensure the Strings are properly formatted
         final String regex = "^\\d+(\\.\\d+)*$";// Check dot-decimal notation
         if (!installedVersion.matches(regex) || !newVersion.matches(regex)) {
@@ -58,6 +63,6 @@ public class VersionHelper {
             }
         }
 
-        return false;// Same version
+        return false;
     }
 }

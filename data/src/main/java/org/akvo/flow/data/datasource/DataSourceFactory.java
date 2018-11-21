@@ -24,7 +24,6 @@ import org.akvo.flow.data.datasource.files.FileDataSource;
 import org.akvo.flow.data.datasource.files.ImageDataSource;
 import org.akvo.flow.data.datasource.files.VideoDataSource;
 import org.akvo.flow.data.datasource.preferences.SecureSharedPreferencesDataSource;
-import org.akvo.flow.data.datasource.apk.NetworkApkDataSource;
 import org.akvo.flow.data.datasource.preferences.SharedPreferencesDataSource;
 
 import javax.inject.Inject;
@@ -39,26 +38,19 @@ public class DataSourceFactory {
     private final FileDataSource fileDataSource;
     private final SecureSharedPreferencesDataSource secureSharedPreferencesDataSource;
     private final VideoDataSource videoDataSource;
-    private final NetworkApkDataSource networkApkDataSource;
 
     @Inject
     public DataSourceFactory(SharedPreferencesDataSource sharedPreferencesDataSource,
             ImageDataSource imageDataSource, DatabaseDataSource dataBaseDataSource,
-            NetworkApkDataSource networkApkDataSource,
             SecureSharedPreferencesDataSource secureSharedPreferencesDataSource,
             FileDataSource fileDataSource,
             VideoDataSource videoDataSource) {
         this.sharedPreferencesDataSource = sharedPreferencesDataSource;
         this.imageDataSource = imageDataSource;
         this.dataBaseDataSource = dataBaseDataSource;
-        this.networkApkDataSource = networkApkDataSource;
         this.secureSharedPreferencesDataSource = secureSharedPreferencesDataSource;
-            this.fileDataSource = fileDataSource;
-            this.videoDataSource = videoDataSource;
-    }
-
-    public NetworkApkDataSource getNetworkDataSource() {
-        return networkApkDataSource;
+        this.fileDataSource = fileDataSource;
+        this.videoDataSource = videoDataSource;
     }
 
     public SharedPreferencesDataSource getSharedPreferencesDataSource() {

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010-2016 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2016-2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo FLOW.
  *
@@ -22,6 +22,7 @@ import android.support.annotation.NonNull;
 import org.akvo.flow.data.datasource.DataSourceFactory;
 import org.akvo.flow.data.entity.ApiApkData;
 import org.akvo.flow.data.entity.ApkDataMapper;
+import org.akvo.flow.data.net.RestApi;
 import org.akvo.flow.domain.entity.ApkData;
 import org.akvo.flow.domain.repository.ApkRepository;
 
@@ -33,17 +34,20 @@ import io.reactivex.functions.Function;
 public class ApkDataRepository implements ApkRepository {
 
     private final DataSourceFactory dataSourceFactory;
+    private final RestApi restApi;
     private final ApkDataMapper mapper;
 
     @Inject
-    public ApkDataRepository(DataSourceFactory dataSourceFactory, ApkDataMapper mapper) {
+    public ApkDataRepository(DataSourceFactory dataSourceFactory, RestApi restApi,
+            ApkDataMapper mapper) {
         this.dataSourceFactory = dataSourceFactory;
+        this.restApi = restApi;
         this.mapper = mapper;
     }
 
     @Override
     public Observable<ApkData> loadApkData() {
-        return dataSourceFactory.getNetworkDataSource().getApkData()
+        return restApi.loadApkData()
                 .map(new Function<ApiApkData, ApkData>() {
                     @Override
                     public ApkData apply(ApiApkData apiApkData) {

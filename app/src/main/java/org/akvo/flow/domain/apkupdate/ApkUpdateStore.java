@@ -23,7 +23,6 @@ import android.support.annotation.Nullable;
 
 import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.domain.util.GsonMapper;
-import org.akvo.flow.domain.util.VersionHelper;
 import org.akvo.flow.util.ConstantUtil;
 
 @Deprecated
@@ -35,30 +34,10 @@ public class ApkUpdateStore {
 
     private final GsonMapper gsonMapper;
     private final Prefs preferences;
-    private final VersionHelper versionHelper;
 
-    public ApkUpdateStore(GsonMapper gsonMapper, Prefs prefs,
-            VersionHelper versionHelper) {
+    public ApkUpdateStore(GsonMapper gsonMapper, Prefs prefs) {
         this.gsonMapper = gsonMapper;
         this.preferences = prefs;
-        this.versionHelper = versionHelper;
-    }
-
-    public void updateApkData(ViewApkData apkData) {
-        ViewApkData savedApkData = getApkData();
-        if (savedApkData == null || versionHelper
-                .isNewerVersion(savedApkData.getVersion(), apkData.getVersion())) {
-            saveApkData(apkData);
-            clearAppUpdateNotified();
-        }
-    }
-
-    private void saveApkData(ViewApkData apkData) {
-        preferences.setString(KEY_APK_DATA, gsonMapper.write(apkData, ViewApkData.class));
-    }
-
-    private void clearAppUpdateNotified() {
-        preferences.removePreference(KEY_APP_UPDATE_LAST_NOTIFIED);
     }
 
     @Nullable

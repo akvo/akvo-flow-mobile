@@ -79,7 +79,6 @@
         <service android:name=".service.DataSyncService"/>
         <service android:name=".service.SurveyDownloadService"/>
         <service android:name=".service.BootstrapService"/>
-        <service android:name=".service.UserRequestedApkUpdateService"/>
         <service android:name=".service.TimeCheckService"/>
         <service
                 android:name=".service.ApkUpdateService"
@@ -127,7 +126,7 @@
                 android:value="@integer/google_play_services_version"/>
 
         <activity
-                android:name=".presentation.AboutActivity"
+                android:name=".presentation.about.AboutActivity"
                 android:configChanges="locale|layoutDirection"
                 android:label="@string/about_activity_title">
         </activity>

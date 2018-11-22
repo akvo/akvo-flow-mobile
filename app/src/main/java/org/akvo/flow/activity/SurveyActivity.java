@@ -42,6 +42,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import com.google.gson.GsonBuilder;
+
 import org.akvo.flow.BuildConfig;
 import org.akvo.flow.R;
 import org.akvo.flow.app.FlowApp;
@@ -162,7 +164,7 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
             mDatabase.open();
 
             updateSelectedSurvey();
-            apkUpdateStore = new ApkUpdateStore(new GsonMapper(), prefs, versionHelper);
+            apkUpdateStore = new ApkUpdateStore(new GsonMapper(new GsonBuilder().create()), prefs);
 
             initNavigationDrawer();
             selectSurvey();

@@ -99,12 +99,6 @@ public class ApplicationModule {
 
     @Provides
     @Singleton
-    GsonMapper provideGsonMapper() {
-        return new GsonMapper();
-    }
-
-    @Provides
-    @Singleton
     FileRepository provideFileRepository(FileDataRepository fileDataRepository) {
         return fileDataRepository;
     }

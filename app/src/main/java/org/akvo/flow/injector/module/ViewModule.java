@@ -30,6 +30,7 @@ import org.akvo.flow.domain.interactor.CopyVideo;
 import org.akvo.flow.domain.interactor.DeleteSurvey;
 import org.akvo.flow.domain.interactor.ExportSurveyInstances;
 import org.akvo.flow.domain.interactor.GetAllSurveys;
+import org.akvo.flow.domain.interactor.GetApkData;
 import org.akvo.flow.domain.interactor.GetIsDeviceSetUp;
 import org.akvo.flow.domain.interactor.GetPublishDataTime;
 import org.akvo.flow.domain.interactor.GetSavedDataPoints;
@@ -279,5 +280,12 @@ public class ViewModule {
     @Named("mobileUploadSet")
     UseCase provideMobileUploadSet(MobileUploadSet mobileUploadSet) {
         return mobileUploadSet;
+    }
+
+
+    @Provides
+    @Named("getApkData")
+    UseCase provideGetApkData(GetApkData getApkData) {
+        return getApkData;
     }
 }

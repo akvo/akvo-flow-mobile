@@ -86,12 +86,28 @@ public class NotificationHelper {
     }
 
     public static Notification getSyncingNotification(Context context) {
+        createNotificationChannel(context);
         String title = context.getString(R.string.sync_service_notification_title);
         NotificationCompat.Builder b = new NotificationCompat.Builder(context,
                 ConstantUtil.NOTIFICATION_CHANNEL_ID)
                 .setSmallIcon(R.drawable.notification_icon)
                 .setContentTitle(title)
                 .setTicker(context.getString(R.string.sync_service_notification_ticker))
+                .setProgress(0, 0, true)
+                .setColor(ContextCompat.getColor(context, R.color.orange_main))
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setOngoing(true);
+        return (b.build());
+    }
+
+    public static Notification getUnPublishingNotification(Context context) {
+        createNotificationChannel(context);
+        String title = context.getString(R.string.unpublish_service_notification_title);
+        NotificationCompat.Builder b = new NotificationCompat.Builder(context,
+                ConstantUtil.NOTIFICATION_CHANNEL_ID)
+                .setSmallIcon(R.drawable.notification_icon)
+                .setContentTitle(title)
+                .setTicker(context.getString(R.string.unpublish_service_notification_ticker))
                 .setProgress(0, 0, true)
                 .setColor(ContextCompat.getColor(context, R.color.orange_main))
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)

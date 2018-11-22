@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+          xmlns:tools="http://schemas.android.com/tools"
           package="org.akvo.flow">
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
@@ -21,7 +22,8 @@
             android:hasCode="true"
             android:icon="@mipmap/ic_launcher"
             android:label="@string/app_name"
-            android:theme="@style/FlowAppTheme">
+            android:theme="@style/FlowAppTheme"
+            tools:ignore="GoogleAppIndexingWarning">
         <meta-data
                 android:name="io.fabric.ApiKey"
                 android:value="89dc21727e76a10511ecda549cab1b2d3aff2ec7"/>

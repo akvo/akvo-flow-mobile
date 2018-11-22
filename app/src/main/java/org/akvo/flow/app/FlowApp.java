@@ -100,11 +100,12 @@ public class FlowApp extends Application {
         startUpdateService();
         startBootstrapFolderTracker();
         updateLoggingInfo();
-        registerReceiver(new SyncDataReceiver(), new IntentFilter(SyncDataReceiver.CONNECTIVITY_ACTION));
+        registerReceiver(new SyncDataReceiver(),
+                new IntentFilter(SyncDataReceiver.CONNECTIVITY_ACTION));
         saveConfig();
     }
 
-    protected void installLeakCanary() {
+    private void installLeakCanary() {
         LeakCanary.install(this);
     }
 

@@ -20,14 +20,18 @@
 package org.akvo.flow.util;
 
 import android.app.Notification;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.TaskStackBuilder;
 import android.support.v4.content.ContextCompat;
 
 import org.akvo.flow.R;
+import org.akvo.flow.activity.SurveyActivity;
 
 public class NotificationHelper {
 
@@ -71,13 +75,11 @@ public class NotificationHelper {
     }
 
     public static void displayNotification(Context context, int total, String title, String text,
-            int notificationId,
-            boolean ongoing, int progress) {
+            int notificationId, boolean ongoing, int progress) {
         NotificationCompat.Builder builder = createNotificationBuilder(title, text, context);
 
-        builder.setOngoing(ongoing);// Ongoing if still syncing the records
+        builder.setOngoing(ongoing);
 
-        // Progress will only be displayed in Android versions > 4.0
         builder.setProgress(total, progress, false);
 
         notifyWithDummyIntent(context, notificationId, builder);
@@ -85,21 +87,28 @@ public class NotificationHelper {
 
     public static Notification getSyncingNotification(Context context) {
         String title = context.getString(R.string.sync_service_notification_title);
-        NotificationCompat.Builder b = new NotificationCompat.Builder(context)
+        NotificationCompat.Builder b = new NotificationCompat.Builder(context,
+                ConstantUtil.NOTIFICATION_CHANNEL_ID)
                 .setSmallIcon(R.drawable.notification_icon)
                 .setContentTitle(title)
                 .setTicker(context.getString(R.string.sync_service_notification_ticker))
                 .setProgress(0, 0, true)
                 .setColor(ContextCompat.getColor(context, R.color.orange_main))
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .setOngoing(true);
         return (b.build());
     }
 
     private static void notifyWithDummyIntent(Context context, int notificationId,
             NotificationCompat.Builder builder) {
-        // Dummy intent. Do nothing when clicked
-        PendingIntent dummyIntent = PendingIntent.getActivity(context, 0, new Intent(), 0);
-        builder.setContentIntent(dummyIntent);
+        Intent resultIntent = new Intent(context, SurveyActivity.class);
+        TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
+        stackBuilder.addNextIntentWithParentStack(resultIntent);
+        PendingIntent resultPendingIntent =
+                stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+        builder.setContentIntent(resultPendingIntent);
+
+        createNotificationChannel(context);
 
         NotificationManager notificationManager =
                 (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
@@ -114,10 +123,12 @@ public class NotificationHelper {
 
     private static NotificationCompat.Builder createDefaultNotification(String title, String text,
             Context context) {
-        return new NotificationCompat.Builder(context).setSmallIcon(R.drawable.notification_icon)
+        return new NotificationCompat.Builder(context, ConstantUtil.NOTIFICATION_CHANNEL_ID)
+                .setSmallIcon(R.drawable.notification_icon)
                 .setStyle(new NotificationCompat.BigTextStyle().bigText(text))
                 .setContentTitle(title)
                 .setContentText(text)
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .setTicker(title);
     }
 
@@ -125,5 +136,20 @@ public class NotificationHelper {
             String text, Context context) {
         return createDefaultNotification(title, text, context)
                 .setColor(ContextCompat.getColor(context, R.color.red));
+    }
+
+    private static void createNotificationChannel(Context context) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            CharSequence name = context.getString(R.string.channel_name);
+            String description = context.getString(R.string.channel_description);
+            NotificationChannel channel = new NotificationChannel(
+                    ConstantUtil.NOTIFICATION_CHANNEL_ID, name,
+                    NotificationManager.IMPORTANCE_DEFAULT);
+            channel.setDescription(description);
+            channel.enableVibration(false);
+            NotificationManager notificationManager = context
+                    .getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(channel);
+        }
     }
 }

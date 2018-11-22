@@ -150,4 +150,19 @@ public class UserDataRepository implements UserRepository {
     public Observable<Boolean> mobileUploadSet() {
         return dataSourceFactory.getSharedPreferencesDataSource().mobileUploadSet();
     }
+
+    @Override
+    public Observable<Boolean> clearAppUpdateNotified() {
+        return dataSourceFactory.getSharedPreferencesDataSource().clearAppUpdateNotified();
+    }
+
+    @Override
+    public Observable<Long> getLastNotificationTime() {
+        return dataSourceFactory.getSharedPreferencesDataSource().getAppUpdateNotifiedTime();
+    }
+
+    @Override
+    public Observable<Boolean> saveLastNotificationTime() {
+        return dataSourceFactory.getSharedPreferencesDataSource().saveAppUpdateNotifiedTime();
+    }
 }

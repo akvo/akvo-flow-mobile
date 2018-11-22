@@ -24,12 +24,14 @@ import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.util.Base64;
 
+import org.akvo.flow.data.entity.ApiApkData;
 import org.akvo.flow.data.entity.ApiFilesResult;
 import org.akvo.flow.data.entity.ApiLocaleResult;
 import org.akvo.flow.data.entity.S3File;
 import org.akvo.flow.data.entity.Transmission;
 import org.akvo.flow.data.net.gae.DataPointDownloadService;
 import org.akvo.flow.data.net.gae.DeviceFilesService;
+import org.akvo.flow.data.net.gae.FlowApiService;
 import org.akvo.flow.data.net.gae.ProcessingNotificationService;
 import org.akvo.flow.data.net.s3.AwsS3;
 import org.akvo.flow.data.util.ApiUrls;
@@ -109,6 +111,11 @@ public class RestApi {
         } else {
             return uploadPrivateFile(date, s3File);
         }
+    }
+
+    public Observable<ApiApkData> loadApkData(String appVersion) {
+        return serviceFactory.createRetrofitService(FlowApiService.class, apiUrls.getGaeUrl())
+                .loadApkData(appVersion);
     }
 
     private Observable<ResponseBody> uploadPublicFile(String date, S3File s3File) {

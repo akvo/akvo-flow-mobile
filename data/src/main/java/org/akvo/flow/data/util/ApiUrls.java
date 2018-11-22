@@ -41,6 +41,8 @@ public class ApiUrls {
     public static final String ACTION = "action";
     public static final String FORM_ID = "formID";
     public static final String FILENAME = "fileName";
+    public static final String APK_VERSION_SERVICE_PATH =
+            "/deviceapprest?action=getLatestVersion&deviceType=androidPhone&appCode=flowapp";
 
     private final String gaeUrl;
     private final String s3Url;

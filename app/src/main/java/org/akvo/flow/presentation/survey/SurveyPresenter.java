@@ -51,8 +51,7 @@ public class SurveyPresenter implements Presenter {
     @Inject
     public SurveyPresenter(@Named("GetApkDataPreferences") UseCase getApkDataPreferences,
             @Named("SaveApkUpdateNotified") UseCase saveApkUpdateNotified,
-            VersionHelper versionHelper,
-            ViewApkMapper viewApkMapper) {
+            VersionHelper versionHelper, ViewApkMapper viewApkMapper) {
         this.getApkDataPreferences = getApkDataPreferences;
         this.saveApkUpdateNotified = saveApkUpdateNotified;
         this.versionHelper = versionHelper;

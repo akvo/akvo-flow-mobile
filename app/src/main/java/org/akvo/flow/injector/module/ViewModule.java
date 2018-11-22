@@ -283,8 +283,7 @@ public class ViewModule {
     UseCase provideMobileUploadSet(MobileUploadSet mobileUploadSet) {
         return mobileUploadSet;
     }
-
-
+    
     @Provides
     @Named("getApkData")
     UseCase provideGetApkData(GetApkData getApkData) {

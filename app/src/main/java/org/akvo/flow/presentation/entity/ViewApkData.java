@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010-2016 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2016-2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo FLOW.
  *
@@ -38,14 +38,5 @@ public class ViewApkData {
 
     public String getMd5Checksum() {
         return md5Checksum;
-    }
-
-    @Override
-    public String toString() {
-        return "ViewApkData{" +
-                "version='" + version + '\'' +
-                ", fileUrl='" + fileUrl + '\'' +
-                ", md5Checksum='" + md5Checksum + '\'' +
-                '}';
     }
 }

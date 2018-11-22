@@ -24,7 +24,7 @@ import org.akvo.flow.presentation.entity.ViewApkData;
 
 public interface AboutView {
 
-    void showNewVersionAvailable(ViewApkData transform);
+    void showNewVersionAvailable(ViewApkData apkData);
 
     void showNoUpdateAvailable();
 

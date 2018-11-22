@@ -29,7 +29,6 @@ import javax.inject.Inject;
  * Prefs is a SharedPreferences wrapper, with utility methods to
  * access and edit key/value pairs.
  */
-@Deprecated
 public class Prefs {
 
     public static final String KEY_SURVEY_GROUP_ID = "surveyGroupId";

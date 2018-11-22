@@ -21,7 +21,6 @@
 package org.akvo.flow.domain.util;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonIOException;
 import com.google.gson.JsonSyntaxException;
 
@@ -38,9 +37,8 @@ public class GsonMapper {
     private final Gson gson;
 
     @Inject
-    public GsonMapper() {
-        //TODO: inject this
-        this.gson = new GsonBuilder().create();
+    public GsonMapper(Gson gson) {
+        this.gson = gson;
     }
 
     public <T> T read(final String content, final Class<T> type) throws JsonSyntaxException {

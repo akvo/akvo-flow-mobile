@@ -84,20 +84,6 @@ public class Navigator {
         context.startActivity(i);
     }
 
-    @Deprecated
-    public void navigateToAppUpdate(@NonNull Context context,
-            @NonNull org.akvo.flow.domain.apkupdate.ViewApkData data) {
-        Intent i = new Intent(context, AppUpdateActivity.class);
-        i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        i.putExtra(AppUpdateActivity.EXTRA_URL, data.getFileUrl());
-        i.putExtra(AppUpdateActivity.EXTRA_VERSION, data.getVersion());
-        String md5Checksum = data.getMd5Checksum();
-        if (StringUtil.isValid(md5Checksum)) {
-            i.putExtra(AppUpdateActivity.EXTRA_CHECKSUM, md5Checksum);
-        }
-        context.startActivity(i);
-    }
-
     public void navigateToAddUser(Context context) {
         context.startActivity(new Intent(context, AddUserActivity.class));
     }

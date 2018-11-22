@@ -32,7 +32,7 @@ import org.akvo.flow.BuildConfig;
 import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.domain.entity.ApkData;
 import org.akvo.flow.domain.interactor.DefaultObserver;
-import org.akvo.flow.domain.interactor.RefreshApkData;
+import org.akvo.flow.domain.interactor.apk.RefreshApkData;
 import org.akvo.flow.util.ConstantUtil;
 
 import java.util.HashMap;

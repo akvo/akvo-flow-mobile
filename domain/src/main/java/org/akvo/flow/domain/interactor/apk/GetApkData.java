@@ -18,12 +18,13 @@
  *
  */
 
-package org.akvo.flow.domain.interactor;
+package org.akvo.flow.domain.interactor.apk;
 
 import android.os.Build;
 
 import org.akvo.flow.domain.executor.PostExecutionThread;
 import org.akvo.flow.domain.executor.ThreadExecutor;
+import org.akvo.flow.domain.interactor.UseCase;
 import org.akvo.flow.domain.repository.ApkRepository;
 
 import java.util.Map;

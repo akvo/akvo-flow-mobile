@@ -191,6 +191,10 @@ public class SharedPreferencesDataSource {
         return Observable.just(true);
     }
 
+    public Observable<Long> getAppUpdateNotifiedTime() {
+        return Observable.just(getLong(KEY_APP_UPDATE_LAST_NOTIFIED, LONG_VALUE_UNSET));
+    }
+
     protected String getString(String key, String defaultValue) {
         return preferences.getString(key, defaultValue);
     }

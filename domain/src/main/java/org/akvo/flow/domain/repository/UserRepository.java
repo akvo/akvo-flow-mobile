@@ -71,4 +71,8 @@ public interface UserRepository {
     Observable<Boolean> mobileUploadSet();
 
     Observable<Boolean> clearAppUpdateNotified();
+
+    Observable<Long> getLastNotificationTime();
+
+    Observable<Boolean> saveLastNotificationTime();
 }

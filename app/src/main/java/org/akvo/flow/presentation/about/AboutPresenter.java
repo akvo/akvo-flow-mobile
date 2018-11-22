@@ -25,7 +25,7 @@ import android.support.annotation.Nullable;
 import org.akvo.flow.BuildConfig;
 import org.akvo.flow.domain.entity.ApkData;
 import org.akvo.flow.domain.interactor.DefaultObserver;
-import org.akvo.flow.domain.interactor.GetApkData;
+import org.akvo.flow.domain.interactor.apk.GetApkData;
 import org.akvo.flow.domain.interactor.UseCase;
 import org.akvo.flow.domain.util.VersionHelper;
 import org.akvo.flow.presentation.Presenter;

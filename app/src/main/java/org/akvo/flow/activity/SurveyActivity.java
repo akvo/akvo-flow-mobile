@@ -42,9 +42,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
-import com.google.gson.GsonBuilder;
-
-import org.akvo.flow.BuildConfig;
 import org.akvo.flow.R;
 import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.data.database.SurveyDbDataSource;
@@ -53,24 +50,24 @@ import org.akvo.flow.database.SurveyDbAdapter;
 import org.akvo.flow.database.SurveyInstanceStatus;
 import org.akvo.flow.domain.Survey;
 import org.akvo.flow.domain.SurveyGroup;
-import org.akvo.flow.domain.apkupdate.ApkUpdateStore;
-import org.akvo.flow.domain.apkupdate.ViewApkData;
 import org.akvo.flow.domain.entity.User;
 import org.akvo.flow.domain.interactor.DefaultObserver;
 import org.akvo.flow.domain.interactor.UseCase;
-import org.akvo.flow.domain.util.GsonMapper;
 import org.akvo.flow.domain.util.VersionHelper;
 import org.akvo.flow.injector.component.ApplicationComponent;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
 import org.akvo.flow.presentation.SnackBarManager;
 import org.akvo.flow.presentation.UserDeleteConfirmationDialog;
+import org.akvo.flow.presentation.entity.ViewApkData;
 import org.akvo.flow.presentation.navigation.CreateUserDialog;
 import org.akvo.flow.presentation.navigation.EditUserDialog;
 import org.akvo.flow.presentation.navigation.FlowNavigationView;
 import org.akvo.flow.presentation.navigation.SurveyDeleteConfirmationDialog;
 import org.akvo.flow.presentation.navigation.UserOptionsDialog;
 import org.akvo.flow.presentation.navigation.ViewUser;
+import org.akvo.flow.presentation.survey.SurveyPresenter;
+import org.akvo.flow.presentation.survey.SurveyView;
 import org.akvo.flow.service.BootstrapService;
 import org.akvo.flow.service.DataSyncService;
 import org.akvo.flow.service.SurveyDownloadService;
@@ -98,7 +95,7 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
         FlowNavigationView.DrawerNavigationListener,
         SurveyDeleteConfirmationDialog.SurveyDeleteListener, UserOptionsDialog.UserOptionListener,
         UserDeleteConfirmationDialog.UserDeleteListener, EditUserDialog.EditUserListener,
-        CreateUserDialog.CreateUserListener {
+        CreateUserDialog.CreateUserListener, SurveyView {
 
     public static final int NAVIGATION_DRAWER_DELAY_MILLIS = 250;
     private static final String DATA_POINTS_FRAGMENT_TAG = "datapoints_fragment";
@@ -140,10 +137,12 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     @Inject
     VersionHelper versionHelper;
 
+    @Inject
+    SurveyPresenter presenter;
+
     private SurveyGroup mSurveyGroup;
 
     private ActionBarDrawerToggle mDrawerToggle;
-    private ApkUpdateStore apkUpdateStore;
     private long selectedSurveyId;
     private boolean activityJustCreated;
     private boolean permissionsResults;
@@ -156,6 +155,7 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
         ButterKnife.bind(this);
 
         initializeToolBar();
+        presenter.setView(this);
 
         if (!deviceSetUpCompleted()) {
             navigateToSetUp();
@@ -164,7 +164,6 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
             mDatabase.open();
 
             updateSelectedSurvey();
-            apkUpdateStore = new ApkUpdateStore(new GsonMapper(new GsonBuilder().create()), prefs);
 
             initNavigationDrawer();
             selectSurvey();
@@ -294,7 +293,7 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
                 mDatabase.deleteEmptyRecords();
             }
 
-            showApkUpdateIfNeeded();
+            presenter.verifyApkUpdate();
             updateAddDataPointFab();
             if (!permissionsResults) {
                 handlePermissions();
@@ -352,16 +351,6 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
                         R.string.action_retry, retryListener, this);
     }
 
-    private void showApkUpdateIfNeeded() {
-        ViewApkData apkData = apkUpdateStore.getApkData();
-        boolean shouldNotifyUpdate = apkUpdateStore.shouldNotifyNewVersion();
-        if (apkData != null && shouldNotifyUpdate && versionHelper
-                .isNewerVersion(BuildConfig.VERSION_NAME, apkData.getVersion())) {
-            apkUpdateStore.saveAppUpdateNotifiedTime();
-            navigator.navigateToAppUpdate(this, apkData);
-        }
-    }
-
     private void updateAddDataPointFab() {
         if (mSurveyGroup != null) {
             addDataPointFab.setVisibility(View.VISIBLE);
@@ -382,6 +371,7 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
 
     @Override
     public void onDestroy() {
+        presenter.destroy();
         super.onDestroy();
         if (mDatabase != null) {
             mDatabase.close();
@@ -632,5 +622,10 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
             String newLocaleId = mDatabase.createSurveyedLocale(mSurveyGroup.getId());
             onRecordSelected(newLocaleId);
         }
+    }
+
+    @Override
+    public void showNewVersionAvailable(ViewApkData apkData) {
+        navigator.navigateToAppUpdate(this, apkData);
     }
 }

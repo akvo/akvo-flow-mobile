@@ -20,18 +20,19 @@ package org.akvo.flow.serialization.response.value;
 
 import android.text.TextUtils;
 
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonIOException;
 import com.google.gson.JsonSyntaxException;
 
-import org.akvo.flow.domain.util.GsonMapper;
 import org.akvo.flow.domain.response.value.Signature;
+import org.akvo.flow.domain.util.GsonMapper;
 
 import timber.log.Timber;
 
 public class SignatureValue {
 
     public static String serialize(Signature signature) {
-        GsonMapper mapper = new GsonMapper();
+        GsonMapper mapper = new GsonMapper(new GsonBuilder().create());
         try {
             return mapper.write(signature, Signature.class);
         } catch (JsonIOException | JsonSyntaxException e) {
@@ -43,7 +44,7 @@ public class SignatureValue {
     public static Signature deserialize(String data) {
         if (!TextUtils.isEmpty(data)) {
             try {
-                GsonMapper mapper = new GsonMapper();
+                GsonMapper mapper = new GsonMapper(new GsonBuilder().create());
                 return mapper.read(data, Signature.class);
             } catch (JsonSyntaxException e) {
                 Timber.e("Value is not a valid JSON response: %s", data);

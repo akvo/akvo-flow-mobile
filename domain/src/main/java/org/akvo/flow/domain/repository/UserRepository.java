@@ -69,4 +69,10 @@ public interface UserRepository {
     Observable<Boolean> setWalkThroughSeen();
 
     Observable<Boolean> mobileUploadSet();
+
+    Observable<Boolean> clearAppUpdateNotified();
+
+    Observable<Long> getLastNotificationTime();
+
+    Observable<Boolean> saveLastNotificationTime();
 }

@@ -163,6 +163,6 @@ public class UserDataRepository implements UserRepository {
 
     @Override
     public Observable<Boolean> saveLastNotificationTime() {
-        return dataSourceFactory.getSharedPreferencesDataSource().saveAppUpdateNotifiedTime();
+        return dataSourceFactory.getSharedPreferencesDataSource().setAppUpdateNotifiedTime();
     }
 }

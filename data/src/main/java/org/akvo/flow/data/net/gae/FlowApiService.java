@@ -18,19 +18,17 @@
  *
  */
 
-package org.akvo.flow.data.util;
+package org.akvo.flow.data.net.gae;
 
-public class Constants {
+import org.akvo.flow.data.entity.ApiApkData;
+import org.akvo.flow.data.util.ApiUrls;
 
-    public static final String ARCHIVE_SUFFIX = ".zip";
-    public static final String JPG_SUFFIX = ".jpg";
-    public static final String PNG_SUFFIX = ".png";
-    public static final String VIDEO_SUFFIX = ".mp4";
-    public static final String DATA_CONTENT_TYPE = "application/zip";
-    public static final String JPEG_CONTENT_TYPE = "image/jpeg";
-    public static final String PNG_CONTENT_TYPE = "image/png";
-    public static final String VIDEO_CONTENT_TYPE = "video/mp4";
-    public static final String VERSION = "ver";
-    static final String SURVEY_DATA_FILE_JSON = "data.json";
-    static final String UTF_8_CHARSET = "UTF-8";
+import io.reactivex.Observable;
+import retrofit2.http.GET;
+import retrofit2.http.Query;
+
+public interface FlowApiService {
+
+    @GET(ApiUrls.APK_VERSION_SERVICE_PATH)
+    Observable<ApiApkData> loadApkData(@Query("androidBuildVersion") String version);
 }

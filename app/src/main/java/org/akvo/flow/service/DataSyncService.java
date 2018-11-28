@@ -74,7 +74,7 @@ public class DataSyncService extends Service {
 
     @Inject
     @Named("checkSubmittedFiles")
-    UseCase checkPublishedFiles;
+    UseCase checkSubmittedFiles;
 
     @Inject
     @Named("exportSurveyInstances")
@@ -94,7 +94,7 @@ public class DataSyncService extends Service {
         upload.dispose();
         allowedToConnect.dispose();
         checkDeviceNotification.dispose();
-        checkPublishedFiles.dispose();
+        checkSubmittedFiles.dispose();
         exportSurveyInstances.dispose();
     }
 
@@ -108,6 +108,7 @@ public class DataSyncService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         startForeground(ConstantUtil.DATA_SYNC_NOTIFICATION_ID,
                 NotificationHelper.getSyncingNotification(getApplicationContext()));
+        Timber.d("onStartCommand");
         makeDataPrivate.dispose();
         makeDataPrivate.execute(new DefaultObserver<Boolean>() {
             @Override
@@ -125,8 +126,8 @@ public class DataSyncService extends Service {
     }
 
     private void verify() {
-        checkPublishedFiles.dispose();
-        checkPublishedFiles.execute(new DefaultObserver<List<Boolean>>() {
+        checkSubmittedFiles.dispose();
+        checkSubmittedFiles.execute(new DefaultObserver<List<Boolean>>() {
             @Override
             public void onError(Throwable e) {
                export();

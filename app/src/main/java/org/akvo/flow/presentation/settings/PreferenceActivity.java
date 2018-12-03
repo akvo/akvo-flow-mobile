@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -67,7 +67,7 @@ public class PreferenceActivity extends BackActivity implements PreferenceView,
         PassCodeDownloadFormDialog.PassCodeDownloadFormListener,
         PassCodeReloadFormsDialog.PassCodeReloadFormsListener,
         DeleteResponsesWarningDialog.DeleteResponsesListener,
-        DeleteAllWarningDialog.DeleteAllListener {
+        DeleteAllWarningDialog.DeleteAllListener, DownloadFormDialog.DownloadFormListener {
 
     @Inject
     Navigator navigator;
@@ -364,6 +364,21 @@ public class PreferenceActivity extends BackActivity implements PreferenceView,
     @Override
     public void dismiss() {
         finish();
+    }
+
+    @Override
+    public void downloadForm(String formId) {
+        presenter.downloadForm(formId);
+    }
+
+    @Override
+    public void showDownloadFormError() {
+        showMessage(R.string.download_form_error);
+    }
+
+    @Override
+    public void showDownloadFormSuccess() {
+        showMessage(R.string.download_form_success);
     }
 
     private void showMessage(int resId) {

@@ -53,6 +53,8 @@ import okhttp3.ResponseBody;
 public class RestApi {
     private static final String PAYLOAD_PUT_PUBLIC = "PUT\n%s\n%s\n%s\nx-amz-acl:public-read\n/%s/%s";// md5, type, date, bucket, obj
     private static final String PAYLOAD_PUT_PRIVATE = "PUT\n%s\n%s\n%s\n/%s/%s";// md5, type, date, bucket, obj
+    private static final String PAYLOAD_GET = "GET\n\n\n%s\n/%s/%s";// date, bucket, obj
+    public static final String SURVEYS_FOLDER = "surveys";
 
     private final String androidId;
     private final String imei;
@@ -118,8 +120,19 @@ public class RestApi {
                 .loadApkData(appVersion);
     }
 
+    public Observable<String> downloadFormHeader(String formId, String deviceId) {
+        return serviceFactory
+                .createScalarsRetrofitService(FlowApiService.class, apiUrls.getGaeUrl())
+                .downloadFormHeader(formId, phoneNumber, androidId, imei, version, deviceId);
+    }
+
+    public Observable<ResponseBody> downloadForm(String fileName) {
+        String authorization = getAmazonAuthForGet(getDate(), SURVEYS_FOLDER + "/" + fileName);
+        return createRetrofitService().getSurvey(SURVEYS_FOLDER, fileName, authorization);
+    }
+
     private Observable<ResponseBody> uploadPublicFile(String date, S3File s3File) {
-        String authorization = getAmazonAuth(date, PAYLOAD_PUT_PUBLIC, s3File);
+        String authorization = getAmazonAuthForPut(date, PAYLOAD_PUT_PUBLIC, s3File);
         return createRetrofitService()
                 .uploadPublic(s3File.getDir(), s3File.getFilename(), s3File.getMd5Base64(),
                         s3File.getContentType(), date, authorization, createBody(s3File));
@@ -130,7 +143,7 @@ public class RestApi {
     }
 
     private Observable<ResponseBody> uploadPrivateFile(String date, S3File s3File) {
-        String authorization = getAmazonAuth(date, PAYLOAD_PUT_PRIVATE, s3File);
+        String authorization = getAmazonAuthForPut(date, PAYLOAD_PUT_PRIVATE, s3File);
         return createRetrofitService()
                 .upload(s3File.getDir(), s3File.getFilename(), s3File.getMd5Base64(),
                         s3File.getContentType(), date, authorization, createBody(s3File));
@@ -142,10 +155,22 @@ public class RestApi {
     }
 
     @NonNull
-    private String getAmazonAuth(String date, String payloadStr, S3File s3File) {
+    private String getAmazonAuthForPut(String date, String payloadStr, S3File s3File) {
         final String payload = String
                 .format(payloadStr, s3File.getMd5Base64(), s3File.getContentType(), date,
                         s3User.getBucket(), s3File.getObjectKey());
+        return createAuthorization(payload);
+    }
+
+    @NonNull
+    private String getAmazonAuthForGet(String date, String filename) {
+        final String payload = String
+                .format(RestApi.PAYLOAD_GET, date, s3User.getBucket(), filename);
+        return createAuthorization(payload);
+    }
+
+    @NonNull
+    private String createAuthorization(String payload) {
         final String signature = signatureHelper
                 .getAuthorization(payload, s3User.getSecret(), Base64.NO_WRAP);
         return "AWS " + s3User.getAccessKey() + ":" + signature;
@@ -154,4 +179,5 @@ public class RestApi {
     private String getDate() {
         return dateFormat.format(new Date()) + "GMT";
     }
+
 }

@@ -22,6 +22,7 @@ package org.akvo.flow.broadcast;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.support.v4.content.ContextCompat;
 
 import org.akvo.flow.service.DataSyncService;
 import org.akvo.flow.util.ConstantUtil;
@@ -39,7 +40,8 @@ public class SyncDataReceiver extends BroadcastReceiver {
 
     public void onReceive(Context context, Intent intent) {
         if (isIntentActionExpected(intent.getAction())) {
-            context.startService(new Intent(context, DataSyncService.class));
+//            context.startService(new Intent(context, DataSyncService.class));
+            ContextCompat.startForegroundService(context, new Intent(context, DataSyncService.class));
         }
     }
 

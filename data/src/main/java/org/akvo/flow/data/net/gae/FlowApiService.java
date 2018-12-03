@@ -27,8 +27,21 @@ import io.reactivex.Observable;
 import retrofit2.http.GET;
 import retrofit2.http.Query;
 
+import static org.akvo.flow.data.util.ApiUrls.ANDROID_ID;
+import static org.akvo.flow.data.util.ApiUrls.DEVICE_ID;
+import static org.akvo.flow.data.util.ApiUrls.IMEI;
+import static org.akvo.flow.data.util.ApiUrls.PHONE_NUMBER;
+import static org.akvo.flow.data.util.ApiUrls.SURVEY_ID;
+import static org.akvo.flow.data.util.ApiUrls.VERSION;
+
 public interface FlowApiService {
 
     @GET(ApiUrls.APK_VERSION_SERVICE_PATH)
-    Observable<ApiApkData> loadApkData(@Query("androidBuildVersion") String version);
+    Observable<ApiApkData> loadApkData(@Query(ApiUrls.ANDROID_BUILD_VERSION) String version);
+
+    @GET(ApiUrls.SURVEY_HEADER_PATH)
+    Observable<String> downloadFormHeader(@Query(SURVEY_ID) String formId,
+            @Query(PHONE_NUMBER) String phoneNumber, @Query(ANDROID_ID) String androidId,
+            @Query(IMEI) String imei, @Query(VERSION) String version,
+            @Query(DEVICE_ID) String deviceId);
 }

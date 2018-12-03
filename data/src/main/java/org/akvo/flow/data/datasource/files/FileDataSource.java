@@ -37,7 +37,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import io.reactivex.Observable;
-import timber.log.Timber;
+import okhttp3.ResponseBody;
 
 @Singleton
 public class FileDataSource {
@@ -68,16 +68,12 @@ public class FileDataSource {
 
     public Observable<Boolean> copyFile(String originFilePath, String destinationFilePath) {
         File originalFile = new File(originFilePath);
-        try {
-            File destinationFile = new File(destinationFilePath);
-            String copiedFilePath = fileHelper.copyFile(originalFile, destinationFile);
-            if (copiedFilePath == null) {
-                return Observable.error(new Exception("Error copying video file"));
-            }
-            return Observable.just(true);
-        } catch (IOException e) {
-            return Observable.error(e);
+        File destinationFile = new File(destinationFilePath);
+        String copiedFilePath = fileHelper.saveStreamToFile(originalFile, destinationFile);
+        if (copiedFilePath == null) {
+            return Observable.error(new Exception("Error copying video file"));
         }
+        return Observable.just(true);
     }
 
     private List<String> moveFiles(String folderName) {
@@ -99,17 +95,12 @@ public class FileDataSource {
         if (files != null) {
             File folder = getPrivateFolder(folderName);
             for (File f : files) {
-                try {
-                    String destinationPath = fileHelper.copyFileToFolder(f, folder);
-                    if (!TextUtils.isEmpty(destinationPath)) {
-                        movedFiles.add(destinationPath);
-                        //noinspection ResultOfMethodCallIgnored
-                        f.delete();
-                    }
-                } catch (IOException e) {
-                    Timber.e(e);
+                String destinationPath = fileHelper.copyFileToFolder(f, folder);
+                if (!TextUtils.isEmpty(destinationPath)) {
+                    movedFiles.add(destinationPath);
+                    //noinspection ResultOfMethodCallIgnored
+                    f.delete();
                 }
-
             }
         }
         return movedFiles;
@@ -125,19 +116,15 @@ public class FileDataSource {
     }
 
     public Observable<Boolean> publishFiles(List<String> fileNames) {
-        try {
-            boolean dataCopied = copyPrivateFileToAppExternalFolder(FlowFileBrowser.DIR_DATA,
-                    FlowFileBrowser.DIR_PUBLISHED_DATA, fileNames);
-            boolean mediaCopied = copyPrivateFileToAppExternalFolder(FlowFileBrowser.DIR_MEDIA,
-                    FlowFileBrowser.DIR_PUBLISHED_MEDIA, fileNames);
-            return Observable.just(dataCopied || mediaCopied);
-        } catch (IOException e) {
-            return Observable.error(e);
-        }
+        boolean dataCopied = copyPrivateFileToAppExternalFolder(FlowFileBrowser.DIR_DATA,
+                FlowFileBrowser.DIR_PUBLISHED_DATA, fileNames);
+        boolean mediaCopied = copyPrivateFileToAppExternalFolder(FlowFileBrowser.DIR_MEDIA,
+                FlowFileBrowser.DIR_PUBLISHED_MEDIA, fileNames);
+        return Observable.just(dataCopied || mediaCopied);
     }
 
     private boolean copyPrivateFileToAppExternalFolder(String privateFolderName,
-            String publicFolderName, List<String> fileNames) throws IOException {
+            String publicFolderName, List<String> fileNames) {
         boolean filesCopied = false;
         File destinationDataFolder = flowFileBrowser.getAppExternalFolder(publicFolderName);
         if (destinationDataFolder != null && !destinationDataFolder.exists()) {
@@ -217,12 +204,19 @@ public class FileDataSource {
     }
 
     public Observable<Boolean> writeDataToZipFile(String zipFileName, String formInstanceData) {
-        File folder = flowFileBrowser.getExistingAppExternalFolder(FlowFileBrowser.DIR_DATA);
+        File folder = flowFileBrowser.getExistingAppInternalFolder(FlowFileBrowser.DIR_DATA);
         try {
             fileHelper.writeZipFile(folder, zipFileName, formInstanceData);
             return Observable.just(true);
         } catch (IOException e) {
             return Observable.error(e);
         }
+    }
+
+    public Observable<Boolean> saveRemoteFile(ResponseBody responseBody, String filename) {
+        File formFolder = flowFileBrowser.getExistingAppInternalFolder(FlowFileBrowser.DIR_FORMS);
+        final File surveyFormsZipArchive = new File(formFolder, filename);
+        fileHelper.extractOnlineArchive(responseBody, formFolder, surveyFormsZipArchive);
+        return null;
     }
 }

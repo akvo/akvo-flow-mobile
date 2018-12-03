@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -18,32 +18,32 @@
  *
  */
 
-package org.akvo.flow.domain.interactor;
+package org.akvo.flow.domain.interactor.forms;
 
-import android.support.v4.util.Pair;
-
-import org.akvo.flow.domain.entity.Survey;
 import org.akvo.flow.domain.executor.PostExecutionThread;
 import org.akvo.flow.domain.executor.ThreadExecutor;
+import org.akvo.flow.domain.interactor.UseCase;
 import org.akvo.flow.domain.repository.SurveyRepository;
 import org.akvo.flow.domain.repository.UserRepository;
 
-import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
 
 import io.reactivex.Observable;
+import io.reactivex.ObservableSource;
 import io.reactivex.functions.Function;
 
-public class GetAllSurveys extends UseCase {
+public class DownloadForm extends UseCase {
+
+    public static final String FORM_ID_PARAM = "formId";
 
     private final SurveyRepository surveyRepository;
     private final UserRepository userRepository;
 
     @Inject
-    protected GetAllSurveys(ThreadExecutor threadExecutor,
-            PostExecutionThread postExecutionThread, SurveyRepository surveyRepository,
+    protected DownloadForm(ThreadExecutor threadExecutor, PostExecutionThread postExecutionThread,
+            SurveyRepository surveyRepository,
             UserRepository userRepository) {
         super(threadExecutor, postExecutionThread);
         this.surveyRepository = surveyRepository;
@@ -51,23 +51,16 @@ public class GetAllSurveys extends UseCase {
     }
 
     @Override
-    protected <T> Observable buildUseCaseObservable(Map<String, T> parameters) {
-        return surveyRepository.getSurveys()
-                .concatMap(new Function<List<Survey>, Observable<Pair<List<Survey>, Long>>>() {
-                    @Override
-                    public Observable<Pair<List<Survey>, Long>> apply(final List<Survey> surveys) {
-                        return getSelectedSurvey(surveys);
-                    }
-                });
-    }
-
-    private Observable<Pair<List<Survey>, Long>> getSelectedSurvey(final List<Survey> surveys) {
-        return userRepository.getSelectedSurvey()
-                .concatMap(new Function<Long, Observable<Pair<List<Survey>, Long>>>() {
-                    @Override
-                    public Observable<Pair<List<Survey>, Long>> apply(Long selectedSurvey) {
-                        return Observable.just(new Pair<>(surveys, selectedSurvey));
-                    }
-                });
+    protected <T> Observable buildUseCaseObservable(final Map<String, T> parameters) {
+        if (parameters == null || !parameters.containsKey(FORM_ID_PARAM)) {
+            throw new IllegalArgumentException("missing form id");
+        }
+        return userRepository.getDeviceId()
+                .concatMap(new Function<String, ObservableSource<?>>() {
+            @Override
+            public ObservableSource<?> apply(String deviceId) {
+                return surveyRepository.downloadForm((String)parameters.get(FORM_ID_PARAM), deviceId);
+            }
+        });
     }
 }

@@ -29,7 +29,8 @@ import org.akvo.flow.domain.interactor.CopyFile;
 import org.akvo.flow.domain.interactor.CopyVideo;
 import org.akvo.flow.domain.interactor.DeleteSurvey;
 import org.akvo.flow.domain.interactor.ExportSurveyInstances;
-import org.akvo.flow.domain.interactor.GetAllSurveys;
+import org.akvo.flow.domain.interactor.forms.DownloadForm;
+import org.akvo.flow.domain.interactor.forms.GetAllSurveys;
 import org.akvo.flow.domain.interactor.GetIsDeviceSetUp;
 import org.akvo.flow.domain.interactor.GetPublishDataTime;
 import org.akvo.flow.domain.interactor.GetSavedDataPoints;
@@ -237,7 +238,7 @@ public class ViewModule {
     }
 
     @Provides
-    @Named("copyFile")
+    @Named("saveStreamToFile")
     UseCase provideCopyFile(CopyFile copyFile) {
         return copyFile;
     }
@@ -300,5 +301,11 @@ public class ViewModule {
     @Named("SaveApkUpdateNotified")
     UseCase provideSaveApkUpdateNotified(SaveApkUpdateNotified saveApkUpdateNotified) {
         return saveApkUpdateNotified;
+    }
+
+    @Provides
+    @Named("downloadForm")
+    UseCase provideDownloadForm(DownloadForm downloadForm) {
+        return downloadForm;
     }
 }

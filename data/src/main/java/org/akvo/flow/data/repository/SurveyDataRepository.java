@@ -27,11 +27,13 @@ import org.akvo.flow.data.datasource.DataSourceFactory;
 import org.akvo.flow.data.datasource.DatabaseDataSource;
 import org.akvo.flow.data.entity.ApiDataPoint;
 import org.akvo.flow.data.entity.ApiFilesResult;
+import org.akvo.flow.data.entity.ApiFormHeader;
 import org.akvo.flow.data.entity.ApiLocaleResult;
 import org.akvo.flow.data.entity.ApiSurveyInstance;
 import org.akvo.flow.data.entity.DataPointMapper;
 import org.akvo.flow.data.entity.FilesResultMapper;
 import org.akvo.flow.data.entity.FilteredFilesResult;
+import org.akvo.flow.data.entity.FormHeaderParser;
 import org.akvo.flow.data.entity.FormIdMapper;
 import org.akvo.flow.data.entity.FormInstanceMapper;
 import org.akvo.flow.data.entity.FormInstanceMetadataMapper;
@@ -95,6 +97,7 @@ public class SurveyDataRepository implements SurveyRepository {
     private final TransmissionMapper transmissionMapper;
     private final FormInstanceMapper formInstanceMapper;
     private final FormInstanceMetadataMapper formInstanceMetadataMapper;
+    private final FormHeaderParser formHeaderParser;
 
     //TODO: this needs to be split, too many methods and params
     @Inject
@@ -104,7 +107,8 @@ public class SurveyDataRepository implements SurveyRepository {
             TransmissionFilenameMapper transmissionFilenameMapper, FormIdMapper surveyIdMapper,
             FilesResultMapper filesResultMapper, TransmissionMapper transmissionMapper,
             FormInstanceMapper formInstanceMapper,
-            FormInstanceMetadataMapper formInstanceMetadataMapper) {
+            FormInstanceMetadataMapper formInstanceMetadataMapper,
+            FormHeaderParser formHeaderParser) {
         this.dataSourceFactory = dataSourceFactory;
         this.dataPointMapper = dataPointMapper;
         this.syncedTimeMapper = syncedTimeMapper;
@@ -117,6 +121,7 @@ public class SurveyDataRepository implements SurveyRepository {
         this.transmissionMapper = transmissionMapper;
         this.formInstanceMapper = formInstanceMapper;
         this.formInstanceMetadataMapper = formInstanceMetadataMapper;
+        this.formHeaderParser = formHeaderParser;
     }
 
     @Override
@@ -424,12 +429,12 @@ public class SurveyDataRepository implements SurveyRepository {
                     public Observable<List<Transmission>> apply(List<String> formIds) {
                         return Observable.fromIterable(formIds)
                                 .flatMap(new Function<String, Observable<List<Transmission>>>() {
-                                            @Override
-                                            public Observable<List<Transmission>> apply(
-                                                    String formId) {
-                                                return getFormTransmissions(formId);
-                                            }
-                                        });
+                                    @Override
+                                    public Observable<List<Transmission>> apply(
+                                            String formId) {
+                                        return getFormTransmissions(formId);
+                                    }
+                                });
 
                     }
                 });
@@ -505,6 +510,67 @@ public class SurveyDataRepository implements SurveyRepository {
                     @Override
                     public Observable<Boolean> apply(List<Boolean> ignored) {
                         return dataBaseDataSource.setInstanceStatusToSubmitted(instanceId);
+                    }
+                });
+    }
+
+    @Override
+    public Observable<Boolean> downloadForm(String formId, String deviceId) {
+        final DatabaseDataSource dataBaseDataSource = dataSourceFactory.getDataBaseDataSource();
+        if ("0".equals(formId)) {
+            return dataBaseDataSource.reinstallTestSurvey();
+        } else {
+            return restApi.downloadFormHeader(formId, deviceId)
+                    .map(new Function<String, ApiFormHeader>() {
+                        @Override
+                        public ApiFormHeader apply(String response) {
+                            return formHeaderParser.parse(response);
+                        }
+                    })
+                    .concatMap(new Function<ApiFormHeader, Observable<Boolean>>() {
+                        @Override
+                        public Observable<Boolean> apply(final ApiFormHeader apiFormHeader) {
+                            return dataBaseDataSource.insertSurveyGroup(apiFormHeader)
+                                    .concatMap(new Function<Boolean, Observable<Boolean>>() {
+                                        @Override
+                                        public Observable<Boolean> apply(Boolean aBoolean) {
+                                            return downloadSurvey(apiFormHeader);
+                                        }
+                                    });
+                        }
+                    });
+        }
+    }
+
+    private Observable<Boolean> downloadSurvey(final ApiFormHeader apiFormHeader) {
+        return dataSourceFactory.getDataBaseDataSource().surveyNeedsUpdate(apiFormHeader)
+                .concatMap(new Function<Boolean, Observable<Boolean>>() {
+                    @Override
+                    public Observable<Boolean> apply(Boolean updateNeeded) {
+                        if (updateNeeded) {
+                            return downloadAndSaveForm(apiFormHeader);
+                        } else {
+                            return Observable.just(true);
+                        }
+                    }
+
+                });
+    }
+
+    private Observable<Boolean> downloadAndSaveForm(final ApiFormHeader apiFormHeader) {
+        final String filename = apiFormHeader.getId() + ".zip";
+        return restApi.downloadForm(filename)
+                .concatMap(new Function<ResponseBody, Observable<Boolean>>() {
+                    @Override
+                    public Observable<Boolean> apply(ResponseBody responseBody) {
+                        return dataSourceFactory.getFileDataSource().saveRemoteFile(responseBody,
+                                        filename)
+                                .concatMap(new Function<Boolean, Observable<Boolean>>() {
+                                            @Override
+                                            public Observable<Boolean> apply(Boolean aBoolean) {
+                                                return dataSourceFactory.getDataBaseDataSource().insertSurvey(apiFormHeader, false);
+                                            }
+                                        });
                     }
                 });
     }

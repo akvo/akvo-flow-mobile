@@ -22,8 +22,8 @@ package org.akvo.flow.presentation.settings;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
@@ -35,17 +35,35 @@ import android.view.View;
 import android.widget.EditText;
 
 import org.akvo.flow.R;
-import org.akvo.flow.service.SurveyDownloadService;
 
 public class DownloadFormDialog extends DialogFragment {
 
     public static final String TAG = "ReloadFormsConfirmationDialog";
+
+    private DownloadFormListener listener;
 
     public DownloadFormDialog() {
     }
 
     public static DownloadFormDialog newInstance() {
         return new DownloadFormDialog();
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        FragmentActivity activity = getActivity();
+        if (activity instanceof DownloadFormListener) {
+            listener = (DownloadFormListener)activity;
+        } else {
+            throw new IllegalArgumentException("Activity must implement DownloadFormListener");
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        listener = null;
     }
 
     @NonNull
@@ -56,19 +74,14 @@ public class DownloadFormDialog extends DialogFragment {
         inputDialog.setTitle(R.string.downloadsurveylabel);
         inputDialog.setMessage(R.string.downloadsurveyinstr);
         View main = LayoutInflater.from(activity).inflate(R.layout.download_form_dialog, null);
-        final EditText input = (EditText) main.findViewById(R.id.form_id_et);
+        final EditText input = main.findViewById(R.id.form_id_et);
         input.setKeyListener(new DigitsKeyListener(false, false));
         inputDialog.setView(main);
         inputDialog.setPositiveButton(R.string.okbutton, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
                 String surveyId = input.getText().toString().trim();
-                if (!TextUtils.isEmpty(surveyId)) {
-                    FragmentActivity fragmentActivity = getActivity();
-                    if (fragmentActivity != null) {
-                        Intent intent = new Intent(fragmentActivity, SurveyDownloadService.class);
-                        intent.putExtra(SurveyDownloadService.EXTRA_SURVEY_ID, surveyId);
-                        fragmentActivity.startService(intent);
-                    }
+                if (!TextUtils.isEmpty(surveyId) && listener != null) {
+                   listener.downloadForm(surveyId);
                 }
             }
         });
@@ -79,5 +92,10 @@ public class DownloadFormDialog extends DialogFragment {
         });
 
         return inputDialog.create();
+    }
+
+    public interface DownloadFormListener {
+
+        void downloadForm(String formId);
     }
 }

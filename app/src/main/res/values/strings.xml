@@ -314,5 +314,7 @@
 
     <string name="unpublish_service_notification_title">Deleting published files</string>
     <string name="unpublish_service_notification_ticker">Deleting</string>
+    <string name="download_form_error">Error downloading form</string>
+    <string name="download_form_success">Form downloaded</string>
 
 </resources>

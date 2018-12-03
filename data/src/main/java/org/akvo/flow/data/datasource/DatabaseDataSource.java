@@ -24,15 +24,19 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 
 import com.squareup.sqlbrite2.BriteDatabase;
 
 import org.akvo.flow.data.entity.ApiDataPoint;
+import org.akvo.flow.data.entity.ApiFormHeader;
 import org.akvo.flow.data.entity.ApiQuestionAnswer;
 import org.akvo.flow.data.entity.ApiSurveyInstance;
 import org.akvo.flow.database.Constants;
 import org.akvo.flow.database.RecordColumns;
 import org.akvo.flow.database.ResponseColumns;
+import org.akvo.flow.database.SurveyColumns;
+import org.akvo.flow.database.SurveyGroupColumns;
 import org.akvo.flow.database.SurveyInstanceColumns;
 import org.akvo.flow.database.SurveyInstanceStatus;
 import org.akvo.flow.database.SyncTimeColumns;
@@ -347,6 +351,47 @@ public class DatabaseDataSource {
     private Observable<Boolean> insertTransmission(Long instanceId, String formId, String filename) {
         briteSurveyDbAdapter
                 .createTransmission(instanceId, formId, filename, TransmissionStatus.QUEUED);
+        return Observable.just(true);
+    }
+
+    public Observable<Boolean> reinstallTestSurvey() {
+        briteSurveyDbAdapter.reinstallTestSurvey();
+        return Observable.just(true);
+    }
+
+    public Observable<Boolean> insertSurveyGroup(ApiFormHeader apiFormHeader) {
+        ContentValues values = new ContentValues();
+        values.put(SurveyGroupColumns.SURVEY_GROUP_ID, apiFormHeader.getGroupId());
+        values.put(SurveyGroupColumns.NAME, apiFormHeader.getGroupName());
+        values.put(SurveyGroupColumns.REGISTER_SURVEY_ID, apiFormHeader.getRegistrationSurveyId());
+        values.put(SurveyGroupColumns.MONITORED, apiFormHeader.isMonitored() ? 1 : 0);
+        briteSurveyDbAdapter.addSurveyGroup(values);
+        return Observable.just(true);
+    }
+
+    public Observable<Boolean> surveyNeedsUpdate(ApiFormHeader apiFormHeader) {
+        final boolean surveyUpToDate = briteSurveyDbAdapter
+                .isSurveyUpToDate(apiFormHeader.getId(), apiFormHeader.getVersion());
+        return Observable.just(!surveyUpToDate);
+    }
+
+    //TODO: extract constants
+    public Observable<Boolean> insertSurvey(ApiFormHeader formHeader,
+            boolean cascadeResourcesDownloaded) {
+        String language = TextUtils.isEmpty(formHeader.getLanguage()) ?
+                "en" :
+                formHeader.getLanguage().toLowerCase();
+        ContentValues updatedValues = new ContentValues();
+        updatedValues.put(SurveyColumns.SURVEY_ID, formHeader.getId());
+        updatedValues.put(SurveyColumns.VERSION, formHeader.getVersion());
+        updatedValues.put(SurveyColumns.TYPE, "survey");
+        updatedValues.put(SurveyColumns.LOCATION, "sdcard");
+        updatedValues.put(SurveyColumns.FILENAME, formHeader.getId() + ".xml");
+        updatedValues.put(SurveyColumns.NAME, formHeader.getName());
+        updatedValues.put(SurveyColumns.LANGUAGE, language);
+        updatedValues.put(SurveyColumns.SURVEY_GROUP_ID, formHeader.getGroupId());
+        updatedValues.put(SurveyColumns.HELP_DOWNLOADED, cascadeResourcesDownloaded? 1: 0);
+        briteSurveyDbAdapter.updateSurvey(updatedValues, formHeader.getId());
         return Observable.just(true);
     }
 }

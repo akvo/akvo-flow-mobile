@@ -26,7 +26,6 @@ import org.akvo.flow.data.util.FileHelper;
 import org.akvo.flow.data.util.FlowFileBrowser;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 
 import javax.inject.Inject;
@@ -74,15 +73,11 @@ public class VideoDataSource {
     }
 
     private Observable<Boolean> copyVideo(String destinationFilePath, InputStream inputStream) {
-        try {
-            File destinationFile = new File(destinationFilePath);
-            String copiedFilePath = fileHelper.copyFile(destinationFile, inputStream);
-            if (copiedFilePath == null) {
-                return Observable.error(new Exception("Error copying video file"));
-            }
-            return Observable.just(true);
-        } catch (IOException e) {
-            return Observable.error(e);
+        File destinationFile = new File(destinationFilePath);
+        String copiedFilePath = fileHelper.saveStreamToFile(inputStream, destinationFile);
+        if (copiedFilePath == null) {
+            return Observable.error(new Exception("Error copying video file"));
         }
+        return Observable.just(true);
     }
 }

@@ -88,7 +88,8 @@ public class FlowFileBrowser {
         return new File(externalStoragePath + File.separator + folderName);
     }
 
-    @Nullable public File getAppExternalFolder(String folderName) {
+    @Nullable
+    public File getAppExternalFolder(String folderName) {
         String path = getAppExternalFolderPath(folderName);
         File folder = null;
         if (path != null) {
@@ -97,7 +98,8 @@ public class FlowFileBrowser {
         return folder;
     }
 
-    @Nullable public File getExistingAppExternalFolder(String folderName) {
+    @Nullable
+    public File getExistingAppInternalFolder(String folderName) {
         String path = getInternalFolder(folderName).getAbsolutePath();
         File folder = new File(path);
         if (!folder.exists()) {

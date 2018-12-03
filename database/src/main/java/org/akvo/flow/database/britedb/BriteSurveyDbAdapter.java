@@ -556,6 +556,19 @@ public class BriteSurveyDbAdapter {
         return briteDatabase.query(sql, selectionArgs);
     }
 
+    public boolean isSurveyUpToDate(String surveyId, String surveyVersion) {
+        boolean isUpToDate = true;
+        Cursor cursor = getSurveys(surveyId, surveyVersion);
+
+        if (cursor == null || cursor.getCount() <= 0) {
+            isUpToDate = false;
+        }
+        if (cursor != null) {
+            cursor.close();
+        }
+        return isUpToDate;
+    }
+
     /**
      * updates the survey table by recording the help download flag
      */

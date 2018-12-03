@@ -30,9 +30,11 @@ import javax.inject.Singleton;
 
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
+import retrofit2.Converter;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
+import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 @Singleton
 public class RestServiceFactory {
@@ -63,19 +65,26 @@ public class RestServiceFactory {
     public <T> T createRetrofitServiceWithInterceptor(final Class<T> clazz, String baseUrl) {
         OkHttpClient.Builder httpClient = createHttpClient();
         httpClient.addInterceptor(new HMACInterceptor(key, dateFormat, encoder, signatureHelper));
-        return createRetrofit(clazz, httpClient, baseUrl);
+        return createRetrofit(clazz, httpClient, baseUrl, GsonConverterFactory.create());
     }
 
     public <T> T createRetrofitService(final Class<T> clazz, String baseUrl) {
         OkHttpClient.Builder httpClient = createHttpClient();
-        return createRetrofit(clazz, httpClient, baseUrl);
+        return createRetrofit(clazz, httpClient, baseUrl, GsonConverterFactory.create());
     }
 
-    private <T> T createRetrofit(Class<T> clazz, OkHttpClient.Builder httpClient, String baseUrl) {
+    public <T> T createScalarsRetrofitService(final Class<T> clazz, String baseUrl) {
+        OkHttpClient.Builder httpClient = createHttpClient();
+        return createRetrofit(clazz, httpClient, baseUrl, ScalarsConverterFactory.create());
+    }
+
+
+    private <T> T createRetrofit(Class<T> clazz, OkHttpClient.Builder httpClient, String baseUrl,
+            Converter.Factory converter) {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(baseUrl)
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-                .addConverterFactory(GsonConverterFactory.create())
+                .addConverterFactory(converter)
                 .client(httpClient.build())
                 .build();
         return retrofit.create(clazz);

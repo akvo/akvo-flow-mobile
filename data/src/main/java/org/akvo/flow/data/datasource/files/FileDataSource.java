@@ -29,7 +29,10 @@ import org.akvo.flow.data.util.FileHelper;
 import org.akvo.flow.data.util.FlowFileBrowser;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,6 +41,7 @@ import javax.inject.Singleton;
 
 import io.reactivex.Observable;
 import okhttp3.ResponseBody;
+import timber.log.Timber;
 
 @Singleton
 public class FileDataSource {
@@ -213,10 +217,21 @@ public class FileDataSource {
         }
     }
 
-    public Observable<Boolean> saveRemoteFile(ResponseBody responseBody, String filename) {
+    public Observable<Boolean> extractRemoteArchive(ResponseBody responseBody, String folderName) {
+        File formFolder = flowFileBrowser.getExistingAppInternalFolder(folderName);
+        fileHelper.extractOnlineArchive(responseBody, formFolder);
+        return Observable.just(true);
+    }
+
+    public Observable<InputStream> getFormFile(String id) {
         File formFolder = flowFileBrowser.getExistingAppInternalFolder(FlowFileBrowser.DIR_FORMS);
-        final File surveyFormsZipArchive = new File(formFolder, filename);
-        fileHelper.extractOnlineArchive(responseBody, formFolder, surveyFormsZipArchive);
-        return null;
+        InputStream input;
+        try {
+            input = new FileInputStream(new File(formFolder, id + FlowFileBrowser.XML_SUFFIX));
+        } catch (FileNotFoundException e) {
+            Timber.e(e);
+            return Observable.error(e);
+        }
+        return Observable.just(input);
     }
 }

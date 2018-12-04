@@ -440,10 +440,6 @@ public class SurveyDbDataSource {
         briteSurveyDbAdapter.deleteAllSurveys();
     }
 
-    public void reinstallTestSurvey() {
-        briteSurveyDbAdapter.reinstallTestSurvey();
-    }
-
     public void deleteEmptyRecords() {
         surveyDbAdapter.deleteEmptyRecords();
     }

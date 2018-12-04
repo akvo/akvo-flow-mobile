@@ -369,7 +369,7 @@ public class DatabaseDataSource {
         return Observable.just(true);
     }
 
-    public Observable<Boolean> surveyNeedsUpdate(ApiFormHeader apiFormHeader) {
+    public Observable<Boolean> formNeedsUpdate(ApiFormHeader apiFormHeader) {
         final boolean surveyUpToDate = briteSurveyDbAdapter
                 .isSurveyUpToDate(apiFormHeader.getId(), apiFormHeader.getVersion());
         return Observable.just(!surveyUpToDate);

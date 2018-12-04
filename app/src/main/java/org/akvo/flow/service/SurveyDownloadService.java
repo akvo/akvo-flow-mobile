@@ -67,10 +67,8 @@ public class SurveyDownloadService extends IntentService {
     /**
      * Intent parameter to specify which survey needs to be downloaded
      */
-    public static final String EXTRA_SURVEY_ID = "survey";
     public static final String EXTRA_DELETE_SURVEYS = "delete_surveys";
 
-    private static final String TEST_SURVEY_ID = "0";
     private static final String TAG = "SURVEY_DOWNLOAD_SERVICE";
     private static final String DEFAULT_TYPE = "Survey";
 
@@ -97,9 +95,7 @@ public class SurveyDownloadService extends IntentService {
     public void onHandleIntent(@Nullable Intent intent) {
         try {
             databaseAdaptor.open();
-            if (intent != null && intent.hasExtra(EXTRA_SURVEY_ID)) {
-                downloadSurvey(intent);
-            } else if (intent != null && intent.getBooleanExtra(EXTRA_DELETE_SURVEYS, false)) {
+            if (intent != null && intent.getBooleanExtra(EXTRA_DELETE_SURVEYS, false)) {
                 reDownloadAllSurveys(intent);
             } else {
                 checkAndDownload(null);
@@ -117,16 +113,6 @@ public class SurveyDownloadService extends IntentService {
         String[] surveyIds = ids.toArray(new String[0]);
         databaseAdaptor.deleteAllSurveys();
         checkAndDownload(surveyIds);
-    }
-
-    private void downloadSurvey(@NonNull Intent intent) {
-        String surveyId = intent.getStringExtra(EXTRA_SURVEY_ID);
-        intent.removeExtra(EXTRA_SURVEY_ID);
-        if (TEST_SURVEY_ID.equals(surveyId)) {
-            databaseAdaptor.reinstallTestSurvey();
-        } else {
-            checkAndDownload(new String[] { surveyId });
-        }
     }
 
     /**

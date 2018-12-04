@@ -44,6 +44,8 @@ public class FlowFileBrowser {
     public static final String DIR_RES = "res";
     public static final String DIR_FORMS = "forms";
     public static final String DIR_INBOX = "akvoflow/inbox";
+    public static final String XML_SUFFIX = ".xml";
+    public static final String ZIP_SUFFIX = ".zip";
     private static final String VIDEO_SUFFIX = ".mp4";
 
     private final Context context;

@@ -126,9 +126,10 @@ public class RestApi {
                 .downloadFormHeader(formId, phoneNumber, androidId, imei, version, deviceId);
     }
 
-    public Observable<ResponseBody> downloadForm(String fileName) {
-        String authorization = getAmazonAuthForGet(getDate(), SURVEYS_FOLDER + "/" + fileName);
-        return createRetrofitService().getSurvey(SURVEYS_FOLDER, fileName, authorization);
+    public Observable<ResponseBody> downloadArchive(String fileName) {
+        final String date = getDate();
+        String authorization = getAmazonAuthForGet(date, SURVEYS_FOLDER + "/" + fileName);
+        return createRetrofitService().getSurvey(SURVEYS_FOLDER, fileName, date, authorization);
     }
 
     private Observable<ResponseBody> uploadPublicFile(String date, S3File s3File) {
@@ -179,5 +180,4 @@ public class RestApi {
     private String getDate() {
         return dateFormat.format(new Date()) + "GMT";
     }
-
 }

@@ -177,15 +177,11 @@ public class FileHelper {
         fout.close();
     }
 
-    public void extractOnlineArchive(ResponseBody responseBody, File formFolder,
-            File surveyFormsZipArchive) {
+    //TODO: check errors
+    public void extractOnlineArchive(ResponseBody responseBody, File targetFolder) {
         InputStream inputStream = responseBody.byteStream();
-        final String savedZipFilePath = saveStreamToFile(inputStream, surveyFormsZipArchive);
+        extractZipContent(inputStream, targetFolder);
         close(inputStream);
-        if (savedZipFilePath != null) {
-            extractZipFile(surveyFormsZipArchive, formFolder);
-            deleteFile(savedZipFilePath);
-        }
     }
 
     private void copyStream(InputStream inputStream, File destinationFile) {
@@ -205,13 +201,13 @@ public class FileHelper {
         }
     }
 
-    private void extractZipFile(File originalZipFile, File dst) {
+    private void extractZipContent(InputStream input, File destinationFolder) {
         ZipInputStream zis = null;
         try {
-            zis = new ZipInputStream(new FileInputStream(originalZipFile));
+            zis = new ZipInputStream(input);
             ZipEntry entry;
             while ((entry = zis.getNextEntry()) != null && !entry.isDirectory()) {
-                File f = new File(dst, entry.getName());
+                File f = new File(destinationFolder, entry.getName());
                 copyStream(zis, f);
                 zis.closeEntry();
             }

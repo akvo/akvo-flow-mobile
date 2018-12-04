@@ -56,5 +56,6 @@ public interface AwsS3 {
     @GET(S3_FILE_PATH)
     Observable<ResponseBody> getSurvey(@Path("key") String key,
             @Path("file") String file,
+            @Header("Date") String date,
             @Header("Authorization") String authorization);
 }

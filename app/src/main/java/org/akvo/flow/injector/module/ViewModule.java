@@ -239,7 +239,7 @@ public class ViewModule {
     }
 
     @Provides
-    @Named("saveStreamToFile")
+    @Named("copyFile")
     UseCase provideCopyFile(CopyFile copyFile) {
         return copyFile;
     }

@@ -73,7 +73,7 @@ public class FileDataSource {
     public Observable<Boolean> copyFile(String originFilePath, String destinationFilePath) {
         File originalFile = new File(originFilePath);
         File destinationFile = new File(destinationFilePath);
-        String copiedFilePath = fileHelper.saveStreamToFile(originalFile, destinationFile);
+        String copiedFilePath = fileHelper.copyFile(originalFile, destinationFile);
         if (copiedFilePath == null) {
             return Observable.error(new Exception("Error copying video file"));
         }

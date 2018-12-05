@@ -43,7 +43,7 @@ public class CaddisflyPresenter implements Presenter {
     private CaddisflyView view;
 
     @Inject
-    public CaddisflyPresenter(@Named("saveStreamToFile") UseCase copyFile, MediaFileHelper mediaFileHelper) {
+    public CaddisflyPresenter(@Named("copyFile") UseCase copyFile, MediaFileHelper mediaFileHelper) {
         this.copyFile = copyFile;
         this.mediaFileHelper = mediaFileHelper;
     }

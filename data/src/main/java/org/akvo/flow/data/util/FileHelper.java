@@ -92,7 +92,7 @@ public class FileHelper {
 
     public String copyFileToFolder(File originalFile, File destinationFolder) {
         File file = new File(destinationFolder, originalFile.getName());
-        return saveStreamToFile(originalFile, file);
+        return copyFile(originalFile, file);
     }
 
     /**
@@ -100,7 +100,7 @@ public class FileHelper {
      *
      * @return the destination file path if copy succeeded, null otherwise
      */
-    public String saveStreamToFile(File originalFile, File destinationFile) {
+    public String copyFile(File originalFile, File destinationFile) {
         String destinationPath = null;
         try {
             destinationPath = saveStreamToFile(new FileInputStream(originalFile), destinationFile);

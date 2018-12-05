@@ -58,7 +58,7 @@ public class ApkDataRepository implements ApkRepository {
 
     @Override
     public Observable<Boolean> saveApkDataPreference(@NonNull ApkData apkData) {
-        dataSourceFactory.getSharedPreferencesDataSource().saveApkData(apkData);
+        dataSourceFactory.getSharedPreferencesDataSource().setApkData(apkData);
         return Observable.just(true);
     }
 

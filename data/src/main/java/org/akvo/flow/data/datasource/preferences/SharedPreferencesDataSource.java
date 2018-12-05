@@ -133,13 +133,13 @@ public class SharedPreferencesDataSource {
         return Observable.just(getLong(KEY_USER_ID, LONG_VALUE_UNSET));
     }
 
-    public Observable<Boolean> clearSelectedUser() {
-        return setSelectedUser(LONG_VALUE_UNSET);
-    }
-
     public Observable<Boolean> setSelectedUser(long userId) {
         setLong(KEY_USER_ID, userId);
         return Observable.just(true);
+    }
+
+    public Observable<Boolean> clearSelectedUser() {
+        return setSelectedUser(LONG_VALUE_UNSET);
     }
 
     public Observable<Boolean> isDeviceSetup() {
@@ -167,16 +167,6 @@ public class SharedPreferencesDataSource {
         return Observable.just(preferences.contains(KEY_CELL_UPLOAD));
     }
 
-    public Observable<Boolean> saveApkData(ApkData apkData) {
-        setString(KEY_APK_DATA, gsonMapper.write(apkData, ApkData.class));
-        return Observable.just(true);
-    }
-
-    public Observable<Boolean> clearAppUpdateNotified() {
-        removePreference(KEY_APP_UPDATE_LAST_NOTIFIED);
-        return Observable.just(true);
-    }
-
     @Nullable
     public Observable<ApkData> getApkData() {
         String apkDataString = preferences.getString(KEY_APK_DATA, null);
@@ -186,13 +176,23 @@ public class SharedPreferencesDataSource {
         return Observable.just(gsonMapper.read(apkDataString, ApkData.class));
     }
 
-    public Observable<Boolean> saveAppUpdateNotifiedTime() {
-        setLong(KEY_APP_UPDATE_LAST_NOTIFIED, System.currentTimeMillis());
+    public Observable<Boolean> setApkData(ApkData apkData) {
+        setString(KEY_APK_DATA, gsonMapper.write(apkData, ApkData.class));
         return Observable.just(true);
     }
 
     public Observable<Long> getAppUpdateNotifiedTime() {
         return Observable.just(getLong(KEY_APP_UPDATE_LAST_NOTIFIED, LONG_VALUE_UNSET));
+    }
+
+    public Observable<Boolean> setAppUpdateNotifiedTime() {
+        setLong(KEY_APP_UPDATE_LAST_NOTIFIED, System.currentTimeMillis());
+        return Observable.just(true);
+    }
+
+    public Observable<Boolean> clearAppUpdateNotified() {
+        removePreference(KEY_APP_UPDATE_LAST_NOTIFIED);
+        return Observable.just(true);
     }
 
     protected String getString(String key, String defaultValue) {
@@ -205,6 +205,10 @@ public class SharedPreferencesDataSource {
 
     private boolean getBoolean(String key, boolean defValue) {
         return preferences.getBoolean(key, defValue);
+    }
+
+    private void setBoolean(String key, boolean value) {
+        preferences.edit().putBoolean(key, value).apply();
     }
 
     private long getLong(String key, long defValue) {
@@ -221,10 +225,6 @@ public class SharedPreferencesDataSource {
 
     private void setInt(String key, int value) {
         preferences.edit().putInt(key, value).apply();
-    }
-
-    private void setBoolean(String key, boolean value) {
-        preferences.edit().putBoolean(key, value).apply();
     }
 
     private void clearSetUp() {

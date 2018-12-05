@@ -33,15 +33,13 @@ import javax.inject.Inject;
 import io.reactivex.Observable;
 import io.reactivex.functions.Function;
 
-public class DownloadForm extends UseCase {
-
-    public static final String FORM_ID_PARAM = "formId";
+public class ReloadForms extends UseCase {
 
     private final SurveyRepository surveyRepository;
     private final UserRepository userRepository;
 
     @Inject
-    protected DownloadForm(ThreadExecutor threadExecutor, PostExecutionThread postExecutionThread,
+    protected ReloadForms(ThreadExecutor threadExecutor, PostExecutionThread postExecutionThread,
             SurveyRepository surveyRepository,
             UserRepository userRepository) {
         super(threadExecutor, postExecutionThread);
@@ -51,15 +49,11 @@ public class DownloadForm extends UseCase {
 
     @Override
     protected <T> Observable buildUseCaseObservable(final Map<String, T> parameters) {
-        if (parameters == null || !parameters.containsKey(FORM_ID_PARAM)) {
-            throw new IllegalArgumentException("missing form id");
-        }
         return userRepository.getDeviceId()
-                .concatMap(new Function<String, Observable<Boolean>>() {
+                .concatMap(new Function<String, Observable<Integer>>() {
                     @Override
-                    public Observable<Boolean> apply(String deviceId) {
-                        return surveyRepository
-                                .loadForm((String) parameters.get(FORM_ID_PARAM), deviceId);
+                    public Observable<Integer> apply(String deviceId) {
+                        return surveyRepository.reloadForms(deviceId);
                     }
                 });
     }

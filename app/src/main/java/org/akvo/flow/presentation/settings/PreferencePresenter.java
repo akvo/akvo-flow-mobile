@@ -51,6 +51,7 @@ public class PreferencePresenter implements Presenter {
     private final UseCase clearResponses;
     private final UseCase clearAllData;
     private final UseCase downloadForm;
+    private final UseCase reloadForms;
     private final ViewUserSettingsMapper mapper;
     private final LoggingHelper helper;
 
@@ -66,6 +67,7 @@ public class PreferencePresenter implements Presenter {
             @Named("clearResponses") UseCase clearResponses,
             @Named("clearAllData") UseCase clearAllData,
             @Named("downloadForm") UseCase downloadForm,
+            @Named("reloadForms") UseCase reloadForms,
             ViewUserSettingsMapper mapper, LoggingHelper helper) {
         this.getUserSettings = getUserSettings;
         this.saveAppLanguage = saveAppLanguage;
@@ -76,6 +78,7 @@ public class PreferencePresenter implements Presenter {
         this.clearResponses = clearResponses;
         this.clearAllData = clearAllData;
         this.downloadForm = downloadForm;
+        this.reloadForms = reloadForms;
         this.mapper = mapper;
         this.helper = helper;
     }
@@ -157,6 +160,7 @@ public class PreferencePresenter implements Presenter {
         clearAllData.dispose();
         clearResponses.dispose();
         downloadForm.dispose();
+        reloadForms.dispose();
     }
 
     public void deleteCollectedData() {
@@ -215,15 +219,33 @@ public class PreferencePresenter implements Presenter {
             public void onError(Throwable e) {
                 Timber.e(e);
                 view.hideLoading();
-                view.showDownloadFormError();
+                view.showDownloadFormsError(1);
             }
 
             @Override
             public void onNext(Boolean aBoolean) {
                 view.hideLoading();
-                view.showDownloadFormSuccess();
+                view.showDownloadFormsSuccess(1);
             }
         }, params);
+    }
+
+    public void reloadForms() {
+        view.showLoading();
+        reloadForms.execute(new DefaultObserver<Integer>() {
+            @Override
+            public void onError(Throwable e) {
+                Timber.e(e);
+                view.hideLoading();
+                view.showDownloadFormsError(5); //random number for now
+            }
+
+            @Override
+            public void onNext(Integer numberOfForms) {
+                view.hideLoading();
+                view.showDownloadFormsSuccess(numberOfForms);
+            }
+        }, null);
     }
 
     private class ClearDataObserver extends DefaultObserver<Boolean> {

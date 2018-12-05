@@ -64,11 +64,6 @@ import timber.log.Timber;
  */
 public class SurveyDownloadService extends IntentService {
 
-    /**
-     * Intent parameter to specify which survey needs to be downloaded
-     */
-    public static final String EXTRA_DELETE_SURVEYS = "delete_surveys";
-
     private static final String TAG = "SURVEY_DOWNLOAD_SERVICE";
     private static final String DEFAULT_TYPE = "Survey";
 
@@ -95,24 +90,12 @@ public class SurveyDownloadService extends IntentService {
     public void onHandleIntent(@Nullable Intent intent) {
         try {
             databaseAdaptor.open();
-            if (intent != null && intent.getBooleanExtra(EXTRA_DELETE_SURVEYS, false)) {
-                reDownloadAllSurveys(intent);
-            } else {
-                checkAndDownload(null);
-            }
+            checkAndDownload();
         } catch (Exception e) {
             Timber.e(e, e.getMessage());
         } finally {
             databaseAdaptor.close();
         }
-    }
-
-    private void reDownloadAllSurveys(@NonNull Intent intent) {
-        intent.removeExtra(EXTRA_DELETE_SURVEYS);
-        List<String> ids = databaseAdaptor.getSurveyIds();
-        String[] surveyIds = ids.toArray(new String[0]);
-        databaseAdaptor.deleteAllSurveys();
-        checkAndDownload(surveyIds);
     }
 
     /**
@@ -121,13 +104,9 @@ public class SurveyDownloadService extends IntentService {
      * passed in, then those specific surveys will be downloaded. If they're already
      * on the device, the surveys will be replaced with the new ones.
      */
-    private void checkAndDownload(@Nullable String[] surveyIds) {
+    private void checkAndDownload() {
         List<Survey> surveys;
-        if (surveyIds != null && surveyIds.length > 0) {
-            surveys = getSurveyHeaders(surveyIds);
-        } else {
-            surveys = checkForSurveys();
-        }
+        surveys = checkForSurveys();
 
         // Update all survey groups
         syncSurveyGroups(surveys);

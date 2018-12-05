@@ -235,6 +235,10 @@ public class DatabaseDataSource {
         return Observable.just(briteSurveyDbAdapter.getFormIds(surveyId));
     }
 
+    public Observable<Cursor> getFormIds() {
+        return Observable.just(briteSurveyDbAdapter.getFormIds());
+    }
+
     public Observable<Boolean> setFileTransmissionFailed(@Nullable List<String> filenames) {
         if (filenames == null || filenames.isEmpty()) {
             return Observable.just(true);
@@ -392,6 +396,11 @@ public class DatabaseDataSource {
         updatedValues.put(SurveyColumns.SURVEY_GROUP_ID, formHeader.getGroupId());
         updatedValues.put(SurveyColumns.HELP_DOWNLOADED, cascadeResourcesDownloaded? 1: 0);
         briteSurveyDbAdapter.updateSurvey(updatedValues, formHeader.getId());
+        return Observable.just(true);
+    }
+
+    public Observable<Boolean> deleteAllForms() {
+        briteSurveyDbAdapter.deleteAllSurveys();
         return Observable.just(true);
     }
 }

@@ -79,5 +79,7 @@ public interface SurveyRepository {
 
     Observable<Boolean> createTransmissions(Long instanceId, String formId, Set<String> fileNames);
 
-    Observable<Boolean> downloadForm(String formId, String deviceId);
+    Observable<Boolean> loadForm(String formId, String deviceId);
+
+    Observable<Integer> reloadForms(String deviceId);
 }

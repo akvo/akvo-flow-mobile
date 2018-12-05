@@ -44,7 +44,7 @@ public interface PreferenceView {
 
     void dismiss();
 
-    void showDownloadFormError();
+    void showDownloadFormsError(int numberOfForms);
 
-    void showDownloadFormSuccess();
+    void showDownloadFormsSuccess(int numberOfForms);
 }

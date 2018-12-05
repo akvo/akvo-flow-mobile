@@ -184,26 +184,26 @@ public class SurveyDataRepository implements SurveyRepository {
         return downloadDataPoints(surveyGroupId, state)
                 .doOnNext(new Consumer<State>() {
                     @Override
-                    public void accept(@NonNull State state) throws Exception {
+                    public void accept(@NonNull State state) {
                         List<ApiDataPoint> lastBatch = state.getLastBatch();
                         dataSourceFactory.getDataBaseDataSource().syncDataPoints(lastBatch);
                     }
                 })
                 .repeatWhen(new Function<Flowable<Object>, Publisher<?>>() {
                     @Override
-                    public Publisher<?> apply(@NonNull Flowable<Object> flowable) throws Exception {
+                    public Publisher<?> apply(@NonNull Flowable<Object> flowable) {
                         return flowable.delay(15, TimeUnit.SECONDS);
                     }
                 })
                 .takeUntil(new Predicate<State>() {
                     @Override
-                    public boolean test(State state) throws Exception {
+                    public boolean test(State state) {
                         return state.getLastBatch().isEmpty();
                     }
                 })
                 .filter(new Predicate<State>() {
                     @Override
-                    public boolean test(State state) throws Exception {
+                    public boolean test(State state) {
                         return state.getLastBatch().isEmpty();
                     }
                 })
@@ -219,14 +219,13 @@ public class SurveyDataRepository implements SurveyRepository {
             final State state) {
         return Flowable.defer(new Callable<Flowable<ApiLocaleResult>>() {
             @Override
-            public Flowable<ApiLocaleResult> call() throws Exception {
+            public Flowable<ApiLocaleResult> call() {
                 return restApi.downloadDataPoints(surveyGroupId,
                         state.getTimestamp());
             }
         }).map(new Function<ApiLocaleResult, List<ApiDataPoint>>() {
             @Override
-            public List<ApiDataPoint> apply(@NonNull ApiLocaleResult apiLocaleResult)
-                    throws Exception {
+            public List<ApiDataPoint> apply(@NonNull ApiLocaleResult apiLocaleResult) {
                 if (apiLocaleResult == null || apiLocaleResult.getDataPoints() == null) {
                     return Collections.emptyList();
                 }
@@ -236,8 +235,7 @@ public class SurveyDataRepository implements SurveyRepository {
             }
         }).concatMap(new Function<List<ApiDataPoint>, Flowable<State>>() {
             @Override
-            public Flowable<State> apply(@NonNull List<ApiDataPoint> dataPoints)
-                    throws Exception {
+            public Flowable<State> apply(@NonNull List<ApiDataPoint> dataPoints) {
                 return filterDataPoints(dataPoints, state);
             }
         });
@@ -518,32 +516,81 @@ public class SurveyDataRepository implements SurveyRepository {
                 });
     }
 
+    //TODO: extract constant
     @Override
-    public Observable<Boolean> downloadForm(String formId, String deviceId) {
+    public Observable<Boolean> loadForm(String formId, String deviceId) {
         final DatabaseDataSource dataBaseDataSource = dataSourceFactory.getDataBaseDataSource();
         if ("0".equals(formId)) {
             return dataBaseDataSource.reinstallTestSurvey();
         } else {
-            return restApi.downloadFormHeader(formId, deviceId)
-                    .map(new Function<String, ApiFormHeader>() {
-                        @Override
-                        public ApiFormHeader apply(String response) {
-                            return formHeaderParser.parse(response);
-                        }
-                    })
-                    .concatMap(new Function<ApiFormHeader, Observable<Boolean>>() {
-                        @Override
-                        public Observable<Boolean> apply(final ApiFormHeader apiFormHeader) {
-                            return dataBaseDataSource.insertSurveyGroup(apiFormHeader)
-                                    .concatMap(new Function<Boolean, Observable<Boolean>>() {
-                                        @Override
-                                        public Observable<Boolean> apply(Boolean aBoolean) {
-                                            return downloadForm(apiFormHeader);
-                                        }
-                                    });
-                        }
-                    });
+            return downloadForm(formId, deviceId);
         }
+    }
+
+    private Observable<Boolean> downloadForm(String formId, String deviceId) {
+        return restApi.downloadFormHeader(formId, deviceId)
+                .map(new Function<String, ApiFormHeader>() {
+                    @Override
+                    public ApiFormHeader apply(String response) {
+                        return formHeaderParser.parse(response);
+                    }
+                })
+                .concatMap(new Function<ApiFormHeader, Observable<Boolean>>() {
+                    @Override
+                    public Observable<Boolean> apply(final ApiFormHeader apiFormHeader) {
+                        return dataSourceFactory.getDataBaseDataSource()
+                                .insertSurveyGroup(apiFormHeader)
+                                .concatMap(new Function<Boolean, Observable<Boolean>>() {
+                                    @Override
+                                    public Observable<Boolean> apply(Boolean aBoolean) {
+                                        return downloadForm(apiFormHeader);
+                                    }
+                                });
+                    }
+                });
+    }
+
+    //TODO: handle errors
+    @Override
+    public Observable<Integer> reloadForms(final String deviceId) {
+        final DatabaseDataSource dataBaseDataSource = dataSourceFactory.getDataBaseDataSource();
+        return dataBaseDataSource.getFormIds()
+                .map(new Function<Cursor, List<String>>() {
+                    @Override
+                    public List<String> apply(Cursor cursor) {
+                        return surveyIdMapper.mapToFormId(cursor);
+                    }
+                }).concatMap(new Function<List<String>, Observable<Integer>>() {
+                    @Override
+                    public Observable<Integer> apply(final List<String> formIds) {
+                        return dataBaseDataSource.deleteAllForms()
+                                .concatMap(new Function<Boolean, Observable<Integer>>() {
+                                    @Override
+                                    public Observable<Integer> apply(Boolean aBoolean) {
+                                        return downloadForms(formIds, deviceId);
+                                    }
+                                });
+                    }
+                });
+    }
+
+    //TODO: check errors
+    private Observable<Integer> downloadForms(List<String> formIds, final String deviceId) {
+        return Observable.fromIterable(formIds)
+                .concatMap(new Function<String, Observable<Boolean>>() {
+                    @Override
+                    public Observable<Boolean> apply(String formId) {
+                        return downloadForm(formId, deviceId);
+                    }
+                })
+                .toList()
+                .toObservable()
+                .map(new Function<List<Boolean>, Integer>() {
+                    @Override
+                    public Integer apply(List<Boolean> booleans) {
+                        return booleans.size();
+                    }
+                });
     }
 
     private Observable<Boolean> downloadForm(final ApiFormHeader apiFormHeader) {

@@ -189,6 +189,11 @@ public class ConstantUtil {
 
     public static final int NOTIFICATION_BOOTSTRAP = 106;
 
+    public static final String NOTIFICATION_CHANNEL_ID = "1";
+
+    public static final int DATA_SYNC_NOTIFICATION_ID = 1234;
+    public static final int UN_PUBLISH_NOTIFICATION_ID = 1235;
+
     /**
      * Caddisfly serialization settings
      */
@@ -247,10 +252,6 @@ public class ConstantUtil {
     public static final int STORAGE_PERMISSION_CODE = 2;
     public static final int STORAGE_AND_PHONE_STATE_PERMISSION_CODE = 3;
 
-    public static final String NOTIFICATION_CHANNEL_ID = "1";
-
-    public static final int DATA_SYNC_NOTIFICATION_ID = 1234;
-    public static final int UN_PUBLISH_NOTIFICATION_ID = 1235;
 
     /**
      * prevent instantiation

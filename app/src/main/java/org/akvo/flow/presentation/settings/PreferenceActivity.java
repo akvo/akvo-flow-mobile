@@ -27,6 +27,7 @@ import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.StringRes;
 import android.support.design.widget.AppBarLayout;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.content.ContextCompat;
@@ -67,7 +68,8 @@ public class PreferenceActivity extends BackActivity implements PreferenceView,
         PassCodeDownloadFormDialog.PassCodeDownloadFormListener,
         PassCodeReloadFormsDialog.PassCodeReloadFormsListener,
         DeleteResponsesWarningDialog.DeleteResponsesListener,
-        DeleteAllWarningDialog.DeleteAllListener, DownloadFormDialog.DownloadFormListener {
+        DeleteAllWarningDialog.DeleteAllListener, DownloadFormDialog.DownloadFormListener,
+        ReloadFormsConfirmationDialog.ReloadFormsListener {
 
     @Inject
     Navigator navigator;
@@ -372,16 +374,26 @@ public class PreferenceActivity extends BackActivity implements PreferenceView,
     }
 
     @Override
-    public void showDownloadFormError() {
-        showMessage(R.string.download_form_error);
+    public void reloadFormsConfirmed() {
+        presenter.reloadForms();
     }
 
     @Override
-    public void showDownloadFormSuccess() {
-        showMessage(R.string.download_form_success);
+    public void showDownloadFormsError(int numberOfForms) {
+        showQuantityMessage(R.plurals.download_forms_error, numberOfForms);
     }
 
-    private void showMessage(int resId) {
+    @Override
+    public void showDownloadFormsSuccess(int numberOfForms) {
+        showQuantityMessage(R.plurals.download_forms_success, numberOfForms);
+    }
+
+    private void showMessage(@StringRes int resId) {
         snackBarManager.displaySnackBar(instanceNameTv, resId, this);
+    }
+
+    private void showQuantityMessage(int resId, int quantity) {
+        String message = getResources().getQuantityString(resId, quantity);
+        snackBarManager.displaySnackBar(instanceNameTv, message, this);
     }
 }

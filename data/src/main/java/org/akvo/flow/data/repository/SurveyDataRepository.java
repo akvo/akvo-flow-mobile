@@ -422,26 +422,14 @@ public class SurveyDataRepository implements SurveyRepository {
                 .flatMap(new Function<List<String>, Observable<List<Transmission>>>() {
                     @Override
                     public Observable<List<Transmission>> apply(List<String> formIds) {
-                        return Observable.fromIterable(formIds)
-                                .flatMap(new Function<String, Observable<List<Transmission>>>() {
-                                            @Override
-                                            public Observable<List<Transmission>> apply(
-                                                    String formId) {
-                                                return getFormTransmissions(formId);
-                                            }
-                                        });
-
-                    }
-                });
-    }
-
-    private Observable<List<Transmission>> getFormTransmissions(String formId) {
-        return dataSourceFactory.getDataBaseDataSource()
-                .getUnSyncedTransmissions(formId)
-                .map(new Function<Cursor, List<Transmission>>() {
-                    @Override
-                    public List<Transmission> apply(Cursor cursor) {
-                        return transmissionMapper.transform(cursor);
+                        return dataSourceFactory.getDataBaseDataSource()
+                                .getUnSyncedTransmissions(formIds)
+                                .map(new Function<Cursor, List<Transmission>>() {
+                                    @Override
+                                    public List<Transmission> apply(Cursor cursor) {
+                                        return transmissionMapper.transform(cursor);
+                                    }
+                                });
                     }
                 });
     }
@@ -563,6 +551,7 @@ public class SurveyDataRepository implements SurveyRepository {
                 .concatMap(new Function<ResponseBody, Observable<?>>() {
                     @Override
                     public Observable<?> apply(ResponseBody ignored) {
+                        Timber.d("Trying to upload : " + transmissionId);
                         S3File s3File = transmission.getS3File();
                         return restApi.notifyFileAvailable(s3File.getAction(),
                                 transmission.getFormId(), s3File.getFile().getName(), deviceId);
@@ -571,6 +560,7 @@ public class SurveyDataRepository implements SurveyRepository {
                 .doOnNext(new Consumer<Object>() {
                     @Override
                     public void accept(Object o) {
+                        Timber.d("doOnNext : " + transmissionId);
                         dataBaseDataSource.setFileTransmissionSucceeded(transmissionId);
                     }
                 })
@@ -583,6 +573,7 @@ public class SurveyDataRepository implements SurveyRepository {
                 .onErrorReturn(new Function<Throwable, UploadResult>() {
                     @Override
                     public UploadResult apply(Throwable throwable) {
+                        Timber.d("onErrorReturn : " + transmissionId);
                         Timber.e(throwable);
                         boolean formNotFound = throwable instanceof HttpException && (
                                 ((HttpException) throwable).code() == 404);

@@ -704,4 +704,21 @@ public class BriteSurveyDbAdapter {
         };
         return queryTransmissions(column, whereClause, selectionArgs);
     }
+
+    public Cursor getUnSyncedTransmissions(List<String> formIds) {
+        String column =
+                TransmissionColumns._ID + ", "
+                        + TransmissionColumns.SURVEY_INSTANCE_ID + ", "
+                        + TransmissionColumns.SURVEY_ID + ", "
+                        + TransmissionColumns.FILENAME;
+        String whereClause =
+                TransmissionColumns.STATUS + " IN ("
+                        + TransmissionStatus.QUEUED + ", "
+                        + TransmissionStatus.IN_PROGRESS + ", "
+                        + TransmissionStatus.FAILED + ") AND "
+                        + TransmissionColumns.FILENAME
+                        + " LIKE '%.%' AND " + TransmissionColumns.SURVEY_ID + " IN ";
+        String[] selectionArgs = formIds.toArray(new String[0]);
+        return queryTransmissions(column, whereClause, selectionArgs);
+    }
 }

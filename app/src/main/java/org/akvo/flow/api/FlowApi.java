@@ -19,14 +19,11 @@
 
 package org.akvo.flow.api;
 
-import android.content.Context;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
 import org.akvo.flow.BuildConfig;
-import org.akvo.flow.data.preference.Prefs;
-import org.akvo.flow.domain.util.DeviceHelper;
 import org.akvo.flow.util.HttpUtil;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -40,21 +37,10 @@ public class FlowApi {
     private static final String HTTPS_PREFIX = "https";
     private static final String HTTP_PREFIX = "http";
 
-    private final String phoneNumber;
-    private final String imei;
-    private final String androidId;
-    private final String deviceIdentifier;
     private final String baseUrl;
 
-    public FlowApi(Context context) {
-        DeviceHelper deviceHelper = new DeviceHelper(context);
+    public FlowApi() {
         this.baseUrl = BuildConfig.SERVER_BASE;
-        this.phoneNumber = deviceHelper.getPhoneNumber();
-        this.imei = deviceHelper.getImei();
-        this.androidId = deviceHelper.getAndroidId();
-        Prefs prefs = new Prefs(context);
-        this.deviceIdentifier = prefs
-                .getString(Prefs.KEY_DEVICE_IDENTIFIER, Prefs.DEFAULT_VALUE_DEVICE_IDENTIFIER);
     }
 
     public String getServerTime() throws IOException {
@@ -85,39 +71,12 @@ public class FlowApi {
         return builder.build().toString();
     }
 
-    @NonNull
-    private String buildSurveysUrl(@NonNull String serverBaseUrl) {
-        Uri.Builder builder = Uri.parse(serverBaseUrl).buildUpon();
-        builder.appendPath(Path.SURVEY_LIST_SERVICE);
-        builder.appendQueryParameter(Param.PARAM_ACTION, Param.VALUE_SURVEY);
-        appendDeviceParams(builder);
-        return builder.build().toString();
-    }
-
-    private void appendDeviceParams(@NonNull Uri.Builder builder) {
-        builder.appendQueryParameter(Param.PHONE_NUMBER, phoneNumber);
-        builder.appendQueryParameter(Param.ANDROID_ID, androidId);
-        builder.appendQueryParameter(Param.IMEI, imei);
-        builder.appendQueryParameter(Param.VERSION, BuildConfig.VERSION_NAME);
-        builder.appendQueryParameter(Param.DEVICE_ID, deviceIdentifier);
-    }
-
     interface Path {
-        String SURVEY_LIST_SERVICE = "surveymanager";
         String TIME_CHECK = "devicetimerest";
     }
 
     interface Param {
 
-        String PHONE_NUMBER = "phoneNumber";
-        String IMEI = "imei";
         String TIMESTAMP = "ts";
-        String VERSION = "ver";
-        String DEVICE_ID = "devId";
-        String ANDROID_ID = "androidId";
-
-        String PARAM_ACTION = "action";
-
-        String VALUE_SURVEY = "getAvailableSurveysDevice";
     }
 }

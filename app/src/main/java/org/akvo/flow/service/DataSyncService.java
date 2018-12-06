@@ -108,7 +108,6 @@ public class DataSyncService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         startForeground(ConstantUtil.DATA_SYNC_NOTIFICATION_ID,
                 NotificationHelper.getSyncingNotification(getApplicationContext()));
-        Timber.d("onStartCommand");
         makeDataPrivate.dispose();
         makeDataPrivate.execute(new DefaultObserver<Boolean>() {
             @Override

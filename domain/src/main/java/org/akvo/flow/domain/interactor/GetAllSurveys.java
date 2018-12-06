@@ -18,14 +18,13 @@
  *
  */
 
-package org.akvo.flow.domain.interactor.forms;
+package org.akvo.flow.domain.interactor;
 
 import android.support.v4.util.Pair;
 
 import org.akvo.flow.domain.entity.Survey;
 import org.akvo.flow.domain.executor.PostExecutionThread;
 import org.akvo.flow.domain.executor.ThreadExecutor;
-import org.akvo.flow.domain.interactor.UseCase;
 import org.akvo.flow.domain.repository.SurveyRepository;
 import org.akvo.flow.domain.repository.UserRepository;
 

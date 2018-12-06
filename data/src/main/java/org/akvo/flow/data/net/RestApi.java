@@ -126,6 +126,12 @@ public class RestApi {
                 .downloadFormHeader(formId, phoneNumber, androidId, imei, version, deviceId);
     }
 
+    public Observable<String> downloadFormsHeader(String deviceId) {
+        return serviceFactory
+                .createScalarsRetrofitService(FlowApiService.class, apiUrls.getGaeUrl())
+                .downloadFormsHeader(phoneNumber, androidId, imei, version, deviceId);
+    }
+
     public Observable<ResponseBody> downloadArchive(String fileName) {
         final String date = getDate();
         String authorization = getAmazonAuthForGet(date, SURVEYS_FOLDER + "/" + fileName);

@@ -26,17 +26,12 @@ import android.text.TextUtils;
 
 import org.akvo.flow.BuildConfig;
 import org.akvo.flow.data.preference.Prefs;
-import org.akvo.flow.domain.Survey;
 import org.akvo.flow.domain.util.DeviceHelper;
-import org.akvo.flow.serialization.form.SurveyMetaParser;
 import org.akvo.flow.util.HttpUtil;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 import timber.log.Timber;
 
@@ -91,37 +86,6 @@ public class FlowApi {
     }
 
     @NonNull
-    public List<Survey> getSurveyHeader(@NonNull String surveyId)
-            throws IOException {
-        final String url = buildSurveyHeaderUrl(baseUrl, surveyId);
-        String response = HttpUtil.httpGet(url);
-        if (!TextUtils.isEmpty(response)) {
-            return new SurveyMetaParser().parseList(response, true);
-        }
-        return Collections.emptyList();
-    }
-
-    @NonNull
-    private String buildSurveyHeaderUrl(@NonNull String serverBaseUrl, @NonNull String surveyId) {
-        Uri.Builder builder = Uri.parse(serverBaseUrl).buildUpon();
-        builder.appendPath(Path.SURVEY_HEADER_SERVICE);
-        builder.appendQueryParameter(Param.PARAM_ACTION, Param.VALUE_HEADER);
-        builder.appendQueryParameter(Param.SURVEY_ID, surveyId);
-        appendDeviceParams(builder);
-        return builder.build().toString();
-    }
-
-    public List<Survey> getSurveys() throws IOException {
-        List<Survey> surveys = new ArrayList<>();
-        final String url = buildSurveysUrl(baseUrl);
-        String response = HttpUtil.httpGet(url);
-        if (!TextUtils.isEmpty(response)) {
-            surveys = new SurveyMetaParser().parseList(response);
-        }
-        return surveys;
-    }
-
-    @NonNull
     private String buildSurveysUrl(@NonNull String serverBaseUrl) {
         Uri.Builder builder = Uri.parse(serverBaseUrl).buildUpon();
         builder.appendPath(Path.SURVEY_LIST_SERVICE);
@@ -140,7 +104,6 @@ public class FlowApi {
 
     interface Path {
         String SURVEY_LIST_SERVICE = "surveymanager";
-        String SURVEY_HEADER_SERVICE = "surveymanager";
         String TIME_CHECK = "devicetimerest";
     }
 
@@ -154,9 +117,7 @@ public class FlowApi {
         String ANDROID_ID = "androidId";
 
         String PARAM_ACTION = "action";
-        String SURVEY_ID = "surveyId";
 
-        String VALUE_HEADER = "getSurveyHeader";
         String VALUE_SURVEY = "getAvailableSurveysDevice";
     }
 }

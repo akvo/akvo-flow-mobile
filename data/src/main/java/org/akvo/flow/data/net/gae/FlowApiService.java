@@ -39,9 +39,15 @@ public interface FlowApiService {
     @GET(ApiUrls.APK_VERSION_SERVICE_PATH)
     Observable<ApiApkData> loadApkData(@Query(ApiUrls.ANDROID_BUILD_VERSION) String version);
 
-    @GET(ApiUrls.SURVEY_HEADER_PATH)
+    @GET(ApiUrls.FORM_HEADER_PATH)
     Observable<String> downloadFormHeader(@Query(SURVEY_ID) String formId,
             @Query(PHONE_NUMBER) String phoneNumber, @Query(ANDROID_ID) String androidId,
+            @Query(IMEI) String imei, @Query(VERSION) String version,
+            @Query(DEVICE_ID) String deviceId);
+
+    @GET(ApiUrls.FORMS_HEADER_PATH)
+    Observable<String> downloadFormsHeader(@Query(PHONE_NUMBER) String phoneNumber,
+            @Query(ANDROID_ID) String androidId,
             @Query(IMEI) String imei, @Query(VERSION) String version,
             @Query(DEVICE_ID) String deviceId);
 }

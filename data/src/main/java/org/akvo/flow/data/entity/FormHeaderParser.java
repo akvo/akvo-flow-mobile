@@ -22,28 +22,61 @@ package org.akvo.flow.data.entity;
 
 import android.text.TextUtils;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.StringTokenizer;
+
 import javax.inject.Inject;
+
+import io.reactivex.annotations.NonNull;
 
 public class FormHeaderParser {
 
-    private static final int ID = 0;
-    private static final int NAME = 1;
-    private static final int LANGUAGE = 2;
-    private static final int VERSION = 3;
+    /**
+     * This is empty most of the time but unfortunately the backend still returns the data in such
+     * way that the first string is either empty or the device's phone
+     */
+    private static final int DEVICE = 0;
+    private static final int ID = 1;
+    private static final int NAME = 2;
+    private static final int LANGUAGE = 3;
+    private static final int VERSION = 4;
 
     // SurveyGroup information
-    private static final int GROUP_ID = 4;
-    private static final int GROUP_NAME = 5;
-    private static final int GROUP_MONITORED = 6;
-    private static final int GROUP_REGISTRATION_SURVEY = 7;
+    private static final int GROUP_ID = 5;
+    private static final int GROUP_NAME = 6;
+    private static final int GROUP_MONITORED = 7;
+    private static final int GROUP_REGISTRATION_SURVEY = 8;
 
-    private static final int COUNT = 8;// Length of column array
+    private static final int COUNT = 9;// Length of column array
 
     @Inject
     public FormHeaderParser() {
     }
 
-    public ApiFormHeader parse(String response) {
+    public List<ApiFormHeader> parseMultiple(String response) {
+        final List<ApiFormHeader> headers = new ArrayList<>();
+        if (!TextUtils.isEmpty(response)) {
+            if (!response.startsWith(",")) {
+                response = "," + response;
+            }
+            final StringTokenizer strTok = new StringTokenizer(response, "\n");
+            while (strTok.hasMoreTokens()) {
+                String currentLine = strTok.nextToken();
+                headers.add(parse(currentLine));
+            }
+        }
+        return headers;
+    }
+
+    public ApiFormHeader parseOne(@NonNull String response) {
+        if (response != null && !response.startsWith(",")) {
+            response = "," + response;
+        }
+        return parse(response);
+    }
+
+    private ApiFormHeader parse(String response) {
         String[] tuple = response.split(",");
         if (tuple.length < COUNT) {
             throw new IllegalArgumentException(

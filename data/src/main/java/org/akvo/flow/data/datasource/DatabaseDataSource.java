@@ -403,4 +403,6 @@ public class DatabaseDataSource {
         briteSurveyDbAdapter.deleteAllSurveys();
         return Observable.just(true);
     }
+
+
 }

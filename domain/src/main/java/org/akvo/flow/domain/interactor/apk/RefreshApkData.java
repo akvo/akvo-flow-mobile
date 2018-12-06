@@ -23,6 +23,7 @@ package org.akvo.flow.domain.interactor.apk;
 import android.os.Build;
 import android.support.annotation.Nullable;
 
+import org.akvo.flow.domain.interactor.SingleThreadUseCase;
 import org.akvo.flow.domain.entity.ApkData;
 import org.akvo.flow.domain.repository.ApkRepository;
 import org.akvo.flow.domain.repository.UserRepository;
@@ -33,40 +34,26 @@ import java.util.Map;
 import javax.inject.Inject;
 
 import io.reactivex.Observable;
-import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.BiFunction;
 import io.reactivex.functions.Function;
-import io.reactivex.observers.DisposableObserver;
 
-/**
- * This is a single threaded UseCase to be used with IntentServices and GcmTaskService whose
- * onHandleIntent or onRunTask methods runs on a worker thread
- */
-public class RefreshApkData {
+public class RefreshApkData extends SingleThreadUseCase {
 
     public static final String APP_VERSION_PARAM = "version";
 
     private final ApkRepository apkRepository;
     private final UserRepository userRepository;
-    private final CompositeDisposable disposables;
     private final VersionHelper versionHelper;
 
     @Inject
-    public RefreshApkData(ApkRepository apkRepository,
-            UserRepository userRepository,
+    public RefreshApkData(ApkRepository apkRepository, UserRepository userRepository,
             VersionHelper versionHelper) {
         this.apkRepository = apkRepository;
         this.userRepository = userRepository;
         this.versionHelper = versionHelper;
-        this.disposables = new CompositeDisposable();
     }
 
-    @SuppressWarnings("unchecked")
-    public <T> void execute(DisposableObserver<T> observer, final Map<String, String> parameters) {
-        addDisposable(((Observable<T>) buildUseCaseObservable(parameters)).subscribeWith(observer));
-    }
-
+    @Override
     protected <T> Observable<Boolean> buildUseCaseObservable(final Map<String, T> parameters) {
         if (parameters == null || !parameters.containsKey(APP_VERSION_PARAM)) {
             throw new IllegalArgumentException("Missing params");
@@ -92,16 +79,6 @@ public class RefreshApkData {
                         return Observable.just(false);
                     }
                 });
-    }
-
-    public void dispose() {
-        if (!disposables.isDisposed()) {
-            disposables.clear();
-        }
-    }
-
-    private void addDisposable(Disposable disposable) {
-        disposables.add(disposable);
     }
 
     private boolean shouldAppBeUpdated(@Nullable ApkData data, String currentVersionName) {

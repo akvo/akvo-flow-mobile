@@ -27,13 +27,11 @@ import org.akvo.flow.data.datasource.DataSourceFactory;
 import org.akvo.flow.data.datasource.DatabaseDataSource;
 import org.akvo.flow.data.entity.ApiDataPoint;
 import org.akvo.flow.data.entity.ApiFilesResult;
-import org.akvo.flow.data.entity.ApiFormHeader;
 import org.akvo.flow.data.entity.ApiLocaleResult;
 import org.akvo.flow.data.entity.ApiSurveyInstance;
 import org.akvo.flow.data.entity.DataPointMapper;
 import org.akvo.flow.data.entity.FilesResultMapper;
 import org.akvo.flow.data.entity.FilteredFilesResult;
-import org.akvo.flow.data.entity.FormHeaderParser;
 import org.akvo.flow.data.entity.FormIdMapper;
 import org.akvo.flow.data.entity.FormInstanceMapper;
 import org.akvo.flow.data.entity.FormInstanceMetadataMapper;
@@ -48,9 +46,7 @@ import org.akvo.flow.data.entity.UploadFormDeletedError;
 import org.akvo.flow.data.entity.UploadResult;
 import org.akvo.flow.data.entity.UploadSuccess;
 import org.akvo.flow.data.entity.UserMapper;
-import org.akvo.flow.data.entity.XmlParser;
 import org.akvo.flow.data.net.RestApi;
-import org.akvo.flow.data.util.FlowFileBrowser;
 import org.akvo.flow.domain.entity.DataPoint;
 import org.akvo.flow.domain.entity.FormInstanceMetadata;
 import org.akvo.flow.domain.entity.InstanceIdUuid;
@@ -60,7 +56,6 @@ import org.akvo.flow.domain.exception.AssignmentRequiredException;
 import org.akvo.flow.domain.repository.SurveyRepository;
 import org.reactivestreams.Publisher;
 
-import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -95,24 +90,21 @@ public class SurveyDataRepository implements SurveyRepository {
     private final SurveyMapper surveyMapper;
     private final UserMapper userMapper;
     private final TransmissionFilenameMapper transmissionFileMapper;
-    private final FormIdMapper surveyIdMapper;
+    private final FormIdMapper formIdMapper;
     private final FilesResultMapper filesResultMapper;
     private final TransmissionMapper transmissionMapper;
     private final FormInstanceMapper formInstanceMapper;
     private final FormInstanceMetadataMapper formInstanceMetadataMapper;
-    private final FormHeaderParser formHeaderParser;
-    private final XmlParser xmlParser;
 
     //TODO: this needs to be split, too many methods and params
     @Inject
     public SurveyDataRepository(DataSourceFactory dataSourceFactory,
             DataPointMapper dataPointMapper, SyncedTimeMapper syncedTimeMapper, RestApi restApi,
             SurveyMapper surveyMapper, UserMapper userMapper,
-            TransmissionFilenameMapper transmissionFilenameMapper, FormIdMapper surveyIdMapper,
+            TransmissionFilenameMapper transmissionFilenameMapper, FormIdMapper formIdMapper,
             FilesResultMapper filesResultMapper, TransmissionMapper transmissionMapper,
             FormInstanceMapper formInstanceMapper,
-            FormInstanceMetadataMapper formInstanceMetadataMapper,
-            FormHeaderParser formHeaderParser, XmlParser xmlParser) {
+            FormInstanceMetadataMapper formInstanceMetadataMapper) {
         this.dataSourceFactory = dataSourceFactory;
         this.dataPointMapper = dataPointMapper;
         this.syncedTimeMapper = syncedTimeMapper;
@@ -120,13 +112,11 @@ public class SurveyDataRepository implements SurveyRepository {
         this.surveyMapper = surveyMapper;
         this.userMapper = userMapper;
         this.transmissionFileMapper = transmissionFilenameMapper;
-        this.surveyIdMapper = surveyIdMapper;
+        this.formIdMapper = formIdMapper;
         this.filesResultMapper = filesResultMapper;
         this.transmissionMapper = transmissionMapper;
         this.formInstanceMapper = formInstanceMapper;
         this.formInstanceMetadataMapper = formInstanceMetadataMapper;
-        this.formHeaderParser = formHeaderParser;
-        this.xmlParser = xmlParser;
     }
 
     @Override
@@ -366,13 +356,14 @@ public class SurveyDataRepository implements SurveyRepository {
                 });
     }
 
+    //TODO: move to FormRepository
     @Override
     public Observable<List<String>> getFormIds(String surveyId) {
         return dataSourceFactory.getDataBaseDataSource().getFormIds(surveyId)
                 .map(new Function<Cursor, List<String>>() {
                     @Override
                     public List<String> apply(Cursor cursor) {
-                        return surveyIdMapper.mapToFormId(cursor);
+                        return formIdMapper.mapToFormId(cursor);
                     }
                 });
     }
@@ -512,172 +503,6 @@ public class SurveyDataRepository implements SurveyRepository {
                     @Override
                     public Observable<Boolean> apply(List<Boolean> ignored) {
                         return dataBaseDataSource.setInstanceStatusToSubmitted(instanceId);
-                    }
-                });
-    }
-
-    //TODO: extract constant
-    @Override
-    public Observable<Boolean> loadForm(String formId, String deviceId) {
-        final DatabaseDataSource dataBaseDataSource = dataSourceFactory.getDataBaseDataSource();
-        if ("0".equals(formId)) {
-            return dataBaseDataSource.reinstallTestSurvey();
-        } else {
-            return downloadForm(formId, deviceId);
-        }
-    }
-
-    private Observable<Boolean> downloadForm(String formId, String deviceId) {
-        return restApi.downloadFormHeader(formId, deviceId)
-                .map(new Function<String, ApiFormHeader>() {
-                    @Override
-                    public ApiFormHeader apply(String response) {
-                        return formHeaderParser.parse(response);
-                    }
-                })
-                .concatMap(new Function<ApiFormHeader, Observable<Boolean>>() {
-                    @Override
-                    public Observable<Boolean> apply(final ApiFormHeader apiFormHeader) {
-                        return dataSourceFactory.getDataBaseDataSource()
-                                .insertSurveyGroup(apiFormHeader)
-                                .concatMap(new Function<Boolean, Observable<Boolean>>() {
-                                    @Override
-                                    public Observable<Boolean> apply(Boolean aBoolean) {
-                                        return downloadForm(apiFormHeader);
-                                    }
-                                });
-                    }
-                });
-    }
-
-    //TODO: handle errors
-    @Override
-    public Observable<Integer> reloadForms(final String deviceId) {
-        final DatabaseDataSource dataBaseDataSource = dataSourceFactory.getDataBaseDataSource();
-        return dataBaseDataSource.getFormIds()
-                .map(new Function<Cursor, List<String>>() {
-                    @Override
-                    public List<String> apply(Cursor cursor) {
-                        return surveyIdMapper.mapToFormId(cursor);
-                    }
-                }).concatMap(new Function<List<String>, Observable<Integer>>() {
-                    @Override
-                    public Observable<Integer> apply(final List<String> formIds) {
-                        return dataBaseDataSource.deleteAllForms()
-                                .concatMap(new Function<Boolean, Observable<Integer>>() {
-                                    @Override
-                                    public Observable<Integer> apply(Boolean aBoolean) {
-                                        return downloadForms(formIds, deviceId);
-                                    }
-                                });
-                    }
-                });
-    }
-
-    //TODO: check errors
-    private Observable<Integer> downloadForms(List<String> formIds, final String deviceId) {
-        return Observable.fromIterable(formIds)
-                .concatMap(new Function<String, Observable<Boolean>>() {
-                    @Override
-                    public Observable<Boolean> apply(String formId) {
-                        return downloadForm(formId, deviceId);
-                    }
-                })
-                .toList()
-                .toObservable()
-                .map(new Function<List<Boolean>, Integer>() {
-                    @Override
-                    public Integer apply(List<Boolean> booleans) {
-                        return booleans.size();
-                    }
-                });
-    }
-
-    private Observable<Boolean> downloadForm(final ApiFormHeader apiFormHeader) {
-        return dataSourceFactory.getDataBaseDataSource().formNeedsUpdate(apiFormHeader)
-                .concatMap(new Function<Boolean, Observable<Boolean>>() {
-                    @Override
-                    public Observable<Boolean> apply(Boolean updateNeeded) {
-                        if (updateNeeded) {
-                            return downloadAndSaveForm(apiFormHeader);
-                        } else {
-                            return Observable.just(true);
-                        }
-                    }
-
-                });
-    }
-
-    private Observable<Boolean> downloadAndSaveForm(final ApiFormHeader apiFormHeader) {
-        return downloadAndExtractFile(apiFormHeader.getId() + FlowFileBrowser.ZIP_SUFFIX,
-                FlowFileBrowser.DIR_FORMS)
-                .concatMap(new Function<Boolean, Observable<Boolean>>() {
-                    @Override
-                    public Observable<Boolean> apply(Boolean aBoolean) {
-                        return saveForm(apiFormHeader);
-                    }
-                });
-    }
-
-    private Observable<Boolean> downloadAndExtractFile(String fileName, final String folder) {
-        return restApi.downloadArchive(fileName)
-                .concatMap(new Function<ResponseBody, Observable<Boolean>>() {
-                    @Override
-                    public Observable<Boolean> apply(ResponseBody responseBody) {
-                        return dataSourceFactory.getFileDataSource()
-                                .extractRemoteArchive(responseBody, folder);
-
-                    }
-                });
-    }
-
-    private Observable<Boolean> saveForm(final ApiFormHeader apiFormHeader) {
-        return dataSourceFactory.getFileDataSource().getFormFile(apiFormHeader.getId())
-                .map(new Function<InputStream, List<String>>() {
-                    @Override
-                    public List<String> apply(InputStream inputStream) {
-                        return xmlParser.parse(inputStream);
-                    }
-                })
-                .concatMap(new Function<List<String>, Observable<Boolean>>() {
-                    @Override
-                    public Observable<Boolean> apply(List<String> resources) {
-                        return downloadResources(resources)
-                                .concatMap(new Function<Boolean, Observable<Boolean>>() {
-                                    @Override
-                                    public Observable<Boolean> apply(Boolean aBoolean) {
-                                        return dataSourceFactory.getDataBaseDataSource()
-                                                .insertSurvey(apiFormHeader, true);
-                                    }
-                                })
-                                .doOnError(new Consumer<Throwable>() {
-                                    @Override
-                                    public void accept(Throwable throwable) {
-                                        Timber.e(throwable);
-                                        dataSourceFactory.getDataBaseDataSource()
-                                                .insertSurvey(apiFormHeader, false);
-                                    }
-                                });
-                    }
-                });
-
-    }
-
-    private Observable<Boolean> downloadResources(List<String> resources) {
-        return Observable.fromIterable(resources)
-                .concatMap(new Function<String, Observable<Boolean>>() {
-                    @Override
-                    public Observable<Boolean> apply(String resource) {
-                        return downloadAndExtractFile(resource + FlowFileBrowser.ZIP_SUFFIX,
-                                FlowFileBrowser.DIR_RES);
-                    }
-                })
-                .toList()
-                .toObservable()
-                .map(new Function<List<Boolean>, Boolean>() {
-                    @Override
-                    public Boolean apply(List<Boolean> ignored) {
-                        return true;
                     }
                 });
     }

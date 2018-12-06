@@ -18,32 +18,15 @@
  *
  */
 
-package org.akvo.flow.domain.interactor;
-
-import org.akvo.flow.domain.executor.PostExecutionThread;
-import org.akvo.flow.domain.executor.ThreadExecutor;
-import org.akvo.flow.domain.repository.FileRepository;
-
-import java.util.Map;
-
-import javax.inject.Inject;
+package org.akvo.flow.domain.repository;
 
 import io.reactivex.Observable;
 
-public class MakeDataPrivate extends UseCase {
+public interface FormRepository {
 
-    private final FileRepository fileRepository;
+    Observable<Boolean> loadForm(String formId, String deviceId);
 
-    @Inject
-    protected MakeDataPrivate(ThreadExecutor threadExecutor,
-            PostExecutionThread postExecutionThread, FileRepository fileRepository) {
-        super(threadExecutor, postExecutionThread);
-        this.fileRepository = fileRepository;
-    }
+    Observable<Integer> reloadForms(String deviceId);
 
-    @Override
-    protected <T> Observable buildUseCaseObservable(Map<String, T> parameters) {
-        return fileRepository.moveFiles();
-    }
-
+    Observable<Integer> downloadFormHeaders(String deviceId);
 }

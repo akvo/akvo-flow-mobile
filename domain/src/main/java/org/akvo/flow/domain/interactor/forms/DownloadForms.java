@@ -18,32 +18,39 @@
  *
  */
 
-package org.akvo.flow.domain.interactor;
+package org.akvo.flow.domain.interactor.forms;
 
-import org.akvo.flow.domain.executor.PostExecutionThread;
-import org.akvo.flow.domain.executor.ThreadExecutor;
-import org.akvo.flow.domain.repository.FileRepository;
+import org.akvo.flow.domain.interactor.SingleThreadUseCase;
+import org.akvo.flow.domain.repository.FormRepository;
+import org.akvo.flow.domain.repository.UserRepository;
 
 import java.util.Map;
 
 import javax.inject.Inject;
 
 import io.reactivex.Observable;
+import io.reactivex.functions.Function;
 
-public class MakeDataPrivate extends UseCase {
+public class DownloadForms extends SingleThreadUseCase {
 
-    private final FileRepository fileRepository;
+    private final FormRepository formRepository;
+    private final UserRepository userRepository;
 
     @Inject
-    protected MakeDataPrivate(ThreadExecutor threadExecutor,
-            PostExecutionThread postExecutionThread, FileRepository fileRepository) {
-        super(threadExecutor, postExecutionThread);
-        this.fileRepository = fileRepository;
+    public DownloadForms(FormRepository formRepository,
+            UserRepository userRepository) {
+        this.formRepository = formRepository;
+        this.userRepository = userRepository;
     }
 
     @Override
     protected <T> Observable buildUseCaseObservable(Map<String, T> parameters) {
-        return fileRepository.moveFiles();
+        return userRepository.getDeviceId()
+                .concatMap(new Function<String, Observable<Integer>>() {
+                    @Override
+                    public Observable<Integer> apply(String deviceId) {
+                        return formRepository.downloadFormHeaders(deviceId);
+                    }
+                });
     }
-
 }

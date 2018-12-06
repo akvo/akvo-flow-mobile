@@ -175,6 +175,7 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
             }
             activityJustCreated = true;
             setNavigationView();
+            startService(new Intent(this, SurveyDownloadService.class));
         }
     }
 
@@ -224,27 +225,7 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
 
     private void initNavigationDrawer() {
         mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout,
-                R.string.drawer_open, R.string.drawer_close) {
-
-            /** Called when a drawer has settled in a completely closed state. */
-            @Override
-            public void onDrawerClosed(View drawerView) {
-                super.onDrawerClosed(drawerView);
-            }
-
-            /**
-             * Called when a drawer has settled in a completely open state.
-             */
-            @Override
-            public void onDrawerOpened(View drawerView) {
-                super.onDrawerOpened(drawerView);
-            }
-
-            @Override
-            public void onDrawerSlide(View drawerView, float slideOffset) {
-                super.onDrawerSlide(drawerView, slideOffset);
-            }
-        };
+                R.string.drawer_open, R.string.drawer_close);
 
         mDrawerLayout.addDrawerListener(mDrawerToggle);
         if (mSurveyGroup == null) {
@@ -394,7 +375,6 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     }
 
     private void startServices() {
-        startService(new Intent(this, SurveyDownloadService.class));
         startService(new Intent(this, DataSyncService.class));
         startService(new Intent(this, BootstrapService.class));
         startService(new Intent(this, TimeCheckService.class));

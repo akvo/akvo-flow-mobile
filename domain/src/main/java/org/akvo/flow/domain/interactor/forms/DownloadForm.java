@@ -23,7 +23,7 @@ package org.akvo.flow.domain.interactor.forms;
 import org.akvo.flow.domain.executor.PostExecutionThread;
 import org.akvo.flow.domain.executor.ThreadExecutor;
 import org.akvo.flow.domain.interactor.UseCase;
-import org.akvo.flow.domain.repository.SurveyRepository;
+import org.akvo.flow.domain.repository.FormRepository;
 import org.akvo.flow.domain.repository.UserRepository;
 
 import java.util.Map;
@@ -37,15 +37,15 @@ public class DownloadForm extends UseCase {
 
     public static final String FORM_ID_PARAM = "formId";
 
-    private final SurveyRepository surveyRepository;
+    private final FormRepository formRepository;
     private final UserRepository userRepository;
 
     @Inject
     protected DownloadForm(ThreadExecutor threadExecutor, PostExecutionThread postExecutionThread,
-            SurveyRepository surveyRepository,
+            FormRepository formRepository,
             UserRepository userRepository) {
         super(threadExecutor, postExecutionThread);
-        this.surveyRepository = surveyRepository;
+        this.formRepository = formRepository;
         this.userRepository = userRepository;
     }
 
@@ -58,7 +58,7 @@ public class DownloadForm extends UseCase {
                 .concatMap(new Function<String, Observable<Boolean>>() {
                     @Override
                     public Observable<Boolean> apply(String deviceId) {
-                        return surveyRepository
+                        return formRepository
                                 .loadForm((String) parameters.get(FORM_ID_PARAM), deviceId);
                     }
                 });

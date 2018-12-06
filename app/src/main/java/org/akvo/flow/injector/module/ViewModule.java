@@ -20,6 +20,7 @@
 
 package org.akvo.flow.injector.module;
 
+import org.akvo.flow.domain.interactor.SingleThreadUseCase;
 import org.akvo.flow.domain.interactor.AllowedToConnect;
 import org.akvo.flow.domain.interactor.CheckDeviceNotifications;
 import org.akvo.flow.domain.interactor.CheckSubmittedFiles;
@@ -29,8 +30,10 @@ import org.akvo.flow.domain.interactor.CopyFile;
 import org.akvo.flow.domain.interactor.CopyVideo;
 import org.akvo.flow.domain.interactor.DeleteSurvey;
 import org.akvo.flow.domain.interactor.ExportSurveyInstances;
+import org.akvo.flow.domain.interactor.apk.RefreshApkData;
 import org.akvo.flow.domain.interactor.forms.DownloadForm;
-import org.akvo.flow.domain.interactor.forms.GetAllSurveys;
+import org.akvo.flow.domain.interactor.forms.DownloadForms;
+import org.akvo.flow.domain.interactor.GetAllSurveys;
 import org.akvo.flow.domain.interactor.GetIsDeviceSetUp;
 import org.akvo.flow.domain.interactor.GetPublishDataTime;
 import org.akvo.flow.domain.interactor.GetSavedDataPoints;
@@ -305,6 +308,12 @@ public class ViewModule {
     }
 
     @Provides
+    @Named("refreshApk")
+    SingleThreadUseCase provideRefreshApkData(RefreshApkData refreshApkData) {
+        return refreshApkData;
+    }
+
+    @Provides
     @Named("downloadForm")
     UseCase provideDownloadForm(DownloadForm downloadForm) {
         return downloadForm;
@@ -314,5 +323,11 @@ public class ViewModule {
     @Named("reloadForms")
     UseCase provideReloadForms(ReloadForms reloadForms) {
         return reloadForms;
+    }
+
+    @Provides
+    @Named("downloadForms")
+    SingleThreadUseCase provideDownloadForms(DownloadForms downloadForms) {
+        return downloadForms;
     }
 }

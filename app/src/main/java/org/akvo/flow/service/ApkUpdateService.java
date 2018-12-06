@@ -32,6 +32,7 @@ import org.akvo.flow.BuildConfig;
 import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.domain.entity.ApkData;
 import org.akvo.flow.domain.interactor.DefaultObserver;
+import org.akvo.flow.domain.interactor.SingleThreadUseCase;
 import org.akvo.flow.domain.interactor.apk.RefreshApkData;
 import org.akvo.flow.util.ConstantUtil;
 
@@ -39,6 +40,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import timber.log.Timber;
 
@@ -57,7 +59,8 @@ public class ApkUpdateService extends GcmTaskService {
     private static final String TAG = "APK_UPDATE_SERVICE";
 
     @Inject
-    RefreshApkData refreshApkData;
+    @Named("refreshApk")
+    SingleThreadUseCase refreshApkData;
 
     public static void scheduleFirstTask(Context context) {
         schedulePeriodicTask(context, ConstantUtil.FIRST_REPEAT_INTERVAL_IN_SECONDS,

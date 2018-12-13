@@ -652,11 +652,6 @@ public class FormActivity extends BackActivity implements SurveyListener,
     public void onSurveySubmit() {
         recordDuration(false);
         saveState();
-
-        // if we have no missing responses, submit the survey
-        mDatabase.updateSurveyInstanceStatus(mSurveyInstanceId,
-                SurveyInstanceStatus.SUBMIT_REQUESTED);
-
         presenter.onSubmitPressed(mSurveyInstanceId);
     }
 

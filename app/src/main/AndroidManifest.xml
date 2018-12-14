@@ -112,12 +112,6 @@
         </service>
         <service android:name=".service.UnPublishDataService"/>
 
-        <receiver android:exported="false" android:name=".broadcast.SyncDataReceiver">
-            <intent-filter>
-                <action android:name="org.akvo.flow.DATA_SUBMITTED"/>
-            </intent-filter>
-        </receiver>
-
         <receiver android:name=".broadcast.BootStrapReceiver" android:exported="false">
             <intent-filter>
                 <action android:name="org.akvo.flow.BOOTSTRAP_NEEDED"/>

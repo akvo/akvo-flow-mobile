@@ -66,6 +66,7 @@ import org.akvo.flow.presentation.navigation.SurveyDeleteConfirmationDialog;
 import org.akvo.flow.presentation.navigation.UserOptionsDialog;
 import org.akvo.flow.presentation.navigation.ViewUser;
 import org.akvo.flow.service.BootstrapService;
+import org.akvo.flow.service.DataFixService;
 import org.akvo.flow.service.SurveyDownloadService;
 import org.akvo.flow.service.TimeCheckService;
 import org.akvo.flow.ui.Navigator;
@@ -340,7 +341,7 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
                     null);
         } else {
             startService(new Intent(this, SurveyDownloadService.class));
-            //startService(new Intent(this, DataFixService.class));
+            startService(new Intent(this, DataFixService.class));
             startService(new Intent(this, BootstrapService.class));
             startService(new Intent(this, TimeCheckService.class));
         }

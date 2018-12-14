@@ -109,7 +109,9 @@ public class DataPointUploadService extends GcmTaskService {
     @Override
     public int onRunTask(TaskParams taskParams) {
         Timber.d("Starting task: "+ taskParams.toString());
+        NotificationHelper.showSyncingNotification(getApplicationContext());
         checkDeviceNotification();
+        NotificationHelper.hideSyncingNotification(getApplicationContext());
         Timber.d("Task completed: "+ taskParams.toString());
         return GcmNetworkManager.RESULT_SUCCESS;
     }

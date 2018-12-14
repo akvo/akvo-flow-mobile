@@ -25,7 +25,6 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
 
-import org.akvo.flow.R;
 import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.domain.interactor.DefaultObserver;
 import org.akvo.flow.domain.interactor.UseCase;
@@ -33,7 +32,6 @@ import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.NotificationHelper;
 
 import java.util.List;
-import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -54,25 +52,13 @@ import timber.log.Timber;
  *
  * @author Christopher Fagiani
  */
-public class DataSyncService extends Service {
+public class DataFixService extends Service {
 
     public static final int NOTIFICATION_ID = 1234;
 
     @Inject
     @Named("makeDataPrivate")
     UseCase makeDataPrivate;
-
-    @Named("uploadSync")
-    @Inject
-    UseCase upload;
-
-    @Named("allowedToConnect")
-    @Inject
-    UseCase allowedToConnect;
-
-    @Named("checkDeviceNotification")
-    @Inject
-    UseCase checkDeviceNotification;
 
     @Inject
     @Named("checkSubmittedFiles")
@@ -93,9 +79,6 @@ public class DataSyncService extends Service {
     public void onDestroy() {
         super.onDestroy();
         makeDataPrivate.dispose();
-        upload.dispose();
-        allowedToConnect.dispose();
-        checkDeviceNotification.dispose();
         checkPublishedFiles.dispose();
         exportSurveyInstances.dispose();
     }
@@ -147,111 +130,18 @@ public class DataSyncService extends Service {
             @Override
             public void onComplete() {
                 broadcastDataPointStatusChange();
-                sync();
-            }
-
-            @Override
-            public void onError(Throwable e) {
-                broadcastDataPointStatusChange();
-                sync();
-            }
-        }, null);
-    }
-
-    private void sync() {
-        allowedToConnect.execute(new DefaultObserver<Boolean>() {
-            @Override
-            public void onNext(Boolean connectAllowed) {
-                if (connectAllowed) {
-                    checkDeviceNotification();
-                } else {
-                    stopService();
-                }
             }
 
             @Override
             public void onError(Throwable e) {
                 Timber.e(e);
-                stopService();
-            }
-        }, null);
-    }
-
-    private void checkDeviceNotification() {
-        checkDeviceNotification.dispose();
-        checkDeviceNotification.execute(new DefaultObserver<List<String>>() {
-            @Override
-            public void onError(Throwable e) {
-                Timber.e(e);
-                syncFiles();
-            }
-
-            @Override
-            public void onNext(List<String> deletedFiles) {
-                for (String formId : deletedFiles) {
-                    displayFormDeletedNotification(formId);
-                }
-                syncFiles();
-            }
-        }, null);
-
-    }
-
-    private void syncFiles() {
-        upload.dispose();
-        upload.execute(new DefaultObserver<Set<String>>() {
-            @Override
-            public void onError(Throwable e) {
-                Timber.e(e);
                 broadcastDataPointStatusChange();
-                stopService();
             }
-
-            @Override
-            public void onNext(Set<String> errorForms) {
-                for (String formId : errorForms) {
-                    displayErrorNotification(formId);
-                }
-                broadcastDataPointStatusChange();
-                stopService();
-            }
-
         }, null);
-    }
-
-    private void stopService() {
-        stopForeground(true);
-        stopSelf();
     }
 
     private void broadcastDataPointStatusChange() {
         Intent intentBroadcast = new Intent(ConstantUtil.ACTION_DATA_SYNC);
         LocalBroadcastManager.getInstance(this).sendBroadcast(intentBroadcast);
-    }
-
-    private void displayErrorNotification(String formId) {
-        NotificationHelper.displayErrorNotification(getString(R.string.sync_error_title, formId),
-                getString(R.string.sync_error_message), this, formId(formId));
-    }
-
-    private void displayFormDeletedNotification(String formId) {
-        final int notificationId = formId(formId);
-
-        String text = String.format(getString(R.string.data_sync_error_form_deleted_text), formId);
-        String title = getString(R.string.data_sync_error_form_deleted_title);
-
-        NotificationHelper.displayNonOnGoingErrorNotification(this, notificationId, text, title);
-    }
-
-    /**
-     * Coerce a form id into its numeric format
-     */
-    private static int formId(String id) {
-        try {
-            return Integer.valueOf(id);
-        } catch (NumberFormatException e) {
-            Timber.e(id + " is not a valid form id");
-            return 0;
-        }
     }
 }

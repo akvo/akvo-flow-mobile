@@ -37,21 +37,24 @@ public class FormPresenter implements Presenter {
 
     private final UseCase exportSurveyInstances;
     private final UseCase mobileUploadSet;
+    private final UseCase mobileUploadAllowed;
 
     private FormView view;
 
     @Inject
-    public FormPresenter(@Named("exportSurveyInstances")
-            UseCase exportSurveyInstances, @Named("mobileUploadSet")
-            UseCase mobileUploadSet) {
+    public FormPresenter(@Named("exportSurveyInstances") UseCase exportSurveyInstances,
+            @Named("mobileUploadSet") UseCase mobileUploadSet,
+            @Named("mobileUploadAllowed") UseCase mobileUploadAllowed) {
         this.exportSurveyInstances = exportSurveyInstances;
         this.mobileUploadSet = mobileUploadSet;
+        this.mobileUploadAllowed = mobileUploadAllowed;
     }
 
     @Override
     public void destroy() {
         exportSurveyInstances.dispose();
         mobileUploadSet.dispose();
+        mobileUploadAllowed.dispose();
     }
 
     public void setView(FormView view) {
@@ -92,8 +95,25 @@ public class FormPresenter implements Presenter {
             @Override
             public void onNext(Boolean aBoolean) {
                 view.hideLoading();
-                view.dismiss();
+                checkConnectionSetting();
             }
         }, params);
+    }
+
+    private void checkConnectionSetting() {
+        mobileUploadAllowed.execute(new DefaultObserver<Boolean>() {
+            @Override
+            public void onError(Throwable e) {
+                Timber.e(e);
+                view.startSync(false);
+            }
+
+            @Override
+            public void onNext(Boolean isAllowed) {
+                view.startSync(isAllowed);
+                view.dismiss();
+            }
+        }, null);
+
     }
 }

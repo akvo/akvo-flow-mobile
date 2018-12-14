@@ -23,7 +23,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
-import org.akvo.flow.service.DataSyncService;
 import org.akvo.flow.util.ConstantUtil;
 
 /**
@@ -39,7 +38,7 @@ public class SyncDataReceiver extends BroadcastReceiver {
 
     public void onReceive(Context context, Intent intent) {
         if (isIntentActionExpected(intent.getAction())) {
-            context.startService(new Intent(context, DataSyncService.class));
+            //context.startService(new Intent(context, DataFixService.class));
         }
     }
 

@@ -231,6 +231,10 @@ public class DatabaseDataSource {
         return Observable.just(briteSurveyDbAdapter.getFormIds(surveyId));
     }
 
+    public Observable<Cursor> getFormIds() {
+        return Observable.just(briteSurveyDbAdapter.getFormIds());
+    }
+
     public Observable<Boolean> setFileTransmissionFailed(@Nullable List<String> filenames) {
         if (filenames == null || filenames.isEmpty()) {
             return Observable.just(true);
@@ -250,7 +254,7 @@ public class DatabaseDataSource {
     public Observable<Boolean> setDeletedForms(@Nullable List<String> deletedFormIds) {
         if (deletedFormIds != null) {
             for (String formId: deletedFormIds) {
-               briteSurveyDbAdapter.deleteSurvey(formId);
+               briteSurveyDbAdapter.setFormDeleted(formId);
             }
         }
         return Observable.just(true);

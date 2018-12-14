@@ -444,10 +444,7 @@ public class BriteSurveyDbAdapter {
         return queryForms(columns, "", null);
     }
 
-    public Cursor getFormIds(@Nullable String surveyId) {
-        if (surveyId == null) {
-            return getFormIds();
-        }
+    public Cursor getFormIds(@NonNull String surveyId) {
         String columns = SurveyColumns.SURVEY_ID;
         String whereClause = SurveyColumns.SURVEY_GROUP_ID + " = ?";
         List<String> surveyIds = new ArrayList<>(1);
@@ -575,7 +572,7 @@ public class BriteSurveyDbAdapter {
      *
      * @param surveyId
      */
-    public void deleteSurvey(String surveyId) {
+    public void setFormDeleted(String surveyId) {
         ContentValues updatedValues = new ContentValues();
         updatedValues.put(SurveyColumns.DELETED, 1);
         briteDatabase

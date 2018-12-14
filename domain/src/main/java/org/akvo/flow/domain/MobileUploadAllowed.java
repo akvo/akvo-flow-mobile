@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -18,12 +18,12 @@
  *
  */
 
-package org.akvo.flow.domain.interactor;
+package org.akvo.flow.domain;
 
 import org.akvo.flow.domain.executor.PostExecutionThread;
 import org.akvo.flow.domain.executor.ThreadExecutor;
+import org.akvo.flow.domain.interactor.UseCase;
 import org.akvo.flow.domain.repository.UserRepository;
-import org.akvo.flow.domain.util.ConnectivityStateManager;
 
 import java.util.Map;
 
@@ -31,26 +31,20 @@ import javax.inject.Inject;
 
 import io.reactivex.Observable;
 
-public class AllowedToConnect extends UseCase {
+public class MobileUploadAllowed extends UseCase {
 
     private final UserRepository userRepository;
-    private final ConnectivityStateManager connectivityStateManager;
 
     @Inject
-    protected AllowedToConnect(ThreadExecutor threadExecutor,
-            PostExecutionThread postExecutionThread, UserRepository userRepository,
-            ConnectivityStateManager connectivityStateManager) {
+    protected MobileUploadAllowed(ThreadExecutor threadExecutor,
+            PostExecutionThread postExecutionThread,
+            UserRepository userRepository) {
         super(threadExecutor, postExecutionThread);
         this.userRepository = userRepository;
-        this.connectivityStateManager = connectivityStateManager;
     }
 
     @Override
     protected <T> Observable buildUseCaseObservable(Map<String, T> parameters) {
-        if (connectivityStateManager.isWifiConnected()) {
-            return Observable.just(true);
-        } else {
-            return userRepository.mobileSyncAllowed();
-        }
+        return userRepository.mobileSyncAllowed();
     }
 }

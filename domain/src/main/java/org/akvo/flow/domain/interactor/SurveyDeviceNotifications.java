@@ -34,13 +34,13 @@ import javax.inject.Inject;
 import io.reactivex.Observable;
 import io.reactivex.functions.Function;
 
-public class CheckDeviceNotifications extends UseCase {
+public class SurveyDeviceNotifications extends UseCase {
 
     private final SurveyRepository surveyRepository;
     private final UserRepository userRepository;
 
     @Inject
-    protected CheckDeviceNotifications(ThreadExecutor threadExecutor,
+    protected SurveyDeviceNotifications(ThreadExecutor threadExecutor,
             PostExecutionThread postExecutionThread, SurveyRepository surveyRepository,
             UserRepository userRepository) {
         super(threadExecutor, postExecutionThread);
@@ -50,19 +50,15 @@ public class CheckDeviceNotifications extends UseCase {
 
     @Override
     protected <T> Observable buildUseCaseObservable(Map<String, T> parameters) {
-        String surveyId = parameters != null ? (String) parameters.get(Constants.KEY_SURVEY_ID) : null;
-        return surveyRepository.getFormIds(surveyId)
-                .concatMap(new Function<List<String>, Observable<List<String>>>() {
+        if (parameters == null || parameters.get(Constants.KEY_SURVEY_ID) == null) {
+            return Observable.error(new IllegalArgumentException("missing surveyId"));
+        }
+        final String surveyId = (String) parameters.get(Constants.KEY_SURVEY_ID);
+        return userRepository.getDeviceId()
+                .concatMap(new Function<String, Observable<List<String>>>() {
                     @Override
-                    public Observable<List<String>> apply(final List<String> formIds) {
-                        return userRepository.getDeviceId()
-                                .concatMap(new Function<String, Observable<List<String>>>() {
-                                    @Override
-                                    public Observable<List<String>> apply(String deviceId) {
-                                        return surveyRepository
-                                                .downloadMissingAndDeleted(formIds, deviceId);
-                                    }
-                                });
+                    public Observable<List<String>> apply(String deviceId) {
+                        return surveyRepository.checkDeviceNotification(surveyId, deviceId);
                     }
                 });
     }

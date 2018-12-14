@@ -21,7 +21,7 @@
 package org.akvo.flow.data.repository;
 
 import android.database.Cursor;
-import android.text.TextUtils;
+import android.support.annotation.NonNull;
 
 import org.akvo.flow.data.datasource.DataSourceFactory;
 import org.akvo.flow.data.datasource.DatabaseDataSource;
@@ -71,8 +71,6 @@ import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.SingleSource;
-import io.reactivex.annotations.NonNull;
-import io.reactivex.annotations.Nullable;
 import io.reactivex.functions.BiFunction;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
@@ -359,8 +357,7 @@ public class SurveyDataRepository implements SurveyRepository {
                 });
     }
 
-    @Override
-    public Observable<List<String>> getFormIds(String surveyId) {
+    private Observable<List<String>> getFormIds(String surveyId) {
         return dataSourceFactory.getDataBaseDataSource().getFormIds(surveyId)
                 .map(new Function<Cursor, List<String>>() {
                     @Override
@@ -370,8 +367,40 @@ public class SurveyDataRepository implements SurveyRepository {
                 });
     }
 
+    private Observable<List<String>> getFormIds() {
+        return dataSourceFactory.getDataBaseDataSource().getFormIds()
+                .map(new Function<Cursor, List<String>>() {
+                    @Override
+                    public List<String> apply(Cursor cursor) {
+                        return surveyIdMapper.mapToFormId(cursor);
+                    }
+                });
+    }
+
     @Override
-    public Observable<List<String>> downloadMissingAndDeleted(List<String> formIds,
+    public Observable<List<String>> checkDeviceNotification(String surveyId,
+            final String deviceId) {
+        return getFormIds(surveyId)
+                .concatMap(new Function<List<String>, Observable<List<String>>>() {
+                    @Override
+                    public Observable<List<String>> apply(List<String> formIds) {
+                        return downloadMissingAndDeleted(formIds, deviceId);
+                    }
+                });
+    }
+
+    @Override
+    public Observable<List<String>> checkDeviceNotification(final String deviceId) {
+        return getFormIds()
+                .concatMap(new Function<List<String>, Observable<List<String>>>() {
+                    @Override
+                    public Observable<List<String>> apply(List<String> formIds) {
+                        return downloadMissingAndDeleted(formIds, deviceId);
+                    }
+                });
+    }
+
+    private Observable<List<String>> downloadMissingAndDeleted(List<String> formIds,
             String deviceId) {
         return restApi.getPendingFiles(formIds, deviceId)
                 .map(new Function<ApiFilesResult, FilteredFilesResult>() {
@@ -399,8 +428,8 @@ public class SurveyDataRepository implements SurveyRepository {
 
     @Override
     public Observable<Set<String>> processTransmissions(final String deviceId,
-            @Nullable String surveyId) {
-        return getUnSyncedTransmissions(surveyId)
+            @NonNull String surveyId) {
+        return getSurveyTransmissions(surveyId)
                 .concatMap(new Function<List<Transmission>, Observable<Set<String>>>() {
                     @Override
                     public Observable<Set<String>> apply(List<Transmission> transmissions) {
@@ -409,12 +438,15 @@ public class SurveyDataRepository implements SurveyRepository {
                 });
     }
 
-    private Observable<List<Transmission>> getUnSyncedTransmissions(String surveyId) {
-        if (TextUtils.isEmpty(surveyId)) {
-            return getAllTransmissions();
-        } else {
-            return getSurveyTransmissions(surveyId);
-        }
+    @Override
+    public Observable<Set<String>> processTransmissions(final String deviceId) {
+        return getAllTransmissions()
+                .concatMap(new Function<List<Transmission>, Observable<Set<String>>>() {
+                    @Override
+                    public Observable<Set<String>> apply(List<Transmission> transmissions) {
+                        return syncTransmissions(transmissions, deviceId);
+                    }
+                });
     }
 
     private Observable<List<Transmission>> getSurveyTransmissions(@NonNull String surveyId) {

@@ -20,8 +20,7 @@
 
 package org.akvo.flow.injector.module;
 
-import org.akvo.flow.domain.interactor.AllowedToConnect;
-import org.akvo.flow.domain.interactor.CheckDeviceNotifications;
+import org.akvo.flow.domain.MobileUploadAllowed;
 import org.akvo.flow.domain.interactor.CheckSubmittedFiles;
 import org.akvo.flow.domain.interactor.ClearAllData;
 import org.akvo.flow.domain.interactor.ClearResponses;
@@ -45,8 +44,9 @@ import org.akvo.flow.domain.interactor.SaveKeepScreenOn;
 import org.akvo.flow.domain.interactor.SaveResizedImage;
 import org.akvo.flow.domain.interactor.SaveSelectedSurvey;
 import org.akvo.flow.domain.interactor.SetWalkthroughSeen;
+import org.akvo.flow.domain.interactor.SurveyDeviceNotifications;
 import org.akvo.flow.domain.interactor.UnSyncedTransmissionsExist;
-import org.akvo.flow.domain.interactor.UploadDataPoints;
+import org.akvo.flow.domain.interactor.UploadSurveyDataPoints;
 import org.akvo.flow.domain.interactor.UseCase;
 import org.akvo.flow.domain.interactor.WasWalkthroughSeen;
 import org.akvo.flow.domain.interactor.setup.SaveSetup;
@@ -75,12 +75,6 @@ public class ViewModule {
     @Named("getSavedDataPoints")
     UseCase provideGetSavedDataPointsUseCase(GetSavedDataPoints getSavedDataPoints) {
         return getSavedDataPoints;
-    }
-
-    @Provides
-    @Named("allowedToConnect")
-    UseCase provideAllowedToConnect(AllowedToConnect allowedToConnect) {
-        return allowedToConnect;
     }
 
     @Provides
@@ -247,20 +241,14 @@ public class ViewModule {
 
     @Provides
     @Named("uploadSync")
-    UseCase provideUploadSync(UploadDataPoints uploadDataPoints) {
-        return uploadDataPoints;
-    }
-
-    @Provides
-    @Named("uploadAsync")
-    UseCase provideUploadAsync(UploadDataPoints uploadDataPoints) {
-        return uploadDataPoints;
+    UseCase provideUploadSync(UploadSurveyDataPoints uploadSurveyDataPoints) {
+        return uploadSurveyDataPoints;
     }
 
     @Provides
     @Named("checkDeviceNotification")
-    UseCase provideDeviceNotificationSync(CheckDeviceNotifications checkDeviceNotifications) {
-        return checkDeviceNotifications;
+    UseCase provideDeviceNotificationSync(SurveyDeviceNotifications surveyDeviceNotifications) {
+        return surveyDeviceNotifications;
     }
 
     @Provides
@@ -279,5 +267,11 @@ public class ViewModule {
     @Named("mobileUploadSet")
     UseCase provideMobileUploadSet(MobileUploadSet mobileUploadSet) {
         return mobileUploadSet;
+    }
+
+    @Provides
+    @Named("mobileUploadAllowed")
+    UseCase provideAllowedToConnect(MobileUploadAllowed mobileUploadAllowed) {
+        return mobileUploadAllowed;
     }
 }

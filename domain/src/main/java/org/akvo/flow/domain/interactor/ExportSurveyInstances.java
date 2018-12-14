@@ -91,34 +91,44 @@ public class ExportSurveyInstances extends UseCase {
                     public Observable<Boolean> apply(List<Long> instanceIds) {
                         return Observable.fromIterable(instanceIds)
                                 .concatMap(new Function<Long, Observable<Boolean>>() {
+                                    @Override
+                                    public Observable<Boolean> apply(Long instanceId) {
+                                        return createInstanceZipFile(instanceId, deviceId);
+                                    }
+                                });
+                    }
+                });
+    }
+
+    private Observable<Boolean> createInstanceZipFile(@NonNull final Long instanceId,
+            final String deviceId) {
+        return surveyRepository.setInstanceStatusToRequested(instanceId)
+                .concatMap(new Function<Boolean, Observable<Boolean>>() {
+                    @Override
+                    public Observable<Boolean> apply(Boolean aBoolean) {
+                        return surveyRepository.getFormInstanceData(instanceId, deviceId)
+                                .concatMap(
+                                        new Function<FormInstanceMetadata, Observable<Boolean>>() {
                                             @Override
-                                            public Observable<Boolean> apply(Long instanceId) {
-                                                return createInstanceZipFile(instanceId, deviceId);
+                                            public Observable<Boolean> apply(
+                                                    final FormInstanceMetadata metadata) {
+                                                return exportSurveyInstance(metadata, instanceId);
                                             }
                                         });
                     }
                 });
     }
 
-    private Observable<Boolean> createInstanceZipFile(@NonNull final Long instanceId,
-            String deviceId) {
-        return surveyRepository.getFormInstanceData(instanceId, deviceId)
-                .concatMap(new Function<FormInstanceMetadata, Observable<Boolean>>() {
+    private Observable<Boolean> exportSurveyInstance(final FormInstanceMetadata metadata,
+            @NonNull final Long instanceId) {
+        return fileRepository.createDataZip(metadata.getZipFileName(), metadata.getFormInstanceData())
+                .concatMap(new Function<Boolean, Observable<Boolean>>() {
                     @Override
-                    public Observable<Boolean> apply(
-                            final FormInstanceMetadata formInstanceMetadata) {
-                        return fileRepository.createDataZip(formInstanceMetadata.getZipFileName(),
-                                formInstanceMetadata.getFormInstanceData())
-                                .concatMap(new Function<Boolean, Observable<Boolean>>() {
-                                    @Override
-                                    public Observable<Boolean> apply(Boolean ignored) {
-                                        Set<String> filenames = new HashSet<>(
-                                                formInstanceMetadata.getMediaFileNames());
-                                        filenames.add(formInstanceMetadata.getZipFileName());
-                                        return surveyRepository.createTransmissions(instanceId,
-                                                formInstanceMetadata.getFormId(), filenames);
-                                    }
-                                });
+                    public Observable<Boolean> apply(Boolean ignored) {
+                        Set<String> filenames = new HashSet<>(metadata.getMediaFileNames());
+                        filenames.add(metadata.getZipFileName());
+                        return surveyRepository
+                                .createTransmissions(instanceId, metadata.getFormId(), filenames);
                     }
                 });
     }

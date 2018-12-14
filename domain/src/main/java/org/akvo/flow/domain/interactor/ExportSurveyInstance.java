@@ -21,13 +21,14 @@
 package org.akvo.flow.domain.interactor;
 
 import org.akvo.flow.domain.entity.FormInstanceMetadata;
+import org.akvo.flow.domain.executor.PostExecutionThread;
+import org.akvo.flow.domain.executor.ThreadExecutor;
 import org.akvo.flow.domain.repository.FileRepository;
 import org.akvo.flow.domain.repository.SurveyRepository;
 import org.akvo.flow.domain.repository.UserRepository;
 import org.akvo.flow.domain.util.TextValueCleaner;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -35,47 +36,35 @@ import javax.inject.Inject;
 
 import io.reactivex.Observable;
 import io.reactivex.annotations.NonNull;
-import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Function;
-import io.reactivex.observers.DisposableObserver;
 
-public class ExportSurveyInstances {
+public class ExportSurveyInstance extends UseCase {
+
+    public static final String SURVEY_INSTANCE_ID_PARAM = "survey_instance_id";
 
     private final UserRepository userRepository;
     private final TextValueCleaner valueCleaner;
     private final SurveyRepository surveyRepository;
     private final FileRepository fileRepository;
-    private final CompositeDisposable disposables;
 
     @Inject
-    protected ExportSurveyInstances(UserRepository userRepository,
+    protected ExportSurveyInstance(ThreadExecutor threadExecutor,
+            PostExecutionThread postExecutionThread, UserRepository userRepository,
             TextValueCleaner valueCleaner, SurveyRepository surveyRepository,
             FileRepository fileRepository) {
+        super(threadExecutor, postExecutionThread);
         this.userRepository = userRepository;
         this.valueCleaner = valueCleaner;
         this.surveyRepository = surveyRepository;
         this.fileRepository = fileRepository;
-        this.disposables = new CompositeDisposable();
     }
 
-    @SuppressWarnings("unchecked")
-    public <T> void execute(DisposableObserver<T> observer, Map<String, Object> parameters) {
-        final Observable<T> observable = buildUseCaseObservable(parameters);
-        addDisposable(observable.subscribeWith(observer));
-    }
-
-    public void dispose() {
-        if (!disposables.isDisposed()) {
-            disposables.clear();
+    @Override
+    protected <T> Observable buildUseCaseObservable(Map<String, T> parameters) {
+        if (parameters == null || parameters.get(SURVEY_INSTANCE_ID_PARAM) == null)  {
+            return Observable.error(new IllegalArgumentException("Missing survey instance id"));
         }
-    }
-
-    private void addDisposable(Disposable disposable) {
-        disposables.add(disposable);
-    }
-
-    private  <T> Observable buildUseCaseObservable(Map<String, T> parameters) {
+        final Long surveyInstanceId = (Long) parameters.get(SURVEY_INSTANCE_ID_PARAM);
         return userRepository.getDeviceId()
                 .map(new Function<String, String>() {
                     @Override
@@ -86,23 +75,7 @@ public class ExportSurveyInstances {
                 .flatMap(new Function<String, Observable<Boolean>>() {
                     @Override
                     public Observable<Boolean> apply(final String deviceId) {
-                        return createInstancesZipFiles(deviceId);
-                    }
-                });
-    }
-
-    private Observable<Boolean> createInstancesZipFiles(final String deviceId) {
-        return surveyRepository.getPendingSurveyInstances()
-                .concatMap(new Function<List<Long>, Observable<Boolean>>() {
-                    @Override
-                    public Observable<Boolean> apply(List<Long> instanceIds) {
-                        return Observable.fromIterable(instanceIds)
-                                .concatMap(new Function<Long, Observable<Boolean>>() {
-                                    @Override
-                                    public Observable<Boolean> apply(Long instanceId) {
-                                        return createInstanceZipFile(instanceId, deviceId);
-                                    }
-                                });
+                        return createInstanceZipFile(surveyInstanceId, deviceId);
                     }
                 });
     }
@@ -128,8 +101,7 @@ public class ExportSurveyInstances {
 
     private Observable<Boolean> exportSurveyInstance(final FormInstanceMetadata metadata,
             @NonNull final Long instanceId) {
-        return fileRepository
-                .createDataZip(metadata.getZipFileName(), metadata.getFormInstanceData())
+        return fileRepository.createDataZip(metadata.getZipFileName(), metadata.getFormInstanceData())
                 .concatMap(new Function<Boolean, Observable<Boolean>>() {
                     @Override
                     public Observable<Boolean> apply(Boolean ignored) {

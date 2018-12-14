@@ -341,9 +341,9 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
                     null);
         } else {
             startService(new Intent(this, SurveyDownloadService.class));
-            startService(new Intent(this, DataFixService.class));
             startService(new Intent(this, BootstrapService.class));
             startService(new Intent(this, TimeCheckService.class));
+            DataFixService.enqueueWork(getApplicationContext(), new Intent());
         }
     }
 

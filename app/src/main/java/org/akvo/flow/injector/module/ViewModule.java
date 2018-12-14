@@ -21,19 +21,17 @@
 package org.akvo.flow.injector.module;
 
 import org.akvo.flow.domain.MobileUploadAllowed;
-import org.akvo.flow.domain.interactor.CheckSubmittedFiles;
 import org.akvo.flow.domain.interactor.ClearAllData;
 import org.akvo.flow.domain.interactor.ClearResponses;
 import org.akvo.flow.domain.interactor.CopyFile;
 import org.akvo.flow.domain.interactor.CopyVideo;
 import org.akvo.flow.domain.interactor.DeleteSurvey;
-import org.akvo.flow.domain.interactor.ExportSurveyInstances;
+import org.akvo.flow.domain.interactor.ExportSurveyInstance;
 import org.akvo.flow.domain.interactor.GetAllSurveys;
 import org.akvo.flow.domain.interactor.GetIsDeviceSetUp;
 import org.akvo.flow.domain.interactor.GetPublishDataTime;
 import org.akvo.flow.domain.interactor.GetSavedDataPoints;
 import org.akvo.flow.domain.interactor.GetUserSettings;
-import org.akvo.flow.domain.interactor.MakeDataPrivate;
 import org.akvo.flow.domain.interactor.MobileUploadSet;
 import org.akvo.flow.domain.interactor.PublishData;
 import org.akvo.flow.domain.interactor.SaveAppLanguage;
@@ -234,12 +232,6 @@ public class ViewModule {
     }
 
     @Provides
-    @Named("makeDataPrivate")
-    UseCase provideMakeDataPrivate(MakeDataPrivate makeDataPrivate) {
-        return makeDataPrivate;
-    }
-
-    @Provides
     @Named("uploadSync")
     UseCase provideUploadSync(UploadSurveyDataPoints uploadSurveyDataPoints) {
         return uploadSurveyDataPoints;
@@ -252,15 +244,9 @@ public class ViewModule {
     }
 
     @Provides
-    @Named("checkSubmittedFiles")
-    UseCase provideSubmittedFilesSync(CheckSubmittedFiles checkSubmittedFiles) {
-        return checkSubmittedFiles;
-    }
-
-    @Provides
-    @Named("exportSurveyInstances")
-    UseCase provideExportSurveyInstancesSync(ExportSurveyInstances exportSurveyInstances) {
-        return exportSurveyInstances;
+    @Named("exportSurveyInstance")
+    UseCase provideExportSurveyInstanceSync(ExportSurveyInstance exportSurveyInstance) {
+        return exportSurveyInstance;
     }
 
     @Provides

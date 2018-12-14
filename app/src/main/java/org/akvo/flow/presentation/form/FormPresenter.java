@@ -21,7 +21,7 @@
 package org.akvo.flow.presentation.form;
 
 import org.akvo.flow.domain.interactor.DefaultObserver;
-import org.akvo.flow.domain.interactor.ExportSurveyInstances;
+import org.akvo.flow.domain.interactor.ExportSurveyInstance;
 import org.akvo.flow.domain.interactor.UseCase;
 import org.akvo.flow.presentation.Presenter;
 
@@ -35,24 +35,24 @@ import timber.log.Timber;
 
 public class FormPresenter implements Presenter {
 
-    private final UseCase exportSurveyInstances;
+    private final UseCase exportSurveyInstance;
     private final UseCase mobileUploadSet;
     private final UseCase mobileUploadAllowed;
 
     private FormView view;
 
     @Inject
-    public FormPresenter(@Named("exportSurveyInstances") UseCase exportSurveyInstances,
+    public FormPresenter(@Named("exportSurveyInstance") UseCase exportSurveyInstance,
             @Named("mobileUploadSet") UseCase mobileUploadSet,
             @Named("mobileUploadAllowed") UseCase mobileUploadAllowed) {
-        this.exportSurveyInstances = exportSurveyInstances;
+        this.exportSurveyInstance = exportSurveyInstance;
         this.mobileUploadSet = mobileUploadSet;
         this.mobileUploadAllowed = mobileUploadAllowed;
     }
 
     @Override
     public void destroy() {
-        exportSurveyInstances.dispose();
+        exportSurveyInstance.dispose();
         mobileUploadSet.dispose();
         mobileUploadAllowed.dispose();
     }
@@ -83,8 +83,8 @@ public class FormPresenter implements Presenter {
     private void exportInstance(long surveyInstanceId) {
         view.showLoading();
         Map<String, Object> params = new HashMap<>(2);
-        params.put(ExportSurveyInstances.SURVEY_INSTANCE_ID_PARAM, surveyInstanceId);
-        exportSurveyInstances.execute(new DefaultObserver<Boolean>() {
+        params.put(ExportSurveyInstance.SURVEY_INSTANCE_ID_PARAM, surveyInstanceId);
+        exportSurveyInstance.execute(new DefaultObserver<Boolean>() {
             @Override
             public void onError(Throwable e) {
                 Timber.e(e);

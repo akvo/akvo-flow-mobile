@@ -20,8 +20,6 @@
 
 package org.akvo.flow.domain.interactor;
 
-import org.akvo.flow.domain.executor.PostExecutionThread;
-import org.akvo.flow.domain.executor.ThreadExecutor;
 import org.akvo.flow.domain.repository.FileRepository;
 
 import java.util.Map;
@@ -29,25 +27,43 @@ import java.util.Map;
 import javax.inject.Inject;
 
 import io.reactivex.Observable;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.observers.DisposableObserver;
 
 /**
  * This is a single threaded UseCase to be used with IntentServices whose onHandleIntent method runs
  * on a worker thread
  */
-public class MakeDataPrivate extends UseCase {
+public class MakeDataPrivate {
 
     private final FileRepository fileRepository;
+    private final CompositeDisposable disposables;
 
     @Inject
-    protected MakeDataPrivate(ThreadExecutor threadExecutor,
-            PostExecutionThread postExecutionThread, FileRepository fileRepository) {
-        super(threadExecutor, postExecutionThread);
+    protected MakeDataPrivate(FileRepository fileRepository) {
         this.fileRepository = fileRepository;
+        this.disposables = new CompositeDisposable();
     }
 
-    @Override
-    protected <T> Observable buildUseCaseObservable(Map<String, T> parameters) {
+    @SuppressWarnings("unchecked")
+    public <T> void execute(DisposableObserver<T> observer, Map<String, Object> parameters) {
+        final Observable<T> observable = buildUseCaseObservable(parameters);
+        addDisposable(observable.subscribeWith(observer));
+    }
+
+    public void dispose() {
+        if (!disposables.isDisposed()) {
+            disposables.clear();
+        }
+    }
+
+    private <T> Observable buildUseCaseObservable(Map<String, T> parameters) {
         return fileRepository.moveFiles();
+    }
+
+    private void addDisposable(Disposable disposable) {
+        disposables.add(disposable);
     }
 
 }

@@ -19,22 +19,22 @@
 
 package org.akvo.flow.service;
 
-import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
-import android.os.IBinder;
-import android.support.annotation.Nullable;
+import android.support.annotation.NonNull;
+import android.support.v4.app.JobIntentService;
 import android.support.v4.content.LocalBroadcastManager;
 
 import org.akvo.flow.app.FlowApp;
+import org.akvo.flow.domain.interactor.CheckSubmittedFiles;
 import org.akvo.flow.domain.interactor.DefaultObserver;
-import org.akvo.flow.domain.interactor.UseCase;
+import org.akvo.flow.domain.interactor.ExportSurveyInstances;
+import org.akvo.flow.domain.interactor.MakeDataPrivate;
 import org.akvo.flow.util.ConstantUtil;
-import org.akvo.flow.util.NotificationHelper;
 
 import java.util.List;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 
 import timber.log.Timber;
 
@@ -52,25 +52,33 @@ import timber.log.Timber;
  *
  * @author Christopher Fagiani
  */
-public class DataFixService extends Service {
+public class DataFixService extends JobIntentService {
 
-    public static final int NOTIFICATION_ID = 1234;
-
-    @Inject
-    @Named("makeDataPrivate")
-    UseCase makeDataPrivate;
-
-    @Inject
-    @Named("checkSubmittedFiles")
-    UseCase checkPublishedFiles;
+    /**
+     * Unique job ID for this service.
+     */
+    private static final int JOB_ID = 1000;
 
     @Inject
-    @Named("exportSurveyInstances")
-    UseCase exportSurveyInstances;
+    MakeDataPrivate makeDataPrivate;
+
+    @Inject
+    CheckSubmittedFiles checkSubmittedFiles;
+
+    @Inject
+    ExportSurveyInstances exportSurveyInstances;
+
+    /**
+     * Convenience method for enqueuing work in to this service.
+     */
+    public static void enqueueWork(Context context, Intent work) {
+        enqueueWork(context, DataFixService.class, JOB_ID, work);
+    }
 
     @Override
     public void onCreate() {
         super.onCreate();
+        Timber.d("onCreate");
         FlowApp application = (FlowApp) getApplicationContext();
         application.getApplicationComponent().inject(this);
     }
@@ -78,22 +86,15 @@ public class DataFixService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
+        Timber.d("onDestroy");
         makeDataPrivate.dispose();
-        checkPublishedFiles.dispose();
+        checkSubmittedFiles.dispose();
         exportSurveyInstances.dispose();
     }
 
-    @Nullable
     @Override
-    public IBinder onBind(Intent intent) {
-        return null;
-    }
-
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        startForeground(NOTIFICATION_ID,
-                NotificationHelper.getSyncingNotification(getApplicationContext()));
-        makeDataPrivate.dispose();
+    protected void onHandleWork(@NonNull Intent intent) {
+        Timber.d("onHandleWork");
         makeDataPrivate.execute(new DefaultObserver<Boolean>() {
             @Override
             public void onComplete() {
@@ -106,15 +107,13 @@ public class DataFixService extends Service {
                 verify();
             }
         }, null);
-        return super.onStartCommand(intent, flags, startId);
     }
 
     private void verify() {
-        checkPublishedFiles.dispose();
-        checkPublishedFiles.execute(new DefaultObserver<List<Boolean>>() {
+        checkSubmittedFiles.execute(new DefaultObserver<List<Boolean>>() {
             @Override
             public void onError(Throwable e) {
-               export();
+                export();
             }
 
             @Override

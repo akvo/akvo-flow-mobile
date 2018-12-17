@@ -231,7 +231,7 @@ public class BriteSurveyDbAdapter {
                 String.valueOf(surveyInstanceId));
 
         if (rows < 1) {
-            Timber.e("Could not update status for Survey Instance: %d", surveyInstanceId);
+            Timber.e("Could not update status for Survey Instance: %s", surveyInstanceId);
         }
     }
 
@@ -373,7 +373,7 @@ public class BriteSurveyDbAdapter {
         BriteDatabase.Transaction transaction = beginTransaction();
         try {
             for (String filename : filenames) {
-                int rows = updateFailedTransmission(filename, TransmissionStatus.FAILED);
+                int rows = updateFailedTransmission(filename);
                 if (rows == 0) {
                     // Use a dummy "-1" as survey_instance_id, as the database needs that attribute
                     createTransmission(-1, null, filename, TransmissionStatus.FAILED);
@@ -600,13 +600,21 @@ public class BriteSurveyDbAdapter {
     /**
      * marks a survey record identified by the ID passed in as deleted.
      *
-     * @param surveyId
      */
-    public void setFormDeleted(String surveyId) {
-        ContentValues updatedValues = new ContentValues();
-        updatedValues.put(SurveyColumns.DELETED, 1);
-        briteDatabase
-                .update(Tables.SURVEY, updatedValues, SurveyColumns.SURVEY_ID + " = ?", surveyId);
+    public void setFormsDeleted(List<String> formIds) {
+        BriteDatabase.Transaction transaction = beginTransaction();
+        try {
+            for (String formId : formIds) {
+                ContentValues updatedValues = new ContentValues();
+                updatedValues.put(SurveyColumns.DELETED, 1);
+                briteDatabase
+                        .update(Tables.SURVEY, updatedValues, SurveyColumns.SURVEY_ID + " = ?",
+                                formId);
+            }
+            transaction.markSuccessful();
+        } finally {
+            transaction.end();
+        }
     }
 
     /**
@@ -685,14 +693,21 @@ public class BriteSurveyDbAdapter {
         return queryTransmissions(column, whereClause, selectionArgs);
     }
 
+    public Cursor getTransmissionForFileName(String filename) {
+        String column = TransmissionColumns.SURVEY_INSTANCE_ID;
+        String whereClause = TransmissionColumns.FILENAME + " = ? ";
+        whereClause += "GROUP BY " + column;
+        return queryTransmissions(column, whereClause, new String[] {filename});
+    }
+
     private Cursor queryTransmissions(String column, String whereClause, String[] selectionArgs) {
         String sql = "SELECT " + column + " FROM " + Tables.TRANSMISSION + " WHERE " + whereClause;
         return briteDatabase.query(sql, selectionArgs);
     }
 
-    public int updateFailedTransmission(String filename, int status) {
+    private int updateFailedTransmission(String filename) {
         ContentValues contentValues = new ContentValues(1);
-        contentValues.put(TransmissionColumns.STATUS, status);
+        contentValues.put(TransmissionColumns.STATUS, TransmissionStatus.FAILED);
         String where = TransmissionColumns.FILENAME + " = ? ";
         return briteDatabase.update(Tables.TRANSMISSION, contentValues, where, filename);
     }

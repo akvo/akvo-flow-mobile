@@ -30,6 +30,7 @@ import com.squareup.sqlbrite2.BriteDatabase;
 import org.akvo.flow.data.entity.ApiDataPoint;
 import org.akvo.flow.data.entity.ApiQuestionAnswer;
 import org.akvo.flow.data.entity.ApiSurveyInstance;
+import org.akvo.flow.data.entity.SurveyInstanceIdMapper;
 import org.akvo.flow.database.Constants;
 import org.akvo.flow.database.RecordColumns;
 import org.akvo.flow.database.ResponseColumns;
@@ -40,20 +41,25 @@ import org.akvo.flow.database.TransmissionStatus;
 import org.akvo.flow.database.britedb.BriteSurveyDbAdapter;
 import org.akvo.flow.domain.entity.User;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import javax.inject.Inject;
 
 import io.reactivex.Observable;
+import io.reactivex.functions.Function;
+import io.reactivex.functions.Predicate;
 
 public class DatabaseDataSource {
 
     private final BriteSurveyDbAdapter briteSurveyDbAdapter;
+    private final SurveyInstanceIdMapper surveyInstanceIdMapper;
 
     @Inject
-    public DatabaseDataSource(BriteDatabase db) {
+    public DatabaseDataSource(BriteDatabase db, SurveyInstanceIdMapper surveyInstanceIdMapper) {
         this.briteSurveyDbAdapter = new BriteSurveyDbAdapter(db);
+        this.surveyInstanceIdMapper = surveyInstanceIdMapper;
     }
 
     public Observable<Cursor> getSurveys() {
@@ -242,12 +248,46 @@ public class DatabaseDataSource {
         return Observable.just(true);
     }
 
-    public Observable<Boolean> setDeletedForms(@Nullable List<String> deletedFormIds) {
-        if (deletedFormIds != null) {
-            for (String formId: deletedFormIds) {
-               briteSurveyDbAdapter.setFormDeleted(formId);
-            }
+    public Observable<Boolean> updateFailedTransmissionsSurveyInstances(
+            @Nullable List<String> filenames) {
+        if (filenames == null || filenames.isEmpty()) {
+            return Observable.just(true);
         }
+        return Observable.fromIterable(filenames)
+                .concatMap(new Function<String, Observable<Boolean>>() {
+                    @Override
+                    public Observable<Boolean> apply(String filename) {
+                        return Observable
+                                .just(briteSurveyDbAdapter.getTransmissionForFileName(filename))
+                                .map(new Function<Cursor, Long>() {
+                                    @Override
+                                    public Long apply(Cursor cursor) {
+                                        return surveyInstanceIdMapper.getSurveyInstanceIds(cursor);
+                                    }
+                                })
+                                .filter(new Predicate<Long>() {
+                                    @Override
+                                    public boolean test(Long aLong) {
+                                        return aLong != -1L;
+                                    }
+                                })
+                                .toList()
+                                .toObservable()
+                                .concatMap(new Function<List<Long>, Observable<Boolean>>() {
+                                    @Override
+                                    public Observable<Boolean> apply(List<Long> instanceIds) {
+                                        return updateFailedSubmissions(new HashSet<>(instanceIds));
+                                    }
+                                });
+                    }
+                });
+    }
+
+    public Observable<Boolean> setDeletedForms(@Nullable List<String> deletedFormIds) {
+        if (deletedFormIds == null || deletedFormIds.isEmpty()) {
+            return Observable.just(true);
+        }
+        briteSurveyDbAdapter.setFormsDeleted(deletedFormIds);
         return Observable.just(true);
     }
 
@@ -260,18 +300,15 @@ public class DatabaseDataSource {
     }
 
     public void setFileTransmissionSucceeded(Long id) {
-        briteSurveyDbAdapter
-                .updateTransmissionStatus(id, TransmissionStatus.SYNCED);
+        briteSurveyDbAdapter.updateTransmissionStatus(id, TransmissionStatus.SYNCED);
     }
 
     public void setFileTransmissionFailed(Long id) {
-        briteSurveyDbAdapter
-                .updateTransmissionStatus(id, TransmissionStatus.FAILED);
+        briteSurveyDbAdapter.updateTransmissionStatus(id, TransmissionStatus.FAILED);
     }
 
     public void setFileTransmissionFormDeleted(long id) {
-        briteSurveyDbAdapter
-                .updateTransmissionStatus(id, TransmissionStatus.FORM_DELETED);
+        briteSurveyDbAdapter.updateTransmissionStatus(id, TransmissionStatus.FORM_DELETED);
     }
 
     public Observable<Boolean> updateFailedSubmissions(Set<Long> failedSubmissions) {

@@ -412,14 +412,23 @@ public class SurveyDataRepository implements SurveyRepository {
                 .concatMap(new Function<FilteredFilesResult, Observable<List<String>>>() {
                     @Override
                     public Observable<List<String>> apply(final FilteredFilesResult filtered) {
-                        DatabaseDataSource dataSource = dataSourceFactory.getDataBaseDataSource();
+                        final DatabaseDataSource dataSource = dataSourceFactory
+                                .getDataBaseDataSource();
                         return Observable.zip(dataSource
                                         .setFileTransmissionsFailed(filtered.getMissingFiles()),
                                 dataSource.setDeletedForms(filtered.getDeletedForms()),
-                                new BiFunction<Boolean, Boolean, List<String>>() {
+                                new BiFunction<Boolean, Boolean, Boolean>() {
                                     @Override
-                                    public List<String> apply(Boolean ignored, Boolean ignored2) {
-                                        return filtered.getDeletedForms();
+                                    public Boolean apply(Boolean result1, Boolean result2) {
+                                        return result1 && result2;
+                                    }
+                                })
+                                .concatMap(new Function<Boolean, Observable<List<String>>>() {
+                                    @Override
+                                    public Observable<List<String>> apply(Boolean ignored) {
+                                        dataSource.updateFailedTransmissionsSurveyInstances(
+                                                filtered.getMissingFiles());
+                                        return Observable.just(filtered.getDeletedForms());
                                     }
                                 });
                     }

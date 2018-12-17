@@ -23,38 +23,53 @@ package org.akvo.flow.domain.interactor;
 import android.support.v4.util.Pair;
 
 import org.akvo.flow.domain.entity.InstanceIdUuid;
-import org.akvo.flow.domain.executor.PostExecutionThread;
-import org.akvo.flow.domain.executor.ThreadExecutor;
 import org.akvo.flow.domain.repository.FileRepository;
 import org.akvo.flow.domain.repository.SurveyRepository;
 
 import java.io.File;
 import java.util.List;
-import java.util.Map;
 
 import javax.inject.Inject;
 
 import io.reactivex.Observable;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Function;
 import io.reactivex.functions.Predicate;
+import io.reactivex.observers.DisposableObserver;
 import timber.log.Timber;
 
-public class CheckSubmittedFiles extends UseCase {
+public class CheckSubmittedFiles {
 
     private final SurveyRepository surveyRepository;
     private final FileRepository fileRepository;
+    private final CompositeDisposable disposables;
 
     @Inject
-    protected CheckSubmittedFiles(ThreadExecutor threadExecutor,
-            PostExecutionThread postExecutionThread,
-            SurveyRepository surveyRepository, FileRepository fileRepository) {
-        super(threadExecutor, postExecutionThread);
+    protected CheckSubmittedFiles(SurveyRepository surveyRepository,
+            FileRepository fileRepository) {
         this.surveyRepository = surveyRepository;
         this.fileRepository = fileRepository;
+        this.disposables = new CompositeDisposable();
     }
 
-    @Override
-    protected <T> Observable buildUseCaseObservable(Map<String, T> parameters) {
+    @SuppressWarnings("unchecked")
+    public <T> void execute(DisposableObserver<T> observer) {
+        final Observable<T> observable = buildUseCaseObservable();
+        addDisposable(observable.subscribeWith(observer));
+    }
+
+    public void dispose() {
+        if (!disposables.isDisposed()) {
+            disposables.clear();
+        }
+    }
+
+    private void addDisposable(Disposable disposable) {
+        disposables.add(disposable);
+    }
+
+    private Observable buildUseCaseObservable() {
         return surveyRepository.getSubmittedInstances()
                 .flatMap(new Function<List<InstanceIdUuid>, Observable<List<Boolean>>>() {
                     @Override
@@ -67,11 +82,11 @@ public class CheckSubmittedFiles extends UseCase {
     private Observable<List<Boolean>> checkExistingFiles(List<InstanceIdUuid> instanceIdUuids) {
         return Observable.fromIterable(instanceIdUuids)
                 .flatMap(new Function<InstanceIdUuid, Observable<Boolean>>() {
-                            @Override
-                            public Observable<Boolean> apply(InstanceIdUuid instanceIdUuid) {
-                                return updateMissingFileInstances(instanceIdUuid);
-                            }
-                        })
+                    @Override
+                    public Observable<Boolean> apply(InstanceIdUuid instanceIdUuid) {
+                        return updateMissingFileInstances(instanceIdUuid);
+                    }
+                })
                 .toList().toObservable();
     }
 

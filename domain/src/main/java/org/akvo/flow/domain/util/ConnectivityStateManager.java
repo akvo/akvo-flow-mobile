@@ -54,12 +54,4 @@ public class ConnectivityStateManager {
         }
         return false;
     }
-
-    public boolean isWifiConnected() {
-        ConnectivityManager connectionManager = (ConnectivityManager) context
-                .getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo wifiCheck = connectionManager != null ? connectionManager
-                .getNetworkInfo(ConnectivityManager.TYPE_WIFI) : null;
-        return wifiCheck != null && wifiCheck.isConnected();
-    }
 }

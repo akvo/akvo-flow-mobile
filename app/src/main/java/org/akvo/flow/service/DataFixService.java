@@ -106,7 +106,7 @@ public class DataFixService extends JobIntentService {
                 Timber.e(e);
                 verify();
             }
-        }, null);
+        });
     }
 
     private void verify() {
@@ -121,7 +121,7 @@ public class DataFixService extends JobIntentService {
                 export();
             }
 
-        }, null);
+        });
     }
 
     private void export() {
@@ -136,7 +136,7 @@ public class DataFixService extends JobIntentService {
                 Timber.e(e);
                 broadcastDataPointStatusChange();
             }
-        }, null);
+        });
     }
 
     private void broadcastDataPointStatusChange() {

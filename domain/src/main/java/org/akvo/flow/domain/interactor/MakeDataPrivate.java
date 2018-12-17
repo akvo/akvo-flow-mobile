@@ -22,8 +22,6 @@ package org.akvo.flow.domain.interactor;
 
 import org.akvo.flow.domain.repository.FileRepository;
 
-import java.util.Map;
-
 import javax.inject.Inject;
 
 import io.reactivex.Observable;
@@ -47,8 +45,8 @@ public class MakeDataPrivate {
     }
 
     @SuppressWarnings("unchecked")
-    public <T> void execute(DisposableObserver<T> observer, Map<String, Object> parameters) {
-        final Observable<T> observable = buildUseCaseObservable(parameters);
+    public <T> void execute(DisposableObserver<T> observer) {
+        final Observable<T> observable = buildUseCaseObservable();
         addDisposable(observable.subscribeWith(observer));
     }
 
@@ -58,12 +56,11 @@ public class MakeDataPrivate {
         }
     }
 
-    private <T> Observable buildUseCaseObservable(Map<String, T> parameters) {
+    private Observable buildUseCaseObservable() {
         return fileRepository.moveFiles();
     }
 
     private void addDisposable(Disposable disposable) {
         disposables.add(disposable);
     }
-
 }

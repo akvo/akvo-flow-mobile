@@ -43,6 +43,7 @@ import org.akvo.flow.database.UserColumns;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
@@ -340,7 +341,20 @@ public class BriteSurveyDbAdapter {
         return briteDatabase.query(sql, String.valueOf(surveyInstanceId), questionId);
     }
 
-    public void createTransmission(long surveyInstanceId, String formID, String filename,
+
+    public void createTransmissions(Long instanceId, String formId, Set<String> filenames) {
+        BriteDatabase.Transaction transaction = beginTransaction();
+        try {
+            for (String filename : filenames) {
+                createTransmission(instanceId, formId, filename, TransmissionStatus.QUEUED);
+            }
+            transaction.markSuccessful();
+        } finally {
+            transaction.end();
+        }
+    }
+
+    private void createTransmission(long surveyInstanceId, String formID, String filename,
             int status) {
         ContentValues values = new ContentValues();
         values.put(TransmissionColumns.SURVEY_INSTANCE_ID, surveyInstanceId);
@@ -353,6 +367,22 @@ public class BriteSurveyDbAdapter {
             values.put(TransmissionColumns.END_DATE, date);
         }
         briteDatabase.insert(Tables.TRANSMISSION, values);
+    }
+
+    public void updateFailedTransmissions(@NonNull List<String> filenames) {
+        BriteDatabase.Transaction transaction = beginTransaction();
+        try {
+            for (String filename : filenames) {
+                int rows = updateFailedTransmission(filename, TransmissionStatus.FAILED);
+                if (rows == 0) {
+                    // Use a dummy "-1" as survey_instance_id, as the database needs that attribute
+                    createTransmission(-1, null, filename, TransmissionStatus.FAILED);
+                }
+            }
+            transaction.markSuccessful();
+        } finally {
+            transaction.end();
+        }
     }
 
     /**

@@ -28,7 +28,6 @@ import org.akvo.flow.domain.util.TextValueCleaner;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -60,8 +59,8 @@ public class ExportSurveyInstances {
     }
 
     @SuppressWarnings("unchecked")
-    public <T> void execute(DisposableObserver<T> observer, Map<String, Object> parameters) {
-        final Observable<T> observable = buildUseCaseObservable(parameters);
+    public <T> void execute(DisposableObserver<T> observer) {
+        final Observable<T> observable = buildUseCaseObservable();
         addDisposable(observable.subscribeWith(observer));
     }
 
@@ -75,7 +74,7 @@ public class ExportSurveyInstances {
         disposables.add(disposable);
     }
 
-    private  <T> Observable buildUseCaseObservable(Map<String, T> parameters) {
+    private Observable buildUseCaseObservable() {
         return userRepository.getDeviceId()
                 .map(new Function<String, String>() {
                     @Override
@@ -100,14 +99,22 @@ public class ExportSurveyInstances {
                                 .concatMap(new Function<Long, Observable<Boolean>>() {
                                     @Override
                                     public Observable<Boolean> apply(Long instanceId) {
-                                        return createInstanceZipFile(instanceId, deviceId);
+                                        return getFormInstanceData(instanceId, deviceId);
+                                    }
+                                })
+                                .toList()
+                                .toObservable()
+                                .map(new Function<List<Boolean>, Boolean>() {
+                                    @Override
+                                    public Boolean apply(List<Boolean> ignored) {
+                                        return true;
                                     }
                                 });
                     }
                 });
     }
 
-    private Observable<Boolean> createInstanceZipFile(@NonNull final Long instanceId,
+    private Observable<Boolean> getFormInstanceData(@NonNull final Long instanceId,
             final String deviceId) {
         return surveyRepository.setInstanceStatusToRequested(instanceId)
                 .concatMap(new Function<Boolean, Observable<Boolean>>() {
@@ -119,14 +126,14 @@ public class ExportSurveyInstances {
                                             @Override
                                             public Observable<Boolean> apply(
                                                     final FormInstanceMetadata metadata) {
-                                                return exportSurveyInstance(metadata, instanceId);
+                                                return createTransmissions(metadata, instanceId);
                                             }
                                         });
                     }
                 });
     }
 
-    private Observable<Boolean> exportSurveyInstance(final FormInstanceMetadata metadata,
+    private Observable<Boolean> createTransmissions(final FormInstanceMetadata metadata,
             @NonNull final Long instanceId) {
         return fileRepository
                 .createDataZip(metadata.getZipFileName(), metadata.getFormInstanceData())

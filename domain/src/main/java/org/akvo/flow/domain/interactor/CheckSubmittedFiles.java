@@ -28,7 +28,6 @@ import org.akvo.flow.domain.repository.SurveyRepository;
 
 import java.io.File;
 import java.util.List;
-import java.util.Map;
 
 import javax.inject.Inject;
 
@@ -55,8 +54,8 @@ public class CheckSubmittedFiles {
     }
 
     @SuppressWarnings("unchecked")
-    public <T> void execute(DisposableObserver<T> observer, Map<String, Object> parameters) {
-        final Observable<T> observable = buildUseCaseObservable(parameters);
+    public <T> void execute(DisposableObserver<T> observer) {
+        final Observable<T> observable = buildUseCaseObservable();
         addDisposable(observable.subscribeWith(observer));
     }
 
@@ -70,7 +69,7 @@ public class CheckSubmittedFiles {
         disposables.add(disposable);
     }
 
-    private <T> Observable buildUseCaseObservable(Map<String, T> parameters) {
+    private Observable buildUseCaseObservable() {
         return surveyRepository.getSubmittedInstances()
                 .flatMap(new Function<List<InstanceIdUuid>, Observable<List<Boolean>>>() {
                     @Override

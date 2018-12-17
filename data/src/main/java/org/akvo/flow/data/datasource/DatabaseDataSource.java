@@ -46,7 +46,6 @@ import java.util.Set;
 import javax.inject.Inject;
 
 import io.reactivex.Observable;
-import io.reactivex.functions.Function;
 
 public class DatabaseDataSource {
 
@@ -235,19 +234,11 @@ public class DatabaseDataSource {
         return Observable.just(briteSurveyDbAdapter.getFormIds());
     }
 
-    public Observable<Boolean> setFileTransmissionFailed(@Nullable List<String> filenames) {
+    public Observable<Boolean> setFileTransmissionsFailed(@Nullable List<String> filenames) {
         if (filenames == null || filenames.isEmpty()) {
             return Observable.just(true);
         }
-        for (String filename: filenames) {
-            int rows = briteSurveyDbAdapter
-                    .updateFailedTransmission(filename, TransmissionStatus.FAILED);
-            if (rows == 0) {
-                // Use a dummy "-1" as survey_instance_id, as the database needs that attribute
-                briteSurveyDbAdapter
-                        .createTransmission(-1, null, filename, TransmissionStatus.FAILED);
-            }
-        }
+        briteSurveyDbAdapter.updateFailedTransmissions(filenames);
         return Observable.just(true);
     }
 
@@ -336,21 +327,12 @@ public class DatabaseDataSource {
     }
 
 
-    public Observable<List<Boolean>> createTransmissions(final Long instanceId, final String formId,
+    public Observable<Boolean> createTransmissions(final Long instanceId, final String formId,
             Set<String> filenames) {
-        return Observable.fromIterable(filenames)
-                .concatMap(new Function<String, Observable<Boolean>>() {
-                    @Override
-                    public Observable<Boolean> apply(final String filename) {
-                        return insertTransmission(instanceId, formId, filename);
-                    }
-                })
-                .toList().toObservable();
-    }
-
-    private Observable<Boolean> insertTransmission(Long instanceId, String formId, String filename) {
-        briteSurveyDbAdapter
-                .createTransmission(instanceId, formId, filename, TransmissionStatus.QUEUED);
+        if (filenames == null || filenames.isEmpty()) {
+            return Observable.just(true);
+        }
+        briteSurveyDbAdapter.createTransmissions(instanceId, formId, filenames);
         return Observable.just(true);
     }
 }

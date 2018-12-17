@@ -45,6 +45,9 @@ import javax.inject.Inject;
 
 import timber.log.Timber;
 
+/**
+ * Task service which will only run if there is a connection
+ */
 public class DataPointUploadService extends GcmTaskService {
 
     private static final String TAG = "DataPointUploadService";

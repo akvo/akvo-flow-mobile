@@ -414,7 +414,7 @@ public class SurveyDataRepository implements SurveyRepository {
                     public Observable<List<String>> apply(final FilteredFilesResult filtered) {
                         DatabaseDataSource dataSource = dataSourceFactory.getDataBaseDataSource();
                         return Observable.zip(dataSource
-                                        .setFileTransmissionFailed(filtered.getMissingFiles()),
+                                        .setFileTransmissionsFailed(filtered.getMissingFiles()),
                                 dataSource.setDeletedForms(filtered.getDeletedForms()),
                                 new BiFunction<Boolean, Boolean, List<String>>() {
                                     @Override
@@ -456,12 +456,12 @@ public class SurveyDataRepository implements SurveyRepository {
                     public Observable<List<Transmission>> apply(List<String> formIds) {
                         return Observable.fromIterable(formIds)
                                 .flatMap(new Function<String, Observable<List<Transmission>>>() {
-                                            @Override
-                                            public Observable<List<Transmission>> apply(
-                                                    String formId) {
-                                                return getFormTransmissions(formId);
-                                            }
-                                        });
+                                    @Override
+                                    public Observable<List<Transmission>> apply(
+                                            String formId) {
+                                        return getFormTransmissions(formId);
+                                    }
+                                });
 
                     }
                 });
@@ -518,8 +518,8 @@ public class SurveyDataRepository implements SurveyRepository {
     @Override
     public Observable<FormInstanceMetadata> getFormInstanceData(Long instanceId,
             final String deviceId) {
-        return dataSourceFactory.getDataBaseDataSource().getResponses(instanceId).map(
-                new Function<Cursor, FormInstanceMetadata>() {
+        return dataSourceFactory.getDataBaseDataSource().getResponses(instanceId)
+                .map(new Function<Cursor, FormInstanceMetadata>() {
                     @Override
                     public FormInstanceMetadata apply(Cursor cursor) {
                         return formInstanceMetadataMapper.transform(cursor, deviceId);
@@ -533,9 +533,9 @@ public class SurveyDataRepository implements SurveyRepository {
         final DatabaseDataSource dataBaseDataSource = dataSourceFactory.getDataBaseDataSource();
         return dataBaseDataSource
                 .createTransmissions(instanceId, formId, fileNames)
-                .flatMap(new Function<List<Boolean>, Observable<Boolean>>() {
+                .flatMap(new Function<Boolean, Observable<Boolean>>() {
                     @Override
-                    public Observable<Boolean> apply(List<Boolean> ignored) {
+                    public Observable<Boolean> apply(Boolean ignored) {
                         return dataBaseDataSource.setInstanceStatusToSubmitted(instanceId);
                     }
                 });

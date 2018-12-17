@@ -319,6 +319,7 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
         if (mDatabase != null) {
             mDatabase.close();
         }
+        getSelectedUser.dispose();
     }
 
     @Override

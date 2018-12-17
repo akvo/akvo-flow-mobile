@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2018 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -38,20 +38,6 @@ import javax.inject.Inject;
 
 import timber.log.Timber;
 
-/**
- * Handle survey export and sync in a background thread. The export process takes
- * no arguments, and will try to zip all the survey instances with a SUBMIT_REQUESTED status
- * but with no EXPORT_DATE (export hasn't happened yet). Ideally, and if the service has been
- * triggered by a survey submission, only one survey instance will be exported. However, if for
- * whatever reason, a previous export attempt has failed, a new export will be tried on each
- * execution of the service, until the zip file finally gets exported. A possible scenario for
- * this is the submission of a survey when the external storage is not available, postponing the
- * export until it gets ready.
- * After the export of the zip files, the sync will be run, attempting to upload all the non synced
- * files to the datastore.
- *
- * @author Christopher Fagiani
- */
 public class DataFixService extends JobIntentService {
 
     /**
@@ -78,7 +64,6 @@ public class DataFixService extends JobIntentService {
     @Override
     public void onCreate() {
         super.onCreate();
-        Timber.d("onCreate");
         FlowApp application = (FlowApp) getApplicationContext();
         application.getApplicationComponent().inject(this);
     }
@@ -86,7 +71,6 @@ public class DataFixService extends JobIntentService {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        Timber.d("onDestroy");
         makeDataPrivate.dispose();
         checkSubmittedFiles.dispose();
         exportSurveyInstances.dispose();
@@ -94,7 +78,6 @@ public class DataFixService extends JobIntentService {
 
     @Override
     protected void onHandleWork(@NonNull Intent intent) {
-        Timber.d("onHandleWork");
         makeDataPrivate.execute(new DefaultObserver<Boolean>() {
             @Override
             public void onComplete() {

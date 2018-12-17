@@ -231,7 +231,7 @@ public class BriteSurveyDbAdapter {
                 String.valueOf(surveyInstanceId));
 
         if (rows < 1) {
-            Timber.e("Could not update status for Survey Instance: %s", surveyInstanceId);
+            Timber.e("Could not update status for Survey Instance: %d", surveyInstanceId);
         }
     }
 
@@ -607,9 +607,8 @@ public class BriteSurveyDbAdapter {
             for (String formId : formIds) {
                 ContentValues updatedValues = new ContentValues();
                 updatedValues.put(SurveyColumns.DELETED, 1);
-                briteDatabase
-                        .update(Tables.SURVEY, updatedValues, SurveyColumns.SURVEY_ID + " = ?",
-                                formId);
+                briteDatabase.update(Tables.SURVEY, updatedValues, SurveyColumns.SURVEY_ID + " = ?",
+                        formId);
             }
             transaction.markSuccessful();
         } finally {

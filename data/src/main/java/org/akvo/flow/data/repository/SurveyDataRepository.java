@@ -466,12 +466,24 @@ public class SurveyDataRepository implements SurveyRepository {
                         return Observable.fromIterable(formIds)
                                 .flatMap(new Function<String, Observable<List<Transmission>>>() {
                                     @Override
-                                    public Observable<List<Transmission>> apply(
-                                            String formId) {
+                                    public Observable<List<Transmission>> apply(String formId) {
                                         return getFormTransmissions(formId);
                                     }
+                                })
+                                .toList()
+                                .toObservable()
+                                .map(new Function<List<List<Transmission>>, List<Transmission>>() {
+                                    @Override
+                                    public List<Transmission> apply(List<List<Transmission>> lists) {
+                                        List<Transmission> transmissions = new ArrayList<>();
+                                        for (List<Transmission> transmissionList : lists) {
+                                            if (transmissionList != null) {
+                                                transmissions.addAll(transmissionList);
+                                            }
+                                        }
+                                        return transmissions;
+                                    }
                                 });
-
                     }
                 });
     }

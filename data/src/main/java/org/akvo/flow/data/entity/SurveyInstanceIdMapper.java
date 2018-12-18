@@ -38,8 +38,8 @@ public class SurveyInstanceIdMapper {
             if (cursor.moveToFirst()) {
                 final int formIdCol = cursor.getColumnIndexOrThrow(TransmissionColumns.SURVEY_ID);
                 instanceId = cursor.getLong(formIdCol);
-                cursor.close();
             }
+            cursor.close();
         }
         return instanceId;
     }

@@ -54,7 +54,8 @@ public class RestServiceFactory {
         return createRetrofit(clazz, baseUrl, okHttpClient, ScalarsConverterFactory.create());
     }
 
-    private <T> T createRetrofit(Class<T> clazz, String baseUrl, OkHttpClient okHttpClient, Converter.Factory converter) {
+    private <T> T createRetrofit(Class<T> clazz, String baseUrl, OkHttpClient okHttpClient,
+            Converter.Factory converter) {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(baseUrl)
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
@@ -63,5 +64,4 @@ public class RestServiceFactory {
                 .build();
         return retrofit.create(clazz);
     }
-
 }

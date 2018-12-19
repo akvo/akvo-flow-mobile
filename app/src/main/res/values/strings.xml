@@ -311,4 +311,8 @@
     <string name="channel_name">Flow channel</string>
     <string name="channel_description">Flow notifications</string>
 
+
+    <string name="unpublish_service_notification_title">Deleting published files</string>
+    <string name="unpublish_service_notification_ticker">Deleting</string>
+
 </resources>

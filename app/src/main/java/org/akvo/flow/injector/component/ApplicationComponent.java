@@ -28,16 +28,16 @@ import com.squareup.sqlbrite2.BriteDatabase;
 import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.broadcast.BootReceiver;
 import org.akvo.flow.broadcast.DataTimeoutReceiver;
-import org.akvo.flow.data.net.RestApi;
 import org.akvo.flow.domain.executor.PostExecutionThread;
 import org.akvo.flow.domain.executor.ThreadExecutor;
+import org.akvo.flow.domain.repository.ApkRepository;
 import org.akvo.flow.domain.repository.FileRepository;
-import org.akvo.flow.domain.repository.SetupRepository;
 import org.akvo.flow.domain.repository.SurveyRepository;
 import org.akvo.flow.domain.repository.UserRepository;
 import org.akvo.flow.injector.module.ApplicationModule;
 import org.akvo.flow.injector.module.ViewModule;
 import org.akvo.flow.presentation.BaseActivity;
+import org.akvo.flow.service.ApkUpdateService;
 import org.akvo.flow.service.BootstrapService;
 import org.akvo.flow.service.DataSyncService;
 import org.akvo.flow.service.FileChangeTrackingService;
@@ -59,9 +59,7 @@ public interface ApplicationComponent {
 
     BriteDatabase provideDatabase();
 
-    void inject(FlowApp app);
-
-    void inject(BaseActivity baseActivity);
+    ApkRepository apkRepository();
 
     Context context();
 
@@ -75,11 +73,7 @@ public interface ApplicationComponent {
 
     UserRepository userRepository();
 
-    SetupRepository setupRepository();
-
     Gson gson();
-
-    RestApi restApi();
 
     void inject(FileChangeTrackingService fileChangeTrackingService);
 
@@ -94,4 +88,10 @@ public interface ApplicationComponent {
     void inject(BootReceiver bootReceiver);
 
     void inject(UnPublishDataService unPublishDataService);
+
+    void inject(ApkUpdateService apkUpdateService);
+
+    void inject(FlowApp app);
+
+    void inject(BaseActivity baseActivity);
 }

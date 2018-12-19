@@ -249,6 +249,9 @@ public class ConstantUtil {
 
     public static final String NOTIFICATION_CHANNEL_ID = "1";
 
+    public static final int DATA_SYNC_NOTIFICATION_ID = 1234;
+    public static final int UN_PUBLISH_NOTIFICATION_ID = 1235;
+
     /**
      * prevent instantiation
      */

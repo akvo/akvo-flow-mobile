@@ -56,8 +56,6 @@ import timber.log.Timber;
  */
 public class DataSyncService extends Service {
 
-    public static final int NOTIFICATION_ID = 1234;
-
     @Inject
     @Named("makeDataPrivate")
     UseCase makeDataPrivate;
@@ -108,7 +106,7 @@ public class DataSyncService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        startForeground(NOTIFICATION_ID,
+        startForeground(ConstantUtil.DATA_SYNC_NOTIFICATION_ID,
                 NotificationHelper.getSyncingNotification(getApplicationContext()));
         makeDataPrivate.dispose();
         makeDataPrivate.execute(new DefaultObserver<Boolean>() {

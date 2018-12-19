@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -18,9 +18,8 @@
  *
  */
 
-package org.akvo.flow.presentation;
+package org.akvo.flow.presentation.about;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.widget.TextView;
 
@@ -29,7 +28,8 @@ import org.akvo.flow.R;
 import org.akvo.flow.activity.BackActivity;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
-import org.akvo.flow.service.UserRequestedApkUpdateService;
+import org.akvo.flow.presentation.SnackBarManager;
+import org.akvo.flow.presentation.entity.ViewApkData;
 import org.akvo.flow.ui.Navigator;
 
 import javax.inject.Inject;
@@ -38,7 +38,10 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class AboutActivity extends BackActivity {
+public class AboutActivity extends BackActivity implements AboutView {
+
+    @Inject
+    AboutPresenter presenter;
 
     @Inject
     Navigator navigator;
@@ -49,6 +52,9 @@ public class AboutActivity extends BackActivity {
     @BindView(R.id.text_copyright)
     TextView copyright;
 
+    @Inject
+    SnackBarManager snackBarManager;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -57,6 +63,13 @@ public class AboutActivity extends BackActivity {
         initializeInjector();
         setupToolBar();
         initializeViews();
+        presenter.setView(this);
+    }
+
+    @Override
+    protected void onDestroy() {
+        presenter.destroy();
+        super.onDestroy();
     }
 
     private void initializeViews() {
@@ -72,7 +85,8 @@ public class AboutActivity extends BackActivity {
 
     @OnClick(R.id.text_check_updates)
     void onCheckUpdatesTap() {
-        startService(new Intent(this, UserRequestedApkUpdateService.class));
+        //TODO: add loading
+        presenter.checkApkVersion();
     }
 
     @OnClick(R.id.text_release_notes)
@@ -88,5 +102,22 @@ public class AboutActivity extends BackActivity {
     @OnClick(R.id.text_terms)
     void onViewTermsTap() {
         navigator.navigateToTerms(this);
+    }
+
+    @Override
+    public void showNewVersionAvailable(ViewApkData viewApkData) {
+        navigator.navigateToAppUpdate(this, viewApkData);
+    }
+
+    @Override
+    public void showNoUpdateAvailable() {
+        snackBarManager.displaySnackBar(findViewById(R.id.root_layout),
+                R.string.apk_update_service_no_update, this);
+    }
+
+    @Override
+    public void showErrorGettingApkData() {
+        snackBarManager.displaySnackBar(findViewById(R.id.root_layout),
+                R.string.apk_update_service_error_update, this);
     }
 }

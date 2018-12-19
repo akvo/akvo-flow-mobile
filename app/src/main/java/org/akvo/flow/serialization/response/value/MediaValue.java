@@ -23,6 +23,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonIOException;
 import com.google.gson.JsonSyntaxException;
 
@@ -35,7 +36,7 @@ public class MediaValue {
 
     @NonNull
     public static String serialize(Media media) {
-        GsonMapper mapper = new GsonMapper();
+        GsonMapper mapper = new GsonMapper(new GsonBuilder().create());
         try {
             return mapper.write(media, Media.class);
         } catch (JsonIOException | JsonSyntaxException e) {
@@ -50,7 +51,7 @@ public class MediaValue {
             return null;
         }
         try {
-            GsonMapper mapper = new GsonMapper();
+            GsonMapper mapper = new GsonMapper(new GsonBuilder().create());
             return mapper.read(data, Media.class);
         } catch (JsonIOException | JsonSyntaxException e) {
             Timber.e("Value is not a valid JSON response: " + data);

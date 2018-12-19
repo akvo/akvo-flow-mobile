@@ -69,7 +69,7 @@ import org.akvo.flow.presentation.navigation.SurveyDeleteConfirmationDialog;
 import org.akvo.flow.presentation.navigation.UserOptionsDialog;
 import org.akvo.flow.presentation.navigation.ViewUser;
 import org.akvo.flow.service.BootstrapService;
-import org.akvo.flow.service.DataSyncService;
+import org.akvo.flow.service.DataFixService;
 import org.akvo.flow.service.SurveyDownloadService;
 import org.akvo.flow.service.TimeCheckService;
 import org.akvo.flow.ui.Navigator;
@@ -381,6 +381,7 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
         if (mDatabase != null) {
             mDatabase.close();
         }
+        getSelectedUser.dispose();
     }
 
     @Override
@@ -400,9 +401,9 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
 
     private void startServices() {
         startService(new Intent(this, SurveyDownloadService.class));
-        startService(new Intent(this, DataSyncService.class));
         startService(new Intent(this, BootstrapService.class));
         startService(new Intent(this, TimeCheckService.class));
+        DataFixService.enqueueWork(getApplicationContext(), new Intent());
     }
 
     private void displayExternalStorageMissing() {

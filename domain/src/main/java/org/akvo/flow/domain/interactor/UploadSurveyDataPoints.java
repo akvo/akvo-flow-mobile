@@ -34,13 +34,13 @@ import javax.inject.Inject;
 import io.reactivex.Observable;
 import io.reactivex.functions.Function;
 
-public class UploadDataPoints extends UseCase {
+public class UploadSurveyDataPoints extends UseCase {
 
     private final SurveyRepository surveyRepository;
     private final UserRepository userRepository;
 
     @Inject
-    protected UploadDataPoints(ThreadExecutor threadExecutor,
+    protected UploadSurveyDataPoints(ThreadExecutor threadExecutor,
             PostExecutionThread postExecutionThread, SurveyRepository surveyRepository,
             UserRepository userRepository) {
         super(threadExecutor, postExecutionThread);
@@ -50,8 +50,10 @@ public class UploadDataPoints extends UseCase {
 
     @Override
     protected <T> Observable buildUseCaseObservable(Map<String, T> parameters) {
-        final String surveyId =
-                parameters != null ? (String) parameters.get(Constants.KEY_SURVEY_ID) : null;
+        if (parameters == null || parameters.get(Constants.KEY_SURVEY_ID) == null) {
+            return Observable.error(new IllegalArgumentException("missing surveyId"));
+        }
+        final String surveyId = (String) parameters.get(Constants.KEY_SURVEY_ID);
         return userRepository.getDeviceId()
                 .concatMap(new Function<String, Observable<Set<String>>>() {
                     @Override

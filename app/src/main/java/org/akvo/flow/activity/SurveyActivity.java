@@ -378,21 +378,9 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     }
 
     private void startServices() {
-        if (!StatusUtil.hasExternalStorage()) {
-            ViewUtil.showConfirmDialog(R.string.checksd, R.string.sdmissing, this,
-                    false,
-                    new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            SurveyActivity.this.finish();
-                        }
-                    },
-                    null);
-        } else {
-            startService(new Intent(this, BootstrapService.class));
-            startService(new Intent(this, TimeCheckService.class));
-            DataFixService.enqueueWork(getApplicationContext(), new Intent());
-        }
+        startService(new Intent(this, BootstrapService.class));
+        startService(new Intent(this, TimeCheckService.class));
+        DataFixService.enqueueWork(getApplicationContext(), new Intent());
     }
 
     private void displayExternalStorageMissing() {

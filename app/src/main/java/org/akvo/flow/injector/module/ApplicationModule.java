@@ -22,6 +22,7 @@ package org.akvo.flow.injector.module;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.support.annotation.NonNull;
 
 import com.google.gson.Gson;
 import com.squareup.sqlbrite2.BriteDatabase;
@@ -33,6 +34,7 @@ import org.akvo.flow.data.datasource.preferences.SharedPreferencesDataSource;
 import org.akvo.flow.data.executor.JobExecutor;
 import org.akvo.flow.data.net.DeviceHelper;
 import org.akvo.flow.data.net.Encoder;
+import org.akvo.flow.data.net.HMACInterceptor;
 import org.akvo.flow.data.net.RestApi;
 import org.akvo.flow.data.net.RestServiceFactory;
 import org.akvo.flow.data.net.S3User;
@@ -59,12 +61,14 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 import java.util.TimeZone;
+import java.util.concurrent.TimeUnit;
 
 import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
 import io.reactivex.schedulers.Schedulers;
+import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 
 @Module
@@ -75,6 +79,11 @@ public class ApplicationModule {
     private static final String TIMEZONE = "GMT";
     private static final String PREFS_NAME = "flow_prefs";
     private static final int PREFS_MODE = Context.MODE_PRIVATE;
+    private static final int CONNECTION_TIMEOUT = 10;
+    /**
+     * Requests to GAE take a long time especially when there are a lot of datapoints
+     */
+    private static final int NO_TIMEOUT = 0;
 
     private final FlowApp application;
 
@@ -149,10 +158,20 @@ public class ApplicationModule {
         if (BuildConfig.DEBUG) {
             loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
         }
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(SERVICE_FACTORY_DATE_PATTERN, Locale.US);
+
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(SERVICE_FACTORY_DATE_PATTERN,
+                Locale.US);
         simpleDateFormat.setTimeZone(TimeZone.getTimeZone(TIMEZONE));
-        return new RestServiceFactory(loggingInterceptor, simpleDateFormat, encoder,
-                BuildConfig.API_KEY, signatureHelper);
+        OkHttpClient.Builder httpClient = createHttpClient(loggingInterceptor);
+        httpClient.addInterceptor(
+                new HMACInterceptor(BuildConfig.API_KEY, simpleDateFormat, encoder,
+                        signatureHelper));
+        OkHttpClient okHttpClientWithHmac = httpClient.build();
+
+        OkHttpClient.Builder httpClient2 = createHttpClient(loggingInterceptor);
+        OkHttpClient okHttpClient = httpClient2.build();
+
+        return new RestServiceFactory(okHttpClientWithHmac, okHttpClient);
     }
 
     @Provides
@@ -197,5 +216,15 @@ public class ApplicationModule {
     @Singleton
     Gson provideGson() {
         return new Gson();
+    }
+
+    @NonNull
+    private OkHttpClient.Builder createHttpClient(
+            HttpLoggingInterceptor loggingInterceptor) {
+        OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
+        httpClient.addInterceptor(loggingInterceptor);
+        httpClient.connectTimeout(CONNECTION_TIMEOUT, TimeUnit.SECONDS);
+        httpClient.readTimeout(NO_TIMEOUT, TimeUnit.SECONDS);
+        return httpClient;
     }
 }

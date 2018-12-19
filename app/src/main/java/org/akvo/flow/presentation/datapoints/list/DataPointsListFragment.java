@@ -104,7 +104,7 @@ public class DataPointsListFragment extends Fragment implements LocationListener
 
     /**
      * BroadcastReceiver to notify of data synchronisation. This should be
-     * fired from {@link org.akvo.flow.service.DataSyncService}
+     * fired from {@link org.akvo.flow.service.DataPointUploadService}
      */
     private final BroadcastReceiver dataSyncReceiver = new DataSyncBroadcastReceiver(this);
 

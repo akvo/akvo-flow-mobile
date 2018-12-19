@@ -250,7 +250,7 @@ public class ResponseListFragment extends ListFragment implements LoaderCallback
      * TODO: make a static inner class to avoid memory leaks
      *
      * BroadcastReceiver to notify of data synchronisation. This should be
-     * fired from DataSyncService.
+     * fired from DataFixService.
      */
     private final BroadcastReceiver dataSyncReceiver = new BroadcastReceiver() {
         @Override

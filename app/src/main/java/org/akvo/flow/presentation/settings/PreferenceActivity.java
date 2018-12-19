@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -20,7 +20,6 @@
 
 package org.akvo.flow.presentation.settings;
 
-import android.content.Intent;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.PorterDuff;
@@ -46,7 +45,7 @@ import org.akvo.flow.presentation.settings.passcode.PassCodeDeleteAllDialog;
 import org.akvo.flow.presentation.settings.passcode.PassCodeDeleteCollectedDialog;
 import org.akvo.flow.presentation.settings.passcode.PassCodeDownloadFormDialog;
 import org.akvo.flow.presentation.settings.passcode.PassCodeReloadFormsDialog;
-import org.akvo.flow.service.DataSyncService;
+import org.akvo.flow.service.DataPointUploadService;
 import org.akvo.flow.ui.Navigator;
 
 import java.util.Arrays;
@@ -174,8 +173,7 @@ public class PreferenceActivity extends BackActivity implements PreferenceView,
 
     @OnClick(R.id.send_data_points)
     void onDataPointSendTap() {
-        Intent i = new Intent(this, DataSyncService.class);
-        getApplicationContext().startService(i);
+        DataPointUploadService.scheduleUpload(getApplicationContext(), enableDataSc.isChecked());
         finish();
     }
 

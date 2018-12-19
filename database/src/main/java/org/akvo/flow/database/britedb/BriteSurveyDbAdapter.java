@@ -43,6 +43,7 @@ import org.akvo.flow.database.UserColumns;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
@@ -340,7 +341,20 @@ public class BriteSurveyDbAdapter {
         return briteDatabase.query(sql, String.valueOf(surveyInstanceId), questionId);
     }
 
-    public void createTransmission(long surveyInstanceId, String formID, String filename,
+
+    public void createTransmissions(Long instanceId, String formId, Set<String> filenames) {
+        BriteDatabase.Transaction transaction = beginTransaction();
+        try {
+            for (String filename : filenames) {
+                createTransmission(instanceId, formId, filename, TransmissionStatus.QUEUED);
+            }
+            transaction.markSuccessful();
+        } finally {
+            transaction.end();
+        }
+    }
+
+    private void createTransmission(long surveyInstanceId, String formID, String filename,
             int status) {
         ContentValues values = new ContentValues();
         values.put(TransmissionColumns.SURVEY_INSTANCE_ID, surveyInstanceId);
@@ -353,6 +367,22 @@ public class BriteSurveyDbAdapter {
             values.put(TransmissionColumns.END_DATE, date);
         }
         briteDatabase.insert(Tables.TRANSMISSION, values);
+    }
+
+    public void updateFailedTransmissions(@NonNull List<String> filenames) {
+        BriteDatabase.Transaction transaction = beginTransaction();
+        try {
+            for (String filename : filenames) {
+                int rows = updateFailedTransmission(filename);
+                if (rows == 0) {
+                    // Use a dummy "-1" as survey_instance_id, as the database needs that attribute
+                    createTransmission(-1, null, filename, TransmissionStatus.FAILED);
+                }
+            }
+            transaction.markSuccessful();
+        } finally {
+            transaction.end();
+        }
     }
 
     /**
@@ -444,10 +474,7 @@ public class BriteSurveyDbAdapter {
         return queryForms(columns, "", null);
     }
 
-    public Cursor getFormIds(@Nullable String surveyId) {
-        if (surveyId == null) {
-            return getFormIds();
-        }
+    public Cursor getFormIds(@NonNull String surveyId) {
         String columns = SurveyColumns.SURVEY_ID;
         String whereClause = SurveyColumns.SURVEY_GROUP_ID + " = ?";
         List<String> surveyIds = new ArrayList<>(1);
@@ -573,13 +600,20 @@ public class BriteSurveyDbAdapter {
     /**
      * marks a survey record identified by the ID passed in as deleted.
      *
-     * @param surveyId
      */
-    public void deleteSurvey(String surveyId) {
-        ContentValues updatedValues = new ContentValues();
-        updatedValues.put(SurveyColumns.DELETED, 1);
-        briteDatabase
-                .update(Tables.SURVEY, updatedValues, SurveyColumns.SURVEY_ID + " = ?", surveyId);
+    public void setFormsDeleted(List<String> formIds) {
+        BriteDatabase.Transaction transaction = beginTransaction();
+        try {
+            for (String formId : formIds) {
+                ContentValues updatedValues = new ContentValues();
+                updatedValues.put(SurveyColumns.DELETED, 1);
+                briteDatabase.update(Tables.SURVEY, updatedValues, SurveyColumns.SURVEY_ID + " = ?",
+                        formId);
+            }
+            transaction.markSuccessful();
+        } finally {
+            transaction.end();
+        }
     }
 
     /**
@@ -658,14 +692,21 @@ public class BriteSurveyDbAdapter {
         return queryTransmissions(column, whereClause, selectionArgs);
     }
 
+    public Cursor getTransmissionForFileName(String filename) {
+        String column = TransmissionColumns.SURVEY_INSTANCE_ID;
+        String whereClause = TransmissionColumns.FILENAME + " = ? ";
+        whereClause += "GROUP BY " + column;
+        return queryTransmissions(column, whereClause, new String[] {filename});
+    }
+
     private Cursor queryTransmissions(String column, String whereClause, String[] selectionArgs) {
         String sql = "SELECT " + column + " FROM " + Tables.TRANSMISSION + " WHERE " + whereClause;
         return briteDatabase.query(sql, selectionArgs);
     }
 
-    public int updateFailedTransmission(String filename, int status) {
+    private int updateFailedTransmission(String filename) {
         ContentValues contentValues = new ContentValues(1);
-        contentValues.put(TransmissionColumns.STATUS, status);
+        contentValues.put(TransmissionColumns.STATUS, TransmissionStatus.FAILED);
         String where = TransmissionColumns.FILENAME + " = ? ";
         return briteDatabase.update(Tables.TRANSMISSION, contentValues, where, filename);
     }

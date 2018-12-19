@@ -51,7 +51,7 @@ public class RestServiceFactory {
     }
 
     public <T> T createScalarsRetrofitService(final Class<T> clazz, String baseUrl) {
-        return createRetrofit(clazz, okHttpClient, baseUrl, ScalarsConverterFactory.create());
+        return createRetrofit(clazz, baseUrl, okHttpClient, ScalarsConverterFactory.create());
     }
 
     private <T> T createRetrofit(Class<T> clazz, String baseUrl, OkHttpClient okHttpClient, Converter.Factory converter) {

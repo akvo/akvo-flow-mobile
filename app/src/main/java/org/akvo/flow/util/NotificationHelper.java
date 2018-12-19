@@ -35,6 +35,8 @@ import org.akvo.flow.activity.SurveyActivity;
 
 public class NotificationHelper {
 
+    public static final int SYNCING_NOTIFICATION_ID = 1235;
+
     private NotificationHelper() {
     }
 
@@ -113,6 +115,24 @@ public class NotificationHelper {
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .setOngoing(true);
         return (b.build());
+    }
+
+    public static void showSyncingNotification(Context context) {
+        String title = context.getString(R.string.sync_service_notification_title);
+        NotificationCompat.Builder b = new NotificationCompat.Builder(context)
+                .setSmallIcon(R.drawable.notification_icon)
+                .setContentTitle(title)
+                .setTicker(context.getString(R.string.sync_service_notification_ticker))
+                .setProgress(0, 0, true)
+                .setColor(ContextCompat.getColor(context, R.color.orange_main))
+                .setOngoing(true);
+        notifyWithDummyIntent(context, SYNCING_NOTIFICATION_ID, b);
+    }
+
+    public static void hideSyncingNotification(Context context) {
+        NotificationManager notificationManager =
+                (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.cancel(SYNCING_NOTIFICATION_ID);
     }
 
     private static void notifyWithDummyIntent(Context context, int notificationId,

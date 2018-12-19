@@ -28,7 +28,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import org.akvo.flow.R;
-import org.akvo.flow.service.DataSyncService;
+import org.akvo.flow.service.DataPointUploadService;
 import org.akvo.flow.service.SurveyDownloadService;
 import org.akvo.flow.service.TimeCheckService;
 
@@ -60,9 +60,9 @@ public class TimeCheckActivity extends AppCompatActivity {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         // Since date/time settings (might) have been updated, we fire the services sensitive
         // to time changes (the ones interacting with S3)
-        startService(new Intent(this, SurveyDownloadService.class));
-        startService(new Intent(this, DataSyncService.class));
         startService(new Intent(this, TimeCheckService.class));// Re-check time setting status
+        startService(new Intent(this, SurveyDownloadService.class));
+        DataPointUploadService.scheduleUpload(getApplicationContext(), false);
         finish();
     }
 

@@ -1,5 +1,13 @@
 Akvo FLOW app release notes
 ===========================
+# ver 2.6.3.1
+Date: 19 December 2018
+
+# Resolved issues
+* **Crash related to incorrect OkhttptClient use** - [#1271](https://github.com/akvo/akvo-flow-mobile/issues/1271) Avoid recreating okhttpClient but reuse them instead. 
+* **Datapoint status not updated correctly** - [#1273](https://github.com/akvo/akvo-flow-mobile/issues/1273) Datapoint syncing logic has been reviewed to avoid errors that could lead to status being incorrect.
+
+---------------
 # ver 2.6.3
 Date: 13 November 2018
 

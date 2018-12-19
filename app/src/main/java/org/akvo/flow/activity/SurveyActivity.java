@@ -54,6 +54,7 @@ import org.akvo.flow.domain.entity.User;
 import org.akvo.flow.domain.interactor.DefaultObserver;
 import org.akvo.flow.domain.interactor.UseCase;
 import org.akvo.flow.domain.util.VersionHelper;
+import org.akvo.flow.domain.util.GsonMapper;
 import org.akvo.flow.injector.component.ApplicationComponent;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
@@ -69,7 +70,7 @@ import org.akvo.flow.presentation.navigation.ViewUser;
 import org.akvo.flow.presentation.survey.SurveyPresenter;
 import org.akvo.flow.presentation.survey.SurveyView;
 import org.akvo.flow.service.BootstrapService;
-import org.akvo.flow.service.DataSyncService;
+import org.akvo.flow.service.DataFixService;
 import org.akvo.flow.service.SurveyDownloadService;
 import org.akvo.flow.service.TimeCheckService;
 import org.akvo.flow.ui.Navigator;
@@ -77,6 +78,7 @@ import org.akvo.flow.ui.fragment.DatapointsFragment;
 import org.akvo.flow.ui.fragment.RecordListListener;
 import org.akvo.flow.util.AppPermissionsHelper;
 import org.akvo.flow.util.ConstantUtil;
+import org.akvo.flow.util.PlatformUtil;
 import org.akvo.flow.util.StatusUtil;
 import org.akvo.flow.util.ViewUtil;
 
@@ -357,6 +359,7 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
         if (mDatabase != null) {
             mDatabase.close();
         }
+        getSelectedUser.dispose();
     }
 
     @Override
@@ -375,9 +378,21 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     }
 
     private void startServices() {
-        startService(new Intent(this, DataSyncService.class));
-        startService(new Intent(this, BootstrapService.class));
-        startService(new Intent(this, TimeCheckService.class));
+        if (!StatusUtil.hasExternalStorage()) {
+            ViewUtil.showConfirmDialog(R.string.checksd, R.string.sdmissing, this,
+                    false,
+                    new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            SurveyActivity.this.finish();
+                        }
+                    },
+                    null);
+        } else {
+            startService(new Intent(this, BootstrapService.class));
+            startService(new Intent(this, TimeCheckService.class));
+            DataFixService.enqueueWork(getApplicationContext(), new Intent());
+        }
     }
 
     private void displayExternalStorageMissing() {

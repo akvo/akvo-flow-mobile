@@ -67,6 +67,7 @@ import org.akvo.flow.presentation.SnackBarManager;
 import org.akvo.flow.presentation.form.FormPresenter;
 import org.akvo.flow.presentation.form.FormView;
 import org.akvo.flow.presentation.form.mobiledata.MobileDataSettingDialog;
+import org.akvo.flow.service.DataPointUploadService;
 import org.akvo.flow.ui.Navigator;
 import org.akvo.flow.ui.adapter.LanguageAdapter;
 import org.akvo.flow.ui.adapter.SurveyTabAdapter;
@@ -671,11 +672,6 @@ public class FormActivity extends BackActivity implements SurveyListener,
     public void onSurveySubmit() {
         recordDuration(false);
         saveState();
-
-        // if we have no missing responses, submit the survey
-        mDatabase.updateSurveyInstanceStatus(mSurveyInstanceId,
-                SurveyInstanceStatus.SUBMIT_REQUESTED);
-
         presenter.onSubmitPressed(mSurveyInstanceId);
     }
 
@@ -690,11 +686,13 @@ public class FormActivity extends BackActivity implements SurveyListener,
     }
 
     @Override
+    public void startSync(boolean isMobileSyncAllowed) {
+        DataPointUploadService.scheduleUpload(getApplicationContext(), isMobileSyncAllowed);
+    }
+
+    @Override
     public void dismiss() {
         mReadOnly = true;
-        //for data syncing to start
-        Intent i = new Intent(ConstantUtil.DATA_AVAILABLE_INTENT);
-        sendBroadcast(i);
         setResult(RESULT_OK);
         finish();
     }

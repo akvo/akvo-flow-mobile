@@ -20,25 +20,18 @@
 
 package org.akvo.flow.injector.module;
 
-import org.akvo.flow.domain.interactor.SingleThreadUseCase;
-import org.akvo.flow.domain.interactor.AllowedToConnect;
-import org.akvo.flow.domain.interactor.CheckDeviceNotifications;
-import org.akvo.flow.domain.interactor.CheckSubmittedFiles;
+import org.akvo.flow.domain.MobileUploadAllowed;
 import org.akvo.flow.domain.interactor.ClearAllData;
 import org.akvo.flow.domain.interactor.ClearResponses;
 import org.akvo.flow.domain.interactor.CopyFile;
 import org.akvo.flow.domain.interactor.CopyVideo;
 import org.akvo.flow.domain.interactor.DeleteSurvey;
-import org.akvo.flow.domain.interactor.ExportSurveyInstances;
-import org.akvo.flow.domain.interactor.apk.RefreshApkData;
-import org.akvo.flow.domain.interactor.forms.DownloadForm;
-import org.akvo.flow.domain.interactor.forms.DownloadForms;
+import org.akvo.flow.domain.interactor.ExportSurveyInstance;
 import org.akvo.flow.domain.interactor.GetAllSurveys;
 import org.akvo.flow.domain.interactor.GetIsDeviceSetUp;
 import org.akvo.flow.domain.interactor.GetPublishDataTime;
 import org.akvo.flow.domain.interactor.GetSavedDataPoints;
 import org.akvo.flow.domain.interactor.GetUserSettings;
-import org.akvo.flow.domain.interactor.MakeDataPrivate;
 import org.akvo.flow.domain.interactor.MobileUploadSet;
 import org.akvo.flow.domain.interactor.PublishData;
 import org.akvo.flow.domain.interactor.SaveAppLanguage;
@@ -49,13 +42,18 @@ import org.akvo.flow.domain.interactor.SaveKeepScreenOn;
 import org.akvo.flow.domain.interactor.SaveResizedImage;
 import org.akvo.flow.domain.interactor.SaveSelectedSurvey;
 import org.akvo.flow.domain.interactor.SetWalkthroughSeen;
+import org.akvo.flow.domain.interactor.SingleThreadUseCase;
+import org.akvo.flow.domain.interactor.SurveyDeviceNotifications;
 import org.akvo.flow.domain.interactor.UnSyncedTransmissionsExist;
-import org.akvo.flow.domain.interactor.UploadDataPoints;
+import org.akvo.flow.domain.interactor.UploadSurveyDataPoints;
 import org.akvo.flow.domain.interactor.UseCase;
 import org.akvo.flow.domain.interactor.WasWalkthroughSeen;
 import org.akvo.flow.domain.interactor.apk.GetApkData;
 import org.akvo.flow.domain.interactor.apk.GetApkDataPreferences;
+import org.akvo.flow.domain.interactor.apk.RefreshApkData;
 import org.akvo.flow.domain.interactor.apk.SaveApkUpdateNotified;
+import org.akvo.flow.domain.interactor.forms.DownloadForm;
+import org.akvo.flow.domain.interactor.forms.DownloadForms;
 import org.akvo.flow.domain.interactor.forms.ReloadForms;
 import org.akvo.flow.domain.interactor.setup.SaveSetup;
 import org.akvo.flow.domain.interactor.users.CreateUser;
@@ -83,12 +81,6 @@ public class ViewModule {
     @Named("getSavedDataPoints")
     UseCase provideGetSavedDataPointsUseCase(GetSavedDataPoints getSavedDataPoints) {
         return getSavedDataPoints;
-    }
-
-    @Provides
-    @Named("allowedToConnect")
-    UseCase provideAllowedToConnect(AllowedToConnect allowedToConnect) {
-        return allowedToConnect;
     }
 
     @Provides
@@ -248,39 +240,21 @@ public class ViewModule {
     }
 
     @Provides
-    @Named("makeDataPrivate")
-    UseCase provideMakeDataPrivate(MakeDataPrivate makeDataPrivate) {
-        return makeDataPrivate;
-    }
-
-    @Provides
     @Named("uploadSync")
-    UseCase provideUploadSync(UploadDataPoints uploadDataPoints) {
-        return uploadDataPoints;
-    }
-
-    @Provides
-    @Named("uploadAsync")
-    UseCase provideUploadAsync(UploadDataPoints uploadDataPoints) {
-        return uploadDataPoints;
+    UseCase provideUploadSync(UploadSurveyDataPoints uploadSurveyDataPoints) {
+        return uploadSurveyDataPoints;
     }
 
     @Provides
     @Named("checkDeviceNotification")
-    UseCase provideDeviceNotificationSync(CheckDeviceNotifications checkDeviceNotifications) {
-        return checkDeviceNotifications;
+    UseCase provideDeviceNotificationSync(SurveyDeviceNotifications surveyDeviceNotifications) {
+        return surveyDeviceNotifications;
     }
 
     @Provides
-    @Named("checkSubmittedFiles")
-    UseCase provideSubmittedFilesSync(CheckSubmittedFiles checkSubmittedFiles) {
-        return checkSubmittedFiles;
-    }
-
-    @Provides
-    @Named("exportSurveyInstances")
-    UseCase provideExportSurveyInstancesSync(ExportSurveyInstances exportSurveyInstances) {
-        return exportSurveyInstances;
+    @Named("exportSurveyInstance")
+    UseCase provideExportSurveyInstanceSync(ExportSurveyInstance exportSurveyInstance) {
+        return exportSurveyInstance;
     }
 
     @Provides
@@ -288,7 +262,13 @@ public class ViewModule {
     UseCase provideMobileUploadSet(MobileUploadSet mobileUploadSet) {
         return mobileUploadSet;
     }
-    
+
+    @Provides
+    @Named("mobileUploadAllowed")
+    UseCase provideAllowedToConnect(MobileUploadAllowed mobileUploadAllowed) {
+        return mobileUploadAllowed;
+    }
+
     @Provides
     @Named("getApkData")
     UseCase provideGetApkData(GetApkData getApkData) {

@@ -20,16 +20,10 @@
 
 package org.akvo.flow.data.net;
 
-import android.support.annotation.NonNull;
-
-import java.text.SimpleDateFormat;
-import java.util.concurrent.TimeUnit;
-
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import okhttp3.OkHttpClient;
-import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Converter;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
@@ -39,63 +33,35 @@ import retrofit2.converter.scalars.ScalarsConverterFactory;
 @Singleton
 public class RestServiceFactory {
 
-    private static final int CONNECTION_TIMEOUT = 10;
-    /**
-     * Requests to GAE take a long time especially when there are a lot of datapoints
-     */
-    private static final int NO_TIMEOUT = 0;
-
-    private final HttpLoggingInterceptor loggingInterceptor;
-    private final SimpleDateFormat dateFormat;
-    private final Encoder encoder;
-    private final String key;
-    private SignatureHelper signatureHelper;
+    private final OkHttpClient okHttpClientWithHmac;
+    private final OkHttpClient okHttpClient;
 
     @Inject
-    public RestServiceFactory(HttpLoggingInterceptor loggingInterceptor,
-            SimpleDateFormat simpleDateFormat, Encoder encoder, String key,
-            SignatureHelper signatureHelper) {
-        this.loggingInterceptor = loggingInterceptor;
-        this.dateFormat = simpleDateFormat;
-        this.encoder = encoder;
-        this.key = key;
-        this.signatureHelper = signatureHelper;
+    public RestServiceFactory(OkHttpClient okHttpClientWithHmac, OkHttpClient okHttpClient) {
+        this.okHttpClientWithHmac = okHttpClientWithHmac;
+        this.okHttpClient = okHttpClient;
     }
 
     public <T> T createRetrofitServiceWithInterceptor(final Class<T> clazz, String baseUrl) {
-        OkHttpClient.Builder httpClient = createHttpClient();
-        httpClient.addInterceptor(new HMACInterceptor(key, dateFormat, encoder, signatureHelper));
-        return createRetrofit(clazz, httpClient, baseUrl, GsonConverterFactory.create());
+        return createRetrofit(clazz, baseUrl, okHttpClientWithHmac, GsonConverterFactory.create());
     }
 
     public <T> T createRetrofitService(final Class<T> clazz, String baseUrl) {
-        OkHttpClient.Builder httpClient = createHttpClient();
-        return createRetrofit(clazz, httpClient, baseUrl, GsonConverterFactory.create());
+        return createRetrofit(clazz, baseUrl, okHttpClient, GsonConverterFactory.create());
     }
 
     public <T> T createScalarsRetrofitService(final Class<T> clazz, String baseUrl) {
-        OkHttpClient.Builder httpClient = createHttpClient();
-        return createRetrofit(clazz, httpClient, baseUrl, ScalarsConverterFactory.create());
+        return createRetrofit(clazz, okHttpClient, baseUrl, ScalarsConverterFactory.create());
     }
 
-
-    private <T> T createRetrofit(Class<T> clazz, OkHttpClient.Builder httpClient, String baseUrl,
-            Converter.Factory converter) {
+    private <T> T createRetrofit(Class<T> clazz, String baseUrl, OkHttpClient okHttpClient, Converter.Factory converter) {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(baseUrl)
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .addConverterFactory(converter)
-                .client(httpClient.build())
+                .client(okHttpClient)
                 .build();
         return retrofit.create(clazz);
     }
 
-    @NonNull
-    private OkHttpClient.Builder createHttpClient() {
-        OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
-        httpClient.addInterceptor(loggingInterceptor);
-        httpClient.connectTimeout(CONNECTION_TIMEOUT, TimeUnit.SECONDS);
-        httpClient.readTimeout(NO_TIMEOUT, TimeUnit.SECONDS);
-        return httpClient;
-    }
 }

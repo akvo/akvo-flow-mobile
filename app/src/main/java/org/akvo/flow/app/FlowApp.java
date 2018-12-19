@@ -21,7 +21,6 @@ package org.akvo.flow.app;
 
 import android.app.Application;
 import android.content.Context;
-import android.content.IntentFilter;
 import android.content.res.Configuration;
 import android.support.annotation.Nullable;
 import android.support.multidex.MultiDex;
@@ -32,7 +31,6 @@ import com.crashlytics.android.core.CrashlyticsCore;
 import com.squareup.leakcanary.LeakCanary;
 
 import org.akvo.flow.BuildConfig;
-import org.akvo.flow.broadcast.SyncDataReceiver;
 import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.domain.entity.User;
 import org.akvo.flow.domain.interactor.DefaultObserver;
@@ -100,8 +98,6 @@ public class FlowApp extends Application {
         startUpdateService();
         startBootstrapFolderTracker();
         updateLoggingInfo();
-        registerReceiver(new SyncDataReceiver(),
-                new IntentFilter(SyncDataReceiver.CONNECTIVITY_ACTION));
         saveConfig();
     }
 

@@ -20,27 +20,34 @@
 
 package org.akvo.flow.domain.interactor;
 
-import org.akvo.flow.domain.repository.FileRepository;
+import org.akvo.flow.domain.repository.SurveyRepository;
+import org.akvo.flow.domain.repository.UserRepository;
+
+import java.util.Set;
 
 import javax.inject.Inject;
 
 import io.reactivex.Observable;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Function;
 import io.reactivex.observers.DisposableObserver;
 
 /**
- * This is a single threaded UseCase to be used with IntentServices whose onHandleIntent method runs
- * on a worker thread
+ * Runs on the same thread as is called
  */
-public class MakeDataPrivate {
+public class UploadAllDataPoints {
 
-    private final FileRepository fileRepository;
+    private final SurveyRepository surveyRepository;
+    private final UserRepository userRepository;
     private final CompositeDisposable disposables;
 
+
     @Inject
-    protected MakeDataPrivate(FileRepository fileRepository) {
-        this.fileRepository = fileRepository;
+    protected UploadAllDataPoints(SurveyRepository surveyRepository,
+            UserRepository userRepository) {
+        this.surveyRepository = surveyRepository;
+        this.userRepository = userRepository;
         this.disposables = new CompositeDisposable();
     }
 
@@ -56,11 +63,17 @@ public class MakeDataPrivate {
         }
     }
 
-    private Observable buildUseCaseObservable() {
-        return fileRepository.moveFiles();
-    }
-
     private void addDisposable(Disposable disposable) {
         disposables.add(disposable);
+    }
+
+    private Observable buildUseCaseObservable() {
+        return userRepository.getDeviceId()
+                .concatMap(new Function<String, Observable<Set<String>>>() {
+                    @Override
+                    public Observable<Set<String>> apply(final String deviceId) {
+                        return surveyRepository.processTransmissions(deviceId);
+                    }
+                });
     }
 }

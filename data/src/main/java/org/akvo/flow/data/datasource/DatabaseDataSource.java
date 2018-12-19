@@ -367,7 +367,6 @@ public class DatabaseDataSource {
         return Observable.just(briteSurveyDbAdapter.getResponses(surveyInstanceId));
     }
 
-
     public Observable<Boolean> createTransmissions(final Long instanceId, final String formId,
             Set<String> filenames) {
         if (filenames == null || filenames.isEmpty()) {
@@ -422,6 +421,4 @@ public class DatabaseDataSource {
         briteSurveyDbAdapter.deleteAllSurveys();
         return Observable.just(true);
     }
-
-
 }

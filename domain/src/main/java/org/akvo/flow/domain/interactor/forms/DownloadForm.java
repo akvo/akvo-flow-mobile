@@ -52,7 +52,7 @@ public class DownloadForm extends UseCase {
     @Override
     protected <T> Observable buildUseCaseObservable(final Map<String, T> parameters) {
         if (parameters == null || !parameters.containsKey(FORM_ID_PARAM)) {
-            throw new IllegalArgumentException("missing form id");
+            return Observable.error(new IllegalArgumentException("missing form id"));
         }
         return userRepository.getDeviceId()
                 .concatMap(new Function<String, Observable<Boolean>>() {

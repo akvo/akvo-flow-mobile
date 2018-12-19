@@ -10,6 +10,7 @@
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES"/>
     <!-- For GcmTaskService -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
@@ -79,7 +80,10 @@
                 android:configChanges="locale|layoutDirection"
                 android:screenOrientation="landscape"/>
 
-        <service android:name=".service.DataSyncService"/>
+        <service
+                android:name=".service.DataFixService"
+                android:exported="false"
+                android:permission="android.permission.BIND_JOB_SERVICE"/>
         <service android:name=".service.SurveyDownloadService"/>
         <service android:name=".service.BootstrapService"/>
         <service android:name=".service.TimeCheckService"/>
@@ -100,13 +104,16 @@
                 <action android:name="com.google.android.gms.gcm.ACTION_TASK_READY"/>
             </intent-filter>
         </service>
-        <service android:name=".service.UnPublishDataService"/>
 
-        <receiver android:exported="false" android:name=".broadcast.SyncDataReceiver">
+        <service
+                android:name=".service.DataPointUploadService"
+                android:exported="true"
+                android:permission="com.google.android.gms.permission.BIND_NETWORK_TASK_SERVICE">
             <intent-filter>
-                <action android:name="org.akvo.flow.DATA_SUBMITTED"/>
+                <action android:name="com.google.android.gms.gcm.ACTION_TASK_READY" />
             </intent-filter>
-        </receiver>
+        </service>
+        <service android:name=".service.UnPublishDataService"/>
 
         <receiver android:name=".broadcast.BootStrapReceiver" android:exported="false">
             <intent-filter>

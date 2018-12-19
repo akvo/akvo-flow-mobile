@@ -20,11 +20,14 @@
 
 package org.akvo.flow.data.entity;
 
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.VisibleForTesting;
 import android.text.TextUtils;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -35,21 +38,21 @@ public class FilesResultMapper {
     public FilesResultMapper() {
     }
 
-    @Nullable
+    @NonNull
     public FilteredFilesResult transform(@Nullable ApiFilesResult apiFilesResult) {
         if (apiFilesResult == null) {
-            return null;
+            return new FilteredFilesResult(Collections.<String>emptyList(),
+                    Collections.<String>emptyList());
         }
-        List<String> missingFiles = apiFilesResult.getMissingFiles();
-        if (missingFiles == null) {
-            missingFiles = new ArrayList<>();
+        List<String> missingFilesRaw = new ArrayList<>();
+        if (apiFilesResult.getMissingFiles() != null ) {
+            missingFilesRaw.addAll(apiFilesResult.getMissingFiles());
         }
-        List<String> missingUnknown = apiFilesResult.getMissingUnknown();
-        if (missingUnknown != null) {
-            missingFiles.addAll(missingUnknown);
+        if (apiFilesResult.getMissingUnknown() != null) {
+            missingFilesRaw.addAll(apiFilesResult.getMissingUnknown());
         }
         List<String> missingFilenames = new ArrayList<>();
-        for (String f: missingFiles) {
+        for (String f: missingFilesRaw) {
             String filename = getFilenameFromPath(f);
             if (!TextUtils.isEmpty(filename)) {
                  missingFilenames.add(filename);
@@ -62,13 +65,15 @@ public class FilesResultMapper {
         return new FilteredFilesResult(missingFilenames, deletedForms);
     }
 
+    @VisibleForTesting
     @Nullable
-    private String getFilenameFromPath(@Nullable String filePath) {
-        String filename = null;
+    String getFilenameFromPath(@Nullable String filePath) {
+        String filename;
         if (!TextUtils.isEmpty(filePath) && filePath.contains(File.separator)
                 && filePath.contains(".")) {
             filename = filePath.substring(filePath.lastIndexOf(File.separator) + 1);
-
+        } else {
+            filename = filePath;
         }
         return filename;
     }

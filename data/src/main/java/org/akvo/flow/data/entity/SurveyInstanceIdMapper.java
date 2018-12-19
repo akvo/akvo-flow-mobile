@@ -18,19 +18,29 @@
  *
  */
 
-package org.akvo.flow.presentation.form;
+package org.akvo.flow.data.entity;
 
-public interface FormView {
+import android.database.Cursor;
 
-    void showLoading();
+import org.akvo.flow.database.TransmissionColumns;
 
-    void hideLoading();
+import javax.inject.Inject;
 
-    void dismiss();
+public class SurveyInstanceIdMapper {
 
-    void showErrorExport();
+    @Inject
+    public SurveyInstanceIdMapper() {
+    }
 
-    void showMobileUploadSetting(long surveyInstanceId);
-
-    void startSync(boolean isMobileSyncAllowed);
+    public long getSurveyInstanceIds(Cursor cursor) {
+        long instanceId = -1L;
+        if (cursor != null) {
+            if (cursor.moveToFirst()) {
+                final int formIdCol = cursor.getColumnIndexOrThrow(TransmissionColumns.SURVEY_ID);
+                instanceId = cursor.getLong(formIdCol);
+            }
+            cursor.close();
+        }
+        return instanceId;
+    }
 }

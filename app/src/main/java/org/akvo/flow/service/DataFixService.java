@@ -103,7 +103,6 @@ public class DataFixService extends JobIntentService {
             public void onComplete() {
                 export();
             }
-
         });
     }
 

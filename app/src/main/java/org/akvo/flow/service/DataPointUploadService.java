@@ -80,7 +80,6 @@ public class DataPointUploadService extends GcmTaskService {
         super.onCreate();
         FlowApp application = (FlowApp) getApplicationContext();
         application.getApplicationComponent().inject(this);
-        Timber.d("onCreate");
     }
 
     @Override
@@ -88,7 +87,6 @@ public class DataPointUploadService extends GcmTaskService {
         super.onDestroy();
         checkDeviceNotification.dispose();
         upload.dispose();
-        Timber.d("onDestroy");
     }
 
     @Override
@@ -105,33 +103,27 @@ public class DataPointUploadService extends GcmTaskService {
     @Override
     public void onInitializeTasks() {
         super.onInitializeTasks();
-        Timber.d("onInitializeTasks");
         scheduleUpload(getApplicationContext(), false);
     }
 
     @Override
     public int onRunTask(TaskParams taskParams) {
-        Timber.d("Starting task: "+ taskParams.toString());
         NotificationHelper.showSyncingNotification(getApplicationContext());
         checkDeviceNotification();
         NotificationHelper.hideSyncingNotification(getApplicationContext());
-        Timber.d("Task completed: "+ taskParams.toString());
         return GcmNetworkManager.RESULT_SUCCESS;
     }
 
     private void checkDeviceNotification() {
-        Timber.d("checkDeviceNotification");
         checkDeviceNotification.execute(new DefaultObserver<List<String>>() {
             @Override
             public void onError(Throwable e) {
-                Timber.d("checkDeviceNotification onError");
                 Timber.e(e);
                 uploadFiles();
             }
 
             @Override
             public void onNext(List<String> deletedFiles) {
-                Timber.d("checkDeviceNotification onNext");
                 for (String formId : deletedFiles) {
                     displayFormDeletedNotification(formId);
                 }
@@ -141,18 +133,15 @@ public class DataPointUploadService extends GcmTaskService {
     }
 
     private void uploadFiles() {
-        Timber.d("uploadFiles");
         upload.execute(new DefaultObserver<Set<String>>() {
             @Override
             public void onError(Throwable e) {
-                Timber.d("uploadFiles onError");
                 Timber.e(e);
                 broadcastDataPointStatusChange();
             }
 
             @Override
             public void onNext(Set<String> errorForms) {
-                Timber.d("uploadFiles onNext");
                 for (String formId : errorForms) {
                     displayErrorNotification(formId);
                 }

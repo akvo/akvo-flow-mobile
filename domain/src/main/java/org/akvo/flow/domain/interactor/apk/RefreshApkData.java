@@ -23,7 +23,6 @@ package org.akvo.flow.domain.interactor.apk;
 import android.os.Build;
 import android.support.annotation.Nullable;
 
-import org.akvo.flow.domain.interactor.SingleThreadUseCase;
 import org.akvo.flow.domain.entity.ApkData;
 import org.akvo.flow.domain.repository.ApkRepository;
 import org.akvo.flow.domain.repository.UserRepository;
@@ -34,16 +33,20 @@ import java.util.Map;
 import javax.inject.Inject;
 
 import io.reactivex.Observable;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.BiFunction;
 import io.reactivex.functions.Function;
+import io.reactivex.observers.DisposableObserver;
 
-public class RefreshApkData extends SingleThreadUseCase {
+public class RefreshApkData {
 
     public static final String APP_VERSION_PARAM = "version";
 
     private final ApkRepository apkRepository;
     private final UserRepository userRepository;
     private final VersionHelper versionHelper;
+    private final CompositeDisposable disposables;
 
     @Inject
     public RefreshApkData(ApkRepository apkRepository, UserRepository userRepository,
@@ -51,10 +54,26 @@ public class RefreshApkData extends SingleThreadUseCase {
         this.apkRepository = apkRepository;
         this.userRepository = userRepository;
         this.versionHelper = versionHelper;
+        this.disposables = new CompositeDisposable();
     }
 
-    @Override
-    protected <T> Observable<Boolean> buildUseCaseObservable(final Map<String, T> parameters) {
+    @SuppressWarnings("unchecked")
+    public <T> void execute(DisposableObserver<T> observer, final Map<String, Object> parameters) {
+        final Observable<T> observable = buildUseCaseObservable(parameters);
+        addDisposable(observable.subscribeWith(observer));
+    }
+
+    public void dispose() {
+        if (!disposables.isDisposed()) {
+            disposables.clear();
+        }
+    }
+
+    private void addDisposable(Disposable disposable) {
+        disposables.add(disposable);
+    }
+
+    private <T> Observable buildUseCaseObservable(final Map<String, T> parameters) {
         if (parameters == null || !parameters.containsKey(APP_VERSION_PARAM)) {
             throw new IllegalArgumentException("Missing params");
         }

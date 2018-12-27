@@ -55,9 +55,8 @@ public class FormHeaderParser {
 
     public List<ApiFormHeader> parseMultiple(final String response) {
         final List<ApiFormHeader> headers = new ArrayList<>();
-        String safeResponse = fixResponse(response);
-        if (!TextUtils.isEmpty(safeResponse)) {
-            final StringTokenizer strTok = new StringTokenizer(safeResponse, "\n");
+        if (!TextUtils.isEmpty(response)) {
+            final StringTokenizer strTok = new StringTokenizer(response, "\n");
             while (strTok.hasMoreTokens()) {
                 String currentLine = strTok.nextToken();
                 headers.add(parse(currentLine));

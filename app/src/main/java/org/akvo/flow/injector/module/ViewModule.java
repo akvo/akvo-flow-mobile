@@ -42,7 +42,6 @@ import org.akvo.flow.domain.interactor.SaveKeepScreenOn;
 import org.akvo.flow.domain.interactor.SaveResizedImage;
 import org.akvo.flow.domain.interactor.SaveSelectedSurvey;
 import org.akvo.flow.domain.interactor.SetWalkthroughSeen;
-import org.akvo.flow.domain.interactor.SingleThreadUseCase;
 import org.akvo.flow.domain.interactor.SurveyDeviceNotifications;
 import org.akvo.flow.domain.interactor.UnSyncedTransmissionsExist;
 import org.akvo.flow.domain.interactor.UploadSurveyDataPoints;
@@ -50,10 +49,8 @@ import org.akvo.flow.domain.interactor.UseCase;
 import org.akvo.flow.domain.interactor.WasWalkthroughSeen;
 import org.akvo.flow.domain.interactor.apk.GetApkData;
 import org.akvo.flow.domain.interactor.apk.GetApkDataPreferences;
-import org.akvo.flow.domain.interactor.apk.RefreshApkData;
 import org.akvo.flow.domain.interactor.apk.SaveApkUpdateNotified;
 import org.akvo.flow.domain.interactor.forms.DownloadForm;
-import org.akvo.flow.domain.interactor.forms.DownloadForms;
 import org.akvo.flow.domain.interactor.forms.ReloadForms;
 import org.akvo.flow.domain.interactor.setup.SaveSetup;
 import org.akvo.flow.domain.interactor.users.CreateUser;
@@ -288,12 +285,6 @@ public class ViewModule {
     }
 
     @Provides
-    @Named("refreshApk")
-    SingleThreadUseCase provideRefreshApkData(RefreshApkData refreshApkData) {
-        return refreshApkData;
-    }
-
-    @Provides
     @Named("downloadForm")
     UseCase provideDownloadForm(DownloadForm downloadForm) {
         return downloadForm;
@@ -303,11 +294,5 @@ public class ViewModule {
     @Named("reloadForms")
     UseCase provideReloadForms(ReloadForms reloadForms) {
         return reloadForms;
-    }
-
-    @Provides
-    @Named("downloadForms")
-    SingleThreadUseCase provideDownloadForms(DownloadForms downloadForms) {
-        return downloadForms;
     }
 }

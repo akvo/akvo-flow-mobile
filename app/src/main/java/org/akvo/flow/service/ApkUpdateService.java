@@ -32,7 +32,6 @@ import org.akvo.flow.BuildConfig;
 import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.domain.entity.ApkData;
 import org.akvo.flow.domain.interactor.DefaultObserver;
-import org.akvo.flow.domain.interactor.SingleThreadUseCase;
 import org.akvo.flow.domain.interactor.apk.RefreshApkData;
 import org.akvo.flow.util.ConstantUtil;
 
@@ -40,7 +39,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 
 import timber.log.Timber;
 
@@ -59,8 +57,7 @@ public class ApkUpdateService extends GcmTaskService {
     private static final String TAG = "APK_UPDATE_SERVICE";
 
     @Inject
-    @Named("refreshApk")
-    SingleThreadUseCase refreshApkData;
+    RefreshApkData refreshApkData;
 
     public static void scheduleFirstTask(Context context) {
         schedulePeriodicTask(context, ConstantUtil.FIRST_REPEAT_INTERVAL_IN_SECONDS,
@@ -142,7 +139,7 @@ public class ApkUpdateService extends GcmTaskService {
         //after the first time the task is run we reschedule to a higher interval
         schedulePeriodicTask(this, ConstantUtil.REPEAT_INTERVAL_IN_SECONDS,
                 ConstantUtil.FLEX_INTERVAL_IN_SECONDS);
-        Map<String, String> params = new HashMap<>(2);
+        Map<String, Object> params = new HashMap<>(2);
         params.put(RefreshApkData.APP_VERSION_PARAM, BuildConfig.VERSION_NAME);
         refreshApkData.execute(new DefaultObserver<ApkData>() {
             @Override

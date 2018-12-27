@@ -20,31 +20,48 @@
 
 package org.akvo.flow.domain.interactor.forms;
 
-import org.akvo.flow.domain.interactor.SingleThreadUseCase;
 import org.akvo.flow.domain.repository.FormRepository;
 import org.akvo.flow.domain.repository.UserRepository;
-
-import java.util.Map;
 
 import javax.inject.Inject;
 
 import io.reactivex.Observable;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Function;
+import io.reactivex.observers.DisposableObserver;
 
-public class DownloadForms extends SingleThreadUseCase {
+public class DownloadForms {
 
     private final FormRepository formRepository;
     private final UserRepository userRepository;
+    private final CompositeDisposable disposables;
 
     @Inject
-    public DownloadForms(FormRepository formRepository,
+    protected DownloadForms(FormRepository formRepository,
             UserRepository userRepository) {
         this.formRepository = formRepository;
         this.userRepository = userRepository;
+        this.disposables = new CompositeDisposable();
     }
 
-    @Override
-    protected <T> Observable buildUseCaseObservable(Map<String, T> parameters) {
+    @SuppressWarnings("unchecked")
+    public <T> void execute(DisposableObserver<T> observer) {
+        final Observable<T> observable = buildUseCaseObservable();
+        addDisposable(observable.subscribeWith(observer));
+    }
+
+    public void dispose() {
+        if (!disposables.isDisposed()) {
+            disposables.clear();
+        }
+    }
+
+    private void addDisposable(Disposable disposable) {
+        disposables.add(disposable);
+    }
+
+    private Observable buildUseCaseObservable() {
         return userRepository.getDeviceId()
                 .concatMap(new Function<String, Observable<Integer>>() {
                     @Override

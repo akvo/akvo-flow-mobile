@@ -26,12 +26,11 @@ import android.support.annotation.Nullable;
 import org.akvo.flow.R;
 import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.domain.interactor.DefaultObserver;
-import org.akvo.flow.domain.interactor.SingleThreadUseCase;
+import org.akvo.flow.domain.interactor.forms.DownloadForms;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.NotificationHelper;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 
 import timber.log.Timber;
 
@@ -45,8 +44,7 @@ public class SurveyDownloadService extends IntentService {
     private static final String TAG = "SURVEY_DOWNLOAD_SERVICE";
 
     @Inject
-    @Named("downloadForms")
-    SingleThreadUseCase downloadForms;
+    DownloadForms downloadForms;
 
     public SurveyDownloadService() {
         super(TAG);
@@ -70,7 +68,7 @@ public class SurveyDownloadService extends IntentService {
             public void onNext(Integer downloaded) {
                 displayNotification(downloaded, 0, downloaded);
             }
-        }, null);
+        });
     }
 
     @Override

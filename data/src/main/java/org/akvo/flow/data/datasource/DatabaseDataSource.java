@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -24,16 +24,21 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 
 import com.squareup.sqlbrite2.BriteDatabase;
 
 import org.akvo.flow.data.entity.ApiDataPoint;
+import org.akvo.flow.data.entity.ApiFormHeader;
 import org.akvo.flow.data.entity.ApiQuestionAnswer;
 import org.akvo.flow.data.entity.ApiSurveyInstance;
 import org.akvo.flow.data.entity.SurveyInstanceIdMapper;
+import org.akvo.flow.data.util.FlowFileBrowser;
 import org.akvo.flow.database.Constants;
 import org.akvo.flow.database.RecordColumns;
 import org.akvo.flow.database.ResponseColumns;
+import org.akvo.flow.database.SurveyColumns;
+import org.akvo.flow.database.SurveyGroupColumns;
 import org.akvo.flow.database.SurveyInstanceColumns;
 import org.akvo.flow.database.SurveyInstanceStatus;
 import org.akvo.flow.database.SyncTimeColumns;
@@ -52,6 +57,10 @@ import io.reactivex.functions.Function;
 import io.reactivex.functions.Predicate;
 
 public class DatabaseDataSource {
+
+    private static final String DEFAULTS_SURVEY_LANGUAGE = "en";
+    private static final String DEFAULT_SURVEY_TYPE = "survey";
+    public static final String DEFAULT_SURVEY_LOCATION = "sdcard";
 
     private final BriteSurveyDbAdapter briteSurveyDbAdapter;
     private final SurveyInstanceIdMapper surveyInstanceIdMapper;
@@ -363,7 +372,6 @@ public class DatabaseDataSource {
         return Observable.just(briteSurveyDbAdapter.getResponses(surveyInstanceId));
     }
 
-
     public Observable<Boolean> createTransmissions(final Long instanceId, final String formId,
             Set<String> filenames) {
         if (filenames == null || filenames.isEmpty()) {
@@ -371,5 +379,53 @@ public class DatabaseDataSource {
         }
         briteSurveyDbAdapter.createTransmissions(instanceId, formId, filenames);
         return Observable.just(true);
+    }
+
+    public Observable<Boolean> installTestForm() {
+        briteSurveyDbAdapter.installTestForm();
+        return Observable.just(true);
+    }
+
+    public Observable<Boolean> insertSurveyGroup(ApiFormHeader apiFormHeader) {
+        ContentValues values = new ContentValues();
+        values.put(SurveyGroupColumns.SURVEY_GROUP_ID, apiFormHeader.getGroupId());
+        values.put(SurveyGroupColumns.NAME, apiFormHeader.getGroupName());
+        values.put(SurveyGroupColumns.REGISTER_SURVEY_ID, apiFormHeader.getRegistrationSurveyId());
+        values.put(SurveyGroupColumns.MONITORED, apiFormHeader.isMonitored() ? 1 : 0);
+        briteSurveyDbAdapter.addSurveyGroup(values);
+        return Observable.just(true);
+    }
+
+    public Observable<Boolean> formNeedsUpdate(ApiFormHeader apiFormHeader) {
+        final boolean surveyUpToDate = briteSurveyDbAdapter
+                .isSurveyUpToDate(apiFormHeader.getId(), apiFormHeader.getVersion());
+        return Observable.just(!surveyUpToDate);
+    }
+
+    public Observable<Boolean> insertSurvey(ApiFormHeader formHeader,
+            boolean cascadeResourcesDownloaded) {
+        ContentValues updatedValues = new ContentValues();
+        updatedValues.put(SurveyColumns.SURVEY_ID, formHeader.getId());
+        updatedValues.put(SurveyColumns.VERSION, formHeader.getVersion());
+        updatedValues.put(SurveyColumns.TYPE, DEFAULT_SURVEY_TYPE);
+        updatedValues.put(SurveyColumns.LOCATION, DEFAULT_SURVEY_LOCATION);
+        updatedValues.put(SurveyColumns.FILENAME, formHeader.getId() + FlowFileBrowser.XML_SUFFIX);
+        updatedValues.put(SurveyColumns.NAME, formHeader.getName());
+        updatedValues.put(SurveyColumns.LANGUAGE, getFormLanguage(formHeader));
+        updatedValues.put(SurveyColumns.SURVEY_GROUP_ID, formHeader.getGroupId());
+        updatedValues.put(SurveyColumns.HELP_DOWNLOADED, cascadeResourcesDownloaded? 1: 0);
+        briteSurveyDbAdapter.updateSurvey(updatedValues, formHeader.getId());
+        return Observable.just(true);
+    }
+
+    public Observable<Boolean> deleteAllForms() {
+        briteSurveyDbAdapter.deleteAllSurveys();
+        return Observable.just(true);
+    }
+
+    @NonNull
+    private String getFormLanguage(ApiFormHeader formHeader) {
+        final String language = formHeader != null ? formHeader.getLanguage() : "";
+        return TextUtils.isEmpty(language) ? DEFAULTS_SURVEY_LANGUAGE : language.toLowerCase();
     }
 }

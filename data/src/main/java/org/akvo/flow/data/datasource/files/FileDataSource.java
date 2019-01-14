@@ -29,7 +29,10 @@ import org.akvo.flow.data.util.FileHelper;
 import org.akvo.flow.data.util.FlowFileBrowser;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,6 +40,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import io.reactivex.Observable;
+import okhttp3.ResponseBody;
 import timber.log.Timber;
 
 @Singleton
@@ -68,16 +72,12 @@ public class FileDataSource {
 
     public Observable<Boolean> copyFile(String originFilePath, String destinationFilePath) {
         File originalFile = new File(originFilePath);
-        try {
-            File destinationFile = new File(destinationFilePath);
-            String copiedFilePath = fileHelper.copyFile(originalFile, destinationFile);
-            if (copiedFilePath == null) {
-                return Observable.error(new Exception("Error copying video file"));
-            }
-            return Observable.just(true);
-        } catch (IOException e) {
-            return Observable.error(e);
+        File destinationFile = new File(destinationFilePath);
+        String copiedFilePath = fileHelper.copyFile(originalFile, destinationFile);
+        if (copiedFilePath == null) {
+            return Observable.error(new Exception("Error copying video file"));
         }
+        return Observable.just(true);
     }
 
     private List<String> moveFiles(String folderName) {
@@ -99,17 +99,12 @@ public class FileDataSource {
         if (files != null) {
             File folder = getPrivateFolder(folderName);
             for (File f : files) {
-                try {
-                    String destinationPath = fileHelper.copyFileToFolder(f, folder);
-                    if (!TextUtils.isEmpty(destinationPath)) {
-                        movedFiles.add(destinationPath);
-                        //noinspection ResultOfMethodCallIgnored
-                        f.delete();
-                    }
-                } catch (IOException e) {
-                    Timber.e(e);
+                String destinationPath = fileHelper.copyFileToFolder(f, folder);
+                if (!TextUtils.isEmpty(destinationPath)) {
+                    movedFiles.add(destinationPath);
+                    //noinspection ResultOfMethodCallIgnored
+                    f.delete();
                 }
-
             }
         }
         return movedFiles;
@@ -125,19 +120,15 @@ public class FileDataSource {
     }
 
     public Observable<Boolean> publishFiles(List<String> fileNames) {
-        try {
-            boolean dataCopied = copyPrivateFileToAppExternalFolder(FlowFileBrowser.DIR_DATA,
-                    FlowFileBrowser.DIR_PUBLISHED_DATA, fileNames);
-            boolean mediaCopied = copyPrivateFileToAppExternalFolder(FlowFileBrowser.DIR_MEDIA,
-                    FlowFileBrowser.DIR_PUBLISHED_MEDIA, fileNames);
-            return Observable.just(dataCopied || mediaCopied);
-        } catch (IOException e) {
-            return Observable.error(e);
-        }
+        boolean dataCopied = copyPrivateFileToAppExternalFolder(FlowFileBrowser.DIR_DATA,
+                FlowFileBrowser.DIR_PUBLISHED_DATA, fileNames);
+        boolean mediaCopied = copyPrivateFileToAppExternalFolder(FlowFileBrowser.DIR_MEDIA,
+                FlowFileBrowser.DIR_PUBLISHED_MEDIA, fileNames);
+        return Observable.just(dataCopied || mediaCopied);
     }
 
     private boolean copyPrivateFileToAppExternalFolder(String privateFolderName,
-            String publicFolderName, List<String> fileNames) throws IOException {
+            String publicFolderName, List<String> fileNames) {
         boolean filesCopied = false;
         File destinationDataFolder = flowFileBrowser.getAppExternalFolder(publicFolderName);
         if (destinationDataFolder != null && !destinationDataFolder.exists()) {
@@ -217,12 +208,30 @@ public class FileDataSource {
     }
 
     public Observable<Boolean> writeDataToZipFile(String zipFileName, String formInstanceData) {
-        File folder = flowFileBrowser.getExistingAppExternalFolder(FlowFileBrowser.DIR_DATA);
+        File folder = flowFileBrowser.getExistingAppInternalFolder(FlowFileBrowser.DIR_DATA);
         try {
             fileHelper.writeZipFile(folder, zipFileName, formInstanceData);
             return Observable.just(true);
         } catch (IOException e) {
             return Observable.error(e);
         }
+    }
+
+    public Observable<Boolean> extractRemoteArchive(ResponseBody responseBody, String folderName) {
+        File formFolder = flowFileBrowser.getExistingAppInternalFolder(folderName);
+        fileHelper.extractOnlineArchive(responseBody, formFolder);
+        return Observable.just(true);
+    }
+
+    public Observable<InputStream> getFormFile(String id) {
+        File formFolder = flowFileBrowser.getExistingAppInternalFolder(FlowFileBrowser.DIR_FORMS);
+        InputStream input;
+        try {
+            input = new FileInputStream(new File(formFolder, id + FlowFileBrowser.XML_SUFFIX));
+        } catch (FileNotFoundException e) {
+            Timber.e(e);
+            return Observable.error(e);
+        }
+        return Observable.just(input);
     }
 }

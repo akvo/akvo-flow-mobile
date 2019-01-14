@@ -88,7 +88,7 @@ public class SurveyDataRepository implements SurveyRepository {
     private final SurveyMapper surveyMapper;
     private final UserMapper userMapper;
     private final TransmissionFilenameMapper transmissionFileMapper;
-    private final FormIdMapper surveyIdMapper;
+    private final FormIdMapper formIdMapper;
     private final FilesResultMapper filesResultMapper;
     private final TransmissionMapper transmissionMapper;
     private final FormInstanceMapper formInstanceMapper;
@@ -99,7 +99,7 @@ public class SurveyDataRepository implements SurveyRepository {
     public SurveyDataRepository(DataSourceFactory dataSourceFactory,
             DataPointMapper dataPointMapper, SyncedTimeMapper syncedTimeMapper, RestApi restApi,
             SurveyMapper surveyMapper, UserMapper userMapper,
-            TransmissionFilenameMapper transmissionFilenameMapper, FormIdMapper surveyIdMapper,
+            TransmissionFilenameMapper transmissionFilenameMapper, FormIdMapper formIdMapper,
             FilesResultMapper filesResultMapper, TransmissionMapper transmissionMapper,
             FormInstanceMapper formInstanceMapper,
             FormInstanceMetadataMapper formInstanceMetadataMapper) {
@@ -110,7 +110,7 @@ public class SurveyDataRepository implements SurveyRepository {
         this.surveyMapper = surveyMapper;
         this.userMapper = userMapper;
         this.transmissionFileMapper = transmissionFilenameMapper;
-        this.surveyIdMapper = surveyIdMapper;
+        this.formIdMapper = formIdMapper;
         this.filesResultMapper = filesResultMapper;
         this.transmissionMapper = transmissionMapper;
         this.formInstanceMapper = formInstanceMapper;
@@ -172,26 +172,26 @@ public class SurveyDataRepository implements SurveyRepository {
         return downloadDataPoints(surveyGroupId, state)
                 .doOnNext(new Consumer<State>() {
                     @Override
-                    public void accept(@NonNull State state) throws Exception {
+                    public void accept(@NonNull State state) {
                         List<ApiDataPoint> lastBatch = state.getLastBatch();
                         dataSourceFactory.getDataBaseDataSource().syncDataPoints(lastBatch);
                     }
                 })
                 .repeatWhen(new Function<Flowable<Object>, Publisher<?>>() {
                     @Override
-                    public Publisher<?> apply(@NonNull Flowable<Object> flowable) throws Exception {
+                    public Publisher<?> apply(@NonNull Flowable<Object> flowable) {
                         return flowable.delay(15, TimeUnit.SECONDS);
                     }
                 })
                 .takeUntil(new Predicate<State>() {
                     @Override
-                    public boolean test(State state) throws Exception {
+                    public boolean test(State state) {
                         return state.getLastBatch().isEmpty();
                     }
                 })
                 .filter(new Predicate<State>() {
                     @Override
-                    public boolean test(State state) throws Exception {
+                    public boolean test(State state) {
                         return state.getLastBatch().isEmpty();
                     }
                 })
@@ -207,14 +207,13 @@ public class SurveyDataRepository implements SurveyRepository {
             final State state) {
         return Flowable.defer(new Callable<Flowable<ApiLocaleResult>>() {
             @Override
-            public Flowable<ApiLocaleResult> call() throws Exception {
+            public Flowable<ApiLocaleResult> call() {
                 return restApi.downloadDataPoints(surveyGroupId,
                         state.getTimestamp());
             }
         }).map(new Function<ApiLocaleResult, List<ApiDataPoint>>() {
             @Override
-            public List<ApiDataPoint> apply(@NonNull ApiLocaleResult apiLocaleResult)
-                    throws Exception {
+            public List<ApiDataPoint> apply(@NonNull ApiLocaleResult apiLocaleResult) {
                 if (apiLocaleResult == null || apiLocaleResult.getDataPoints() == null) {
                     return Collections.emptyList();
                 }
@@ -224,8 +223,7 @@ public class SurveyDataRepository implements SurveyRepository {
             }
         }).concatMap(new Function<List<ApiDataPoint>, Flowable<State>>() {
             @Override
-            public Flowable<State> apply(@NonNull List<ApiDataPoint> dataPoints)
-                    throws Exception {
+            public Flowable<State> apply(@NonNull List<ApiDataPoint> dataPoints) {
                 return filterDataPoints(dataPoints, state);
             }
         });
@@ -236,7 +234,7 @@ public class SurveyDataRepository implements SurveyRepository {
         return Flowable.fromIterable(dataPoints)
                 .filter(new Predicate<ApiDataPoint>() {
                     @Override
-                    public boolean test(@NonNull ApiDataPoint apiDataPoint) throws Exception {
+                    public boolean test(@NonNull ApiDataPoint apiDataPoint) {
                         List<ApiSurveyInstance> instances = apiDataPoint.getSurveyInstances();
                         return instances != null && !instances.isEmpty();
                     }
@@ -244,8 +242,7 @@ public class SurveyDataRepository implements SurveyRepository {
                 .toList()
                 .flatMap(new Function<List<ApiDataPoint>, SingleSource<State>>() {
                     @Override
-                    public SingleSource<State> apply(@NonNull List<ApiDataPoint> points)
-                            throws Exception {
+                    public SingleSource<State> apply(@NonNull List<ApiDataPoint> points) {
                         state.update(points);
                         return Single.just(state);
                     }
@@ -362,7 +359,7 @@ public class SurveyDataRepository implements SurveyRepository {
                 .map(new Function<Cursor, List<String>>() {
                     @Override
                     public List<String> apply(Cursor cursor) {
-                        return surveyIdMapper.mapToFormId(cursor);
+                        return formIdMapper.mapToFormId(cursor);
                     }
                 });
     }
@@ -372,7 +369,7 @@ public class SurveyDataRepository implements SurveyRepository {
                 .map(new Function<Cursor, List<String>>() {
                     @Override
                     public List<String> apply(Cursor cursor) {
-                        return surveyIdMapper.mapToFormId(cursor);
+                        return formIdMapper.mapToFormId(cursor);
                     }
                 });
     }

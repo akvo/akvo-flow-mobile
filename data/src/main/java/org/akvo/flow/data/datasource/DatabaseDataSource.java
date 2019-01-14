@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -33,6 +33,7 @@ import org.akvo.flow.data.entity.ApiFormHeader;
 import org.akvo.flow.data.entity.ApiQuestionAnswer;
 import org.akvo.flow.data.entity.ApiSurveyInstance;
 import org.akvo.flow.data.entity.SurveyInstanceIdMapper;
+import org.akvo.flow.data.util.FlowFileBrowser;
 import org.akvo.flow.database.Constants;
 import org.akvo.flow.database.RecordColumns;
 import org.akvo.flow.database.ResponseColumns;
@@ -56,6 +57,10 @@ import io.reactivex.functions.Function;
 import io.reactivex.functions.Predicate;
 
 public class DatabaseDataSource {
+
+    private static final String DEFAULTS_SURVEY_LANGUAGE = "en";
+    private static final String DEFAULT_SURVEY_TYPE = "survey";
+    public static final String DEFAULT_SURVEY_LOCATION = "sdcard";
 
     private final BriteSurveyDbAdapter briteSurveyDbAdapter;
     private final SurveyInstanceIdMapper surveyInstanceIdMapper;
@@ -376,8 +381,8 @@ public class DatabaseDataSource {
         return Observable.just(true);
     }
 
-    public Observable<Boolean> reinstallTestSurvey() {
-        briteSurveyDbAdapter.reinstallTestSurvey();
+    public Observable<Boolean> installTestForm() {
+        briteSurveyDbAdapter.installTestForm();
         return Observable.just(true);
     }
 
@@ -397,20 +402,16 @@ public class DatabaseDataSource {
         return Observable.just(!surveyUpToDate);
     }
 
-    //TODO: extract constants
     public Observable<Boolean> insertSurvey(ApiFormHeader formHeader,
             boolean cascadeResourcesDownloaded) {
-        String language = TextUtils.isEmpty(formHeader.getLanguage()) ?
-                "en" :
-                formHeader.getLanguage().toLowerCase();
         ContentValues updatedValues = new ContentValues();
         updatedValues.put(SurveyColumns.SURVEY_ID, formHeader.getId());
         updatedValues.put(SurveyColumns.VERSION, formHeader.getVersion());
-        updatedValues.put(SurveyColumns.TYPE, "survey");
-        updatedValues.put(SurveyColumns.LOCATION, "sdcard");
-        updatedValues.put(SurveyColumns.FILENAME, formHeader.getId() + ".xml");
+        updatedValues.put(SurveyColumns.TYPE, DEFAULT_SURVEY_TYPE);
+        updatedValues.put(SurveyColumns.LOCATION, DEFAULT_SURVEY_LOCATION);
+        updatedValues.put(SurveyColumns.FILENAME, formHeader.getId() + FlowFileBrowser.XML_SUFFIX);
         updatedValues.put(SurveyColumns.NAME, formHeader.getName());
-        updatedValues.put(SurveyColumns.LANGUAGE, language);
+        updatedValues.put(SurveyColumns.LANGUAGE, getFormLanguage(formHeader));
         updatedValues.put(SurveyColumns.SURVEY_GROUP_ID, formHeader.getGroupId());
         updatedValues.put(SurveyColumns.HELP_DOWNLOADED, cascadeResourcesDownloaded? 1: 0);
         briteSurveyDbAdapter.updateSurvey(updatedValues, formHeader.getId());
@@ -420,5 +421,11 @@ public class DatabaseDataSource {
     public Observable<Boolean> deleteAllForms() {
         briteSurveyDbAdapter.deleteAllSurveys();
         return Observable.just(true);
+    }
+
+    @NonNull
+    private String getFormLanguage(ApiFormHeader formHeader) {
+        final String language = formHeader != null ? formHeader.getLanguage() : "";
+        return TextUtils.isEmpty(language) ? DEFAULTS_SURVEY_LANGUAGE : language.toLowerCase();
     }
 }

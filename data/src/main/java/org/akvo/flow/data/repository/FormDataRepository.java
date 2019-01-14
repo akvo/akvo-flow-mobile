@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2018-2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -45,6 +45,7 @@ import timber.log.Timber;
 
 public class FormDataRepository implements FormRepository {
 
+    public static final String TEST_FORM_ID = "0";
     private final FormHeaderParser formHeaderParser;
     private final XmlParser xmlParser;
     private final RestApi restApi;
@@ -63,18 +64,16 @@ public class FormDataRepository implements FormRepository {
         this.formIdMapper = formIdMapper;
     }
 
-    //TODO: extract constant
     @Override
     public Observable<Boolean> loadForm(String formId, String deviceId) {
         final DatabaseDataSource dataBaseDataSource = dataSourceFactory.getDataBaseDataSource();
-        if ("0".equals(formId)) {
-            return dataBaseDataSource.reinstallTestSurvey();
+        if (TEST_FORM_ID.equals(formId)) {
+            return dataBaseDataSource.installTestForm();
         } else {
             return downloadFormHeader(formId, deviceId);
         }
     }
 
-    //TODO: handle errors
     @Override
     public Observable<Integer> reloadForms(final String deviceId) {
         final DatabaseDataSource dataBaseDataSource = dataSourceFactory.getDataBaseDataSource();
@@ -139,7 +138,6 @@ public class FormDataRepository implements FormRepository {
                 });
     }
 
-    //TODO: check for errors
     private Observable<Integer> downloadForms(List<ApiFormHeader> apiFormHeaders) {
         return Observable.fromIterable(apiFormHeaders)
                 .concatMap(new Function<ApiFormHeader, Observable<Boolean>>() {
@@ -166,7 +164,6 @@ public class FormDataRepository implements FormRepository {
                 });
     }
 
-    //TODO: check errors
     private Observable<Integer> downloadForms(List<String> formIds, final String deviceId) {
         return Observable.fromIterable(formIds)
                 .concatMap(new Function<String, Observable<Boolean>>() {

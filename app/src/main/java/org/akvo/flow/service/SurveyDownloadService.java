@@ -82,5 +82,4 @@ public class SurveyDownloadService extends IntentService {
         super.onDestroy();
         downloadForms.dispose();
     }
-
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010-2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2010-2019 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -58,15 +58,21 @@ public class SurveyDownloadService extends IntentService {
     }
 
     public void onHandleIntent(@Nullable Intent intent) {
+        NotificationHelper
+                .displayFormsSyncingNotification(getApplicationContext());
         downloadForms.execute(new DefaultObserver<Integer>(){
-            @Override 
+            @Override
             public void onError(Throwable e) {
                 Timber.e(e);
+                NotificationHelper
+                        .displayErrorNotification(getString(R.string.error_form_sync_title),
+                                "", getApplicationContext(), ConstantUtil.NOTIFICATION_FORM);
             }
 
             @Override 
             public void onNext(Integer downloaded) {
-                displayNotification(downloaded, 0, downloaded);
+                NotificationHelper
+                        .displayFormsSyncedNotification(getApplicationContext(), downloaded);
             }
         });
     }
@@ -77,16 +83,4 @@ public class SurveyDownloadService extends IntentService {
         downloadForms.dispose();
     }
 
-    private void displayNotification(int synced, int failed, int total) {
-        boolean finished = synced + failed >= total;
-        String title = getString(R.string.downloading_forms);
-        // Do not show failed if there is none
-        String text = failed > 0 ? String.format(getString(R.string.data_sync_all),
-                synced, failed)
-                : String.format(getString(R.string.data_sync_synced), synced);
-
-        NotificationHelper.displayNotification(this, total, title, text,
-                ConstantUtil.NOTIFICATION_FORMS_SYNCED, !finished,
-                synced + failed);
-    }
 }

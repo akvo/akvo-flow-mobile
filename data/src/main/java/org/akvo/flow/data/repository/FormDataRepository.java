@@ -45,7 +45,8 @@ import timber.log.Timber;
 
 public class FormDataRepository implements FormRepository {
 
-    public static final String TEST_FORM_ID = "0";
+    private static final String TEST_FORM_ID = "0";
+    
     private final FormHeaderParser formHeaderParser;
     private final XmlParser xmlParser;
     private final RestApi restApi;

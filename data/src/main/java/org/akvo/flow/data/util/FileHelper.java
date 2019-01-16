@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2018-2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -50,7 +50,8 @@ public class FileHelper {
 
     private static final int BUFFER_SIZE = 2048;
 
-    @Inject FileHelper() {
+    @Inject
+    FileHelper() {
     }
 
     /**
@@ -177,7 +178,6 @@ public class FileHelper {
         fout.close();
     }
 
-    //TODO: check errors
     public void extractOnlineArchive(ResponseBody responseBody, File targetFolder) {
         InputStream inputStream = responseBody.byteStream();
         extractZipContent(inputStream, targetFolder);

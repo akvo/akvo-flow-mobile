@@ -26,6 +26,7 @@ import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.StringRes;
 import android.support.design.widget.AppBarLayout;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.content.ContextCompat;
@@ -66,7 +67,8 @@ public class PreferenceActivity extends BackActivity implements PreferenceView,
         PassCodeDownloadFormDialog.PassCodeDownloadFormListener,
         PassCodeReloadFormsDialog.PassCodeReloadFormsListener,
         DeleteResponsesWarningDialog.DeleteResponsesListener,
-        DeleteAllWarningDialog.DeleteAllListener {
+        DeleteAllWarningDialog.DeleteAllListener, DownloadFormDialog.DownloadFormListener,
+        ReloadFormsConfirmationDialog.ReloadFormsListener {
 
     @Inject
     Navigator navigator;
@@ -364,7 +366,32 @@ public class PreferenceActivity extends BackActivity implements PreferenceView,
         finish();
     }
 
-    private void showMessage(int resId) {
+    @Override
+    public void downloadForm(String formId) {
+        presenter.downloadForm(formId);
+    }
+
+    @Override
+    public void reloadFormsConfirmed() {
+        presenter.reloadForms();
+    }
+
+    @Override
+    public void showDownloadFormsError(int numberOfForms) {
+        showQuantityMessage(R.plurals.download_forms_error, numberOfForms);
+    }
+
+    @Override
+    public void showDownloadFormsSuccess(int numberOfForms) {
+        showQuantityMessage(R.plurals.download_forms_success, numberOfForms);
+    }
+
+    private void showMessage(@StringRes int resId) {
         snackBarManager.displaySnackBar(instanceNameTv, resId, this);
+    }
+
+    private void showQuantityMessage(int resId, int quantity) {
+        String message = getResources().getQuantityString(resId, quantity);
+        snackBarManager.displaySnackBar(instanceNameTv, message, this);
     }
 }

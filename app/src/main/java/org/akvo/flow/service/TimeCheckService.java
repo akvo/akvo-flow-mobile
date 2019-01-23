@@ -54,7 +54,7 @@ public class TimeCheckService extends IntentService {
         // Since a misconfigured date/time might be considering the SSL certificate as expired,
         // we'll use HTTP by default, instead of HTTPS
         try {
-            FlowApi flowApi = new FlowApi(getApplicationContext());
+            FlowApi flowApi = new FlowApi();
             String time = flowApi.getServerTime();
 
             if (isValid(time)) {

@@ -139,7 +139,7 @@ public class ApkUpdateService extends GcmTaskService {
         //after the first time the task is run we reschedule to a higher interval
         schedulePeriodicTask(this, ConstantUtil.REPEAT_INTERVAL_IN_SECONDS,
                 ConstantUtil.FLEX_INTERVAL_IN_SECONDS);
-        Map<String, String> params = new HashMap<>(2);
+        Map<String, Object> params = new HashMap<>(2);
         params.put(RefreshApkData.APP_VERSION_PARAM, BuildConfig.VERSION_NAME);
         refreshApkData.execute(new DefaultObserver<ApkData>() {
             @Override

@@ -50,6 +50,8 @@ import org.akvo.flow.domain.interactor.WasWalkthroughSeen;
 import org.akvo.flow.domain.interactor.apk.GetApkData;
 import org.akvo.flow.domain.interactor.apk.GetApkDataPreferences;
 import org.akvo.flow.domain.interactor.apk.SaveApkUpdateNotified;
+import org.akvo.flow.domain.interactor.forms.DownloadForm;
+import org.akvo.flow.domain.interactor.forms.ReloadForms;
 import org.akvo.flow.domain.interactor.setup.SaveSetup;
 import org.akvo.flow.domain.interactor.users.CreateUser;
 import org.akvo.flow.domain.interactor.users.DeleteUser;
@@ -280,5 +282,17 @@ public class ViewModule {
     @Named("SaveApkUpdateNotified")
     UseCase provideSaveApkUpdateNotified(SaveApkUpdateNotified saveApkUpdateNotified) {
         return saveApkUpdateNotified;
+    }
+
+    @Provides
+    @Named("downloadForm")
+    UseCase provideDownloadForm(DownloadForm downloadForm) {
+        return downloadForm;
+    }
+
+    @Provides
+    @Named("reloadForms")
+    UseCase provideReloadForms(ReloadForms reloadForms) {
+        return reloadForms;
     }
 }

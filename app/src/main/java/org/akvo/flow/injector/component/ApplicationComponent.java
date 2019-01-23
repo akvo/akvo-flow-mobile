@@ -32,6 +32,7 @@ import org.akvo.flow.domain.executor.PostExecutionThread;
 import org.akvo.flow.domain.executor.ThreadExecutor;
 import org.akvo.flow.domain.repository.ApkRepository;
 import org.akvo.flow.domain.repository.FileRepository;
+import org.akvo.flow.domain.repository.FormRepository;
 import org.akvo.flow.domain.repository.SurveyRepository;
 import org.akvo.flow.domain.repository.UserRepository;
 import org.akvo.flow.injector.module.ApplicationModule;
@@ -73,6 +74,8 @@ public interface ApplicationComponent {
     FileRepository fileRepository();
 
     UserRepository userRepository();
+
+    FormRepository formRepository();
 
     Gson gson();
 

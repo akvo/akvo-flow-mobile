@@ -40,6 +40,7 @@ import org.akvo.flow.data.net.S3User;
 import org.akvo.flow.data.net.SignatureHelper;
 import org.akvo.flow.data.repository.ApkDataRepository;
 import org.akvo.flow.data.repository.FileDataRepository;
+import org.akvo.flow.data.repository.FormDataRepository;
 import org.akvo.flow.data.repository.SetupDataRepository;
 import org.akvo.flow.data.repository.SurveyDataRepository;
 import org.akvo.flow.data.repository.UserDataRepository;
@@ -50,6 +51,7 @@ import org.akvo.flow.domain.executor.PostExecutionThread;
 import org.akvo.flow.domain.executor.ThreadExecutor;
 import org.akvo.flow.domain.repository.ApkRepository;
 import org.akvo.flow.domain.repository.FileRepository;
+import org.akvo.flow.domain.repository.FormRepository;
 import org.akvo.flow.domain.repository.SetupRepository;
 import org.akvo.flow.domain.repository.SurveyRepository;
 import org.akvo.flow.domain.repository.UserRepository;
@@ -138,6 +140,12 @@ public class ApplicationModule {
     @Singleton
     SetupRepository provideSetupRepository(SetupDataRepository setupDataRepository) {
         return setupDataRepository;
+    }
+
+    @Provides
+    @Singleton
+    FormRepository provideFormRepository(FormDataRepository formDataRepository) {
+        return formDataRepository;
     }
 
     @Provides

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2016-2019 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -29,13 +29,14 @@ import android.os.Build;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 import android.support.v4.content.ContextCompat;
+import android.text.TextUtils;
 
 import org.akvo.flow.R;
 import org.akvo.flow.activity.SurveyActivity;
 
 public class NotificationHelper {
 
-    public static final int SYNCING_NOTIFICATION_ID = 1235;
+    private static final int SYNCING_NOTIFICATION_ID = 1235;
 
     private NotificationHelper() {
     }
@@ -76,30 +77,25 @@ public class NotificationHelper {
         notifyWithDummyIntent(context, notificationId, builder);
     }
 
-    public static void displayNotification(Context context, int total, String title, String text,
-            int notificationId, boolean ongoing, int progress) {
+    public static void displayFormsSyncedNotification(Context context, int synced) {
+        String title = context.getString(R.string.downloading_forms);
+        String text = String.format(context.getString(R.string.data_sync_synced), synced);
+
         NotificationCompat.Builder builder = createNotificationBuilder(title, text, context);
 
-        builder.setOngoing(ongoing);
+        builder.setProgress(synced, synced, false);
 
-        builder.setProgress(total, progress, false);
-
-        notifyWithDummyIntent(context, notificationId, builder);
+        notifyWithDummyIntent(context, ConstantUtil.NOTIFICATION_FORM, builder);
     }
 
-    public static Notification getSyncingNotification(Context context) {
-        createNotificationChannel(context);
-        String title = context.getString(R.string.sync_service_notification_title);
-        NotificationCompat.Builder b = new NotificationCompat.Builder(context,
-                ConstantUtil.NOTIFICATION_CHANNEL_ID)
-                .setSmallIcon(R.drawable.notification_icon)
-                .setContentTitle(title)
-                .setTicker(context.getString(R.string.sync_service_notification_ticker))
-                .setProgress(0, 0, true)
-                .setColor(ContextCompat.getColor(context, R.color.orange_main))
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                .setOngoing(true);
-        return (b.build());
+    public static void displayFormsSyncingNotification(Context context) {
+        String title = context.getString(R.string.downloading_forms);
+
+        NotificationCompat.Builder builder = createNotificationBuilder(title, "", context);
+
+        builder.setProgress(0, 0, true);
+
+        notifyWithDummyIntent(context, ConstantUtil.NOTIFICATION_FORM, builder);
     }
 
     public static Notification getUnPublishingNotification(Context context) {
@@ -119,7 +115,8 @@ public class NotificationHelper {
 
     public static void showSyncingNotification(Context context) {
         String title = context.getString(R.string.sync_service_notification_title);
-        NotificationCompat.Builder b = new NotificationCompat.Builder(context)
+        NotificationCompat.Builder b = new NotificationCompat.Builder(context,
+                ConstantUtil.NOTIFICATION_CHANNEL_ID)
                 .setSmallIcon(R.drawable.notification_icon)
                 .setContentTitle(title)
                 .setTicker(context.getString(R.string.sync_service_notification_ticker))
@@ -159,13 +156,17 @@ public class NotificationHelper {
 
     private static NotificationCompat.Builder createDefaultNotification(String title, String text,
             Context context) {
-        return new NotificationCompat.Builder(context, ConstantUtil.NOTIFICATION_CHANNEL_ID)
+        final NotificationCompat.Builder builder = new NotificationCompat.Builder(context,
+                ConstantUtil.NOTIFICATION_CHANNEL_ID)
                 .setSmallIcon(R.drawable.notification_icon)
-                .setStyle(new NotificationCompat.BigTextStyle().bigText(text))
                 .setContentTitle(title)
-                .setContentText(text)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .setTicker(title);
+        if (!TextUtils.isEmpty(text)) {
+            builder.setStyle(new NotificationCompat.BigTextStyle().bigText(text));
+            builder.setContentText(text);
+        }
+        return builder;
     }
 
     private static NotificationCompat.Builder createErrorNotificationBuilder(String title,

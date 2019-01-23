@@ -50,7 +50,8 @@ public class FileHelper {
 
     private static final int BUFFER_SIZE = 2048;
 
-    @Inject FileHelper() {
+    @Inject
+    FileHelper() {
     }
 
     /**

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -18,33 +18,15 @@
  *
  */
 
-package org.akvo.flow.presentation.settings;
+package org.akvo.flow.domain.repository;
 
-public interface PreferenceView {
+import io.reactivex.Observable;
 
-    void showLoading();
+public interface FormRepository {
 
-    void hideLoading();
+    Observable<Boolean> loadForm(String formId, String deviceId);
 
-    void displaySettings(ViewUserSettings viewUserSettings);
+    Observable<Integer> reloadForms(String deviceId);
 
-    void displayLanguageChanged(String language);
-
-    void showDeleteCollectedData();
-
-    void showDeleteCollectedDataWithPending();
-
-    void showDeleteAllData();
-
-    void showDeleteAllDataWithPending();
-
-    void showClearDataError();
-
-    void showClearDataSuccess();
-
-    void dismiss();
-
-    void showDownloadFormsError(int numberOfForms);
-
-    void showDownloadFormsSuccess(int numberOfForms);
+    Observable<Integer> downloadFormHeaders(String deviceId);
 }

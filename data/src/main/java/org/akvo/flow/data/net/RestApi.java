@@ -152,7 +152,7 @@ public class RestApi {
             String etag = getEtag(response);
             if (TextUtils.isEmpty(etag) || !etag.equals(s3File.getMd5Hex())) {
                 return Observable.error(new Exception(
-                        "File upload failed" + s3File.getFilename()));
+                        "File upload to S3 Failed" + s3File.getFilename()));
             }
         } else {
             return Observable.error(new HttpException(response));

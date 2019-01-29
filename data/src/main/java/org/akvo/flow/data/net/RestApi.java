@@ -122,7 +122,7 @@ public class RestApi {
                             @Override
                             public Observable<Response<ResponseBody>> apply(
                                     Response<ResponseBody> response) {
-                                return verifyEtag(response, s3File);
+                                return verifyResponse(response, s3File);
                             }
                         });
     }
@@ -141,12 +141,12 @@ public class RestApi {
                             @Override
                             public Observable<Response<ResponseBody>> apply(
                                     Response<ResponseBody> response) {
-                                return verifyEtag(response, s3File);
+                                return verifyResponse(response, s3File);
                             }
                         });
     }
 
-    private Observable<Response<ResponseBody>> verifyEtag(Response<ResponseBody> response,
+    private Observable<Response<ResponseBody>> verifyResponse(Response<ResponseBody> response,
             S3File s3File) {
         if (response.isSuccessful()) {
             String etag = getEtag(response);

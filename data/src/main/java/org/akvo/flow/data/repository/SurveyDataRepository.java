@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -77,6 +77,7 @@ import io.reactivex.functions.Function;
 import io.reactivex.functions.Predicate;
 import okhttp3.ResponseBody;
 import retrofit2.HttpException;
+import retrofit2.Response;
 import timber.log.Timber;
 
 public class SurveyDataRepository implements SurveyRepository {
@@ -613,9 +614,9 @@ public class SurveyDataRepository implements SurveyRepository {
         final long surveyInstanceId = transmission.getRespondentId();
         final String formId = transmission.getFormId();
         return restApi.uploadFile(transmission)
-                .concatMap(new Function<ResponseBody, Observable<?>>() {
+                .concatMap(new Function<Response<ResponseBody>, Observable<?>>() {
                     @Override
-                    public Observable<?> apply(ResponseBody ignored) {
+                    public Observable<?> apply(Response ignored) {
                         S3File s3File = transmission.getS3File();
                         return restApi.notifyFileAvailable(s3File.getAction(),
                                 transmission.getFormId(), s3File.getFile().getName(), deviceId);

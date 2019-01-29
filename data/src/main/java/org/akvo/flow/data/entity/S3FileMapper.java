@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2018-2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -49,8 +49,9 @@ public class S3FileMapper {
         File transmissionFile = getFile(filename);
         if (transmissionFile != null && transmissionFile.exists()) {
             String md5Checksum = fileHelper.getMd5Base64(transmissionFile);
+            String md5Hex = fileHelper.hexMd5(transmissionFile);
             trans = new S3File(transmissionFile, isFilePublic(filename), getDir(filename),
-                    getAction(filename), md5Checksum);
+                    getAction(filename), md5Checksum, md5Hex);
         }
         return trans;
     }

@@ -28,6 +28,7 @@ import org.akvo.flow.domain.util.Constants;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.inject.Inject;
 
@@ -55,9 +56,9 @@ public class SurveyDeviceNotifications extends UseCase {
         }
         final String surveyId = (String) parameters.get(Constants.KEY_SURVEY_ID);
         return userRepository.getDeviceId()
-                .concatMap(new Function<String, Observable<List<String>>>() {
+                .concatMap(new Function<String, Observable<Set<String>>>() {
                     @Override
-                    public Observable<List<String>> apply(String deviceId) {
+                    public Observable<Set<String>> apply(String deviceId) {
                         return surveyRepository.checkDeviceNotification(surveyId, deviceId);
                     }
                 });

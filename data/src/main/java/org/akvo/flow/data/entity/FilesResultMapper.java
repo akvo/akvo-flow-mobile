@@ -28,7 +28,9 @@ import android.text.TextUtils;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.inject.Inject;
 
@@ -41,8 +43,8 @@ public class FilesResultMapper {
     @NonNull
     public FilteredFilesResult transform(@Nullable ApiFilesResult apiFilesResult) {
         if (apiFilesResult == null) {
-            return new FilteredFilesResult(Collections.<String>emptyList(),
-                    Collections.<String>emptyList());
+            return new FilteredFilesResult(Collections.<String>emptySet(),
+                    Collections.<String>emptySet());
         }
         List<String> missingFilesRaw = new ArrayList<>();
         if (apiFilesResult.getMissingFiles() != null ) {
@@ -51,16 +53,16 @@ public class FilesResultMapper {
         if (apiFilesResult.getMissingUnknown() != null) {
             missingFilesRaw.addAll(apiFilesResult.getMissingUnknown());
         }
-        List<String> missingFilenames = new ArrayList<>();
+        Set<String> missingFilenames = new HashSet<>();
         for (String f: missingFilesRaw) {
             String filename = getFilenameFromPath(f);
             if (!TextUtils.isEmpty(filename)) {
                  missingFilenames.add(filename);
             }
         }
-        List<String> deletedForms = apiFilesResult.getDeletedForms();
-        if (deletedForms == null) {
-            deletedForms = new ArrayList<>();
+        Set<String> deletedForms = new HashSet<>();
+        if (apiFilesResult.getDeletedForms() != null) {
+            deletedForms.addAll(apiFilesResult.getDeletedForms());
         }
         return new FilteredFilesResult(missingFilenames, deletedForms);
     }

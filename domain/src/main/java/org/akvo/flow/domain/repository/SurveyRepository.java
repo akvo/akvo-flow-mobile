@@ -77,7 +77,7 @@ public interface SurveyRepository {
 
     Observable<Boolean> createTransmissions(Long instanceId, String formId, Set<String> fileNames);
 
-    Observable<List<String>> checkDeviceNotification(String surveyId, String deviceId);
+    Observable<Set<String>> checkDeviceNotification(String surveyId, String deviceId);
 
-    Observable<List<String>> checkDeviceNotification(String deviceId);
+    Observable<Set<String>> checkDeviceNotification(String deviceId);
 }

@@ -253,7 +253,7 @@ public class DataPointsListPresenter implements Presenter {
             view.showLoading();
             final Map<String, Object> params = new HashMap<>(2);
             params.put(Constants.KEY_SURVEY_ID, surveyGroup.getId() + "");
-            checkDeviceNotification.execute(new DefaultObserver<List<String>>() {
+            checkDeviceNotification.execute(new DefaultObserver<Set<String>>() {
                 @Override
                 public void onError(Throwable e) {
                     Timber.e(e);
@@ -261,7 +261,7 @@ public class DataPointsListPresenter implements Presenter {
                 }
 
                 @Override
-                public void onNext(List<String> strings) {
+                public void onNext(Set<String> ignored) {
                     uploadDataPoints(params);
                 }
             }, params);

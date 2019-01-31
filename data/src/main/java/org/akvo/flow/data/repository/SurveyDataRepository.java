@@ -22,6 +22,7 @@ package org.akvo.flow.data.repository;
 
 import android.database.Cursor;
 import android.support.annotation.NonNull;
+import android.support.annotation.VisibleForTesting;
 
 import org.akvo.flow.data.datasource.DataSourceFactory;
 import org.akvo.flow.data.datasource.DatabaseDataSource;
@@ -69,6 +70,7 @@ import javax.inject.Inject;
 
 import io.reactivex.Flowable;
 import io.reactivex.Observable;
+import io.reactivex.ObservableSource;
 import io.reactivex.Single;
 import io.reactivex.SingleSource;
 import io.reactivex.functions.BiFunction;
@@ -379,59 +381,69 @@ public class SurveyDataRepository implements SurveyRepository {
     }
 
     @Override
-    public Observable<List<String>> checkDeviceNotification(String surveyId,
+    public Observable<Set<String>> checkDeviceNotification(String surveyId,
             final String deviceId) {
         return getFormIds(surveyId)
-                .concatMap(new Function<List<String>, Observable<List<String>>>() {
+                .concatMap(new Function<List<String>, Observable<Set<String>>>() {
                     @Override
-                    public Observable<List<String>> apply(List<String> formIds) {
+                    public Observable<Set<String>> apply(List<String> formIds) {
                         return downloadMissingAndDeleted(formIds, deviceId);
                     }
                 });
     }
 
     @Override
-    public Observable<List<String>> checkDeviceNotification(final String deviceId) {
+    public Observable<Set<String>> checkDeviceNotification(final String deviceId) {
         return getFormIds()
-                .concatMap(new Function<List<String>, Observable<List<String>>>() {
+                .concatMap(new Function<List<String>, Observable<Set<String>>>() {
                     @Override
-                    public Observable<List<String>> apply(List<String> formIds) {
+                    public Observable<Set<String>> apply(List<String> formIds) {
                         return downloadMissingAndDeleted(formIds, deviceId);
                     }
                 });
     }
 
-    private Observable<List<String>> downloadMissingAndDeleted(List<String> formIds,
-            String deviceId) {
+    @VisibleForTesting
+    Observable<Set<String>> downloadMissingAndDeleted(List<String> formIds, String deviceId) {
+        return getPendingFiles(formIds, deviceId)
+                .concatMap(new Function<FilteredFilesResult, Observable<Set<String>>>() {
+                    @Override
+                    public Observable<Set<String>> apply(final FilteredFilesResult filtered) {
+                        final DatabaseDataSource dataSource = dataSourceFactory.getDataBaseDataSource();
+                        return saveMissing(filtered.getMissingFiles())
+                                .concatMap(new Function<Boolean, Observable<Set<String>>>() {
+                                    @Override
+                                    public Observable<Set<String>> apply(Boolean ignored) {
+                                        return saveDeletedForms(filtered.getDeletedForms());
+                                    }
+                                });
+                    }
+                });
+    }
+
+    @VisibleForTesting
+    Observable<Boolean> saveMissing(final Set<String> missingFiles) {
+        final DatabaseDataSource dataSource = dataSourceFactory.getDataBaseDataSource();
+        return dataSource.saveMissingFiles(missingFiles)
+                .concatMap(new Function<Boolean, Observable<Boolean>>() {
+                    @Override
+                    public Observable<Boolean> apply(Boolean aBoolean) {
+                        return dataSource.updateFailedTransmissionsSurveyInstances(missingFiles);
+                    }
+                });
+    }
+
+    @VisibleForTesting
+    Observable<Set<String>> saveDeletedForms(Set<String> deletedForms) {
+        return dataSourceFactory.getDataBaseDataSource().setDeletedForms(deletedForms);
+    }
+
+    private Observable<FilteredFilesResult> getPendingFiles(List<String> formIds, String deviceId) {
         return restApi.getPendingFiles(formIds, deviceId)
                 .map(new Function<ApiFilesResult, FilteredFilesResult>() {
                     @Override
                     public FilteredFilesResult apply(ApiFilesResult apiFilesResult) {
                         return filesResultMapper.transform(apiFilesResult);
-                    }
-                })
-                .concatMap(new Function<FilteredFilesResult, Observable<List<String>>>() {
-                    @Override
-                    public Observable<List<String>> apply(final FilteredFilesResult filtered) {
-                        final DatabaseDataSource dataSource = dataSourceFactory
-                                .getDataBaseDataSource();
-                        return Observable.zip(dataSource
-                                        .setFileTransmissionsFailed(filtered.getMissingFiles()),
-                                dataSource.setDeletedForms(filtered.getDeletedForms()),
-                                new BiFunction<Boolean, Boolean, Boolean>() {
-                                    @Override
-                                    public Boolean apply(Boolean result1, Boolean result2) {
-                                        return result1 && result2;
-                                    }
-                                })
-                                .concatMap(new Function<Boolean, Observable<List<String>>>() {
-                                    @Override
-                                    public Observable<List<String>> apply(Boolean ignored) {
-                                        dataSource.updateFailedTransmissionsSurveyInstances(
-                                                filtered.getMissingFiles());
-                                        return Observable.just(filtered.getDeletedForms());
-                                    }
-                                });
                     }
                 });
     }

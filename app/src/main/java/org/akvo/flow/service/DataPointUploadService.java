@@ -115,7 +115,7 @@ public class DataPointUploadService extends GcmTaskService {
     }
 
     private void checkDeviceNotification() {
-        checkDeviceNotification.execute(new DefaultObserver<List<String>>() {
+        checkDeviceNotification.execute(new DefaultObserver<Set<String>>() {
             @Override
             public void onError(Throwable e) {
                 Timber.e(e);
@@ -123,7 +123,7 @@ public class DataPointUploadService extends GcmTaskService {
             }
 
             @Override
-            public void onNext(List<String> deletedFiles) {
+            public void onNext(Set<String> deletedFiles) {
                 for (String formId : deletedFiles) {
                     displayFormDeletedNotification(formId);
                 }

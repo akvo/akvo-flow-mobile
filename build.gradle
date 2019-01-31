@@ -30,6 +30,7 @@ ext {
     gsonVersion = "2.8.2"
     leakCanaryVersion = "1.6.1"
     loggingInterceptorVersion = "3.6.0"
+    mockServerVersion = "3.6.0"
     mapUtilsVersion = "0.5"
     prettyTimeVersion = "3.2.4.Final"
     rxAndroidVersion = "2.0.1"

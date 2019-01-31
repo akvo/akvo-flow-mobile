@@ -24,6 +24,7 @@ import org.akvo.flow.domain.repository.SurveyRepository;
 import org.akvo.flow.domain.repository.UserRepository;
 
 import java.util.List;
+import java.util.Set;
 
 import javax.inject.Inject;
 
@@ -67,9 +68,9 @@ public class AllDeviceNotifications {
 
     private <T> Observable buildUseCaseObservable() {
         return userRepository.getDeviceId()
-                .concatMap(new Function<String, Observable<List<String>>>() {
+                .concatMap(new Function<String, Observable<Set<String>>>() {
                     @Override
-                    public Observable<List<String>> apply(String deviceId) {
+                    public Observable<Set<String>> apply(String deviceId) {
                         return surveyRepository.checkDeviceNotification(deviceId);
                     }
                 });

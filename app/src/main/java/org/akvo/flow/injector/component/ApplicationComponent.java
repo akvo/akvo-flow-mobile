@@ -32,6 +32,7 @@ import org.akvo.flow.data.net.RestApi;
 import org.akvo.flow.domain.executor.PostExecutionThread;
 import org.akvo.flow.domain.executor.ThreadExecutor;
 import org.akvo.flow.domain.repository.FileRepository;
+import org.akvo.flow.domain.repository.MissingAndDeletedRepository;
 import org.akvo.flow.domain.repository.SetupRepository;
 import org.akvo.flow.domain.repository.SurveyRepository;
 import org.akvo.flow.domain.repository.UserRepository;
@@ -76,11 +77,9 @@ public interface ApplicationComponent {
 
     UserRepository userRepository();
 
-    SetupRepository setupRepository();
+    MissingAndDeletedRepository missingAndDeletedRepository();
 
     Gson gson();
-
-    RestApi restApi();
 
     void inject(FileChangeTrackingService fileChangeTrackingService);
 

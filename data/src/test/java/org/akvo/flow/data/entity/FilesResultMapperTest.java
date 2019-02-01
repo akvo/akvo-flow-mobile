@@ -32,6 +32,7 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 import java.util.Collections;
+import java.util.Iterator;
 
 import static junit.framework.Assert.assertNull;
 import static junit.framework.TestCase.assertTrue;
@@ -43,20 +44,7 @@ import static org.powermock.api.mockito.PowerMockito.when;
 
 @SmallTest
 @RunWith(PowerMockRunner.class)
-@PrepareForTest(TextUtils.class)
 public class FilesResultMapperTest {
-
-    @Before
-    public void setup() {
-        mockStatic(TextUtils.class);
-        when(TextUtils.isEmpty(any(CharSequence.class))).thenAnswer(new Answer<Boolean>() {
-            @Override
-            public Boolean answer(InvocationOnMock invocation) {
-                CharSequence a = (CharSequence) invocation.getArguments()[0];
-                return !(a != null && a.length() > 0);
-            }
-        });
-    }
 
     @Test
     public void transformShouldReturnEmptyDeletedFormsIfNullParam() {
@@ -133,8 +121,9 @@ public class FilesResultMapperTest {
         FilteredFilesResult result = new FilesResultMapper().transform(apiFilesResult);
 
         assertEquals(2, result.getMissingFiles().size());
-        assertEquals("123", result.getMissingFiles().get(0));
-        assertEquals("1234", result.getMissingFiles().get(1));
+        Iterator<String> iterator = result.getMissingFiles().iterator();
+        assertEquals("123", iterator.next());
+        assertEquals("1234", iterator.next());
     }
 
     @Test

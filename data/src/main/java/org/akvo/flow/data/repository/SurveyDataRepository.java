@@ -92,7 +92,6 @@ public class SurveyDataRepository implements SurveyRepository {
     private final UserMapper userMapper;
     private final TransmissionFilenameMapper transmissionFileMapper;
     private final FormIdMapper surveyIdMapper;
-    private final FilesResultMapper filesResultMapper;
     private final TransmissionMapper transmissionMapper;
     private final FormInstanceMapper formInstanceMapper;
     private final FormInstanceMetadataMapper formInstanceMetadataMapper;
@@ -103,8 +102,7 @@ public class SurveyDataRepository implements SurveyRepository {
             DataPointMapper dataPointMapper, SyncedTimeMapper syncedTimeMapper, RestApi restApi,
             SurveyMapper surveyMapper, UserMapper userMapper,
             TransmissionFilenameMapper transmissionFilenameMapper, FormIdMapper surveyIdMapper,
-            FilesResultMapper filesResultMapper, TransmissionMapper transmissionMapper,
-            FormInstanceMapper formInstanceMapper,
+            TransmissionMapper transmissionMapper, FormInstanceMapper formInstanceMapper,
             FormInstanceMetadataMapper formInstanceMetadataMapper) {
         this.dataSourceFactory = dataSourceFactory;
         this.dataPointMapper = dataPointMapper;
@@ -114,7 +112,6 @@ public class SurveyDataRepository implements SurveyRepository {
         this.userMapper = userMapper;
         this.transmissionFileMapper = transmissionFilenameMapper;
         this.surveyIdMapper = surveyIdMapper;
-        this.filesResultMapper = filesResultMapper;
         this.transmissionMapper = transmissionMapper;
         this.formInstanceMapper = formInstanceMapper;
         this.formInstanceMetadataMapper = formInstanceMetadataMapper;
@@ -360,7 +357,8 @@ public class SurveyDataRepository implements SurveyRepository {
                 });
     }
 
-    private Observable<List<String>> getFormIds(String surveyId) {
+    @Override
+    public Observable<List<String>> getFormIds(String surveyId) {
         return dataSourceFactory.getDataBaseDataSource().getFormIds(surveyId)
                 .map(new Function<Cursor, List<String>>() {
                     @Override
@@ -370,80 +368,13 @@ public class SurveyDataRepository implements SurveyRepository {
                 });
     }
 
-    private Observable<List<String>> getFormIds() {
+    @Override
+    public Observable<List<String>> getFormIds() {
         return dataSourceFactory.getDataBaseDataSource().getFormIds()
                 .map(new Function<Cursor, List<String>>() {
                     @Override
                     public List<String> apply(Cursor cursor) {
                         return surveyIdMapper.mapToFormId(cursor);
-                    }
-                });
-    }
-
-    @Override
-    public Observable<Set<String>> checkDeviceNotification(String surveyId,
-            final String deviceId) {
-        return getFormIds(surveyId)
-                .concatMap(new Function<List<String>, Observable<Set<String>>>() {
-                    @Override
-                    public Observable<Set<String>> apply(List<String> formIds) {
-                        return downloadMissingAndDeleted(formIds, deviceId);
-                    }
-                });
-    }
-
-    @Override
-    public Observable<Set<String>> checkDeviceNotification(final String deviceId) {
-        return getFormIds()
-                .concatMap(new Function<List<String>, Observable<Set<String>>>() {
-                    @Override
-                    public Observable<Set<String>> apply(List<String> formIds) {
-                        return downloadMissingAndDeleted(formIds, deviceId);
-                    }
-                });
-    }
-
-    @VisibleForTesting
-    Observable<Set<String>> downloadMissingAndDeleted(List<String> formIds, String deviceId) {
-        return getPendingFiles(formIds, deviceId)
-                .concatMap(new Function<FilteredFilesResult, Observable<Set<String>>>() {
-                    @Override
-                    public Observable<Set<String>> apply(final FilteredFilesResult filtered) {
-                        final DatabaseDataSource dataSource = dataSourceFactory.getDataBaseDataSource();
-                        return saveMissing(filtered.getMissingFiles())
-                                .concatMap(new Function<Boolean, Observable<Set<String>>>() {
-                                    @Override
-                                    public Observable<Set<String>> apply(Boolean ignored) {
-                                        return saveDeletedForms(filtered.getDeletedForms());
-                                    }
-                                });
-                    }
-                });
-    }
-
-    @VisibleForTesting
-    Observable<Boolean> saveMissing(final Set<String> missingFiles) {
-        final DatabaseDataSource dataSource = dataSourceFactory.getDataBaseDataSource();
-        return dataSource.saveMissingFiles(missingFiles)
-                .concatMap(new Function<Boolean, Observable<Boolean>>() {
-                    @Override
-                    public Observable<Boolean> apply(Boolean aBoolean) {
-                        return dataSource.updateFailedTransmissionsSurveyInstances(missingFiles);
-                    }
-                });
-    }
-
-    @VisibleForTesting
-    Observable<Set<String>> saveDeletedForms(Set<String> deletedForms) {
-        return dataSourceFactory.getDataBaseDataSource().setDeletedForms(deletedForms);
-    }
-
-    private Observable<FilteredFilesResult> getPendingFiles(List<String> formIds, String deviceId) {
-        return restApi.getPendingFiles(formIds, deviceId)
-                .map(new Function<ApiFilesResult, FilteredFilesResult>() {
-                    @Override
-                    public FilteredFilesResult apply(ApiFilesResult apiFilesResult) {
-                        return filesResultMapper.transform(apiFilesResult);
                     }
                 });
     }

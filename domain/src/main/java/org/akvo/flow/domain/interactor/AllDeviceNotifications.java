@@ -20,6 +20,7 @@
 
 package org.akvo.flow.domain.interactor;
 
+import org.akvo.flow.domain.repository.MissingAndDeletedRepository;
 import org.akvo.flow.domain.repository.SurveyRepository;
 import org.akvo.flow.domain.repository.UserRepository;
 
@@ -29,6 +30,7 @@ import java.util.Set;
 import javax.inject.Inject;
 
 import io.reactivex.Observable;
+import io.reactivex.ObservableSource;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Function;
@@ -42,12 +44,15 @@ public class AllDeviceNotifications {
     private final SurveyRepository surveyRepository;
     private final UserRepository userRepository;
     private final CompositeDisposable disposables;
+    private final MissingAndDeletedRepository missingAndDeletedRepository;
 
     @Inject
     protected AllDeviceNotifications(SurveyRepository surveyRepository,
-            UserRepository userRepository) {
+            UserRepository userRepository,
+            MissingAndDeletedRepository missingAndDeletedRepository) {
         this.surveyRepository = surveyRepository;
         this.userRepository = userRepository;
+        this.missingAndDeletedRepository = missingAndDeletedRepository;
         this.disposables = new CompositeDisposable();
     }
 
@@ -70,8 +75,15 @@ public class AllDeviceNotifications {
         return userRepository.getDeviceId()
                 .concatMap(new Function<String, Observable<Set<String>>>() {
                     @Override
-                    public Observable<Set<String>> apply(String deviceId) {
-                        return surveyRepository.checkDeviceNotification(deviceId);
+                    public Observable<Set<String>> apply(final String deviceId) {
+                        return surveyRepository.getFormIds()
+                                .concatMap(new Function<List<String>, Observable<Set<String>>>() {
+                                    @Override
+                                    public Observable<Set<String>> apply(List<String> formIds) {
+                                        return missingAndDeletedRepository
+                                                .downloadMissingAndDeleted(formIds, deviceId);
+                                    }
+                                });
                     }
                 });
     }

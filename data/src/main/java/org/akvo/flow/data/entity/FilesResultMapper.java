@@ -23,7 +23,6 @@ package org.akvo.flow.data.entity;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
-import android.text.TextUtils;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -56,7 +55,7 @@ public class FilesResultMapper {
         Set<String> missingFilenames = new HashSet<>();
         for (String f: missingFilesRaw) {
             String filename = getFilenameFromPath(f);
-            if (!TextUtils.isEmpty(filename)) {
+            if (!isEmpty(filename)) {
                  missingFilenames.add(filename);
             }
         }
@@ -69,14 +68,17 @@ public class FilesResultMapper {
 
     @VisibleForTesting
     @Nullable
-    String getFilenameFromPath(@Nullable String filePath) {
+    public String getFilenameFromPath(@Nullable String filePath) {
         String filename;
-        if (!TextUtils.isEmpty(filePath) && filePath.contains(File.separator)
-                && filePath.contains(".")) {
+        if (!isEmpty(filePath) && filePath.contains(File.separator) && filePath.contains(".")) {
             filename = filePath.substring(filePath.lastIndexOf(File.separator) + 1);
         } else {
             filename = filePath;
         }
         return filename;
+    }
+
+    private boolean isEmpty(@Nullable String string) {
+        return string == null || string.isEmpty();
     }
 }

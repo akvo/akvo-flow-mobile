@@ -1,14 +1,19 @@
 package org.akvo.flow.data.repository;
 
 import org.akvo.flow.data.datasource.DataSourceFactory;
+import org.akvo.flow.data.datasource.DatabaseDataSource;
 import org.akvo.flow.data.entity.FilesResultMapper;
+import org.akvo.flow.data.net.DeviceHelper;
 import org.akvo.flow.data.net.RestApi;
 import org.akvo.flow.data.util.ApiUrls;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.invocation.InvocationOnMock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.stubbing.Answer;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -18,6 +23,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
+import io.reactivex.Observable;
 import io.reactivex.observers.TestObserver;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
@@ -25,9 +31,11 @@ import okhttp3.mockwebserver.RecordedRequest;
 
 import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.anySet;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class SurveyDataRepositoryTest {
@@ -35,19 +43,40 @@ public class SurveyDataRepositoryTest {
     private MockWebServer mockWebServer;
     private MissingAndDeletedDataRepository missingAndDeletedDataRepository;
 
+    @Mock
+    DeviceHelper mockDeviceHelper;
+
+    @Mock
+    DatabaseDataSource mockDatabaseDataSource;
+
     @Before
     public void setUp() throws IOException {
         mockWebServer = new MockWebServer();
         mockWebServer.start(8080);
 
         DataSourceFactory dataSourceFactory = new DataSourceFactory(null, null,
-                new TestDataBaseDataSource(), null, null, null);
+                mockDatabaseDataSource, null, null, null);
 
-        RestApi restApi = new RestApi(new TestDeviceHelper(), new TestRestServiceFactory(), null,
+        RestApi restApi = new RestApi(mockDeviceHelper, new TestRestServiceFactory(), null,
                 "1.2.3", new ApiUrls(null, null), null, null);
 
         missingAndDeletedDataRepository = spy(new MissingAndDeletedDataRepository(restApi,
                 new FilesResultMapper(), dataSourceFactory));
+
+        when(mockDeviceHelper.getPhoneNumber()).thenReturn("123");
+        when(mockDeviceHelper.getImei()).thenReturn("123");
+        when(mockDeviceHelper.getAndroidId()).thenReturn("123");
+
+        when(mockDatabaseDataSource.saveMissingFiles(anySet())).thenReturn(Observable.just(true));
+        when(mockDatabaseDataSource.updateFailedTransmissionsSurveyInstances(anySet()))
+                .thenReturn(Observable.just(true));
+        when(mockDatabaseDataSource.setDeletedForms(anySet())).thenAnswer(new Answer<Object>() {
+            @Override
+            public Object answer(InvocationOnMock invocation) {
+                Object[] args = invocation.getArguments();
+                return Observable.just((HashSet) args[0]);
+            }
+        });
     }
 
     @Test
@@ -114,7 +143,8 @@ public class SurveyDataRepositoryTest {
         TestObserver observer = new TestObserver<Set<String>>();
 
         MockResponse response = new MockResponse().setResponseCode(200)
-                .setBody("{\"missingUnknown\":[],\"missingFiles\":[],\"deletedForms\":[1234,12345]}");
+                .setBody(
+                        "{\"missingUnknown\":[],\"missingFiles\":[],\"deletedForms\":[1234,12345]}");
         mockWebServer.enqueue(response);
 
         List<String> forms = new ArrayList<>(1);
@@ -122,7 +152,8 @@ public class SurveyDataRepositoryTest {
 
         missingAndDeletedDataRepository.downloadMissingAndDeleted(forms, "123").subscribe(observer);
         verify(missingAndDeletedDataRepository, times(1)).getPendingFiles(forms, "123");
-        verify(missingAndDeletedDataRepository, times(1)).saveMissing(Collections.<String>emptySet());
+        verify(missingAndDeletedDataRepository, times(1))
+                .saveMissing(Collections.<String>emptySet());
         Set<String> set = new HashSet<>();
         set.add("1234");
         set.add("12345");
@@ -132,7 +163,7 @@ public class SurveyDataRepositoryTest {
 
         observer.assertNoErrors();
         observer.assertValueCount(1);
-        assertEquals(2, ((HashSet)observer.values().get(0)).size());
+        assertEquals(2, ((HashSet) observer.values().get(0)).size());
     }
 
     @Test
@@ -140,7 +171,8 @@ public class SurveyDataRepositoryTest {
         TestObserver observer = new TestObserver<Set<String>>();
 
         MockResponse response = new MockResponse().setResponseCode(200)
-                .setBody("{\"missingUnknown\":[\"123.jpg\",\"1234.jpg\"],\"missingFiles\":[],\"deletedForms\":[]}");
+                .setBody(
+                        "{\"missingUnknown\":[\"123.jpg\",\"1234.jpg\"],\"missingFiles\":[],\"deletedForms\":[]}");
         mockWebServer.enqueue(response);
 
         List<String> forms = new ArrayList<>(1);
@@ -153,13 +185,14 @@ public class SurveyDataRepositoryTest {
         set.add("123.jpg");
         set.add("1234.jpg");
         verify(missingAndDeletedDataRepository, times(1)).saveMissing(set);
-        verify(missingAndDeletedDataRepository, times(1)).saveDeletedForms(Collections.<String>emptySet());
+        verify(missingAndDeletedDataRepository, times(1))
+                .saveDeletedForms(Collections.<String>emptySet());
 
         observer.awaitTerminalEvent(2, TimeUnit.SECONDS);
 
         observer.assertNoErrors();
         observer.assertValueCount(1);
-        assertEquals(0, ((HashSet)observer.values().get(0)).size());
+        assertEquals(0, ((HashSet) observer.values().get(0)).size());
     }
 
     @Test

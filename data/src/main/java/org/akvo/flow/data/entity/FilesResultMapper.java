@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2018-2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -68,7 +68,7 @@ public class FilesResultMapper {
 
     @VisibleForTesting
     @Nullable
-    public String getFilenameFromPath(@Nullable String filePath) {
+    String getFilenameFromPath(@Nullable String filePath) {
         String filename;
         if (!isEmpty(filePath) && filePath.contains(File.separator) && filePath.contains(".")) {
             filename = filePath.substring(filePath.lastIndexOf(File.separator) + 1);

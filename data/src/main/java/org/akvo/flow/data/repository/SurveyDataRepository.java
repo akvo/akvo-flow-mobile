@@ -22,17 +22,13 @@ package org.akvo.flow.data.repository;
 
 import android.database.Cursor;
 import android.support.annotation.NonNull;
-import android.support.annotation.VisibleForTesting;
 
 import org.akvo.flow.data.datasource.DataSourceFactory;
 import org.akvo.flow.data.datasource.DatabaseDataSource;
 import org.akvo.flow.data.entity.ApiDataPoint;
-import org.akvo.flow.data.entity.ApiFilesResult;
 import org.akvo.flow.data.entity.ApiLocaleResult;
 import org.akvo.flow.data.entity.ApiSurveyInstance;
 import org.akvo.flow.data.entity.DataPointMapper;
-import org.akvo.flow.data.entity.FilesResultMapper;
-import org.akvo.flow.data.entity.FilteredFilesResult;
 import org.akvo.flow.data.entity.FormIdMapper;
 import org.akvo.flow.data.entity.FormInstanceMapper;
 import org.akvo.flow.data.entity.FormInstanceMetadataMapper;
@@ -70,7 +66,6 @@ import javax.inject.Inject;
 
 import io.reactivex.Flowable;
 import io.reactivex.Observable;
-import io.reactivex.ObservableSource;
 import io.reactivex.Single;
 import io.reactivex.SingleSource;
 import io.reactivex.functions.BiFunction;

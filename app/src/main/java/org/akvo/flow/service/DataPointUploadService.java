@@ -38,7 +38,6 @@ import org.akvo.flow.domain.interactor.UploadAllDataPoints;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.NotificationHelper;
 
-import java.util.List;
 import java.util.Set;
 
 import javax.inject.Inject;

@@ -77,5 +77,4 @@ public class MissingAndDeletedDataRepository implements MissingAndDeletedReposit
     Observable<Set<String>> saveDeletedForms(Set<String> deletedForms) {
         return dataSourceFactory.getDataBaseDataSource().setDeletedForms(deletedForms);
     }
-
 }

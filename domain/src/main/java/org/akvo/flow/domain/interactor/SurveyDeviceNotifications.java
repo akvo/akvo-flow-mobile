@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2018-2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -34,7 +34,6 @@ import java.util.Set;
 import javax.inject.Inject;
 
 import io.reactivex.Observable;
-import io.reactivex.ObservableSource;
 import io.reactivex.functions.Function;
 
 public class SurveyDeviceNotifications extends UseCase {

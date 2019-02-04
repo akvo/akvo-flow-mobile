@@ -22,6 +22,7 @@ package org.akvo.flow.data.repository;
 
 import android.database.Cursor;
 import android.support.annotation.NonNull;
+import android.support.annotation.VisibleForTesting;
 
 import org.akvo.flow.data.datasource.DataSourceFactory;
 import org.akvo.flow.data.datasource.DatabaseDataSource;
@@ -397,7 +398,8 @@ public class SurveyDataRepository implements SurveyRepository {
                 });
     }
 
-    private Observable<List<Transmission>> getSurveyTransmissions(@NonNull String surveyId) {
+    @VisibleForTesting
+    Observable<List<Transmission>> getSurveyTransmissions(@NonNull String surveyId) {
         return getFormIds(surveyId)
                 .flatMap(new Function<List<String>, Observable<List<Transmission>>>() {
                     @Override
@@ -409,25 +411,22 @@ public class SurveyDataRepository implements SurveyRepository {
                                         return getFormTransmissions(formId);
                                     }
                                 })
-                                .toList()
-                                .toObservable()
-                                .map(new Function<List<List<Transmission>>, List<Transmission>>() {
-                                    @Override
-                                    public List<Transmission> apply(List<List<Transmission>> lists) {
-                                        List<Transmission> transmissions = new ArrayList<>();
-                                        for (List<Transmission> transmissionList : lists) {
-                                            if (transmissionList != null) {
-                                                transmissions.addAll(transmissionList);
+                                .flatMapIterable(
+                                        new Function<List<Transmission>, List<Transmission>>() {
+                                            @Override
+                                            public List<Transmission> apply(
+                                                    List<Transmission> transmissions) {
+                                                return transmissions;
                                             }
-                                        }
-                                        return transmissions;
-                                    }
-                                });
+                                        })
+                                .toList()
+                                .toObservable();
                     }
                 });
     }
 
-    private Observable<List<Transmission>> getFormTransmissions(String formId) {
+    @VisibleForTesting
+    Observable<List<Transmission>> getFormTransmissions(String formId) {
         return dataSourceFactory.getDataBaseDataSource()
                 .getUnSyncedTransmissions(formId)
                 .map(new Function<Cursor, List<Transmission>>() {

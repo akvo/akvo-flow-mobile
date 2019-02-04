@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2018-2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -21,6 +21,8 @@
 package org.akvo.flow.data.entity;
 
 import android.database.Cursor;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import org.akvo.flow.database.SurveyColumns;
 
@@ -35,7 +37,8 @@ public class FormIdMapper {
     public FormIdMapper() {
     }
 
-    public List<String> mapToFormId(Cursor cursor) {
+    @NonNull
+    public List<String> mapToFormId(@Nullable Cursor cursor) {
         int size = cursor == null ? 0 : cursor.getCount();
         List<String> formIds = new ArrayList<>(size);
         if (cursor != null && cursor.moveToFirst()) {
@@ -51,7 +54,6 @@ public class FormIdMapper {
 
 
     private String getFormId(Cursor cursor) {
-        return cursor
-                .getString(cursor.getColumnIndexOrThrow(SurveyColumns.SURVEY_ID));
+        return cursor.getString(cursor.getColumnIndexOrThrow(SurveyColumns.SURVEY_ID));
     }
 }

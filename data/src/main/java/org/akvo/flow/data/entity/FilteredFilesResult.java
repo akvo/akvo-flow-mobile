@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2018-2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -20,23 +20,23 @@
 
 package org.akvo.flow.data.entity;
 
-import java.util.List;
+import java.util.Set;
 
 public class FilteredFilesResult {
 
-    private final List<String> missingFiles;
-    private final List<String> deletedForms;
+    private final Set<String> missingFiles;
+    private final Set<String> deletedForms;
 
-    public FilteredFilesResult(List<String> missingFiles, List<String> deletedForms) {
+    public FilteredFilesResult(Set<String> missingFiles, Set<String> deletedForms) {
         this.missingFiles =  missingFiles;
         this.deletedForms = deletedForms;
     }
 
-    public List<String> getMissingFiles() {
+    public Set<String> getMissingFiles() {
         return missingFiles;
     }
 
-    public List<String> getDeletedForms() {
+    public Set<String> getDeletedForms() {
         return deletedForms;
     }
 }

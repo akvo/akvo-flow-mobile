@@ -56,3 +56,6 @@ build_config
 akvo-flow-server-config/
 app/fabric.properties
 
+#errors
+hs_err_*
+

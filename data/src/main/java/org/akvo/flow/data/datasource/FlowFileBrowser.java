@@ -82,6 +82,11 @@ public class FlowFileBrowser {
         return new File(path);
     }
 
+    public File getInternalFile(@NonNull String filename, @Nullable String folderName) {
+        File folder = getInternalFolder(folderName);
+        return new File(folder, filename);
+    }
+
     @Nullable
     File getPublicFolder(String folderName) {
         String externalStoragePath = externalStorageHelper.getExternalStoragePath();

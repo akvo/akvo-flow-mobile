@@ -62,7 +62,7 @@ public class S3FileMapperTest {
     File mockFile;
 
     @Before
-    public void setup() {
+    public void setUp() {
         PowerMockito.mockStatic(TextUtils.class);
         when(TextUtils.isEmpty(any(CharSequence.class))).thenAnswer(new Answer<Boolean>() {
             @Override

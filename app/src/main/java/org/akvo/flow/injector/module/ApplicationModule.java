@@ -41,6 +41,7 @@ import org.akvo.flow.data.net.S3User;
 import org.akvo.flow.data.net.SignatureHelper;
 import org.akvo.flow.data.net.s3.AmazonAuthHelper;
 import org.akvo.flow.data.repository.FileDataRepository;
+import org.akvo.flow.data.repository.MissingAndDeletedDataRepository;
 import org.akvo.flow.data.repository.SetupDataRepository;
 import org.akvo.flow.data.repository.SurveyDataRepository;
 import org.akvo.flow.data.repository.UserDataRepository;
@@ -50,6 +51,7 @@ import org.akvo.flow.database.LanguageTable;
 import org.akvo.flow.domain.executor.PostExecutionThread;
 import org.akvo.flow.domain.executor.ThreadExecutor;
 import org.akvo.flow.domain.repository.FileRepository;
+import org.akvo.flow.domain.repository.MissingAndDeletedRepository;
 import org.akvo.flow.domain.repository.SetupRepository;
 import org.akvo.flow.domain.repository.SurveyRepository;
 import org.akvo.flow.domain.repository.UserRepository;
@@ -118,6 +120,13 @@ public class ApplicationModule {
     @Singleton
     SurveyRepository provideSurveyRepository(SurveyDataRepository surveyDataRepository) {
         return surveyDataRepository;
+    }
+
+    @Provides
+    @Singleton
+    MissingAndDeletedRepository provideMissingAndDeletedRepository(
+            MissingAndDeletedDataRepository repository) {
+        return repository;
     }
 
     @Provides

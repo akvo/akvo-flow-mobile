@@ -143,6 +143,15 @@ public class SurveyDataRepositoryTest {
         when(mockDeviceHelper.getAndroidId()).thenReturn("123");
 
         when(mockBodyCreator.createBody(any(S3File.class))).thenReturn(mockBody);
+
+        when(mockS3File.getAction()).thenReturn("submit");
+        when(mockS3File.getContentType()).thenReturn("application/zip");
+        when(mockS3File.getDir()).thenReturn("devicezip");
+        when(mockS3File.getFile()).thenReturn(mockFile);
+        when(mockS3File.isPublic()).thenReturn(false);
+        when(mockS3File.getFilename()).thenReturn("abc.zip");
+        when(mockS3File.getMd5Hex()).thenReturn("123");
+        when(mockS3File.getMd5Base64()).thenReturn("123");
     }
 
     @Test
@@ -212,14 +221,6 @@ public class SurveyDataRepositoryTest {
         mockWebServer.enqueue(gaeResponse);
 
         Transmission transmission = new Transmission(1L, 2L, "123", mockS3File);
-        when(mockS3File.getAction()).thenReturn("submit");
-        when(mockS3File.getContentType()).thenReturn("application/zip");
-        when(mockS3File.getDir()).thenReturn("devicezip");
-        when(mockS3File.getFile()).thenReturn(mockFile);
-        when(mockS3File.isPublic()).thenReturn(false);
-        when(mockS3File.getFilename()).thenReturn("abc.zip");
-        when(mockS3File.getMd5Hex()).thenReturn("123");
-        when(mockS3File.getMd5Base64()).thenReturn("123");
 
         surveyDataRepository.syncTransmission(transmission, "123").subscribe(observer);
 
@@ -245,14 +246,6 @@ public class SurveyDataRepositoryTest {
         mockWebServer.enqueue(gaeResponse);
 
         Transmission transmission = new Transmission(1L, 2L, "123", mockS3File);
-        when(mockS3File.getAction()).thenReturn("submit");
-        when(mockS3File.getContentType()).thenReturn("application/zip");
-        when(mockS3File.getDir()).thenReturn("devicezip");
-        when(mockS3File.getFile()).thenReturn(mockFile);
-        when(mockS3File.isPublic()).thenReturn(false);
-        when(mockS3File.getFilename()).thenReturn("abc.zip");
-        when(mockS3File.getMd5Hex()).thenReturn("123");
-        when(mockS3File.getMd5Base64()).thenReturn("123");
 
         surveyDataRepository.syncTransmission(transmission, "123").subscribe(observer);
 
@@ -278,14 +271,6 @@ public class SurveyDataRepositoryTest {
         mockWebServer.enqueue(gaeResponse);
 
         Transmission transmission = new Transmission(1L, 2L, "123", mockS3File);
-        when(mockS3File.getAction()).thenReturn("submit");
-        when(mockS3File.getContentType()).thenReturn("application/zip");
-        when(mockS3File.getDir()).thenReturn("devicezip");
-        when(mockS3File.getFile()).thenReturn(mockFile);
-        when(mockS3File.isPublic()).thenReturn(false);
-        when(mockS3File.getFilename()).thenReturn("abc.zip");
-        when(mockS3File.getMd5Hex()).thenReturn("123");
-        when(mockS3File.getMd5Base64()).thenReturn("123");
 
         surveyDataRepository.syncTransmission(transmission, "123").subscribe(observer);
 
@@ -311,14 +296,6 @@ public class SurveyDataRepositoryTest {
         mockWebServer.enqueue(gaeResponse);
 
         Transmission transmission = new Transmission(1L, 2L, "123", mockS3File);
-        when(mockS3File.getAction()).thenReturn("submit");
-        when(mockS3File.getContentType()).thenReturn("application/zip");
-        when(mockS3File.getDir()).thenReturn("devicezip");
-        when(mockS3File.getFile()).thenReturn(mockFile);
-        when(mockS3File.isPublic()).thenReturn(false);
-        when(mockS3File.getFilename()).thenReturn("abc.zip");
-        when(mockS3File.getMd5Hex()).thenReturn("123");
-        when(mockS3File.getMd5Base64()).thenReturn("123");
 
         surveyDataRepository.syncTransmission(transmission, "123").subscribe(observer);
 

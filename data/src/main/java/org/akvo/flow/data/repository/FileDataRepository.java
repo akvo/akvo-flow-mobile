@@ -60,18 +60,19 @@ public class FileDataRepository implements FileRepository {
         return dataSourceFactory.getMediaDataSource().getInputStreamFromUri(uri)
                 .concatMap(new Function<InputStream, Observable<Boolean>>() {
                     @Override
-                    public Observable<Boolean> apply(final InputStream inputStream) {
-                        return saveResizedImage(uri, resizedImagePath, imageSize)
-                                .concatMap(new Function<Boolean, Observable<Boolean>>() {
-                                    @Override
-                                    public Observable<Boolean> apply(Boolean result) {
-                                        if (removeDuplicate) {
-                                            return removeDuplicateImage(uri);
-                                        } else {
-                                            return Observable.just(result);
-                                        }
-                                    }
-                                });
+                    public Observable<Boolean> apply(InputStream inputStream) {
+                        return dataSourceFactory.getImageDataSource()
+                                .saveResizedImage(uri, resizedImagePath, imageSize, inputStream);
+                    }
+                })
+                .concatMap(new Function<Boolean, Observable<Boolean>>() {
+                    @Override
+                    public Observable<Boolean> apply(Boolean result) {
+                        if (removeDuplicate) {
+                            return removeDuplicateImage(uri);
+                        } else {
+                            return Observable.just(result);
+                        }
                     }
                 });
     }
@@ -83,18 +84,6 @@ public class FileDataRepository implements FileRepository {
             Timber.e(e);
         }
         return Observable.just(true);
-    }
-
-    private Observable<Boolean> saveResizedImage(final Uri uri, final String resizedImagePath,
-            final int imageSize) {
-        return dataSourceFactory.getMediaDataSource().getInputStreamFromUri(uri)
-                .concatMap(new Function<InputStream, Observable<Boolean>>() {
-                    @Override
-                    public Observable<Boolean> apply(InputStream inputStream) {
-                        return dataSourceFactory.getImageDataSource()
-                                .saveResizedImage(uri, resizedImagePath, imageSize, inputStream);
-                    }
-                });
     }
 
     @Override

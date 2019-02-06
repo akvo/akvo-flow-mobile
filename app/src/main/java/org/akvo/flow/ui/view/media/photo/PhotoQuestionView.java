@@ -261,6 +261,15 @@ public class PhotoQuestionView extends QuestionView implements
         presenter.destroy();
     }
 
+    @Override
+    public boolean isValid() {
+        File file = rebuildFilePath();
+        if (file == null|| !file.exists()) {
+            return false;
+        }
+        return super.isValid();
+    }
+
     private void displayThumbnail() {
         hideDownloadViews();
 

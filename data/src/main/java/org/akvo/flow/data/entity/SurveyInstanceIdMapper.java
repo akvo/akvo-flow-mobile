@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2018-2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -36,7 +36,8 @@ public class SurveyInstanceIdMapper {
         long instanceId = -1L;
         if (cursor != null) {
             if (cursor.moveToFirst()) {
-                final int formIdCol = cursor.getColumnIndexOrThrow(TransmissionColumns.SURVEY_ID);
+                final int formIdCol = cursor
+                        .getColumnIndexOrThrow(TransmissionColumns.SURVEY_INSTANCE_ID);
                 instanceId = cursor.getLong(formIdCol);
             }
             cursor.close();

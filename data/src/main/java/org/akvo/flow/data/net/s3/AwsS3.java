@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2018-2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -23,6 +23,7 @@ package org.akvo.flow.data.net.s3;
 import io.reactivex.Observable;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
+import retrofit2.Response;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
@@ -35,7 +36,7 @@ import static org.akvo.flow.data.util.ApiUrls.S3_FILE_PATH;
 public interface AwsS3 {
 
     @PUT(S3_FILE_PATH)
-    Observable<ResponseBody> upload(@Path("key") String key,
+    Observable<Response<ResponseBody>> upload(@Path("key") String key,
                 @Path("file") String file,
                 @Header("Content-MD5") String md5Base64,
                 @Header("Content-type") String contentType,
@@ -45,7 +46,7 @@ public interface AwsS3 {
 
     @Headers({"x-amz-acl: public-read"})
     @PUT(S3_FILE_PATH)
-    Observable<ResponseBody> uploadPublic(@Path("key") String key,
+    Observable<Response<ResponseBody>> uploadPublic(@Path("key") String key,
             @Path("file") String file,
             @Header("Content-MD5") String md5Base64,
             @Header("Content-type") String contentType,

@@ -20,6 +20,7 @@
 
 package org.akvo.flow.data.util;
 
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Base64;
@@ -82,6 +83,7 @@ public class FileHelper {
         return null;
     }
 
+    @NonNull
     public String getMd5Base64(File file) {
         byte[] md5Checksum = getMD5Checksum(file);
         if (md5Checksum != null) {
@@ -89,6 +91,19 @@ public class FileHelper {
         } else {
             return "";
         }
+    }
+
+    @NonNull
+    public String hexMd5(File file) {
+        byte[] rawHash = getMD5Checksum(file);
+        if (rawHash != null) {
+            StringBuilder builder = new StringBuilder();
+            for (byte b : rawHash) {
+                builder.append(String.format("%02x", b));
+            }
+            return builder.toString();
+        }
+        return "";
     }
 
     public String copyFileToFolder(File originalFile, File destinationFolder) {

@@ -369,7 +369,7 @@ public class BriteSurveyDbAdapter {
         briteDatabase.insert(Tables.TRANSMISSION, values);
     }
 
-    public void updateFailedTransmissions(@NonNull List<String> filenames) {
+    public void updateFailedTransmissions(@NonNull Set<String> filenames) {
         BriteDatabase.Transaction transaction = beginTransaction();
         try {
             for (String filename : filenames) {
@@ -614,7 +614,7 @@ public class BriteSurveyDbAdapter {
      * marks a survey record identified by the ID passed in as deleted.
      *
      */
-    public void setFormsDeleted(List<String> formIds) {
+    public void setFormsDeleted(Set<String> formIds) {
         BriteDatabase.Transaction transaction = beginTransaction();
         try {
             for (String formId : formIds) {

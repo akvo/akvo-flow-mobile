@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2019 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -18,25 +18,14 @@
  *
  */
 
-package org.akvo.flow.data.entity;
+package org.akvo.flow.domain.repository;
 
+import java.util.List;
 import java.util.Set;
 
-public class FilteredFilesResult {
+import io.reactivex.Observable;
 
-    private final Set<String> missingFiles;
-    private final Set<String> deletedForms;
+public interface MissingAndDeletedRepository {
 
-    public FilteredFilesResult(Set<String> missingFiles, Set<String> deletedForms) {
-        this.missingFiles =  missingFiles;
-        this.deletedForms = deletedForms;
-    }
-
-    public Set<String> getMissingFiles() {
-        return missingFiles;
-    }
-
-    public Set<String> getDeletedForms() {
-        return deletedForms;
-    }
+    Observable<Set<String>> downloadMissingAndDeleted(List<String> formIds, String deviceId);
 }

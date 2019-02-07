@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2016-2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -39,8 +39,10 @@ import org.akvo.flow.data.net.RestServiceFactory;
 import org.akvo.flow.data.net.S3User;
 import org.akvo.flow.data.net.SignatureHelper;
 import org.akvo.flow.data.repository.ApkDataRepository;
+import org.akvo.flow.data.net.s3.AmazonAuthHelper;
 import org.akvo.flow.data.repository.FileDataRepository;
 import org.akvo.flow.data.repository.FormDataRepository;
+import org.akvo.flow.data.repository.MissingAndDeletedDataRepository;
 import org.akvo.flow.data.repository.SetupDataRepository;
 import org.akvo.flow.data.repository.SurveyDataRepository;
 import org.akvo.flow.data.repository.UserDataRepository;
@@ -51,6 +53,7 @@ import org.akvo.flow.domain.executor.PostExecutionThread;
 import org.akvo.flow.domain.executor.ThreadExecutor;
 import org.akvo.flow.domain.repository.ApkRepository;
 import org.akvo.flow.domain.repository.FileRepository;
+import org.akvo.flow.domain.repository.MissingAndDeletedRepository;
 import org.akvo.flow.domain.repository.FormRepository;
 import org.akvo.flow.domain.repository.SetupRepository;
 import org.akvo.flow.domain.repository.SurveyRepository;
@@ -128,6 +131,13 @@ public class ApplicationModule {
     @Singleton
     SurveyRepository provideSurveyRepository(SurveyDataRepository surveyDataRepository) {
         return surveyDataRepository;
+    }
+
+    @Provides
+    @Singleton
+    MissingAndDeletedRepository provideMissingAndDeletedRepository(
+            MissingAndDeletedDataRepository repository) {
+        return repository;
     }
 
     @Provides
@@ -212,14 +222,20 @@ public class ApplicationModule {
 
     @Provides
     @Singleton
-    RestApi provideRestApi(DeviceHelper deviceHelper, RestServiceFactory serviceFactory,
-            Encoder encoder, ApiUrls apiUrls, SignatureHelper signatureHelper) {
+    AmazonAuthHelper provideAmazonAuthHelper(SignatureHelper signatureHelper) {
         S3User s3User = new S3User(BuildConfig.AWS_BUCKET, BuildConfig.AWS_ACCESS_KEY_ID,
                 BuildConfig.AWS_SECRET_KEY);
+        return new AmazonAuthHelper(signatureHelper, s3User);
+    }
+
+    @Provides
+    @Singleton
+    RestApi provideRestApi(DeviceHelper deviceHelper, RestServiceFactory serviceFactory,
+            Encoder encoder, ApiUrls apiUrls, AmazonAuthHelper amazonAuthHelper) {
         final DateFormat df = new SimpleDateFormat(REST_API_DATE_PATTERN, Locale.US);
         df.setTimeZone(TimeZone.getTimeZone(TIMEZONE));
         return new RestApi(deviceHelper, serviceFactory, encoder, BuildConfig.VERSION_NAME,
-                apiUrls, signatureHelper, s3User, df);
+                apiUrls, amazonAuthHelper, df);
     }
 
     @Provides

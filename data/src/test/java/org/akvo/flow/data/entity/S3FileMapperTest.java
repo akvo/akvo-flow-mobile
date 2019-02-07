@@ -86,7 +86,7 @@ public class S3FileMapperTest {
     public void shouldReturnNullForEmptyFilename() {
         S3FileMapper s3FileMapper = new S3FileMapper(mockFileBrowser, mockFileHelper);
 
-        S3File file = s3FileMapper.transform(null);
+        S3File file = s3FileMapper.transform("");
 
         assertNull(file);
     }

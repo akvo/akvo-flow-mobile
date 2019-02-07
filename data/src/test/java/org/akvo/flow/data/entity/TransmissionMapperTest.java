@@ -52,7 +52,7 @@ public class TransmissionMapperTest {
 
     @Test
     public void shouldReturnEmptyForNullCursor() {
-        TransmissionMapper mapper = new TransmissionMapper(null);
+        TransmissionMapper mapper = new TransmissionMapper(mockS3Mapper);
 
         List<Transmission> transmissions = mapper.transform(null);
 
@@ -61,7 +61,7 @@ public class TransmissionMapperTest {
 
     @Test
     public void shouldReturnEmptyForEmptyCursor() {
-        TransmissionMapper mapper = new TransmissionMapper(null);
+        TransmissionMapper mapper = new TransmissionMapper(mockS3Mapper);
         given(mockCursor.getCount()).willReturn(0);
         given(mockCursor.moveToFirst()).willReturn(false);
         doNothing().when(mockCursor).close();

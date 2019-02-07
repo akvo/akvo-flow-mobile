@@ -34,12 +34,12 @@ import javax.inject.Inject;
 
 public class S3FileMapper {
 
-    private final FlowFileBrowser folderBrowser;
+    private final FlowFileBrowser fileBrowser;
     private final FileHelper fileHelper;
 
     @Inject
-    public S3FileMapper(FlowFileBrowser folderBrowser, FileHelper fileHelper) {
-        this.folderBrowser = folderBrowser;
+    public S3FileMapper(FlowFileBrowser fileBrowser, FileHelper fileHelper) {
+        this.fileBrowser = fileBrowser;
         this.fileHelper = fileHelper;
     }
 
@@ -83,7 +83,10 @@ public class S3FileMapper {
     }
 
     @Nullable
-    private File getFile(String filename) {
+    private File getFile(@Nullable String filename) {
+        if (TextUtils.isEmpty(filename)) {
+            return null;
+        }
         String ext = getFileExtension(filename);
         String folderName;
         if (isMedia(ext)) {
@@ -94,13 +97,7 @@ public class S3FileMapper {
             //unsupported file format found
             folderName = null;
         }
-        File folder = folderBrowser.getInternalFolder(folderName);
-        File file = new File(folder, filename);
-        if (file.exists()) {
-            return file;
-        } else {
-            return null;
-        }
+        return fileBrowser.getInternalFile(filename, folderName);
     }
 
     private boolean isMedia(@Nullable String ext) {

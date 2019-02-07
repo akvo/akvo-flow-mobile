@@ -26,6 +26,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Rect;
 import android.net.Uri;
 import android.os.ParcelFileDescriptor;
+import android.text.TextUtils;
 
 import org.akvo.flow.data.datasource.DataSourceFactory;
 import org.akvo.flow.data.datasource.ImageDataSource;
@@ -36,6 +37,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
@@ -57,7 +60,7 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest(BitmapFactory.class)
+@PrepareForTest({BitmapFactory.class, TextUtils.class})
 public class FileDataRepositoryTest {
 
     @Mock
@@ -95,6 +98,15 @@ public class FileDataRepositoryTest {
         PowerMockito.when(BitmapFactory
                 .decodeFileDescriptor(any(FileDescriptor.class), any(Rect.class),
                         any(BitmapFactory.Options.class))).thenReturn(mockBitmap);
+
+        PowerMockito.mockStatic(TextUtils.class);
+        PowerMockito.when(TextUtils.isEmpty(any(CharSequence.class))).thenAnswer(new Answer<Boolean>() {
+            @Override
+            public Boolean answer(InvocationOnMock invocation) throws Throwable {
+                CharSequence a = (CharSequence) invocation.getArguments()[0];
+                return !(a != null && a.length() > 0);
+            }
+        });
 
         MediaDataSource mediaDataSource = new MediaDataSource(mockContext);
         ImageDataSource imageDataSource = new ImageDataSource(mockFileHelper, mockContext);

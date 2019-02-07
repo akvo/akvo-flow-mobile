@@ -92,20 +92,30 @@ public class ImageDataSource {
 
     private Observable<Boolean> saveImage(@Nullable Bitmap bitmap, String filename) {
         if (bitmap == null) {
-            return Observable.just(false);
+            return Observable.error(new Exception("Error saving null bitmap"));
         }
         OutputStream out = null;
+        boolean saved = false;
+        Throwable caughtException = null;
         try {
             out = new BufferedOutputStream(new FileOutputStream(filename));
-            if (bitmap.compress(Bitmap.CompressFormat.JPEG, QUALITY_FULL, out)) {
-                return Observable.just(true);
-            }
+            saved = bitmap.compress(Bitmap.CompressFormat.JPEG, QUALITY_FULL, out);
         } catch (FileNotFoundException e) {
-            Timber.e(e);
+            caughtException = e;
         } finally {
             fileHelper.close(out);
         }
-        return Observable.error(new Exception("Error saving bitmap"));
+        if (saved) {
+            return Observable.just(true);
+        } else {
+            Exception error;
+            if (caughtException != null) {
+                error = new Exception("Error saving bitmap", caughtException);
+            } else {
+                error = new Exception("Error saving bitmap");
+            }
+            return Observable.error(error);
+        }
     }
 
     private Observable<Boolean> saveResizedImage(Bitmap bitmap, String absolutePath) {
@@ -124,13 +134,14 @@ public class ImageDataSource {
                     context.getContentResolver().openFileDescriptor(uri, "r");
             if (parcelFileDescriptor != null) {
                 FileDescriptor fileDescriptor = parcelFileDescriptor.getFileDescriptor();
-                BitmapFactory.Options options = prepareBitmapOptions(fileDescriptor, sizePreference);
+                BitmapFactory.Options options = prepareBitmapOptions(fileDescriptor,
+                        sizePreference);
                 Bitmap bitmap = BitmapFactory.decodeFileDescriptor(fileDescriptor, null, options);
                 parcelFileDescriptor.close();
                 return saveImage(bitmap, outFilename);
             }
         } catch (IOException e) {
-            Timber.e(e);
+            return Observable.error(new Exception("Error getting bitmap from uri: " + uri, e));
         }
         return Observable.error(new Exception("Error getting bitmap from uri: " + uri));
     }

@@ -54,8 +54,8 @@ public class SaveResizedImage extends UseCase {
 
     @Override
     protected <T> Observable buildUseCaseObservable(Map<String, T> parameters) {
-        if (parameters == null || !parameters.containsKey(ORIGINAL_FILE_NAME_PARAM)
-                || !parameters.containsKey(RESIZED_FILE_NAME_PARAM)) {
+        if (parameters == null || parameters.get(ORIGINAL_FILE_NAME_PARAM) == null
+                || parameters.get(RESIZED_FILE_NAME_PARAM) == null) {
             return Observable.error(new IllegalArgumentException("Missing params"));
         }
 

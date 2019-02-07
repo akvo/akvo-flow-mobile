@@ -65,7 +65,6 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -90,9 +89,6 @@ public class SurveyDataRepositoryTest {
 
     @Mock
     DeviceHelper mockDeviceHelper;
-
-    @Mock
-    DatabaseDataSource mockDatabaseDataSource;
 
     @Mock
     S3File mockS3File;
@@ -134,9 +130,8 @@ public class SurveyDataRepositoryTest {
 
         when(mockAmazonAuth.getAmazonAuth(anyString(), anyString(), any(S3File.class))).thenReturn("123");
 
-        surveyDataRepository = spy(
-                new SurveyDataRepository(mockDataSourceFactory, null, null,restApi, null, null, null,
-                        mockMapper, mockTransmissionMapper, null, null));
+        surveyDataRepository = new SurveyDataRepository(mockDataSourceFactory, null, null, restApi, null, null,
+                        null, mockMapper, mockTransmissionMapper, null, null);
 
         when(mockDeviceHelper.getPhoneNumber()).thenReturn("123");
         when(mockDeviceHelper.getImei()).thenReturn("123");

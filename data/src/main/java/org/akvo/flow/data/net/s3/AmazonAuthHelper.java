@@ -62,26 +62,10 @@ public class AmazonAuthHelper {
                 s3User.getBucket(), s3File.getObjectKey());
     }
 
-//    @NonNull
-//    private String getAmazonAuthForPut(String date, String payloadStr, S3File s3File) {
-//        final String payload = String
-//                .format(payloadStr, s3File.getMd5Base64(), s3File.getContentType(), date,
-//                        s3User.getBucket(), s3File.getObjectKey());
-//        return createAuthorization(payload);
-//    }
-
-//    @NonNull
-//    public String getAmazonAuthForGet(String date, String filename) {
-//        final String payload = String
-//                .format(RestApi.PAYLOAD_GET, date, s3User.getBucket(), filename);
-//        return createAuthorization(payload);
-//    }
-
     @NonNull
     private String createAuthorization(String payload) {
         final String signature = signatureHelper
                 .getAuthorization(payload, s3User.getSecret(), Base64.NO_WRAP);
         return "AWS " + s3User.getAccessKey() + ":" + signature;
     }
-
 }

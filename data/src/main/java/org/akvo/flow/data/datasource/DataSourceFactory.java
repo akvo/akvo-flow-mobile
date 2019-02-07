@@ -43,8 +43,7 @@ public class DataSourceFactory {
     public DataSourceFactory(SharedPreferencesDataSource sharedPreferencesDataSource,
             ImageDataSource imageDataSource, DatabaseDataSource dataBaseDataSource,
             SecureSharedPreferencesDataSource secureSharedPreferencesDataSource,
-            FileDataSource fileDataSource,
-            VideoDataSource videoDataSource) {
+            FileDataSource fileDataSource, VideoDataSource videoDataSource) {
         this.sharedPreferencesDataSource = sharedPreferencesDataSource;
         this.imageDataSource = imageDataSource;
         this.dataBaseDataSource = dataBaseDataSource;

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -60,17 +60,16 @@ public class BitmapHelper {
             return false;
         }
         OutputStream out = null;
+        boolean saved = false;
         try {
             out = new BufferedOutputStream(new FileOutputStream(filename));
-            if (bitmap.compress(Bitmap.CompressFormat.JPEG, QUALITY_FULL, out)) {
-                return true;
-            }
+            saved = bitmap.compress(Bitmap.CompressFormat.JPEG, QUALITY_FULL, out);
         } catch (FileNotFoundException e) {
             Timber.e(e);
         } finally {
             fileHelper.close(out);
         }
-        return false;
+        return saved;
     }
 
     Bitmap createResizedBitmap(Bitmap bitmap) {

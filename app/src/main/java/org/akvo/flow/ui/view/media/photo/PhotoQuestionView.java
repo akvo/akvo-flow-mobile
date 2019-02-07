@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2018-2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -288,6 +288,15 @@ public class PhotoQuestionView extends QuestionView
     @Override
     public void onDestroy() {
         presenter.destroy();
+    }
+
+    @Override
+    public boolean isValid() {
+        File file = rebuildFilePath();
+        if (file == null|| !file.exists()) {
+            return false;
+        }
+        return super.isValid();
     }
 
     private void displayThumbnail() {

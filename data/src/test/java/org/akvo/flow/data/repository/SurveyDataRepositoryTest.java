@@ -31,7 +31,7 @@ import org.akvo.flow.data.entity.TransmissionMapper;
 import org.akvo.flow.data.entity.UploadError;
 import org.akvo.flow.data.entity.UploadFormDeletedError;
 import org.akvo.flow.data.entity.UploadSuccess;
-import org.akvo.flow.data.net.BodyCreator;
+import org.akvo.flow.data.net.s3.BodyCreator;
 import org.akvo.flow.data.net.DeviceHelper;
 import org.akvo.flow.data.net.RestApi;
 import org.akvo.flow.data.net.s3.AmazonAuthHelper;
@@ -128,10 +128,11 @@ public class SurveyDataRepositoryTest {
                 .format(any(Date.class), any(StringBuffer.class), any(FieldPosition.class)))
                 .thenReturn(new StringBuffer().append("12-12-2012"));
 
-        when(mockAmazonAuth.getAmazonAuth(anyString(), anyString(), any(S3File.class))).thenReturn("123");
+        when(mockAmazonAuth.getAmazonAuth(anyString(), anyString(), any(S3File.class)))
+                .thenReturn("123");
 
-        surveyDataRepository = new SurveyDataRepository(mockDataSourceFactory, null, null, restApi, null, null,
-                        null, mockMapper, mockTransmissionMapper, null, null);
+        surveyDataRepository = new SurveyDataRepository(mockDataSourceFactory, null, null, restApi,
+                null, null, null, mockMapper, mockTransmissionMapper, null, null);
 
         when(mockDeviceHelper.getPhoneNumber()).thenReturn("123");
         when(mockDeviceHelper.getImei()).thenReturn("123");
@@ -193,7 +194,8 @@ public class SurveyDataRepositoryTest {
         formIds.add("2");
         when(mockMapper.mapToFormId(any(Cursor.class))).thenReturn(formIds);
 
-        when(mockTransmissionMapper.transform(any(Cursor.class))).thenReturn(Collections.<Transmission>emptyList());
+        when(mockTransmissionMapper.transform(any(Cursor.class)))
+                .thenReturn(Collections.<Transmission>emptyList());
 
         TestObserver observer = new TestObserver<List<Transmission>>();
 

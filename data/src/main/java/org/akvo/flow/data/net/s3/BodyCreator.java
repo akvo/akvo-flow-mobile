@@ -17,7 +17,7 @@
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.akvo.flow.data.net;
+package org.akvo.flow.data.net.s3;
 
 import android.support.annotation.NonNull;
 

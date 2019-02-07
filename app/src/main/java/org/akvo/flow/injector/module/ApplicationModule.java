@@ -32,7 +32,7 @@ import org.akvo.flow.BuildConfig;
 import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.data.datasource.preferences.SharedPreferencesDataSource;
 import org.akvo.flow.data.executor.JobExecutor;
-import org.akvo.flow.data.net.BodyCreator;
+import org.akvo.flow.data.net.s3.BodyCreator;
 import org.akvo.flow.data.net.DeviceHelper;
 import org.akvo.flow.data.net.Encoder;
 import org.akvo.flow.data.net.HMACInterceptor;

@@ -33,6 +33,7 @@ import org.akvo.flow.data.net.gae.DeviceFilesService;
 import org.akvo.flow.data.net.gae.ProcessingNotificationService;
 import org.akvo.flow.data.net.s3.AmazonAuthHelper;
 import org.akvo.flow.data.net.s3.AwsS3;
+import org.akvo.flow.data.net.s3.BodyCreator;
 import org.akvo.flow.data.util.ApiUrls;
 
 import java.text.DateFormat;
@@ -44,7 +45,6 @@ import javax.inject.Singleton;
 import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.reactivex.functions.Function;
-import okhttp3.MediaType;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import retrofit2.HttpException;
@@ -64,10 +64,11 @@ public class RestApi {
     private final ApiUrls apiUrls;
     private final AmazonAuthHelper amazonAuthHelper;
     private final DateFormat dateFormat;
+    private final BodyCreator bodyCreator;
 
     public RestApi(DeviceHelper deviceHelper, RestServiceFactory serviceFactory,
             Encoder encoder, String version, ApiUrls apiUrls, AmazonAuthHelper amazonAuthHelper,
-            DateFormat dateFormat) {
+            DateFormat dateFormat, BodyCreator bodyCreator) {
         this.androidId = deviceHelper.getAndroidId();
         this.imei = deviceHelper.getImei();
         this.phoneNumber = deviceHelper.getPhoneNumber();
@@ -77,6 +78,7 @@ public class RestApi {
         this.apiUrls = apiUrls;
         this.amazonAuthHelper = amazonAuthHelper;
         this.dateFormat = dateFormat;
+        this.bodyCreator = bodyCreator;
     }
 
     public Flowable<ApiLocaleResult> downloadDataPoints(long surveyGroup,
@@ -116,7 +118,8 @@ public class RestApi {
         String authorization = amazonAuthHelper.getAmazonAuth(date, PAYLOAD_PUT_PUBLIC, s3File);
         return createRetrofitService()
                 .uploadPublic(s3File.getDir(), s3File.getFilename(), s3File.getMd5Base64(),
-                        s3File.getContentType(), date, authorization, createBody(s3File))
+                        s3File.getContentType(), date, authorization,
+                        bodyCreator.createBody(s3File))
                 .concatMap(
                         new Function<Response<ResponseBody>, Observable<Response<ResponseBody>>>() {
                             @Override
@@ -133,11 +136,11 @@ public class RestApi {
 
     private Observable<Response<ResponseBody>> uploadPrivateFile(String date, final S3File s3File) {
         String authorization = amazonAuthHelper.getAmazonAuth(date, PAYLOAD_PUT_PRIVATE, s3File);
+        RequestBody body = bodyCreator.createBody(s3File);
         return createRetrofitService()
                 .upload(s3File.getDir(), s3File.getFilename(), s3File.getMd5Base64(),
-                        s3File.getContentType(), date, authorization, createBody(s3File))
-                .concatMap(
-                        new Function<Response<ResponseBody>, Observable<Response<ResponseBody>>>() {
+                        s3File.getContentType(), date, authorization, body)
+                .concatMap(new Function<Response<ResponseBody>, Observable<Response<ResponseBody>>>() {
                             @Override
                             public Observable<Response<ResponseBody>> apply(
                                     Response<ResponseBody> response) {
@@ -167,11 +170,6 @@ public class RestApi {
             eTag = eTag.replaceAll("\"", "");
         }
         return eTag;
-    }
-
-    @NonNull
-    private RequestBody createBody(S3File s3File) {
-        return RequestBody.create(MediaType.parse(s3File.getContentType()), s3File.getFile());
     }
 
     private String getDate() {

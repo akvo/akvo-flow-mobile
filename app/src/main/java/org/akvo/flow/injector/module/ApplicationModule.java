@@ -32,6 +32,7 @@ import org.akvo.flow.BuildConfig;
 import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.data.datasource.preferences.SharedPreferencesDataSource;
 import org.akvo.flow.data.executor.JobExecutor;
+import org.akvo.flow.data.net.s3.BodyCreator;
 import org.akvo.flow.data.net.DeviceHelper;
 import org.akvo.flow.data.net.Encoder;
 import org.akvo.flow.data.net.HMACInterceptor;
@@ -214,11 +215,12 @@ public class ApplicationModule {
     @Provides
     @Singleton
     RestApi provideRestApi(DeviceHelper deviceHelper, RestServiceFactory serviceFactory,
-            Encoder encoder, ApiUrls apiUrls, AmazonAuthHelper amazonAuthHelper) {
+            Encoder encoder, ApiUrls apiUrls, AmazonAuthHelper amazonAuthHelper,
+            BodyCreator bodyCreator) {
         final DateFormat df = new SimpleDateFormat(REST_API_DATE_PATTERN, Locale.US);
         df.setTimeZone(TimeZone.getTimeZone(TIMEZONE));
         return new RestApi(deviceHelper, serviceFactory, encoder, BuildConfig.VERSION_NAME,
-                apiUrls, amazonAuthHelper, df);
+                apiUrls, amazonAuthHelper, df, bodyCreator);
     }
 
     @Provides

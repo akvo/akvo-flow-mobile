@@ -264,8 +264,6 @@ public class DatabaseDataSource {
                                         return aLong != -1L;
                                     }
                                 });
-
-
                     }
                 })
                 .toList()

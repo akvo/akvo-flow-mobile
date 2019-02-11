@@ -242,14 +242,14 @@ public class DatabaseDataSource {
     }
 
     public Observable<Boolean> updateFailedTransmissionsSurveyInstances(
-            @Nullable Set<String> filenames) {
+            @Nullable final Set<String> filenames) {
         if (filenames == null || filenames.isEmpty()) {
             return Observable.just(true);
         }
         return Observable.fromIterable(filenames)
-                .concatMap(new Function<String, Observable<Boolean>>() {
+                .concatMap(new Function<String, Observable<Long>>() {
                     @Override
-                    public Observable<Boolean> apply(String filename) {
+                    public Observable<Long> apply(String filename) {
                         return Observable
                                 .just(briteSurveyDbAdapter.getTransmissionForFileName(filename))
                                 .map(new Function<Cursor, Long>() {
@@ -263,15 +263,17 @@ public class DatabaseDataSource {
                                     public boolean test(Long aLong) {
                                         return aLong != -1L;
                                     }
-                                })
-                                .toList()
-                                .toObservable()
-                                .concatMap(new Function<List<Long>, Observable<Boolean>>() {
-                                    @Override
-                                    public Observable<Boolean> apply(List<Long> instanceIds) {
-                                        return updateFailedSubmissions(new HashSet<>(instanceIds));
-                                    }
                                 });
+
+
+                    }
+                })
+                .toList()
+                .toObservable()
+                .concatMap(new Function<List<Long>, Observable<Boolean>>() {
+                    @Override
+                    public Observable<Boolean> apply(List<Long> instanceIds) {
+                        return updateFailedSubmissions(new HashSet<>(instanceIds));
                     }
                 });
     }

@@ -19,8 +19,6 @@
 
 package org.akvo.flow.data.repository;
 
-import android.content.ContentResolver;
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Rect;
@@ -44,10 +42,8 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 import java.io.FileDescriptor;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 
 import io.reactivex.observers.TestObserver;
 
@@ -55,7 +51,6 @@ import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
@@ -65,12 +60,6 @@ public class FileDataRepositoryTest {
 
     @Mock
     SharedPreferencesDataSource mockSharedPrefs;
-
-    @Mock
-    Context mockContext;
-
-    @Mock
-    ContentResolver mockContentResolver;
 
     @Mock
     Uri mockUri;
@@ -88,10 +77,10 @@ public class FileDataRepositoryTest {
     Bitmap mockBitmap;
 
     @Mock
-    MediaResolverHelper mediaResolverHelper;
+    MediaResolverHelper mockMediaResolverHelper;
 
     @Mock
-    BitmapHelper bitmapHelper;
+    BitmapHelper mockBitmapHelper;
 
     private FileDataRepository fileDataRepository;
 
@@ -111,17 +100,18 @@ public class FileDataRepositoryTest {
             }
         });
 
-        ImageDataSource imageDataSource = new ImageDataSource(mediaResolverHelper, bitmapHelper);
+        ImageDataSource imageDataSource = new ImageDataSource(mockMediaResolverHelper, mockBitmapHelper);
         DataSourceFactory dataSourceFactory = new DataSourceFactory(mockSharedPrefs,
                 imageDataSource, null, null, null, null);
-        when(mockContext.getContentResolver()).thenReturn(mockContentResolver);
         fileDataRepository = new FileDataRepository(dataSourceFactory);
         doNothing().when(mockParcelFileDescriptor).close();
+
+        when(mockMediaResolverHelper.removeDuplicateImage(mockUri)).thenReturn(true);
     }
 
     @Test
-    public void shouldReturnErrorIfWrongUri() throws FileNotFoundException {
-        when(mockContentResolver.openInputStream(any(Uri.class))).thenReturn(null);
+    public void shouldReturnErrorIfWrongUri() {
+        when(mockMediaResolverHelper.getInputStreamFromUri(any(Uri.class))).thenReturn(null);
 
         TestObserver observer = new TestObserver<Boolean>();
 
@@ -133,23 +123,8 @@ public class FileDataRepositoryTest {
     }
 
     @Test
-    public void shouldReturnErrorIfUriNotFound() throws FileNotFoundException {
-        when(mockContentResolver.openInputStream(any(Uri.class)))
-                .thenThrow(new FileNotFoundException());
-
-        TestObserver observer = new TestObserver<Boolean>();
-
-        fileDataRepository.copyResizedImage(mockUri, "123", 0, true).subscribe(observer);
-
-        observer.assertNoValues();
-        assertEquals(1, observer.errorCount());
-        assertTrue(observer.errors().get(0) instanceof FileNotFoundException);
-    }
-
-    @Test
-    public void shouldReturnErrorIfNullFileDescriptor() throws FileNotFoundException {
-        when(mockContentResolver.openInputStream(any(Uri.class))).thenReturn(mockFileInputStream);
-        when(mockContentResolver.openFileDescriptor((any(Uri.class)), anyString()))
+    public void shouldReturnErrorIfNullFileDescriptor() {
+        when(mockMediaResolverHelper.openFileDescriptor((any(Uri.class))))
                 .thenReturn(null);
 
         TestObserver observer = new TestObserver<Boolean>();
@@ -162,14 +137,11 @@ public class FileDataRepositoryTest {
     }
 
     @Test
-    public void shouldReturnErrorIfNullBitmap() throws FileNotFoundException {
-        when(mockContentResolver.openInputStream(any(Uri.class))).thenReturn(mockFileInputStream);
-        when(mockContentResolver.openFileDescriptor((any(Uri.class)), anyString()))
+    public void shouldReturnErrorIfNullBitmap() {
+        when(mockMediaResolverHelper.openFileDescriptor((any(Uri.class))))
                 .thenReturn(mockParcelFileDescriptor);
-        PowerMockito.when(BitmapFactory
-                .decodeFileDescriptor(any(FileDescriptor.class), any(Rect.class),
-                        any(BitmapFactory.Options.class))).thenReturn(null);
         when(mockParcelFileDescriptor.getFileDescriptor()).thenReturn(mockFileDescriptor);
+        when(mockBitmapHelper.getBitmap(anyInt(), any(ParcelFileDescriptor.class))).thenReturn(null);
 
         TestObserver observer = new TestObserver<Boolean>();
 
@@ -181,33 +153,15 @@ public class FileDataRepositoryTest {
     }
 
     @Test
-    public void shouldReturnErrorCompressFails() throws FileNotFoundException {
-        when(mockContentResolver.openInputStream(any(Uri.class))).thenReturn(mockFileInputStream);
-        when(mockContentResolver.openFileDescriptor((any(Uri.class)), anyString()))
+    public void shouldReturnNoErrorsIfAllGoesWell() {
+        when(mockMediaResolverHelper.openFileDescriptor((any(Uri.class))))
                 .thenReturn(mockParcelFileDescriptor);
         when(mockParcelFileDescriptor.getFileDescriptor()).thenReturn(mockFileDescriptor);
-        when(mockBitmap
-                .compress(any(Bitmap.CompressFormat.class), anyInt(), any(OutputStream.class)))
-                .thenReturn(false);
-
-        TestObserver observer = new TestObserver<Boolean>();
-
-        fileDataRepository.copyResizedImage(mockUri, "123", 0, true).subscribe(observer);
-
-        observer.assertNoValues();
-        assertEquals(1, observer.errorCount());
-        assertTrue(observer.errors().get(0) instanceof Exception);
-    }
-
-    @Test
-    public void shouldReturnNoErrorsIfAllGoesWell() throws FileNotFoundException {
-        when(mockContentResolver.openInputStream(any(Uri.class))).thenReturn(mockFileInputStream);
-        when(mockContentResolver.openFileDescriptor((any(Uri.class)), anyString()))
-                .thenReturn(mockParcelFileDescriptor);
+        when(mockBitmapHelper.getBitmap(anyInt(), any(ParcelFileDescriptor.class))).thenReturn(mockBitmap);
         when(mockParcelFileDescriptor.getFileDescriptor()).thenReturn(mockFileDescriptor);
-        when(mockBitmap
+     /*   when(mockBitmap
                 .compress(any(Bitmap.CompressFormat.class), anyInt(), any(OutputStream.class)))
-                .thenReturn(true);
+                .thenReturn(true);*/
 
         TestObserver observer = new TestObserver<Boolean>();
 

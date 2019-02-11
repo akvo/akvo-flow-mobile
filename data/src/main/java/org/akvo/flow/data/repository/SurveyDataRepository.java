@@ -523,7 +523,8 @@ public class SurveyDataRepository implements SurveyRepository {
                 });
     }
 
-    private Observable<Set<String>> syncTransmissions(List<Transmission> transmissions,
+    @VisibleForTesting
+    Observable<Set<String>> syncTransmissions(List<Transmission> transmissions,
             final String deviceId) {
         return Observable.fromIterable(transmissions)
                 .concatMap(new Function<Transmission, Observable<UploadResult>>() {
@@ -541,7 +542,8 @@ public class SurveyDataRepository implements SurveyRepository {
                 });
     }
 
-    private Observable<UploadResult> syncTransmission(final Transmission transmission,
+    @VisibleForTesting
+    Observable<UploadResult> syncTransmission(final Transmission transmission,
             final String deviceId) {
         final DatabaseDataSource dataBaseDataSource = dataSourceFactory.getDataBaseDataSource();
         final long transmissionId = transmission.getId();

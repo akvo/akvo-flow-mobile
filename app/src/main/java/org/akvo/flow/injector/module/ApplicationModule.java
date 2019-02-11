@@ -38,8 +38,9 @@ import org.akvo.flow.data.net.RestApi;
 import org.akvo.flow.data.net.RestServiceFactory;
 import org.akvo.flow.data.net.S3User;
 import org.akvo.flow.data.net.SignatureHelper;
-import org.akvo.flow.data.repository.ApkDataRepository;
 import org.akvo.flow.data.net.s3.AmazonAuthHelper;
+import org.akvo.flow.data.net.s3.BodyCreator;
+import org.akvo.flow.data.repository.ApkDataRepository;
 import org.akvo.flow.data.repository.FileDataRepository;
 import org.akvo.flow.data.repository.FormDataRepository;
 import org.akvo.flow.data.repository.MissingAndDeletedDataRepository;
@@ -53,8 +54,8 @@ import org.akvo.flow.domain.executor.PostExecutionThread;
 import org.akvo.flow.domain.executor.ThreadExecutor;
 import org.akvo.flow.domain.repository.ApkRepository;
 import org.akvo.flow.domain.repository.FileRepository;
-import org.akvo.flow.domain.repository.MissingAndDeletedRepository;
 import org.akvo.flow.domain.repository.FormRepository;
+import org.akvo.flow.domain.repository.MissingAndDeletedRepository;
 import org.akvo.flow.domain.repository.SetupRepository;
 import org.akvo.flow.domain.repository.SurveyRepository;
 import org.akvo.flow.domain.repository.UserRepository;
@@ -231,11 +232,12 @@ public class ApplicationModule {
     @Provides
     @Singleton
     RestApi provideRestApi(DeviceHelper deviceHelper, RestServiceFactory serviceFactory,
-            Encoder encoder, ApiUrls apiUrls, AmazonAuthHelper amazonAuthHelper) {
+            Encoder encoder, ApiUrls apiUrls, AmazonAuthHelper amazonAuthHelper,
+            BodyCreator bodyCreator) {
         final DateFormat df = new SimpleDateFormat(REST_API_DATE_PATTERN, Locale.US);
         df.setTimeZone(TimeZone.getTimeZone(TIMEZONE));
         return new RestApi(deviceHelper, serviceFactory, encoder, BuildConfig.VERSION_NAME,
-                apiUrls, amazonAuthHelper, df);
+                apiUrls, amazonAuthHelper, df, bodyCreator);
     }
 
     @Provides

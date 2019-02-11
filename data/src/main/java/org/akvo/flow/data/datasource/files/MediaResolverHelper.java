@@ -56,7 +56,7 @@ public class MediaResolverHelper {
     }
 
     @Nullable
-    InputStream getInputStreamFromUri(Uri uri) {
+    public InputStream getInputStreamFromUri(Uri uri) {
         try {
             return context.getContentResolver().openInputStream(uri);
         } catch (FileNotFoundException e) {
@@ -66,7 +66,7 @@ public class MediaResolverHelper {
     }
 
     @Nullable
-    ParcelFileDescriptor openFileDescriptor(Uri uri) {
+    public ParcelFileDescriptor openFileDescriptor(Uri uri) {
         try {
             return context.getContentResolver().openFileDescriptor(uri, "r");
         } catch (FileNotFoundException e) {
@@ -75,7 +75,7 @@ public class MediaResolverHelper {
         }
     }
 
-    boolean removeDuplicateImage(Uri uri) {
+    public boolean removeDuplicateImage(Uri uri) {
         final InputStream inputStream = getInputStreamFromUri(uri);
         String imagePath = getLastImageTakenPath();
         if (!TextUtils.isEmpty(imagePath)) {
@@ -86,7 +86,7 @@ public class MediaResolverHelper {
                     deleteImageByPath(imagePath);
                 }
             } catch (FileNotFoundException e) {
-                Timber.d(e);
+                Timber.e(e);
             } finally {
                 fileHelper.close(fileInputStream);
             }
@@ -95,7 +95,7 @@ public class MediaResolverHelper {
         return deleteMedia(uri);
     }
 
-    boolean updateExifData(Uri uri, String resizedImagePath) {
+    public boolean updateExifData(Uri uri, String resizedImagePath) {
         final InputStream inputStream = getInputStreamFromUri(uri);
         final boolean dataUpdated = exifHelper.updateExifData(inputStream, resizedImagePath);
         fileHelper.close(inputStream);

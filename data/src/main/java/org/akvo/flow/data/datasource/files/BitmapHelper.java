@@ -81,7 +81,7 @@ public class BitmapHelper {
                 .createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), m, true);
     }
 
-    Bitmap getBitmap(int sizePreference, ParcelFileDescriptor parcelFileDescriptor) {
+    public Bitmap getBitmap(int sizePreference, ParcelFileDescriptor parcelFileDescriptor) {
         FileDescriptor fileDescriptor = parcelFileDescriptor.getFileDescriptor();
         BitmapFactory.Options options = prepareBitmapOptions(fileDescriptor,
                 sizePreference);

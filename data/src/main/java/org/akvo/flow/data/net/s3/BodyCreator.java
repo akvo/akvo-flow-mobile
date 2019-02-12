@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2019 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -15,33 +15,27 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 
-package org.akvo.flow.data.entity;
+package org.akvo.flow.data.net.s3;
 
-import android.database.Cursor;
+import android.support.annotation.NonNull;
 
-import org.akvo.flow.database.TransmissionColumns;
+import org.akvo.flow.data.entity.S3File;
 
 import javax.inject.Inject;
 
-public class SurveyInstanceIdMapper {
+import okhttp3.MediaType;
+import okhttp3.RequestBody;
+
+public class BodyCreator {
 
     @Inject
-    public SurveyInstanceIdMapper() {
+    public BodyCreator() {
     }
 
-    public long getSurveyInstanceIds(Cursor cursor) {
-        long instanceId = -1L;
-        if (cursor != null) {
-            if (cursor.moveToFirst()) {
-                final int formIdCol = cursor
-                        .getColumnIndexOrThrow(TransmissionColumns.SURVEY_INSTANCE_ID);
-                instanceId = cursor.getLong(formIdCol);
-            }
-            cursor.close();
-        }
-        return instanceId;
+    @NonNull
+    public RequestBody createBody(S3File s3File) {
+        return RequestBody.create(MediaType.parse(s3File.getContentType()), s3File.getFile());
     }
 }

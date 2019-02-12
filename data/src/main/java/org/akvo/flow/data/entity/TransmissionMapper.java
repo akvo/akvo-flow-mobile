@@ -30,6 +30,8 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import timber.log.Timber;
+
 public class TransmissionMapper {
 
     private final S3FileMapper fileMapper;
@@ -57,6 +59,8 @@ public class TransmissionMapper {
                                 cursor.getLong(surveyInstanceCol), cursor.getString(formIdCol),
                                 s3File);
                         transmissions.add(trans);
+                    } else {
+                        Timber.e("Transmission error: file " + filename + " could not be processed");
                     }
                 } while (cursor.moveToNext());
             }

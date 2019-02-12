@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2016-2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -28,11 +28,10 @@ import com.squareup.sqlbrite2.BriteDatabase;
 import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.broadcast.BootReceiver;
 import org.akvo.flow.broadcast.DataTimeoutReceiver;
-import org.akvo.flow.data.net.RestApi;
 import org.akvo.flow.domain.executor.PostExecutionThread;
 import org.akvo.flow.domain.executor.ThreadExecutor;
 import org.akvo.flow.domain.repository.FileRepository;
-import org.akvo.flow.domain.repository.SetupRepository;
+import org.akvo.flow.domain.repository.MissingAndDeletedRepository;
 import org.akvo.flow.domain.repository.SurveyRepository;
 import org.akvo.flow.domain.repository.UserRepository;
 import org.akvo.flow.injector.module.ApplicationModule;
@@ -76,11 +75,9 @@ public interface ApplicationComponent {
 
     UserRepository userRepository();
 
-    SetupRepository setupRepository();
+    MissingAndDeletedRepository missingAndDeletedRepository();
 
     Gson gson();
-
-    RestApi restApi();
 
     void inject(FileChangeTrackingService fileChangeTrackingService);
 

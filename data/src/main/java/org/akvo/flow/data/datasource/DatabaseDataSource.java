@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -41,6 +41,7 @@ import org.akvo.flow.database.TransmissionStatus;
 import org.akvo.flow.database.britedb.BriteSurveyDbAdapter;
 import org.akvo.flow.domain.entity.User;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -240,23 +241,15 @@ public class DatabaseDataSource {
         return Observable.just(briteSurveyDbAdapter.getFormIds());
     }
 
-    public Observable<Boolean> setFileTransmissionsFailed(@Nullable List<String> filenames) {
-        if (filenames == null || filenames.isEmpty()) {
-            return Observable.just(true);
-        }
-        briteSurveyDbAdapter.updateFailedTransmissions(filenames);
-        return Observable.just(true);
-    }
-
     public Observable<Boolean> updateFailedTransmissionsSurveyInstances(
-            @Nullable List<String> filenames) {
+            @Nullable final Set<String> filenames) {
         if (filenames == null || filenames.isEmpty()) {
             return Observable.just(true);
         }
         return Observable.fromIterable(filenames)
-                .concatMap(new Function<String, Observable<Boolean>>() {
+                .concatMap(new Function<String, Observable<Long>>() {
                     @Override
-                    public Observable<Boolean> apply(String filename) {
+                    public Observable<Long> apply(String filename) {
                         return Observable
                                 .just(briteSurveyDbAdapter.getTransmissionForFileName(filename))
                                 .map(new Function<Cursor, Long>() {
@@ -270,25 +263,25 @@ public class DatabaseDataSource {
                                     public boolean test(Long aLong) {
                                         return aLong != -1L;
                                     }
-                                })
-                                .toList()
-                                .toObservable()
-                                .concatMap(new Function<List<Long>, Observable<Boolean>>() {
-                                    @Override
-                                    public Observable<Boolean> apply(List<Long> instanceIds) {
-                                        return updateFailedSubmissions(new HashSet<>(instanceIds));
-                                    }
                                 });
+                    }
+                })
+                .toList()
+                .toObservable()
+                .concatMap(new Function<List<Long>, Observable<Boolean>>() {
+                    @Override
+                    public Observable<Boolean> apply(List<Long> instanceIds) {
+                        return updateFailedSubmissions(new HashSet<>(instanceIds));
                     }
                 });
     }
 
-    public Observable<Boolean> setDeletedForms(@Nullable List<String> deletedFormIds) {
+    public Observable<Set<String>> setDeletedForms(@Nullable Set<String> deletedFormIds) {
         if (deletedFormIds == null || deletedFormIds.isEmpty()) {
-            return Observable.just(true);
+            return Observable.just(Collections.<String>emptySet());
         }
         briteSurveyDbAdapter.setFormsDeleted(deletedFormIds);
-        return Observable.just(true);
+        return Observable.just(deletedFormIds);
     }
 
     public Observable<Cursor> getUnSyncedTransmissions(String formId) {
@@ -370,6 +363,14 @@ public class DatabaseDataSource {
             return Observable.just(true);
         }
         briteSurveyDbAdapter.createTransmissions(instanceId, formId, filenames);
+        return Observable.just(true);
+    }
+
+    public Observable<Boolean> saveMissingFiles(Set<String> missingFiles) {
+        if (missingFiles == null || missingFiles.isEmpty()) {
+            return Observable.just(true);
+        }
+        briteSurveyDbAdapter.updateFailedTransmissions(missingFiles);
         return Observable.just(true);
     }
 }

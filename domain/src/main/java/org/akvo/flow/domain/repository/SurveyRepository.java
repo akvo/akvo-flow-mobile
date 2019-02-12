@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -77,7 +77,7 @@ public interface SurveyRepository {
 
     Observable<Boolean> createTransmissions(Long instanceId, String formId, Set<String> fileNames);
 
-    Observable<List<String>> checkDeviceNotification(String surveyId, String deviceId);
+    Observable<List<String>> getFormIds(String surveyId);
 
-    Observable<List<String>> checkDeviceNotification(String deviceId);
+    Observable<List<String>> getFormIds();
 }

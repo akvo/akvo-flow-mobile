@@ -1,5 +1,15 @@
 Akvo FLOW app release notes
 ===========================
+# ver 2.6.4
+Date: 12 February 2019
+
+# Resolved issues
+* **Add tests to data syncing logic** - [#1297](https://github.com/akvo/akvo-flow-mobile/issues/1297) Unit tests added to data uploading logic to quickly detect errors.
+* **Corrupted files sent to s3** - [#1298](https://github.com/akvo/akvo-flow-mobile/issues/1298) Added checks after a file is sent to make sure it's not corrupted.
+* **Image checks and logic tests** - [#1304](https://github.com/akvo/akvo-flow-mobile/issues/1304) Making sure image processing logic is tested and that only valid images can be submitted.
+* **Failed files seem to be processed several times** - [#1310](https://github.com/akvo/akvo-flow-mobile/issues/1310) Fixed issue where some files were processed several times.
+
+---------------
 # ver 2.6.3.1
 Date: 19 December 2018
 

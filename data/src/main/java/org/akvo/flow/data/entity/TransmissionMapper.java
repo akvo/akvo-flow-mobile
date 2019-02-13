@@ -60,8 +60,7 @@ public class TransmissionMapper {
                                 s3File);
                         transmissions.add(trans);
                     } else {
-                        Timber.e(new Exception(
-                                "Transmission error: file " + filename + " could not be processed"));
+                        Timber.e("Transmission error: file " + filename + " could not be processed");
                     }
                 } while (cursor.moveToNext());
             }

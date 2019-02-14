@@ -51,7 +51,8 @@ public class ExifHelper {
                         !TextUtils.isEmpty(originalImageOrientation) && !originalImageOrientation
                                 .equals(newImageOrientation);
                 if (orientationNeedsUpdate) {
-                    newImageExif.setAttribute(ExifInterface.TAG_ORIENTATION, originalImageOrientation);
+                    newImageExif
+                            .setAttribute(ExifInterface.TAG_ORIENTATION, originalImageOrientation);
                 }
 
                 copyAttribute(originalImageExif, newImageExif, ExifInterface.TAG_GPS_LATITUDE);

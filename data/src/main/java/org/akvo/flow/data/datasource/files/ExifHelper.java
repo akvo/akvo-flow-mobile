@@ -20,6 +20,8 @@
 
 package org.akvo.flow.data.datasource.files;
 
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.media.ExifInterface;
 import android.text.TextUtils;
 
@@ -36,36 +38,41 @@ public class ExifHelper {
     public ExifHelper() {
     }
 
-    boolean updateExifData(InputStream originalImageInputStream, String resizedImagePath) {
-        try {
-            ExifInterface originalImageExif = new ExifInterface(originalImageInputStream);
-            ExifInterface newImageExif = new ExifInterface(resizedImagePath);
-            final String originalImageOrientation = getOrientation(originalImageExif);
-            final String newImageOrientation = getOrientation(newImageExif);
+    boolean updateExifData(@Nullable InputStream originalImageInputStream,
+            @NonNull String resizedImagePath) {
+        if (originalImageInputStream != null) {
+            try {
+                ExifInterface originalImageExif = new ExifInterface(originalImageInputStream);
+                ExifInterface newImageExif = new ExifInterface(resizedImagePath);
+                final String originalImageOrientation = getOrientation(originalImageExif);
+                final String newImageOrientation = getOrientation(newImageExif);
 
-            boolean orientationNeedsUpdate =
-                    !TextUtils.isEmpty(originalImageOrientation) && !originalImageOrientation
-                            .equals(newImageOrientation);
-            if (orientationNeedsUpdate) {
-                newImageExif.setAttribute(ExifInterface.TAG_ORIENTATION, originalImageOrientation);
+                boolean orientationNeedsUpdate =
+                        !TextUtils.isEmpty(originalImageOrientation) && !originalImageOrientation
+                                .equals(newImageOrientation);
+                if (orientationNeedsUpdate) {
+                    newImageExif.setAttribute(ExifInterface.TAG_ORIENTATION, originalImageOrientation);
+                }
+
+                copyAttribute(originalImageExif, newImageExif, ExifInterface.TAG_GPS_LATITUDE);
+                copyAttribute(originalImageExif, newImageExif, ExifInterface.TAG_GPS_LATITUDE_REF);
+                copyAttribute(originalImageExif, newImageExif, ExifInterface.TAG_GPS_LONGITUDE);
+                copyAttribute(originalImageExif, newImageExif, ExifInterface.TAG_GPS_LONGITUDE_REF);
+                newImageExif.saveAttributes();
+                return true;
+            } catch (IOException e) {
+                Timber.e(e);
             }
-
-            copyAttribute(originalImageExif, newImageExif, ExifInterface.TAG_GPS_LATITUDE);
-            copyAttribute(originalImageExif, newImageExif, ExifInterface.TAG_GPS_LATITUDE_REF);
-            copyAttribute(originalImageExif, newImageExif, ExifInterface.TAG_GPS_LONGITUDE);
-            copyAttribute(originalImageExif, newImageExif, ExifInterface.TAG_GPS_LONGITUDE_REF);
-            newImageExif.saveAttributes();
-        } catch (IOException e) {
-            Timber.e(e);
         }
-        return true;
+        return false;
     }
 
     private String getOrientation(ExifInterface exifInterface) {
         return exifInterface.getAttribute(ExifInterface.TAG_ORIENTATION);
     }
 
-    boolean areDatesEqual(InputStream inputStream, InputStream duplicateInputStream) {
+    boolean areDatesEqual(@Nullable InputStream inputStream,
+            @NonNull InputStream duplicateInputStream) {
         boolean equals = false;
         try {
             String originalFileDate = getExifDate(inputStream);
@@ -77,7 +84,11 @@ public class ExifHelper {
         return equals;
     }
 
-    private String getExifDate(InputStream inputStream) throws IOException {
+    @Nullable
+    private String getExifDate(@Nullable InputStream inputStream) throws IOException {
+        if (inputStream == null) {
+            return null;
+        }
         ExifInterface exifInterface = new ExifInterface(inputStream);
         return exifInterface.getAttribute(ExifInterface.TAG_DATETIME);
     }

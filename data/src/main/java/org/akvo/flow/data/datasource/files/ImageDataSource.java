@@ -23,6 +23,7 @@ package org.akvo.flow.data.datasource.files;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.ParcelFileDescriptor;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import javax.inject.Inject;
@@ -44,7 +45,7 @@ public class ImageDataSource {
         this.bitmapHelper = bitmapHelper;
     }
 
-    public Observable<Boolean> saveImages(Bitmap bitmap, String originalFilePath,
+    public Observable<Boolean> saveImages(@NonNull Bitmap bitmap, String originalFilePath,
             String resizedFilePath) {
         return Observable.zip(saveBitmap(bitmap, originalFilePath),
                 saveResizedBitmap(bitmap, resizedFilePath),

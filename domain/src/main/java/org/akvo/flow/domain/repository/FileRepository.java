@@ -31,7 +31,7 @@ import io.reactivex.annotations.NonNull;
 
 public interface FileRepository {
 
-    Observable<Boolean> saveImage(Bitmap bitmap, String fileName, String resizedFilePath);
+    Observable<Boolean> saveImage(@NonNull Bitmap bitmap, String fileName, String resizedFilePath);
 
     Observable<Boolean> copyResizedImage(Uri fileName, String resizedFilePath, int imageSize,
             boolean removeDuplicate);

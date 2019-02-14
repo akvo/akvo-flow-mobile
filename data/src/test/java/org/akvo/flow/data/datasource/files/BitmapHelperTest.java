@@ -60,8 +60,6 @@ public class BitmapHelperTest {
 
     @Test
     public void compressBitmapShouldReturnFalseForNullBitmap() {
-        bitmapHelper = new BitmapHelper(mockFileHelper);
-
         boolean compressed = bitmapHelper.compressBitmap(null, "abc");
 
         assertFalse(compressed);
@@ -69,8 +67,6 @@ public class BitmapHelperTest {
 
     @Test
     public void compressBitmapShouldReturnFalseForFileNotFound() {
-        bitmapHelper = new BitmapHelper(mockFileHelper);
-
         boolean compressed = bitmapHelper.compressBitmap(mockBitmap, "");
 
         assertFalse(compressed);
@@ -78,8 +74,6 @@ public class BitmapHelperTest {
 
     @Test
     public void compressBitmapShouldReturnTrue() {
-        bitmapHelper = new BitmapHelper(mockFileHelper);
-
         boolean compressed = bitmapHelper.compressBitmap(mockBitmap, "abc");
 
         assertTrue(compressed);

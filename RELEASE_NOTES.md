@@ -1,5 +1,12 @@
 Akvo FLOW app release notes
 ===========================
+# ver 2.6.4.1
+Date: 19 February 2019
+
+# Resolved issues
+* **Photo questions are all mandatory** - [#1318](https://github.com/akvo/akvo-flow-mobile/issues/1318) Allow submitting forms when a photo question is not mandatory and is empty.
+
+---------------
 # ver 2.6.4
 Date: 12 February 2019
 

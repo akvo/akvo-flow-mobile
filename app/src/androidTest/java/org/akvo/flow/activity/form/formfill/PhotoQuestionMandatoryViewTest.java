@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017,2019 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -15,7 +15,6 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 
 package org.akvo.flow.activity.form.formfill;
@@ -23,7 +22,6 @@ package org.akvo.flow.activity.form.formfill;
 import android.content.Context;
 import android.content.Intent;
 import android.support.test.InstrumentationRegistry;
-import android.support.test.espresso.ViewInteraction;
 import android.support.test.filters.MediumTest;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
@@ -38,23 +36,17 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import static android.support.test.espresso.assertion.ViewAssertions.matches;
-import static android.support.test.espresso.matcher.ViewMatchers.isChecked;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.clickNext;
-import static org.akvo.flow.activity.form.FormActivityTestUtil.fillSingleOptionsQuestion;
+import static org.akvo.flow.activity.form.FormActivityTestUtil.fillFreeTextQuestion;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.getFormActivityIntent;
-import static org.akvo.flow.activity.form.FormActivityTestUtil.getSingleChoiceRadioButton;
-import static org.akvo.flow.activity.form.FormActivityTestUtil.verifyQuestionTitleDisplayed;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.verifySubmitButtonDisabled;
-import static org.akvo.flow.activity.form.FormActivityTestUtil.verifySubmitButtonEnabled;
-import static org.akvo.flow.tests.R.raw.option_form;
-import static org.hamcrest.core.IsNot.not;
+import static org.akvo.flow.tests.R.raw.photo_form_mandatory;
 
 @MediumTest
 @RunWith(AndroidJUnit4.class)
-public class OptionsQuestionViewSingleTest {
+public class PhotoQuestionMandatoryViewTest {
 
-    private static final String FORM_TITLE = "OptionsQuestionForm";
+    private static final String FORM_TITLE = "New form";
     private static SurveyInstaller installer;
 
     @Rule
@@ -62,7 +54,7 @@ public class OptionsQuestionViewSingleTest {
             FormActivity.class) {
         @Override
         protected Intent getActivityIntent() {
-            return getFormActivityIntent(42573002L, "43623002", FORM_TITLE, 0L, false);
+            return getFormActivityIntent(311169115L, "318939116", FORM_TITLE, 0L, false);
         }
     };
 
@@ -71,7 +63,7 @@ public class OptionsQuestionViewSingleTest {
         Context targetContext = InstrumentationRegistry.getTargetContext();
         SurveyRequisite.setRequisites(targetContext);
         installer = new SurveyInstaller(targetContext);
-        installer.installSurvey(option_form, InstrumentationRegistry.getContext());
+        installer.installSurvey(photo_form_mandatory, InstrumentationRegistry.getContext());
     }
 
     @After
@@ -86,35 +78,9 @@ public class OptionsQuestionViewSingleTest {
     }
 
     @Test
-    public void ensureCanFillOptionsQuestion() {
-        verifyQuestionTitleDisplayed();
-
-        fillSingleOptionsQuestion(0);
-
-        verifyOptionSelected();
-        verifyOtherOptionUnselected();
-
+    public void ensureCannotSubmitEmptyMandatoryPhoto() {
+        fillFreeTextQuestion("This is an answer to your question");
         clickNext();
-
-        verifySubmitButtonEnabled();
-    }
-
-    @Test
-    public void ensureCannotSubmitIfNoOptionSelected() {
-        verifyQuestionTitleDisplayed();
-
-        clickNext();
-
         verifySubmitButtonDisabled();
-    }
-
-    private void verifyOptionSelected() {
-        ViewInteraction singleChoiceOption = getSingleChoiceRadioButton(0);
-        singleChoiceOption.check(matches(isChecked()));
-    }
-
-    private void verifyOtherOptionUnselected() {
-        ViewInteraction singleChoiceOption = getSingleChoiceRadioButton(1);
-        singleChoiceOption.check(matches(not(isChecked())));
     }
 }

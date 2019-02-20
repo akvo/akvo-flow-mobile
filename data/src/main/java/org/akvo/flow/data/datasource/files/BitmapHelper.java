@@ -72,7 +72,7 @@ public class BitmapHelper {
         return saved;
     }
 
-    Bitmap createResizedBitmap(Bitmap bitmap) {
+    Bitmap createResizedBitmap(@NonNull Bitmap bitmap) {
         Matrix m = new Matrix();
         m.setRectToRect(new RectF(0, 0, bitmap.getWidth(), bitmap.getHeight()),
                 new RectF(0, 0, RESIZED_IMAGE_WIDTH, RESIZED_IMAGE_HEIGHT),
@@ -81,7 +81,7 @@ public class BitmapHelper {
                 .createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), m, true);
     }
 
-    public Bitmap getBitmap(int sizePreference, ParcelFileDescriptor parcelFileDescriptor) {
+    Bitmap getBitmap(int sizePreference, ParcelFileDescriptor parcelFileDescriptor) {
         FileDescriptor fileDescriptor = parcelFileDescriptor.getFileDescriptor();
         BitmapFactory.Options options = prepareBitmapOptions(fileDescriptor,
                 sizePreference);

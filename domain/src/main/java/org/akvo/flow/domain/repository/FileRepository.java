@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -31,7 +31,7 @@ import io.reactivex.annotations.NonNull;
 
 public interface FileRepository {
 
-    Observable<Boolean> saveImage(Bitmap bitmap, String fileName, String resizedFilePath);
+    Observable<Boolean> saveImage(@NonNull Bitmap bitmap, String fileName, String resizedFilePath);
 
     Observable<Boolean> copyResizedImage(Uri fileName, String resizedFilePath, int imageSize,
             boolean removeDuplicate);

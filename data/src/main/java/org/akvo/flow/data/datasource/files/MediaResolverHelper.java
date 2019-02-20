@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2018-2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -25,6 +25,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
@@ -51,12 +52,8 @@ public class MediaResolverHelper {
         this.fileHelper = fileHelper;
     }
 
-    boolean deleteMedia(final Uri uri) {
-        return context.getContentResolver().delete(uri, null, null) > 0;
-    }
-
     @Nullable
-    public InputStream getInputStreamFromUri(Uri uri) {
+    public InputStream getInputStreamFromUri(@NonNull Uri uri) {
         try {
             return context.getContentResolver().openInputStream(uri);
         } catch (FileNotFoundException e) {
@@ -66,7 +63,7 @@ public class MediaResolverHelper {
     }
 
     @Nullable
-    public ParcelFileDescriptor openFileDescriptor(Uri uri) {
+    public ParcelFileDescriptor openFileDescriptor(@NonNull Uri uri) {
         try {
             return context.getContentResolver().openFileDescriptor(uri, "r");
         } catch (FileNotFoundException e) {
@@ -75,31 +72,40 @@ public class MediaResolverHelper {
         }
     }
 
-    public boolean removeDuplicateImage(Uri uri) {
-        final InputStream inputStream = getInputStreamFromUri(uri);
+    public boolean removeDuplicateImage(@NonNull Uri uri) {
         String imagePath = getLastImageTakenPath();
         if (!TextUtils.isEmpty(imagePath)) {
-            FileInputStream fileInputStream = null;
-            try {
-                fileInputStream = new FileInputStream(imagePath);
-                if (exifHelper.areDatesEqual(inputStream, fileInputStream)) {
-                    deleteImageByPath(imagePath);
-                }
-            } catch (FileNotFoundException e) {
-                Timber.e(e);
-            } finally {
-                fileHelper.close(fileInputStream);
-            }
+            removeDuplicatedExtraFile(uri, imagePath);
         }
-        fileHelper.close(inputStream);
         return deleteMedia(uri);
     }
 
-    public boolean updateExifData(Uri uri, String resizedImagePath) {
+    boolean updateExifData(@NonNull Uri uri, @NonNull String resizedImagePath) {
         final InputStream inputStream = getInputStreamFromUri(uri);
         final boolean dataUpdated = exifHelper.updateExifData(inputStream, resizedImagePath);
         fileHelper.close(inputStream);
         return dataUpdated;
+    }
+
+    void removeDuplicatedExtraFile(@NonNull Uri uri, @NonNull String imagePath) {
+        InputStream inputStream = null;
+        FileInputStream fileInputStream = null;
+        try {
+            inputStream = getInputStreamFromUri(uri);
+            fileInputStream = new FileInputStream(imagePath);
+            if (exifHelper.areDatesEqual(inputStream, fileInputStream)) {
+                deleteImageByPath(imagePath);
+            }
+        } catch (FileNotFoundException e) {
+            Timber.e(e);
+        } finally {
+            fileHelper.close(fileInputStream);
+            fileHelper.close(inputStream);
+        }
+    }
+
+    boolean deleteMedia(@NonNull final Uri uri) {
+        return context.getContentResolver().delete(uri, null, null) > 0;
     }
 
     private String getLastImageTakenPath() {

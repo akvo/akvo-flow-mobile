@@ -19,6 +19,7 @@
 
 package org.akvo.flow.domain.entity;
 
+import android.test.suitebuilder.annotation.SmallTest;
 import android.text.TextUtils;
 
 import org.junit.Before;
@@ -37,6 +38,7 @@ import static junit.framework.TestCase.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.powermock.api.mockito.PowerMockito.when;
 
+@SmallTest
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(TextUtils.class)
 public class FormInstanceMetadataTest {

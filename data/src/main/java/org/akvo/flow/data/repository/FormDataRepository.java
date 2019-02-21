@@ -46,7 +46,7 @@ import timber.log.Timber;
 public class FormDataRepository implements FormRepository {
 
     private static final String TEST_FORM_ID = "0";
-    
+
     private final FormHeaderParser formHeaderParser;
     private final XmlParser xmlParser;
     private final RestApi restApi;
@@ -54,10 +54,8 @@ public class FormDataRepository implements FormRepository {
     private final FormIdMapper formIdMapper;
 
     @Inject
-    public FormDataRepository(FormHeaderParser formHeaderParser,
-            XmlParser xmlParser, RestApi restApi,
-            DataSourceFactory dataSourceFactory,
-            FormIdMapper formIdMapper) {
+    public FormDataRepository(FormHeaderParser formHeaderParser, XmlParser xmlParser,
+            RestApi restApi, DataSourceFactory dataSourceFactory, FormIdMapper formIdMapper) {
         this.formHeaderParser = formHeaderParser;
         this.xmlParser = xmlParser;
         this.restApi = restApi;
@@ -92,7 +90,7 @@ public class FormDataRepository implements FormRepository {
                                 .concatMap(new Function<Boolean, Observable<Integer>>() {
                                     @Override
                                     public Observable<Integer> apply(Boolean aBoolean) {
-                                        return downloadForms(formIds, deviceId);
+                                        return downloadFormHeaders(formIds, deviceId);
                                     }
                                 });
                     }
@@ -127,14 +125,7 @@ public class FormDataRepository implements FormRepository {
                 .concatMap(new Function<ApiFormHeader, Observable<Boolean>>() {
                     @Override
                     public Observable<Boolean> apply(final ApiFormHeader apiFormHeader) {
-                        return dataSourceFactory.getDataBaseDataSource()
-                                .insertSurveyGroup(apiFormHeader)
-                                .concatMap(new Function<Boolean, Observable<Boolean>>() {
-                                    @Override
-                                    public Observable<Boolean> apply(Boolean aBoolean) {
-                                        return downloadForm(apiFormHeader);
-                                    }
-                                });
+                        return insertAndDownload(apiFormHeader);
                     }
                 });
     }
@@ -144,14 +135,7 @@ public class FormDataRepository implements FormRepository {
                 .concatMap(new Function<ApiFormHeader, Observable<Boolean>>() {
                     @Override
                     public Observable<Boolean> apply(final ApiFormHeader apiFormHeader) {
-                        return dataSourceFactory.getDataBaseDataSource()
-                                .insertSurveyGroup(apiFormHeader)
-                                .concatMap(new Function<Boolean, Observable<Boolean>>() {
-                                    @Override
-                                    public Observable<Boolean> apply(Boolean aBoolean) {
-                                        return downloadForm(apiFormHeader);
-                                    }
-                                });
+                        return insertAndDownload(apiFormHeader);
 
                     }
                 })
@@ -165,7 +149,17 @@ public class FormDataRepository implements FormRepository {
                 });
     }
 
-    private Observable<Integer> downloadForms(List<String> formIds, final String deviceId) {
+    private Observable<Boolean> insertAndDownload(final ApiFormHeader apiFormHeader) {
+        return dataSourceFactory.getDataBaseDataSource().insertSurveyGroup(apiFormHeader)
+                .concatMap(new Function<Boolean, Observable<Boolean>>() {
+                    @Override
+                    public Observable<Boolean> apply(Boolean ignored) {
+                        return downloadForm(apiFormHeader);
+                    }
+                });
+    }
+
+    private Observable<Integer> downloadFormHeaders(List<String> formIds, final String deviceId) {
         return Observable.fromIterable(formIds)
                 .concatMap(new Function<String, Observable<Boolean>>() {
                     @Override

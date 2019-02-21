@@ -472,13 +472,25 @@ public class SurveyDataRepository implements SurveyRepository {
     }
 
     @Override
-    public Observable<FormInstanceMetadata> getFormInstanceData(Long instanceId,
+    public Observable<FormInstanceMetadata> getFormInstanceData(final Long instanceId,
             final String deviceId) {
         return dataSourceFactory.getDataBaseDataSource().getResponses(instanceId)
                 .map(new Function<Cursor, FormInstanceMetadata>() {
                     @Override
                     public FormInstanceMetadata apply(Cursor cursor) {
                         return formInstanceMetadataMapper.transform(cursor, deviceId);
+                    }
+                })
+                .concatMap(new Function<FormInstanceMetadata, Observable<FormInstanceMetadata>>() {
+                    @Override
+                    public Observable<FormInstanceMetadata> apply(
+                            FormInstanceMetadata formInstanceMetadata) {
+                        if (!formInstanceMetadata.isValid()) {
+                            return Observable
+                                    .error(new Exception("Invalid form instance: " + instanceId));
+                        } else {
+                            return Observable.just(formInstanceMetadata);
+                        }
                     }
                 });
     }

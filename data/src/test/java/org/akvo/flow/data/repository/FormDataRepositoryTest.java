@@ -19,6 +19,8 @@
 
 package org.akvo.flow.data.repository;
 
+import android.database.Cursor;
+
 import org.akvo.flow.data.datasource.DataSourceFactory;
 import org.akvo.flow.data.datasource.DatabaseDataSource;
 import org.akvo.flow.data.datasource.files.FileDataSource;
@@ -41,8 +43,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.text.DateFormat;
 import java.text.FieldPosition;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Observable;
@@ -92,6 +96,9 @@ public class FormDataRepositoryTest {
     @Mock
     AmazonAuthHelper mockAmazonAuth;
 
+    @Mock
+    Cursor mockCursor;
+
     private MockWebServer mockWebServer;
     private FormDataRepository formDataRepository;
     private RestApi restApi;
@@ -109,11 +116,21 @@ public class FormDataRepositoryTest {
                 restApi, dataSourceFactory, mockFormIdMapper);
 
         when(mockFormHeaderParser.parseOne(anyString())).thenReturn(mockApiFormHeader);
+        when(mockFormHeaderParser.parseMultiple(anyString())).thenReturn(
+                Collections.<ApiFormHeader>emptyList());
         when(mockDateFormat
                 .format(any(Date.class), any(StringBuffer.class), any(FieldPosition.class)))
                 .thenReturn(new StringBuffer().append("12-12-2012"));
         when(mockAmazonAuth.getAmazonAuthForGet(anyString(), anyString(), anyString()))
                 .thenReturn("123");
+        when(mockDatabaseDataSource.insertSurveyGroup(any(ApiFormHeader.class)))
+                .thenReturn(Observable.just(true));
+        when(mockDatabaseDataSource.insertSurvey(any(ApiFormHeader.class), anyBoolean()))
+                .thenReturn(Observable.just(true));
+        when(mockFileDataSource.extractRemoteArchive(any(ResponseBody.class), anyString()))
+                .thenReturn(Observable.just(true));
+        when(mockFileDataSource.getFormFile(anyString()))
+                .thenReturn(Observable.just(mockInputStream));
     }
 
     @Test
@@ -130,8 +147,6 @@ public class FormDataRepositoryTest {
     @Test
     public void loadFormShouldNotUpdateAlreadyUpdatedForm() {
         TestObserver observer = new TestObserver<Boolean>();
-        when(mockDatabaseDataSource.insertSurveyGroup(any(ApiFormHeader.class)))
-                .thenReturn(Observable.just(true));
         when(mockDatabaseDataSource.formNeedsUpdate(any(ApiFormHeader.class)))
                 .thenReturn(Observable.just(false));
 
@@ -152,17 +167,11 @@ public class FormDataRepositoryTest {
     @Test
     public void loadFormShouldUpdateOutdatedForm() {
         TestObserver observer = new TestObserver<Boolean>();
-        when(mockDatabaseDataSource.insertSurveyGroup(any(ApiFormHeader.class)))
-                .thenReturn(Observable.just(true));
+
         when(mockDatabaseDataSource.formNeedsUpdate(any(ApiFormHeader.class)))
                 .thenReturn(Observable.just(true));
-        when(mockFileDataSource.extractRemoteArchive(any(ResponseBody.class), anyString()))
-                .thenReturn(Observable.just(true));
-        when(mockFileDataSource.getFormFile(anyString()))
-                .thenReturn(Observable.just(mockInputStream));
+
         when(mockXmlParser.parse(mockInputStream)).thenReturn(Collections.<String>emptyList());
-        when(mockDatabaseDataSource.insertSurvey(any(ApiFormHeader.class), anyBoolean()))
-                .thenReturn(Observable.just(true));
 
         mockWebServer.enqueue(new MockResponse().setResponseCode(200)
                 .setBody(",1,cde,abc,cde,6.0,cde,true,33"));
@@ -177,6 +186,56 @@ public class FormDataRepositoryTest {
         verify(restApi, times(1)).downloadArchive(anyString());
         verify(mockFileDataSource, times(1))
                 .extractRemoteArchive(any(ResponseBody.class), anyString());
+    }
+
+    @Test
+    public void reloadFormsShouldUpdateOutdatedForms() {
+        TestObserver observer = new TestObserver<Boolean>();
+        when(mockDatabaseDataSource.getFormIds()).thenReturn(Observable.just(mockCursor));
+        List<String> formIds = new ArrayList<>(3);
+        formIds.add("1");
+        formIds.add("2");
+        formIds.add("3");
+        when(mockFormIdMapper.mapToFormId(mockCursor)).thenReturn(formIds);
+        when(mockDatabaseDataSource.formNeedsUpdate(any(ApiFormHeader.class)))
+                .thenReturn(Observable.just(true));
+        when(mockDatabaseDataSource.deleteAllForms()).thenReturn(Observable.just(true));
+
+        mockWebServer.enqueue(new MockResponse().setResponseCode(200).setBody(
+                ",1,cde,abc,cde,6.0,cde,true,33\n"));
+        mockWebServer.enqueue(new MockResponse().setResponseCode(200)
+                .setBody("{}"));
+        mockWebServer.enqueue(new MockResponse().setResponseCode(200).setBody(
+                ",2,cde,abc,cde,6.0,cde,true,34\n"));
+        mockWebServer.enqueue(new MockResponse().setResponseCode(200)
+                .setBody("{}"));
+        mockWebServer.enqueue(new MockResponse().setResponseCode(200).setBody(
+                ",3,cde,abc,cde,6.0,cde,true,35\n"));
+        mockWebServer.enqueue(new MockResponse().setResponseCode(200)
+                .setBody("{}"));
+
+        formDataRepository.reloadForms("deviceId").subscribe(observer);
+        observer.awaitTerminalEvent(2, TimeUnit.SECONDS);
+
+        observer.assertNoErrors();
+        observer.assertValueCount(1);
+        verify(restApi, times(3)).downloadFormHeader(anyString(), anyString());
+    }
+
+    @Test
+    public void reloadFormsShouldNotReloadEmptyForms() {
+        TestObserver observer = new TestObserver<Boolean>();
+        when(mockDatabaseDataSource.getFormIds()).thenReturn(Observable.just(mockCursor));
+        List<String> formIds = new ArrayList<>(0);
+        when(mockFormIdMapper.mapToFormId(mockCursor)).thenReturn(formIds);
+        when(mockDatabaseDataSource.deleteAllForms()).thenReturn(Observable.just(true));
+
+        formDataRepository.reloadForms("deviceId").subscribe(observer);
+        observer.awaitTerminalEvent(2, TimeUnit.SECONDS);
+
+        observer.assertNoErrors();
+        observer.assertValueCount(1);
+        verify(restApi, times(0)).downloadFormHeader(anyString(), anyString());
     }
 
     @After

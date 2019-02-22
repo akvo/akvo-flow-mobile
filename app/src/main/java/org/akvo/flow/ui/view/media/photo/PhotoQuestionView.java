@@ -292,9 +292,11 @@ public class PhotoQuestionView extends QuestionView
 
     @Override
     public boolean isValid() {
-        File file = rebuildFilePath();
-        if (file == null|| !file.exists()) {
-            return false;
+        if (getQuestion().isMandatory()) {
+            File file = rebuildFilePath();
+            if (file == null|| !file.exists()) {
+                return false;
+            }
         }
         return super.isValid();
     }

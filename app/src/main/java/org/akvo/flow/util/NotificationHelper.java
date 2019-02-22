@@ -181,7 +181,7 @@ public class NotificationHelper {
             String description = context.getString(R.string.channel_description);
             NotificationChannel channel = new NotificationChannel(
                     ConstantUtil.NOTIFICATION_CHANNEL_ID, name,
-                    NotificationManager.IMPORTANCE_DEFAULT);
+                    NotificationManager.IMPORTANCE_LOW);
             channel.setDescription(description);
             channel.enableVibration(false);
             NotificationManager notificationManager = context

@@ -98,7 +98,7 @@ public class FormDataRepository implements FormRepository {
     }
 
     @Override
-    public Observable<Integer> downloadFormHeaders(final String deviceId) {
+    public Observable<Integer> downloadForms(final String deviceId) {
         return restApi.downloadFormsHeader(deviceId)
                 .map(new Function<String, List<ApiFormHeader>>() {
                     @Override

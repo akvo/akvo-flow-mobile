@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2018-2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -66,7 +66,7 @@ public class DownloadForms {
                 .concatMap(new Function<String, Observable<Integer>>() {
                     @Override
                     public Observable<Integer> apply(String deviceId) {
-                        return formRepository.downloadFormHeaders(deviceId);
+                        return formRepository.downloadForms(deviceId);
                     }
                 });
     }

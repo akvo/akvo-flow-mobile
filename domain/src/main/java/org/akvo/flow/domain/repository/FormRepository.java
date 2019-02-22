@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2018-2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -28,5 +28,5 @@ public interface FormRepository {
 
     Observable<Integer> reloadForms(String deviceId);
 
-    Observable<Integer> downloadFormHeaders(String deviceId);
+    Observable<Integer> downloadForms(String deviceId);
 }

@@ -58,7 +58,7 @@ public class FormHeaderParserTest {
     }
 
     @Test
-    public void parseMultipleShouldReturnEmpyIfNullResponse() {
+    public void parseMultipleShouldReturnEmptyIfNullResponse() {
         FormHeaderParser formHeaderParser = new FormHeaderParser();
 
         final List<ApiFormHeader> results = formHeaderParser.parseMultiple(null);

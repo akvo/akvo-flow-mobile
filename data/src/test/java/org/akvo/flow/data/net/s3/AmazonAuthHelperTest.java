@@ -52,7 +52,7 @@ public class AmazonAuthHelperTest {
         S3File s3File = spy(new S3File(new File("dir", "name.png"), true, "dir", "action", "md564","md5hex"));
         when(s3File.getContentType()).thenReturn("type");
 
-        String formattedPayload = helper.formatPayload("12-12-2009", PAYLOAD_PUT_PUBLIC, s3File);
+        String formattedPayload = helper.formatPayloadForPut("12-12-2009", PAYLOAD_PUT_PUBLIC, s3File);
 
         assertEquals("PUT\nmd564\ntype\n12-12-2009\nx-amz-acl:public-read\n/bucket/dir/name.png", formattedPayload);
     }
@@ -63,14 +63,14 @@ public class AmazonAuthHelperTest {
         S3File s3File = spy(new S3File(new File("dir", "name.png"), true, "dir", "action", "md564","md5hex"));
         when(s3File.getContentType()).thenReturn("type");
 
-        helper.formatPayload("12-12-2009", null, s3File);
+        helper.formatPayloadForPut("12-12-2009", null, s3File);
     }
 
     @Test(expected = NullPointerException.class)
     public void shouldFormatPayloadFailIfNullS3File() {
         AmazonAuthHelper helper = new AmazonAuthHelper(null, new S3User("bucket", null, null));
 
-        helper.formatPayload("12-12-2009", PAYLOAD_PUT_PUBLIC, null);
+        helper.formatPayloadForPut("12-12-2009", PAYLOAD_PUT_PUBLIC, null);
     }
 
     @Test
@@ -79,9 +79,9 @@ public class AmazonAuthHelperTest {
         S3File s3File = new S3File(new File("dir", "name.png"), true, "dir", "action", "md564","md5hex");
         AmazonAuthHelper helper = spy(new AmazonAuthHelper(mockSignatureHelper, s3User));
         when(mockSignatureHelper.getAuthorization("payload", "secret", Base64.NO_WRAP)).thenReturn("auth");
-        when(helper.formatPayload("12-12-2009", "payload", s3File)).thenReturn("payload");
+        when(helper.formatPayloadForPut("12-12-2009", "payload", s3File)).thenReturn("payload");
 
-        String auth = helper.getAmazonAuth("12-12-2009", "payload", s3File);
+        String auth = helper.getAmazonAuthForPut("12-12-2009", "payload", s3File);
 
         assertEquals("AWS key:auth", auth);
     }

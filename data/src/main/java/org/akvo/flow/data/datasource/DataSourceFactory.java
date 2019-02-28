@@ -20,6 +20,9 @@
 
 package org.akvo.flow.data.datasource;
 
+import org.akvo.flow.data.datasource.files.FileDataSource;
+import org.akvo.flow.data.datasource.files.ImageDataSource;
+import org.akvo.flow.data.datasource.files.VideoDataSource;
 import org.akvo.flow.data.datasource.preferences.SecureSharedPreferencesDataSource;
 import org.akvo.flow.data.datasource.preferences.SharedPreferencesDataSource;
 
@@ -34,19 +37,19 @@ public class DataSourceFactory {
     private final DatabaseDataSource dataBaseDataSource;
     private final FileDataSource fileDataSource;
     private final SecureSharedPreferencesDataSource secureSharedPreferencesDataSource;
-    private final MediaDataSource mediaDataSource;
+    private final VideoDataSource videoDataSource;
 
     @Inject
     public DataSourceFactory(SharedPreferencesDataSource sharedPreferencesDataSource,
             ImageDataSource imageDataSource, DatabaseDataSource dataBaseDataSource,
             SecureSharedPreferencesDataSource secureSharedPreferencesDataSource,
-            FileDataSource fileDataSource, MediaDataSource mediaDataSource) {
+            FileDataSource fileDataSource, VideoDataSource videoDataSource) {
         this.sharedPreferencesDataSource = sharedPreferencesDataSource;
         this.imageDataSource = imageDataSource;
         this.dataBaseDataSource = dataBaseDataSource;
         this.secureSharedPreferencesDataSource = secureSharedPreferencesDataSource;
         this.fileDataSource = fileDataSource;
-        this.mediaDataSource = mediaDataSource;
+        this.videoDataSource = videoDataSource;
     }
 
     public SharedPreferencesDataSource getSharedPreferencesDataSource() {
@@ -69,7 +72,7 @@ public class DataSourceFactory {
         return fileDataSource;
     }
 
-    public MediaDataSource getMediaDataSource() {
-        return mediaDataSource;
+    public VideoDataSource getVideoDataSource() {
+        return videoDataSource;
     }
 }

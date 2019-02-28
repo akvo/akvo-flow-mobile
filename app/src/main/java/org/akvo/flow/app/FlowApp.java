@@ -101,7 +101,7 @@ public class FlowApp extends Application {
         saveConfig();
     }
 
-    protected void installLeakCanary() {
+    private void installLeakCanary() {
         LeakCanary.install(this);
     }
 

@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2018 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -19,12 +19,7 @@
 
 package org.akvo.flow.util;
 
-import android.content.Context;
-import android.net.wifi.WifiInfo;
-import android.net.wifi.WifiManager;
-import android.os.Build;
 import android.os.Environment;
-import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 
 import org.akvo.flow.BuildConfig;
@@ -40,58 +35,6 @@ import timber.log.Timber;
  * @author Christopher Fagiani
  */
 public class StatusUtil {
-
-    /**
-     * gets the device's primary phone number
-     *
-     * @return
-     */
-    public static String getPhoneNumber(Context context) {
-        TelephonyManager teleMgr = (TelephonyManager) context
-                .getSystemService(Context.TELEPHONY_SERVICE);
-        String number = null;
-        if (teleMgr != null) {
-            // On a GSM device, this will only work if the provider put the
-            // number on the SIM card
-            number = teleMgr.getLine1Number();
-        }
-        if (number == null || number.trim().length() == 0
-                || number.trim().equalsIgnoreCase("null")
-                || number.trim().equalsIgnoreCase("unknown")) {
-            // If we can't get the phone number, use the MAC instead (only Android < 6.0)
-            if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP) {
-                return "";
-            }
-            WifiManager wifiMgr = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
-            if (wifiMgr != null) {
-                // presumably if we don't have a cell connection, then we must
-                // be connected by WIFI so this should work
-                WifiInfo info = wifiMgr.getConnectionInfo();
-                if (info != null) {
-                    number = info.getMacAddress();
-                }
-            }
-        }
-        return number;
-    }
-
-    /**
-     * gets the device's IMEI (MEID or ESN for CDMA phone)
-     *
-     * @return
-     */
-    public static String getImei(Context context) {
-        TelephonyManager teleMgr = (TelephonyManager) context
-                .getSystemService(Context.TELEPHONY_SERVICE);
-        String number = null;
-        if (teleMgr != null) {
-            number = teleMgr.getDeviceId();
-        }
-        if (number == null) {
-            number = "NO_IMEI";
-        }
-        return number;
-    }
 
     public static boolean hasExternalStorage() {
         return Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED);

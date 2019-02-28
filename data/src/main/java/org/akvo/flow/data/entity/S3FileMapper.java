@@ -24,7 +24,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
-import org.akvo.flow.data.datasource.FlowFileBrowser;
+import org.akvo.flow.data.util.FlowFileBrowser;
 import org.akvo.flow.data.util.Constants;
 import org.akvo.flow.data.util.FileHelper;
 

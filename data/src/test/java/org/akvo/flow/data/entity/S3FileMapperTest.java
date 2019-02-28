@@ -23,8 +23,8 @@ package org.akvo.flow.data.entity;
 import android.test.suitebuilder.annotation.SmallTest;
 import android.text.TextUtils;
 
-import org.akvo.flow.data.datasource.FlowFileBrowser;
 import org.akvo.flow.data.util.FileHelper;
+import org.akvo.flow.data.util.FlowFileBrowser;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

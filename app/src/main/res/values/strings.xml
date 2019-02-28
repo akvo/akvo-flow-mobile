@@ -304,5 +304,24 @@
     <string name="mobile_data_dialog_title">Enable uploading submissions over mobile data?</string>
     <string name="mobile_data_dialog_subtitle">When disabled submissions will only be uploaded when a wifi connection is available.</string>
     <string name="enable_button">Enable</string>
+    <string name="location_permission_refused">Location permission is required in order to get the device location.</string>
+    <string name="action_enable">Enable</string>
+    <string name="storage_permission_missing">Storage permission is necessary for the app to work correctly.</string>
+    <string name="survey_permissions_missing">Storage and Phone State permissions are necessary for the app to work correctly.</string>
+    <string name="channel_name">Flow channel</string>
+    <string name="channel_description">Flow notifications</string>
+
+
+    <string name="unpublish_service_notification_title">Deleting published files</string>
+    <string name="unpublish_service_notification_ticker">Deleting</string>
+
+    <plurals name="download_forms_error">
+        <item quantity="one">Error downloading form</item>
+        <item quantity="other">Error downloading forms</item>
+    </plurals>
+    <plurals name="download_forms_success">
+        <item quantity="one">Form downloaded</item>
+        <item quantity="other">Forms downloaded</item>
+    </plurals>
 
 </resources>

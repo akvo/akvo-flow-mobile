@@ -1,12 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+          xmlns:tools="http://schemas.android.com/tools"
           package="org.akvo.flow">
 
-    <uses-permission android:name="android.permission.CAMERA"/>
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE"/>
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
@@ -17,14 +15,16 @@
     <!-- For GcmTaskService -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
 
-    <uses-feature android:name="android.hardware.camera"/>
+    <uses-feature android:name="android.hardware.camera" android:required="false"/>
 
     <application
+            android:allowBackup="false"
             android:name=".app.FlowApp"
             android:hasCode="true"
             android:icon="@mipmap/ic_launcher"
             android:label="@string/app_name"
-            android:theme="@style/FlowAppTheme">
+            android:theme="@style/FlowAppTheme"
+            tools:ignore="GoogleAppIndexingWarning">
         <meta-data
                 android:name="io.fabric.ApiKey"
                 android:value="89dc21727e76a10511ecda549cab1b2d3aff2ec7"/>
@@ -86,7 +86,6 @@
                 android:permission="android.permission.BIND_JOB_SERVICE"/>
         <service android:name=".service.SurveyDownloadService"/>
         <service android:name=".service.BootstrapService"/>
-        <service android:name=".service.UserRequestedApkUpdateService"/>
         <service android:name=".service.TimeCheckService"/>
         <service
                 android:name=".service.ApkUpdateService"
@@ -137,7 +136,7 @@
                 android:value="@integer/google_play_services_version"/>
 
         <activity
-                android:name=".presentation.AboutActivity"
+                android:name=".presentation.about.AboutActivity"
                 android:configChanges="locale|layoutDirection"
                 android:label="@string/about_activity_title">
         </activity>

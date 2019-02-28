@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2018 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -244,7 +244,7 @@ public class FreetextQuestionView extends QuestionView implements View.OnClickLi
     }
 
     @Override
-    public void questionComplete(Bundle data) {
+    public void onQuestionResultReceived(Bundle data) {
         if (data != null && data.containsKey(ConstantUtil.CADDISFLY_RESPONSE)) {
             Question question = getQuestion();
             setResponse(new QuestionResponse.QuestionResponseBuilder()

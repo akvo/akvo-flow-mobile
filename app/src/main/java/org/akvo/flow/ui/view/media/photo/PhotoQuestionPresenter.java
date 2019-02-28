@@ -86,7 +86,7 @@ public class PhotoQuestionPresenter implements Presenter {
             params.put(SaveResizedImage.REMOVE_ORIGINAL_IMAGE_PARAM, deleteOriginal);
             saveResizedImage.execute(new DefaultObserver<Boolean>() {
                 @Override
-                public void onNext(Boolean aBoolean) {
+                public void onNext(Boolean ignored) {
                     view.displayImage(resizedImageFilePath);
                 }
 

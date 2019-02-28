@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2016-2107 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2016-2018 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -19,6 +19,7 @@
 
 package org.akvo.flow.event;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.location.Location;
 import android.location.LocationListener;
@@ -62,6 +63,7 @@ public class TimedLocationListener implements LocationListener {
         weakLocationListener = new WeakLocationListener(this);
     }
 
+    @SuppressLint("MissingPermission")
     public void start() {
         if (!mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
             Listener listener = listenerWeakReference.get();

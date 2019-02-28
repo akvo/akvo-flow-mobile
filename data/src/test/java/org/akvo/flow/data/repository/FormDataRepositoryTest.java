@@ -122,6 +122,7 @@ public class FormDataRepositoryTest {
         when(mockFormHeaderParser.parseOne(anyString())).thenReturn(mockApiFormHeader);
         when(mockFormHeaderParser.parseMultiple(anyString())).thenReturn(
                 Collections.<ApiFormHeader>emptyList());
+        when(mockApiFormHeader.getId()).thenReturn("123456");
         when(mockDateFormat
                 .format(any(Date.class), any(StringBuffer.class), any(FieldPosition.class)))
                 .thenReturn(new StringBuffer().append("12-12-2012"));
@@ -205,6 +206,7 @@ public class FormDataRepositoryTest {
         when(mockDatabaseDataSource.formNeedsUpdate(any(ApiFormHeader.class)))
                 .thenReturn(Observable.just(true));
         when(mockDatabaseDataSource.deleteAllForms()).thenReturn(Observable.just(true));
+        when(mockXmlParser.parse(mockInputStream)).thenReturn(mockForm);
 
         mockWebServer.enqueue(new MockResponse().setResponseCode(200).setBody(
                 ",1,cde,abc,cde,6.0,cde,true,33\n"));

@@ -31,11 +31,11 @@ import org.akvo.flow.data.entity.TransmissionMapper;
 import org.akvo.flow.data.entity.UploadError;
 import org.akvo.flow.data.entity.UploadFormDeletedError;
 import org.akvo.flow.data.entity.UploadSuccess;
-import org.akvo.flow.data.net.s3.BodyCreator;
-import org.akvo.flow.data.net.DeviceHelper;
 import org.akvo.flow.data.net.RestApi;
 import org.akvo.flow.data.net.s3.AmazonAuthHelper;
+import org.akvo.flow.data.net.s3.BodyCreator;
 import org.akvo.flow.data.util.ApiUrls;
+import org.akvo.flow.domain.util.DeviceHelper;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -82,7 +82,7 @@ public class SurveyDataRepositoryTest {
     Cursor mockCursor;
 
     @Mock
-    FormIdMapper mockMapper;
+    FormIdMapper mockFormIdMapper;
 
     @Mock
     TransmissionMapper mockTransmissionMapper;
@@ -128,11 +128,11 @@ public class SurveyDataRepositoryTest {
                 .format(any(Date.class), any(StringBuffer.class), any(FieldPosition.class)))
                 .thenReturn(new StringBuffer().append("12-12-2012"));
 
-        when(mockAmazonAuth.getAmazonAuth(anyString(), anyString(), any(S3File.class)))
+        when(mockAmazonAuth.getAmazonAuthForPut(anyString(), anyString(), any(S3File.class)))
                 .thenReturn("123");
 
         surveyDataRepository = new SurveyDataRepository(mockDataSourceFactory, null, null, restApi,
-                null, null, null, mockMapper, mockTransmissionMapper, null, null);
+                null, null, null, mockTransmissionMapper, null, mockFormIdMapper, null);
 
         when(mockDeviceHelper.getPhoneNumber()).thenReturn("123");
         when(mockDeviceHelper.getImei()).thenReturn("123");
@@ -155,7 +155,7 @@ public class SurveyDataRepositoryTest {
         List<String> formIds = new ArrayList<>(2);
         formIds.add("1");
         formIds.add("2");
-        when(mockMapper.mapToFormId(any(Cursor.class))).thenReturn(formIds);
+        when(mockFormIdMapper.mapToFormId(any(Cursor.class))).thenReturn(formIds);
 
         List<Transmission> oneTransmissionList = new ArrayList<>(1);
         oneTransmissionList.add(new Transmission(0L, 0L, "1", null));
@@ -176,7 +176,7 @@ public class SurveyDataRepositoryTest {
 
     @Test
     public void shouldReturnEmptySurveyTransmissionsForEmptyFormsList() {
-        when(mockMapper.mapToFormId(any(Cursor.class))).thenReturn(Collections.<String>emptyList());
+        when(mockFormIdMapper.mapToFormId(any(Cursor.class))).thenReturn(Collections.<String>emptyList());
 
         TestObserver observer = new TestObserver<List<Transmission>>();
 
@@ -192,7 +192,7 @@ public class SurveyDataRepositoryTest {
         List<String> formIds = new ArrayList<>(2);
         formIds.add("1");
         formIds.add("2");
-        when(mockMapper.mapToFormId(any(Cursor.class))).thenReturn(formIds);
+        when(mockFormIdMapper.mapToFormId(any(Cursor.class))).thenReturn(formIds);
 
         when(mockTransmissionMapper.transform(any(Cursor.class)))
                 .thenReturn(Collections.<Transmission>emptyList());

@@ -24,6 +24,7 @@ import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
@@ -42,10 +43,10 @@ import org.akvo.flow.activity.RecordActivity;
 import org.akvo.flow.activity.SurveyActivity;
 import org.akvo.flow.activity.TransmissionHistoryActivity;
 import org.akvo.flow.domain.SurveyGroup;
-import org.akvo.flow.domain.apkupdate.ViewApkData;
-import org.akvo.flow.presentation.AboutActivity;
 import org.akvo.flow.presentation.AppDownloadDialogFragment;
 import org.akvo.flow.presentation.FullImageActivity;
+import org.akvo.flow.presentation.about.AboutActivity;
+import org.akvo.flow.presentation.entity.ViewApkData;
 import org.akvo.flow.presentation.help.HelpActivity;
 import org.akvo.flow.presentation.legal.LegalNoticesActivity;
 import org.akvo.flow.presentation.settings.PreferenceActivity;
@@ -55,6 +56,7 @@ import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.StringUtil;
 
 import java.io.File;
+import java.util.List;
 
 import javax.inject.Inject;
 
@@ -110,12 +112,20 @@ public class Navigator {
     }
 
     public void navigateToTakePhoto(@NonNull Activity activity, Uri uri) {
-        Intent i = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
-        if (i.resolveActivity(activity.getPackageManager()) != null) {
-            i.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, uri);
-            activity.startActivityForResult(i, ConstantUtil.PHOTO_ACTIVITY_REQUEST);
+        Intent intent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+        PackageManager packageManager = activity.getPackageManager();
+        if (packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)
+                && intent.resolveActivity(packageManager) != null) {
+            final List<ResolveInfo> activities = packageManager
+                    .queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY);
+            for (ResolveInfo resolvedIntentInfo : activities) {
+                final String name = resolvedIntentInfo.activityInfo.packageName;
+                activity.grantUriPermission(name, uri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+            }
+            intent.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, uri);
+            activity.startActivityForResult(intent, ConstantUtil.PHOTO_ACTIVITY_REQUEST);
         } else {
-            Timber.e(new Exception("No app found to take pictures"));
+            Timber.e(new Exception("No camera on device or no app found to take pictures"));
             //TODO: notify user
         }
     }
@@ -347,6 +357,15 @@ public class Navigator {
         intent.addCategory(Intent.CATEGORY_OPENABLE);
         if (intent.resolveActivity(activity.getPackageManager()) != null) {
             activity.startActivityForResult(intent, ConstantUtil.GET_VIDEO_ACTIVITY_REQUEST);
+        }
+    }
+
+    public void navigateToAppSystemSettings(@Nullable Context context) {
+        if (context != null) {
+            Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                    Uri.fromParts("package", context.getPackageName(), null));
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            context.startActivity(intent);
         }
     }
 }

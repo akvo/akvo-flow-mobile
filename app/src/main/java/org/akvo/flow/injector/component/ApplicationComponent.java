@@ -30,13 +30,16 @@ import org.akvo.flow.broadcast.BootReceiver;
 import org.akvo.flow.broadcast.DataTimeoutReceiver;
 import org.akvo.flow.domain.executor.PostExecutionThread;
 import org.akvo.flow.domain.executor.ThreadExecutor;
+import org.akvo.flow.domain.repository.ApkRepository;
 import org.akvo.flow.domain.repository.FileRepository;
+import org.akvo.flow.domain.repository.FormRepository;
 import org.akvo.flow.domain.repository.MissingAndDeletedRepository;
 import org.akvo.flow.domain.repository.SurveyRepository;
 import org.akvo.flow.domain.repository.UserRepository;
 import org.akvo.flow.injector.module.ApplicationModule;
 import org.akvo.flow.injector.module.ViewModule;
 import org.akvo.flow.presentation.BaseActivity;
+import org.akvo.flow.service.ApkUpdateService;
 import org.akvo.flow.service.BootstrapService;
 import org.akvo.flow.service.DataFixService;
 import org.akvo.flow.service.DataPointUploadService;
@@ -59,9 +62,7 @@ public interface ApplicationComponent {
 
     BriteDatabase provideDatabase();
 
-    void inject(FlowApp app);
-
-    void inject(BaseActivity baseActivity);
+    ApkRepository apkRepository();
 
     Context context();
 
@@ -74,6 +75,8 @@ public interface ApplicationComponent {
     FileRepository fileRepository();
 
     UserRepository userRepository();
+
+    FormRepository formRepository();
 
     MissingAndDeletedRepository missingAndDeletedRepository();
 
@@ -94,4 +97,10 @@ public interface ApplicationComponent {
     void inject(UnPublishDataService unPublishDataService);
 
     void inject(DataPointUploadService uploadService);
+
+    void inject(ApkUpdateService apkUpdateService);
+
+    void inject(FlowApp app);
+
+    void inject(BaseActivity baseActivity);
 }

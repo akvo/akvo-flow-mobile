@@ -1,5 +1,25 @@
 Akvo FLOW app release notes
 ===========================
+# ver 2.7.1
+Date: 28 February 2019
+
+# New and noteworthy
+* **Refactor ApkUpdateService to clean architecture** - [#537](https://github.com/akvo/akvo-flow-mobile/issues/537) Improve the code maintainability for apk update.
+* **Camera permission** - [#1232](https://github.com/akvo/akvo-flow-mobile/issues/1232) Camera permission is no longer required.
+* **Storage permission** - [#1233](https://github.com/akvo/akvo-flow-mobile/issues/1233) Require Storage permission at Runtime (only devices with Android 6.0 and later).
+* **Read Phone State Permission** - [#1234](https://github.com/akvo/akvo-flow-mobile/issues/1234) Require Phone State permission at Runtime (only devices with Android 6.0 and later).
+* **Location permission** - [#1235](https://github.com/akvo/akvo-flow-mobile/issues/1235) Require Location permission at Runtime (only devices with Android 6.0 and later).
+* **Media Uri permissions** - [#1252](https://github.com/akvo/akvo-flow-mobile/issues/1252) Grant permission to use the media uri (for photo and video questions).
+* **Notifications channel for android 26** - [#1261](https://github.com/akvo/akvo-flow-mobile/issues/1261) Use a notification channel for devices with Android 8 and 9.
+* **Background services limitation for target api 26** - [#1267](https://github.com/akvo/akvo-flow-mobile/issues/1267) Making sure we comply with the background services limitations.
+* **Add UI tests for issue with images** - [#1320](https://github.com/akvo/akvo-flow-mobile/issues/1320) Image questions now have UI tests.
+* **Add tests to form download logic** - [#1328](https://github.com/akvo/akvo-flow-mobile/issues/1328) Form download logic now has unit tests.
+
+# Resolved issues
+* **FormInstance mappers error** - [#1313](https://github.com/akvo/akvo-flow-mobile/issues/1313) Mappers are now tested and no longer produce a crash.
+* **Android 8.0 Notifications vibration** - [#1330](https://github.com/akvo/akvo-flow-mobile/issues/1330) Fix the excessive vibration on notifications.
+
+---------------
 # ver 2.6.4.1
 Date: 19 February 2019
 

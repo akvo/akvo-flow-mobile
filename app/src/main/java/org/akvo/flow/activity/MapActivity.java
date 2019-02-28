@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015-2017 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2015-2018 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -19,14 +19,15 @@
 
 package org.akvo.flow.activity;
 
-import android.support.v4.app.LoaderManager;
+import android.annotation.SuppressLint;
 import android.content.Context;
-import android.support.v4.content.Loader;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.Loader;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -71,10 +72,13 @@ public class MapActivity extends BackActivity implements OnMapReadyCallback,
         }
     }
 
+    @SuppressLint("MissingPermission")
     @Override
     public void onMapReady(GoogleMap googleMap) {
         this.map = googleMap;
-        googleMap.setMyLocationEnabled(true);
+        if (isLocationAllowed()) {
+            googleMap.setMyLocationEnabled(true);
+        }
         loadDataPoint();
     }
 
@@ -113,7 +117,8 @@ public class MapActivity extends BackActivity implements OnMapReadyCallback,
         Criteria criteria = new Criteria();
         criteria.setAccuracy(Criteria.ACCURACY_COARSE);
         String provider = manager.getBestProvider(criteria, true);
-        if (provider != null) {
+        if (provider != null && isLocationAllowed()) {
+            @SuppressLint("MissingPermission")
             Location location = manager.getLastKnownLocation(provider);
             if (location != null) {
                 position = new LatLng(location.getLatitude(), location.getLongitude());
@@ -133,13 +138,13 @@ public class MapActivity extends BackActivity implements OnMapReadyCallback,
         positionMap(position);
     }
 
-    @Override
+    @NonNull @Override
     public Loader<SurveyedLocale> onCreateLoader(int id, Bundle args) {
         return new SurveyedLocaleItemLoader(this, datapointId);
     }
 
     @Override
-    public void onLoadFinished(Loader<SurveyedLocale> loader, SurveyedLocale data) {
+    public void onLoadFinished(@NonNull Loader<SurveyedLocale> loader, SurveyedLocale data) {
         this.datapoint  = data;
         updateTitle();
         addDataPointMarker();

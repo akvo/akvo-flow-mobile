@@ -4,7 +4,8 @@
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context="org.akvo.flow.presentation.AboutActivity">
+        android:id="@+id/root_layout"
+        tools:context="org.akvo.flow.presentation.about.AboutActivity">
 
     <include layout="@layout/app_bar_layout"/>
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2018-2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -22,6 +22,7 @@ package org.akvo.flow.data.entity;
 
 import android.database.Cursor;
 import android.support.annotation.NonNull;
+import android.support.annotation.VisibleForTesting;
 import android.support.v4.util.Pair;
 
 import org.akvo.flow.database.ResponseColumns;
@@ -37,13 +38,18 @@ public class ResponseMapper {
 
     @NonNull
     Response extractResponse(Cursor data, String value) {
-        int answerTypeColumn = data.getColumnIndexOrThrow(ResponseColumns.TYPE);
-        String type = data.getString(answerTypeColumn);
+        String type = getAnswerType(data);
         Pair<String, Integer> mappedIdIteration = mapIdIteration(data);
         return new Response(mappedIdIteration.first, type, value, mappedIdIteration.second);
     }
 
-    private Pair<String, Integer> mapIdIteration(Cursor data) {
+    private String getAnswerType(Cursor data) {
+        int answerTypeColumn = data.getColumnIndexOrThrow(ResponseColumns.TYPE);
+        return data.getString(answerTypeColumn);
+    }
+
+    @VisibleForTesting
+    Pair<String, Integer> mapIdIteration(Cursor data) {
         int questionIdColumn = data.getColumnIndexOrThrow(ResponseColumns.QUESTION_ID);
         int iterationColumn = data.getColumnIndexOrThrow(ResponseColumns.ITERATION);
         String rawQuestionId = data.getString(questionIdColumn);

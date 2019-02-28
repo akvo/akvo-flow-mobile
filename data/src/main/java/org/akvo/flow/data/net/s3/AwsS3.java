@@ -25,6 +25,7 @@ import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import retrofit2.Response;
 import retrofit2.http.Body;
+import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.Headers;
 import retrofit2.http.PUT;
@@ -52,4 +53,10 @@ public interface AwsS3 {
             @Header("Date") String date,
             @Header("Authorization") String authorization,
             @Body RequestBody body);
+
+    @GET(S3_FILE_PATH)
+    Observable<ResponseBody> getSurvey(@Path("key") String key,
+            @Path("file") String file,
+            @Header("Date") String date,
+            @Header("Authorization") String authorization);
 }

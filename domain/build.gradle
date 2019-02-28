@@ -33,6 +33,9 @@ android {
         abortOnError false
         ignore 'InvalidPackage'
     }
+    testOptions {
+        unitTests.returnDefaultValues = true
+    }
 }
 
 dependencies {
@@ -44,4 +47,11 @@ dependencies {
     implementation "com.android.support:appcompat-v7:${rootProject.ext.supportVersion}"
     implementation "com.jakewharton.timber:timber:${rootProject.ext.timberVersion}"
     implementation "com.google.code.gson:gson:${rootProject.ext.gsonVersion}"
+
+    testImplementation "junit:junit:${rootProject.ext.jUnitVersion}"
+    testImplementation "org.mockito:mockito-core:${rootProject.ext.mockitoCoreVersion}"
+    testImplementation "org.powermock:powermock-module-junit4:${rootProject.ext.powerMockVersion}"
+    testImplementation "org.powermock:powermock-module-junit4-rule:${rootProject.ext.powerMockVersion}"
+    testImplementation "org.powermock:powermock-api-mockito:${rootProject.ext.powerMockVersion}"
+    testImplementation "org.powermock:powermock-classloading-xstream:${rootProject.ext.powerMockVersion}"
 }

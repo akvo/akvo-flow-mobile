@@ -24,9 +24,11 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import okhttp3.OkHttpClient;
+import retrofit2.Converter;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
+import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 @Singleton
 public class RestServiceFactory {
@@ -41,21 +43,25 @@ public class RestServiceFactory {
     }
 
     public <T> T createRetrofitServiceWithInterceptor(final Class<T> clazz, String baseUrl) {
-        return createRetrofit(clazz, baseUrl, okHttpClientWithHmac);
+        return createRetrofit(clazz, baseUrl, okHttpClientWithHmac, GsonConverterFactory.create());
     }
 
     public <T> T createRetrofitService(final Class<T> clazz, String baseUrl) {
-        return createRetrofit(clazz, baseUrl, okHttpClient);
+        return createRetrofit(clazz, baseUrl, okHttpClient, GsonConverterFactory.create());
     }
 
-    private <T> T createRetrofit(Class<T> clazz, String baseUrl, OkHttpClient okHttpClient) {
+    public <T> T createScalarsRetrofitService(final Class<T> clazz, String baseUrl) {
+        return createRetrofit(clazz, baseUrl, okHttpClient, ScalarsConverterFactory.create());
+    }
+
+    private <T> T createRetrofit(Class<T> clazz, String baseUrl, OkHttpClient okHttpClient,
+            Converter.Factory converter) {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(baseUrl)
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-                .addConverterFactory(GsonConverterFactory.create())
+                .addConverterFactory(converter)
                 .client(okHttpClient)
                 .build();
         return retrofit.create(clazz);
     }
-
 }

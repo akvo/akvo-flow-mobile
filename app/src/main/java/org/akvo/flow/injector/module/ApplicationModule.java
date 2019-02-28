@@ -32,8 +32,6 @@ import org.akvo.flow.BuildConfig;
 import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.data.datasource.preferences.SharedPreferencesDataSource;
 import org.akvo.flow.data.executor.JobExecutor;
-import org.akvo.flow.data.net.s3.BodyCreator;
-import org.akvo.flow.data.net.DeviceHelper;
 import org.akvo.flow.data.net.Encoder;
 import org.akvo.flow.data.net.HMACInterceptor;
 import org.akvo.flow.data.net.RestApi;
@@ -41,7 +39,10 @@ import org.akvo.flow.data.net.RestServiceFactory;
 import org.akvo.flow.data.net.S3User;
 import org.akvo.flow.data.net.SignatureHelper;
 import org.akvo.flow.data.net.s3.AmazonAuthHelper;
+import org.akvo.flow.data.net.s3.BodyCreator;
+import org.akvo.flow.data.repository.ApkDataRepository;
 import org.akvo.flow.data.repository.FileDataRepository;
+import org.akvo.flow.data.repository.FormDataRepository;
 import org.akvo.flow.data.repository.MissingAndDeletedDataRepository;
 import org.akvo.flow.data.repository.SetupDataRepository;
 import org.akvo.flow.data.repository.SurveyDataRepository;
@@ -51,11 +52,15 @@ import org.akvo.flow.database.DatabaseHelper;
 import org.akvo.flow.database.LanguageTable;
 import org.akvo.flow.domain.executor.PostExecutionThread;
 import org.akvo.flow.domain.executor.ThreadExecutor;
+import org.akvo.flow.domain.repository.ApkRepository;
 import org.akvo.flow.domain.repository.FileRepository;
+import org.akvo.flow.domain.repository.FormRepository;
 import org.akvo.flow.domain.repository.MissingAndDeletedRepository;
 import org.akvo.flow.domain.repository.SetupRepository;
 import org.akvo.flow.domain.repository.SurveyRepository;
 import org.akvo.flow.domain.repository.UserRepository;
+import org.akvo.flow.domain.util.DeviceHelper;
+import org.akvo.flow.domain.util.GsonMapper;
 import org.akvo.flow.thread.UIThread;
 import org.akvo.flow.util.logging.DebugLoggingHelper;
 import org.akvo.flow.util.logging.LoggingHelper;
@@ -103,6 +108,12 @@ public class ApplicationModule {
 
     @Provides
     @Singleton
+    ApkRepository provideApkRepository(ApkDataRepository apkDataRepository) {
+        return apkDataRepository;
+    }
+
+    @Provides
+    @Singleton
     FileRepository provideFileRepository(FileDataRepository fileDataRepository) {
         return fileDataRepository;
     }
@@ -140,6 +151,12 @@ public class ApplicationModule {
     @Singleton
     SetupRepository provideSetupRepository(SetupDataRepository setupDataRepository) {
         return setupDataRepository;
+    }
+
+    @Provides
+    @Singleton
+    FormRepository provideFormRepository(FormDataRepository formDataRepository) {
+        return formDataRepository;
     }
 
     @Provides
@@ -187,9 +204,9 @@ public class ApplicationModule {
 
     @Provides
     @Singleton
-    SharedPreferencesDataSource provideSharedPreferences() {
+    SharedPreferencesDataSource provideSharedPreferences(GsonMapper mapper) {
         return new SharedPreferencesDataSource(
-                application.getSharedPreferences(PREFS_NAME, PREFS_MODE));
+                application.getSharedPreferences(PREFS_NAME, PREFS_MODE), mapper);
     }
 
     @Provides

@@ -39,10 +39,12 @@ import java.security.NoSuchAlgorithmException;
 import java.util.zip.Adler32;
 import java.util.zip.CheckedOutputStream;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
 import javax.inject.Inject;
 
+import okhttp3.ResponseBody;
 import timber.log.Timber;
 
 public class FileHelper {
@@ -104,7 +106,7 @@ public class FileHelper {
         return "";
     }
 
-    public String copyFileToFolder(File originalFile, File destinationFolder) throws IOException {
+    public String copyFileToFolder(File originalFile, File destinationFolder) {
         File file = new File(destinationFolder, originalFile.getName());
         return copyFile(originalFile, file);
     }
@@ -114,52 +116,24 @@ public class FileHelper {
      *
      * @return the destination file path if copy succeeded, null otherwise
      */
-    public String copyFile(File originalFile, File destinationFile) throws IOException {
+    public String copyFile(File originalFile, File destinationFile) {
         String destinationPath = null;
-        InputStream in = null;
-        OutputStream out = null;
         try {
-            in = new FileInputStream(originalFile);
-            out = new FileOutputStream(destinationFile);
-            byte[] buffer = new byte[1024];
-            int read;
-            while ((read = in.read(buffer)) != -1) {
-                out.write(buffer, 0, read);
-            }
-            out.flush();
-            destinationPath = destinationFile.getAbsolutePath();
+            destinationPath = saveStreamToFile(new FileInputStream(originalFile), destinationFile);
         } catch (FileNotFoundException e) {
             Timber.e(e);
-        } finally {
-            close(in);
-            close(out);
         }
         return destinationPath;
     }
 
     @Nullable
-    public String copyFile(File destinationFile, InputStream inputStream) throws IOException {
-        String destinationPath = null;
-        OutputStream out = null;
-        try {
-            out = new FileOutputStream(destinationFile);
-            byte[] buffer = new byte[1024];
-            int read;
-            while ((read = inputStream.read(buffer)) != -1) {
-                out.write(buffer, 0, read);
-            }
-            out.flush();
-            destinationPath = destinationFile.getAbsolutePath();
-        } catch (FileNotFoundException e) {
-            Timber.e(e);
-        } finally {
-            close(inputStream);
-            close(out);
-        }
-        return destinationPath;
+    public String saveStreamToFile(InputStream inputStream, File destinationFile) {
+        copyStream(inputStream, destinationFile);
+        close(inputStream);
+        return destinationFile.getAbsolutePath();
     }
 
-   public void close(Closeable closeable) {
+    public void close(Closeable closeable) {
         if (closeable != null) {
             try {
                 closeable.close();
@@ -219,8 +193,43 @@ public class FileHelper {
         fout.close();
     }
 
-    public boolean deleteFile(String path) {
-        File file = new File(path);
-        return file.exists() && file.delete();
+    public void extractOnlineArchive(ResponseBody responseBody, File targetFolder) {
+        InputStream inputStream = responseBody.byteStream();
+        extractZipContent(inputStream, targetFolder);
+        close(inputStream);
+    }
+
+    private void copyStream(InputStream inputStream, File destinationFile) {
+        OutputStream out = null;
+        try {
+            out = new FileOutputStream(destinationFile);
+            byte[] buffer = new byte[1024];
+            int read;
+            while ((read = inputStream.read(buffer)) != -1) {
+                out.write(buffer, 0, read);
+            }
+            out.flush();
+        } catch (IOException e) {
+            Timber.e(e);
+        } finally {
+            close(out);
+        }
+    }
+
+    private void extractZipContent(InputStream input, File destinationFolder) {
+        ZipInputStream zis = null;
+        try {
+            zis = new ZipInputStream(input);
+            ZipEntry entry;
+            while ((entry = zis.getNextEntry()) != null && !entry.isDirectory()) {
+                File f = new File(destinationFolder, entry.getName());
+                copyStream(zis, f);
+                zis.closeEntry();
+            }
+        } catch (IOException e) {
+            Timber.e(e);
+        } finally {
+            close(zis);
+        }
     }
 }

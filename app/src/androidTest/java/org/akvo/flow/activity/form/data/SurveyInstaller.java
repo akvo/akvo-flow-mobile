@@ -26,6 +26,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.util.SparseArray;
 
+import com.google.gson.GsonBuilder;
 import com.squareup.sqlbrite2.BriteDatabase;
 import com.squareup.sqlbrite2.SqlBrite;
 
@@ -203,7 +204,7 @@ public class SurveyInstaller {
                 .openRawResource(resId);
         try {
             String jsonDataString = FileUtil.readText(input);
-            GsonMapper mapper = new GsonMapper();
+            GsonMapper mapper = new GsonMapper(new GsonBuilder().create());
             TestDataPoint dataPoint = mapper.read(jsonDataString, TestDataPoint.class);
             List<TestResponse> responses = dataPoint.getResponses();
             List<QuestionResponse.QuestionResponseBuilder> builders = new ArrayList<>(

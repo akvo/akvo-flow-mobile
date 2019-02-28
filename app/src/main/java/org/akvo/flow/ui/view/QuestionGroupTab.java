@@ -137,10 +137,18 @@ public class QuestionGroupTab extends ConstraintLayout
         }
     }
 
-    public void onQuestionComplete(String questionId, Bundle data) {
+    public void onQuestionResultReceived(String questionId, Bundle data) {
         QuestionView qv = mQuestionViews.get(questionId);
         if (qv != null) {
-            qv.questionComplete(data);
+            qv.onQuestionResultReceived(data);
+        }
+    }
+
+    public void onRequestPermissionsResult(int requestCode, String questionId, String[] permissions,
+            int[] grantResults) {
+        QuestionView qv = mQuestionViews.get(questionId);
+        if (qv != null) {
+            qv.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
     }
 

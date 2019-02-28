@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -543,7 +543,7 @@ public class BriteSurveyDbAdapter {
      * reinserts the test survey into the database. For debugging purposes only.
      * The survey xml must exist in the APK
      */
-    public void reinstallTestSurvey() {
+    public void installTestForm() {
         ContentValues values = new ContentValues();
         values.put(SurveyColumns.SURVEY_ID, "999991");
         values.put(SurveyColumns.NAME, "Sample Survey");
@@ -581,6 +581,19 @@ public class BriteSurveyDbAdapter {
                 String.valueOf(1)
         };
         return briteDatabase.query(sql, selectionArgs);
+    }
+
+    public boolean isSurveyUpToDate(String surveyId, String surveyVersion) {
+        boolean isUpToDate = true;
+        Cursor cursor = getSurveys(surveyId, surveyVersion);
+
+        if (cursor == null || cursor.getCount() <= 0) {
+            isUpToDate = false;
+        }
+        if (cursor != null) {
+            cursor.close();
+        }
+        return isUpToDate;
     }
 
     /**

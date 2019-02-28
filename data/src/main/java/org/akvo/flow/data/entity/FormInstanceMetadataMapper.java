@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2018-2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -48,11 +48,16 @@ public class FormInstanceMetadataMapper {
                 .getFormInstanceWithMedia(deviceId, cursor);
         FormInstance formInstance = processedInstance.first;
         Set<String> imagePaths = processedInstance.second;
-
-        String data = mapper.write(formInstance, FormInstance.class);
-        String uuid = formInstance.getUUID();
-        String formId = formInstance.getFormId();
-        String filename = uuid + Constants.ARCHIVE_SUFFIX;
+        String data = null;
+        String uuid;
+        String formId = null;
+        String filename = null;
+        if (formInstance != null) {
+            data = mapper.write(formInstance, FormInstance.class);
+            uuid = formInstance.getUUID();
+            formId = formInstance.getFormId();
+            filename = uuid + Constants.ARCHIVE_SUFFIX;
+        }
         return new FormInstanceMetadata(filename, formId, data, imagePaths);
     }
 }

@@ -47,6 +47,11 @@ import org.akvo.flow.domain.interactor.UnSyncedTransmissionsExist;
 import org.akvo.flow.domain.interactor.UploadSurveyDataPoints;
 import org.akvo.flow.domain.interactor.UseCase;
 import org.akvo.flow.domain.interactor.WasWalkthroughSeen;
+import org.akvo.flow.domain.interactor.apk.GetApkData;
+import org.akvo.flow.domain.interactor.apk.GetApkDataPreferences;
+import org.akvo.flow.domain.interactor.apk.SaveApkUpdateNotified;
+import org.akvo.flow.domain.interactor.forms.DownloadForm;
+import org.akvo.flow.domain.interactor.forms.ReloadForms;
 import org.akvo.flow.domain.interactor.setup.SaveSetup;
 import org.akvo.flow.domain.interactor.users.CreateUser;
 import org.akvo.flow.domain.interactor.users.DeleteUser;
@@ -259,5 +264,35 @@ public class ViewModule {
     @Named("mobileUploadAllowed")
     UseCase provideAllowedToConnect(MobileUploadAllowed mobileUploadAllowed) {
         return mobileUploadAllowed;
+    }
+
+    @Provides
+    @Named("getApkData")
+    UseCase provideGetApkData(GetApkData getApkData) {
+        return getApkData;
+    }
+
+    @Provides
+    @Named("GetApkDataPreferences")
+    UseCase provideGetApkDataPreferences(GetApkDataPreferences getApkDataPreferences) {
+        return getApkDataPreferences;
+    }
+
+    @Provides
+    @Named("SaveApkUpdateNotified")
+    UseCase provideSaveApkUpdateNotified(SaveApkUpdateNotified saveApkUpdateNotified) {
+        return saveApkUpdateNotified;
+    }
+
+    @Provides
+    @Named("downloadForm")
+    UseCase provideDownloadForm(DownloadForm downloadForm) {
+        return downloadForm;
+    }
+
+    @Provides
+    @Named("reloadForms")
+    UseCase provideReloadForms(ReloadForms reloadForms) {
+        return reloadForms;
     }
 }

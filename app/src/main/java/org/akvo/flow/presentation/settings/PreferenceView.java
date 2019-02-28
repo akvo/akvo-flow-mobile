@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -43,4 +43,8 @@ public interface PreferenceView {
     void showClearDataSuccess();
 
     void dismiss();
+
+    void showDownloadFormsError(int numberOfForms);
+
+    void showDownloadFormsSuccess(int numberOfForms);
 }

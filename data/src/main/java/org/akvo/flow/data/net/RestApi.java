@@ -24,17 +24,20 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
+import org.akvo.flow.data.entity.ApiApkData;
 import org.akvo.flow.data.entity.ApiFilesResult;
 import org.akvo.flow.data.entity.ApiLocaleResult;
 import org.akvo.flow.data.entity.S3File;
 import org.akvo.flow.data.entity.Transmission;
 import org.akvo.flow.data.net.gae.DataPointDownloadService;
 import org.akvo.flow.data.net.gae.DeviceFilesService;
+import org.akvo.flow.data.net.gae.FlowApiService;
 import org.akvo.flow.data.net.gae.ProcessingNotificationService;
 import org.akvo.flow.data.net.s3.AmazonAuthHelper;
 import org.akvo.flow.data.net.s3.AwsS3;
 import org.akvo.flow.data.net.s3.BodyCreator;
 import org.akvo.flow.data.util.ApiUrls;
+import org.akvo.flow.domain.util.DeviceHelper;
 
 import java.text.DateFormat;
 import java.util.Date;
@@ -54,6 +57,8 @@ import retrofit2.Response;
 public class RestApi {
     private static final String PAYLOAD_PUT_PUBLIC = "PUT\n%s\n%s\n%s\nx-amz-acl:public-read\n/%s/%s";// md5, type, date, bucket, obj
     private static final String PAYLOAD_PUT_PRIVATE = "PUT\n%s\n%s\n%s\n/%s/%s";// md5, type, date, bucket, obj
+    private static final String PAYLOAD_GET = "GET\n\n\n%s\n/%s/%s";// date, bucket, obj
+    private static final String SURVEYS_FOLDER = "surveys";
 
     private final String androidId;
     private final String imei;
@@ -114,8 +119,31 @@ public class RestApi {
         }
     }
 
+    public Observable<ApiApkData> loadApkData(String appVersion) {
+        return serviceFactory.createRetrofitService(FlowApiService.class, apiUrls.getGaeUrl())
+                .loadApkData(appVersion);
+    }
+
+    public Observable<String> downloadFormHeader(String formId, String deviceId) {
+        return serviceFactory
+                .createScalarsRetrofitService(FlowApiService.class, apiUrls.getGaeUrl())
+                .downloadFormHeader(formId, phoneNumber, androidId, imei, version, deviceId);
+    }
+
+    public Observable<String> downloadFormsHeader(String deviceId) {
+        return serviceFactory
+                .createScalarsRetrofitService(FlowApiService.class, apiUrls.getGaeUrl())
+                .downloadFormsHeader(phoneNumber, androidId, imei, version, deviceId);
+    }
+
+    public Observable<ResponseBody> downloadArchive(String fileName) {
+        final String date = getDate();
+        String authorization = amazonAuthHelper.getAmazonAuthForGet(date, PAYLOAD_GET, SURVEYS_FOLDER + "/" + fileName);
+        return createRetrofitService().getSurvey(SURVEYS_FOLDER, fileName, date, authorization);
+    }
+
     private Observable<Response<ResponseBody>> uploadPublicFile(String date, final S3File s3File) {
-        String authorization = amazonAuthHelper.getAmazonAuth(date, PAYLOAD_PUT_PUBLIC, s3File);
+            String authorization = amazonAuthHelper.getAmazonAuthForPut(date, PAYLOAD_PUT_PUBLIC, s3File);
         return createRetrofitService()
                 .uploadPublic(s3File.getDir(), s3File.getFilename(), s3File.getMd5Base64(),
                         s3File.getContentType(), date, authorization,
@@ -135,7 +163,7 @@ public class RestApi {
     }
 
     private Observable<Response<ResponseBody>> uploadPrivateFile(String date, final S3File s3File) {
-        String authorization = amazonAuthHelper.getAmazonAuth(date, PAYLOAD_PUT_PRIVATE, s3File);
+        String authorization = amazonAuthHelper.getAmazonAuthForPut(date, PAYLOAD_PUT_PRIVATE, s3File);
         RequestBody body = bodyCreator.createBody(s3File);
         return createRetrofitService()
                 .upload(s3File.getDir(), s3File.getFilename(), s3File.getMd5Base64(),

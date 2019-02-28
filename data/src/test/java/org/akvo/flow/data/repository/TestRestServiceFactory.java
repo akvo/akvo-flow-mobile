@@ -29,10 +29,12 @@ import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
+import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 public class TestRestServiceFactory extends RestServiceFactory {
 
     private final Retrofit retrofit;
+    private final Retrofit retrofitScalar;
 
     public TestRestServiceFactory() {
         super(null, null);
@@ -51,10 +53,21 @@ public class TestRestServiceFactory extends RestServiceFactory {
                 .addConverterFactory(GsonConverterFactory.create())
                 .client(okHttpClient)
                 .build();
+
+        retrofitScalar = new Retrofit.Builder()
+                .baseUrl("http://localhost:8080/")
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                .addConverterFactory(ScalarsConverterFactory.create())
+                .client(okHttpClient)
+                .build();
     }
 
     @Override
     public <T> T createRetrofitService(final Class<T> clazz, String baseUrl) {
         return retrofit.create(clazz);
+    }
+
+    public <T> T createScalarsRetrofitService(final Class<T> clazz, String baseUrl) {
+        return retrofitScalar.create(clazz);
     }
 }

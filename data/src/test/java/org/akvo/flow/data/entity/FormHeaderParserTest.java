@@ -22,6 +22,7 @@ package org.akvo.flow.data.entity;
 import android.test.suitebuilder.annotation.SmallTest;
 import android.text.TextUtils;
 
+import org.akvo.flow.data.entity.form.FormHeaderParser;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

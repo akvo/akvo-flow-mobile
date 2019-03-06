@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -100,12 +100,7 @@ public class BarcodeQuestionViewMultiple extends QuestionView implements
     @Override
     public void captureResponse(boolean suppressListeners) {
         String value = barcodeQuestionAdapter.getBarcodes();
-        QuestionResponse questionResponse = new QuestionResponse.QuestionResponseBuilder()
-                .setValue(value)
-                .setType(ConstantUtil.VALUE_RESPONSE_TYPE)
-                .setQuestionId(getQuestion().getId())
-                .createQuestionResponse();
-        setResponse(questionResponse, suppressListeners);
+        setResponse(suppressListeners, getQuestion(), value, ConstantUtil.VALUE_RESPONSE_TYPE);
     }
 
     @Override

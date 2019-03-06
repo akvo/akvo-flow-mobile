@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015-2018 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2015-2019 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -110,11 +110,6 @@ public class GeoshapeQuestionView extends QuestionView implements OnClickListene
     @Override
     public void captureResponse(boolean suppressListeners) {
         Question question = getQuestion();
-        setResponse(new QuestionResponse.QuestionResponseBuilder().setValue(mValue)
-                .setType(ConstantUtil.VALUE_RESPONSE_TYPE)
-                .setQuestionId(question.getQuestionId())
-                .setIteration(question.getIteration())
-                .createQuestionResponse(), suppressListeners);
+        setResponse(suppressListeners, question, mValue, ConstantUtil.VALUE_RESPONSE_TYPE);
     }
-
 }

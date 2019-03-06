@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2012,2018 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2012,2018-2019 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -37,7 +37,6 @@ public class QuestionInteractionEvent {
     public static final String QUESTION_ANSWER_EVENT = "ANS";
     public static final String QUESTION_CLEAR_EVENT = "CLR";
     public static final String SCAN_BARCODE_EVENT = "SCAN";
-    public static final String EXTERNAL_SOURCE_EVENT = "EXTERNALSOURCE";
     public static final String CADDISFLY = "CADDISFLY";
     public static final String PLOTTING_EVENT = "PLOTTING";
     public static final String ADD_SIGNATURE_EVENT = "SIGNATURE";

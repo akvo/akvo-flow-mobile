@@ -179,7 +179,6 @@ public class ConstantUtil {
     /**
      * Caddisfly serialization settings
      */
-    public static final String EXTERNAL_SOURCE_ACTION = "org.akvo.flow.action.externalsource";
     public static final String CADDISFLY_ACTION = "org.akvo.flow.action.caddisfly";
     public static final String CADDISFLY_RESOURCE_ID = "caddisflyResourceUuid";
     public static final String CADDISFLY_QUESTION_ID = "questionId";
@@ -212,7 +211,6 @@ public class ConstantUtil {
     public static final int PHOTO_ACTIVITY_REQUEST = 1;
     public static final int VIDEO_ACTIVITY_REQUEST = 2;
     public static final int SCAN_ACTIVITY_REQUEST = 3;
-    public static final int EXTERNAL_SOURCE_REQUEST = 4;
     public static final int CADDISFLY_REQUEST = 5;
     public static final int PLOTTING_REQUEST = 6;
     public static final int SIGNATURE_REQUEST = 7;

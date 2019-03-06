@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2016-2018 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2016-2019 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -160,15 +160,6 @@ public class Navigator {
         Intent intent = new Intent(Intent.ACTION_VIEW);
         intent.setData(Uri.parse(uriString));
         activity.startActivity(intent);
-    }
-
-    public void navigateToExternalSource(@NonNull Activity activity, Bundle data,
-            CharSequence title) {
-        Intent intent = new Intent(ConstantUtil.EXTERNAL_SOURCE_ACTION);
-        intent.putExtras(data);
-        intent.setType(ConstantUtil.CADDISFLY_MIME);
-        activity.startActivityForResult(Intent.createChooser(intent, title),
-                ConstantUtil.EXTERNAL_SOURCE_REQUEST);
     }
 
     public void navigateToCaddisfly(@NonNull Activity activity, Bundle data, CharSequence title) {

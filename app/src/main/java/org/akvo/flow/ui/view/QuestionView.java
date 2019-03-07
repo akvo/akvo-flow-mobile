@@ -416,22 +416,11 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
 
     public void setResponse(boolean suppressListeners, Question question, String value,
             String type) {
-        setResponse(new QuestionResponse.QuestionResponseBuilder()
-                        .setValue(value)
-                        .setType(type)
-                        .setQuestionId(question.getQuestionId())
-                        .setIteration(question.getIteration())
-                        .createQuestionResponse(),
-                suppressListeners);
+        setResponse(createResponse(question, value, type), suppressListeners);
     }
 
     public void setResponse(Question question, String value, String type) {
-        setResponse(new QuestionResponse.QuestionResponseBuilder()
-                .setValue(value)
-                .setType(type)
-                .setQuestionId(question.getQuestionId())
-                .setIteration(question.getIteration())
-                .createQuestionResponse());
+        setResponse(createResponse(question, value, type));
     }
 
     /**
@@ -568,5 +557,13 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
         }
         return true;
     }
-}
 
+    private QuestionResponse createResponse(Question question, String value, String type) {
+        return new QuestionResponse.QuestionResponseBuilder()
+                .setValue(value)
+                .setType(type)
+                .setQuestionId(question.getQuestionId())
+                .setIteration(question.getIteration())
+                .createQuestionResponse();
+    }
+}

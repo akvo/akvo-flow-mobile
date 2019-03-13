@@ -23,6 +23,7 @@ package org.akvo.flow.data.entity;
 import android.database.Cursor;
 import android.test.suitebuilder.annotation.SmallTest;
 
+import org.akvo.flow.data.entity.form.FormIdMapper;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;

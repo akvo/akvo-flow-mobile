@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2018 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2019 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -147,12 +147,8 @@ public class DateQuestionView extends QuestionView implements View.OnClickListen
     public void captureResponse(boolean suppressListeners) {
         String utcTimeStampString = mLocalCalendar.getTimeInMillis() + "";
         Question question = getQuestion();
-        setResponse(new QuestionResponse.QuestionResponseBuilder()
-                        .setValue(utcTimeStampString)
-                        .setType(ConstantUtil.DATE_RESPONSE_TYPE)
-                        .setQuestionId(question.getQuestionId())
-                        .setIteration(question.getIteration())
-                        .createQuestionResponse(), suppressListeners);
+        setResponse(suppressListeners, question, utcTimeStampString,
+                ConstantUtil.DATE_RESPONSE_TYPE);
     }
 
     @Override

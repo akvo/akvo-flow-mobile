@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2018 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2019 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -414,6 +414,15 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
      */
     public abstract void captureResponse(boolean suppressListeners);
 
+    public void setResponse(boolean suppressListeners, Question question, String value,
+            String type) {
+        setResponse(createResponse(question, value, type), suppressListeners);
+    }
+
+    public void setResponse(Question question, String value, String type) {
+        setResponse(createResponse(question, value, type));
+    }
+
     /**
      * this method should be overridden by subclasses so they can manage the UI
      * changes when resetting the value
@@ -548,5 +557,13 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
         }
         return true;
     }
-}
 
+    private QuestionResponse createResponse(Question question, String value, String type) {
+        return new QuestionResponse.QuestionResponseBuilder()
+                .setValue(value)
+                .setType(type)
+                .setQuestionId(question.getQuestionId())
+                .setIteration(question.getIteration())
+                .createQuestionResponse();
+    }
+}

@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2014-2018 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2014-2019 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -260,11 +260,6 @@ public class CascadeQuestionView extends QuestionView
     }
 
     @Override
-    public void setResponse(QuestionResponse response) {
-        super.setResponse(response);
-    }
-
-    @Override
     public void captureResponse(boolean suppressListeners) {
         List<CascadeNode> values = new ArrayList<>();
         for (int i = 0; i < mSpinnerContainer.getChildCount(); i++) {
@@ -279,12 +274,7 @@ public class CascadeQuestionView extends QuestionView
 
         String response = CascadeValue.serialize(values);
         Question question = getQuestion();
-        setResponse(new QuestionResponse.QuestionResponseBuilder()
-                .setValue(response)
-                .setType(ConstantUtil.CASCADE_RESPONSE_TYPE)
-                .setQuestionId(question.getQuestionId())
-                .setIteration(question.getIteration())
-                .createQuestionResponse(), suppressListeners);
+        setResponse(suppressListeners, question, response, ConstantUtil.CASCADE_RESPONSE_TYPE);
     }
 
     private Spinner getSpinner(int position) {

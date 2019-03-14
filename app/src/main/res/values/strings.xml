@@ -307,9 +307,6 @@
     <string name="action_enable">Enable</string>
     <string name="storage_permission_missing">Storage permission is necessary for the app to work correctly.</string>
     <string name="survey_permissions_missing">Storage and Phone State permissions are necessary for the app to work correctly.</string>
-    <string name="channel_name">Flow channel</string>
-    <string name="channel_description">Flow notifications</string>
-
 
     <string name="unpublish_service_notification_title">Deleting published files</string>
     <string name="unpublish_service_notification_ticker">Deleting</string>

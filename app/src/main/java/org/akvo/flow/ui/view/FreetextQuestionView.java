@@ -20,7 +20,6 @@
 package org.akvo.flow.ui.view;
 
 import android.content.Context;
-import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.text.Editable;
 import android.text.InputFilter;
@@ -31,26 +30,23 @@ import android.text.TextWatcher;
 import android.text.method.DigitsKeyListener;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.Button;
 import android.widget.EditText;
 
 import org.akvo.flow.R;
 import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionResponse;
 import org.akvo.flow.domain.ValidationRule;
-import org.akvo.flow.event.QuestionInteractionEvent;
 import org.akvo.flow.event.SurveyListener;
 import org.akvo.flow.exception.ValidationException;
 import org.akvo.flow.util.ConstantUtil;
-
-import java.util.Locale;
 
 /**
  * Question that supports free-text input via the keyboard
  * 
  * @author Christopher Fagiani
  */
-public class FreetextQuestionView extends QuestionView implements View.OnClickListener {
+public class FreetextQuestionView extends QuestionView {
+
     private EditText mEditText, mDoubleEntryText;
 
     private boolean mCaptureResponse;
@@ -62,8 +58,8 @@ public class FreetextQuestionView extends QuestionView implements View.OnClickLi
 
     private void init() {
         setQuestionView(R.layout.freetext_question_view);
-        mEditText = (EditText)findViewById(R.id.input_et);
-        mDoubleEntryText = (EditText)findViewById(R.id.double_entry_et);
+        mEditText = findViewById(R.id.input_et);
+        mDoubleEntryText = findViewById(R.id.double_entry_et);
 
         // Show/Hide double entry title & EditText
         if (isDoubleEntry()) {
@@ -106,18 +102,6 @@ public class FreetextQuestionView extends QuestionView implements View.OnClickLi
         mEditText.setOnFocusChangeListener(inputListener);
         mDoubleEntryText.addTextChangedListener(extraListener);
         mDoubleEntryText.setOnFocusChangeListener(extraListener);
-
-        Button externalSourceBtn = (Button)findViewById(R.id.external_source_btn);
-        if (mQuestion.useExternalSource()) {
-            externalSourceBtn.setVisibility(VISIBLE);
-            externalSourceBtn.setOnClickListener(this);
-            externalSourceBtn.setEnabled(!mSurveyListener.isReadOnly());
-            mEditText.setEnabled(false);
-            mEditText.setInputType(mEditText.getInputType() & ~InputType.TYPE_TEXT_FLAG_MULTI_LINE);
-            mDoubleEntryText.setEnabled(false);
-        } else {
-            externalSourceBtn.setVisibility(GONE);
-        }
     }
 
     @Override
@@ -235,29 +219,6 @@ public class FreetextQuestionView extends QuestionView implements View.OnClickLi
             if (!text.equals(validatedText)) {
                 view.setText(validatedText);// This action will trigger captureResponse again
             }
-        }
-    }
-
-    @Override
-    public void onQuestionResultReceived(Bundle data) {
-        if (data != null && data.containsKey(ConstantUtil.CADDISFLY_RESPONSE)) {
-            Question question = getQuestion();
-            String value = data.getString(ConstantUtil.CADDISFLY_RESPONSE);
-            setResponse(question, value, ConstantUtil.VALUE_RESPONSE_TYPE);
-        }
-    }
-
-    @Override
-    public void onClick(View view) {
-        if (view.getId() == R.id.external_source_btn) {
-            Question q = getQuestion();
-            Bundle data = new Bundle();
-            data.putString(ConstantUtil.CADDISFLY_QUESTION_ID, q.getId());
-            data.putString(ConstantUtil.CADDISFLY_QUESTION_TITLE, q.getText());
-            data.putString(ConstantUtil.CADDISFLY_DATAPOINT_ID, mSurveyListener.getDatapointId());
-            data.putString(ConstantUtil.CADDISFLY_FORM_ID, mSurveyListener.getFormId());
-            data.putString(ConstantUtil.CADDISFLY_LANGUAGE, Locale.getDefault().getLanguage());
-            notifyQuestionListeners(QuestionInteractionEvent.EXTERNAL_SOURCE_EVENT, data);
         }
     }
 

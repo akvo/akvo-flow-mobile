@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010-2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2010-2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -579,7 +579,6 @@ public class FormActivity extends BackActivity implements SurveyListener,
             case ConstantUtil.GET_VIDEO_ACTIVITY_REQUEST:
                 onVideoAcquired(intent.getData());
                 break;
-            case ConstantUtil.EXTERNAL_SOURCE_REQUEST:
             case ConstantUtil.CADDISFLY_REQUEST:
             case ConstantUtil.SCAN_ACTIVITY_REQUEST:
             case ConstantUtil.PLOTTING_REQUEST:
@@ -786,8 +785,6 @@ public class FormActivity extends BackActivity implements SurveyListener,
             clearQuestion(event);
         } else if (QuestionInteractionEvent.QUESTION_ANSWER_EVENT.equals(event.getEventType())) {
             storeAnswer(event);
-        } else if (QuestionInteractionEvent.EXTERNAL_SOURCE_EVENT.equals(event.getEventType())) {
-            navigateToExternalSource(event);
         } else if (QuestionInteractionEvent.CADDISFLY.equals(event.getEventType())) {
             navigateToCaddisfly(event);
         } else if (QuestionInteractionEvent.PLOTTING_EVENT.equals(event.getEventType())) {
@@ -820,12 +817,6 @@ public class FormActivity extends BackActivity implements SurveyListener,
     private void navigateToCaddisfly(QuestionInteractionEvent event) {
         mRequestQuestionId = event.getSource().getQuestion().getId();
         navigator.navigateToCaddisfly(this, event.getData(), getString(R.string.caddisfly_test));
-    }
-
-    private void navigateToExternalSource(QuestionInteractionEvent event) {
-        mRequestQuestionId = event.getSource().getQuestion().getId();
-        navigator.navigateToExternalSource(this, event.getData(),
-                getString(R.string.use_external_source));
     }
 
     private void storeAnswer(QuestionInteractionEvent event) {

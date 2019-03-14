@@ -152,13 +152,8 @@ public class FreetextQuestionView extends QuestionView {
             return;// Die early. Don't store the value.
         }
 
-        setResponse(new QuestionResponse.QuestionResponseBuilder()
-                        .setValue(mEditText.getText().toString())
-                        .setType(ConstantUtil.VALUE_RESPONSE_TYPE)
-                        .setQuestionId(question.getQuestionId())
-                        .setIteration(question.getIteration())
-                        .createQuestionResponse(),
-                suppressListeners);
+        String value = mEditText.getText().toString();
+        setResponse(suppressListeners, question, value, ConstantUtil.VALUE_RESPONSE_TYPE);
 
         checkMandatory();// Mandatory question must be answered
     }

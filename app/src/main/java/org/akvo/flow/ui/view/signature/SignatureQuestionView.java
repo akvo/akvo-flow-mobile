@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -170,12 +170,7 @@ public class SignatureQuestionView extends QuestionView {
     @Override
     public void captureResponse(boolean suppressListeners) {
         String value = SignatureValue.serialize(mSignature);
-        QuestionResponse questionResponse = new QuestionResponse.QuestionResponseBuilder()
-                .setValue(value)
-                .setType(ConstantUtil.SIGNATURE_RESPONSE_TYPE)
-                .setQuestionId(getQuestion().getId())
-                .createQuestionResponse();
-        setResponse(questionResponse);
+        setResponse(getQuestion(), value, ConstantUtil.SIGNATURE_RESPONSE_TYPE);
     }
 
     private void resetResponse(String name) {

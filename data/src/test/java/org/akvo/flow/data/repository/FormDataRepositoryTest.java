@@ -25,9 +25,10 @@ import org.akvo.flow.data.datasource.DataSourceFactory;
 import org.akvo.flow.data.datasource.DatabaseDataSource;
 import org.akvo.flow.data.datasource.files.FileDataSource;
 import org.akvo.flow.data.entity.ApiFormHeader;
-import org.akvo.flow.data.entity.FormHeaderParser;
-import org.akvo.flow.data.entity.FormIdMapper;
-import org.akvo.flow.data.entity.XmlParser;
+import org.akvo.flow.data.entity.form.Form;
+import org.akvo.flow.data.entity.form.FormHeaderParser;
+import org.akvo.flow.data.entity.form.FormIdMapper;
+import org.akvo.flow.data.entity.form.XmlFormParser;
 import org.akvo.flow.data.net.RestApi;
 import org.akvo.flow.data.net.s3.AmazonAuthHelper;
 import org.akvo.flow.data.util.ApiUrls;
@@ -70,7 +71,7 @@ public class FormDataRepositoryTest {
     FormHeaderParser mockFormHeaderParser;
 
     @Mock
-    XmlParser mockXmlParser;
+    XmlFormParser mockXmlParser;
 
     @Mock
     DatabaseDataSource mockDatabaseDataSource;
@@ -99,6 +100,9 @@ public class FormDataRepositoryTest {
     @Mock
     Cursor mockCursor;
 
+    @Mock
+    Form mockForm;
+
     private MockWebServer mockWebServer;
     private FormDataRepository formDataRepository;
     private RestApi restApi;
@@ -118,6 +122,7 @@ public class FormDataRepositoryTest {
         when(mockFormHeaderParser.parseOne(anyString())).thenReturn(mockApiFormHeader);
         when(mockFormHeaderParser.parseMultiple(anyString())).thenReturn(
                 Collections.<ApiFormHeader>emptyList());
+        when(mockApiFormHeader.getId()).thenReturn("123456");
         when(mockDateFormat
                 .format(any(Date.class), any(StringBuffer.class), any(FieldPosition.class)))
                 .thenReturn(new StringBuffer().append("12-12-2012"));
@@ -125,7 +130,8 @@ public class FormDataRepositoryTest {
                 .thenReturn("123");
         when(mockDatabaseDataSource.insertSurveyGroup(any(ApiFormHeader.class)))
                 .thenReturn(Observable.just(true));
-        when(mockDatabaseDataSource.insertSurvey(any(ApiFormHeader.class), anyBoolean()))
+        when(mockDatabaseDataSource
+                .insertSurvey(any(ApiFormHeader.class), anyBoolean(), any(Form.class)))
                 .thenReturn(Observable.just(true));
         when(mockFileDataSource.extractRemoteArchive(any(ResponseBody.class), anyString()))
                 .thenReturn(Observable.just(true));
@@ -171,7 +177,7 @@ public class FormDataRepositoryTest {
         when(mockDatabaseDataSource.formNeedsUpdate(any(ApiFormHeader.class)))
                 .thenReturn(Observable.just(true));
 
-        when(mockXmlParser.parse(mockInputStream)).thenReturn(Collections.<String>emptyList());
+        when(mockXmlParser.parse(mockInputStream)).thenReturn(mockForm);
 
         mockWebServer.enqueue(new MockResponse().setResponseCode(200)
                 .setBody(",1,cde,abc,cde,6.0,cde,true,33"));
@@ -200,6 +206,7 @@ public class FormDataRepositoryTest {
         when(mockDatabaseDataSource.formNeedsUpdate(any(ApiFormHeader.class)))
                 .thenReturn(Observable.just(true));
         when(mockDatabaseDataSource.deleteAllForms()).thenReturn(Observable.just(true));
+        when(mockXmlParser.parse(mockInputStream)).thenReturn(mockForm);
 
         mockWebServer.enqueue(new MockResponse().setResponseCode(200).setBody(
                 ",1,cde,abc,cde,6.0,cde,true,33\n"));

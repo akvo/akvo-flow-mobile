@@ -24,7 +24,7 @@ import android.database.Cursor;
 
 import org.akvo.flow.data.datasource.DataSourceFactory;
 import org.akvo.flow.data.datasource.DatabaseDataSource;
-import org.akvo.flow.data.entity.FormIdMapper;
+import org.akvo.flow.data.entity.form.FormIdMapper;
 import org.akvo.flow.data.entity.S3File;
 import org.akvo.flow.data.entity.Transmission;
 import org.akvo.flow.data.entity.TransmissionMapper;

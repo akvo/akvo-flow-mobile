@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2010-2017,2019 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -38,7 +38,7 @@ import org.akvo.flow.injector.component.ApplicationComponent;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
 import org.akvo.flow.presentation.datapoints.list.DataPointsListFragment;
-import org.akvo.flow.presentation.datapoints.map.DataPointsMapFragment;
+import org.akvo.flow.presentation.datapoints.map.mapbox.DataPointsMapFragment;
 import org.akvo.flow.util.ConstantUtil;
 
 import java.util.Map;
@@ -123,8 +123,8 @@ public class DatapointsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.datapoints_fragment, container, false);
-        ViewPager mPager = (ViewPager) v.findViewById(R.id.pager);
-        TabLayout tabs = (TabLayout) v.findViewById(R.id.tabs);
+        ViewPager mPager = v.findViewById(R.id.pager);
+        TabLayout tabs = v.findViewById(R.id.tabs);
 
         mTabsAdapter = new TabsAdapter(getChildFragmentManager(), tabNames, mSurveyGroup);
         mPager.setAdapter(mTabsAdapter);

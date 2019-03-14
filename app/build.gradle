@@ -232,6 +232,7 @@ dependencies {
     debugImplementation "com.squareup.leakcanary:leakcanary-support-fragment:${rootProject.ext.leakCanaryVersion}"
 
     implementation "com.android.support:multidex:${rootProject.ext.multidexVersion}"
+    implementation "com.mapbox.mapboxsdk:mapbox-android-sdk:${rootProject.ext.mapboxVersion}"
 
     testImplementation "junit:junit:${rootProject.ext.jUnitVersion}"
     testImplementation "org.mockito:mockito-core:${rootProject.ext.mockitoCoreVersion}"

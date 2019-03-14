@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2013-2018 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2013-2019 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -28,6 +28,7 @@ import android.text.TextUtils;
 
 import com.crashlytics.android.Crashlytics;
 import com.crashlytics.android.core.CrashlyticsCore;
+import com.mapbox.mapboxsdk.Mapbox;
 import com.squareup.leakcanary.LeakCanary;
 
 import org.akvo.flow.BuildConfig;
@@ -89,6 +90,11 @@ public class FlowApp extends Application {
             // You should not init your app in this process.
             return;
         }
+
+        // Mapbox access token is configured here. This needs to be called either in your application
+        // object or in the same activity which contains the mapview.
+        //TODO: extract token
+        Mapbox.getInstance(this, "pk.eyJ1IjoiYWt2byIsImEiOiJzUFVwR3pJIn0.8dLa4fHG19fBwwBUJMDOSQ");
 
         installLeakCanary();
         initializeInjector();

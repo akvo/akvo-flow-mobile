@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017,2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -34,7 +34,7 @@ import org.akvo.flow.presentation.datapoints.map.entity.MapDataPoint;
  * This custom renderer overrides original 'bucketed' names, in order to display the accurate
  * number of markers within a cluster.
  */
-class PointRenderer extends DefaultClusterRenderer<MapDataPoint> {
+public class PointRenderer extends DefaultClusterRenderer<MapDataPoint> {
 
     public PointRenderer(GoogleMap map, Context context,
             ClusterManager<MapDataPoint> clusterManager) {

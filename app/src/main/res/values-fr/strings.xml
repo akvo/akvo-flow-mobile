@@ -16,10 +16,6 @@
   <string name="preferences_general_section">Paramètres généraux</string>
   <string name="aboutlabel">A propos</string>
   <string name="otherinstructions">Veuillez entrer une description</string>
-  <string name="texthelpoption">Voir le texte d\'aide</string>
-  <string name="videohelpoption">Voir la vidéo d\'aide</string>
-  <string name="photohelpoption">Voir les photos d\'aide</string>
-  <string name="helpheading">Options d\'aide</string>
   <string name="deleteresponse">Effacer les réponses</string>
   <string name="othertext">Autre...</string>
   <string name="surveylanglabel">Langues de l\'enquête</string>
@@ -68,8 +64,13 @@
   <string name="clear_data_success">Les données ont été effacées de l\'appareil avec succès</string>
   <string name="clear_data_error">Des erreurs se sont produites lors de l\'effacement des données de l\'appareil</string>
   <string name="search">Recherche</string>
+  <string name="download">Télécharger</string>
+  <string name="upload">Envoyer</string>
   <string name="sort">Trier</string>
   <string name="stats">Stats</string>
+  <string name="data_points_sync_error_message_network">Le téléchargement a échoué. Pas de connection.</string>
+  <string name="data_points_sync_error_message_assignment">Le téléchargement a échoué. Affectation manquante.</string>
+  <string name="data_points_sync_error_message_default">Le téléchargement a échoué</string>
   <string name="prefill_title">Pré-remplir les réponses</string>
   <string name="prefill_text">Pré-remplir les réponses avec les valeurs précédentes de la même question</string>
   <!--Data sync-->
@@ -96,7 +97,6 @@
   <string name="error_answer_match">Les réponses ne correspondent pas</string>
   <string name="error_img_preview">Impossible de charger l\'image</string>
   <string name="error_video_preview">Impossible de charger l\'aperçu vidéo</string>
-  <string name="use_external_source">Utiliser source externe</string>
   <string name="caddisfly_test">Tester</string>
   <string name="error_empty_form">Les formulaires vides ne peuvent être envoyés. Veuillez répondre aux questions.</string>
   <string name="select">Veuillez sélectionner</string>
@@ -142,6 +142,7 @@
   <!--Form & transmission status-->
   <string name="status_queued">En attente</string>
   <string name="status_in_progress">En cours</string>
+  <string name="status_uploaded">Envoyé</string>
   <string name="status_failed">Échec</string>
   <string name="status_saved">Enregistré</string>
   <string name="status_submitted">Envoyé</string>
@@ -230,10 +231,11 @@
   <string name="error_loading_help">Erreur lors du chargement du contenu d\'aide</string>
   <string name="error_mobile_data_sync">Désactiver la synchronisation des données mobiles</string>
   <string name="preference_screen_on">Garder l\'ecran en marche pendant la collecte</string>
-  <string name="preference_mobile_data">Activer l\'utilisation des données mobiles</string>
+  <string name="preference_upload_mobile_data">Autoriser l\'utilisation les données mobiles pour l\'envoi des soumissions</string>
   <string name="preference_app_language">Langage App</string>
   <string name="preference_image_size">Taille de l\'image</string>
   <string name="preferences_data_section">Données</string>
+  <string name="preference_sync_datapoints">Envoyer les points de données à l\'intance Flow.</string>
   <string name="preference_delete_collected_data">Effacer les données et images collectées</string>
   <string name="preference_delete_everything">Tout supprimer</string>
   <string name="preferences_configuration_section">Configuration</string>
@@ -242,10 +244,14 @@
   <string name="preferences_section_information">Information</string>
   <string name="preference_identifier">Identifiant de l\'appareil</string>
   <string name="preference_instance_name">Nom de l\'instance</string>
-  <string name="data_points_sync_error_mobile_data_sync">La synchronisation via données mobiles est désactivée</string>
   <string name="action_settings">Paramètres</string>
+  <string name="no_records_subtitle_monitored">Utilisez \'+\' pour capturer des données ou \'Télécharger\' pour obtenir des données existantes</string>
   <string name="no_records_subtitle_non_monitored">Utilisez \'+\' pour capturer des données.</string>
   <!--Verify if this works for transifex-->
+  <plurals name="data_points_sync_success_message">
+    <item quantity="one">%1$d enregistrement téléchargé</item>
+    <item quantity="other">%1$d enregistrements téléchargés</item>
+  </plurals>
   <string name="surveys_error">Erreur de chargement des enquêtes</string>
   <string name="users_error">Erreur de chargement des utilisateurs</string>
   <string name="survey_delete_error">Erreur lors de la suppression d\'enquête</string>
@@ -256,6 +262,7 @@
   <string name="add_user_message">Le nouvel utilisateur sera automatiquement sélectionné</string>
   <string name="survey">enquête</string>
   <string name="no_gps_status_message">GPS Status n\'est pas installé sur cet appareil. Voulez-vous l\'installer maintenant?</string>
+  <string name="data_points_sync_no_data_points">Aucun enregistrement à télécharger</string>
   <string name="app_update_dialog_title">Une nouvelle version de Flow est disponible</string>
   <string name="app_update_dialog_subtitle">Effectuez la mise à jour afin de tirer le meilleur parti de votre application Flow</string>
   <string name="error_getting_media">Erreur d\'obtention de fichiers media, veuillez réessayer.</string>
@@ -277,4 +284,29 @@
   <string name="submit_tab_description">Les réponses envoyées peuvent être vues mais non modifiées</string>
   <string name="snackbar_submitted">Envoyé</string>
   <string name="form_id_hint">Identifiant du formulaire</string>
+  <string name="sync_service_notification_title">Synchronisation des données en cours</string>
+  <string name="sync_service_notification_ticker">Synchronisation en cours</string>
+  <string name="form_submit_error">Erreur de soumission de formulaire, veuillez réessayer</string>
+  <string name="media_from_camera">Appareil photo</string>
+  <string name="media_from_gallery">Galerie</string>
+  <string name="error_username_required">Le nom d\'utilisateur est obligatoire</string>
+  <string name="error_device_id_required">L\'identifiant de l\'appareil est obligatoire</string>
+  <string name="no_thanks_button">Non merci</string>
+  <string name="mobile_data_dialog_title">Autoriser l\'utilisation les données mobiles pour l\'envoi des soumissions?</string>
+  <string name="mobile_data_dialog_subtitle">Lorsque cette option est désactivée, les envois ne seront téléchargés que lorsqu\'une connexion wifi est disponible.</string>
+  <string name="enable_button">Autoriser</string>
+  <string name="location_permission_refused">Une autorisation d\'emplacement est requise afin d\'obtenir l\'emplacement de l\'appareil.</string>
+  <string name="action_enable">Autoriser</string>
+  <string name="storage_permission_missing">Une autorisation d\'accès aux fichiers est nécessaire pour que l\'application fonctionne correctement.</string>
+  <string name="survey_permissions_missing">Une autorisation d\'accès aux fichiers et à la téléphonie sont nécessaires pour que l\'application fonctionne correctement.</string>
+  <string name="unpublish_service_notification_title">Suppression des fichiers publiés en cours</string>
+  <string name="unpublish_service_notification_ticker">Suppression en cours</string>
+  <plurals name="download_forms_error">
+    <item quantity="one">Error de téléchargement de formulaire</item>
+    <item quantity="other">Error de téléchargement des formulaires</item>
+  </plurals>
+  <plurals name="download_forms_success">
+    <item quantity="one">Formulaire téléchargé</item>
+    <item quantity="other">Formulaires téléchargés</item>
+  </plurals>
 </resources>

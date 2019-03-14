@@ -11,10 +11,6 @@
   <string name="submitbutton">ចុចបញ្ជូនចេញ </string>
   <string name="aboutlabel">អំពី</string>
   <string name="otherinstructions">សូមបញ្ចូលការព៌ណនា </string>
-  <string name="texthelpoption">មើលអត្ថបទក្នុង Help</string>
-  <string name="videohelpoption">មើលវីដេអូក្នុង Help</string>
-  <string name="photohelpoption">មើលរូបភាពក្នុង Help </string>
-  <string name="helpheading">ជម្រើសក្នុង Help</string>
   <string name="deleteresponse">លុបចម្លើយ</string>
   <string name="othertext">ផ្សេងៗ...</string>
   <string name="surveylanglabel">ភាសាប្រើក្នុងការអង្កេត</string>
@@ -79,7 +75,6 @@
   <string name="repeat_answer">សូមឆ្លើយម្តងទៀត</string>
   <string name="error_answer_match">ចម្លើយមិនត្រូវគ្នា</string>
   <string name="error_img_preview">មិនអាចផ្ទុករូបភាពមើលជាមុន </string>
-  <string name="use_external_source">ចូរប្រើប្រភពខាងក្រៅ </string>
   <string name="caddisfly_test">ចូលទៅកាន់ការសាកល្បង</string>
   <string name="error_empty_form">ទម្រង់ទទេមិនអាចបញ្ជូនចេញបានទេ។ សូមបន្ថែមចម្លើយដែលត្រូវគ្នា ជាមុន </string>
   <string name="select">សូមជ្រើសរើស </string>

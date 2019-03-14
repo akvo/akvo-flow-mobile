@@ -16,10 +16,6 @@
   <string name="preferences_general_section">सामान्य </string>
   <string name="aboutlabel">ऐप्प के बारे में</string>
   <string name="otherinstructions">कृपया विवरण डाले </string>
-  <string name="texthelpoption">सहायक पुस्तिका देखें </string>
-  <string name="videohelpoption">सहायक वीडियो  देखें </string>
-  <string name="photohelpoption">सहायक चित्र   देखें </string>
-  <string name="helpheading">सहायक विकल्प </string>
   <string name="deleteresponse">प्रतिक्रिया को हटाएं </string>
   <string name="othertext">अन्य </string>
   <string name="surveylanglabel">सर्वे की  भाषाएँ </string>
@@ -96,7 +92,6 @@
   <string name="error_answer_match">उत्तर मेल नहीं खा रहे हैं </string>
   <string name="error_img_preview">चित्र लोड होने में त्रुटि </string>
   <string name="error_video_preview">वीडियो लोड नहीं हो रहा </string>
-  <string name="use_external_source">बाहरी स्त्रोत का उपयोग करें </string>
   <string name="caddisfly_test">जांच प्रारंभ करें</string>
   <string name="error_empty_form">खली फॉर्म जमा नहीं हो सकतेI  कृपया पहले अनुकूल उत्तर दें I</string>
   <string name="select">कृपया चुनें   </string>
@@ -223,7 +218,6 @@
   <string name="error_loading_help">सहायता जानकारी लोड करने में त्रुटि</string>
   <string name="error_mobile_data_sync">मोबाईल डाटा सिंक की आज्ञा नहीं है</string>
   <string name="preference_screen_on">सर्वे के दौरान, स्क्रीन को बंद ना होने दें</string>
-  <string name="preference_mobile_data">मोबाइल डाटा के प्रयोग करें</string>
   <string name="preference_app_language">ऐप की भाषा</string>
   <string name="preference_image_size">फोटो की लम्बाई - चौड़ाई</string>
   <string name="preferences_data_section">डाटा</string>
@@ -235,7 +229,6 @@
   <string name="preferences_section_information">जानकारी</string>
   <string name="preference_identifier">डिवाइस आइडेंटिफायर </string>
   <string name="preference_instance_name">डैशबोर्ड का नाम</string>
-  <string name="data_points_sync_error_mobile_data_sync">मोबाईल डाटा सिंक की आज्ञा नहीं है</string>
   <string name="action_settings">सेटिंग्स</string>
   <string name="no_records_subtitle_non_monitored">डाटा एकत्रित करने के लिए \'+\' दबाएं</string>
   <!--Verify if this works for transifex-->

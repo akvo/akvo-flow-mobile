@@ -16,10 +16,6 @@
   <string name="preferences_general_section">Umum</string>
   <string name="aboutlabel">Tentang</string>
   <string name="otherinstructions">Silakan beri keterangan singkat.</string>
-  <string name="texthelpoption">Lihat Teks Bantuan</string>
-  <string name="videohelpoption">Lihat Video Bantuan</string>
-  <string name="photohelpoption">Lihat Foto Bantuan</string>
-  <string name="helpheading">Pilihan Bantuan</string>
   <string name="deleteresponse">Hapus Jawaban</string>
   <string name="othertext">Lainnya...</string>
   <string name="surveylanglabel">Bahasa Survei</string>
@@ -95,7 +91,6 @@
   <string name="error_answer_match">Jawaban tidak sama</string>
   <string name="error_img_preview">Tidak dapat memuat gambar pratayang</string>
   <string name="error_video_preview">Tidak bisa mengunggah pratinjau video</string>
-  <string name="use_external_source">Gunakan sumber dari luar</string>
   <string name="caddisfly_test">Pindah ke halaman tes</string>
   <string name="error_empty_form">Tidak dapat mengirim formulir kosong. Mohon jawab pertanyaan terlebih dulu.</string>
   <string name="select">mohon pilih</string>
@@ -226,7 +221,6 @@
   <string name="error_loading_help">Kesalahan dalam memuat bantuan konten</string>
   <string name="error_mobile_data_sync">Sinkronisasi data perangkat dimatikan</string>
   <string name="preference_screen_on">Jaga layar agar tetap menyala selama mengisi formulir</string>
-  <string name="preference_mobile_data">Menyalakan penggunaan data perangkat</string>
   <string name="preference_app_language">Bahasa aplikasi</string>
   <string name="preference_image_size">Ukuran gambar</string>
   <string name="preferences_data_section">Data</string>
@@ -238,7 +232,6 @@
   <string name="preferences_section_information">Informasi </string>
   <string name="preference_identifier">Identitas Perangkat</string>
   <string name="preference_instance_name">Nama instansi</string>
-  <string name="data_points_sync_error_mobile_data_sync">Sinkronisasi data perangkat dimatikan</string>
   <string name="action_settings">Pengaturan</string>
   <string name="no_records_subtitle_non_monitored">Gunakan \'+\' untuk merekam data.</string>
   <!--Verify if this works for transifex-->

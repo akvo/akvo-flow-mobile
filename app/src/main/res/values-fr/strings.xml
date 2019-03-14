@@ -292,13 +292,13 @@
   <string name="error_username_required">Le nom d\'utilisateur est obligatoire</string>
   <string name="error_device_id_required">L\'identifiant de l\'appareil est obligatoire</string>
   <string name="no_thanks_button">Non merci</string>
-  <string name="mobile_data_dialog_title">Autoriser l\'utilisation les données mobiles pour l\'envoi des soumissions?</string>
-  <string name="mobile_data_dialog_subtitle">Lorsque cette option est désactivée, les envois ne seront téléchargés que lorsqu\'une connexion wifi est disponible.</string>
+  <string name="mobile_data_dialog_title">Utiliser les données mobiles pour l\'envoi des soumissions?</string>
+  <string name="mobile_data_dialog_subtitle">Lorsque cette option est désactivée, les envois ne seront envoyés que lorsqu\'une connexion wifi est disponible.</string>
   <string name="enable_button">Autoriser</string>
-  <string name="location_permission_refused">Une autorisation d\'emplacement est requise afin d\'obtenir l\'emplacement de l\'appareil.</string>
+  <string name="location_permission_refused">Une autorisation d\'emplacement est requise.</string>
   <string name="action_enable">Autoriser</string>
   <string name="storage_permission_missing">Une autorisation d\'accès aux fichiers est nécessaire pour que l\'application fonctionne correctement.</string>
-  <string name="survey_permissions_missing">Une autorisation d\'accès aux fichiers et à la téléphonie sont nécessaires pour que l\'application fonctionne correctement.</string>
+  <string name="survey_permissions_missing">L\'accès aux fichiers et à la téléphonie sont nécessaires pour que l\'application fonctionne correctement.</string>
   <string name="unpublish_service_notification_title">Suppression des fichiers publiés en cours</string>
   <string name="unpublish_service_notification_ticker">Suppression en cours</string>
   <plurals name="download_forms_error">

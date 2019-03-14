@@ -292,13 +292,13 @@
   <string name="error_username_required">El nombre de usario es obligatorio</string>
   <string name="error_device_id_required">El identificador de dispositivo es obligatorio</string>
   <string name="no_thanks_button">No gracias</string>
-  <string name="mobile_data_dialog_title">Habilitar el uso de datos móviles para el envio de puntos de datos?</string>
+  <string name="mobile_data_dialog_title">Habilitar el uso de datos móviles para el envio de datos?</string>
   <string name="mobile_data_dialog_subtitle">Si esta opcion está deshabilitada solo se enviaran los puntos de datos cuando haya una conexión wifi disponible.</string>
   <string name="enable_button">Permitir</string>
   <string name="location_permission_refused">Se requiere permiso de ubicación para obtener la ubicación del dispositivo.</string>
   <string name="action_enable">Permitir</string>
   <string name="storage_permission_missing">El permiso de almacenamiento es necesario para que la aplicación funcione correctamente.</string>
-  <string name="survey_permissions_missing">Los permisos de almacenamiento y telefonia son necesarios para que la aplicación funcione correctamente.</string>
+  <string name="survey_permissions_missing">Los permisos de almacenamiento y telefonia permiten el correcto funcionamiento de la aplicación.</string>
   <string name="unpublish_service_notification_title">Borrando ficheros publicados</string>
   <string name="unpublish_service_notification_ticker">Borrando</string>
   <plurals name="download_forms_error">
@@ -306,7 +306,7 @@
     <item quantity="other">Error de descarga de formularios</item>
   </plurals>
   <plurals name="download_forms_success">
-    <item quantity="one">Formulario descarregado</item>
-    <item quantity="other">Formularios descarregados</item>
+    <item quantity="one">Formulario descargado</item>
+    <item quantity="other">Formularios descargados</item>
   </plurals>
 </resources>

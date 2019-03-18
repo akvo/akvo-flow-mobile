@@ -114,8 +114,7 @@ public class Navigator {
     public void navigateToTakePhoto(@NonNull Activity activity, Uri uri) {
         Intent intent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
         PackageManager packageManager = activity.getPackageManager();
-        if (packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)
-                && intent.resolveActivity(packageManager) != null) {
+        if (intent.resolveActivity(packageManager) != null) {
             final List<ResolveInfo> activities = packageManager
                     .queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY);
             for (ResolveInfo resolvedIntentInfo : activities) {

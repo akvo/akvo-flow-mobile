@@ -15,10 +15,6 @@
   <string name="settings">Instellingen</string>
   <string name="aboutlabel">Over deze app</string>
   <string name="otherinstructions">Voeg s.v.p. een beschrijving toe</string>
-  <string name="texthelpoption">Bekijk help tekst</string>
-  <string name="videohelpoption">Bekijk help video</string>
-  <string name="photohelpoption">Bekijk help fotos</string>
-  <string name="helpheading">Assistentie opties</string>
   <string name="deleteresponse">Verwijder antwoord</string>
   <string name="othertext">Ander…</string>
   <string name="surveylanglabel">Talen van de vragenlijsten</string>
@@ -93,7 +89,6 @@
   <string name="repeat_answer">Herhaal s.v.p. uw antwoord</string>
   <string name="error_answer_match">Antwoorden komen niet overeen</string>
   <string name="error_img_preview">Voorbeeld plaatje kan niet geladen worden</string>
-  <string name="use_external_source">Gebruik externe bron</string>
   <string name="caddisfly_test">Ga naar test</string>
   <string name="error_empty_form">Lege formulieren kunnen niet ingediend worden. Voeg s.v.p. eerst de bijbehorende antwoorden toe.</string>
   <string name="select">Selecteer s.v.p.</string>
@@ -223,7 +218,6 @@
   <string name="error_loading_help">Fout bij het laden van help content</string>
   <string name="error_mobile_data_sync">Mobiele data synchronisatie uitgeschakeld</string>
   <string name="preference_screen_on">Houdt uw scherm aan gedurende het invullen van het formulier</string>
-  <string name="preference_mobile_data">Het gebruik van mobiele data inschakelen</string>
   <string name="preference_app_language">Taal van de app</string>
   <string name="preference_image_size">Grootte van de afbeelding</string>
   <string name="preferences_data_section">Data</string>
@@ -235,7 +229,6 @@
   <string name="preferences_section_information">Informatie</string>
   <string name="preference_identifier">Identificatiecode van het apparaat</string>
   <string name="preference_instance_name">Naam van de instance</string>
-  <string name="data_points_sync_error_mobile_data_sync">Mobiele data synchronisatie uitgeschakeld.</string>
   <string name="action_settings">Instellingen</string>
   <string name="no_records_subtitle_non_monitored"> Gebruik \'+\" om data te verzamelen.</string>
   <!--Verify if this works for transifex-->

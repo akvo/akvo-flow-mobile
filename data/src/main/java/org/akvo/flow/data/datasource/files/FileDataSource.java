@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2018-2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -99,7 +99,13 @@ public class FileDataSource {
         if (files != null) {
             File folder = getPrivateFolder(folderName);
             for (File f : files) {
-                String destinationPath = fileHelper.copyFileToFolder(f, folder);
+                String destinationPath;
+                if (f.isDirectory() && FlowFileBrowser.DIR_DATA.equals(folderName)){
+                    destinationPath = f.getAbsolutePath();
+                    fileHelper.deleteFilesInDirectory(f, false);
+                } else {
+                    destinationPath = fileHelper.copyFileToFolder(f, folder);
+                }
                 if (!TextUtils.isEmpty(destinationPath)) {
                     movedFiles.add(destinationPath);
                     //noinspection ResultOfMethodCallIgnored

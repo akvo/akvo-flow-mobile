@@ -15,10 +15,6 @@
   <string name="settings">सेटिङहरु</string>
   <string name="aboutlabel">हाम्रो बारेमा</string>
   <string name="otherinstructions">कृपया वर्णन लेख्नुहोस्।</string>
-  <string name="texthelpoption">सहयोग पाठ हेर्नुहोस्।</string>
-  <string name="videohelpoption">सहयोग भिडियो हेर्नुहोस्।</string>
-  <string name="photohelpoption">सहयोग तस्बिरहरु हेर्नुहोस्।</string>
-  <string name="helpheading">सहयोगका विकल्पहरु</string>
   <string name="deleteresponse">उतर हटाउनुहोस्।</string>
   <string name="othertext">अरु...</string>
   <string name="surveylanglabel">सर्भे भाषाहरु</string>
@@ -90,7 +86,6 @@
   <string name="repeat_answer">कृपया उत्तर दोहोराउनुहोस्।</string>
   <string name="error_answer_match">उत्तरहरु एक आपसमा मिल्दैनन्।</string>
   <string name="error_img_preview">फोटोको प्री-भ्यु लोड गर्न सकिएन।</string>
-  <string name="use_external_source">बाहिरी श्रोतको प्रयोग गर्नुहोस्</string>
   <string name="caddisfly_test">टेस्टमा जानुहोस्</string>
   <string name="error_empty_form">खाली फारमहरु सब्मिट हुन सक्तैनन्। कृपया पहिले चाहिने उत्तरहरु थप्निहोस्।</string>
   <string name="select">कृपया छान्नुहोस्</string>
@@ -208,7 +203,6 @@
   <string name="error_loading_help">सहयोग सामग्री लोड् हुँदा त्रुटी भयो </string>
   <string name="error_mobile_data_sync">मोबाइल डाटाको सिन्क बन्द गरिएको छ</string>
   <string name="preference_screen_on">फारम भरि राख्दा मोबाइलको स्क्रिन \'अन\' नै राख्नुहोस् </string>
-  <string name="preference_mobile_data">मोबाइल डाटाको प्रयोग शुरु गर्नुहोस्</string>
   <string name="preference_app_language">एप्पको भाषा</string>
   <string name="preference_image_size">फोटोको साइज</string>
   <string name="preferences_data_section">डाटा</string>
@@ -220,7 +214,6 @@
   <string name="preferences_section_information">सुचना</string>
   <string name="preference_identifier">डिभाइस् आईडेन्टीफायर</string>
   <string name="preference_instance_name">इन्स्ट्यान्स् को नाम</string>
-  <string name="data_points_sync_error_mobile_data_sync">मोबाइल डाटा सिन्क बन्द गरिएको छ</string>
   <string name="action_settings">सेटिङ्स्</string>
   <string name="no_records_subtitle_non_monitored">डाटा संकलनको लागि \'+\' को प्रयोग गर्नुहोस्</string>
   <!--Verify if this works for transifex-->

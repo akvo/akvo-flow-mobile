@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2018 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2019 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -67,7 +67,6 @@ public class Question {
     private boolean localeLocation = false;
     private String sourceQuestionId; // "Copied-from" question Id
     private boolean isDoubleEntry;
-    private boolean useExternalSource;
     private boolean allowPoints, allowLine, allowPolygon;
     private String caddisflyRes;
 
@@ -281,14 +280,6 @@ public class Question {
         return isDoubleEntry;
     }
 
-    public void useExternalSource(boolean useExternalSource) {
-        this.useExternalSource = useExternalSource;
-    }
-
-    public boolean useExternalSource() {
-        return useExternalSource;
-    }
-
     public void setSrc(String src) {
         this.src = src;
     }
@@ -360,7 +351,6 @@ public class Question {
         q.localeLocation = question.isLocaleLocation();
         q.sourceQuestionId = question.getSourceQuestionId();
         q.isDoubleEntry = question.isDoubleEntry();
-        q.useExternalSource = question.useExternalSource();
         q.allowPoints = question.isAllowPoints();
         q.allowLine = question.isAllowLine();
         q.allowPolygon = question.isAllowPolygon();

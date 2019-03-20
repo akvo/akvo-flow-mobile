@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2016-2018 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2016-2019 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -155,7 +155,7 @@ public class CaddisflyQuestionView extends QuestionView implements View.OnClickL
             Timber.d("caddisflyTestComplete - Response: %s . Image: %s", mValue, image);
 
             File src = !TextUtils.isEmpty(image) ? new File(image) : null;
-            if (src != null && src.exists()) {
+            if (src != null && src.exists() && !src.isDirectory()) {
                 presenter.onImageReady(src);
             } else {
                 captureResponse();
@@ -180,7 +180,8 @@ public class CaddisflyQuestionView extends QuestionView implements View.OnClickL
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            int[] grantResults) {
         if (requestCode == ConstantUtil.STORAGE_PERMISSION_CODE) {
             if (storagePermissionsHelper.storagePermissionsGranted(permissions[0], grantResults)) {
                 launchCaddisflyTest();
@@ -194,7 +195,8 @@ public class CaddisflyQuestionView extends QuestionView implements View.OnClickL
         final View.OnClickListener retryListener = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (storagePermissionsHelper.userPressedDoNotShowAgain((FormActivity) getContext())) {
+                if (storagePermissionsHelper
+                        .userPressedDoNotShowAgain((FormActivity) getContext())) {
                     navigator.navigateToAppSystemSettings(getContext());
                 } else {
                     requestStoragePermissions();
@@ -217,8 +219,8 @@ public class CaddisflyQuestionView extends QuestionView implements View.OnClickL
         data.putString(ConstantUtil.CADDISFLY_FORM_ID, mSurveyListener.getFormId());
         data.putString(ConstantUtil.CADDISFLY_LANGUAGE, Locale.getDefault().getLanguage());
         String serverBase = BuildConfig.SERVER_BASE;
-        serverBase = serverBase.replaceFirst("https://","");
-        serverBase = serverBase.replaceFirst("http://","");
+        serverBase = serverBase.replaceFirst("https://", "");
+        serverBase = serverBase.replaceFirst("http://", "");
         serverBase = serverBase.replace(".appspot.com", "");
         data.putString(ConstantUtil.CADDISFLY_INSTANCE_NAME, serverBase);
         notifyQuestionListeners(QuestionInteractionEvent.CADDISFLY, data);

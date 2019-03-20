@@ -15,10 +15,6 @@
   <string name="settings">Cài đặt</string>
   <string name="aboutlabel">Phiên bản</string>
   <string name="otherinstructions">Vui lòng nhập một mô tả</string>
-  <string name="texthelpoption">Xem trợ giúp dưới dạng văn bản</string>
-  <string name="videohelpoption">Xem trợ giúp dưới dạng video</string>
-  <string name="photohelpoption">Xem trợ giúp dưới dạng ảnh</string>
-  <string name="helpheading">Lựa chọn trợ giúp</string>
   <string name="deleteresponse">Xóa câu trả lời</string>
   <string name="othertext">Khác…</string>
   <string name="surveylanglabel">Những ngôn ngữ của đợt khảo sát</string>
@@ -90,7 +86,6 @@
   <string name="repeat_answer">Vui lòng, nhắc lại câu trả lời</string>
   <string name="error_answer_match">Câu trả lời không phù hợp</string>
   <string name="error_img_preview">Không thể xem trước hình ảnh</string>
-  <string name="use_external_source">Sử dụng nguồn bên ngoài</string>
   <string name="caddisfly_test">Đi đến thử nghiệm</string>
   <string name="error_empty_form">Những biểu mẫu trống dữ liệu không thể đệ trình. Trước tiên, vui lòng, điền thêm những câu trả lời tương ứng.</string>
   <string name="select">Vui lòng chọn</string>
@@ -218,7 +213,6 @@
   <string name="error_loading_help">Lỗi tải </string>
   <string name="error_mobile_data_sync">Vô hiệu hóa đồng bộ dữ liệu qua mạng di động</string>
   <string name="preference_screen_on">Giữ màn hình bật sáng trong quá trình nhập dữ liệu</string>
-  <string name="preference_mobile_data">Kích hoạt sử dụng dữ liệu di động</string>
   <string name="preference_app_language">Ngôn ngữ ứng dụng</string>
   <string name="preference_image_size">Kích thước ảnh</string>
   <string name="preferences_data_section">Dữ liệu</string>
@@ -230,7 +224,6 @@
   <string name="preferences_section_information">Thông tin</string>
   <string name="preference_identifier">Nhận dạng thiết bị</string>
   <string name="preference_instance_name">Tên trường Flow</string>
-  <string name="data_points_sync_error_mobile_data_sync">Vô hiệu hóa đồng bộ dữ liệu qua mạng di động</string>
   <string name="action_settings">Cài đặt</string>
   <string name="no_records_subtitle_non_monitored">Nhấn dấu \'+\' để tạo một điểm dữ liệu mới</string>
   <!--Verify if this works for transifex-->

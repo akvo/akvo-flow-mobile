@@ -1,5 +1,18 @@
 Akvo FLOW app release notes
 ===========================
+# ver 2.7.2
+Date: 20 March 2019
+
+* **Caddisfly images can be a folder** - [#1293](https://github.com/akvo/akvo-flow-mobile/issues/1293)
+* **Deleting a repetition with answers does not delete** - [#1294](https://github.com/akvo/akvo-flow-mobile/issues/1294)
+* **Add missing translations to app** - [#1307](https://github.com/akvo/akvo-flow-mobile/issues/1307)
+* **Form version inconsistency** - [#1324](https://github.com/akvo/akvo-flow-mobile/issues/1324)
+* **Remove old caddisfly implementation** - [#1335](https://github.com/akvo/akvo-flow-mobile/issues/1335)
+* **Some notification strings should not be translated** - [#1346](https://github.com/akvo/akvo-flow-mobile/issues/1346)
+* **Camera seems to be not found on some device** - [#1350](https://github.com/akvo/akvo-flow-mobile/issues/1350)
+* **Unexpected folder found when moving private files** - [#1352](https://github.com/akvo/akvo-flow-mobile/issues/1352)
+
+---------------
 # ver 2.7.1
 Date: 28 February 2019
 

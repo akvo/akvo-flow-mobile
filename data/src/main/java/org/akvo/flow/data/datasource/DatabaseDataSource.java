@@ -33,6 +33,7 @@ import org.akvo.flow.data.entity.ApiFormHeader;
 import org.akvo.flow.data.entity.ApiQuestionAnswer;
 import org.akvo.flow.data.entity.ApiSurveyInstance;
 import org.akvo.flow.data.entity.SurveyInstanceIdMapper;
+import org.akvo.flow.data.entity.form.Form;
 import org.akvo.flow.data.util.FlowFileBrowser;
 import org.akvo.flow.database.Constants;
 import org.akvo.flow.database.RecordColumns;
@@ -396,10 +397,13 @@ public class DatabaseDataSource {
     }
 
     public Observable<Boolean> insertSurvey(ApiFormHeader formHeader,
-            boolean cascadeResourcesDownloaded) {
+            boolean cascadeResourcesDownloaded, Form form) {
         ContentValues updatedValues = new ContentValues();
         updatedValues.put(SurveyColumns.SURVEY_ID, formHeader.getId());
-        updatedValues.put(SurveyColumns.VERSION, formHeader.getVersion());
+        String versionValue = form.getVersion() != null && !"0.0".equals(form.getVersion()) ?
+                form.getVersion() :
+                formHeader.getVersion();
+        updatedValues.put(SurveyColumns.VERSION, versionValue);
         updatedValues.put(SurveyColumns.TYPE, DEFAULT_SURVEY_TYPE);
         updatedValues.put(SurveyColumns.LOCATION, DEFAULT_SURVEY_LOCATION);
         updatedValues.put(SurveyColumns.FILENAME, formHeader.getId() + FlowFileBrowser.XML_SUFFIX);

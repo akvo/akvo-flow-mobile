@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2012,2018 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2012,2018-2019 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -92,7 +92,6 @@ public class SurveyHandler extends DefaultHandler {
     private static final String SURVEY_GROUP_NAME = "surveyGroupName";
     private static final String REGISTRATION_SURVEY = "registrationSurvey";
 
-    private static final String USE_EXTERNAL_SOURCE = "allowExternalSources";
     private static final String CASCADE_RESOURCE = "cascadeResource";
     private static final String CADDISFLY_RESOURCE = "caddisflyResourceUuid";
     private static final String LEVELS = "levels";
@@ -361,12 +360,6 @@ public class SurveyHandler extends DefaultHandler {
             }
             if (attributes.getValue(SOURCE_QUESTION_ID) != null) {
                 currentQuestion.setSourceQuestionId(attributes.getValue(SOURCE_QUESTION_ID));
-            }
-            if (attributes.getValue(USE_EXTERNAL_SOURCE) != null) {
-                currentQuestion.useExternalSource(Boolean.parseBoolean(attributes
-                        .getValue(USE_EXTERNAL_SOURCE)));
-            } else {
-                currentQuestion.useExternalSource(false);
             }
 
             // Question src. Added in cascading question implementation.

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017,2019 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -15,7 +15,6 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 
 package org.akvo.flow.activity.form.formfill;
@@ -23,14 +22,15 @@ package org.akvo.flow.activity.form.formfill;
 import android.content.Context;
 import android.content.Intent;
 import android.support.test.InstrumentationRegistry;
-import android.support.test.espresso.ViewInteraction;
 import android.support.test.filters.MediumTest;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 
+import org.akvo.flow.R;
 import org.akvo.flow.activity.FormActivity;
 import org.akvo.flow.activity.form.data.SurveyInstaller;
 import org.akvo.flow.activity.form.data.SurveyRequisite;
+import org.akvo.flow.ui.view.QuestionView;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -38,23 +38,24 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
-import static android.support.test.espresso.matcher.ViewMatchers.isChecked;
+import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
+import static android.support.test.espresso.matcher.ViewMatchers.withId;
+import static org.akvo.flow.activity.form.FormActivityTestUtil.verifySubmitButtonEnabled;
+import static org.hamcrest.Matchers.allOf;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.clickNext;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.fillSingleOptionsQuestion;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.getFormActivityIntent;
-import static org.akvo.flow.activity.form.FormActivityTestUtil.getSingleChoiceRadioButton;
-import static org.akvo.flow.activity.form.FormActivityTestUtil.verifyQuestionTitleDisplayed;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.verifySubmitButtonDisabled;
-import static org.akvo.flow.activity.form.FormActivityTestUtil.verifySubmitButtonEnabled;
-import static org.akvo.flow.tests.R.raw.option_form;
-import static org.hamcrest.core.IsNot.not;
+import static org.akvo.flow.activity.form.FormActivityTestUtil.withQuestionViewParent;
+import static org.akvo.flow.tests.R.raw.photo_form_dependent;
 
 @MediumTest
 @RunWith(AndroidJUnit4.class)
-public class OptionsQuestionViewSingleTest {
+public class PhotoQuestionDependentViewTest {
 
-    private static final String FORM_TITLE = "OptionsQuestionForm";
+    private static final String FORM_TITLE = "New form";
     private static SurveyInstaller installer;
 
     @Rule
@@ -62,7 +63,7 @@ public class OptionsQuestionViewSingleTest {
             FormActivity.class) {
         @Override
         protected Intent getActivityIntent() {
-            return getFormActivityIntent(42573002L, "43623002", FORM_TITLE, 0L, false);
+            return getFormActivityIntent(311169115L, "318939116", FORM_TITLE, 0L, false);
         }
     };
 
@@ -71,7 +72,7 @@ public class OptionsQuestionViewSingleTest {
         Context targetContext = InstrumentationRegistry.getTargetContext();
         SurveyRequisite.setRequisites(targetContext);
         installer = new SurveyInstaller(targetContext);
-        installer.installSurvey(option_form, InstrumentationRegistry.getContext());
+        installer.installSurvey(photo_form_dependent, InstrumentationRegistry.getContext());
     }
 
     @After
@@ -86,35 +87,20 @@ public class OptionsQuestionViewSingleTest {
     }
 
     @Test
-    public void ensureCanFillOptionsQuestion() {
-        verifyQuestionTitleDisplayed();
-
+    public void ensureCannotSubmitEmptyMandatoryPhoto() {
         fillSingleOptionsQuestion(0);
-
-        verifyOptionSelected();
-        verifyOtherOptionUnselected();
-
+        onView(allOf(withId(R.id.camera_btn), withQuestionViewParent(QuestionView.class, "342649116"))).check(matches(isDisplayed()));
+        onView(allOf(withId(R.id.gallery_btn), withQuestionViewParent(QuestionView.class, "342649116"))).check(matches(isDisplayed()));
         clickNext();
-
-        verifySubmitButtonEnabled();
-    }
-
-    @Test
-    public void ensureCannotSubmitIfNoOptionSelected() {
-        verifyQuestionTitleDisplayed();
-
-        clickNext();
-
         verifySubmitButtonDisabled();
     }
 
-    private void verifyOptionSelected() {
-        ViewInteraction singleChoiceOption = getSingleChoiceRadioButton(0);
-        singleChoiceOption.check(matches(isChecked()));
-    }
-
-    private void verifyOtherOptionUnselected() {
-        ViewInteraction singleChoiceOption = getSingleChoiceRadioButton(1);
-        singleChoiceOption.check(matches(not(isChecked())));
+    @Test
+    public void ensureCanSubmitEmptyNonMandatoryPhoto() {
+        fillSingleOptionsQuestion(1);
+        onView(allOf(withId(R.id.camera_btn), withQuestionViewParent(QuestionView.class, "340779116"))).check(matches(isDisplayed()));
+        onView(allOf(withId(R.id.gallery_btn), withQuestionViewParent(QuestionView.class, "340779116"))).check(matches(isDisplayed()));
+        clickNext();
+        verifySubmitButtonEnabled();
     }
 }

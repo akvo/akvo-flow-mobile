@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2016-2018 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2016-2019 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -114,8 +114,7 @@ public class Navigator {
     public void navigateToTakePhoto(@NonNull Activity activity, Uri uri) {
         Intent intent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
         PackageManager packageManager = activity.getPackageManager();
-        if (packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)
-                && intent.resolveActivity(packageManager) != null) {
+        if (intent.resolveActivity(packageManager) != null) {
             final List<ResolveInfo> activities = packageManager
                     .queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY);
             for (ResolveInfo resolvedIntentInfo : activities) {
@@ -160,15 +159,6 @@ public class Navigator {
         Intent intent = new Intent(Intent.ACTION_VIEW);
         intent.setData(Uri.parse(uriString));
         activity.startActivity(intent);
-    }
-
-    public void navigateToExternalSource(@NonNull Activity activity, Bundle data,
-            CharSequence title) {
-        Intent intent = new Intent(ConstantUtil.EXTERNAL_SOURCE_ACTION);
-        intent.putExtras(data);
-        intent.setType(ConstantUtil.CADDISFLY_MIME);
-        activity.startActivityForResult(Intent.createChooser(intent, title),
-                ConstantUtil.EXTERNAL_SOURCE_REQUEST);
     }
 
     public void navigateToCaddisfly(@NonNull Activity activity, Bundle data, CharSequence title) {

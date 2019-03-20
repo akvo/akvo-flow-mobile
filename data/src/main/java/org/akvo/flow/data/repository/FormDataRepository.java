@@ -25,9 +25,10 @@ import android.database.Cursor;
 import org.akvo.flow.data.datasource.DataSourceFactory;
 import org.akvo.flow.data.datasource.DatabaseDataSource;
 import org.akvo.flow.data.entity.ApiFormHeader;
-import org.akvo.flow.data.entity.FormHeaderParser;
-import org.akvo.flow.data.entity.FormIdMapper;
-import org.akvo.flow.data.entity.XmlParser;
+import org.akvo.flow.data.entity.form.Form;
+import org.akvo.flow.data.entity.form.FormHeaderParser;
+import org.akvo.flow.data.entity.form.FormIdMapper;
+import org.akvo.flow.data.entity.form.XmlFormParser;
 import org.akvo.flow.data.net.RestApi;
 import org.akvo.flow.data.util.FlowFileBrowser;
 import org.akvo.flow.domain.repository.FormRepository;
@@ -48,13 +49,13 @@ public class FormDataRepository implements FormRepository {
     private static final String TEST_FORM_ID = "0";
 
     private final FormHeaderParser formHeaderParser;
-    private final XmlParser xmlParser;
+    private final XmlFormParser xmlParser;
     private final RestApi restApi;
     private final DataSourceFactory dataSourceFactory;
     private final FormIdMapper formIdMapper;
 
     @Inject
-    public FormDataRepository(FormHeaderParser formHeaderParser, XmlParser xmlParser,
+    public FormDataRepository(FormHeaderParser formHeaderParser, XmlFormParser xmlParser,
             RestApi restApi, DataSourceFactory dataSourceFactory, FormIdMapper formIdMapper) {
         this.formHeaderParser = formHeaderParser;
         this.xmlParser = xmlParser;
@@ -217,21 +218,21 @@ public class FormDataRepository implements FormRepository {
 
     private Observable<Boolean> saveForm(final ApiFormHeader apiFormHeader) {
         return dataSourceFactory.getFileDataSource().getFormFile(apiFormHeader.getId())
-                .map(new Function<InputStream, List<String>>() {
+                .map(new Function<InputStream, Form>() {
                     @Override
-                    public List<String> apply(InputStream inputStream) {
+                    public Form apply(InputStream inputStream) {
                         return xmlParser.parse(inputStream);
                     }
                 })
-                .concatMap(new Function<List<String>, Observable<Boolean>>() {
+                .concatMap(new Function<Form, Observable<Boolean>>() {
                     @Override
-                    public Observable<Boolean> apply(List<String> resources) {
-                        return downloadResources(resources)
+                    public Observable<Boolean> apply(final Form form) {
+                        return downloadResources(form)
                                 .concatMap(new Function<Boolean, Observable<Boolean>>() {
                                     @Override
                                     public Observable<Boolean> apply(Boolean aBoolean) {
                                         return dataSourceFactory.getDataBaseDataSource()
-                                                .insertSurvey(apiFormHeader, true);
+                                                .insertSurvey(apiFormHeader, true, form);
                                     }
                                 })
                                 .doOnError(new Consumer<Throwable>() {
@@ -239,7 +240,7 @@ public class FormDataRepository implements FormRepository {
                                     public void accept(Throwable throwable) {
                                         Timber.e(throwable);
                                         dataSourceFactory.getDataBaseDataSource()
-                                                .insertSurvey(apiFormHeader, false);
+                                                .insertSurvey(apiFormHeader, false, form);
                                     }
                                 });
                     }
@@ -247,8 +248,8 @@ public class FormDataRepository implements FormRepository {
 
     }
 
-    private Observable<Boolean> downloadResources(List<String> resources) {
-        return Observable.fromIterable(resources)
+    private Observable<Boolean> downloadResources(Form form) {
+        return Observable.fromIterable(form.getResources())
                 .concatMap(new Function<String, Observable<Boolean>>() {
                     @Override
                     public Observable<Boolean> apply(String resource) {

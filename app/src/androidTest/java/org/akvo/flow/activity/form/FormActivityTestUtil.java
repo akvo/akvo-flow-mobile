@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -29,6 +29,7 @@ import android.support.test.espresso.Espresso;
 import android.support.test.espresso.ViewInteraction;
 import android.support.test.rule.ActivityTestRule;
 import android.view.View;
+import android.widget.RadioGroup;
 
 import org.akvo.flow.R;
 import org.akvo.flow.activity.Constants;
@@ -172,8 +173,13 @@ public class FormActivityTestUtil {
     @NonNull
     public static <T extends View> Matcher<View> withQuestionViewParent(Question question,
             Class<T> parentClass) {
+        return withQuestionViewParent(parentClass, question.getId());
+    }
+
+    public static <T extends View> Matcher<View> withQuestionViewParent(Class<T> parentClass,
+            String id) {
         return isDescendantOfA(allOf(IsInstanceOf.<View>instanceOf(parentClass),
-                withTagValue(is((Object) question.getId()))));
+                withTagValue(is((Object) id))));
     }
 
     @NonNull
@@ -258,6 +264,16 @@ public class FormActivityTestUtil {
                 allOf(withId(R.id.cascade_level_number), withText(level.getText())));
         cascadeLevelNumber.perform(scrollTo());
         cascadeLevelNumber.check(matches(isDisplayed()));
+    }
+
+    public static void fillSingleOptionsQuestion(int option) {
+        ViewInteraction radioButton = getSingleChoiceRadioButton(option);
+        radioButton.perform(click());
+    }
+
+    public static ViewInteraction getSingleChoiceRadioButton(int option) {
+        return onView(allOf(withId(option),
+                isDescendantOfA(IsInstanceOf.<View>instanceOf(RadioGroup.class))));
     }
 
     private static ViewInteraction checkBoxWithText(Option option, int optionPosition,

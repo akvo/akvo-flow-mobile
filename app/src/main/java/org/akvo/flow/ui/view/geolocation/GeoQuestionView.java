@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -323,12 +323,7 @@ public class GeoQuestionView extends QuestionView
     }
 
     private void setGeoQuestionResponse(String lat, String lon) {
-        QuestionResponse questionResponse = new QuestionResponse.QuestionResponseBuilder()
-                .setValue(getResponse(lat, lon))
-                .setType(ConstantUtil.GEO_RESPONSE_TYPE)
-                .setQuestionId(getQuestion().getId())
-                .createQuestionResponse();
-        setResponse(questionResponse);
+        setResponse(getQuestion(), getResponse(lat, lon), ConstantUtil.GEO_RESPONSE_TYPE);
     }
 
     @NonNull

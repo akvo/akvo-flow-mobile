@@ -30,7 +30,7 @@ import org.akvo.flow.data.entity.ApiDataPoint;
 import org.akvo.flow.data.entity.ApiLocaleResult;
 import org.akvo.flow.data.entity.ApiSurveyInstance;
 import org.akvo.flow.data.entity.DataPointMapper;
-import org.akvo.flow.data.entity.FormIdMapper;
+import org.akvo.flow.data.entity.form.FormIdMapper;
 import org.akvo.flow.data.entity.FormInstanceMapper;
 import org.akvo.flow.data.entity.FormInstanceMetadataMapper;
 import org.akvo.flow.data.entity.S3File;

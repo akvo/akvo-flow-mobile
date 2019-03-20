@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -15,10 +15,9 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 
-package org.akvo.flow.data.entity;
+package org.akvo.flow.data.entity.form;
 
 import android.text.TextUtils;
 
@@ -37,20 +36,23 @@ import javax.inject.Inject;
 import io.reactivex.annotations.NonNull;
 import timber.log.Timber;
 
-public class XmlParser {
+public class XmlFormParser {
 
     private static final String QUESTION = "question";
+    private static final String SURVEY = "survey";
     private static final String CASCADE_RESOURCE = "cascadeResource";
+    private static final String VERSION = "version";
     private final FileHelper helper;
 
     @Inject
-    public XmlParser(FileHelper helper) {
+    public XmlFormParser(FileHelper helper) {
         this.helper = helper;
     }
 
     @NonNull
-    public List<String> parse(InputStream input) {
+    public Form parse(InputStream input) {
         List<String> resources = new ArrayList<>();
+        String version = "0.0";
 
         XmlPullParserFactory parserFactory;
         try {
@@ -68,7 +70,9 @@ public class XmlParser {
                 switch (eventType) {
                     case XmlPullParser.START_TAG:
                         eltName = parser.getName();
-                        if (QUESTION.equals(eltName)) {
+                        if (SURVEY.equals(eltName)) {
+                            version = parser.getAttributeValue(null, VERSION);
+                        } else if (QUESTION.equals(eltName)) {
                             String resource = parser.getAttributeValue(null, CASCADE_RESOURCE);
                             if (!TextUtils.isEmpty(resource)) {
                                 resources.add(resource);
@@ -85,6 +89,6 @@ public class XmlParser {
         } finally {
           helper.close(input);
         }
-        return resources;
+        return new Form(resources, version);
     }
 }

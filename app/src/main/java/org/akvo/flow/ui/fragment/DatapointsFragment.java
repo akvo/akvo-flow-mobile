@@ -38,7 +38,7 @@ import org.akvo.flow.injector.component.ApplicationComponent;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
 import org.akvo.flow.presentation.datapoints.list.DataPointsListFragment;
-import org.akvo.flow.presentation.datapoints.map.mapbox.DataPointsMapFragment;
+import org.akvo.flow.presentation.datapoints.map.DataPointsMapBoxFragment;
 import org.akvo.flow.util.ConstantUtil;
 
 import java.util.Map;
@@ -165,7 +165,7 @@ public class DatapointsFragment extends Fragment {
             this.surveyGroup = newSurveyGroup;
             DataPointsListFragment listFragment = (DataPointsListFragment) fragmentsRef
                     .get(POSITION_LIST);
-            DataPointsMapFragment mapFragment = (DataPointsMapFragment) fragmentsRef
+            DataPointsMapBoxFragment mapFragment = (DataPointsMapBoxFragment) fragmentsRef
                     .get(POSITION_MAP);
 
             if (listFragment != null) {
@@ -184,7 +184,7 @@ public class DatapointsFragment extends Fragment {
                 fragmentsRef.put(POSITION_LIST, dataPointsListFragment);
                 return dataPointsListFragment;
             } else {
-                DataPointsMapFragment mapFragment = (DataPointsMapFragment) super
+                DataPointsMapBoxFragment mapFragment = (DataPointsMapBoxFragment) super
                         .instantiateItem(container, position);
                 fragmentsRef.put(POSITION_MAP, mapFragment);
                 return mapFragment;
@@ -196,7 +196,7 @@ public class DatapointsFragment extends Fragment {
             if (position == POSITION_LIST) {
                 return DataPointsListFragment.newInstance(surveyGroup);
             }
-            return DataPointsMapFragment.newInstance(surveyGroup);
+            return DataPointsMapBoxFragment.newInstance(surveyGroup);
         }
 
         @Override

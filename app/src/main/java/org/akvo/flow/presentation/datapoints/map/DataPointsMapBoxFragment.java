@@ -17,15 +17,13 @@
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.akvo.flow.presentation.datapoints.map.mapbox;
+package org.akvo.flow.presentation.datapoints.map;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
-import android.location.Criteria;
-import android.location.Location;
-import android.location.LocationManager;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -40,14 +38,23 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 
+import com.mapbox.geojson.Feature;
+import com.mapbox.geojson.FeatureCollection;
+import com.mapbox.geojson.Point;
 import com.mapbox.mapboxsdk.annotations.Marker;
-import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
-import com.mapbox.mapboxsdk.geometry.LatLng;
+import com.mapbox.mapboxsdk.location.LocationComponent;
+import com.mapbox.mapboxsdk.location.modes.CameraMode;
+import com.mapbox.mapboxsdk.location.modes.RenderMode;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.MapboxMapOptions;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.maps.SupportMapFragment;
+import com.mapbox.mapboxsdk.style.expressions.Expression;
+import com.mapbox.mapboxsdk.style.layers.CircleLayer;
+import com.mapbox.mapboxsdk.style.layers.SymbolLayer;
+import com.mapbox.mapboxsdk.style.sources.GeoJsonOptions;
+import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 
 import org.akvo.flow.R;
 import org.akvo.flow.app.FlowApp;
@@ -66,14 +73,31 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-//import com.google.maps.android.clustering.ClusterManager;
+import static android.graphics.Color.rgb;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.all;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.get;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.gt;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.gte;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.has;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.literal;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.lt;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.toNumber;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.circleColor;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.circleRadius;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconColor;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconImage;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textAllowOverlap;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textColor;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textField;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textIgnorePlacement;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textSize;
 
-public class DataPointsMapFragment extends SupportMapFragment implements
-        MapboxMap.OnInfoWindowClickListener,
-        OnMapReadyCallback, DataPointsMapView {
+public class DataPointsMapBoxFragment extends SupportMapFragment implements
+        MapboxMap.OnInfoWindowClickListener, OnMapReadyCallback, DataPointsMapView {
 
-    private static final int MAP_ZOOM_LEVEL = 10;
+    private static final String MARKER_IMAGE = "custom-marker";
     private static final String MAP_OPTIONS = "MapOptions";
+    private static final String SOURCE_ID = "datapoints";
 
     @Inject
     DataPointSyncSnackBarManager dataPointSyncSnackBarManager;
@@ -93,14 +117,13 @@ public class DataPointsMapFragment extends SupportMapFragment implements
     private ProgressBar progressBar;
 
     @Nullable
-    private MapboxMap mMap;
+    private MapboxMap mapboxMap;
 
-//    private ClusterManager<MapDataPoint> mClusterManager;
     private boolean activityJustCreated;
     private Integer menuRes = null;
 
-    public static DataPointsMapFragment newInstance(SurveyGroup surveyGroup) {
-        DataPointsMapFragment fragment = new DataPointsMapFragment();
+    public static DataPointsMapBoxFragment newInstance(SurveyGroup surveyGroup) {
+        DataPointsMapBoxFragment fragment = new DataPointsMapBoxFragment();
         Bundle args = new Bundle();
         args.putSerializable(ConstantUtil.SURVEY_GROUP_EXTRA, surveyGroup);
         MapboxMapOptions options = new MapboxMapOptions();
@@ -171,36 +194,93 @@ public class DataPointsMapFragment extends SupportMapFragment implements
     }
 
     @Override
-    public void onMapReady(MapboxMap googleMap) {
-        mMap = googleMap;
-        configMap();
+    public void onMapReady(@NonNull MapboxMap mapboxMap) {
+        this.mapboxMap = mapboxMap;
         presenter.onViewReady();
     }
 
-    @SuppressLint("MissingPermission")
-    private void configMap() {
-        if (mMap != null) {
-            FragmentActivity activity = getActivity();
-            if (isLocationAllowed()) {
-                //mMap.setMyLocationEnabled(true);
+    //TODO: too long method refactor
+    private void addClusteredGeoJsonSource(@NonNull Style loadedMapStyle) {
+        List<Feature> features = new ArrayList<>();
+        for (MapDataPoint item : mItems) {
+            com.google.android.gms.maps.model.LatLng position = item.getPosition();
+            if (position != null) {
+                features.add(Feature.fromGeometry(
+                        Point.fromLngLat(position.longitude, position.latitude)));
             }
-            mMap.setOnInfoWindowClickListener(this);
-//            mClusterManager = new ClusterManager<>(activity, mMap);
-//            mClusterManager.setRenderer(new PointRenderer(mMap, activity, mClusterManager));
-//            mMap.setOnMarkerClickListener(mClusterManager);
-//            mMap.setOnCameraChangeListener(new MapboxMap.OnCameraChangeListener() {
-//                @Override
-//                public void onCameraChange(CameraPosition cameraPosition) {
-//                    cluster();
-//                }
-//            });
-            centerMapOnUserLocation();
-            mMap.setStyle(Style.LIGHT, new Style.OnStyleLoaded() {
-                @Override
-                public void onStyleLoaded(@NonNull Style style) {
-                    //style.addSource(new UnknownSource());
-                }
-            });
+        }
+
+        GeoJsonSource source = (GeoJsonSource) loadedMapStyle.getSource(SOURCE_ID);
+        if (source == null) {
+            loadedMapStyle.addSource(
+                    new GeoJsonSource(SOURCE_ID,
+                            FeatureCollection.fromFeatures(features),
+                            new GeoJsonOptions()
+                                    .withCluster(true)
+                                    .withClusterMaxZoom(14)
+                                    .withClusterRadius(50)
+                    )
+            );
+
+            // Use the datapoints GeoJSON source to create three layers: One layer for each cluster category.
+            // Each point range gets a different fill color.
+            int[][] layers = new int[][] {
+                    new int[] { 50, Color.parseColor("#009954") },
+                    new int[] { 20, Color.parseColor("#007B99") },
+                    new int[] { 0, Color.parseColor("#005899") }
+            };
+
+            //Creating a marker layer for single data points
+            SymbolLayer unclustered = new SymbolLayer("unclustered-points", SOURCE_ID);
+
+            unclustered.setProperties(
+                    iconImage(MARKER_IMAGE),
+                    iconColor(
+                            rgb(255, 119, 77)
+                              /*  interpolate(exponential(1), get("mag"),
+                                        stop(2.0, rgb(0, 255, 0)),
+                                        stop(4.5, rgb(0, 0, 255)),
+                                        stop(7.0, rgb(255, 0, 0))
+                                )*/
+                    )
+            );
+            loadedMapStyle.addLayer(unclustered);
+
+            for (int i = 0; i < layers.length; i++) {
+                //Add clusters' circles
+                CircleLayer circles = new CircleLayer("cluster-" + i, SOURCE_ID);
+                circles.setProperties(
+                        circleColor(layers[i][1]),
+                        circleRadius(18f)
+                );
+
+                Expression pointCount = toNumber(get("point_count"));
+
+                // Add a filter to the cluster layer that hides the circles based on "point_count"
+                circles.setFilter(
+                        i == 0
+                                ? all(has("point_count"),
+                                gte(pointCount, literal(layers[i][0]))
+                        ) : all(has("point_count"),
+                                gt(pointCount, literal(layers[i][0])),
+                                lt(pointCount, literal(layers[i - 1][0]))
+                        )
+                );
+                loadedMapStyle.addLayer(circles);
+            }
+
+            //Add the count labels
+            SymbolLayer count = new SymbolLayer("count", SOURCE_ID);
+            count.setProperties(
+                    textField(Expression.toString(get("point_count"))),
+                    textSize(12f),
+                    textColor(Color.WHITE),
+                    textIgnorePlacement(true),
+                    textAllowOverlap(true)
+            );
+            loadedMapStyle.addLayer(count);
+        } else {
+            source.setGeoJson(FeatureCollection.fromFeatures(features));
         }
     }
 
@@ -208,61 +288,6 @@ public class DataPointsMapFragment extends SupportMapFragment implements
         FragmentActivity activity = getActivity();
         return activity != null && ContextCompat.checkSelfPermission(activity,
                 Manifest.permission.ACCESS_FINE_LOCATION) == PermissionChecker.PERMISSION_GRANTED;
-    }
-
-    private void cluster() {
-//        if (mMap == null) {
-//            return;
-//        }
-//
-//        final LatLngBounds bounds = mMap.getProjection().getVisibleRegion().latLngBounds;
-//        LatLng ne = bounds.getNorthEast();
-//        LatLng sw = bounds.getSouthWest();
-//        double latDst = Math.abs(ne.getLatitude() - sw.getLatitude());
-//        double lonDst = Math.abs(ne.getLongitude() - sw.getLongitude());
-//
-//        final double scale = 1d;
-//        LatLngBounds newBounds =
-//                bounds.include(
-//                        new LatLng(ne.getLatitude() + latDst / scale, ne.getLongitude() + lonDst / scale))
-//                        .include(new LatLng(sw.getLatitude() - latDst / scale,
-//                                ne.getLongitude() + lonDst / scale))
-//                        .include(new LatLng(sw.getLatitude() - latDst / scale,
-//                                sw.getLongitude() - lonDst / scale))
-//                        .include(new LatLng(ne.getLatitude() + latDst / scale,
-//                                sw.getLongitude() - lonDst / scale));
-
-//        mClusterManager.clearItems();
-//        for (MapDataPoint item : mItems) {
-//            if (item.getPosition() != null && newBounds.contains(item.getPosition())) {
-//                mClusterManager.addItem(item);
-//            }
-//        }
-//        mClusterManager.cluster();
-    }
-
-    private void centerMapOnUserLocation() {
-        if (mMap == null) {
-            return;
-        }
-
-        LatLng position = null;
-        LocationManager manager = (LocationManager) getActivity().getApplicationContext()
-                .getSystemService(Context.LOCATION_SERVICE);
-        Criteria criteria = new Criteria();
-        criteria.setAccuracy(Criteria.ACCURACY_FINE);
-        String provider = manager == null ? null : manager.getBestProvider(criteria, true);
-        if (provider != null && isLocationAllowed()) {
-            @SuppressLint("MissingPermission")
-            Location location = manager.getLastKnownLocation(provider);
-            if (location != null) {
-                position = new LatLng(location.getLatitude(), location.getLongitude());
-            }
-        }
-
-        if (position != null) {
-            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(position, MAP_ZOOM_LEVEL));
-        }
     }
 
     @Override
@@ -340,7 +365,32 @@ public class DataPointsMapFragment extends SupportMapFragment implements
     public void displayData(List<MapDataPoint> surveyedLocales) {
         mItems.clear();
         mItems.addAll(surveyedLocales);
-        cluster();
+
+        if (mapboxMap != null) {
+            mapboxMap.setStyle(new Style.Builder()
+                    .fromUrl("mapbox://styles/mapbox/light-v10"), new Style.OnStyleLoaded() {
+                @Override
+                public void onStyleLoaded(@NonNull Style style) {
+                    //TODO: refactor this to do this only once
+                    style.addImage(MARKER_IMAGE, BitmapFactory.decodeResource(
+                            getResources(), R.drawable.marker), true);
+                    enableLocationComponent(style);
+                    addClusteredGeoJsonSource(style);
+                }
+            });
+        }
+    }
+
+    @SuppressWarnings({ "MissingPermission" })
+    private void enableLocationComponent(@NonNull Style loadedMapStyle) {
+        Context context = getContext();
+        if (isLocationAllowed() && mapboxMap != null && context != null) {
+            LocationComponent locationComponent = mapboxMap.getLocationComponent();
+            locationComponent.activateLocationComponent(context, loadedMapStyle);
+            locationComponent.setLocationComponentEnabled(true);
+            locationComponent.setCameraMode(CameraMode.TRACKING);
+            locationComponent.setRenderMode(RenderMode.NORMAL);
+        }
     }
 
     @Override

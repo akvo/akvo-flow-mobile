@@ -1,5 +1,11 @@
 Akvo FLOW app release notes
 ===========================
+# ver 2.7.2.1
+Date: 26 March 2019
+
+* **Error downloading apk updates** - [#1355](https://github.com/akvo/akvo-flow-mobile/issues/1355)
+
+---------------
 # ver 2.7.2
 Date: 20 March 2019
 

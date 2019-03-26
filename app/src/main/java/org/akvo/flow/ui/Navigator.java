@@ -26,10 +26,12 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 
@@ -321,9 +323,17 @@ public class Navigator {
      */
     public void installAppUpdate(Context context, String filename) {
         Intent intent = new Intent(Intent.ACTION_VIEW);
-        intent.setDataAndType(Uri.fromFile(new File(filename)),
-                "application/vnd.android.package-archive");
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        Uri fileUri;
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            fileUri = FileProvider
+                    .getUriForFile(context, ConstantUtil.FILE_PROVIDER_AUTHORITY,
+                            new File(filename));
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        } else {
+            fileUri = Uri.fromFile(new File(filename));
+        }
+        intent.setDataAndType(fileUri, "application/vnd.android.package-archive");
         context.startActivity(intent);
     }
 

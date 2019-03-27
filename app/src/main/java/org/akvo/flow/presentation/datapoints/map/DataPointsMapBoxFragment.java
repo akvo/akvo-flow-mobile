@@ -24,6 +24,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.PointF;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -36,20 +37,28 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.mapbox.geojson.Feature;
 import com.mapbox.geojson.FeatureCollection;
 import com.mapbox.geojson.Point;
-import com.mapbox.mapboxsdk.annotations.Marker;
+import com.mapbox.mapboxsdk.camera.CameraPosition;
+import com.mapbox.mapboxsdk.constants.MapboxConstants;
+import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.location.LocationComponent;
 import com.mapbox.mapboxsdk.location.modes.CameraMode;
 import com.mapbox.mapboxsdk.location.modes.RenderMode;
+import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.MapboxMapOptions;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
+import com.mapbox.mapboxsdk.maps.Projection;
 import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.maps.SupportMapFragment;
+import com.mapbox.mapboxsdk.plugins.markerview.MarkerView;
+import com.mapbox.mapboxsdk.plugins.markerview.MarkerViewManager;
 import com.mapbox.mapboxsdk.style.expressions.Expression;
 import com.mapbox.mapboxsdk.style.layers.CircleLayer;
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer;
@@ -69,11 +78,13 @@ import org.akvo.flow.ui.fragment.RecordListListener;
 import org.akvo.flow.util.ConstantUtil;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.inject.Inject;
 
 import static android.graphics.Color.rgb;
+import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.all;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.get;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.gt;
@@ -93,11 +104,14 @@ import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textIgnorePlacem
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textSize;
 
 public class DataPointsMapBoxFragment extends SupportMapFragment implements
-        MapboxMap.OnInfoWindowClickListener, OnMapReadyCallback, DataPointsMapView {
+        MapboxMap.OnMapClickListener, OnMapReadyCallback, DataPointsMapView {
 
     private static final String MARKER_IMAGE = "custom-marker";
     private static final String MAP_OPTIONS = "MapOptions";
     private static final String SOURCE_ID = "datapoints";
+    public static final String UNCLUSTERED_POINTS = "unclustered-points";
+    public static final String POINT_COUNT = "point_count";
+    private static final String PROPERTY_SELECTED = "selected";
 
     @Inject
     DataPointSyncSnackBarManager dataPointSyncSnackBarManager;
@@ -121,14 +135,23 @@ public class DataPointsMapBoxFragment extends SupportMapFragment implements
 
     private boolean activityJustCreated;
     private Integer menuRes = null;
+    private FeatureCollection featureCollection;
+    private GeoJsonSource source;
+    private MarkerView markerView;
+    private MarkerViewManager markerViewManager;
+    private View customView;
 
     public static DataPointsMapBoxFragment newInstance(SurveyGroup surveyGroup) {
         DataPointsMapBoxFragment fragment = new DataPointsMapBoxFragment();
         Bundle args = new Bundle();
         args.putSerializable(ConstantUtil.SURVEY_GROUP_EXTRA, surveyGroup);
-        MapboxMapOptions options = new MapboxMapOptions();
-        //options.zOrderOnTop(true);
-        args.putParcelable(MAP_OPTIONS, options);
+        MapboxMapOptions options = new MapboxMapOptions()
+                .camera(new CameraPosition.Builder()
+                        .target(new LatLng(41.6082045, 2.654562)) //for debugging
+                        .zoom(12)
+                        .build());
+        args.putParcelable(MapboxConstants.FRAG_ARG_MAPBOXMAPOPTIONS, options);
+
         fragment.setArguments(args);
         return fragment;
     }
@@ -196,91 +219,31 @@ public class DataPointsMapBoxFragment extends SupportMapFragment implements
     @Override
     public void onMapReady(@NonNull MapboxMap mapboxMap) {
         this.mapboxMap = mapboxMap;
-        presenter.onViewReady();
+        this.mapboxMap.addOnMapClickListener(this);
+        markerViewManager = new MarkerViewManager((MapView) getView(), mapboxMap);
+        this.mapboxMap.setStyle(new Style.Builder()
+                .fromUrl("mapbox://styles/mapbox/light-v10"), new Style.OnStyleLoaded() {
+            @Override
+            public void onStyleLoaded(@NonNull Style style) {
+                //TODO: refactor this to do this only once
+                style.addImage(MARKER_IMAGE, BitmapFactory.decodeResource(
+                        getResources(), R.drawable.marker), true);
+                enableLocationComponent(style);
+                addClusteredGeoJsonSource(style);
+                presenter.onViewReady();
+            }
+        });
     }
 
-    //TODO: too long method refactor
-    private void addClusteredGeoJsonSource(@NonNull Style loadedMapStyle) {
-        List<Feature> features = new ArrayList<>();
-        for (MapDataPoint item : mItems) {
-            com.google.android.gms.maps.model.LatLng position = item.getPosition();
-            if (position != null) {
-                features.add(Feature.fromGeometry(
-                        Point.fromLngLat(position.longitude, position.latitude)));
-            }
-        }
-
-        GeoJsonSource source = (GeoJsonSource) loadedMapStyle.getSource(SOURCE_ID);
-        if (source == null) {
-            loadedMapStyle.addSource(
-                    new GeoJsonSource(SOURCE_ID,
-                            FeatureCollection.fromFeatures(features),
-                            new GeoJsonOptions()
-                                    .withCluster(true)
-                                    .withClusterMaxZoom(14)
-                                    .withClusterRadius(50)
-                    )
-            );
-
-            // Use the datapoints GeoJSON source to create three layers: One layer for each cluster category.
-            // Each point range gets a different fill color.
-            int[][] layers = new int[][] {
-                    new int[] { 50, Color.parseColor("#009954") },
-                    new int[] { 20, Color.parseColor("#007B99") },
-                    new int[] { 0, Color.parseColor("#005899") }
-            };
-
-            //Creating a marker layer for single data points
-            SymbolLayer unclustered = new SymbolLayer("unclustered-points", SOURCE_ID);
-
-            unclustered.setProperties(
-                    iconImage(MARKER_IMAGE),
-                    iconColor(
-                            rgb(255, 119, 77)
-                              /*  interpolate(exponential(1), get("mag"),
-                                        stop(2.0, rgb(0, 255, 0)),
-                                        stop(4.5, rgb(0, 0, 255)),
-                                        stop(7.0, rgb(255, 0, 0))
-                                )*/
-                    )
-            );
-            loadedMapStyle.addLayer(unclustered);
-
-            for (int i = 0; i < layers.length; i++) {
-                //Add clusters' circles
-                CircleLayer circles = new CircleLayer("cluster-" + i, SOURCE_ID);
-                circles.setProperties(
-                        circleColor(layers[i][1]),
-                        circleRadius(18f)
-                );
-
-                Expression pointCount = toNumber(get("point_count"));
-
-                // Add a filter to the cluster layer that hides the circles based on "point_count"
-                circles.setFilter(
-                        i == 0
-                                ? all(has("point_count"),
-                                gte(pointCount, literal(layers[i][0]))
-                        ) : all(has("point_count"),
-                                gt(pointCount, literal(layers[i][0])),
-                                lt(pointCount, literal(layers[i - 1][0]))
-                        )
-                );
-                loadedMapStyle.addLayer(circles);
-            }
-
-            //Add the count labels
-            SymbolLayer count = new SymbolLayer("count", SOURCE_ID);
-            count.setProperties(
-                    textField(Expression.toString(get("point_count"))),
-                    textSize(12f),
-                    textColor(Color.WHITE),
-                    textIgnorePlacement(true),
-                    textAllowOverlap(true)
-            );
-            loadedMapStyle.addLayer(count);
-        } else {
-            source.setGeoJson(FeatureCollection.fromFeatures(features));
+    @SuppressWarnings({ "MissingPermission" })
+    private void enableLocationComponent(@NonNull Style loadedMapStyle) {
+        Context context = getContext();
+        if (isLocationAllowed() && mapboxMap != null && context != null) {
+            LocationComponent locationComponent = mapboxMap.getLocationComponent();
+            locationComponent.activateLocationComponent(context, loadedMapStyle);
+            locationComponent.setLocationComponentEnabled(true);
+            locationComponent.setCameraMode(CameraMode.TRACKING);
+            locationComponent.setRenderMode(RenderMode.NORMAL);
         }
     }
 
@@ -288,6 +251,204 @@ public class DataPointsMapBoxFragment extends SupportMapFragment implements
         FragmentActivity activity = getActivity();
         return activity != null && ContextCompat.checkSelfPermission(activity,
                 Manifest.permission.ACCESS_FINE_LOCATION) == PermissionChecker.PERMISSION_GRANTED;
+    }
+
+    //TODO: too long method refactor
+    private void addClusteredGeoJsonSource(@NonNull Style loadedMapStyle) {
+        featureCollection = getFeatureCollection();
+        addGeoJsonSource(loadedMapStyle, featureCollection);
+        addUnClusteredLayer(loadedMapStyle);
+
+        // Use the datapoints GeoJSON source to create three layers: One layer for each cluster category.
+        // Each point range gets a different fill color.
+        //TODO: extract color resources
+        int[][] layers = new int[][] {
+                new int[] { 50, Color.parseColor("#009954") },
+                new int[] { 20, Color.parseColor("#007B99") },
+                new int[] { 0, Color.parseColor("#005899") }
+        };
+
+        for (int i = 0; i < layers.length; i++) {
+            //Add clusters' circles
+            addClusterLayer(loadedMapStyle, layers, i);
+        }
+
+        //Add the count labels
+        addCountLabels(loadedMapStyle);
+    }
+
+    private FeatureCollection getFeatureCollection() {
+        //TODO: make datapoint a feature
+        List<Feature> features = new ArrayList<>();
+        for (MapDataPoint item : mItems) {
+            com.google.android.gms.maps.model.LatLng position = item.getPosition();
+            if (position != null) {
+                Feature feature = Feature.fromGeometry(
+                        Point.fromLngLat(position.longitude, position.latitude));
+                feature.addStringProperty("id", item.getId());
+                feature.addStringProperty("name", item.getName());
+                feature.addBooleanProperty(PROPERTY_SELECTED, false);
+                features.add(feature);
+            }
+        }
+
+        return FeatureCollection.fromFeatures(features);
+    }
+
+    private void addGeoJsonSource(@NonNull Style loadedMapStyle,
+            FeatureCollection featureCollection) {
+        source = new GeoJsonSource(SOURCE_ID,
+                featureCollection,
+                new GeoJsonOptions()
+                        .withCluster(true)
+                        .withClusterMaxZoom(14)
+                        .withClusterRadius(50)
+        );
+        loadedMapStyle.addSource(source);
+    }
+
+    private void addUnClusteredLayer(@NonNull Style loadedMapStyle) {
+        SymbolLayer unClustered = new SymbolLayer(UNCLUSTERED_POINTS, SOURCE_ID);
+
+        unClustered.setProperties(
+                iconImage(MARKER_IMAGE),
+                iconColor(
+                        rgb(255, 119, 77)
+                )
+        );
+        loadedMapStyle.addLayer(unClustered);
+    }
+
+    private void addClusterLayer(@NonNull Style loadedMapStyle, int[][] layers, int position) {
+        int layerColor = layers[position][1];
+        CircleLayer circles = new CircleLayer("cluster-" + position, SOURCE_ID);
+        circles.setProperties(
+                circleColor(layerColor),
+                circleRadius(18f)
+        );
+
+        Expression pointCount = toNumber(get(POINT_COUNT));
+
+        // Add a filter to the cluster layer that hides the circles based on "point_count"
+        int minPointsNumber = layers[position][0];
+        circles.setFilter(
+                position == 0
+                        ? all(has(POINT_COUNT),
+                        gte(pointCount, literal(minPointsNumber))
+                ) : all(has(POINT_COUNT),
+                        gt(pointCount, literal(minPointsNumber)),
+                        lt(pointCount, literal(layers[position - 1][0]))
+                )
+        );
+        loadedMapStyle.addLayer(circles);
+    }
+
+    private void addCountLabels(@NonNull Style loadedMapStyle) {
+        SymbolLayer count = new SymbolLayer("count", SOURCE_ID);
+        count.setProperties(
+                textField(Expression.toString(get(POINT_COUNT))),
+                textSize(12f),
+                textColor(Color.WHITE),
+                textIgnorePlacement(true),
+                textAllowOverlap(true)
+        );
+        loadedMapStyle.addLayer(count);
+    }
+
+    @Override
+    public boolean onMapClick(@NonNull LatLng point) {
+        if (mapboxMap != null) {
+            Projection projection = mapboxMap.getProjection();
+            return handleClickIcon(projection.toScreenLocation(point));
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * This method handles click events for SymbolLayer symbols.
+     * <p>
+     * When a SymbolLayer icon is clicked, we moved that feature to the selected state.
+     * </p>
+     *
+     * @param screenPoint the point on screen clicked
+     */
+    private boolean handleClickIcon(PointF screenPoint) {
+        List<Feature> features = mapboxMap == null ?
+                Collections.<Feature>emptyList() :
+                mapboxMap.queryRenderedFeatures(screenPoint, UNCLUSTERED_POINTS);
+        if (!features.isEmpty() && features.get(0) != null) {
+            Feature feature = features.get(0);
+            if (feature.hasNonNullValueForProperty("id")) {
+                String id = feature.getStringProperty("id");
+                List<Feature> featureList = featureCollection.features();
+                if (featureList != null) {
+                    for (int i = 0; i < featureList.size(); i++) {
+                        Feature selectedFeature = featureList.get(i);
+                        String selectedItemId = selectedFeature.getStringProperty("id");
+                        if (selectedItemId.equals(id)) {
+                            MapDataPoint item = getItem(selectedItemId);
+                            onFeaturePressed(item);
+                        }
+                    }
+                }
+            }
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    @Nullable
+    private MapDataPoint getItem(String selectedItemId) {
+        if (mItems == null || selectedItemId == null) {
+            return null;
+        }
+        for (MapDataPoint dp: mItems) {
+            if (selectedItemId.equals(dp.getId())) {
+                return dp;
+            }
+        }
+        return null;
+    }
+
+    private void onFeaturePressed(MapDataPoint selectedDataPoint) {
+        if (markerView == null) {
+            createNewMarker(selectedDataPoint);
+        } else {
+            markerViewManager.removeMarker(markerView);
+            markerView = null;
+            if (customView == null || !selectedDataPoint.getId().equals(customView.getTag())) {
+                createNewMarker(selectedDataPoint);
+            }
+        }
+    }
+
+    private void createNewMarker(MapDataPoint selectedDataPoint) {
+        // Use an XML layout to create a View object
+        customView = LayoutInflater.from(getActivity()).inflate(
+                R.layout.symbol_layer_info_window_layout_callout, null);
+        customView.setLayoutParams(new FrameLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT));
+        customView.setTag(selectedDataPoint.getId());
+
+        // Set the View's TextViews with content
+        TextView titleTextView = customView.findViewById(R.id.info_window_title);
+        TextView snippetTextView = customView.findViewById(R.id.info_window_description);
+
+        titleTextView.setText(selectedDataPoint.getName());
+        snippetTextView.setText(selectedDataPoint.getId());
+        customView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onInfoWindowClick((String) customView.getTag());
+            }
+        });
+
+        // Use the View to create a MarkerView which will eventually be given to
+        // the plugin's MarkerViewManager class
+        com.google.android.gms.maps.model.LatLng position = selectedDataPoint.getPosition();
+        markerView = new MarkerView(new LatLng(position.latitude, position.longitude), customView);
+        markerViewManager.addMarker(markerView);
     }
 
     @Override
@@ -352,44 +513,22 @@ public class DataPointsMapBoxFragment extends SupportMapFragment implements
         }
     }
 
-    @Override
-    public boolean onInfoWindowClick(@NonNull Marker marker) {
-        final String surveyedLocaleId = marker.getSnippet();
+    public void onInfoWindowClick(String surveyedLocaleId) {
         if (mListener != null) {
             mListener.onRecordSelected(surveyedLocaleId);
         }
-        return false;
     }
 
     @Override
     public void displayData(List<MapDataPoint> surveyedLocales) {
         mItems.clear();
         mItems.addAll(surveyedLocales);
-
-        if (mapboxMap != null) {
-            mapboxMap.setStyle(new Style.Builder()
-                    .fromUrl("mapbox://styles/mapbox/light-v10"), new Style.OnStyleLoaded() {
-                @Override
-                public void onStyleLoaded(@NonNull Style style) {
-                    //TODO: refactor this to do this only once
-                    style.addImage(MARKER_IMAGE, BitmapFactory.decodeResource(
-                            getResources(), R.drawable.marker), true);
-                    enableLocationComponent(style);
-                    addClusteredGeoJsonSource(style);
-                }
-            });
-        }
-    }
-
-    @SuppressWarnings({ "MissingPermission" })
-    private void enableLocationComponent(@NonNull Style loadedMapStyle) {
-        Context context = getContext();
-        if (isLocationAllowed() && mapboxMap != null && context != null) {
-            LocationComponent locationComponent = mapboxMap.getLocationComponent();
-            locationComponent.activateLocationComponent(context, loadedMapStyle);
-            locationComponent.setLocationComponentEnabled(true);
-            locationComponent.setCameraMode(CameraMode.TRACKING);
-            locationComponent.setRenderMode(RenderMode.NORMAL);
+        featureCollection = getFeatureCollection();
+        source.setGeoJson(featureCollection);
+        //TODO: check if the selected datapoint still exists
+        if (markerView != null) {
+            markerViewManager.removeMarker(markerView);
+            markerView = null;
         }
     }
 

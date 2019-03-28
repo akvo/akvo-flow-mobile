@@ -30,6 +30,7 @@ import com.mapbox.mapboxsdk.Mapbox;
 import com.squareup.leakcanary.LeakCanary;
 
 import org.akvo.flow.BuildConfig;
+import org.akvo.flow.R;
 import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.domain.entity.User;
 import org.akvo.flow.domain.interactor.DefaultObserver;
@@ -80,10 +81,7 @@ public class FlowApp extends MultiDexApplication {
             return;
         }
 
-        // Mapbox access token is configured here. This needs to be called either in your application
-        // object or in the same activity which contains the mapview.
-        //TODO: extract token
-        Mapbox.getInstance(this, "pk.eyJ1IjoiYWt2byIsImEiOiJzUFVwR3pJIn0.8dLa4fHG19fBwwBUJMDOSQ");
+        Mapbox.getInstance(this, getString(R.string.mapbox_token));
 
         installLeakCanary();
         initializeInjector();

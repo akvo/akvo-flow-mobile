@@ -20,7 +20,6 @@
 package org.akvo.flow.presentation.datapoints.map;
 
 import android.Manifest;
-import android.app.Activity;
 import android.content.Context;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -106,8 +105,6 @@ public class DataPointsMapBoxFragment extends SupportMapFragment implements
     private static final String SOURCE_ID = "datapoints";
     private static final String UNCLUSTERED_POINTS = "unclustered-points";
     private static final String POINT_COUNT = "point_count";
-    private static final String PROPERTY_SELECTED = "selected";
-    private static final String NAME_PROPERTY = "name";
     private static final String ID_PROPERTY = "id";
 
     @Inject
@@ -132,7 +129,6 @@ public class DataPointsMapBoxFragment extends SupportMapFragment implements
 
     private boolean activityJustCreated;
     private Integer menuRes = null;
-    private FeatureCollection featureCollection;
     private GeoJsonSource source;
     private MarkerView markerView;
     private MarkerViewManager markerViewManager;
@@ -157,15 +153,15 @@ public class DataPointsMapBoxFragment extends SupportMapFragment implements
     }
 
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
+    public void onAttach(Context context) {
+        super.onAttach(context);
         // This makes sure that the container activity has implemented
         // the callback interface. If not, it throws an exception
         try {
-            mListener = (RecordListListener) activity;
+            mListener = (RecordListListener) context;
         } catch (ClassCastException e) {
             throw new ClassCastException(
-                    activity.toString() + " must implement RecordListListener");
+                    context.toString() + " must implement RecordListListener");
         }
     }
 
@@ -257,8 +253,7 @@ public class DataPointsMapBoxFragment extends SupportMapFragment implements
     }
 
     private void addClusteredGeoJsonSource(@NonNull Style loadedMapStyle) {
-        featureCollection = getFeatureCollection();
-        addGeoJsonSource(loadedMapStyle, featureCollection);
+        addGeoJsonSource(loadedMapStyle, getFeatureCollection());
         addUnClusteredLayer(loadedMapStyle);
 
         int[][] layers = new int[][] {
@@ -279,8 +274,6 @@ public class DataPointsMapBoxFragment extends SupportMapFragment implements
             Feature feature = Feature.fromGeometry(
                     Point.fromLngLat(item.getLongitude(), item.getLatitude()));
             feature.addStringProperty(ID_PROPERTY, item.getId());
-            feature.addStringProperty(NAME_PROPERTY, item.getName());
-            feature.addBooleanProperty(PROPERTY_SELECTED, false);
             features.add(feature);
         }
         return FeatureCollection.fromFeatures(features);
@@ -502,8 +495,7 @@ public class DataPointsMapBoxFragment extends SupportMapFragment implements
     public void displayData(List<MapDataPoint> surveyedLocales) {
         mItems.clear();
         mItems.addAll(surveyedLocales);
-        featureCollection = getFeatureCollection();
-        source.setGeoJson(featureCollection);
+        source.setGeoJson(getFeatureCollection());
         unSelectDataPoint();
     }
 
@@ -528,7 +520,7 @@ public class DataPointsMapBoxFragment extends SupportMapFragment implements
     private void reloadMenu() {
         FragmentActivity activity = getActivity();
         if (activity != null) {
-            activity.supportInvalidateOptionsMenu();
+            activity.invalidateOptionsMenu();
         }
     }
 

@@ -31,7 +31,6 @@ import org.akvo.flow.injector.module.ViewModule;
 import org.akvo.flow.presentation.AppDownloadDialogFragment;
 import org.akvo.flow.presentation.about.AboutActivity;
 import org.akvo.flow.presentation.datapoints.list.DataPointsListFragment;
-import org.akvo.flow.presentation.datapoints.map.DataPointsMapFragment;
 import org.akvo.flow.presentation.datapoints.map.DataPointsMapBoxFragment;
 import org.akvo.flow.presentation.form.mobiledata.MobileDataSettingDialog;
 import org.akvo.flow.presentation.help.HelpActivity;
@@ -60,8 +59,6 @@ public interface ViewComponent {
     void inject(DatapointsFragment datapointsFragment);
 
     void inject(FormActivity formActivity);
-
-    void inject(DataPointsMapFragment dataPointsMapFragment);
 
     void inject(DataPointsListFragment dataPointsListFragment);
 

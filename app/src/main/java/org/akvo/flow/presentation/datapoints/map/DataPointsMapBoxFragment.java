@@ -44,15 +44,12 @@ import android.widget.TextView;
 import com.mapbox.geojson.Feature;
 import com.mapbox.geojson.FeatureCollection;
 import com.mapbox.geojson.Point;
-import com.mapbox.mapboxsdk.camera.CameraPosition;
-import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.location.LocationComponent;
 import com.mapbox.mapboxsdk.location.modes.CameraMode;
 import com.mapbox.mapboxsdk.location.modes.RenderMode;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
-import com.mapbox.mapboxsdk.maps.MapboxMapOptions;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.maps.Projection;
 import com.mapbox.mapboxsdk.maps.Style;
@@ -72,7 +69,6 @@ import org.akvo.flow.injector.component.ApplicationComponent;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
 import org.akvo.flow.presentation.datapoints.DataPointSyncSnackBarManager;
-import org.akvo.flow.presentation.datapoints.map.entity.MapDataPoint;
 import org.akvo.flow.ui.Navigator;
 import org.akvo.flow.ui.fragment.RecordListListener;
 import org.akvo.flow.util.ConstantUtil;
@@ -107,11 +103,12 @@ public class DataPointsMapBoxFragment extends SupportMapFragment implements
         MapboxMap.OnMapClickListener, OnMapReadyCallback, DataPointsMapView {
 
     private static final String MARKER_IMAGE = "custom-marker";
-    private static final String MAP_OPTIONS = "MapOptions";
     private static final String SOURCE_ID = "datapoints";
-    public static final String UNCLUSTERED_POINTS = "unclustered-points";
-    public static final String POINT_COUNT = "point_count";
+    private static final String UNCLUSTERED_POINTS = "unclustered-points";
+    private static final String POINT_COUNT = "point_count";
     private static final String PROPERTY_SELECTED = "selected";
+    private static final String NAME_PROPERTY = "name";
+    private static final String ID_PROPERTY = "id";
 
     @Inject
     DataPointSyncSnackBarManager dataPointSyncSnackBarManager;
@@ -140,18 +137,14 @@ public class DataPointsMapBoxFragment extends SupportMapFragment implements
     private MarkerView markerView;
     private MarkerViewManager markerViewManager;
     private View customView;
+    private TextView titleTextView;
+    private TextView snippetTextView;
+    private MapDataPoint currentSelected = null;
 
     public static DataPointsMapBoxFragment newInstance(SurveyGroup surveyGroup) {
         DataPointsMapBoxFragment fragment = new DataPointsMapBoxFragment();
         Bundle args = new Bundle();
         args.putSerializable(ConstantUtil.SURVEY_GROUP_EXTRA, surveyGroup);
-        MapboxMapOptions options = new MapboxMapOptions()
-                .camera(new CameraPosition.Builder()
-                        .target(new LatLng(41.6082045, 2.654562)) //for debugging
-                        .zoom(12)
-                        .build());
-        args.putParcelable(MapboxConstants.FRAG_ARG_MAPBOXMAPOPTIONS, options);
-
         fragment.setArguments(args);
         return fragment;
     }
@@ -196,6 +189,17 @@ public class DataPointsMapBoxFragment extends SupportMapFragment implements
         SurveyGroup surveyGroup = (SurveyGroup) getArguments()
                 .getSerializable(ConstantUtil.SURVEY_GROUP_EXTRA);
         presenter.onDataReady(surveyGroup);
+        customView = LayoutInflater.from(getActivity()).inflate(
+                R.layout.symbol_layer_info_window_layout_callout, null);
+        customView.setLayoutParams(new FrameLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT));
+        titleTextView = customView.findViewById(R.id.info_window_title);
+        snippetTextView = customView.findViewById(R.id.info_window_description);
+        customView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onInfoWindowClick((String) customView.getTag());
+            }
+        });
         getMapAsync(this);
         activityJustCreated = true;
     }
@@ -225,7 +229,6 @@ public class DataPointsMapBoxFragment extends SupportMapFragment implements
                 .fromUrl("mapbox://styles/mapbox/light-v10"), new Style.OnStyleLoaded() {
             @Override
             public void onStyleLoaded(@NonNull Style style) {
-                //TODO: refactor this to do this only once
                 style.addImage(MARKER_IMAGE, BitmapFactory.decodeResource(
                         getResources(), R.drawable.marker), true);
                 enableLocationComponent(style);
@@ -253,15 +256,11 @@ public class DataPointsMapBoxFragment extends SupportMapFragment implements
                 Manifest.permission.ACCESS_FINE_LOCATION) == PermissionChecker.PERMISSION_GRANTED;
     }
 
-    //TODO: too long method refactor
     private void addClusteredGeoJsonSource(@NonNull Style loadedMapStyle) {
         featureCollection = getFeatureCollection();
         addGeoJsonSource(loadedMapStyle, featureCollection);
         addUnClusteredLayer(loadedMapStyle);
 
-        // Use the datapoints GeoJSON source to create three layers: One layer for each cluster category.
-        // Each point range gets a different fill color.
-        //TODO: extract color resources
         int[][] layers = new int[][] {
                 new int[] { 50, Color.parseColor("#009954") },
                 new int[] { 20, Color.parseColor("#007B99") },
@@ -269,29 +268,21 @@ public class DataPointsMapBoxFragment extends SupportMapFragment implements
         };
 
         for (int i = 0; i < layers.length; i++) {
-            //Add clusters' circles
             addClusterLayer(loadedMapStyle, layers, i);
         }
-
-        //Add the count labels
         addCountLabels(loadedMapStyle);
     }
 
     private FeatureCollection getFeatureCollection() {
-        //TODO: make datapoint a feature
         List<Feature> features = new ArrayList<>();
         for (MapDataPoint item : mItems) {
-            com.google.android.gms.maps.model.LatLng position = item.getPosition();
-            if (position != null) {
-                Feature feature = Feature.fromGeometry(
-                        Point.fromLngLat(position.longitude, position.latitude));
-                feature.addStringProperty("id", item.getId());
-                feature.addStringProperty("name", item.getName());
-                feature.addBooleanProperty(PROPERTY_SELECTED, false);
-                features.add(feature);
-            }
+            Feature feature = Feature.fromGeometry(
+                    Point.fromLngLat(item.getLongitude(), item.getLatitude()));
+            feature.addStringProperty(ID_PROPERTY, item.getId());
+            feature.addStringProperty(NAME_PROPERTY, item.getName());
+            feature.addBooleanProperty(PROPERTY_SELECTED, false);
+            features.add(feature);
         }
-
         return FeatureCollection.fromFeatures(features);
     }
 
@@ -301,7 +292,6 @@ public class DataPointsMapBoxFragment extends SupportMapFragment implements
                 featureCollection,
                 new GeoJsonOptions()
                         .withCluster(true)
-                        .withClusterMaxZoom(14)
                         .withClusterRadius(50)
         );
         loadedMapStyle.addSource(source);
@@ -377,26 +367,21 @@ public class DataPointsMapBoxFragment extends SupportMapFragment implements
         List<Feature> features = mapboxMap == null ?
                 Collections.<Feature>emptyList() :
                 mapboxMap.queryRenderedFeatures(screenPoint, UNCLUSTERED_POINTS);
-        if (!features.isEmpty() && features.get(0) != null) {
-            Feature feature = features.get(0);
-            if (feature.hasNonNullValueForProperty("id")) {
-                String id = feature.getStringProperty("id");
-                List<Feature> featureList = featureCollection.features();
-                if (featureList != null) {
-                    for (int i = 0; i < featureList.size(); i++) {
-                        Feature selectedFeature = featureList.get(i);
-                        String selectedItemId = selectedFeature.getStringProperty("id");
-                        if (selectedItemId.equals(id)) {
-                            MapDataPoint item = getItem(selectedItemId);
-                            onFeaturePressed(item);
-                        }
-                    }
-                }
+        Feature feature = features.isEmpty() ? null : features.get(0);
+        if (feature != null && feature.hasNonNullValueForProperty(ID_PROPERTY)) {
+            String id = feature.getStringProperty(ID_PROPERTY);
+            MapDataPoint item = getItem(id);
+            if (item != null) {
+                onFeaturePressed(item);
+                return true;
             }
-            return true;
-        } else {
-            return false;
         }
+        if (currentSelected != null) {
+            currentSelected = null;
+            markerViewManager.removeMarker(markerView);
+            return true;
+        }
+        return false;
     }
 
     @Nullable
@@ -413,42 +398,36 @@ public class DataPointsMapBoxFragment extends SupportMapFragment implements
     }
 
     private void onFeaturePressed(MapDataPoint selectedDataPoint) {
-        if (markerView == null) {
-            createNewMarker(selectedDataPoint);
+        if (currentSelected != null && currentSelected.getId().equals(selectedDataPoint.getId())) {
+            //datapoint already selected, unselect
+            unSelectDataPoint();
         } else {
-            markerViewManager.removeMarker(markerView);
-            markerView = null;
-            if (customView == null || !selectedDataPoint.getId().equals(customView.getTag())) {
-                createNewMarker(selectedDataPoint);
+            if (currentSelected != null) {
+                //another dp selected, remove first
+                markerViewManager.removeMarker(markerView);
             }
+            customView.setTag(selectedDataPoint.getId());
+            titleTextView.setText(selectedDataPoint.getName());
+            snippetTextView.setText(selectedDataPoint.getId());
+
+            LatLng latLng = new LatLng(selectedDataPoint.getLatitude(),
+                    selectedDataPoint.getLongitude());
+            if (markerView == null) {
+                markerView = new MarkerView(latLng,
+                        customView);
+            } else {
+                markerView.setLatLng(latLng);
+            }
+            markerViewManager.addMarker(markerView);
+            currentSelected = selectedDataPoint;
         }
     }
 
-    private void createNewMarker(MapDataPoint selectedDataPoint) {
-        // Use an XML layout to create a View object
-        customView = LayoutInflater.from(getActivity()).inflate(
-                R.layout.symbol_layer_info_window_layout_callout, null);
-        customView.setLayoutParams(new FrameLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT));
-        customView.setTag(selectedDataPoint.getId());
-
-        // Set the View's TextViews with content
-        TextView titleTextView = customView.findViewById(R.id.info_window_title);
-        TextView snippetTextView = customView.findViewById(R.id.info_window_description);
-
-        titleTextView.setText(selectedDataPoint.getName());
-        snippetTextView.setText(selectedDataPoint.getId());
-        customView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onInfoWindowClick((String) customView.getTag());
-            }
-        });
-
-        // Use the View to create a MarkerView which will eventually be given to
-        // the plugin's MarkerViewManager class
-        com.google.android.gms.maps.model.LatLng position = selectedDataPoint.getPosition();
-        markerView = new MarkerView(new LatLng(position.latitude, position.longitude), customView);
-        markerViewManager.addMarker(markerView);
+    private void unSelectDataPoint() {
+        if (markerView != null) {
+            markerViewManager.removeMarker(markerView);
+            currentSelected = null;
+        }
     }
 
     @Override
@@ -525,11 +504,7 @@ public class DataPointsMapBoxFragment extends SupportMapFragment implements
         mItems.addAll(surveyedLocales);
         featureCollection = getFeatureCollection();
         source.setGeoJson(featureCollection);
-        //TODO: check if the selected datapoint still exists
-        if (markerView != null) {
-            markerViewManager.removeMarker(markerView);
-            markerView = null;
-        }
+        unSelectDataPoint();
     }
 
     @Override

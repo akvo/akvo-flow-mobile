@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -343,21 +343,13 @@ public class DataPointsMapFragment extends SupportMapFragment implements
     public boolean onMapClick(@NonNull LatLng point) {
         if (mapboxMap != null) {
             Projection projection = mapboxMap.getProjection();
-            return handleClickIcon(projection.toScreenLocation(point));
+            return handlePointClick(projection.toScreenLocation(point));
         } else {
             return false;
         }
     }
 
-    /**
-     * This method handles click events for SymbolLayer symbols.
-     * <p>
-     * When a SymbolLayer icon is clicked, we moved that feature to the selected state.
-     * </p>
-     *
-     * @param screenPoint the point on screen clicked
-     */
-    private boolean handleClickIcon(PointF screenPoint) {
+    private boolean handlePointClick(PointF screenPoint) {
         List<Feature> features = mapboxMap == null ?
                 Collections.<Feature>emptyList() :
                 mapboxMap.queryRenderedFeatures(screenPoint, UNCLUSTERED_POINTS);
@@ -393,11 +385,9 @@ public class DataPointsMapFragment extends SupportMapFragment implements
 
     private void onFeaturePressed(MapDataPoint selectedDataPoint) {
         if (currentSelected != null && currentSelected.getId().equals(selectedDataPoint.getId())) {
-            //datapoint already selected, unselect
             unSelectDataPoint();
         } else {
             if (currentSelected != null) {
-                //another dp selected, remove first
                 markerViewManager.removeMarker(markerView);
             }
             customView.setTag(selectedDataPoint.getId());
@@ -407,8 +397,7 @@ public class DataPointsMapFragment extends SupportMapFragment implements
             LatLng latLng = new LatLng(selectedDataPoint.getLatitude(),
                     selectedDataPoint.getLongitude());
             if (markerView == null) {
-                markerView = new MarkerView(latLng,
-                        customView);
+                markerView = new MarkerView(latLng, customView);
             } else {
                 markerView.setLatLng(latLng);
             }

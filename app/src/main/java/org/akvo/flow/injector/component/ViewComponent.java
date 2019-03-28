@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2019 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2016-2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -60,6 +60,8 @@ public interface ViewComponent {
 
     void inject(FormActivity formActivity);
 
+    void inject(DataPointsMapFragment dataPointsMapFragment);
+
     void inject(DataPointsListFragment dataPointsListFragment);
 
     void inject(RecordActivity recordActivity);
@@ -107,7 +109,4 @@ public interface ViewComponent {
     void inject(WalkThroughActivity walkThroughActivity);
 
     void inject(MobileDataSettingDialog mobileDataSettingDialog);
-
-    void inject(
-            DataPointsMapFragment mapFragment);
 }

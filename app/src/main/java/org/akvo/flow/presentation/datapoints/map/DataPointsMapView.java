@@ -20,6 +20,8 @@
 
 package org.akvo.flow.presentation.datapoints.map;
 
+import org.akvo.flow.presentation.datapoints.map.entity.MapDataPoint;
+
 import java.util.List;
 
 interface DataPointsMapView {

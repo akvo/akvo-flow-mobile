@@ -68,6 +68,7 @@ import org.akvo.flow.injector.component.ApplicationComponent;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
 import org.akvo.flow.presentation.datapoints.DataPointSyncSnackBarManager;
+import org.akvo.flow.presentation.datapoints.map.entity.MapDataPoint;
 import org.akvo.flow.ui.Navigator;
 import org.akvo.flow.ui.fragment.RecordListListener;
 import org.akvo.flow.util.ConstantUtil;

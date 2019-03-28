@@ -33,6 +33,8 @@ import org.akvo.flow.domain.interactor.GetSavedDataPoints;
 import org.akvo.flow.domain.interactor.UseCase;
 import org.akvo.flow.domain.util.Constants;
 import org.akvo.flow.presentation.Presenter;
+import org.akvo.flow.presentation.datapoints.map.entity.MapDataPoint;
+import org.akvo.flow.presentation.datapoints.map.entity.MapDataPointMapper;
 
 import java.util.HashMap;
 import java.util.List;

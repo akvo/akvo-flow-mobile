@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010-2017,2019 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -38,7 +38,7 @@ import org.akvo.flow.injector.component.ApplicationComponent;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
 import org.akvo.flow.presentation.datapoints.list.DataPointsListFragment;
-import org.akvo.flow.presentation.datapoints.map.DataPointsMapBoxFragment;
+import org.akvo.flow.presentation.datapoints.map.DataPointsMapFragment;
 import org.akvo.flow.util.ConstantUtil;
 
 import java.util.Map;
@@ -165,7 +165,7 @@ public class DatapointsFragment extends Fragment {
             this.surveyGroup = newSurveyGroup;
             DataPointsListFragment listFragment = (DataPointsListFragment) fragmentsRef
                     .get(POSITION_LIST);
-            DataPointsMapBoxFragment mapFragment = (DataPointsMapBoxFragment) fragmentsRef
+            DataPointsMapFragment mapFragment = (DataPointsMapFragment) fragmentsRef
                     .get(POSITION_MAP);
 
             if (listFragment != null) {
@@ -184,7 +184,7 @@ public class DatapointsFragment extends Fragment {
                 fragmentsRef.put(POSITION_LIST, dataPointsListFragment);
                 return dataPointsListFragment;
             } else {
-                DataPointsMapBoxFragment mapFragment = (DataPointsMapBoxFragment) super
+                DataPointsMapFragment mapFragment = (DataPointsMapFragment) super
                         .instantiateItem(container, position);
                 fragmentsRef.put(POSITION_MAP, mapFragment);
                 return mapFragment;
@@ -196,7 +196,7 @@ public class DatapointsFragment extends Fragment {
             if (position == POSITION_LIST) {
                 return DataPointsListFragment.newInstance(surveyGroup);
             }
-            return DataPointsMapBoxFragment.newInstance(surveyGroup);
+            return DataPointsMapFragment.newInstance(surveyGroup);
         }
 
         @Override

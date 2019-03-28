@@ -98,7 +98,7 @@ import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textField;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textIgnorePlacement;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textSize;
 
-public class DataPointsMapBoxFragment extends SupportMapFragment implements
+public class DataPointsMapFragment extends SupportMapFragment implements
         MapboxMap.OnMapClickListener, OnMapReadyCallback, DataPointsMapView {
 
     private static final String MARKER_IMAGE = "custom-marker";
@@ -137,8 +137,8 @@ public class DataPointsMapBoxFragment extends SupportMapFragment implements
     private TextView snippetTextView;
     private MapDataPoint currentSelected = null;
 
-    public static DataPointsMapBoxFragment newInstance(SurveyGroup surveyGroup) {
-        DataPointsMapBoxFragment fragment = new DataPointsMapBoxFragment();
+    public static DataPointsMapFragment newInstance(SurveyGroup surveyGroup) {
+        DataPointsMapFragment fragment = new DataPointsMapFragment();
         Bundle args = new Bundle();
         args.putSerializable(ConstantUtil.SURVEY_GROUP_EXTRA, surveyGroup);
         fragment.setArguments(args);

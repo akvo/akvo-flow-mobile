@@ -352,10 +352,8 @@ public class DataPointsMapFragment extends SupportMapFragment implements
 
     private boolean handlePointClick(PointF screenPoint) {
         Feature feature = getSelectedFeature(screenPoint);
-        if (feature != null && feature.hasNonNullValueForProperty(ID_PROPERTY)) {
-            if (onFeatureSelected(feature)) {
-                return true;
-            }
+        if (featureSelected(feature)) {
+            return true;
         }
         if (currentSelected != null) {
             unSelectDataPoint();
@@ -364,12 +362,14 @@ public class DataPointsMapFragment extends SupportMapFragment implements
         return false;
     }
 
-    private boolean onFeatureSelected(Feature feature) {
-        String id = feature.getStringProperty(ID_PROPERTY);
-        MapDataPoint item = getItem(id);
-        if (item != null) {
-            onDataPointSelected(item);
-            return true;
+    private boolean featureSelected(@Nullable Feature feature) {
+        if (feature != null && feature.hasNonNullValueForProperty(ID_PROPERTY)) {
+            String id = feature.getStringProperty(ID_PROPERTY);
+            MapDataPoint item = getItem(id);
+            if (item != null) {
+                onDataPointSelected(item);
+                return true;
+            }
         }
         return false;
     }

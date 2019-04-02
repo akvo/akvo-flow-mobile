@@ -134,6 +134,7 @@ android {
         exclude 'META-INF/notice.txt'
         exclude 'META-INF/ASL2.0'
         exclude '.readme'
+        exclude 'androidsupportmultidexversion.txt'
     }
 
     flavorDimensions "default"
@@ -184,12 +185,6 @@ private Properties loadProperties(String fileName) {
 
 private static String getBuildYear() {
     new Date().format('yyyy')
-}
-
-android.applicationVariants.all { variant ->
-    variant.outputs.all { output ->
-        outputFileName = file("/flow.apk")
-    }
 }
 
 configurations.all { config ->

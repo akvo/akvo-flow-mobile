@@ -68,7 +68,7 @@ for i in $(cat tmp/instances.txt); do
 
         ./gradlew $build -Pnodexcount=true
         mkdir -p builds/$i/$version
-        mv app/build/outputs/apk/$flavor/release/flow.apk $filename
+        mv app/build/outputs/apk/$flavor/release/app-$flavor-release.apk $filename
         java -jar "$FLOW_DEPLOY_JAR" "$FLOW_S3_ACCESS_KEY" "$FLOW_S3_SECRET_KEY" "$i" "$filename" "$version" "$accountId" "$accountSecret"
     else
         echo "Cannot find survey.properties or p12 file for instance" $i

@@ -17,7 +17,7 @@ buildscript {
 ext {
     compileSdkVersion = 28
     minSdkVersion = 15
-    targetSdkVersion = 26
+    targetSdkVersion = 28
 
     adapterRxJava2Version = "2.3.0"
     butterKnifeVersion = "8.5.1"

@@ -4,7 +4,7 @@
 
     <include layout="@layout/question_header" />
 
-    <android.support.v7.widget.RecyclerView
+    <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/caddisfly_results_recycler_view"
             android:scrollbars="none"
             android:layout_marginTop="2dp"

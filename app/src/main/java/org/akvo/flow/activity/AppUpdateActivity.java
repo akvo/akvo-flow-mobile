@@ -22,7 +22,6 @@ package org.akvo.flow.activity;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.Window;
@@ -55,6 +54,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import androidx.annotation.Nullable;
 import timber.log.Timber;
 
 public class AppUpdateActivity extends BaseActivity {

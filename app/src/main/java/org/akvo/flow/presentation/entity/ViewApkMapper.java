@@ -17,7 +17,7 @@
 
 package org.akvo.flow.presentation.entity;
 
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 
 import org.akvo.flow.domain.entity.ApkData;
 

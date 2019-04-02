@@ -20,7 +20,7 @@
 package org.akvo.flow.data.entity;
 
 import android.database.Cursor;
-import android.support.v4.util.Pair;
+import androidx.core.util.Pair;
 import android.test.suitebuilder.annotation.SmallTest;
 import android.text.TextUtils;
 

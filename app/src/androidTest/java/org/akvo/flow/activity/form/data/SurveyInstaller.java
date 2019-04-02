@@ -20,8 +20,8 @@
 package org.akvo.flow.activity.form.data;
 
 import android.content.Context;
-import android.support.test.InstrumentationRegistry;
-import android.support.v4.util.Pair;
+import androidx.test.InstrumentationRegistry;
+import androidx.core.util.Pair;
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.SparseArray;

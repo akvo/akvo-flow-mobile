@@ -21,7 +21,7 @@
 package org.akvo.flow.data.database.cascade;
 
 import android.database.Cursor;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.util.SparseArray;
 
 import org.akvo.flow.domain.Node;

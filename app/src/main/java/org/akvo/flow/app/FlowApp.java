@@ -20,8 +20,8 @@
 package org.akvo.flow.app;
 
 import android.content.res.Configuration;
-import android.support.annotation.Nullable;
-import android.support.multidex.MultiDexApplication;
+import androidx.annotation.Nullable;
+import androidx.multidex.MultiDexApplication;
 import android.text.TextUtils;
 
 import com.crashlytics.android.Crashlytics;

@@ -21,8 +21,8 @@
 package org.akvo.flow.presentation.navigation;
 
 import android.app.AlertDialog;
-import android.support.annotation.NonNull;
-import android.support.v4.app.DialogFragment;
+import androidx.annotation.NonNull;
+import androidx.fragment.app.DialogFragment;
 import android.widget.Button;
 
 class PositiveButtonHandler {

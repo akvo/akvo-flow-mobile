@@ -22,14 +22,14 @@ package org.akvo.flow.ui.view;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.drawable.Drawable;
-import android.support.v4.content.ContextCompat;
+import androidx.core.content.ContextCompat;
 import android.view.MotionEvent;
 import android.view.View;
 
 import org.akvo.flow.R;
 import org.akvo.flow.util.ViewUtil;
 
-public class QuestionGroupIterationHeader extends android.support.v7.widget.AppCompatTextView
+public class QuestionGroupIterationHeader extends androidx.appcompat.widget.AppCompatTextView
         implements View.OnTouchListener {
 
     private String mTitle;

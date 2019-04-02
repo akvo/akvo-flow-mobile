@@ -21,7 +21,7 @@
 package org.akvo.flow.data.entity;
 
 import android.database.Cursor;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 
 import org.akvo.flow.database.TransmissionColumns;
 

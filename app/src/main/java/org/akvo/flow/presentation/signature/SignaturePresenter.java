@@ -21,7 +21,7 @@
 package org.akvo.flow.presentation.signature;
 
 import android.graphics.Bitmap;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.text.TextUtils;
 
 import org.akvo.flow.domain.interactor.DefaultObserver;

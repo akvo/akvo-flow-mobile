@@ -20,7 +20,7 @@
 
 package org.akvo.flow.util;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.text.TextUtils;
 
 public class SurveyIdGenerator {

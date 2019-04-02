@@ -20,7 +20,7 @@
 
 package org.akvo.flow.presentation.survey;
 
-import android.support.v4.util.Pair;
+import androidx.core.util.Pair;
 
 import org.akvo.flow.BuildConfig;
 import org.akvo.flow.domain.entity.ApkData;

@@ -21,7 +21,7 @@
 package org.akvo.flow.ui.view.media.photo;
 
 import android.net.Uri;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 import android.text.TextUtils;
 
 import org.akvo.flow.domain.interactor.DefaultObserver;

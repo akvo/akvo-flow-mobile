@@ -21,8 +21,8 @@
 package org.akvo.flow.ui.view.barcode;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.AttributeSet;

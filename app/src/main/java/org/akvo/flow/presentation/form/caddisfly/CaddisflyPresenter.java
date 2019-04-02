@@ -20,7 +20,7 @@
 
 package org.akvo.flow.presentation.form.caddisfly;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import org.akvo.flow.domain.interactor.CopyFile;
 import org.akvo.flow.domain.interactor.DefaultObserver;

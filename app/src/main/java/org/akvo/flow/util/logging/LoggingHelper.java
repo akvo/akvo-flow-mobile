@@ -20,7 +20,7 @@
 
 package org.akvo.flow.util.logging;
 
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 
 public interface LoggingHelper {
 

@@ -25,7 +25,7 @@ import android.content.DialogInterface;
 import android.graphics.Point;
 import android.os.Build;
 import android.os.Handler;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.view.Display;
 import android.view.ViewTreeObserver;
 import android.view.WindowManager;

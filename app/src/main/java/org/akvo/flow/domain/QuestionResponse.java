@@ -19,7 +19,7 @@
 
 package org.akvo.flow.domain;
 
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 
 import org.akvo.flow.serialization.response.value.CascadeValue;
 import org.akvo.flow.serialization.response.value.OptionValue;

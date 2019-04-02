@@ -20,7 +20,7 @@
 
 package org.akvo.flow.data.datasource.files;
 
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 import android.text.TextUtils;
 
 import org.akvo.flow.data.util.Constants;

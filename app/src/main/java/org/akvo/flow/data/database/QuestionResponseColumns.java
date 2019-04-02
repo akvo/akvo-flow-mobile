@@ -21,7 +21,7 @@
 package org.akvo.flow.data.database;
 
 import android.database.Cursor;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import org.akvo.flow.database.ResponseColumns;
 

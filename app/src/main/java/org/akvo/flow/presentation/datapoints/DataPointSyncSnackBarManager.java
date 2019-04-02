@@ -20,7 +20,7 @@
 
 package org.akvo.flow.presentation.datapoints;
 
-import android.support.annotation.StringRes;
+import androidx.annotation.StringRes;
 import android.view.View;
 
 import org.akvo.flow.R;

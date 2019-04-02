@@ -21,7 +21,7 @@
 package org.akvo.flow.domain.interactor.apk;
 
 import android.os.Build;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 
 import org.akvo.flow.domain.entity.ApkData;
 import org.akvo.flow.domain.repository.ApkRepository;

@@ -22,7 +22,7 @@ package org.akvo.flow.util;
 
 import android.location.LocationListener;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import java.lang.ref.WeakReference;
 

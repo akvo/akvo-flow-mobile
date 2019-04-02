@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -22,12 +22,6 @@ package org.akvo.flow.activity.form.submittedformsview;
 
 import android.content.Context;
 import android.content.Intent;
-import androidx.test.InstrumentationRegistry;
-import androidx.test.espresso.ViewInteraction;
-import androidx.test.rule.ActivityTestRule;
-import androidx.test.runner.AndroidJUnit4;
-import androidx.core.util.Pair;
-import android.test.suitebuilder.annotation.LargeTest;
 import android.text.TextUtils;
 
 import com.google.gson.Gson;
@@ -69,6 +63,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 
+import androidx.core.util.Pair;
+import androidx.test.InstrumentationRegistry;
+import androidx.test.espresso.ViewInteraction;
+import androidx.test.filters.LargeTest;
+import androidx.test.rule.ActivityTestRule;
+import androidx.test.runner.AndroidJUnit4;
+
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.scrollTo;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
@@ -82,6 +83,7 @@ import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withSpinnerText;
 import static androidx.test.espresso.matcher.ViewMatchers.withTagValue;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
+import static org.akvo.flow.activity.form.FormActivityTestUtil.getCameraButton;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.getDateButton;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.getDateEditText;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.getDoubleEntryInput;
@@ -89,7 +91,6 @@ import static org.akvo.flow.activity.form.FormActivityTestUtil.getFormActivityIn
 import static org.akvo.flow.activity.form.FormActivityTestUtil.getFreeTextInput;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.getGalleryButton;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.getGeoButton;
-import static org.akvo.flow.activity.form.FormActivityTestUtil.getCameraButton;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.getOptionView;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.selectAndVerifyTab;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.verifyAccuracyLabel;

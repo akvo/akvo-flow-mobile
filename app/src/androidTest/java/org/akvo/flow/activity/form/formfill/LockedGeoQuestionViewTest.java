@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -26,15 +26,6 @@ import android.graphics.Color;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
-import androidx.test.InstrumentationRegistry;
-import androidx.test.espresso.UiController;
-import androidx.test.espresso.ViewAction;
-import androidx.test.espresso.ViewInteraction;
-import androidx.test.espresso.matcher.BoundedMatcher;
-import androidx.test.espresso.matcher.ViewMatchers;
-import androidx.test.filters.MediumTest;
-import androidx.test.rule.ActivityTestRule;
-import androidx.test.runner.AndroidJUnit4;
 import android.view.View;
 import android.widget.TextView;
 
@@ -53,6 +44,16 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.text.DecimalFormat;
+
+import androidx.test.InstrumentationRegistry;
+import androidx.test.espresso.UiController;
+import androidx.test.espresso.ViewAction;
+import androidx.test.espresso.ViewInteraction;
+import androidx.test.espresso.matcher.BoundedMatcher;
+import androidx.test.espresso.matcher.ViewMatchers;
+import androidx.test.filters.MediumTest;
+import androidx.test.rule.ActivityTestRule;
+import androidx.test.runner.AndroidJUnit4;
 
 import static androidx.test.espresso.Espresso.closeSoftKeyboard;
 import static androidx.test.espresso.Espresso.onView;
@@ -259,7 +260,7 @@ public class LockedGeoQuestionViewTest {
     }
 
     private void verifyErrorSnackBarDisplayed() {
-        onView(allOf(withId(android.support.design.R.id.snackbar_text),
+        onView(allOf(withId(com.google.android.material.R.id.snackbar_text),
                 withText(R.string.location_timeout)))
                 .check(matches(withEffectiveVisibility(ViewMatchers.Visibility.VISIBLE)));
     }
@@ -276,7 +277,7 @@ public class LockedGeoQuestionViewTest {
     }
 
     private void clickSnackBarRetry() {
-        onView(withId(android.support.design.R.id.snackbar_action))
+        onView(withId(com.google.android.material.R.id.snackbar_action))
                 .check(matches(allOf(isEnabled(), isClickable())))
                 .perform(new ViewAction() {
                              @Override

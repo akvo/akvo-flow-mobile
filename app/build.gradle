@@ -231,32 +231,22 @@ dependencies {
 
     implementation "com.mapbox.mapboxsdk:mapbox-android-sdk:${rootProject.ext.mapboxVersion}"
     implementation "com.mapbox.mapboxsdk:mapbox-android-plugin-markerview-v7:${rootProject.ext.mapboxMarkerVersion}"
+
     testImplementation "junit:junit:${rootProject.ext.jUnitVersion}"
     testImplementation "org.mockito:mockito-core:${rootProject.ext.mockitoCoreVersion}"
     testImplementation "org.powermock:powermock-module-junit4:${rootProject.ext.powerMockVersion}"
     testImplementation "org.powermock:powermock-module-junit4-rule:${rootProject.ext.powerMockVersion}"
     testImplementation "org.powermock:powermock-api-mockito:${rootProject.ext.powerMockVersion}"
     testImplementation "org.powermock:powermock-classloading-xstream:${rootProject.ext.powerMockVersion}"
+
+    androidTestImplementation "androidx.test.ext:junit:${rootProject.ext.androidXJunit}"
+    androidTestImplementation "androidx.test:core:${rootProject.ext.androidXCore}"
     androidTestImplementation "com.google.dexmaker:dexmaker:${rootProject.ext.dexMakerVersion}"
     androidTestImplementation "com.google.dexmaker:dexmaker-mockito:${rootProject.ext.dexMakerVersion}"
-    androidTestImplementation("androidx.test:rules:${rootProject.ext.supportTestRulesVersion}") {
-        exclude module: 'support-annotations'
-        exclude group: 'com.android.support', module: 'appcompat'
-        exclude group: 'com.android.support', module: 'support-v4'
-        exclude module: 'recyclerview-v7'
-    }
-    androidTestImplementation("androidx.test.espresso:espresso-core:${rootProject.ext.espressoCoreVersion}") {
-        exclude module: 'support-annotations'
-        exclude group: 'com.android.support', module: 'appcompat'
-        exclude group: 'com.android.support', module: 'support-v4'
-        exclude module: 'recyclerview-v7'
-    }
-    androidTestImplementation("androidx.test.espresso:espresso-contrib:${rootProject.ext.espressoContribVersion}") {
-        exclude module: 'support-annotations'
-        exclude group: 'com.android.support', module: 'appcompat'
-        exclude group: 'com.android.support', module: 'support-v4'
-        exclude module: 'recyclerview-v7'
-    }
+    androidTestImplementation "androidx.test:rules:${rootProject.ext.supportTestRulesVersion}"
+    androidTestImplementation "androidx.test.espresso:espresso-core:${rootProject.ext.espressoCoreVersion}"
+    androidTestImplementation "androidx.test.espresso:espresso-contrib:${rootProject.ext.espressoContribVersion}"
+
     implementation project(':domain')
     implementation project(':data')
     implementation project(':database')

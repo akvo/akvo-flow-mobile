@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -20,18 +20,18 @@
 
 package org.akvo.flow.activity;
 
-import androidx.test.InstrumentationRegistry;
-import androidx.test.espresso.ViewInteraction;
-import androidx.test.rule.ActivityTestRule;
-import androidx.test.runner.AndroidJUnit4;
-import android.test.suitebuilder.annotation.MediumTest;
-
 import org.akvo.flow.R;
 import org.akvo.flow.activity.form.data.SurveyRequisite;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import androidx.test.InstrumentationRegistry;
+import androidx.test.espresso.ViewInteraction;
+import androidx.test.filters.MediumTest;
+import androidx.test.rule.ActivityTestRule;
+import androidx.test.runner.AndroidJUnit4;
 
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
@@ -60,7 +60,7 @@ public class AddUserActivityTest {
     }
 
     @Test
-    public void testAddUser() throws Exception {
+    public void testAddUser() {
         ViewInteraction nameEditText = onView(
                 allOf(withId(R.id.username), isDisplayed()));
         nameEditText.check(matches(withHint(R.string.username)));

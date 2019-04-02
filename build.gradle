@@ -51,12 +51,15 @@ ext {
     jUnitVersion = "4.12"
     mockServerVersion = "3.12.1"
 
+    androidXJunit = "1.1.0"
+    androidXCore = "1.1.0"
     dexMakerVersion = "1.2"
-    espressoCoreVersion = '3.1.0-alpha4'
-    espressoContribVersion = '3.1.0-alpha4'
+    espressoCoreVersion = "3.1.1"
+    espressoContribVersion = "3.1.1"
     mockitoCoreVersion = "1.10.19"
     powerMockVersion = "1.6.2"
-    supportTestRulesVersion = '1.1.0-alpha4'
+    supportTestRulesVersion = "1.1.1"
+
 }
 allprojects {
     repositories {

@@ -40,6 +40,8 @@ ext {
     supportVersion = "27.1.1"
     timberVersion = "4.5.1"
     multidexVersion = "1.0.3"
+    mapboxVersion = "7.2.0"
+    mapboxMarkerVersion = "0.2.0"
 
     jUnitVersion = "4.12"
     mockServerVersion = "3.12.1"

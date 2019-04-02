@@ -89,6 +89,7 @@ android {
 
         release {
             minifyEnabled true
+            multiDexEnabled true
             proguardFile 'proguard-files/proguard-rules.pro'
             proguardFile 'proguard-files/proguard-butterknife.pro'
             proguardFile 'proguard-files/proguard-glide.pro'
@@ -232,6 +233,8 @@ dependencies {
     debugImplementation "com.squareup.leakcanary:leakcanary-support-fragment:${rootProject.ext.leakCanaryVersion}"
 
     implementation "com.android.support:multidex:${rootProject.ext.multidexVersion}"
+    implementation "com.mapbox.mapboxsdk:mapbox-android-sdk:${rootProject.ext.mapboxVersion}"
+    implementation "com.mapbox.mapboxsdk:mapbox-android-plugin-markerview-v7:${rootProject.ext.mapboxMarkerVersion}"
 
     testImplementation "junit:junit:${rootProject.ext.jUnitVersion}"
     testImplementation "org.mockito:mockito-core:${rootProject.ext.mockitoCoreVersion}"

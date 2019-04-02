@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -15,24 +15,22 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 
 package org.akvo.flow.presentation.datapoints.map.entity;
 
-import com.google.android.gms.maps.model.LatLng;
-import com.google.maps.android.clustering.ClusterItem;
-
-public class MapDataPoint implements ClusterItem {
+public class MapDataPoint {
 
     private final String id;
     private final String name;
-    private final LatLng position;
+    private final double latitude;
+    private final double longitude;
 
-    public MapDataPoint(String id, String name, LatLng position) {
+    public MapDataPoint(String id, String name, double latitude, double longitude) {
         this.id = id;
         this.name = name;
-        this.position = position;
+        this.latitude = latitude;
+        this.longitude = longitude;
     }
 
     public String getId() {
@@ -43,18 +41,11 @@ public class MapDataPoint implements ClusterItem {
         return name;
     }
 
-    @Override
-    public LatLng getPosition() {
-        return position;
+    public double getLatitude() {
+        return latitude;
     }
 
-    @Override
-    public String getTitle() {
-        return name;
-    }
-
-    @Override
-    public String getSnippet() {
-        return id;
+    public double getLongitude() {
+        return longitude;
     }
 }

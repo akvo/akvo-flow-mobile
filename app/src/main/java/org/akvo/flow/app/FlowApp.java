@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2013-2018 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2013-2019 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -19,18 +19,18 @@
 
 package org.akvo.flow.app;
 
-import android.app.Application;
-import android.content.Context;
 import android.content.res.Configuration;
 import android.support.annotation.Nullable;
-import android.support.multidex.MultiDex;
+import android.support.multidex.MultiDexApplication;
 import android.text.TextUtils;
 
 import com.crashlytics.android.Crashlytics;
 import com.crashlytics.android.core.CrashlyticsCore;
+import com.mapbox.mapboxsdk.Mapbox;
 import com.squareup.leakcanary.LeakCanary;
 
 import org.akvo.flow.BuildConfig;
+import org.akvo.flow.R;
 import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.domain.entity.User;
 import org.akvo.flow.domain.interactor.DefaultObserver;
@@ -54,7 +54,7 @@ import javax.inject.Named;
 import io.fabric.sdk.android.Fabric;
 import timber.log.Timber;
 
-public class FlowApp extends Application {
+public class FlowApp extends MultiDexApplication {
 
     @Inject
     LoggingHelper loggingHelper;
@@ -73,15 +73,6 @@ public class FlowApp extends Application {
     UseCase saveSetup;
 
     @Override
-    protected void attachBaseContext(Context base) {
-        super.attachBaseContext(base);
-
-        if (BuildConfig.DEBUG) {
-            MultiDex.install(this);
-        }
-    }
-
-    @Override
     public void onCreate() {
         super.onCreate();
         if (LeakCanary.isInAnalyzerProcess(this)) {
@@ -89,6 +80,8 @@ public class FlowApp extends Application {
             // You should not init your app in this process.
             return;
         }
+
+        Mapbox.getInstance(this, getString(R.string.mapbox_token));
 
         installLeakCanary();
         initializeInjector();

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -15,19 +15,17 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 
 package org.akvo.flow.presentation.datapoints.map;
 
 import android.Manifest;
-import android.app.Activity;
 import android.content.Context;
-import android.content.pm.PackageManager;
-import android.location.Criteria;
-import android.location.Location;
-import android.location.LocationManager;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.graphics.PointF;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
@@ -38,19 +36,30 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.GoogleMap.OnInfoWindowClickListener;
-import com.google.android.gms.maps.GoogleMapOptions;
-import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.CameraPosition;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.LatLngBounds;
-import com.google.android.gms.maps.model.Marker;
-import com.google.maps.android.clustering.ClusterManager;
+import com.mapbox.geojson.Feature;
+import com.mapbox.geojson.FeatureCollection;
+import com.mapbox.geojson.Point;
+import com.mapbox.mapboxsdk.geometry.LatLng;
+import com.mapbox.mapboxsdk.location.LocationComponent;
+import com.mapbox.mapboxsdk.location.modes.CameraMode;
+import com.mapbox.mapboxsdk.location.modes.RenderMode;
+import com.mapbox.mapboxsdk.maps.MapView;
+import com.mapbox.mapboxsdk.maps.MapboxMap;
+import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
+import com.mapbox.mapboxsdk.maps.Projection;
+import com.mapbox.mapboxsdk.maps.Style;
+import com.mapbox.mapboxsdk.maps.SupportMapFragment;
+import com.mapbox.mapboxsdk.plugins.markerview.MarkerView;
+import com.mapbox.mapboxsdk.plugins.markerview.MarkerViewManager;
+import com.mapbox.mapboxsdk.style.expressions.Expression;
+import com.mapbox.mapboxsdk.style.layers.CircleLayer;
+import com.mapbox.mapboxsdk.style.layers.SymbolLayer;
+import com.mapbox.mapboxsdk.style.sources.GeoJsonOptions;
+import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 
 import org.akvo.flow.R;
 import org.akvo.flow.app.FlowApp;
@@ -65,15 +74,39 @@ import org.akvo.flow.ui.fragment.RecordListListener;
 import org.akvo.flow.util.ConstantUtil;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.inject.Inject;
 
-public class DataPointsMapFragment extends SupportMapFragment implements OnInfoWindowClickListener,
-        OnMapReadyCallback, DataPointsMapView {
+import static android.graphics.Color.rgb;
+import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.all;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.get;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.gt;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.gte;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.has;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.literal;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.lt;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.toNumber;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.circleColor;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.circleRadius;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconColor;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconImage;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textAllowOverlap;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textColor;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textField;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textIgnorePlacement;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textSize;
 
-    private static final int MAP_ZOOM_LEVEL = 10;
-    private static final String MAP_OPTIONS = "MapOptions";
+public class DataPointsMapFragment extends SupportMapFragment implements
+        MapboxMap.OnMapClickListener, OnMapReadyCallback, DataPointsMapView {
+
+    private static final String MARKER_IMAGE = "custom-marker";
+    private static final String SOURCE_ID = "datapoints";
+    private static final String UNCLUSTERED_POINTS = "unclustered-points";
+    private static final String POINT_COUNT = "point_count";
+    private static final String ID_PROPERTY = "id";
 
     @Inject
     DataPointSyncSnackBarManager dataPointSyncSnackBarManager;
@@ -93,19 +126,22 @@ public class DataPointsMapFragment extends SupportMapFragment implements OnInfoW
     private ProgressBar progressBar;
 
     @Nullable
-    private GoogleMap mMap;
+    private MapboxMap mapboxMap;
 
-    private ClusterManager<MapDataPoint> mClusterManager;
     private boolean activityJustCreated;
     private Integer menuRes = null;
+    private GeoJsonSource source;
+    private MarkerView markerView;
+    private MarkerViewManager markerViewManager;
+    private View customView;
+    private TextView titleTextView;
+    private TextView snippetTextView;
+    private MapDataPoint currentSelected = null;
 
     public static DataPointsMapFragment newInstance(SurveyGroup surveyGroup) {
         DataPointsMapFragment fragment = new DataPointsMapFragment();
         Bundle args = new Bundle();
         args.putSerializable(ConstantUtil.SURVEY_GROUP_EXTRA, surveyGroup);
-        GoogleMapOptions options = new GoogleMapOptions();
-        options.zOrderOnTop(true);
-        args.putParcelable(MAP_OPTIONS, options);
         fragment.setArguments(args);
         return fragment;
     }
@@ -118,15 +154,15 @@ public class DataPointsMapFragment extends SupportMapFragment implements OnInfoW
     }
 
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
+    public void onAttach(Context context) {
+        super.onAttach(context);
         // This makes sure that the container activity has implemented
         // the callback interface. If not, it throws an exception
         try {
-            mListener = (RecordListListener) activity;
+            mListener = (RecordListListener) context;
         } catch (ClassCastException e) {
             throw new ClassCastException(
-                    activity.toString() + " must implement RecordListListener");
+                    context.toString() + " must implement RecordListListener");
         }
     }
 
@@ -137,7 +173,7 @@ public class DataPointsMapFragment extends SupportMapFragment implements OnInfoW
         if (view instanceof ViewGroup) {
             ViewGroup viewGroup = (ViewGroup) view;
             View.inflate(getActivity(), R.layout.map_progress_bar, viewGroup);
-            progressBar = (ProgressBar) view.findViewById(R.id.progressBar);
+            progressBar = view.findViewById(R.id.progressBar);
         }
         return view;
     }
@@ -150,6 +186,17 @@ public class DataPointsMapFragment extends SupportMapFragment implements OnInfoW
         SurveyGroup surveyGroup = (SurveyGroup) getArguments()
                 .getSerializable(ConstantUtil.SURVEY_GROUP_EXTRA);
         presenter.onDataReady(surveyGroup);
+        customView = LayoutInflater.from(getActivity()).inflate(
+                R.layout.symbol_layer_info_window_layout_callout, null);
+        customView.setLayoutParams(new FrameLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT));
+        titleTextView = customView.findViewById(R.id.info_window_title);
+        snippetTextView = customView.findViewById(R.id.info_window_description);
+        customView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onInfoWindowClick((String) customView.getTag());
+            }
+        });
         getMapAsync(this);
         activityJustCreated = true;
     }
@@ -166,34 +213,38 @@ public class DataPointsMapFragment extends SupportMapFragment implements OnInfoW
      *
      * @return {@link ApplicationComponent}
      */
+    @SuppressWarnings("ConstantConditions")
     private ApplicationComponent getApplicationComponent() {
         return ((FlowApp) getActivity().getApplication()).getApplicationComponent();
     }
 
     @Override
-    public void onMapReady(GoogleMap googleMap) {
-        mMap = googleMap;
-        configMap();
-        presenter.onViewReady();
+    public void onMapReady(@NonNull MapboxMap mapboxMap) {
+        this.mapboxMap = mapboxMap;
+        this.mapboxMap.addOnMapClickListener(this);
+        markerViewManager = new MarkerViewManager((MapView) getView(), mapboxMap);
+        this.mapboxMap.setStyle(new Style.Builder()
+                .fromUrl("mapbox://styles/mapbox/light-v10"), new Style.OnStyleLoaded() {
+            @Override
+            public void onStyleLoaded(@NonNull Style style) {
+                style.addImage(MARKER_IMAGE, BitmapFactory.decodeResource(
+                        getResources(), R.drawable.marker), true);
+                enableLocationComponent(style);
+                addClusteredGeoJsonSource(style);
+                presenter.onViewReady();
+            }
+        });
     }
 
-    private void configMap() {
-        if (mMap != null) {
-            FragmentActivity activity = getActivity();
-            if (isLocationAllowed()) {
-                mMap.setMyLocationEnabled(true);
-            }
-            mMap.setOnInfoWindowClickListener(this);
-            mClusterManager = new ClusterManager<>(activity, mMap);
-            mClusterManager.setRenderer(new PointRenderer(mMap, activity, mClusterManager));
-            mMap.setOnMarkerClickListener(mClusterManager);
-            mMap.setOnCameraChangeListener(new GoogleMap.OnCameraChangeListener() {
-                @Override
-                public void onCameraChange(CameraPosition cameraPosition) {
-                    cluster();
-                }
-            });
-            centerMapOnUserLocation();
+    @SuppressWarnings({ "MissingPermission" })
+    private void enableLocationComponent(@NonNull Style loadedMapStyle) {
+        Context context = getContext();
+        if (isLocationAllowed() && mapboxMap != null && context != null) {
+            LocationComponent locationComponent = mapboxMap.getLocationComponent();
+            locationComponent.activateLocationComponent(context, loadedMapStyle);
+            locationComponent.setLocationComponentEnabled(true);
+            locationComponent.setCameraMode(CameraMode.TRACKING);
+            locationComponent.setRenderMode(RenderMode.NORMAL);
         }
     }
 
@@ -203,58 +254,174 @@ public class DataPointsMapFragment extends SupportMapFragment implements OnInfoW
                 Manifest.permission.ACCESS_FINE_LOCATION) == PermissionChecker.PERMISSION_GRANTED;
     }
 
-    private void cluster() {
-        if (mMap == null) {
-            return;
+    private void addClusteredGeoJsonSource(@NonNull Style loadedMapStyle) {
+        addGeoJsonSource(loadedMapStyle, getFeatureCollection());
+        addUnClusteredLayer(loadedMapStyle);
+
+        int[][] layers = new int[][] {
+                new int[] { 50, Color.parseColor("#009954") },
+                new int[] { 20, Color.parseColor("#007B99") },
+                new int[] { 0, Color.parseColor("#005899") }
+        };
+
+        for (int i = 0; i < layers.length; i++) {
+            addClusterLayer(loadedMapStyle, layers, i);
         }
-
-        final LatLngBounds bounds = mMap.getProjection().getVisibleRegion().latLngBounds;
-        LatLng ne = bounds.northeast;
-        LatLng sw = bounds.southwest;
-        double latDst = Math.abs(ne.latitude - sw.latitude);
-        double lonDst = Math.abs(ne.longitude - sw.longitude);
-
-        final double scale = 1d;
-        LatLngBounds newBounds =
-                bounds.including(
-                        new LatLng(ne.latitude + latDst / scale, ne.longitude + lonDst / scale))
-                        .including(new LatLng(sw.latitude - latDst / scale,
-                                ne.longitude + lonDst / scale))
-                        .including(new LatLng(sw.latitude - latDst / scale,
-                                sw.longitude - lonDst / scale))
-                        .including(new LatLng(ne.latitude + latDst / scale,
-                                sw.longitude - lonDst / scale));
-
-        mClusterManager.clearItems();
-        for (MapDataPoint item : mItems) {
-            if (item.getPosition() != null && newBounds.contains(item.getPosition())) {
-                mClusterManager.addItem(item);
-            }
-        }
-        mClusterManager.cluster();
+        addCountLabels(loadedMapStyle);
     }
 
-    private void centerMapOnUserLocation() {
-        if (mMap == null) {
-            return;
+    private FeatureCollection getFeatureCollection() {
+        List<Feature> features = new ArrayList<>();
+        for (MapDataPoint item : mItems) {
+            Feature feature = Feature.fromGeometry(
+                    Point.fromLngLat(item.getLongitude(), item.getLatitude()));
+            feature.addStringProperty(ID_PROPERTY, item.getId());
+            features.add(feature);
         }
+        return FeatureCollection.fromFeatures(features);
+    }
 
-        LatLng position = null;
-        LocationManager manager = (LocationManager) getActivity().getApplicationContext()
-                .getSystemService(Context.LOCATION_SERVICE);
-        Criteria criteria = new Criteria();
-        criteria.setAccuracy(Criteria.ACCURACY_FINE);
-        String provider = manager == null ? null : manager.getBestProvider(criteria, true);
-        if (provider != null && isLocationAllowed()) {
-            Location location = manager.getLastKnownLocation(provider);
-            if (location != null) {
-                position = new LatLng(location.getLatitude(), location.getLongitude());
+    private void addGeoJsonSource(@NonNull Style loadedMapStyle,
+            FeatureCollection featureCollection) {
+        source = new GeoJsonSource(SOURCE_ID,
+                featureCollection,
+                new GeoJsonOptions()
+                        .withCluster(true)
+                        .withClusterRadius(50)
+        );
+        loadedMapStyle.addSource(source);
+    }
+
+    private void addUnClusteredLayer(@NonNull Style loadedMapStyle) {
+        SymbolLayer unClustered = new SymbolLayer(UNCLUSTERED_POINTS, SOURCE_ID);
+
+        unClustered.setProperties(
+                iconImage(MARKER_IMAGE),
+                iconColor(
+                        rgb(255, 119, 77)
+                )
+        );
+        loadedMapStyle.addLayer(unClustered);
+    }
+
+    private void addClusterLayer(@NonNull Style loadedMapStyle, int[][] layers, int position) {
+        int layerColor = layers[position][1];
+        CircleLayer circles = new CircleLayer("cluster-" + position, SOURCE_ID);
+        circles.setProperties(
+                circleColor(layerColor),
+                circleRadius(18f)
+        );
+
+        Expression pointCount = toNumber(get(POINT_COUNT));
+
+        // Add a filter to the cluster layer that hides the circles based on "point_count"
+        int minPointsNumber = layers[position][0];
+        circles.setFilter(
+                position == 0
+                        ? all(has(POINT_COUNT),
+                        gte(pointCount, literal(minPointsNumber))
+                ) : all(has(POINT_COUNT),
+                        gt(pointCount, literal(minPointsNumber)),
+                        lt(pointCount, literal(layers[position - 1][0]))
+                )
+        );
+        loadedMapStyle.addLayer(circles);
+    }
+
+    private void addCountLabels(@NonNull Style loadedMapStyle) {
+        SymbolLayer count = new SymbolLayer("count", SOURCE_ID);
+        count.setProperties(
+                textField(Expression.toString(get(POINT_COUNT))),
+                textSize(12f),
+                textColor(Color.WHITE),
+                textIgnorePlacement(true),
+                textAllowOverlap(true)
+        );
+        loadedMapStyle.addLayer(count);
+    }
+
+    @Override
+    public boolean onMapClick(@NonNull LatLng point) {
+        if (mapboxMap != null) {
+            Projection projection = mapboxMap.getProjection();
+            return handlePointClick(projection.toScreenLocation(point));
+        } else {
+            return false;
+        }
+    }
+
+    private boolean handlePointClick(PointF screenPoint) {
+        Feature feature = getSelectedFeature(screenPoint);
+        if (featureSelected(feature)) {
+            return true;
+        }
+        if (currentSelected != null) {
+            unSelectDataPoint();
+            return true;
+        }
+        return false;
+    }
+
+    private boolean featureSelected(@Nullable Feature feature) {
+        if (feature != null && feature.hasNonNullValueForProperty(ID_PROPERTY)) {
+            String id = feature.getStringProperty(ID_PROPERTY);
+            MapDataPoint item = getItem(id);
+            if (item != null) {
+                onDataPointSelected(item);
+                return true;
             }
         }
+        return false;
+    }
 
-        if (position != null) {
-            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(position, MAP_ZOOM_LEVEL));
+    @Nullable
+    private Feature getSelectedFeature(PointF screenPoint) {
+        List<Feature> features = mapboxMap == null ?
+                Collections.<Feature>emptyList() :
+                mapboxMap.queryRenderedFeatures(screenPoint, UNCLUSTERED_POINTS);
+        return features.isEmpty() ? null : features.get(0);
+    }
+
+    @Nullable
+    private MapDataPoint getItem(String selectedItemId) {
+        if (mItems == null || selectedItemId == null) {
+            return null;
         }
+        for (MapDataPoint dp: mItems) {
+            if (selectedItemId.equals(dp.getId())) {
+                return dp;
+            }
+        }
+        return null;
+    }
+
+    private void onDataPointSelected(MapDataPoint dataPoint) {
+        if (currentSelected != null && currentSelected.getId().equals(dataPoint.getId())) {
+            unSelectDataPoint();
+        } else {
+            if (currentSelected != null) {
+                markerViewManager.removeMarker(markerView);
+            }
+            customView.setTag(dataPoint.getId());
+            titleTextView.setText(dataPoint.getName());
+            snippetTextView.setText(dataPoint.getId());
+
+            LatLng latLng = new LatLng(dataPoint.getLatitude(), dataPoint.getLongitude());
+            if (markerView == null) {
+                markerView = new MarkerView(latLng, customView);
+            } else {
+                markerView.setLatLng(latLng);
+            }
+            markerViewManager.addMarker(markerView);
+            currentSelected = dataPoint;
+        }
+    }
+
+    private void unSelectDataPoint() {
+        if (markerView != null) {
+            markerViewManager.removeMarker(markerView);
+        }
+        currentSelected = null;
     }
 
     @Override
@@ -279,7 +446,12 @@ public class DataPointsMapFragment extends SupportMapFragment implements OnInfoW
     }
 
     public void onNewSurveySelected(SurveyGroup surveyGroup) {
-        getArguments().putSerializable(ConstantUtil.SURVEY_GROUP_EXTRA, surveyGroup);
+        Bundle arguments = getArguments();
+        if (arguments == null) {
+            arguments = new Bundle();
+        }
+        arguments.putSerializable(ConstantUtil.SURVEY_GROUP_EXTRA, surveyGroup);
+        setArguments(arguments);
         presenter.onNewSurveySelected(surveyGroup);
     }
 
@@ -319,9 +491,7 @@ public class DataPointsMapFragment extends SupportMapFragment implements OnInfoW
         }
     }
 
-    @Override
-    public void onInfoWindowClick(Marker marker) {
-        final String surveyedLocaleId = marker.getSnippet();
+    private void onInfoWindowClick(String surveyedLocaleId) {
         if (mListener != null) {
             mListener.onRecordSelected(surveyedLocaleId);
         }
@@ -331,7 +501,8 @@ public class DataPointsMapFragment extends SupportMapFragment implements OnInfoW
     public void displayData(List<MapDataPoint> surveyedLocales) {
         mItems.clear();
         mItems.addAll(surveyedLocales);
-        cluster();
+        source.setGeoJson(getFeatureCollection());
+        unSelectDataPoint();
     }
 
     @Override
@@ -355,7 +526,7 @@ public class DataPointsMapFragment extends SupportMapFragment implements OnInfoW
     private void reloadMenu() {
         FragmentActivity activity = getActivity();
         if (activity != null) {
-            activity.supportInvalidateOptionsMenu();
+            activity.invalidateOptionsMenu();
         }
     }
 

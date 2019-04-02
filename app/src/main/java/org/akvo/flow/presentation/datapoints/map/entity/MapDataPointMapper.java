@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017,2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -15,15 +15,12 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 
 package org.akvo.flow.presentation.datapoints.map.entity;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-
-import com.google.android.gms.maps.model.LatLng;
 
 import org.akvo.flow.domain.entity.DataPoint;
 import org.akvo.flow.presentation.datapoints.DisplayNameMapper;
@@ -51,9 +48,9 @@ public class MapDataPointMapper {
             // so no need to add it
             return null;
         }
-        LatLng position = new LatLng(dataPoint.getLatitude(), dataPoint.getLongitude());
         String displayName = displayNameMapper.createDisplayName(dataPoint.getName());
-        return new MapDataPoint(dataPoint.getId(), displayName, position);
+        return new MapDataPoint(dataPoint.getId(), displayName, dataPoint.getLatitude(),
+                dataPoint.getLongitude());
     }
 
     @NonNull

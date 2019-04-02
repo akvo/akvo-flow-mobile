@@ -213,6 +213,7 @@ public class DataPointsMapFragment extends SupportMapFragment implements
      *
      * @return {@link ApplicationComponent}
      */
+    @SuppressWarnings("ConstantConditions")
     private ApplicationComponent getApplicationComponent() {
         return ((FlowApp) getActivity().getApplication()).getApplicationComponent();
     }
@@ -350,24 +351,35 @@ public class DataPointsMapFragment extends SupportMapFragment implements
     }
 
     private boolean handlePointClick(PointF screenPoint) {
-        List<Feature> features = mapboxMap == null ?
-                Collections.<Feature>emptyList() :
-                mapboxMap.queryRenderedFeatures(screenPoint, UNCLUSTERED_POINTS);
-        Feature feature = features.isEmpty() ? null : features.get(0);
+        Feature feature = getSelectedFeature(screenPoint);
         if (feature != null && feature.hasNonNullValueForProperty(ID_PROPERTY)) {
-            String id = feature.getStringProperty(ID_PROPERTY);
-            MapDataPoint item = getItem(id);
-            if (item != null) {
-                onFeaturePressed(item);
+            if (onFeatureSelected(feature)) {
                 return true;
             }
         }
         if (currentSelected != null) {
-            currentSelected = null;
-            markerViewManager.removeMarker(markerView);
+            unSelectDataPoint();
             return true;
         }
         return false;
+    }
+
+    private boolean onFeatureSelected(Feature feature) {
+        String id = feature.getStringProperty(ID_PROPERTY);
+        MapDataPoint item = getItem(id);
+        if (item != null) {
+            onDataPointSelected(item);
+            return true;
+        }
+        return false;
+    }
+
+    @Nullable
+    private Feature getSelectedFeature(PointF screenPoint) {
+        List<Feature> features = mapboxMap == null ?
+                Collections.<Feature>emptyList() :
+                mapboxMap.queryRenderedFeatures(screenPoint, UNCLUSTERED_POINTS);
+        return features.isEmpty() ? null : features.get(0);
     }
 
     @Nullable
@@ -383,34 +395,33 @@ public class DataPointsMapFragment extends SupportMapFragment implements
         return null;
     }
 
-    private void onFeaturePressed(MapDataPoint selectedDataPoint) {
-        if (currentSelected != null && currentSelected.getId().equals(selectedDataPoint.getId())) {
+    private void onDataPointSelected(MapDataPoint dataPoint) {
+        if (currentSelected != null && currentSelected.getId().equals(dataPoint.getId())) {
             unSelectDataPoint();
         } else {
             if (currentSelected != null) {
                 markerViewManager.removeMarker(markerView);
             }
-            customView.setTag(selectedDataPoint.getId());
-            titleTextView.setText(selectedDataPoint.getName());
-            snippetTextView.setText(selectedDataPoint.getId());
+            customView.setTag(dataPoint.getId());
+            titleTextView.setText(dataPoint.getName());
+            snippetTextView.setText(dataPoint.getId());
 
-            LatLng latLng = new LatLng(selectedDataPoint.getLatitude(),
-                    selectedDataPoint.getLongitude());
+            LatLng latLng = new LatLng(dataPoint.getLatitude(), dataPoint.getLongitude());
             if (markerView == null) {
                 markerView = new MarkerView(latLng, customView);
             } else {
                 markerView.setLatLng(latLng);
             }
             markerViewManager.addMarker(markerView);
-            currentSelected = selectedDataPoint;
+            currentSelected = dataPoint;
         }
     }
 
     private void unSelectDataPoint() {
         if (markerView != null) {
             markerViewManager.removeMarker(markerView);
-            currentSelected = null;
         }
+        currentSelected = null;
     }
 
     @Override
@@ -435,7 +446,12 @@ public class DataPointsMapFragment extends SupportMapFragment implements
     }
 
     public void onNewSurveySelected(SurveyGroup surveyGroup) {
-        getArguments().putSerializable(ConstantUtil.SURVEY_GROUP_EXTRA, surveyGroup);
+        Bundle arguments = getArguments();
+        if (arguments == null) {
+            arguments = new Bundle();
+        }
+        arguments.putSerializable(ConstantUtil.SURVEY_GROUP_EXTRA, surveyGroup);
+        setArguments(arguments);
         presenter.onNewSurveySelected(surveyGroup);
     }
 
@@ -475,7 +491,7 @@ public class DataPointsMapFragment extends SupportMapFragment implements
         }
     }
 
-    public void onInfoWindowClick(String surveyedLocaleId) {
+    private void onInfoWindowClick(String surveyedLocaleId) {
         if (mListener != null) {
             mListener.onRecordSelected(surveyedLocaleId);
         }

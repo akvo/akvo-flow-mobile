@@ -90,6 +90,7 @@ android {
         release {
             minifyEnabled true
             multiDexEnabled true
+            shrinkResources true
             proguardFile 'proguard-files/proguard-rules.pro'
             proguardFile 'proguard-files/proguard-butterknife.pro'
             proguardFile 'proguard-files/proguard-glide.pro'

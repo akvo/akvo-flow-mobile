@@ -33,6 +33,7 @@ before_install:
   - git remote set-url origin https://$GITHUB_USER:$GITHUB_API_KEY@github.com/akvo/akvo-flow-mobile.git
   - echo "android.useAndroidX=true" >> gradle.properties
   - echo "android.enableJetifier=true" >> gradle.properties
+  - echo "android.enableR8=false" >> gradle.properties
   - chmod +x fastlane/deploy_beta.sh
   - chmod +x travis/deploy_release.sh
 

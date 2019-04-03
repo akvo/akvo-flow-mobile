@@ -20,6 +20,8 @@
 
 package org.akvo.flow.activity;
 
+import android.Manifest;
+
 import org.akvo.flow.R;
 import org.akvo.flow.activity.form.data.SurveyRequisite;
 import org.junit.BeforeClass;
@@ -31,6 +33,7 @@ import androidx.test.InstrumentationRegistry;
 import androidx.test.espresso.ViewInteraction;
 import androidx.test.filters.MediumTest;
 import androidx.test.rule.ActivityTestRule;
+import androidx.test.rule.GrantPermissionRule;
 import androidx.test.runner.AndroidJUnit4;
 
 import static androidx.test.espresso.Espresso.onView;
@@ -53,6 +56,18 @@ public class AddUserActivityTest {
     @Rule
     public ActivityTestRule<AddUserActivity> mActivityTestRule = new ActivityTestRule<>(
             AddUserActivity.class);
+
+    @Rule
+    public GrantPermissionRule permissionRule = GrantPermissionRule
+            .grant(android.Manifest.permission.ACCESS_FINE_LOCATION);
+
+    @Rule
+    public GrantPermissionRule permissionRule2 = GrantPermissionRule
+            .grant(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+
+    @Rule
+    public GrantPermissionRule permissionRule3 = GrantPermissionRule
+            .grant(Manifest.permission.READ_PHONE_STATE);
 
     @BeforeClass
     public static void beforeClass() {

@@ -38,7 +38,7 @@ ext {
     leakCanaryVersion = "1.6.1"
     loggingInterceptorVersion = "3.14.0"
     mapboxMarkerVersion = "0.2.0"
-    mapboxVersion = "7.2.0"
+    mapboxVersion = "7.3.0"
     mapUtilsVersion = "0.5"
     prettyTimeVersion = "3.2.4.Final"
     rxAndroidVersion = "2.0.1"
@@ -80,6 +80,3 @@ task clean(type: Delete) {
     delete rootProject.buildDir
 }
 apply plugin: 'checkstyle'
-
-dependencies {
-}

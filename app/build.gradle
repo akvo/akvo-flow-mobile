@@ -102,6 +102,8 @@ android {
             proguardFile 'proguard-files/proguard-sentry.pro'
             proguardFile 'proguard-files/proguard-square-retrofit.pro'
             proguardFile 'proguard-files/proguard-support-v7-appcompat.pro'
+            proguardFile 'proguard-files/okhttp3.pro'
+            proguardFile 'proguard-files/mapbox.pro'
             proguardFile getDefaultProguardFile('proguard-android.txt')
             signingConfig signingConfigs.flowRelease
         }

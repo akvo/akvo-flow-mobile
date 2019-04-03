@@ -36,7 +36,7 @@ ext {
     gmsVersion = "15.0.1"
     gsonVersion = "2.8.2"
     leakCanaryVersion = "1.6.1"
-    loggingInterceptorVersion = "3.14.0"
+    loggingInterceptorVersion = "3.12.1"
     mapboxMarkerVersion = "0.2.0"
     mapboxVersion = "7.3.0"
     mapUtilsVersion = "0.5"

@@ -30,7 +30,7 @@ android:
 before_install:
   - openssl aes-256-cbc -K $encrypted_b2f5a33a8343_key -iv $encrypted_b2f5a33a8343_iv -in build_config.enc -out build_config -d
   - tar xvf build_config
-  - gem install fastlane --necho no | android create avd --force -n test -t android-24 --abi arm64-v8ao-rdoc --no-ri --no-document --quiet
+  - gem install fastlane --no-rdoc --no-ri --no-document --quiet
   - git remote set-url origin https://$GITHUB_USER:$GITHUB_API_KEY@github.com/akvo/akvo-flow-mobile.git
   - echo "android.useAndroidX=true" >> gradle.properties
   - echo "android.enableJetifier=true" >> gradle.properties

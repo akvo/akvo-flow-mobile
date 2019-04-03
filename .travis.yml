@@ -34,6 +34,7 @@ before_install:
   - echo "android.useAndroidX=true" >> gradle.properties
   - echo "android.enableJetifier=true" >> gradle.properties
   - echo "android.enableR8=false" >> gradle.properties
+  - echo "android.enableR8=false" >> app/gradle.properties
   - chmod +x fastlane/deploy_beta.sh
   - chmod +x travis/deploy_release.sh
 

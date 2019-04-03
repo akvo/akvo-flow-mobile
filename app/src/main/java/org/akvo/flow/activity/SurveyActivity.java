@@ -153,7 +153,7 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.survey_activity);
-        Mapbox.getInstance(this, getString(R.string.mapbox_token));
+
         initializeInjector();
         ButterKnife.bind(this);
 

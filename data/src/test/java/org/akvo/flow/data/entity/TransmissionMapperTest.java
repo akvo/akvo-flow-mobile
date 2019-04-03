@@ -21,7 +21,6 @@
 package org.akvo.flow.data.entity;
 
 import android.database.Cursor;
-import android.test.suitebuilder.annotation.SmallTest;
 
 import org.akvo.flow.database.TransmissionColumns;
 import org.junit.Test;
@@ -37,7 +36,6 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doNothing;
 
-@SmallTest
 @RunWith(PowerMockRunner.class)
 public class TransmissionMapperTest {
 

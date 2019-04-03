@@ -19,8 +19,6 @@
 
 package org.akvo.flow.domain.util;
 
-import android.test.suitebuilder.annotation.SmallTest;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.modules.junit4.PowerMockRunner;
@@ -28,7 +26,6 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import static junit.framework.Assert.assertNull;
 import static org.junit.Assert.assertEquals;
 
-@SmallTest
 @RunWith(PowerMockRunner.class)
 public class TextValueCleanerTest {
 

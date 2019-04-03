@@ -21,7 +21,6 @@
 package org.akvo.flow.data.entity;
 
 import android.database.Cursor;
-import android.test.suitebuilder.annotation.SmallTest;
 
 import org.akvo.flow.data.entity.form.FormIdMapper;
 import org.junit.Test;
@@ -40,7 +39,6 @@ import static org.mockito.Mockito.verify;
 import static org.powermock.api.mockito.PowerMockito.doNothing;
 import static org.powermock.api.mockito.PowerMockito.when;
 
-@SmallTest
 @RunWith(PowerMockRunner.class)
 public class FormIdMapperTest {
 

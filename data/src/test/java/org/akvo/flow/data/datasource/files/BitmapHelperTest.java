@@ -20,7 +20,6 @@
 package org.akvo.flow.data.datasource.files;
 
 import android.graphics.Bitmap;
-import android.test.suitebuilder.annotation.SmallTest;
 
 import org.akvo.flow.data.util.FileHelper;
 import org.junit.Before;
@@ -39,7 +38,6 @@ import static org.mockito.Matchers.anyInt;
 import static org.powermock.api.mockito.PowerMockito.doNothing;
 import static org.powermock.api.mockito.PowerMockito.when;
 
-@SmallTest
 @RunWith(PowerMockRunner.class)
 public class BitmapHelperTest {
 

@@ -19,7 +19,6 @@
 
 package org.akvo.flow.data.entity;
 
-import android.test.suitebuilder.annotation.SmallTest;
 import android.text.TextUtils;
 
 import org.akvo.flow.data.entity.form.FormHeaderParser;
@@ -41,7 +40,6 @@ import static junit.framework.TestCase.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.powermock.api.mockito.PowerMockito.when;
 
-@SmallTest
 @PrepareForTest(TextUtils.class)
 @RunWith(PowerMockRunner.class)
 public class FormHeaderParserTest {

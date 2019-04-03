@@ -20,7 +20,6 @@
 
 package org.akvo.flow.data.net.s3;
 
-import android.test.suitebuilder.annotation.SmallTest;
 import android.util.Base64;
 
 import org.akvo.flow.data.entity.S3File;
@@ -37,7 +36,6 @@ import static org.junit.Assert.assertEquals;
 import static org.powermock.api.mockito.PowerMockito.spy;
 import static org.powermock.api.mockito.PowerMockito.when;
 
-@SmallTest
 @RunWith(PowerMockRunner.class)
 public class AmazonAuthHelperTest {
 

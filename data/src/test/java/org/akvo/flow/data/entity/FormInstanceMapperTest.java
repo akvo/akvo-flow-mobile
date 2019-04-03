@@ -20,8 +20,6 @@
 package org.akvo.flow.data.entity;
 
 import android.database.Cursor;
-import androidx.core.util.Pair;
-import android.test.suitebuilder.annotation.SmallTest;
 import android.text.TextUtils;
 
 import org.akvo.flow.data.util.FileHelper;
@@ -41,6 +39,8 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import java.util.List;
 import java.util.Set;
 
+import androidx.core.util.Pair;
+
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertNull;
@@ -53,7 +53,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.powermock.api.mockito.PowerMockito.when;
 
-@SmallTest
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(TextUtils.class)
 public class FormInstanceMapperTest {

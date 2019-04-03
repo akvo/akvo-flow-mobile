@@ -39,7 +39,7 @@ before_install:
   - chmod +x travis/deploy_release.sh
 
 before_script:
-    - echo no | android create avd --force -n test -t android-21 --abi armeabi-v7a -c 2048M
+    - echo no | android create avd --force -n test -t android-24 --abi arm64-v8a -c 2048M
     - mksdcard -l sdcard 2048M sdcard
     - emulator -avd test -no-audio -no-window -sdcard sdcard &
     - android-wait-for-emulator

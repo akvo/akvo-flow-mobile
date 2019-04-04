@@ -24,6 +24,7 @@ android:
     - extra-android-support
     - extra-google-m2repository
     - extra-android-m2repository
+    - sys-img-armeabi-v7a-addon-google_apis-google-21
   licenses:
     - 'android-sdk-preview-license-.+'
     - 'android-sdk-license-.+'
@@ -42,7 +43,7 @@ before_install:
   - chmod +x travis/deploy_release.sh
 
 before_script:
-    - echo no | android create avd --force -n test -t android-21 --abi armeabi-v7a -c 2048M
+    - echo no | android create avd --force -n test -t android-21 --abi google_apis/armeabi-v7a -c 2048M
     - mksdcard -l sdcard 2048M sdcard
     - emulator -avd test -no-audio -no-window -sdcard sdcard &
     - android-wait-for-emulator

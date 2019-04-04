@@ -27,7 +27,6 @@ import android.database.Cursor;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.mapbox.mapboxsdk.Mapbox;
 
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.DialogFragment;

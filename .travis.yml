@@ -2,7 +2,7 @@ language: android
 sudo: required
 env:
   global:
-    - SYS=25 ABI="google_apis;arm64-v8a"
+    - ADB_INSTALL_TIMEOUT=8 # 8 minutes (2 minutes by default)
     - GITHUB_USER=valllllll2000
     - secure: "bh/ISP3IKy+eoWOY3mWjPn3lEoc8bUCZGbSl92/QXUMQQfiCZJRgVmsZfuCBnByzl2t9F/wTZQfnTTsYF0fpX9wCrp+S9nfmlujhFTkN1uc2SVJrh0Ecf2adWZun18SXuUaI6vuNNwVBDu+YAm22BggM5/9IH0dgER9+Zb3z+rc="
     - secure: "Okh2Xw70CDccPKQsHa0LP44QD4fguY53EsKlkj4Gh7uu2+HQohoGYF7o4naD18tuHL2Kpg0uM/i4IJvq53OCwTK0ZNhE+OzjQpD4kh0PMYi5/NQNckaHdOtPaeAw+8x+/MEmuHCji3figTYeRtC35LRD0UYT0hw0t/Kp6OfWesc="
@@ -18,13 +18,14 @@ addons:
 android:
   components:
     - tools
-    - build-tools-28.0.3
+    - build-tools-28.0.2
     - android-28
+    - android-21
     - extra-android-support
     - extra-google-m2repository
     - extra-android-m2repository
   licenses:
-    - 'android-sdk-preview-license-52d11cd2'
+    - 'android-sdk-preview-license-.+'
     - 'android-sdk-license-.+'
     - 'google-gdk-license-.+'
 
@@ -39,25 +40,11 @@ before_install:
   - echo "android.enableR8=false" >> app/gradle.properties
   - chmod +x fastlane/deploy_beta.sh
   - chmod +x travis/deploy_release.sh
-  - export ANDROID_HOME=~/android-sdk-linux
-  - wget -q "https://dl.google.com/android/repository/sdk-tools-linux-4333796.zip" -O android-sdk-tools.zip
-  - unzip -q android-sdk-tools.zip -d ${ANDROID_HOME}
-  - rm android-sdk-tools.zip
-  - mkdir -p ~/.android
-  - touch ~/.android/repositories.cfg
-  - yes | sdkmanager --licenses
-  - sdkmanager "emulator" "tools" "platform-tools" > /dev/null
-  - sdkmanager --list | head -15
-  - sdkmanager "build-tools;25.0.2" "platforms;android-25" > /dev/null
-  - sdkmanager "system-images;android-$SYS;$ABI" > /dev/null
-  - sdkmanager --list | head -15
-  - echo no | avdmanager create avd --force -n test -k "system-images;android-$SYS;$ABI"
-  - $ANDROID_HOME/emulator/emulator -avd test -no-audio -no-window -gpu swiftshader &
 
 before_script:
-    #- echo no | android create avd --force -n test -t android-25 --abi google_apis;arm64-v8a -c 2048M
-    #- mksdcard -l sdcard 2048M sdcard
-    #- emulator -avd test -no-audio -no-window -sdcard sdcard &
+    - echo no | android create avd --force -n test -t android-21 --abi armeabi-v7a -c 2048M
+    - mksdcard -l sdcard 2048M sdcard
+    - emulator -avd test -no-audio -no-window -sdcard sdcard &
     - android-wait-for-emulator
     - adb shell settings put global window_animation_scale 0 &
     - adb shell settings put global transition_animation_scale 0 &

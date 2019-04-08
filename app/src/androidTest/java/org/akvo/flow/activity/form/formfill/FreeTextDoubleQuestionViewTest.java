@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017,2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -22,13 +22,6 @@ package org.akvo.flow.activity.form.formfill;
 
 import android.content.Context;
 import android.content.Intent;
-import androidx.annotation.NonNull;
-import androidx.annotation.StringRes;
-import androidx.test.InstrumentationRegistry;
-import androidx.test.espresso.Espresso;
-import androidx.test.filters.MediumTest;
-import androidx.test.rule.ActivityTestRule;
-import androidx.test.runner.AndroidJUnit4;
 
 import org.akvo.flow.R;
 import org.akvo.flow.activity.FormActivity;
@@ -41,18 +34,27 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.StringRes;
+import androidx.test.InstrumentationRegistry;
+import androidx.test.espresso.Espresso;
+import androidx.test.filters.MediumTest;
+import androidx.test.rule.ActivityTestRule;
+import androidx.test.runner.AndroidJUnit4;
+
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.typeText;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
-import static androidx.test.espresso.matcher.ViewMatchers.hasErrorText;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.clickNext;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.fillFreeTextQuestion;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.getFormActivityIntent;
+import static org.akvo.flow.activity.form.FormActivityTestUtil.hasErrorText;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.verifyQuestionTitleDisplayed;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.verifySubmitButtonDisabled;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.verifySubmitButtonEnabled;
 import static org.akvo.flow.tests.R.raw.freetext_double_entry_form;
+import static org.hamcrest.Matchers.is;
 
 @MediumTest
 @RunWith(AndroidJUnit4.class)
@@ -90,7 +92,7 @@ public class FreeTextDoubleQuestionViewTest {
     }
 
     @Test
-    public void ensureCannotSubmitIfSecondEntryMissing() throws Exception {
+    public void ensureCannotSubmitIfSecondEntryMissing() {
         verifyQuestionTitleDisplayed();
         fillFreeTextQuestion("This is an answer to your question");
         clickNext();
@@ -98,7 +100,7 @@ public class FreeTextDoubleQuestionViewTest {
     }
 
     @Test
-    public void ensureCannotSubmitEmptyFreeText() throws Exception {
+    public void ensureCannotSubmitEmptyFreeText() {
         verifyQuestionTitleDisplayed();
         fillFreeTextQuestion("");
         clickNext();
@@ -106,7 +108,7 @@ public class FreeTextDoubleQuestionViewTest {
     }
 
     @Test
-    public void ensureCannotSubmitDifferentAnswers() throws Exception {
+    public void ensureCannotSubmitDifferentAnswers() {
         verifyQuestionTitleDisplayed();
 
         fillFreeTextQuestion("This is an answer to your question");
@@ -119,7 +121,7 @@ public class FreeTextDoubleQuestionViewTest {
     }
 
     @Test
-    public void ensureCanSubmitCorrectQuestion() throws Exception {
+    public void ensureCanSubmitCorrectQuestion() {
         verifyQuestionTitleDisplayed();
 
         fillFreeTextQuestion("This is an answer to your question");
@@ -130,8 +132,9 @@ public class FreeTextDoubleQuestionViewTest {
     }
 
     private void verifyDoubleEntryMisMatchErrorDisplayed() {
+        String expectedError = getString(R.string.error_answer_match);
         onView(withId(R.id.double_entry_et))
-                .check(matches(hasErrorText(getString(R.string.error_answer_match))));
+                .check(matches(hasErrorText(is(expectedError))));
     }
 
     private void fillDoubleEntry(String text) {

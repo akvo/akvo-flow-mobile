@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017,2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -22,13 +22,6 @@ package org.akvo.flow.activity.form.formfill;
 
 import android.content.Context;
 import android.content.Intent;
-import androidx.annotation.NonNull;
-import androidx.annotation.StringRes;
-import androidx.test.InstrumentationRegistry;
-import androidx.test.espresso.Espresso;
-import androidx.test.filters.MediumTest;
-import androidx.test.rule.ActivityTestRule;
-import androidx.test.runner.AndroidJUnit4;
 
 import org.akvo.flow.R;
 import org.akvo.flow.activity.FormActivity;
@@ -45,10 +38,18 @@ import org.junit.runner.RunWith;
 
 import java.io.IOException;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.StringRes;
+import androidx.test.InstrumentationRegistry;
+import androidx.test.espresso.Espresso;
+import androidx.test.filters.MediumTest;
+import androidx.test.rule.ActivityTestRule;
+import androidx.test.runner.AndroidJUnit4;
+
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.typeText;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
-import static androidx.test.espresso.matcher.ViewMatchers.hasErrorText;
+import static org.akvo.flow.activity.form.FormActivityTestUtil.hasErrorText;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.clickNext;
@@ -57,6 +58,7 @@ import static org.akvo.flow.activity.form.FormActivityTestUtil.getFormActivityIn
 import static org.akvo.flow.activity.form.FormActivityTestUtil.verifySubmitButtonDisabled;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.verifySubmitButtonEnabled;
 import static org.akvo.flow.tests.R.raw.number_form;
+import static org.hamcrest.CoreMatchers.is;
 
 @MediumTest
 @RunWith(AndroidJUnit4.class)
@@ -120,21 +122,21 @@ public class NumberQuestionViewTest {
     }
 
     @Test
-    public void ensureCannotEnterText() throws Exception {
+    public void ensureCannotEnterText() {
         fillFreeTextQuestion("This is an answer to your question");
 
         onView(withId(R.id.input_et)).check(matches(withText("")));
     }
 
     @Test
-    public void ensureCannotEnterSigned() throws Exception {
+    public void ensureCannotEnterSigned() {
         fillFreeTextQuestion("-1");
 
         onView(withId(R.id.input_et)).check(matches(withText("1")));
     }
 
     @Test
-    public void ensureCannotEnterDecimal() throws Exception {
+    public void ensureCannotEnterDecimal() {
         fillFreeTextQuestion("1.1");
 
         onView(withId(R.id.input_et)).check(matches(withText("11")));
@@ -149,13 +151,13 @@ public class NumberQuestionViewTest {
     private void verifyNumberTooLargeErrorShown() {
         int maxValue = getValidationRule().getMaxVal().intValue();
         String tooLargeError = getString(R.string.toolargeerr);
-        onView(withId(R.id.input_et)).check(matches(hasErrorText(tooLargeError + maxValue)));
+        onView(withId(R.id.input_et)).check(matches(hasErrorText(is(tooLargeError + maxValue))));
     }
 
     private void verifyNumberTooSmallErrorShown() {
         int minValue = getValidationRule().getMinVal().intValue();
         String tooSmallError = getString(R.string.toosmallerr);
-        onView(withId(R.id.input_et)).check(matches(hasErrorText(tooSmallError + minValue)));
+        onView(withId(R.id.input_et)).check(matches(hasErrorText(is(tooSmallError + minValue))));
     }
 
     private ValidationRule getValidationRule() {

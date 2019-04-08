@@ -22,13 +22,8 @@ package org.akvo.flow.activity.form;
 
 import android.content.Context;
 import android.content.Intent;
-import androidx.annotation.NonNull;
-import androidx.annotation.StringRes;
-import androidx.test.InstrumentationRegistry;
-import androidx.test.espresso.Espresso;
-import androidx.test.espresso.ViewInteraction;
-import androidx.test.rule.ActivityTestRule;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.RadioGroup;
 
 import org.akvo.flow.R;
@@ -44,8 +39,17 @@ import org.akvo.flow.ui.view.FreetextQuestionView;
 import org.akvo.flow.ui.view.QuestionView;
 import org.akvo.flow.ui.view.geolocation.GeoQuestionView;
 import org.akvo.flow.util.ConstantUtil;
+import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.core.IsInstanceOf;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.StringRes;
+import androidx.test.InstrumentationRegistry;
+import androidx.test.espresso.Espresso;
+import androidx.test.espresso.ViewInteraction;
+import androidx.test.espresso.matcher.BoundedMatcher;
+import androidx.test.rule.ActivityTestRule;
 
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
@@ -60,6 +64,7 @@ import static androidx.test.espresso.matcher.ViewMatchers.isEnabled;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withTagValue;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
+import static com.google.android.gms.common.internal.Preconditions.checkNotNull;
 import static org.akvo.flow.activity.ChildPositionMatcher.childAtPosition;
 import static org.akvo.flow.activity.ToolBarTitleSubtitleMatcher.withToolbarSubtitle;
 import static org.akvo.flow.activity.ToolBarTitleSubtitleMatcher.withToolbarTitle;
@@ -309,5 +314,23 @@ public class FormActivityTestUtil {
             ActivityTestRule<FormActivity> rule) {
         return rule.getActivity().getApplicationContext().getResources()
                 .getString(stringResId);
+    }
+
+    public static Matcher<View> hasErrorText(final Matcher<String> stringMatcher) {
+        checkNotNull(stringMatcher);
+        return new BoundedMatcher<View, EditText>(EditText.class) {
+
+            @Override
+            public void describeTo(Description description) {
+                description.appendText("with error: ");
+                stringMatcher.describeTo(description);
+            }
+
+            @Override
+            protected boolean matchesSafely(EditText view) {
+                if (view.getError() == null) return stringMatcher.matches(view.getError());
+                return stringMatcher.matches(view.getError().toString());
+            }
+        };
     }
 }

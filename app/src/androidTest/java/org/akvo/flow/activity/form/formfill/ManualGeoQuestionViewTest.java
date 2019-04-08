@@ -45,7 +45,7 @@ import static androidx.test.espresso.Espresso.closeSoftKeyboard;
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.typeText;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
-import static androidx.test.espresso.matcher.ViewMatchers.hasErrorText;
+import static org.akvo.flow.activity.form.FormActivityTestUtil.hasErrorText;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.clickNext;
@@ -54,6 +54,7 @@ import static org.akvo.flow.activity.form.FormActivityTestUtil.getString;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.verifySubmitButtonDisabled;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.verifySubmitButtonEnabled;
 import static org.akvo.flow.tests.R.raw.geo_form;
+import static org.hamcrest.CoreMatchers.is;
 
 @MediumTest
 @RunWith(AndroidJUnit4.class)
@@ -130,7 +131,7 @@ public class ManualGeoQuestionViewTest {
         closeSoftKeyboard();
 
         onView(withId(R.id.lat_et))
-                .check(matches(hasErrorText(getString(R.string.invalid_latitude, rule))));
+                .check(matches(hasErrorText(is(getString(R.string.invalid_latitude, rule)))));
     }
 
     @Test
@@ -139,7 +140,7 @@ public class ManualGeoQuestionViewTest {
         closeSoftKeyboard();
 
         onView(withId(R.id.lat_et))
-                .check(matches(hasErrorText(getString(R.string.invalid_latitude, rule))));
+                .check(matches(hasErrorText(is(getString(R.string.invalid_latitude, rule)))));
     }
 
     @Test
@@ -148,7 +149,7 @@ public class ManualGeoQuestionViewTest {
         closeSoftKeyboard();
 
         onView(withId(R.id.lon_et))
-                .check(matches(hasErrorText(getString(R.string.invalid_longitude, rule))));
+                .check(matches(hasErrorText(is(getString(R.string.invalid_longitude, rule)))));
     }
 
     @Test
@@ -157,7 +158,7 @@ public class ManualGeoQuestionViewTest {
         closeSoftKeyboard();
 
         onView(withId(R.id.lon_et))
-                .check(matches(hasErrorText(getString(R.string.invalid_longitude, rule))));
+                .check(matches(hasErrorText(is(getString(R.string.invalid_longitude, rule)))));
     }
 
     @Test
@@ -166,7 +167,7 @@ public class ManualGeoQuestionViewTest {
         closeSoftKeyboard();
 
         onView(withId(R.id.height_et))
-                .check(matches(hasErrorText(getString(R.string.invalid_elevation, rule))));
+                .check(matches(hasErrorText(is(getString(R.string.invalid_elevation, rule)))));
     }
 
     @Test
@@ -175,7 +176,7 @@ public class ManualGeoQuestionViewTest {
         closeSoftKeyboard();
 
         onView(withId(R.id.height_et))
-                .check(matches(hasErrorText(getString(R.string.invalid_elevation, rule))));
+                .check(matches(hasErrorText(is(getString(R.string.invalid_elevation, rule)))));
     }
 
     @Test

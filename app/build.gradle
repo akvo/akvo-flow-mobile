@@ -223,6 +223,7 @@ dependencies {
     debugImplementation "com.squareup.leakcanary:leakcanary-support-fragment:${rootProject.ext.leakCanaryVersion}"
 
     implementation "com.android.support:multidex:${rootProject.ext.multidexVersion}"
+    implementation 'com.google.firebase:firebase-analytics:15.0.2'
 
     testImplementation "junit:junit:${rootProject.ext.jUnitVersion}"
     testImplementation "org.mockito:mockito-core:${rootProject.ext.mockitoCoreVersion}"
@@ -255,4 +256,6 @@ dependencies {
     implementation project(':domain')
     implementation project(':data')
     implementation project(':database')
+
+    apply plugin: 'com.google.gms.google-services'
 }

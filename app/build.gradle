@@ -223,7 +223,7 @@ dependencies {
     debugImplementation "com.squareup.leakcanary:leakcanary-support-fragment:${rootProject.ext.leakCanaryVersion}"
 
     implementation "com.android.support:multidex:${rootProject.ext.multidexVersion}"
-    implementation 'com.google.firebase:firebase-analytics:15.0.2'
+    implementation "com.google.firebase:firebase-analytics:${rootProject.ext.firebaseVersion}"
 
     testImplementation "junit:junit:${rootProject.ext.jUnitVersion}"
     testImplementation "org.mockito:mockito-core:${rootProject.ext.mockitoCoreVersion}"

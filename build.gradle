@@ -33,6 +33,7 @@ ext {
     leakCanaryVersion = "1.6.1"
     loggingInterceptorVersion = "3.6.0"
     mapUtilsVersion = "0.5"
+    multidexVersion = "1.0.3"
     prettyTimeVersion = "3.2.4.Final"
     rxAndroidVersion = "2.0.1"
     rxJavaVersion = "2.1.0"
@@ -40,7 +41,7 @@ ext {
     sqlbriteVersion = "2.0.0"
     supportVersion = "27.1.1"
     timberVersion = "4.5.1"
-    multidexVersion = "1.0.3"
+    firebaseVersion = "15.0.2"
 
     jUnitVersion = "4.12"
     mockServerVersion = "3.12.1"

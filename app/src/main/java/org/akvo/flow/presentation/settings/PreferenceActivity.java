@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -47,6 +47,7 @@ import org.akvo.flow.presentation.settings.passcode.PassCodeDeleteCollectedDialo
 import org.akvo.flow.presentation.settings.passcode.PassCodeDownloadFormDialog;
 import org.akvo.flow.presentation.settings.passcode.PassCodeReloadFormsDialog;
 import org.akvo.flow.service.DataPointUploadService;
+import org.akvo.flow.tracking.TrackingHelper;
 import org.akvo.flow.ui.Navigator;
 
 import java.util.Arrays;
@@ -108,6 +109,7 @@ public class PreferenceActivity extends BackActivity implements PreferenceView,
 
     private List<String> languages;
     private boolean trackChanges = false;
+    private TrackingHelper trackingHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -120,6 +122,7 @@ public class PreferenceActivity extends BackActivity implements PreferenceView,
         updateProgressDrawable();
         languages = Arrays.asList(getResources().getStringArray(R.array.app_language_codes));
         presenter.setView(this);
+        trackingHelper = new TrackingHelper(this);
         presenter.loadPreferences(languages);
     }
 
@@ -176,6 +179,9 @@ public class PreferenceActivity extends BackActivity implements PreferenceView,
     @OnClick(R.id.send_data_points)
     void onDataPointSendTap() {
         DataPointUploadService.scheduleUpload(getApplicationContext(), enableDataSc.isChecked());
+        if (trackingHelper != null) {
+            trackingHelper.logUploadDataEvent();
+        }
         finish();
     }
 
@@ -213,11 +219,17 @@ public class PreferenceActivity extends BackActivity implements PreferenceView,
 
     @OnClick(R.id.preference_gps_fixes)
     void onGpsFixesTap() {
+        if (trackingHelper != null) {
+            trackingHelper.logGpsFixesEvent();
+        }
         navigator.navigateToGpsFixes(this);
     }
 
     @OnClick(R.id.preference_storage)
     void onCheckSdCardStateOptionTap() {
+        if (trackingHelper != null) {
+            trackingHelper.logStorageEvent();
+        }
         navigator.navigateToStorageSettings(this);
     }
 

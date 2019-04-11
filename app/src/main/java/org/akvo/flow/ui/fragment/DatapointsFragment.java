@@ -40,7 +40,7 @@ import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
 import org.akvo.flow.presentation.datapoints.list.DataPointsListFragment;
 import org.akvo.flow.presentation.datapoints.map.DataPointsMapFragment;
-import org.akvo.flow.tracking.TrackingListener;
+import org.akvo.flow.tracking.DataPointsListTrackingListener;
 import org.akvo.flow.util.ConstantUtil;
 
 import java.util.Map;
@@ -64,7 +64,7 @@ public class DatapointsFragment extends Fragment {
 
     private ViewPager mPager;
 
-    private TrackingListener trackingListener;
+    private DataPointsListTrackingListener dataPointsListTrackingListener;
 
     public DatapointsFragment() {
     }
@@ -80,17 +80,17 @@ public class DatapointsFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (! (context instanceof TrackingListener)) {
-            throw new IllegalArgumentException("Activity must implement TrackingListener");
+        if (! (context instanceof DataPointsListTrackingListener)) {
+            throw new IllegalArgumentException("Activity must implement DataPointsListTrackingListener");
         } else {
-            trackingListener = (TrackingListener) context;
+            dataPointsListTrackingListener = (DataPointsListTrackingListener) context;
         }
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        trackingListener = null;
+        dataPointsListTrackingListener = null;
     }
 
     @Override
@@ -163,8 +163,8 @@ public class DatapointsFragment extends Fragment {
             dialogFragment.show(getFragmentManager(), STATS_DIALOG_FRAGMENT_TAG);
             int selectedTab = mPager.getCurrentItem();
 
-            if (trackingListener != null) {
-                trackingListener.logStatsEvent(selectedTab);
+            if (dataPointsListTrackingListener != null) {
+                dataPointsListTrackingListener.logStatsEvent(selectedTab);
             }
             return true;
         }

@@ -72,8 +72,8 @@ import org.akvo.flow.service.BootstrapService;
 import org.akvo.flow.service.DataFixService;
 import org.akvo.flow.service.SurveyDownloadService;
 import org.akvo.flow.service.TimeCheckService;
+import org.akvo.flow.tracking.DataPointsListTrackingListener;
 import org.akvo.flow.tracking.TrackingHelper;
-import org.akvo.flow.tracking.TrackingListener;
 import org.akvo.flow.ui.Navigator;
 import org.akvo.flow.ui.fragment.DatapointsFragment;
 import org.akvo.flow.ui.fragment.RecordListListener;
@@ -97,7 +97,7 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
         FlowNavigationView.DrawerNavigationListener,
         SurveyDeleteConfirmationDialog.SurveyDeleteListener, UserOptionsDialog.UserOptionListener,
         UserDeleteConfirmationDialog.UserDeleteListener, EditUserDialog.EditUserListener,
-        CreateUserDialog.CreateUserListener, SurveyView, TrackingListener {
+        CreateUserDialog.CreateUserListener, SurveyView, DataPointsListTrackingListener {
 
     public static final int NAVIGATION_DRAWER_DELAY_MILLIS = 250;
     private static final String DATA_POINTS_FRAGMENT_TAG = "datapoints_fragment";

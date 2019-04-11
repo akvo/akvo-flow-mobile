@@ -19,7 +19,7 @@
 
 package org.akvo.flow.tracking;
 
-public interface TrackingListener {
+public interface DataPointsListTrackingListener {
 
     void logStatsEvent(int selectedTab);
 

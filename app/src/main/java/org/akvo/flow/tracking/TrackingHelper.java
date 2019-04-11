@@ -61,4 +61,16 @@ public class TrackingHelper {
     public void logSearchEvent() {
         firebaseAnalytics.logEvent("list_search_pressed", null);
     }
+
+    public void logUploadDataEvent() {
+        firebaseAnalytics.logEvent("setting_send_datapoints_pressed", null);
+    }
+
+    public void logGpsFixesEvent() {
+        firebaseAnalytics.logEvent("setting_gps_fix_pressed", null);
+    }
+
+    public void logStorageEvent() {
+        firebaseAnalytics.logEvent("setting_storage_pressed", null);
+    }
 }

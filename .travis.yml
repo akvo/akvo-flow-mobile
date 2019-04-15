@@ -11,8 +11,8 @@ env:
 jdk:
   - oraclejdk8
 
-#services:
- # - docker
+services:
+  - docker
 
 before_cache:
   - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
@@ -44,10 +44,11 @@ before_install:
 before_script:
   # gcloud
   - gcloud version || true
-  - if [ ! -d "$HOME/google-cloud-sdk/bin" ]; then rm -rf $HOME/google-cloud-sdk; export $CLOUDSDK_CORE_DISABLE_PROMPTS; curl https://sdk.cloud.google.com | bash; fi
+  #- if [ ! -d "$HOME/google-cloud-sdk/bin" ]; then rm -rf $HOME/google-cloud-sdk; export $CLOUDSDK_CORE_DISABLE_PROMPTS; curl https://sdk.cloud.google.com | bash; fi
   # Add gcloud to $PATH
-  - source /home/travis/google-cloud-sdk/path.bash.inc
-  - gcloud version
+  #- source /home/travis/google-cloud-sdk/path.bash.inc
+  #- gcloud version
+  - gcloud components update
   # Add gcloud auth
   - gcloud auth activate-service-account firebase-adminsdk-48ycx@akvoflowapp.iam.gserviceaccount.com --key-file=akvoflowapp-firebase-adminsdk-48ycx-c664041e03.json --project=akvoflowapp
 

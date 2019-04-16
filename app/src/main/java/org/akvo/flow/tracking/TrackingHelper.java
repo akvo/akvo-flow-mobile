@@ -116,4 +116,8 @@ public class TrackingHelper {
         params.putString("image_size", size);
         firebaseAnalytics.logEvent("setting_image_size_changed", params);
     }
+
+    public void logPublishPressed() {
+        firebaseAnalytics.logEvent("setting_publish_data_pressed", null);
+    }
 }

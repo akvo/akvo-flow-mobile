@@ -237,6 +237,9 @@ public class PreferenceActivity extends BackActivity implements PreferenceView,
     void onDataCheckChanged(boolean checked) {
         if (trackChanges) {
             presenter.saveEnableMobileData(checked);
+            if (trackingHelper != null) {
+                trackingHelper.logMobileDataChanged(checked);
+            }
         }
     }
 
@@ -244,6 +247,9 @@ public class PreferenceActivity extends BackActivity implements PreferenceView,
     void onScreenOnCheckChanged(boolean checked) {
         if (trackChanges) {
             presenter.saveKeepScreenOn(checked);
+            if (trackingHelper != null) {
+                trackingHelper.logScreenOnChanged(checked);
+            }
         }
     }
 
@@ -251,12 +257,20 @@ public class PreferenceActivity extends BackActivity implements PreferenceView,
     void onLanguageSelected(int position) {
         if (trackChanges) {
             presenter.saveAppLanguage(position, languages);
+            if (trackingHelper != null) {
+                trackingHelper.logLanguageChanged(languages.get(position));
+            }
         }
     }
 
     @OnItemSelected(R.id.preference_image_size)
     void onImageSizeSelected(int position) {
-        presenter.saveImageSize(position);
+        if (trackChanges) {
+            presenter.saveImageSize(position);
+            if (trackingHelper != null) {
+                trackingHelper.logImageSizeChanged(position);
+            }
+        }
     }
 
     @Override

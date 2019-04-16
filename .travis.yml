@@ -47,7 +47,8 @@ before_install:
       curl https://sdk.cloud.google.com | bash;
     fi
   - $HOME/google-cloud-sdk/bin/gcloud version
-  - $HOME/google-cloud-sdk/bin/gcloud auth activate-service-account firebase-adminsdk-48ycx@akvoflowapp.iam.gserviceaccount.com --key-file=akvoflowapp-firebase-adminsdk-48ycx-c664041e03.json --project=akvoflowapp
+  - $HOME/google-cloud-sdk/bin/gcloud auth activate-service-account firebase-adminsdk-48ycx@akvoflowapp.iam.gserviceaccount.com --key-file=akvoflowapp-firebase-adminsdk-48ycx-c664041e03.json
+  - $HOME/google-cloud-sdk/bin/gcloud --quiet config set project=akvoflowapp
 
 #before_script:
   # gcloud

@@ -7,11 +7,20 @@ env:
     - secure: "bh/ISP3IKy+eoWOY3mWjPn3lEoc8bUCZGbSl92/QXUMQQfiCZJRgVmsZfuCBnByzl2t9F/wTZQfnTTsYF0fpX9wCrp+S9nfmlujhFTkN1uc2SVJrh0Ecf2adWZun18SXuUaI6vuNNwVBDu+YAm22BggM5/9IH0dgER9+Zb3z+rc="
     - secure: "Okh2Xw70CDccPKQsHa0LP44QD4fguY53EsKlkj4Gh7uu2+HQohoGYF7o4naD18tuHL2Kpg0uM/i4IJvq53OCwTK0ZNhE+OzjQpD4kh0PMYi5/NQNckaHdOtPaeAw+8x+/MEmuHCji3figTYeRtC35LRD0UYT0hw0t/Kp6OfWesc="
     - secure: "U1bHOcp7gWC5rhFqjBScm+oMcmbtfGFajlgr0RNqbHFsvnL9Zf20gCCGYzPmzsfJKlISwYZo7XCJCYrkW5/jaBvllJLW4rNbTh6Tuj7Lt2GDcHH1nmtbsU5Vw7b8HiLXU2y/6YWgZeoKgdSWdbuCZVm8X44N7HJRtI3TuMJlgPY="
+    - CLOUDSDK_CORE_DISABLE_PROMPTS=1
 
 jdk:
   - oraclejdk8
 
-addons:
+before_cache:
+  - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
+  - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
+
+cache:
+  directories:
+    - "$HOME/.gradle/caches/"
+    - "$HOME/.gradle/wrapper/"
+    - "$HOME/google-cloud-sdk/"
 
 android:
   components:
@@ -25,13 +34,23 @@ android:
 before_install:
   - openssl aes-256-cbc -K $encrypted_b2f5a33a8343_key -iv $encrypted_b2f5a33a8343_iv -in build_config.enc -out build_config -d
   - tar xvf build_config
-  - gem install fastlane --no-rdoc --no-ri --no-document --quiet
+  - gem install fastlane --no-document --quiet
   - git remote set-url origin https://$GITHUB_USER:$GITHUB_API_KEY@github.com/akvo/akvo-flow-mobile.git
   - chmod +x fastlane/deploy_beta.sh
   - chmod +x travis/deploy_release.sh
+  - gcloud version || true
+  - if [ ! -d ${HOME}/google-cloud-sdk/bin ]; then
+      rm -rf $HOME/google-cloud-sdk;
+      curl https://sdk.cloud.google.com | bash;
+    fi
+  - $HOME/google-cloud-sdk/bin/gcloud version
+  - $HOME/google-cloud-sdk/bin/gcloud auth activate-service-account firebase-adminsdk-48ycx@akvoflowapp.iam.gserviceaccount.com --key-file=akvoflowapp-firebase-adminsdk-48ycx-c664041e03.json
+  - $HOME/google-cloud-sdk/bin/gcloud config set project akvoflowapp --quiet
 
 script:
-  - ./gradlew check --continue
+  - ./gradlew check --continue -Pnodexcount=true
+  - ./gradlew :app:assembleFlowDebugAndroidTest -Pnodexcount=true
+  - $HOME/google-cloud-sdk/bin/gcloud firebase test android run --type instrumentation --app app/build/outputs/apk/flow/debug/flow.apk --test app/build/outputs/apk/androidTest/flow/debug/app-flow-debug-androidTest.apk --device model=Nexus5,version=21,locale=en,orientation=portrait
 
 after_success:
   - ./fastlane/deploy_beta.sh

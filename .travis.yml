@@ -61,7 +61,7 @@ before_install:
 script:
   - ./gradlew check --continue -Pnodexcount=true
   - ./gradlew :app:assembleFlowDebugAndroidTest -Pnodexcount=true
-  #- gcloud components update
+  - gcloud components update
   - gcloud firebase test android run --type instrumentation --app app/build/outputs/apk/flow/debug/flow.apk --test app/build/outputs/apk/androidTest/flow/debug/app-flow-debug-androidTest.apk --device model=Nexus5,version=21,locale=en,orientation=portrait
 
 after_success:

@@ -42,9 +42,12 @@ before_install:
   - git remote set-url origin https://$GITHUB_USER:$GITHUB_API_KEY@github.com/akvo/akvo-flow-mobile.git
   - chmod +x fastlane/deploy_beta.sh
   - chmod +x travis/deploy_release.sh
-  - if [ ! -d ${HOME}/google-cloud-sdk ]; then
+  - gcloud version || true
+  - if [ ! -d ${HOME}/google-cloud-sdk/bin ]; then
+      rm -rf $HOME/google-cloud-sdk;
       curl https://sdk.cloud.google.com | bash;
     fi
+  - gcloud version
   - gcloud auth activate-service-account firebase-adminsdk-48ycx@akvoflowapp.iam.gserviceaccount.com --key-file=akvoflowapp-firebase-adminsdk-48ycx-c664041e03.json --project=akvoflowapp
 
 #before_script:

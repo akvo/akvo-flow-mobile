@@ -8,8 +8,8 @@ buildscript {
 
     dependencies {
         classpath 'com.android.tools.build:gradle:3.3.2'
-        classpath 'io.sentry:sentry-android-gradle-plugin:1.7.16'
-        classpath 'com.getkeepsafe.dexcount:dexcount-gradle-plugin:0.8.2'
+        classpath 'io.sentry:sentry-android-gradle-plugin:1.7.22'
+        classpath 'com.getkeepsafe.dexcount:dexcount-gradle-plugin:0.8.6'
         classpath 'io.fabric.tools:gradle:1.28.0'
         classpath 'com.google.gms:google-services:3.2.1'
     }
@@ -46,7 +46,7 @@ ext {
     prettyTimeVersion = "3.2.4.Final"
     rxAndroidVersion = "2.0.1"
     rxJavaVersion = "2.1.0"
-    sentryVersion = "1.7.16"
+    sentryVersion = "1.7.22"
     sqlbriteVersion = "2.0.0"
     slfVersion = "1.7.25"
     timberVersion = "4.7.1"

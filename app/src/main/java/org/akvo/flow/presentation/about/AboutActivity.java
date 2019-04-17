@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2018-2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -30,6 +30,7 @@ import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
 import org.akvo.flow.presentation.SnackBarManager;
 import org.akvo.flow.presentation.entity.ViewApkData;
+import org.akvo.flow.tracking.TrackingHelper;
 import org.akvo.flow.ui.Navigator;
 
 import javax.inject.Inject;
@@ -55,6 +56,8 @@ public class AboutActivity extends BackActivity implements AboutView {
     @Inject
     SnackBarManager snackBarManager;
 
+    private TrackingHelper trackingHelper;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -64,6 +67,7 @@ public class AboutActivity extends BackActivity implements AboutView {
         setupToolBar();
         initializeViews();
         presenter.setView(this);
+        trackingHelper = new TrackingHelper(this);
     }
 
     @Override
@@ -85,22 +89,34 @@ public class AboutActivity extends BackActivity implements AboutView {
 
     @OnClick(R.id.text_check_updates)
     void onCheckUpdatesTap() {
+        if (trackingHelper != null) {
+            trackingHelper.logCheckUpdatePressed();
+        }
         //TODO: add loading
         presenter.checkApkVersion();
     }
 
     @OnClick(R.id.text_release_notes)
     void onViewReleaseNotesTap() {
+        if (trackingHelper != null) {
+            trackingHelper.logViewNotesPressed();
+        }
         navigator.navigateToReleaseNotes(this);
     }
 
     @OnClick(R.id.text_legal_info)
     void onViewLegalInfoTap() {
+        if (trackingHelper != null) {
+            trackingHelper.logViewLegalPressed();
+        }
         navigator.navigateToLegalInfo(this);
     }
 
     @OnClick(R.id.text_terms)
     void onViewTermsTap() {
+        if (trackingHelper != null) {
+            trackingHelper.logViewTermsPressed();
+        }
         navigator.navigateToTerms(this);
     }
 

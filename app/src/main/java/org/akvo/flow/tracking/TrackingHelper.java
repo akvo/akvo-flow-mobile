@@ -154,4 +154,20 @@ public class TrackingHelper {
     public void logDownloadFormsConfirmed() {
         firebaseAnalytics.logEvent("setting_download_forms_confirmed", null);
     }
+
+    public void logCheckUpdatePressed() {
+        firebaseAnalytics.logEvent("about_check_update_pressed", null);
+    }
+
+    public void logViewNotesPressed() {
+        firebaseAnalytics.logEvent("about_view_notes_pressed", null);
+    }
+
+    public void logViewLegalPressed() {
+        firebaseAnalytics.logEvent("about_view_legal_pressed", null);
+    }
+
+    public void logViewTermsPressed() {
+        firebaseAnalytics.logEvent("about_view_terms_pressed", null);
+    }
 }

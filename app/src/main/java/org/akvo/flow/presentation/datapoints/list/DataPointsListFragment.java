@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -61,6 +61,7 @@ import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
 import org.akvo.flow.presentation.datapoints.DataPointSyncSnackBarManager;
 import org.akvo.flow.presentation.datapoints.list.entity.ListDataPoint;
+import org.akvo.flow.tracking.TrackingListener;
 import org.akvo.flow.ui.Navigator;
 import org.akvo.flow.ui.fragment.OrderByDialogFragment;
 import org.akvo.flow.ui.fragment.OrderByDialogFragment.OrderByDialogListener;
@@ -94,6 +95,7 @@ public class DataPointsListFragment extends Fragment implements LocationListener
 
     private DataPointListAdapter mAdapter;
     private RecordListListener mListener;
+    private TrackingListener trackingListener;
 
     private TextView emptyTitleTv;
     private TextView emptySubTitleTv;
@@ -135,6 +137,12 @@ public class DataPointsListFragment extends Fragment implements LocationListener
             throw new ClassCastException(activity.toString()
                     + " must implement SurveyedLocalesFragmentListener");
         }
+
+        if (! (activity instanceof TrackingListener)) {
+            throw new IllegalArgumentException("Activity must implement TrackingListener");
+        } else {
+            trackingListener = (TrackingListener) activity;
+        }
     }
 
     @Override
@@ -150,18 +158,18 @@ public class DataPointsListFragment extends Fragment implements LocationListener
                 .getSystemService(Context.LOCATION_SERVICE);
         weakLocationListener = new WeakLocationListener(this);
         View view = getView();
-        ListView listView = (ListView) view.findViewById(R.id.locales_lv);
+        ListView listView = view.findViewById(R.id.locales_lv);
         View emptyView = view.findViewById(R.id.empty_view);
         listView.setEmptyView(emptyView);
-        emptyTitleTv = (TextView) view.findViewById(R.id.empty_title_tv);
-        emptySubTitleTv = (TextView) view.findViewById(R.id.empty_subtitle_tv);
-        emptyIv = (ImageView) view.findViewById(R.id.empty_iv);
+        emptyTitleTv = view.findViewById(R.id.empty_title_tv);
+        emptySubTitleTv = view.findViewById(R.id.empty_subtitle_tv);
+        emptyIv = view.findViewById(R.id.empty_iv);
         SurveyGroup surveyGroup = (SurveyGroup) getArguments()
                 .getSerializable(ConstantUtil.SURVEY_GROUP_EXTRA);
         mAdapter = new DataPointListAdapter(getActivity(), mLatitude, mLongitude, surveyGroup);
         listView.setAdapter(mAdapter);
         listView.setOnItemClickListener(this);
-        progressBar = (ProgressBar) view.findViewById(R.id.progress);
+        progressBar = view.findViewById(R.id.progress);
         updateProgressDrawable();
         initializeInjector();
         presenter.setView(this);
@@ -241,6 +249,7 @@ public class DataPointsListFragment extends Fragment implements LocationListener
     public void onDetach() {
         super.onDetach();
         mListener = null;
+        trackingListener = null;
     }
 
     @Override
@@ -336,6 +345,9 @@ public class DataPointsListFragment extends Fragment implements LocationListener
                 new MenuItem.OnActionExpandListener() {
                     @Override
                     public boolean onMenuItemActionExpand(MenuItem item) {
+                        if (trackingListener != null) {
+                            trackingListener.logSearchEvent();
+                        }
                         // EMPTY
                         return true;
                     }
@@ -353,12 +365,21 @@ public class DataPointsListFragment extends Fragment implements LocationListener
         switch (item.getItemId()) {
             case R.id.order_by:
                 presenter.onOrderByClicked();
+                if (trackingListener != null) {
+                    trackingListener.logSortEvent();
+                }
                 return true;
             case R.id.download:
                 presenter.onDownloadPressed();
+                if (trackingListener != null) {
+                    trackingListener.logDownloadEvent(0);
+                }
                 return true;
             case R.id.upload:
                 presenter.onUploadPressed();
+                if (trackingListener != null) {
+                    trackingListener.logUploadEvent(0);
+                }
                 return true;
             default:
                 return false;
@@ -368,6 +389,9 @@ public class DataPointsListFragment extends Fragment implements LocationListener
     @Override
     public void onOrderByClick(int order) {
         presenter.onOrderByClick(order);
+        if (trackingListener != null) {
+            trackingListener.logOrderEvent(order);
+        }
     }
 
     // ==================================== //

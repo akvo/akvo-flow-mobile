@@ -93,7 +93,7 @@ public class TrackingHelper {
     public void logLanguageChanged(String language) {
         Bundle params = new Bundle();
         params.putString("app_language", language);
-        params.putString("device_language", Locale.getDefault().getLanguage());
+        params.putString("previous_language", Locale.getDefault().getLanguage());
         firebaseAnalytics.logEvent("setting_language_changed", params);
     }
 

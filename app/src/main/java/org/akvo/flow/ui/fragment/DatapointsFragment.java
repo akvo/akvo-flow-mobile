@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2010-2017,2019 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -19,6 +19,7 @@
 
 package org.akvo.flow.ui.fragment;
 
+import android.content.Context;
 import android.os.Bundle;
 import com.google.android.material.tabs.TabLayout;
 import androidx.fragment.app.Fragment;
@@ -39,6 +40,7 @@ import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
 import org.akvo.flow.presentation.datapoints.list.DataPointsListFragment;
 import org.akvo.flow.presentation.datapoints.map.DataPointsMapFragment;
+import org.akvo.flow.tracking.TrackingListener;
 import org.akvo.flow.util.ConstantUtil;
 
 import java.util.Map;
@@ -60,6 +62,10 @@ public class DatapointsFragment extends Fragment {
 
     private String[] tabNames;
 
+    private ViewPager mPager;
+
+    private TrackingListener trackingListener;
+
     public DatapointsFragment() {
     }
 
@@ -69,6 +75,22 @@ public class DatapointsFragment extends Fragment {
         args.putSerializable(ConstantUtil.SURVEY_GROUP_EXTRA, surveyGroup);
         fragment.setArguments(args);
         return fragment;
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (! (context instanceof TrackingListener)) {
+            throw new IllegalArgumentException("Activity must implement TrackingListener");
+        } else {
+            trackingListener = (TrackingListener) context;
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        trackingListener = null;
     }
 
     @Override
@@ -123,8 +145,8 @@ public class DatapointsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.datapoints_fragment, container, false);
-        ViewPager mPager = (ViewPager) v.findViewById(R.id.pager);
-        TabLayout tabs = (TabLayout) v.findViewById(R.id.tabs);
+        mPager = v.findViewById(R.id.pager);
+        TabLayout tabs = v.findViewById(R.id.tabs);
 
         mTabsAdapter = new TabsAdapter(getChildFragmentManager(), tabNames, mSurveyGroup);
         mPager.setAdapter(mTabsAdapter);
@@ -139,6 +161,11 @@ public class DatapointsFragment extends Fragment {
             StatsDialogFragment dialogFragment = StatsDialogFragment
                     .newInstance(mSurveyGroup.getId());
             dialogFragment.show(getFragmentManager(), STATS_DIALOG_FRAGMENT_TAG);
+            int selectedTab = mPager.getCurrentItem();
+
+            if (trackingListener != null) {
+                trackingListener.logStatsEvent(selectedTab);
+            }
             return true;
         }
         return super.onOptionsItemSelected(item);

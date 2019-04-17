@@ -108,7 +108,7 @@ public class PreferenceActivity extends BackActivity implements PreferenceView,
     SnackBarManager snackBarManager;
 
     private List<String> languages;
-    private boolean trackChanges = false;
+    private boolean listenersEnabled = false;
     private TrackingHelper trackingHelper;
 
     @Override
@@ -247,7 +247,7 @@ public class PreferenceActivity extends BackActivity implements PreferenceView,
 
     @OnCheckedChanged(R.id.switch_enable_data)
     void onDataCheckChanged(boolean checked) {
-        if (trackChanges) {
+        if (listenersEnabled) {
             if (trackingHelper != null) {
                 trackingHelper.logMobileDataChanged(checked);
             }
@@ -257,7 +257,7 @@ public class PreferenceActivity extends BackActivity implements PreferenceView,
 
     @OnCheckedChanged(R.id.switch_screen_on)
     void onScreenOnCheckChanged(boolean checked) {
-        if (trackChanges) {
+        if (listenersEnabled) {
             if (trackingHelper != null) {
                 trackingHelper.logScreenOnChanged(checked);
             }
@@ -267,7 +267,7 @@ public class PreferenceActivity extends BackActivity implements PreferenceView,
 
     @OnItemSelected(R.id.preference_language)
     void onLanguageSelected(int position) {
-        if (trackChanges) {
+        if (listenersEnabled) {
             if (trackingHelper != null) {
                 trackingHelper.logLanguageChanged(languages.get(position));
             }
@@ -277,7 +277,7 @@ public class PreferenceActivity extends BackActivity implements PreferenceView,
 
     @OnItemSelected(R.id.preference_image_size)
     void onImageSizeSelected(int position) {
-        if (trackChanges) {
+        if (listenersEnabled) {
             if (trackingHelper != null) {
                 trackingHelper.logImageSizeChanged(position);
             }
@@ -313,7 +313,7 @@ public class PreferenceActivity extends BackActivity implements PreferenceView,
         appLanguageSp.postDelayed(new Runnable() {
             @Override
             public void run() {
-                trackChanges = true;
+                listenersEnabled = true;
             }
         }, 500);
     }

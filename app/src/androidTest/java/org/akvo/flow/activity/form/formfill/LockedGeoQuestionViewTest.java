@@ -27,6 +27,8 @@ import android.graphics.Color;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
+import android.os.Build;
+import android.os.SystemClock;
 import android.view.View;
 import android.widget.TextView;
 
@@ -249,6 +251,11 @@ public class LockedGeoQuestionViewTest {
         location.setLongitude(MOCK_LONGITUDE);
         location.setAltitude(MOCK_ALTITUDE);
         location.setAccuracy(accuracy);
+        location.setTime(System.currentTimeMillis());
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            location.setElapsedRealtimeNanos(SystemClock.elapsedRealtimeNanos());
+        }
+
         locationManager.setTestProviderLocation(LocationManager.GPS_PROVIDER, location);
     }
 

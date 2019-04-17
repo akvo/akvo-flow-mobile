@@ -61,7 +61,7 @@ import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
 import org.akvo.flow.presentation.datapoints.DataPointSyncSnackBarManager;
 import org.akvo.flow.presentation.datapoints.list.entity.ListDataPoint;
-import org.akvo.flow.tracking.DataPointsListTrackingListener;
+import org.akvo.flow.tracking.TrackingListener;
 import org.akvo.flow.ui.Navigator;
 import org.akvo.flow.ui.fragment.OrderByDialogFragment;
 import org.akvo.flow.ui.fragment.OrderByDialogFragment.OrderByDialogListener;
@@ -95,7 +95,7 @@ public class DataPointsListFragment extends Fragment implements LocationListener
 
     private DataPointListAdapter mAdapter;
     private RecordListListener mListener;
-    private DataPointsListTrackingListener dataPointsListTrackingListener;
+    private TrackingListener trackingListener;
 
     private TextView emptyTitleTv;
     private TextView emptySubTitleTv;
@@ -138,10 +138,10 @@ public class DataPointsListFragment extends Fragment implements LocationListener
                     + " must implement SurveyedLocalesFragmentListener");
         }
 
-        if (! (activity instanceof DataPointsListTrackingListener)) {
-            throw new IllegalArgumentException("Activity must implement DataPointsListTrackingListener");
+        if (! (activity instanceof TrackingListener)) {
+            throw new IllegalArgumentException("Activity must implement TrackingListener");
         } else {
-            dataPointsListTrackingListener = (DataPointsListTrackingListener) activity;
+            trackingListener = (TrackingListener) activity;
         }
     }
 
@@ -249,7 +249,7 @@ public class DataPointsListFragment extends Fragment implements LocationListener
     public void onDetach() {
         super.onDetach();
         mListener = null;
-        dataPointsListTrackingListener = null;
+        trackingListener = null;
     }
 
     @Override
@@ -345,8 +345,8 @@ public class DataPointsListFragment extends Fragment implements LocationListener
                 new MenuItem.OnActionExpandListener() {
                     @Override
                     public boolean onMenuItemActionExpand(MenuItem item) {
-                        if (dataPointsListTrackingListener != null) {
-                            dataPointsListTrackingListener.logSearchEvent();
+                        if (trackingListener != null) {
+                            trackingListener.logSearchEvent();
                         }
                         // EMPTY
                         return true;
@@ -365,20 +365,20 @@ public class DataPointsListFragment extends Fragment implements LocationListener
         switch (item.getItemId()) {
             case R.id.order_by:
                 presenter.onOrderByClicked();
-                if (dataPointsListTrackingListener != null) {
-                    dataPointsListTrackingListener.logSortEvent();
+                if (trackingListener != null) {
+                    trackingListener.logSortEvent();
                 }
                 return true;
             case R.id.download:
                 presenter.onDownloadPressed();
-                if (dataPointsListTrackingListener != null) {
-                    dataPointsListTrackingListener.logDownloadEvent(0);
+                if (trackingListener != null) {
+                    trackingListener.logDownloadEvent(0);
                 }
                 return true;
             case R.id.upload:
                 presenter.onUploadPressed();
-                if (dataPointsListTrackingListener != null) {
-                    dataPointsListTrackingListener.logUploadEvent(0);
+                if (trackingListener != null) {
+                    trackingListener.logUploadEvent(0);
                 }
                 return true;
             default:
@@ -389,8 +389,8 @@ public class DataPointsListFragment extends Fragment implements LocationListener
     @Override
     public void onOrderByClick(int order) {
         presenter.onOrderByClick(order);
-        if (dataPointsListTrackingListener != null) {
-            dataPointsListTrackingListener.logOrderEvent(order);
+        if (trackingListener != null) {
+            trackingListener.logOrderEvent(order);
         }
     }
 

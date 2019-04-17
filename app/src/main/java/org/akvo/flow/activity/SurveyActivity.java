@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2018 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2019 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -54,7 +54,6 @@ import org.akvo.flow.domain.entity.User;
 import org.akvo.flow.domain.interactor.DefaultObserver;
 import org.akvo.flow.domain.interactor.UseCase;
 import org.akvo.flow.domain.util.VersionHelper;
-import org.akvo.flow.domain.util.GsonMapper;
 import org.akvo.flow.injector.component.ApplicationComponent;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
@@ -73,12 +72,13 @@ import org.akvo.flow.service.BootstrapService;
 import org.akvo.flow.service.DataFixService;
 import org.akvo.flow.service.SurveyDownloadService;
 import org.akvo.flow.service.TimeCheckService;
+import org.akvo.flow.tracking.TrackingHelper;
+import org.akvo.flow.tracking.TrackingListener;
 import org.akvo.flow.ui.Navigator;
 import org.akvo.flow.ui.fragment.DatapointsFragment;
 import org.akvo.flow.ui.fragment.RecordListListener;
 import org.akvo.flow.util.AppPermissionsHelper;
 import org.akvo.flow.util.ConstantUtil;
-import org.akvo.flow.util.PlatformUtil;
 import org.akvo.flow.util.StatusUtil;
 import org.akvo.flow.util.ViewUtil;
 
@@ -97,7 +97,7 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
         FlowNavigationView.DrawerNavigationListener,
         SurveyDeleteConfirmationDialog.SurveyDeleteListener, UserOptionsDialog.UserOptionListener,
         UserDeleteConfirmationDialog.UserDeleteListener, EditUserDialog.EditUserListener,
-        CreateUserDialog.CreateUserListener, SurveyView {
+        CreateUserDialog.CreateUserListener, SurveyView, TrackingListener {
 
     public static final int NAVIGATION_DRAWER_DELAY_MILLIS = 250;
     private static final String DATA_POINTS_FRAGMENT_TAG = "datapoints_fragment";
@@ -148,6 +148,7 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     private long selectedSurveyId;
     private boolean activityJustCreated;
     private boolean permissionsResults;
+    private TrackingHelper trackingHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -158,7 +159,7 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
 
         initializeToolBar();
         presenter.setView(this);
-
+        trackingHelper = new TrackingHelper(this);
         if (!deviceSetUpCompleted()) {
             navigateToSetUp();
         } else {
@@ -610,5 +611,69 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     @Override
     public void showNewVersionAvailable(ViewApkData apkData) {
         navigator.navigateToAppUpdate(this, apkData);
+    }
+
+    @Override
+    public void logStatsEvent(int selectedTab) {
+        if (trackingHelper != null) {
+            String fromTab = selectedTab == 0 ? "list" : "google_map";
+            trackingHelper.logStatsEvent(fromTab);
+        }
+    }
+
+    @Override
+    public void logSortEvent() {
+        if (trackingHelper != null) {
+            trackingHelper.logSortEvent();
+        }
+    }
+
+    @Override
+    public void logDownloadEvent(int selectedTab) {
+        if (trackingHelper != null) {
+            String fromTab = selectedTab == 0 ? "list" : "google_map";
+            trackingHelper.logDownloadEvent(fromTab);
+        }
+    }
+
+    @Override
+    public void logUploadEvent(int selectedTab) {
+        if (trackingHelper != null) {
+            String fromTab = selectedTab == 0 ? "list" : "google_map";
+            trackingHelper.logUploadEvent(fromTab);
+        }
+    }
+
+    @Override
+    public void logOrderEvent(int order) {
+        if (trackingHelper != null) {
+            String orderSuffix = null;
+            switch (order) {
+                case ConstantUtil.ORDER_BY_DATE:
+                    orderSuffix = "date";
+                    break;
+                case ConstantUtil.ORDER_BY_DISTANCE:
+                    orderSuffix = "distance";
+                    break;
+                case ConstantUtil.ORDER_BY_STATUS:
+                    orderSuffix = "status";
+                    break;
+                case ConstantUtil.ORDER_BY_NAME:
+                    orderSuffix = "name";
+                    break;
+                    default:
+                        break;
+            }
+            if (orderSuffix != null) {
+                trackingHelper.logSortEventChosen(orderSuffix);
+            }
+        }
+    }
+
+    @Override
+    public void logSearchEvent() {
+        if (trackingHelper != null) {
+            trackingHelper.logSearchEvent();
+        }
     }
 }

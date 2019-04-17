@@ -11,6 +11,7 @@ buildscript {
         classpath 'io.sentry:sentry-android-gradle-plugin:1.7.5'
         classpath 'com.getkeepsafe.dexcount:dexcount-gradle-plugin:0.8.2'
         classpath 'io.fabric.tools:gradle:1.25.4'
+        classpath 'com.google.gms:google-services:3.2.1'
     }
 }
 
@@ -31,7 +32,10 @@ ext {
     gsonVersion = "2.8.2"
     leakCanaryVersion = "1.6.1"
     loggingInterceptorVersion = "3.6.0"
+    mapboxVersion = "7.2.0"
+    mapboxMarkerVersion = "0.2.0"
     mapUtilsVersion = "0.5"
+    multidexVersion = "1.0.3"
     prettyTimeVersion = "3.2.4.Final"
     rxAndroidVersion = "2.0.1"
     rxJavaVersion = "2.1.0"
@@ -39,9 +43,7 @@ ext {
     sqlbriteVersion = "2.0.0"
     supportVersion = "27.1.1"
     timberVersion = "4.5.1"
-    multidexVersion = "1.0.3"
-    mapboxVersion = "7.2.0"
-    mapboxMarkerVersion = "0.2.0"
+    firebaseVersion = "15.0.2"
 
     jUnitVersion = "4.12"
     mockServerVersion = "3.12.1"

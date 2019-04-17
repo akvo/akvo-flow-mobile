@@ -17,6 +17,8 @@ sentry {
     autoUpload true
 }
 
+def isCi = "true" == System.getenv("TRAVIS")
+
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
 
@@ -121,6 +123,7 @@ android {
             proguardFile 'proguard-files/proguard-square-retrofit.pro'
             proguardFile 'proguard-files/proguard-support-v7-appcompat.pro'
             proguardFile getDefaultProguardFile('proguard-android.txt')
+            multiDexKeepProguard file('proguard-files/proguard-multidex-rules.pro')
         }
     }
 
@@ -192,16 +195,6 @@ android.applicationVariants.all { variant ->
     }
 }
 
-configurations.all { config ->
-    if (config.name.contains('UnitTest') || config.name.contains('AndroidTest')) {
-        config.resolutionStrategy.eachDependency { details ->
-            if (details.requested.group == 'com.squareup.leakcanary' && details.requested.name == 'leakcanary-android') {
-                details.useTarget(group: details.requested.group, name: 'leakcanary-android-no-op', version: details.requested.version)
-            }
-        }
-    }
-}
-
 dependencies {
     implementation "com.android.support:appcompat-v7:${rootProject.ext.supportVersion}"
     implementation "com.android.support:exifinterface:${rootProject.ext.supportVersion}"
@@ -228,11 +221,16 @@ dependencies {
     implementation("com.crashlytics.sdk.android:crashlytics:${rootProject.ext.crashlyticsVersion}") {
         transitive = true
     }
-    debugImplementation "com.squareup.leakcanary:leakcanary-android:${rootProject.ext.leakCanaryVersion}"
-    releaseImplementation "com.squareup.leakcanary:leakcanary-android-no-op:${rootProject.ext.leakCanaryVersion}"
-    debugImplementation "com.squareup.leakcanary:leakcanary-support-fragment:${rootProject.ext.leakCanaryVersion}"
+    if (isCi) {
+        debugImplementation "com.squareup.leakcanary:leakcanary-android:${rootProject.ext.leakCanaryVersion}"
+        releaseImplementation "com.squareup.leakcanary:leakcanary-android-no-op:${rootProject.ext.leakCanaryVersion}"
+        debugImplementation "com.squareup.leakcanary:leakcanary-support-fragment:${rootProject.ext.leakCanaryVersion}"
+    } else {
+        implementation "com.squareup.leakcanary:leakcanary-android-no-op:${rootProject.ext.leakCanaryVersion}"
+    }
 
     implementation "com.android.support:multidex:${rootProject.ext.multidexVersion}"
+    implementation "com.google.firebase:firebase-analytics:${rootProject.ext.firebaseVersion}"
     implementation "com.mapbox.mapboxsdk:mapbox-android-sdk:${rootProject.ext.mapboxVersion}"
     implementation "com.mapbox.mapboxsdk:mapbox-android-plugin-markerview-v7:${rootProject.ext.mapboxMarkerVersion}"
 
@@ -267,4 +265,6 @@ dependencies {
     implementation project(':domain')
     implementation project(':data')
     implementation project(':database')
+
+    apply plugin: 'com.google.gms.google-services'
 }

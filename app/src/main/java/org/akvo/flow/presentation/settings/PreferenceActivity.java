@@ -178,10 +178,10 @@ public class PreferenceActivity extends BackActivity implements PreferenceView,
 
     @OnClick(R.id.send_data_points)
     void onDataPointSendTap() {
-        DataPointUploadService.scheduleUpload(getApplicationContext(), enableDataSc.isChecked());
         if (trackingHelper != null) {
             trackingHelper.logUploadDataEvent();
         }
+        DataPointUploadService.scheduleUpload(getApplicationContext(), enableDataSc.isChecked());
         finish();
     }
 
@@ -189,6 +189,9 @@ public class PreferenceActivity extends BackActivity implements PreferenceView,
             R.id.preference_delete_collected_data_subtitle
     })
     void onDeleteCollectedDataTap() {
+        if (trackingHelper != null) {
+            trackingHelper.logDeleteDataPressed();
+        }
         DialogFragment newFragment = PassCodeDeleteCollectedDialog.newInstance();
         newFragment.show(getSupportFragmentManager(), PassCodeDeleteCollectedDialog.TAG);
     }
@@ -197,6 +200,9 @@ public class PreferenceActivity extends BackActivity implements PreferenceView,
             R.id.preference_delete_everything_subtitle
     })
     void onDeleteAllTap() {
+        if (trackingHelper != null) {
+            trackingHelper.logDeleteAllPressed();
+        }
         DialogFragment newFragment = PassCodeDeleteAllDialog.newInstance();
         newFragment.show(getSupportFragmentManager(), PassCodeDeleteAllDialog.TAG);
     }
@@ -205,6 +211,9 @@ public class PreferenceActivity extends BackActivity implements PreferenceView,
             R.id.preference_download_form_subtitle
     })
     void onDownloadFormOptionTap() {
+        if (trackingHelper != null) {
+            trackingHelper.logDownloadFormPressed();
+        }
         DialogFragment newFragment = PassCodeDownloadFormDialog.newInstance();
         newFragment.show(getSupportFragmentManager(), PassCodeDownloadFormDialog.TAG);
     }
@@ -213,6 +222,9 @@ public class PreferenceActivity extends BackActivity implements PreferenceView,
             R.id.preference_reload_forms_subtitle
     })
     void onReloadAllSurveysOptionTap() {
+        if (trackingHelper != null) {
+            trackingHelper.logDownloadFormsPressed();
+        }
         DialogFragment newFragment = PassCodeReloadFormsDialog.newInstance();
         newFragment.show(getSupportFragmentManager(), PassCodeReloadFormsDialog.TAG);
     }
@@ -236,40 +248,40 @@ public class PreferenceActivity extends BackActivity implements PreferenceView,
     @OnCheckedChanged(R.id.switch_enable_data)
     void onDataCheckChanged(boolean checked) {
         if (trackChanges) {
-            presenter.saveEnableMobileData(checked);
             if (trackingHelper != null) {
                 trackingHelper.logMobileDataChanged(checked);
             }
+            presenter.saveEnableMobileData(checked);
         }
     }
 
     @OnCheckedChanged(R.id.switch_screen_on)
     void onScreenOnCheckChanged(boolean checked) {
         if (trackChanges) {
-            presenter.saveKeepScreenOn(checked);
             if (trackingHelper != null) {
                 trackingHelper.logScreenOnChanged(checked);
             }
+            presenter.saveKeepScreenOn(checked);
         }
     }
 
     @OnItemSelected(R.id.preference_language)
     void onLanguageSelected(int position) {
         if (trackChanges) {
-            presenter.saveAppLanguage(position, languages);
             if (trackingHelper != null) {
                 trackingHelper.logLanguageChanged(languages.get(position));
             }
+            presenter.saveAppLanguage(position, languages);
         }
     }
 
     @OnItemSelected(R.id.preference_image_size)
     void onImageSizeSelected(int position) {
         if (trackChanges) {
-            presenter.saveImageSize(position);
             if (trackingHelper != null) {
                 trackingHelper.logImageSizeChanged(position);
             }
+            presenter.saveImageSize(position);
         }
     }
 
@@ -379,11 +391,17 @@ public class PreferenceActivity extends BackActivity implements PreferenceView,
 
     @Override
     public void deleteResponsesConfirmed() {
+        if (trackingHelper != null) {
+            trackingHelper.logDeleteDataConfirmed();
+        }
         presenter.deleteResponsesConfirmed();
     }
 
     @Override
     public void deleteAllConfirmed() {
+        if (trackingHelper != null) {
+            trackingHelper.logDeleteAllConfirmed();
+        }
         presenter.deleteAllConfirmed();
     }
 
@@ -394,11 +412,17 @@ public class PreferenceActivity extends BackActivity implements PreferenceView,
 
     @Override
     public void downloadForm(String formId) {
+        if (trackingHelper != null) {
+            trackingHelper.logDownloadFormConfirmed(formId);
+        }
         presenter.downloadForm(formId);
     }
 
     @Override
     public void reloadFormsConfirmed() {
+        if (trackingHelper != null) {
+            trackingHelper.logDownloadFormsConfirmed();
+        }
         presenter.reloadForms();
     }
 

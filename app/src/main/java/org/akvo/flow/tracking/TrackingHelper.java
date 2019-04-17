@@ -120,4 +120,38 @@ public class TrackingHelper {
     public void logPublishPressed() {
         firebaseAnalytics.logEvent("setting_publish_data_pressed", null);
     }
+
+    public void logDeleteDataPressed() {
+        firebaseAnalytics.logEvent("setting_delete_data_pressed", null);
+    }
+
+    public void logDeleteAllPressed() {
+        firebaseAnalytics.logEvent("setting_delete_all_pressed", null);
+    }
+
+    public void logDownloadFormPressed() {
+        firebaseAnalytics.logEvent("setting_download_form_pressed", null);
+    }
+
+    public void logDownloadFormsPressed() {
+        firebaseAnalytics.logEvent("setting_download_forms_pressed", null);
+    }
+
+    public void logDeleteDataConfirmed() {
+        firebaseAnalytics.logEvent("setting_delete_data_confirmed", null);
+    }
+
+    public void logDeleteAllConfirmed() {
+        firebaseAnalytics.logEvent("setting_delete_all_confirmed", null);
+    }
+
+    public void logDownloadFormConfirmed(String formId) {
+        Bundle params = new Bundle();
+        params.putString("form_id", formId);
+        firebaseAnalytics.logEvent("setting_download_form_confirmed", params);
+    }
+
+    public void logDownloadFormsConfirmed() {
+        firebaseAnalytics.logEvent("setting_download_forms_confirmed", null);
+    }
 }

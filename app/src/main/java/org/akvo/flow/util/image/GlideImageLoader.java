@@ -61,7 +61,6 @@ public class GlideImageLoader implements ImageLoader {
         requestManager.asBitmap().load(file)
                 .skipMemoryCache(true)
                 .diskCacheStrategy(DiskCacheStrategy.NONE)
-
                 .listener(new RequestListener<Bitmap>() {
                     @Override
                     public boolean onLoadFailed(@Nullable GlideException e, Object model,
@@ -77,6 +76,28 @@ public class GlideImageLoader implements ImageLoader {
                     }
                 })
                 .submit();
+    }
+
+    @Override
+    public void loadFromFile(ImageView imageView, File file, ImageLoaderListener listener) {
+        requestManager.asBitmap().load(file)
+                .skipMemoryCache(true)
+                .diskCacheStrategy(DiskCacheStrategy.NONE)
+                .listener(new RequestListener<Bitmap>() {
+                    @Override
+                    public boolean onLoadFailed(@Nullable GlideException e, Object model,
+                            Target<Bitmap> target, boolean isFirstResource) {
+                        return false;
+                    }
+
+                    @Override
+                    public boolean onResourceReady(Bitmap resource, Object model,
+                            Target<Bitmap> target, DataSource dataSource, boolean isFirstResource) {
+                        listener.onImageReady(resource);
+                        return false;
+                    }
+                })
+                .into(imageView);
     }
 
     @Override

@@ -30,7 +30,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import org.akvo.flow.data.util.FileHelper;
-import org.akvo.flow.data.util.ImageSize;
+import org.akvo.flow.domain.util.ImageSize;
 
 import java.io.BufferedOutputStream;
 import java.io.FileDescriptor;

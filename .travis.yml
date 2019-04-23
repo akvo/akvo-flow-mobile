@@ -50,7 +50,10 @@ before_install:
 script:
   - ./gradlew check --continue -Pnodexcount=true
   - ./gradlew :app:assembleFlowDebugAndroidTest -Pnodexcount=true
-  - $HOME/google-cloud-sdk/bin/gcloud firebase test android run --type instrumentation --app app/build/outputs/apk/flow/debug/flow.apk --test app/build/outputs/apk/androidTest/flow/debug/app-flow-debug-androidTest.apk --device model=Nexus5,version=21,locale=en,orientation=portrait
+  # Firebase Test Lab will only run when there is a PR to not get over our quota limitation
+  - if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then
+      $HOME/google-cloud-sdk/bin/gcloud firebase test android run --type instrumentation --app app/build/outputs/apk/flow/debug/flow.apk --test app/build/outputs/apk/androidTest/flow/debug/app-flow-debug-androidTest.apk --device model=Nexus5,version=21,locale=en,orientation=portrait;
+    fi
 
 after_success:
   - ./fastlane/deploy_beta.sh

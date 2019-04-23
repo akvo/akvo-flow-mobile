@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2017-2019 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -21,9 +21,9 @@ package org.akvo.flow.service;
 
 import android.content.Context;
 import android.content.Intent;
-import android.support.annotation.NonNull;
-import android.support.v4.app.JobIntentService;
-import android.support.v4.content.LocalBroadcastManager;
+import androidx.annotation.NonNull;
+import androidx.core.app.JobIntentService;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.domain.interactor.CheckSubmittedFiles;

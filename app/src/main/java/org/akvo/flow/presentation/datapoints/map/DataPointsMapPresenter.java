@@ -20,7 +20,7 @@
 
 package org.akvo.flow.presentation.datapoints.map;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.entity.DataPoint;

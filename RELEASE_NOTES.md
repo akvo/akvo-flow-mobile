@@ -1,5 +1,16 @@
 Akvo FLOW app release notes
 ===========================
+# ver 2.7.3
+Date: 23 April 2019
+
+* **Integrate Firebase Test Lab** - [#1200](https://github.com/akvo/akvo-flow-mobile/issues/1200)
+* **Settings tracking** - [#1360](https://github.com/akvo/akvo-flow-mobile/issues/1360)
+* **Datapoint list tracking** - [#1361](https://github.com/akvo/akvo-flow-mobile/issues/1361)
+* **Connecting the issue no longer necessary in PR template** - [#1363](https://github.com/akvo/akvo-flow-mobile/issues/1363)
+* **Tests are broken on devices with android 4** - [#1368](https://github.com/akvo/akvo-flow-mobile/issues/1368)
+* **Add tracking to about screen** - [#1374](https://github.com/akvo/akvo-flow-mobile/issues/1374)
+
+---------------
 # ver 2.7.2.1
 Date: 26 March 2019
 

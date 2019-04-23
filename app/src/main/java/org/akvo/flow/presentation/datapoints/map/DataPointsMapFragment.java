@@ -25,11 +25,6 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.PointF;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.FragmentActivity;
-import androidx.core.content.ContextCompat;
-import androidx.core.content.PermissionChecker;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -69,6 +64,7 @@ import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
 import org.akvo.flow.presentation.datapoints.DataPointSyncSnackBarManager;
 import org.akvo.flow.presentation.datapoints.map.entity.MapDataPoint;
+import org.akvo.flow.presentation.datapoints.map.offline.OfflineMapsDialog;
 import org.akvo.flow.ui.Navigator;
 import org.akvo.flow.ui.fragment.RecordListListener;
 import org.akvo.flow.util.ConstantUtil;
@@ -78,6 +74,13 @@ import java.util.Collections;
 import java.util.List;
 
 import javax.inject.Inject;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.PermissionChecker;
+import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.FragmentActivity;
 
 import static android.graphics.Color.rgb;
 import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
@@ -172,8 +175,17 @@ public class DataPointsMapFragment extends SupportMapFragment implements
         View view = super.onCreateView(inflater, container, savedInstanceState);
         if (view instanceof ViewGroup) {
             ViewGroup viewGroup = (ViewGroup) view;
-            View.inflate(getActivity(), R.layout.map_progress_bar, viewGroup);
-            progressBar = view.findViewById(R.id.progressBar);
+            FragmentActivity activity = getActivity();
+            if (activity != null) {
+                View.inflate(activity, R.layout.map_progress_bar, viewGroup);
+                View.inflate(activity, R.layout.map_offline_maps_button, viewGroup);
+                progressBar = view.findViewById(R.id.progressBar);
+                view.findViewById(R.id.offline_maps_fab).setOnClickListener(v -> {
+                    DialogFragment dialogFragment = OfflineMapsDialog.newInstance();
+                    dialogFragment
+                            .show(activity.getSupportFragmentManager(), OfflineMapsDialog.TAG);
+                });
+            }
         }
         return view;
     }
@@ -191,12 +203,7 @@ public class DataPointsMapFragment extends SupportMapFragment implements
         customView.setLayoutParams(new FrameLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT));
         titleTextView = customView.findViewById(R.id.info_window_title);
         snippetTextView = customView.findViewById(R.id.info_window_description);
-        customView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onInfoWindowClick((String) customView.getTag());
-            }
-        });
+        customView.setOnClickListener(v -> onInfoWindowClick((String) customView.getTag()));
         getMapAsync(this);
         activityJustCreated = true;
     }
@@ -224,16 +231,13 @@ public class DataPointsMapFragment extends SupportMapFragment implements
         this.mapboxMap.addOnMapClickListener(this);
         markerViewManager = new MarkerViewManager((MapView) getView(), mapboxMap);
         this.mapboxMap.setStyle(new Style.Builder()
-                .fromUrl("mapbox://styles/mapbox/light-v10"), new Style.OnStyleLoaded() {
-            @Override
-            public void onStyleLoaded(@NonNull Style style) {
-                style.addImage(MARKER_IMAGE, BitmapFactory.decodeResource(
-                        getResources(), R.drawable.marker), true);
-                enableLocationComponent(style);
-                addClusteredGeoJsonSource(style);
-                presenter.onViewReady();
-            }
-        });
+                .fromUrl("mapbox://styles/mapbox/light-v10"), style -> {
+                    style.addImage(MARKER_IMAGE, BitmapFactory.decodeResource(
+                            getResources(), R.drawable.marker), true);
+                    enableLocationComponent(style);
+                    addClusteredGeoJsonSource(style);
+                    presenter.onViewReady();
+                });
     }
 
     @SuppressWarnings({ "MissingPermission" })
@@ -377,7 +381,7 @@ public class DataPointsMapFragment extends SupportMapFragment implements
     @Nullable
     private Feature getSelectedFeature(PointF screenPoint) {
         List<Feature> features = mapboxMap == null ?
-                Collections.<Feature>emptyList() :
+                Collections.emptyList() :
                 mapboxMap.queryRenderedFeatures(screenPoint, UNCLUSTERED_POINTS);
         return features.isEmpty() ? null : features.get(0);
     }
@@ -542,22 +546,13 @@ public class DataPointsMapFragment extends SupportMapFragment implements
 
     @Override
     public void showErrorNoNetwork() {
-        dataPointSyncSnackBarManager.showErrorNoNetwork(getView(), new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                presenter.onSyncRecordsPressed();
-            }
-        });
+        dataPointSyncSnackBarManager.showErrorNoNetwork(getView(),
+                v -> presenter.onSyncRecordsPressed());
     }
 
     @Override
     public void showErrorSync() {
-        dataPointSyncSnackBarManager.showErrorSync(getView(), new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                presenter.onSyncRecordsPressed();
-            }
-        });
+        dataPointSyncSnackBarManager.showErrorSync(getView(), v -> presenter.onSyncRecordsPressed());
     }
 
     @Override

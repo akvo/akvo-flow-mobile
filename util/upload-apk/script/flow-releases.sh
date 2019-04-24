@@ -12,7 +12,9 @@ set -e
 # FLOW_SERVER_CONFIG=/path/to/akvo-flow-server-config
 #
 
-FLOW_DEPLOY_JAR="util/upload-apk/build/libs/deploy-1.0.jar"
+. util/upload-apk/version.properties
+
+FLOW_DEPLOY_JAR="util/upload-apk/build/libs/deploy-"${VERSION}".jar"
 
 [[ -n "${FLOW_S3_ACCESS_KEY}" ]] || { echo "FLOW_S3_ACCESS_KEY env var needs to be set"; exit 1; }
 [[ -n "${FLOW_S3_SECRET_KEY}" ]] || { echo "FLOW_S3_SECRET_KEY env var needs to be set"; exit 1; }

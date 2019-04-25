@@ -44,7 +44,6 @@ import org.akvo.flow.ui.view.geolocation.GeoQuestionView;
 import org.akvo.flow.ui.view.signature.SignatureQuestionView;
 import org.akvo.flow.util.ConstantUtil;
 import org.hamcrest.Matcher;
-import org.hamcrest.Matchers;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -196,7 +195,7 @@ public class FormActivityTest {
     }
 
     private Matcher<Object> isFooter() {
-        return allOf(is(instanceOf(String.class)), Matchers.is(SubmitTab.FOOTER));
+        return allOf(is(instanceOf(String.class)), is(SubmitTab.FOOTER));
     }
 
     private void verifyQuestionDisplayed(Question question, int questionPosition) {

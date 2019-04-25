@@ -20,8 +20,6 @@
 package org.akvo.flow.app;
 
 import android.content.res.Configuration;
-import android.support.annotation.Nullable;
-import android.support.multidex.MultiDexApplication;
 import android.text.TextUtils;
 
 import com.crashlytics.android.Crashlytics;
@@ -51,6 +49,8 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import androidx.annotation.Nullable;
+import androidx.multidex.MultiDexApplication;
 import io.fabric.sdk.android.Fabric;
 import timber.log.Timber;
 

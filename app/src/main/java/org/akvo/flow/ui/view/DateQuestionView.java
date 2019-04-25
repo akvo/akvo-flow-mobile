@@ -22,7 +22,7 @@ package org.akvo.flow.ui.view;
 import android.app.DatePickerDialog;
 import android.app.DatePickerDialog.OnDateSetListener;
 import android.content.Context;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 import android.view.View;
 import android.widget.DatePicker;
 import android.widget.EditText;

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -20,20 +20,16 @@
 
 package org.akvo.flow.presentation.navigation;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
-import android.support.design.internal.NavigationMenuView;
-import android.support.design.widget.NavigationView;
-import android.support.v4.app.DialogFragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.TextView;
+
+import com.google.android.material.internal.NavigationMenuView;
+import com.google.android.material.navigation.NavigationView;
 
 import org.akvo.flow.R;
 import org.akvo.flow.app.FlowApp;
@@ -47,7 +43,12 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import butterknife.ButterKnife;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 public class FlowNavigationView extends NavigationView implements IFlowNavigationView {
 
@@ -100,11 +101,11 @@ public class FlowNavigationView extends NavigationView implements IFlowNavigatio
     }
 
     private void initViews() {
-        currentUserTextView = ButterKnife.findById(this, R.id.current_user_name);
-        surveyTitleTextView = ButterKnife.findById(this, R.id.surveys_title_tv);
-        surveysRecyclerView = ButterKnife.findById(this, R.id.surveys_rv);
-        usersRecyclerView = ButterKnife.findById(this, R.id.users_rv);
-        userHeader = ButterKnife.findById(this, R.id.user_header);
+        currentUserTextView = findViewById(R.id.current_user_name);
+        surveyTitleTextView = findViewById(R.id.surveys_title_tv);
+        surveysRecyclerView = findViewById(R.id.surveys_rv);
+        usersRecyclerView = findViewById( R.id.users_rv);
+        userHeader = findViewById( R.id.user_header);
         NavigationMenuView navigationMenuView = (NavigationMenuView) getChildAt(0);
         if (navigationMenuView != null) {
             navigationMenuView.setVerticalScrollBarEnabled(false);
@@ -143,7 +144,7 @@ public class FlowNavigationView extends NavigationView implements IFlowNavigatio
     }
 
     private void setNavigationItemListener() {
-        ButterKnife.findById(this, R.id.settings_tv).setOnClickListener(new OnClickListener() {
+        findViewById(R.id.settings_tv).setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (drawerNavigationListener != null) {
@@ -152,7 +153,7 @@ public class FlowNavigationView extends NavigationView implements IFlowNavigatio
             }
         });
 
-        ButterKnife.findById(this, R.id.help_tv).setOnClickListener(new OnClickListener() {
+        findViewById(R.id.help_tv).setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (drawerNavigationListener != null) {
@@ -161,7 +162,7 @@ public class FlowNavigationView extends NavigationView implements IFlowNavigatio
             }
         });
 
-        ButterKnife.findById(this, R.id.about_tv).setOnClickListener(new OnClickListener() {
+        findViewById(R.id.about_tv).setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (drawerNavigationListener != null) {
@@ -328,7 +329,7 @@ public class FlowNavigationView extends NavigationView implements IFlowNavigatio
         presenter.onDeleteSurvey(surveyGroupId);
     }
 
-    @Override
+    @SuppressLint("RestrictedApi") @Override
     protected void onDetachedFromWindow() {
         presenter.destroy();
         super.onDetachedFromWindow();

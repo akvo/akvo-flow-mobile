@@ -12,12 +12,12 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-        <android.support.v4.view.ViewPager
+        <androidx.viewpager.widget.ViewPager
                 android:id="@+id/pager"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 tools:context="org.akvo.flow.activity.SurveyActivity">
-        </android.support.v4.view.ViewPager>
+        </androidx.viewpager.widget.ViewPager>
 
         <View
                 android:layout_height="6dp"

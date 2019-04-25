@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016,2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2016,2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo FLOW.
  *
@@ -17,7 +17,7 @@
 
 package org.akvo.flow.presentation.entity;
 
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 
 import org.akvo.flow.domain.entity.ApkData;
 

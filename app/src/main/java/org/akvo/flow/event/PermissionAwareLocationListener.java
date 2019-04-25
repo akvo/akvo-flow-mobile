@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2018-2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -22,8 +22,8 @@ package org.akvo.flow.event;
 
 import android.Manifest;
 import android.content.Context;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.content.PermissionChecker;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.PermissionChecker;
 
 import org.akvo.flow.activity.FormActivity;
 import org.akvo.flow.util.ConstantUtil;

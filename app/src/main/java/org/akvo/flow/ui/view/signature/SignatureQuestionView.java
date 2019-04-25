@@ -118,16 +118,13 @@ public class SignatureQuestionView extends QuestionView {
                     .getSignatureImageFile(RESIZED_SUFFIX, mQuestion.getId(),
                             mSurveyListener.getDatapointId());
             //noinspection unchecked
-            imageLoader.loadFromFile(imageFile, new ImageLoaderListener() {
-                @Override
-                public void onImageReady(Bitmap bitmap) {
-                    setUpImage(bitmap);
-                    updateSignButton();
-                    if (bitmap != null) {
-                        mSignature.setImage(ImageUtil.encodeBase64(bitmap));
-                    }
-                    captureResponse();
+            imageLoader.loadFromFile(mImage, imageFile, bitmap -> {
+                mImage.setVisibility(VISIBLE);
+                updateSignButton();
+                if (bitmap != null) {
+                    mSignature.setImage(ImageUtil.encodeBase64(bitmap));
                 }
+                captureResponse();
             });
         }
     }
@@ -175,7 +172,8 @@ public class SignatureQuestionView extends QuestionView {
 
     private void resetResponse(String name) {
         setUpName(name);
-        setUpImage(null);
+        mImage.setImageDrawable(null);
+        mImage.setVisibility(GONE);
         updateSignButton();
     }
 

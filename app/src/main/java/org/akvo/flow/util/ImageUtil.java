@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2012-2016,2018 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2012-2016,2018-2019 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -19,7 +19,7 @@
 package org.akvo.flow.util;
 
 import android.graphics.Bitmap;
-import android.support.media.ExifInterface;
+import androidx.exifinterface.media.ExifInterface;
 import android.util.Base64;
 
 import java.io.ByteArrayOutputStream;

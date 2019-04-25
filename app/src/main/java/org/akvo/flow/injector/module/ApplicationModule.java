@@ -22,7 +22,7 @@ package org.akvo.flow.injector.module;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import com.google.gson.Gson;
 import com.squareup.sqlbrite2.BriteDatabase;

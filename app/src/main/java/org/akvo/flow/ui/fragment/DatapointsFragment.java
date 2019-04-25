@@ -171,7 +171,12 @@ public class DatapointsFragment extends Fragment {
 
             @Override
             public void onPageSelected(int position) {
-                //EMPTY
+                if (position == POSITION_MAP && mSurveyGroup != null) {
+                    DataPointsMapFragment mapFragment = mTabsAdapter.getMapFragment();
+                    if (mapFragment != null) {
+                        mapFragment.showFab();
+                    }
+                }
             }
 
             @Override
@@ -179,19 +184,41 @@ public class DatapointsFragment extends Fragment {
                 switch (state) {
                     case ViewPager.SCROLL_STATE_SETTLING:
                     case ViewPager.SCROLL_STATE_IDLE:
-                        if (fabListener != null) {
-                            fabListener.showFab();
-                        }
+                        showFabs();
                         break;
                     default:
-                        if (fabListener != null) {
-                            fabListener.hideFab();
-                        }
+                        hideFabs();
+                        break;
                 }
             }
         });
 
         return v;
+    }
+
+    private void hideFabs() {
+        if (fabListener != null) {
+            fabListener.hideFab();
+        }
+        if (mSurveyGroup != null) {
+            DataPointsMapFragment mapFragment = mTabsAdapter.getMapFragment();
+            if (mapFragment != null) {
+                mapFragment.hideFab();
+            }
+        }
+    }
+
+    private void showFabs() {
+        if (fabListener != null) {
+            fabListener.showFab();
+        }
+
+        if (mPager.getCurrentItem() == POSITION_MAP && mSurveyGroup != null) {
+            DataPointsMapFragment mapFragment = mTabsAdapter.getMapFragment();
+            if (mapFragment != null) {
+                mapFragment.showFab();
+            }
+        }
     }
 
     @Override
@@ -231,8 +258,7 @@ public class DatapointsFragment extends Fragment {
             this.surveyGroup = newSurveyGroup;
             DataPointsListFragment listFragment = (DataPointsListFragment) fragmentsRef
                     .get(POSITION_LIST);
-            DataPointsMapFragment mapFragment = (DataPointsMapFragment) fragmentsRef
-                    .get(POSITION_MAP);
+            DataPointsMapFragment mapFragment = getMapFragment();
 
             if (listFragment != null) {
                 listFragment.onNewSurveySelected(surveyGroup);
@@ -240,6 +266,11 @@ public class DatapointsFragment extends Fragment {
             if (mapFragment != null) {
                 mapFragment.onNewSurveySelected(surveyGroup);
             }
+        }
+
+        DataPointsMapFragment getMapFragment() {
+            return (DataPointsMapFragment) fragmentsRef
+                    .get(POSITION_MAP);
         }
 
         @Override

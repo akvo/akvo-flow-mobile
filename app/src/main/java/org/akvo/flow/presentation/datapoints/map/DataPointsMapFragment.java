@@ -35,6 +35,7 @@ import android.widget.FrameLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.mapbox.geojson.Feature;
 import com.mapbox.geojson.FeatureCollection;
 import com.mapbox.geojson.Point;
@@ -140,6 +141,7 @@ public class DataPointsMapFragment extends SupportMapFragment implements
     private TextView titleTextView;
     private TextView snippetTextView;
     private MapDataPoint currentSelected = null;
+    private FloatingActionButton offlineMapsFab;
 
     public static DataPointsMapFragment newInstance(SurveyGroup surveyGroup) {
         DataPointsMapFragment fragment = new DataPointsMapFragment();
@@ -180,7 +182,8 @@ public class DataPointsMapFragment extends SupportMapFragment implements
                 View.inflate(activity, R.layout.map_progress_bar, viewGroup);
                 View.inflate(activity, R.layout.map_offline_maps_button, viewGroup);
                 progressBar = view.findViewById(R.id.progressBar);
-                view.findViewById(R.id.offline_maps_fab).setOnClickListener(v -> {
+                offlineMapsFab = view.findViewById(R.id.offline_maps_fab);
+                offlineMapsFab.setOnClickListener(v -> {
                     DialogFragment dialogFragment = OfflineMapsDialog.newInstance();
                     dialogFragment
                             .show(activity.getSupportFragmentManager(), OfflineMapsDialog.TAG);
@@ -558,5 +561,13 @@ public class DataPointsMapFragment extends SupportMapFragment implements
     @Override
     public void showNoDataPointsToSync() {
         dataPointSyncSnackBarManager.showNoDataPointsToSync(getView());
+    }
+
+    public void showFab() {
+        offlineMapsFab.show();
+    }
+
+    public void hideFab() {
+        offlineMapsFab.hide();
     }
 }

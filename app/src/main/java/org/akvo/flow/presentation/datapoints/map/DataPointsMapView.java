@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -47,4 +47,6 @@ interface DataPointsMapView {
     void showMonitoredMenu();
 
     void showNonMonitoredMenu();
+
+    void showFab();
 }

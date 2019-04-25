@@ -21,15 +21,12 @@ package org.akvo.flow.ui.fragment;
 
 import android.content.Context;
 import android.os.Bundle;
-import com.google.android.material.tabs.TabLayout;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentPagerAdapter;
-import androidx.viewpager.widget.ViewPager;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+
+import com.google.android.material.tabs.TabLayout;
 
 import org.akvo.flow.R;
 import org.akvo.flow.app.FlowApp;
@@ -40,6 +37,7 @@ import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
 import org.akvo.flow.presentation.datapoints.list.DataPointsListFragment;
 import org.akvo.flow.presentation.datapoints.map.DataPointsMapFragment;
+import org.akvo.flow.presentation.survey.FABListener;
 import org.akvo.flow.tracking.TrackingListener;
 import org.akvo.flow.util.ConstantUtil;
 
@@ -47,6 +45,12 @@ import java.util.Map;
 import java.util.WeakHashMap;
 
 import javax.inject.Inject;
+
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentPagerAdapter;
+import androidx.viewpager.widget.ViewPager;
 
 public class DatapointsFragment extends Fragment {
 
@@ -65,6 +69,7 @@ public class DatapointsFragment extends Fragment {
     private ViewPager mPager;
 
     private TrackingListener trackingListener;
+    private FABListener fabListener;
 
     public DatapointsFragment() {
     }
@@ -85,12 +90,18 @@ public class DatapointsFragment extends Fragment {
         } else {
             trackingListener = (TrackingListener) context;
         }
+        if (! (context instanceof FABListener)) {
+            throw new IllegalArgumentException("Activity must implement FABListener");
+        } else {
+            fabListener = (FABListener) context;
+        }
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
         trackingListener = null;
+        fabListener = null;
     }
 
     @Override
@@ -142,7 +153,7 @@ public class DatapointsFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.datapoints_fragment, container, false);
         mPager = v.findViewById(R.id.pager);
@@ -151,6 +162,34 @@ public class DatapointsFragment extends Fragment {
         mTabsAdapter = new TabsAdapter(getChildFragmentManager(), tabNames, mSurveyGroup);
         mPager.setAdapter(mTabsAdapter);
         tabs.setupWithViewPager(mPager);
+        mPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset,
+                    int positionOffsetPixels) {
+                //EMPTY
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                //EMPTY
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+                switch (state) {
+                    case ViewPager.SCROLL_STATE_SETTLING:
+                    case ViewPager.SCROLL_STATE_IDLE:
+                        if (fabListener != null) {
+                            fabListener.showFab();
+                        }
+                        break;
+                    default:
+                        if (fabListener != null) {
+                            fabListener.hideFab();
+                        }
+                }
+            }
+        });
 
         return v;
     }

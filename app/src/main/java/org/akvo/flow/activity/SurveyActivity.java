@@ -20,28 +20,16 @@
 package org.akvo.flow.activity;
 
 import android.Manifest;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-
-import androidx.core.app.ActivityCompat;
-import androidx.fragment.app.DialogFragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.core.view.GravityCompat;
-import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.ActionBarDrawerToggle;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import android.text.TextUtils;
-import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
+
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import org.akvo.flow.R;
 import org.akvo.flow.app.FlowApp;
@@ -67,14 +55,15 @@ import org.akvo.flow.presentation.navigation.FlowNavigationView;
 import org.akvo.flow.presentation.navigation.SurveyDeleteConfirmationDialog;
 import org.akvo.flow.presentation.navigation.UserOptionsDialog;
 import org.akvo.flow.presentation.navigation.ViewUser;
+import org.akvo.flow.presentation.survey.FABListener;
 import org.akvo.flow.presentation.survey.SurveyPresenter;
 import org.akvo.flow.presentation.survey.SurveyView;
 import org.akvo.flow.service.BootstrapService;
 import org.akvo.flow.service.DataFixService;
 import org.akvo.flow.service.SurveyDownloadService;
 import org.akvo.flow.service.TimeCheckService;
-import org.akvo.flow.tracking.TrackingListener;
 import org.akvo.flow.tracking.TrackingHelper;
+import org.akvo.flow.tracking.TrackingListener;
 import org.akvo.flow.ui.Navigator;
 import org.akvo.flow.ui.fragment.DatapointsFragment;
 import org.akvo.flow.ui.fragment.RecordListListener;
@@ -89,6 +78,16 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.FragmentManager;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -98,7 +97,7 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
         FlowNavigationView.DrawerNavigationListener,
         SurveyDeleteConfirmationDialog.SurveyDeleteListener, UserOptionsDialog.UserOptionListener,
         UserDeleteConfirmationDialog.UserDeleteListener, EditUserDialog.EditUserListener,
-        CreateUserDialog.CreateUserListener, SurveyView, TrackingListener {
+        CreateUserDialog.CreateUserListener, SurveyView, TrackingListener, FABListener {
 
     public static final int NAVIGATION_DRAWER_DELAY_MILLIS = 250;
     private static final String DATA_POINTS_FRAGMENT_TAG = "datapoints_fragment";
@@ -321,14 +320,11 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     }
 
     private void permissionsNotGranted() {
-        final View.OnClickListener retryListener = new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (appPermissionsHelper.userPressedDoNotShowAgain(SurveyActivity.this)) {
-                    navigator.navigateToAppSystemSettings(SurveyActivity.this);
-                } else {
-                    handlePermissions();
-                }
+        final View.OnClickListener retryListener = v -> {
+            if (appPermissionsHelper.userPressedDoNotShowAgain(SurveyActivity.this)) {
+                navigator.navigateToAppSystemSettings(SurveyActivity.this);
+            } else {
+                handlePermissions();
             }
         };
         snackBarManager
@@ -339,17 +335,17 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
 
     private void updateAddDataPointFab() {
         if (mSurveyGroup != null) {
-            addDataPointFab.setVisibility(View.VISIBLE);
+            addDataPointFab.show();
             addDataPointFab.setEnabled(true);
         } else {
-            addDataPointFab.setVisibility(View.GONE);
+            addDataPointFab.hide();
         }
     }
 
     @Override
     public void onBackPressed() {
-        if (mDrawerLayout.isDrawerOpen(Gravity.START)) {
-            mDrawerLayout.closeDrawer(Gravity.START);
+        if (mDrawerLayout.isDrawerOpen(GravityCompat.START)) {
+            mDrawerLayout.closeDrawer(GravityCompat.START);
         } else {
             super.onBackPressed();
         }
@@ -389,12 +385,7 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     private void displayExternalStorageMissing() {
         ViewUtil.showConfirmDialog(R.string.checksd, R.string.sdmissing, this,
                 false,
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        SurveyActivity.this.finish();
-                    }
-                },
+                (dialog, which) -> SurveyActivity.this.finish(),
                 null);
     }
 
@@ -568,32 +559,17 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
 
     @Override
     public void navigateToHelp() {
-        navigate(new Runnable() {
-            @Override
-            public void run() {
-                navigator.navigateToHelp(SurveyActivity.this);
-            }
-        });
+        navigate(() -> navigator.navigateToHelp(SurveyActivity.this));
     }
 
     @Override
     public void navigateToAbout() {
-        navigate(new Runnable() {
-            @Override
-            public void run() {
-                navigator.navigateToAbout(SurveyActivity.this);
-            }
-        });
+        navigate(() -> navigator.navigateToAbout(SurveyActivity.this));
     }
 
     @Override
     public void navigateToSettings() {
-        navigate(new Runnable() {
-            @Override
-            public void run() {
-                navigator.navigateToAppSettings(SurveyActivity.this);
-            }
-        });
+        navigate(() -> navigator.navigateToAppSettings(SurveyActivity.this));
     }
 
     private void navigate(Runnable runnable) {
@@ -676,6 +652,21 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     public void logSearchEvent() {
         if (trackingHelper != null) {
             trackingHelper.logSearchEvent();
+        }
+    }
+
+    @Override
+    public void showFab() {
+        if (mSurveyGroup != null) {
+            addDataPointFab.show();
+            addDataPointFab.setEnabled(true);
+        }
+    }
+
+    @Override
+    public void hideFab() {
+        if (mSurveyGroup != null) {
+            addDataPointFab.hide();
         }
     }
 }

@@ -23,7 +23,6 @@ package org.akvo.flow.activity.form.formsview;
 import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
-import android.view.View;
 
 import org.akvo.flow.R;
 import org.akvo.flow.activity.FormActivity;
@@ -37,7 +36,6 @@ import org.akvo.flow.domain.Survey;
 import org.akvo.flow.ui.view.CaddisflyQuestionView;
 import org.akvo.flow.ui.view.CascadeQuestionView;
 import org.akvo.flow.ui.view.GeoshapeQuestionView;
-import org.akvo.flow.ui.view.QuestionGroupTab;
 import org.akvo.flow.ui.view.QuestionView;
 import org.akvo.flow.ui.view.SubmitTab;
 import org.akvo.flow.ui.view.barcode.BarcodeQuestionViewMultiple;
@@ -47,7 +45,6 @@ import org.akvo.flow.ui.view.signature.SignatureQuestionView;
 import org.akvo.flow.util.ConstantUtil;
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
-import org.hamcrest.core.IsInstanceOf;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -58,14 +55,13 @@ import org.junit.runner.RunWith;
 import java.util.ArrayList;
 import java.util.List;
 
-import androidx.annotation.NonNull;
-import androidx.test.InstrumentationRegistry;
 import androidx.test.espresso.DataInteraction;
 import androidx.test.espresso.ViewInteraction;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.filters.LargeTest;
+import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.rule.ActivityTestRule;
 import androidx.test.rule.GrantPermissionRule;
-import androidx.test.runner.AndroidJUnit4;
 
 import static androidx.test.espresso.Espresso.onData;
 import static androidx.test.espresso.Espresso.onView;
@@ -74,13 +70,11 @@ import static androidx.test.espresso.action.ViewActions.closeSoftKeyboard;
 import static androidx.test.espresso.action.ViewActions.scrollTo;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.matcher.ViewMatchers.hasDescendant;
-import static androidx.test.espresso.matcher.ViewMatchers.isDescendantOfA;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.isEnabled;
 import static androidx.test.espresso.matcher.ViewMatchers.isFocusable;
 import static androidx.test.espresso.matcher.ViewMatchers.withHint;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
-import static androidx.test.espresso.matcher.ViewMatchers.withTagValue;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static org.akvo.flow.activity.ChildPositionMatcher.childAtPosition;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.getCameraButton;
@@ -137,10 +131,10 @@ public class FormActivityTest {
 
     @BeforeClass
     public static void beforeClass() {
-        Context targetContext = InstrumentationRegistry.getTargetContext();
+        Context targetContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
         SurveyRequisite.setRequisites(targetContext);
         installer = new SurveyInstaller(targetContext);
-        survey = installer.installSurvey(all_questions_form, InstrumentationRegistry.getContext());
+        survey = installer.installSurvey(all_questions_form, InstrumentationRegistry.getInstrumentation().getContext());
     }
 
     @After
@@ -150,7 +144,7 @@ public class FormActivityTest {
 
     @AfterClass
     public static void afterClass() {
-        SurveyRequisite.resetRequisites(InstrumentationRegistry.getTargetContext());
+        SurveyRequisite.resetRequisites(InstrumentationRegistry.getInstrumentation().getTargetContext());
         installer.clearSurveys();
     }
 
@@ -202,7 +196,7 @@ public class FormActivityTest {
     }
 
     private Matcher<Object> isFooter() {
-        return allOf(is(instanceOf(String.class)), Matchers.<Object>is(SubmitTab.FOOTER));
+        return allOf(is(instanceOf(String.class)), Matchers.is(SubmitTab.FOOTER));
     }
 
     private void verifyQuestionDisplayed(Question question, int questionPosition) {
@@ -471,13 +465,6 @@ public class FormActivityTest {
         freeTextQuestionInput.check(matches(withText("")));
         freeTextQuestionInput.perform(click());
         freeTextQuestionInput.perform(closeSoftKeyboard());
-    }
-
-    @NonNull
-    private <T extends View> Matcher<View> withQuestionGroupViewParent(
-            QuestionGroup questionGroup) {
-        return isDescendantOfA(allOf(IsInstanceOf.<View>instanceOf(QuestionGroupTab.class),
-                withTagValue(is((Object) questionGroup.getOrder()))));
     }
 
     private void verifyOptionQuestionView(Question question, int questionPosition) {

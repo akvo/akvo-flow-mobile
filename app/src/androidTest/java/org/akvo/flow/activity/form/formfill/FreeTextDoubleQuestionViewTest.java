@@ -36,11 +36,11 @@ import org.junit.runner.RunWith;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.StringRes;
-import androidx.test.InstrumentationRegistry;
+import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.espresso.Espresso;
 import androidx.test.filters.MediumTest;
 import androidx.test.rule.ActivityTestRule;
-import androidx.test.runner.AndroidJUnit4;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.typeText;
@@ -74,10 +74,10 @@ public class FreeTextDoubleQuestionViewTest {
 
     @BeforeClass
     public static void beforeClass() {
-        Context targetContext = InstrumentationRegistry.getTargetContext();
+        Context targetContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
         SurveyRequisite.setRequisites(targetContext);
         installer = new SurveyInstaller(targetContext);
-        installer.installSurvey(freetext_double_entry_form, InstrumentationRegistry.getContext());
+        installer.installSurvey(freetext_double_entry_form, InstrumentationRegistry.getInstrumentation().getContext());
     }
 
     @After
@@ -87,7 +87,7 @@ public class FreeTextDoubleQuestionViewTest {
 
     @AfterClass
     public static void afterClass() {
-        SurveyRequisite.resetRequisites(InstrumentationRegistry.getTargetContext());
+        SurveyRequisite.resetRequisites(InstrumentationRegistry.getInstrumentation().getTargetContext());
         installer.clearSurveys();
     }
 

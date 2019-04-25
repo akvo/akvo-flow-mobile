@@ -22,11 +22,11 @@ package org.akvo.flow.activity.form.formfill;
 
 import android.content.Context;
 import android.content.Intent;
-import androidx.test.InstrumentationRegistry;
+import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.espresso.ViewInteraction;
 import androidx.test.filters.MediumTest;
 import androidx.test.rule.ActivityTestRule;
-import androidx.test.runner.AndroidJUnit4;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import org.akvo.flow.activity.FormActivity;
 import org.akvo.flow.activity.form.data.SurveyInstaller;
@@ -68,10 +68,10 @@ public class OptionsQuestionViewSingleTest {
 
     @BeforeClass
     public static void beforeClass() {
-        Context targetContext = InstrumentationRegistry.getTargetContext();
+        Context targetContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
         SurveyRequisite.setRequisites(targetContext);
         installer = new SurveyInstaller(targetContext);
-        installer.installSurvey(option_form, InstrumentationRegistry.getContext());
+        installer.installSurvey(option_form, InstrumentationRegistry.getInstrumentation().getContext());
     }
 
     @After
@@ -81,7 +81,7 @@ public class OptionsQuestionViewSingleTest {
 
     @AfterClass
     public static void afterClass() {
-        SurveyRequisite.resetRequisites(InstrumentationRegistry.getTargetContext());
+        SurveyRequisite.resetRequisites(InstrumentationRegistry.getInstrumentation().getTargetContext());
         installer.clearSurveys();
     }
 

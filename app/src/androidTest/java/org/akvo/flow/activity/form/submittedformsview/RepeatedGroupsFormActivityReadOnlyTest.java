@@ -37,11 +37,11 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import androidx.annotation.NonNull;
-import androidx.test.InstrumentationRegistry;
+import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.filters.MediumTest;
 import androidx.test.rule.ActivityTestRule;
 import androidx.test.rule.GrantPermissionRule;
-import androidx.test.runner.AndroidJUnit4;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
@@ -59,7 +59,7 @@ import static org.hamcrest.core.AllOf.allOf;
 @RunWith(AndroidJUnit4.class)
 public class RepeatedGroupsFormActivityReadOnlyTest {
 
-    public static final String SURVEY_TITLE = "RepeatedBarcodeGroup";
+    private static final String SURVEY_TITLE = "RepeatedBarcodeGroup";
 
     @Rule
     public GrantPermissionRule permissionRule = GrantPermissionRule
@@ -78,11 +78,11 @@ public class RepeatedGroupsFormActivityReadOnlyTest {
             FormActivity.class) {
         @Override
         protected Intent getActivityIntent() {
-            Context targetContext = InstrumentationRegistry.getTargetContext();
+            Context targetContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
             SurveyRequisite.setRequisites(targetContext);
             SurveyInstaller installer = new SurveyInstaller(targetContext);
             Survey survey = installer
-                    .installSurvey(repeated_groups_form, InstrumentationRegistry.getContext());
+                    .installSurvey(repeated_groups_form, InstrumentationRegistry.getInstrumentation().getContext());
             long id = installer
                     .createDataPoint(survey.getSurveyGroup(), generateTestResponseData()).first;
             return getFormActivityIntent(207569117L, "200389118", SURVEY_TITLE, id, true);
@@ -91,14 +91,14 @@ public class RepeatedGroupsFormActivityReadOnlyTest {
 
     @AfterClass
     public static void afterClass() {
-        Context targetContext = InstrumentationRegistry.getTargetContext();
+        Context targetContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
         SurveyRequisite.resetRequisites(targetContext);
         SurveyInstaller installer = new SurveyInstaller(targetContext);
         installer.clearSurveys();
     }
 
     @Test
-    public void verifyOneRepetition() throws Exception {
+    public void verifyOneRepetition() {
         clickOnTabNamed("RepeatedBarcodeGroup");
         onView(allOf(withId(R.id.barcode_input), isDisplayed())).check(matches(withText("123456")));
         verifyRepeatHeaderText("Repetitions:1");
@@ -110,7 +110,7 @@ public class RepeatedGroupsFormActivityReadOnlyTest {
     }
 
     @Test
-    public void verifyThreeRepetitions() throws Exception {
+    public void verifyThreeRepetitions() {
         clickOnTabNamed("RepeatedTextGroup");
         verifyRepeatHeaderText("Repetitions:3");
 

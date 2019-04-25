@@ -40,11 +40,11 @@ import java.io.IOException;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.StringRes;
-import androidx.test.InstrumentationRegistry;
+import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.espresso.Espresso;
 import androidx.test.filters.MediumTest;
 import androidx.test.rule.ActivityTestRule;
-import androidx.test.runner.AndroidJUnit4;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.typeText;
@@ -78,10 +78,10 @@ public class NumberQuestionViewTest {
 
     @BeforeClass
     public static void beforeClass() {
-        Context targetContext = InstrumentationRegistry.getTargetContext();
+        Context targetContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
         SurveyRequisite.setRequisites(targetContext);
         installer = new SurveyInstaller(targetContext);
-        survey = installer.installSurvey(number_form, InstrumentationRegistry.getContext());
+        survey = installer.installSurvey(number_form, InstrumentationRegistry.getInstrumentation().getContext());
     }
 
     @After
@@ -91,7 +91,7 @@ public class NumberQuestionViewTest {
 
     @AfterClass
     public static void afterClass() {
-        SurveyRequisite.resetRequisites(InstrumentationRegistry.getTargetContext());
+        SurveyRequisite.resetRequisites(InstrumentationRegistry.getInstrumentation().getTargetContext());
         installer.clearSurveys();
     }
 
@@ -164,7 +164,7 @@ public class NumberQuestionViewTest {
         return survey.getQuestionGroups().get(0).getQuestions().get(0).getValidationRule();
     }
 
-    private void fillNumberQuestion(int firstValue) throws IOException {
+    private void fillNumberQuestion(int firstValue) {
         onView(withId(R.id.input_et)).perform(typeText(String.valueOf(firstValue)));
         Espresso.closeSoftKeyboard();
     }

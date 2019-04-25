@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -22,11 +22,6 @@ package org.akvo.flow.activity.form.formfill;
 
 import android.content.Context;
 import android.content.Intent;
-import androidx.test.InstrumentationRegistry;
-import androidx.test.espresso.contrib.PickerActions;
-import androidx.test.filters.MediumTest;
-import androidx.test.rule.ActivityTestRule;
-import androidx.test.runner.AndroidJUnit4;
 import android.widget.DatePicker;
 
 import org.akvo.flow.R;
@@ -42,6 +37,12 @@ import org.junit.runner.RunWith;
 
 import java.util.Calendar;
 import java.util.Locale;
+
+import androidx.test.espresso.contrib.PickerActions;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
+import androidx.test.filters.MediumTest;
+import androidx.test.platform.app.InstrumentationRegistry;
+import androidx.test.rule.ActivityTestRule;
 
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
@@ -75,10 +76,10 @@ public class DateQuestionViewTest {
 
     @BeforeClass
     public static void beforeClass() {
-        Context targetContext = InstrumentationRegistry.getTargetContext();
+        Context targetContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
         SurveyRequisite.setRequisites(targetContext);
         installer = new SurveyInstaller(targetContext);
-        installer.installSurvey(date_form, InstrumentationRegistry.getContext());
+        installer.installSurvey(date_form, InstrumentationRegistry.getInstrumentation().getContext());
     }
 
     @After
@@ -88,7 +89,7 @@ public class DateQuestionViewTest {
 
     @AfterClass
     public static void afterClass() {
-        SurveyRequisite.resetRequisites(InstrumentationRegistry.getTargetContext());
+        SurveyRequisite.resetRequisites(InstrumentationRegistry.getInstrumentation().getTargetContext());
         installer.clearSurveys();
     }
 

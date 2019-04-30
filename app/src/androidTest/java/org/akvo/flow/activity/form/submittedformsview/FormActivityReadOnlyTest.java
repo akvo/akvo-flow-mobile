@@ -65,12 +65,12 @@ import java.util.Map;
 import java.util.TimeZone;
 
 import androidx.core.util.Pair;
-import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.espresso.ViewInteraction;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.filters.LargeTest;
+import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.rule.ActivityTestRule;
 import androidx.test.rule.GrantPermissionRule;
-import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.scrollTo;
@@ -160,7 +160,6 @@ public class FormActivityReadOnlyTest {
     @Test
     public void testViewFilledFormResponses() {
         verifyToolBar(survey.getName(), survey.getVersion());
-
         List<QuestionGroup> questionGroups = survey.getQuestionGroups();
         for (int i = 0; i < questionGroups.size(); i++) {
             QuestionGroup group = questionGroups.get(i);

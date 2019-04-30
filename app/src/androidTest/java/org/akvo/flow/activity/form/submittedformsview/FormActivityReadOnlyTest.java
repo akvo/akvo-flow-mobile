@@ -65,12 +65,12 @@ import java.util.Map;
 import java.util.TimeZone;
 
 import androidx.core.util.Pair;
-import androidx.test.InstrumentationRegistry;
 import androidx.test.espresso.ViewInteraction;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.filters.LargeTest;
+import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.rule.ActivityTestRule;
 import androidx.test.rule.GrantPermissionRule;
-import androidx.test.runner.AndroidJUnit4;
 
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.scrollTo;
@@ -135,14 +135,14 @@ public class FormActivityReadOnlyTest {
             FormActivity.class) {
         @Override
         protected Intent getActivityIntent() {
-            Context targetContext = InstrumentationRegistry.getTargetContext();
+            Context targetContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
             SurveyRequisite.setRequisites(targetContext);
             SurveyInstaller installer = new SurveyInstaller(targetContext);
             survey = installer
-                    .installSurvey(all_questions_form, InstrumentationRegistry.getContext());
+                    .installSurvey(all_questions_form, InstrumentationRegistry.getInstrumentation().getContext());
             Pair<Long, Map<String, QuestionResponse>> dataPointFromFile = installer
                     .createDataPointFromFile(survey.getSurveyGroup(),
-                            InstrumentationRegistry.getContext(), data);
+                            InstrumentationRegistry.getInstrumentation().getContext(), data);
             long dataPointId = dataPointFromFile.first;
             responseMap = dataPointFromFile.second;
             return getFormActivityIntent(155852013L, "156792013", FORM_TITLE, dataPointId, true);
@@ -151,7 +151,7 @@ public class FormActivityReadOnlyTest {
 
     @AfterClass
     public static void afterClass() {
-        Context targetContext = InstrumentationRegistry.getTargetContext();
+        Context targetContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
         SurveyRequisite.resetRequisites(targetContext);
         SurveyInstaller installer = new SurveyInstaller(targetContext);
         installer.clearSurveys();
@@ -160,7 +160,6 @@ public class FormActivityReadOnlyTest {
     @Test
     public void testViewFilledFormResponses() {
         verifyToolBar(survey.getName(), survey.getVersion());
-
         List<QuestionGroup> questionGroups = survey.getQuestionGroups();
         for (int i = 0; i < questionGroups.size(); i++) {
             QuestionGroup group = questionGroups.get(i);
@@ -431,7 +430,7 @@ public class FormActivityReadOnlyTest {
 
     private void verifyCascadeLevelSpinner(List<CascadeNode> values, int i) {
         ViewInteraction cascadeLevelSpinner = onView(
-                allOf(withId(R.id.cascade_level_spinner), withTagValue(is((Object) i))));
+                allOf(withId(R.id.cascade_level_spinner), withTagValue(is(i))));
         cascadeLevelSpinner.perform(scrollTo());
         cascadeLevelSpinner.check(matches(isDisplayed()));
         cascadeLevelSpinner

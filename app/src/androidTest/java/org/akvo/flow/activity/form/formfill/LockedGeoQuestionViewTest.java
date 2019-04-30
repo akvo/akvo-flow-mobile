@@ -48,7 +48,7 @@ import org.junit.runner.RunWith;
 
 import java.text.DecimalFormat;
 
-import androidx.test.InstrumentationRegistry;
+import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.espresso.UiController;
 import androidx.test.espresso.ViewAction;
 import androidx.test.espresso.ViewInteraction;
@@ -57,7 +57,7 @@ import androidx.test.espresso.matcher.ViewMatchers;
 import androidx.test.filters.MediumTest;
 import androidx.test.rule.ActivityTestRule;
 import androidx.test.rule.GrantPermissionRule;
-import androidx.test.runner.AndroidJUnit4;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import static androidx.test.espresso.Espresso.closeSoftKeyboard;
 import static androidx.test.espresso.Espresso.onView;
@@ -117,10 +117,10 @@ public class LockedGeoQuestionViewTest {
 
     @BeforeClass
     public static void beforeClass() {
-        Context targetContext = InstrumentationRegistry.getTargetContext();
+        Context targetContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
         SurveyRequisite.setRequisites(targetContext);
         installer = new SurveyInstaller(targetContext);
-        installer.installSurvey(locked_geo_form, InstrumentationRegistry.getContext());
+        installer.installSurvey(locked_geo_form, InstrumentationRegistry.getInstrumentation().getContext());
     }
 
     @After
@@ -130,7 +130,7 @@ public class LockedGeoQuestionViewTest {
 
     @AfterClass
     public static void afterClass() {
-        SurveyRequisite.resetRequisites(InstrumentationRegistry.getTargetContext());
+        SurveyRequisite.resetRequisites(InstrumentationRegistry.getInstrumentation().getTargetContext());
         installer.clearSurveys();
     }
 
@@ -210,7 +210,7 @@ public class LockedGeoQuestionViewTest {
     }
 
     @Test
-    public void ensureLocationValuesDisplayedCorrectlyWhenCancelled() throws Exception {
+    public void ensureLocationValuesDisplayedCorrectlyWhenCancelled() {
         onView(withId(R.id.lat_et)).perform(replaceText(""));
         onView(withId(R.id.lon_et)).perform(replaceText(""));
         onView(withId(R.id.height_et)).perform(replaceText(""));
@@ -238,7 +238,7 @@ public class LockedGeoQuestionViewTest {
     }
 
     private void provideMockLocation(float accuracy) {
-        LocationManager locationManager = (LocationManager) InstrumentationRegistry.getContext()
+        LocationManager locationManager = (LocationManager) InstrumentationRegistry.getInstrumentation().getContext()
                 .getSystemService(Context.LOCATION_SERVICE);
         assert locationManager != null;
         locationManager
@@ -288,13 +288,7 @@ public class LockedGeoQuestionViewTest {
 
     private void simulateLocationTimeout() {
         final View geoQuestion = rule.getActivity().findViewById(R.id.geo_question_view);
-        geoQuestion.post(new Runnable() {
-            @Override
-            public void run() {
-                ((TimedLocationListener.Listener) geoQuestion)
-                        .onTimeout();
-            }
-        });
+        geoQuestion.post(((TimedLocationListener.Listener) geoQuestion)::onTimeout);
     }
 
     private void clickSnackBarRetry() {
@@ -335,7 +329,6 @@ public class LockedGeoQuestionViewTest {
 
     private static ViewAction replaceTextInTextView(final String value) {
         return new ViewAction() {
-            @SuppressWarnings("unchecked")
             @Override
             public Matcher<View> getConstraints() {
                 return allOf(isDisplayed(), isAssignableFrom(TextView.class));

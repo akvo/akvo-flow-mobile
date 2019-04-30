@@ -27,7 +27,6 @@ import android.graphics.drawable.Drawable;
 import android.util.Base64;
 import android.widget.ImageView;
 
-import com.bumptech.glide.Glide;
 import com.bumptech.glide.RequestManager;
 import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
@@ -45,15 +44,15 @@ public class GlideImageLoader implements ImageLoader {
     private final RequestManager requestManager;
 
     public GlideImageLoader(Context context) {
-        requestManager = Glide.with(context);
+        requestManager = GlideApp.with(context);
     }
 
     public GlideImageLoader(Activity activity) {
-        requestManager = Glide.with(activity);
+        requestManager = GlideApp.with(activity);
     }
 
     public GlideImageLoader(Fragment fragment) {
-        requestManager = Glide.with(fragment);
+        requestManager = GlideApp.with(fragment);
     }
 
     @Override

@@ -45,7 +45,7 @@ import org.hamcrest.core.IsInstanceOf;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.StringRes;
-import androidx.test.InstrumentationRegistry;
+import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.espresso.Espresso;
 import androidx.test.espresso.ViewInteraction;
 import androidx.test.espresso.matcher.BoundedMatcher;
@@ -138,7 +138,7 @@ public class FormActivityTestUtil {
     }
 
     @NonNull
-    public static String getQuestionHeader(Question question) {
+    private static String getQuestionHeader(Question question) {
         String questionHeader = question.getOrder() + ". " + question.getText();
         if (question.isMandatory()) {
             questionHeader = questionHeader + "*";
@@ -153,7 +153,7 @@ public class FormActivityTestUtil {
 
     @NonNull
     private static Matcher<View> linearLayoutChild(int position) {
-        return childAtPosition(IsInstanceOf.<View>instanceOf(android.widget.LinearLayout.class),
+        return childAtPosition(IsInstanceOf.instanceOf(android.widget.LinearLayout.class),
                 position);
     }
 
@@ -183,8 +183,8 @@ public class FormActivityTestUtil {
 
     public static <T extends View> Matcher<View> withQuestionViewParent(Class<T> parentClass,
             String id) {
-        return isDescendantOfA(allOf(IsInstanceOf.<View>instanceOf(parentClass),
-                withTagValue(is((Object) id))));
+        return isDescendantOfA(allOf(IsInstanceOf.instanceOf(parentClass),
+                withTagValue(is(id))));
     }
 
     @NonNull
@@ -278,7 +278,7 @@ public class FormActivityTestUtil {
 
     public static ViewInteraction getSingleChoiceRadioButton(int option) {
         return onView(allOf(withId(option),
-                isDescendantOfA(IsInstanceOf.<View>instanceOf(RadioGroup.class))));
+                isDescendantOfA(IsInstanceOf.instanceOf(RadioGroup.class))));
     }
 
     private static ViewInteraction checkBoxWithText(Option option, int optionPosition,

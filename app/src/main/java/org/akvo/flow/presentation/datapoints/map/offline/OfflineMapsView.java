@@ -28,4 +28,6 @@ public interface OfflineMapsView {
     void displayRegions(OfflineRegion[] offlineRegions);
 
     void displayNoOfflineMaps();
+
+    void hideLoading();
 }

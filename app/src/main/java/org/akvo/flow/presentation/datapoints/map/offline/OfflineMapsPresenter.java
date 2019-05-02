@@ -40,7 +40,7 @@ public class OfflineMapsPresenter implements Presenter {
 
     @Override
     public void destroy() {
-
+        //EMPTY
     }
 
     public void setView(OfflineMapsView view) {
@@ -50,10 +50,12 @@ public class OfflineMapsPresenter implements Presenter {
     public void load(Context context) {
         view.showLoading();
         //TODO: inject offlineManager
+        //TODO: make sure we "unsubscribe"
         OfflineManager.getInstance(context).listOfflineRegions(
                 new OfflineManager.ListOfflineRegionsCallback() {
                     @Override
                     public void onList(OfflineRegion[] offlineRegions) {
+                        view.hideLoading();
                         if (offlineRegions != null && offlineRegions.length > 0) {
                             view.displayRegions(offlineRegions);
                             //TODO: map to string our something else
@@ -65,6 +67,7 @@ public class OfflineMapsPresenter implements Presenter {
                     @Override
                     public void onError(String error) {
                         Timber.e(error);
+                        view.hideLoading();
                         view.displayNoOfflineMaps();
                     }
                 });

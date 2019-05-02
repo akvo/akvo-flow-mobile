@@ -22,16 +22,27 @@ package org.akvo.flow.presentation.datapoints.map.offline;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
 
 import org.akvo.flow.R;
+import org.akvo.flow.app.FlowApp;
+import org.akvo.flow.injector.component.ApplicationComponent;
+import org.akvo.flow.injector.component.DaggerViewComponent;
+import org.akvo.flow.injector.component.ViewComponent;
+
+import javax.inject.Inject;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
-public class OfflineMapsDialog extends DialogFragment {
+public class OfflineMapsDialog extends DialogFragment implements OfflineMapsView {
 
     public static final String TAG = "OfflineMapsDialog";
+
+    @Inject
+    OfflineMapsPresenter presenter;
 
     public OfflineMapsDialog() {
     }
@@ -45,6 +56,34 @@ public class OfflineMapsDialog extends DialogFragment {
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle(getActivity().getString(R.string.offline_maps_dialog_title));
+        View main = LayoutInflater.from(getContext())
+                .inflate(R.layout.offline_maps_dialog, null);
+        builder.setView(main);
         return builder.create();
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        initializeInjector();
+        presenter.setView(this);
+        presenter.load(getContext().getApplicationContext());
+    }
+
+    private void initializeInjector() {
+        ViewComponent viewComponent = DaggerViewComponent.builder()
+                .applicationComponent(getApplicationComponent())
+                .build();
+        viewComponent.inject(this);
+    }
+
+    /**
+     * Get the Main Application component for dependency injection.
+     *
+     * @return {@link ApplicationComponent}
+     */
+    @SuppressWarnings("ConstantConditions")
+    private ApplicationComponent getApplicationComponent() {
+        return ((FlowApp) getActivity().getApplication()).getApplicationComponent();
     }
 }

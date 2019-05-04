@@ -19,15 +19,21 @@
 
 package org.akvo.flow.presentation.datapoints.map.offline;
 
-import java.util.List;
+import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 
-public interface OfflineMapsView {
+public class OfflineArea {
 
-    void showLoading();
+    private final String name;
+    private final LatLngBounds bounds;
+    private final double zoom;
 
-    void displayRegions(List<OfflineArea> offlineRegions);
+    public OfflineArea(String name, LatLngBounds bounds, double zoom) {
+        this.name = name;
+        this.bounds = bounds;
+        this.zoom = zoom;
+    }
 
-    void displayNoOfflineMaps();
-
-    void hideLoading();
+    public String getName() {
+        return name;
+    }
 }

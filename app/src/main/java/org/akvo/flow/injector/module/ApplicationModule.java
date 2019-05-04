@@ -25,6 +25,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import androidx.annotation.NonNull;
 
 import com.google.gson.Gson;
+import com.mapbox.mapboxsdk.offline.OfflineManager;
 import com.squareup.sqlbrite2.BriteDatabase;
 import com.squareup.sqlbrite2.SqlBrite;
 
@@ -251,6 +252,12 @@ public class ApplicationModule {
     @Singleton
     Gson provideGson() {
         return new Gson();
+    }
+
+    @Provides
+    @Singleton
+    OfflineManager provideOfflineManager() {
+        return OfflineManager.getInstance(application);
     }
 
     @NonNull

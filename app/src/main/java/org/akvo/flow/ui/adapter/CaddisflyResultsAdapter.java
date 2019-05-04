@@ -20,8 +20,6 @@
 
 package org.akvo.flow.ui.adapter;
 
-import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -32,6 +30,9 @@ import org.akvo.flow.ui.model.caddisfly.CaddisflyTestResult;
 import java.util.ArrayList;
 import java.util.List;
 
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
+
 public class CaddisflyResultsAdapter extends RecyclerView.Adapter<CaddisflyResultsAdapter.ViewHolder> {
 
     private final ArrayList<CaddisflyTestResult> caddisflyTestResults;
@@ -40,15 +41,15 @@ public class CaddisflyResultsAdapter extends RecyclerView.Adapter<CaddisflyResul
         this.caddisflyTestResults = caddisflyTestResults;
     }
 
-    @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    @NonNull @Override
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         TextView textView = (TextView) LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.caddisfly_question_view_result_item, parent, false);
+                .inflate(R.layout.simple_item_text_view, parent, false);
         return new ViewHolder(textView);
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         holder.setTextView(caddisflyTestResults.get(position));
     }
 

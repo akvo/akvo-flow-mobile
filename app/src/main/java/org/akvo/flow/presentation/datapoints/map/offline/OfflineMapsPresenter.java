@@ -34,8 +34,13 @@ public class OfflineMapsPresenter implements Presenter {
 
     private OfflineMapsView view;
 
+    private final OfflineAreaMapper mapper;
+    private final OfflineManager offlineManager;
+
     @Inject
-    public OfflineMapsPresenter() {
+    public OfflineMapsPresenter(OfflineAreaMapper mapper, OfflineManager offlineManager) {
+        this.mapper = mapper;
+        this.offlineManager = offlineManager;
     }
 
     @Override
@@ -49,16 +54,14 @@ public class OfflineMapsPresenter implements Presenter {
 
     public void load(Context context) {
         view.showLoading();
-        //TODO: inject offlineManager
         //TODO: make sure we "unsubscribe"
-        OfflineManager.getInstance(context).listOfflineRegions(
+        offlineManager.listOfflineRegions(
                 new OfflineManager.ListOfflineRegionsCallback() {
                     @Override
                     public void onList(OfflineRegion[] offlineRegions) {
                         view.hideLoading();
                         if (offlineRegions != null && offlineRegions.length > 0) {
-                            view.displayRegions(offlineRegions);
-                            //TODO: map to string our something else
+                            view.displayRegions(mapper.transform(offlineRegions));
                         } else {
                             view.displayNoOfflineMaps();
                         }

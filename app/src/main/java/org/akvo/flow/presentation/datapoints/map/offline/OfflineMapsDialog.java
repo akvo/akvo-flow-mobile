@@ -24,11 +24,10 @@ import android.app.Dialog;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-
-import com.mapbox.mapboxsdk.offline.OfflineRegion;
 
 import org.akvo.flow.R;
 import org.akvo.flow.app.FlowApp;
@@ -36,11 +35,15 @@ import org.akvo.flow.injector.component.ApplicationComponent;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.inject.Inject;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -63,6 +66,8 @@ public class OfflineMapsDialog extends DialogFragment implements OfflineMapsView
 
     @BindView(R.id.noMapsTextView)
     TextView noMapsTextView;
+
+    private OfflineAreasAdapter adapter;
 
     public OfflineMapsDialog() {
     }
@@ -87,7 +92,9 @@ public class OfflineMapsDialog extends DialogFragment implements OfflineMapsView
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         initializeInjector();
-
+        adapter = new OfflineAreasAdapter(new ArrayList<>());
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        recyclerView.setAdapter(adapter);
         presenter.setView(this);
         presenter.load(getContext().getApplicationContext());
     }
@@ -120,10 +127,11 @@ public class OfflineMapsDialog extends DialogFragment implements OfflineMapsView
     }
 
     @Override
-    public void displayRegions(OfflineRegion[] offlineRegions) {
+    public void displayRegions(List<OfflineArea> offlineRegions) {
         addMapsButton.setVisibility(View.GONE);
         noMapsTextView.setVisibility(View.GONE);
         recyclerView.setVisibility(View.VISIBLE);
+        adapter.setOfflineAreas(offlineRegions);
     }
 
     @Override
@@ -131,5 +139,59 @@ public class OfflineMapsDialog extends DialogFragment implements OfflineMapsView
         recyclerView.setVisibility(View.GONE);
         addMapsButton.setVisibility(View.VISIBLE);
         noMapsTextView.setVisibility(View.VISIBLE);
+    }
+
+    @OnClick(R.id.addMapButton)
+    public void addMapPressed() {
+        //TODO: go to offline map selection
+    }
+
+    public static class OfflineAreasAdapter
+            extends RecyclerView.Adapter<OfflineAreasAdapter.ViewHolder> {
+
+        private final List<OfflineArea> offlineAreas;
+
+        public OfflineAreasAdapter(ArrayList<OfflineArea> offlineAreas) {
+            this.offlineAreas = offlineAreas;
+        }
+
+        @NonNull @Override
+        public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+            TextView textView = (TextView) LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.simple_item_text_view, parent, false);
+            return new ViewHolder(textView);
+        }
+
+        @Override
+        public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+            holder.setTextView(offlineAreas.get(position).getName());
+        }
+
+        public void setOfflineAreas(@NonNull List<OfflineArea> results) {
+            offlineAreas.clear();
+            offlineAreas.addAll(results);
+            notifyDataSetChanged();
+        }
+
+        @Override
+        public int getItemCount() {
+            return offlineAreas.size();
+        }
+
+        static class ViewHolder extends RecyclerView.ViewHolder {
+
+            private final TextView textView;
+
+            ViewHolder(TextView itemView) {
+                super(itemView);
+                this.textView = itemView;
+            }
+
+            void setTextView(String name) {
+                if (name != null) {
+                    textView.setText(name);
+                }
+            }
+        }
     }
 }

@@ -24,7 +24,6 @@ import android.app.Dialog;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -47,6 +46,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 public class OfflineMapsDialog extends DialogFragment implements OfflineMapsView {
 
@@ -92,11 +92,11 @@ public class OfflineMapsDialog extends DialogFragment implements OfflineMapsView
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         initializeInjector();
-        adapter = new OfflineAreasAdapter(new ArrayList<>());
+        adapter = new OfflineAreasAdapter(new ArrayList<>(), (OfflineMapSelectedListener) getActivity());
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(adapter);
         presenter.setView(this);
-        presenter.load(getContext().getApplicationContext());
+        presenter.load();
     }
 
     private void initializeInjector() {
@@ -143,55 +143,11 @@ public class OfflineMapsDialog extends DialogFragment implements OfflineMapsView
 
     @OnClick(R.id.addMapButton)
     public void addMapPressed() {
-        //TODO: go to offline map selection
+        //TODO: go to offline map creation
     }
 
-    public static class OfflineAreasAdapter
-            extends RecyclerView.Adapter<OfflineAreasAdapter.ViewHolder> {
-
-        private final List<OfflineArea> offlineAreas;
-
-        public OfflineAreasAdapter(ArrayList<OfflineArea> offlineAreas) {
-            this.offlineAreas = offlineAreas;
-        }
-
-        @NonNull @Override
-        public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            TextView textView = (TextView) LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.simple_item_text_view, parent, false);
-            return new ViewHolder(textView);
-        }
-
-        @Override
-        public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-            holder.setTextView(offlineAreas.get(position).getName());
-        }
-
-        public void setOfflineAreas(@NonNull List<OfflineArea> results) {
-            offlineAreas.clear();
-            offlineAreas.addAll(results);
-            notifyDataSetChanged();
-        }
-
-        @Override
-        public int getItemCount() {
-            return offlineAreas.size();
-        }
-
-        static class ViewHolder extends RecyclerView.ViewHolder {
-
-            private final TextView textView;
-
-            ViewHolder(TextView itemView) {
-                super(itemView);
-                this.textView = itemView;
-            }
-
-            void setTextView(String name) {
-                if (name != null) {
-                    textView.setText(name);
-                }
-            }
-        }
+    @OnClick(R.id.onlineMapTextView)
+    public void onOnLineMapSelected() {
+        presenter.onOnlineMapSelected();
     }
 }

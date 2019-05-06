@@ -19,17 +19,7 @@
 
 package org.akvo.flow.presentation.datapoints.map.offline;
 
-import java.util.List;
+public interface OfflineMapSelectedListener {
 
-public interface OfflineMapsView {
-
-    void showLoading();
-
-    void displayRegions(List<OfflineArea> offlineRegions);
-
-    void displayNoOfflineMaps();
-
-    void hideLoading();
-
-    void dismiss();
+    void onOfflineAreaSelected(OfflineArea offlineArea);
 }

@@ -19,8 +19,6 @@
 
 package org.akvo.flow.presentation.datapoints.map.offline;
 
-import android.content.Context;
-
 import com.mapbox.mapboxsdk.offline.OfflineManager;
 import com.mapbox.mapboxsdk.offline.OfflineRegion;
 
@@ -52,7 +50,7 @@ public class OfflineMapsPresenter implements Presenter {
         this.view = view;
     }
 
-    public void load(Context context) {
+    public void load() {
         view.showLoading();
         //TODO: make sure we "unsubscribe"
         offlineManager.listOfflineRegions(
@@ -74,5 +72,10 @@ public class OfflineMapsPresenter implements Presenter {
                         view.displayNoOfflineMaps();
                     }
                 });
+    }
+
+    public void onOnlineMapSelected() {
+        //setup selected maps to online
+        view.dismiss();
     }
 }

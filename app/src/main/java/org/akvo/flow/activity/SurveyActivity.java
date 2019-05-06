@@ -48,6 +48,9 @@ import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
 import org.akvo.flow.presentation.SnackBarManager;
 import org.akvo.flow.presentation.UserDeleteConfirmationDialog;
+import org.akvo.flow.presentation.datapoints.map.offline.OfflineArea;
+import org.akvo.flow.presentation.datapoints.map.offline.OfflineMapSelectedListener;
+import org.akvo.flow.presentation.datapoints.map.offline.OfflineMapsDialog;
 import org.akvo.flow.presentation.entity.ViewApkData;
 import org.akvo.flow.presentation.navigation.CreateUserDialog;
 import org.akvo.flow.presentation.navigation.EditUserDialog;
@@ -97,7 +100,8 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
         FlowNavigationView.DrawerNavigationListener,
         SurveyDeleteConfirmationDialog.SurveyDeleteListener, UserOptionsDialog.UserOptionListener,
         UserDeleteConfirmationDialog.UserDeleteListener, EditUserDialog.EditUserListener,
-        CreateUserDialog.CreateUserListener, SurveyView, TrackingListener, FABListener {
+        CreateUserDialog.CreateUserListener, SurveyView, TrackingListener, FABListener,
+        OfflineMapSelectedListener {
 
     public static final int NAVIGATION_DRAWER_DELAY_MILLIS = 250;
     private static final String DATA_POINTS_FRAGMENT_TAG = "datapoints_fragment";
@@ -668,5 +672,15 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
         if (mSurveyGroup != null) {
             addDataPointFab.hide();
         }
+    }
+
+    @Override
+    public void onOfflineAreaSelected(OfflineArea offlineArea) {
+       DialogFragment fragment = (DialogFragment) getSupportFragmentManager().findFragmentByTag(
+               OfflineMapsDialog.TAG);
+       if (fragment != null) {
+           fragment.dismiss();
+       }
+       //TODO: actually add logic to save the selected area
     }
 }

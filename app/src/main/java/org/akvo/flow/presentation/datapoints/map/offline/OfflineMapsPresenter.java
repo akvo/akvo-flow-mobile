@@ -86,16 +86,17 @@ public class OfflineMapsPresenter implements Presenter {
     }
 
     private void checkSelectedRegion(OfflineRegion[] offlineRegions) {
-        getSelectedOfflineAre.execute(new DefaultObserver<Optional<OfflineArea>>(){
+        getSelectedOfflineAre.execute(new DefaultObserver<Optional<OfflineArea>>() {
             @Override
             public void onError(Throwable e) {
                 Timber.e(e);
-                view.displayRegions(mapper.transform(offlineRegions),  null);
+                view.displayRegions(mapper.transform(offlineRegions), null);
             }
 
             @Override
             public void onNext(Optional<OfflineArea> offlineAreaOptional) {
-                view.displayRegions(mapper.transform(offlineRegions),  offlineAreaMapper.transform(offlineAreaOptional));
+                view.displayRegions(mapper.transform(offlineRegions),
+                        offlineAreaMapper.transform(offlineAreaOptional));
             }
         }, null);
 

@@ -316,6 +316,10 @@
     <string name="offline_maps_dialog_offline_label">Offline</string>
     <string name="offline_maps_dialog_empty_text">No offline maps. Download a map in order to select it.</string>
     <string name="offline_maps_dialog_empty_button">New Offline Map</string>
+    <string name="offline_map_activity_title">New map</string>
+    <string name="offline_map_download_hint">Drag area to download into the blue square</string>
+    <string name="offline_map_download_name">Map name</string>
+    <string name="offline_map_download_button">Download map</string>
 
     <plurals name="download_forms_error">
         <item quantity="one">Error downloading form</item>

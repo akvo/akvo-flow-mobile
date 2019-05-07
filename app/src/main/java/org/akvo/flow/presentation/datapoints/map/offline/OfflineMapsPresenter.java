@@ -22,9 +22,14 @@ package org.akvo.flow.presentation.datapoints.map.offline;
 import com.mapbox.mapboxsdk.offline.OfflineManager;
 import com.mapbox.mapboxsdk.offline.OfflineRegion;
 
+import org.akvo.flow.domain.entity.OfflineArea;
+import org.akvo.flow.domain.entity.Optional;
+import org.akvo.flow.domain.interactor.DefaultObserver;
+import org.akvo.flow.domain.interactor.UseCase;
 import org.akvo.flow.presentation.Presenter;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import timber.log.Timber;
 
@@ -34,16 +39,22 @@ public class OfflineMapsPresenter implements Presenter {
 
     private final OfflineRegionMapper mapper;
     private final OfflineManager offlineManager;
+    private final UseCase getSelectedOfflineAre;
+    private final OfflineAreaMapper offlineAreaMapper;
 
     @Inject
-    public OfflineMapsPresenter(OfflineRegionMapper mapper, OfflineManager offlineManager) {
+    public OfflineMapsPresenter(OfflineRegionMapper mapper, OfflineManager offlineManager,
+            @Named("getSelectedOfflineArea") UseCase getSelectedOfflineAre,
+            OfflineAreaMapper offlineAreaMapper) {
         this.mapper = mapper;
         this.offlineManager = offlineManager;
+        this.getSelectedOfflineAre = getSelectedOfflineAre;
+        this.offlineAreaMapper = offlineAreaMapper;
     }
 
     @Override
     public void destroy() {
-        //EMPTY
+        getSelectedOfflineAre.dispose();
     }
 
     public void setView(OfflineMapsView view) {
@@ -59,7 +70,7 @@ public class OfflineMapsPresenter implements Presenter {
                     public void onList(OfflineRegion[] offlineRegions) {
                         view.hideLoading();
                         if (offlineRegions != null && offlineRegions.length > 0) {
-                            view.displayRegions(mapper.transform(offlineRegions));
+                            checkSelectedRegion(offlineRegions);
                         } else {
                             view.displayNoOfflineMaps();
                         }
@@ -72,6 +83,22 @@ public class OfflineMapsPresenter implements Presenter {
                         view.displayNoOfflineMaps();
                     }
                 });
+    }
+
+    private void checkSelectedRegion(OfflineRegion[] offlineRegions) {
+        getSelectedOfflineAre.execute(new DefaultObserver<Optional<OfflineArea>>(){
+            @Override
+            public void onError(Throwable e) {
+                Timber.e(e);
+                view.displayRegions(mapper.transform(offlineRegions),  null);
+            }
+
+            @Override
+            public void onNext(Optional<OfflineArea> offlineAreaOptional) {
+                view.displayRegions(mapper.transform(offlineRegions),  offlineAreaMapper.transform(offlineAreaOptional));
+            }
+        }, null);
+
     }
 
     public void onOnlineMapSelected() {

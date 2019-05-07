@@ -17,23 +17,28 @@
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.akvo.flow.presentation.datapoints.map.offline;
+package org.akvo.flow.domain.entity;
 
-import com.mapbox.mapboxsdk.geometry.LatLngBounds;
+import java.util.NoSuchElementException;
 
-public class OfflineArea {
+import androidx.annotation.Nullable;
 
-    private final String name;
-    private final LatLngBounds bounds;
-    private final double zoom;
+public class Optional<M> {
 
-    public OfflineArea(String name, LatLngBounds bounds, double zoom) {
-        this.name = name;
-        this.bounds = bounds;
-        this.zoom = zoom;
+    private final M optional;
+
+    public Optional(@Nullable M optional) {
+        this.optional = optional;
     }
 
-    public String getName() {
-        return name;
+    public boolean isEmpty() {
+        return this.optional == null;
+    }
+
+    public M get() {
+        if (optional == null) {
+            throw new NoSuchElementException("No value present");
+        }
+        return optional;
     }
 }

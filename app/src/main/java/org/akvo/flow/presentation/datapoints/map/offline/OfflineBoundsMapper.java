@@ -19,17 +19,21 @@
 
 package org.akvo.flow.presentation.datapoints.map.offline;
 
-import java.util.List;
+import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 
-public interface OfflineMapsView {
+import org.akvo.flow.domain.entity.OfflineBounds;
 
-    void showLoading();
+import javax.inject.Inject;
 
-    void displayRegions(List<ViewOfflineArea> offlineRegions);
+public class OfflineBoundsMapper {
 
-    void displayNoOfflineMaps();
+    @Inject
+    public OfflineBoundsMapper() {
+    }
 
-    void hideLoading();
-
-    void dismiss();
+    public LatLngBounds transform(OfflineBounds offlineBounds) {
+        return LatLngBounds
+                .from(offlineBounds.getLatitudeNorth(), offlineBounds.getLongitudeEast(),
+                        offlineBounds.getLatitudeSouth(), offlineBounds.getLongitudeWest());
+    }
 }

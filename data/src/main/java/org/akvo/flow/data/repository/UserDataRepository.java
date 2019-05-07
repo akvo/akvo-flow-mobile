@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -21,6 +21,8 @@
 package org.akvo.flow.data.repository;
 
 import org.akvo.flow.data.datasource.DataSourceFactory;
+import org.akvo.flow.domain.entity.OfflineArea;
+import org.akvo.flow.domain.entity.Optional;
 import org.akvo.flow.domain.repository.UserRepository;
 
 import javax.inject.Inject;
@@ -164,5 +166,10 @@ public class UserDataRepository implements UserRepository {
     @Override
     public Observable<Boolean> saveLastNotificationTime() {
         return dataSourceFactory.getSharedPreferencesDataSource().setAppUpdateNotifiedTime();
+    }
+
+    @Override
+    public Observable<Optional<OfflineArea>> getSelectedOfflineArea() {
+        return dataSourceFactory.getSharedPreferencesDataSource().getSelectedOfflineArea();
     }
 }

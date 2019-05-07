@@ -33,10 +33,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 public class OfflineAreasAdapter extends RecyclerView.Adapter<OfflineAreasAdapter.ViewHolder> {
 
-    private final List<OfflineArea> offlineAreas;
+    private final List<ViewOfflineArea> offlineAreas;
     private final OfflineMapSelectedListener areaSelectionListener;
 
-    public OfflineAreasAdapter(ArrayList<OfflineArea> offlineAreas,
+    public OfflineAreasAdapter(ArrayList<ViewOfflineArea> offlineAreas,
             OfflineMapSelectedListener listener) {
         this.offlineAreas = offlineAreas;
         this.areaSelectionListener = listener;
@@ -55,7 +55,7 @@ public class OfflineAreasAdapter extends RecyclerView.Adapter<OfflineAreasAdapte
         holder.setTextView(offlineAreas.get(position));
     }
 
-    public void setOfflineAreas(@NonNull List<OfflineArea> results) {
+    public void setOfflineAreas(@NonNull List<ViewOfflineArea> results) {
         offlineAreas.clear();
         offlineAreas.addAll(results);
         notifyDataSetChanged();
@@ -77,14 +77,14 @@ public class OfflineAreasAdapter extends RecyclerView.Adapter<OfflineAreasAdapte
             this.listener = listener;
         }
 
-        void setTextView(OfflineArea offlineArea) {
+        void setTextView(ViewOfflineArea offlineArea) {
             if (offlineArea != null) {
                 textView.setText(offlineArea.getName());
                 textView.setOnClickListener(v -> onAreaSelected(offlineArea));
             }
         }
 
-        private void onAreaSelected(OfflineArea offlineArea) {
+        private void onAreaSelected(ViewOfflineArea offlineArea) {
             if (listener != null) {
                 listener.onOfflineAreaSelected(offlineArea);
             }

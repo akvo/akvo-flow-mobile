@@ -39,6 +39,8 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.mapbox.geojson.Feature;
 import com.mapbox.geojson.FeatureCollection;
 import com.mapbox.geojson.Point;
+import com.mapbox.mapboxsdk.camera.CameraPosition;
+import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.location.LocationComponent;
 import com.mapbox.mapboxsdk.location.modes.CameraMode;
@@ -66,6 +68,7 @@ import org.akvo.flow.injector.component.ViewComponent;
 import org.akvo.flow.presentation.datapoints.DataPointSyncSnackBarManager;
 import org.akvo.flow.presentation.datapoints.map.entity.MapDataPoint;
 import org.akvo.flow.presentation.datapoints.map.offline.OfflineMapsDialog;
+import org.akvo.flow.presentation.datapoints.map.offline.ViewOfflineArea;
 import org.akvo.flow.ui.Navigator;
 import org.akvo.flow.ui.fragment.RecordListListener;
 import org.akvo.flow.util.ConstantUtil;
@@ -505,11 +508,18 @@ public class DataPointsMapFragment extends SupportMapFragment implements
     }
 
     @Override
-    public void displayData(List<MapDataPoint> surveyedLocales) {
+    public void displayData(List<MapDataPoint> dataPoints, @Nullable ViewOfflineArea offlineArea) {
         mItems.clear();
-        mItems.addAll(surveyedLocales);
+        mItems.addAll(dataPoints);
         source.setGeoJson(getFeatureCollection());
         unSelectDataPoint();
+        if (offlineArea != null && mapboxMap != null) {
+            CameraPosition cameraPosition = new CameraPosition.Builder()
+                    .target(offlineArea.getBounds().getCenter())
+                    .zoom(offlineArea.getZoom())
+                    .build();
+            mapboxMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+        }
     }
 
     @Override

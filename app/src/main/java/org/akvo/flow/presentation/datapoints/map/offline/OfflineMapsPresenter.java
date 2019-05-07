@@ -32,11 +32,11 @@ public class OfflineMapsPresenter implements Presenter {
 
     private OfflineMapsView view;
 
-    private final OfflineAreaMapper mapper;
+    private final OfflineRegionMapper mapper;
     private final OfflineManager offlineManager;
 
     @Inject
-    public OfflineMapsPresenter(OfflineAreaMapper mapper, OfflineManager offlineManager) {
+    public OfflineMapsPresenter(OfflineRegionMapper mapper, OfflineManager offlineManager) {
         this.mapper = mapper;
         this.offlineManager = offlineManager;
     }

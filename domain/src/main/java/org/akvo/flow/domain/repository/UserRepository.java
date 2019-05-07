@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -19,6 +19,9 @@
  */
 
 package org.akvo.flow.domain.repository;
+
+import org.akvo.flow.domain.entity.OfflineArea;
+import org.akvo.flow.domain.entity.Optional;
 
 import io.reactivex.Observable;
 
@@ -75,4 +78,6 @@ public interface UserRepository {
     Observable<Long> getLastNotificationTime();
 
     Observable<Boolean> saveLastNotificationTime();
+
+    Observable<Optional<OfflineArea>> getSelectedOfflineArea();
 }

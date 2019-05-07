@@ -127,7 +127,7 @@ public class OfflineMapsDialog extends DialogFragment implements OfflineMapsView
     }
 
     @Override
-    public void displayRegions(List<OfflineArea> offlineRegions) {
+    public void displayRegions(List<ViewOfflineArea> offlineRegions) {
         addMapsButton.setVisibility(View.GONE);
         noMapsTextView.setVisibility(View.GONE);
         recyclerView.setVisibility(View.VISIBLE);

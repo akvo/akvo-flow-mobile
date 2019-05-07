@@ -17,19 +17,29 @@
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.akvo.flow.presentation.datapoints.map.offline;
+package org.akvo.flow.domain.entity;
 
-import java.util.List;
+public class OfflineArea {
 
-public interface OfflineMapsView {
+    private final String name;
+    private final OfflineBounds bounds;
+    private final double zoom;
 
-    void showLoading();
+    public OfflineArea(String name, OfflineBounds bounds, double zoom) {
+        this.name = name;
+        this.bounds = bounds;
+        this.zoom = zoom;
+    }
 
-    void displayRegions(List<ViewOfflineArea> offlineRegions);
+    public String getName() {
+        return name;
+    }
 
-    void displayNoOfflineMaps();
+    public OfflineBounds getBounds() {
+        return bounds;
+    }
 
-    void hideLoading();
-
-    void dismiss();
+    public double getZoom() {
+        return zoom;
+    }
 }

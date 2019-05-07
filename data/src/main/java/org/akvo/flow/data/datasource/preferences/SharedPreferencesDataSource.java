@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -21,14 +21,16 @@
 package org.akvo.flow.data.datasource.preferences;
 
 import android.content.SharedPreferences;
-import androidx.annotation.Nullable;
 
 import org.akvo.flow.domain.entity.ApkData;
+import org.akvo.flow.domain.entity.OfflineArea;
+import org.akvo.flow.domain.entity.Optional;
 import org.akvo.flow.domain.util.GsonMapper;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import androidx.annotation.Nullable;
 import io.reactivex.Observable;
 
 @Singleton
@@ -40,6 +42,7 @@ public class SharedPreferencesDataSource {
     private static final String KEY_MAX_IMG_SIZE = "media.img.maxsize";
     private static final String KEY_DATA_PUBLISH_TIME = "data_publish_time";
     private static final String KEY_SETUP = "setup";
+    private static final String KEY_OFFLINE_AREA = "offline_area";
 
     private static final String DEFAULT_VALUE_DEVICE_IDENTIFIER = "unset";
     private static final int DEFAULT_VALUE_IMAGE_SIZE = 0;
@@ -193,6 +196,14 @@ public class SharedPreferencesDataSource {
     public Observable<Boolean> clearAppUpdateNotified() {
         removePreference(KEY_APP_UPDATE_LAST_NOTIFIED);
         return Observable.just(true);
+    }
+
+    public Observable<Optional<OfflineArea>> getSelectedOfflineArea() {
+        String area = preferences.getString(KEY_OFFLINE_AREA, null);
+        if (area == null) {
+            return Observable.just(new Optional<OfflineArea>(null));
+        }
+        return Observable.just(new Optional<>(gsonMapper.read(area, OfflineArea.class)));
     }
 
     protected String getString(String key, String defaultValue) {

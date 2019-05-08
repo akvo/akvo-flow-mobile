@@ -24,13 +24,14 @@ import android.content.SharedPreferences;
 
 import org.akvo.flow.domain.entity.ApkData;
 import org.akvo.flow.domain.entity.OfflineArea;
-import org.akvo.flow.domain.entity.Optional;
 import org.akvo.flow.domain.util.GsonMapper;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import androidx.annotation.Nullable;
+import io.reactivex.Completable;
+import io.reactivex.Maybe;
 import io.reactivex.Observable;
 
 @Singleton
@@ -163,6 +164,7 @@ public class SharedPreferencesDataSource {
         clearSelectedUser();
         clearSetUp();
         clearPublishDataTime();
+        removePreference(KEY_OFFLINE_AREA);
         return Observable.just(true);
     }
 
@@ -198,12 +200,22 @@ public class SharedPreferencesDataSource {
         return Observable.just(true);
     }
 
-    public Observable<Optional<OfflineArea>> getSelectedOfflineArea() {
+    public Maybe<OfflineArea> getSelectedOfflineArea() {
         String area = preferences.getString(KEY_OFFLINE_AREA, null);
         if (area == null) {
-            return Observable.just(new Optional<OfflineArea>(null));
+            return Maybe.empty();
+        } else {
+            return Maybe.just(gsonMapper.read(area, OfflineArea.class));
         }
-        return Observable.just(new Optional<>(gsonMapper.read(area, OfflineArea.class)));
+    }
+
+    public Completable saveSelectedOfflineArea(@Nullable OfflineArea offlineArea) {
+        if (offlineArea == null) {
+            removePreference(KEY_OFFLINE_AREA);
+        } else {
+            setString(KEY_OFFLINE_AREA, gsonMapper.write(offlineArea, OfflineArea.class));
+        }
+        return Completable.complete();
     }
 
     protected String getString(String key, String defaultValue) {

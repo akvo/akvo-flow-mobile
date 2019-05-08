@@ -28,13 +28,15 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
-import io.reactivex.Maybe;
+import io.reactivex.Completable;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.observers.DisposableMaybeObserver;
+import io.reactivex.observers.DisposableCompletableObserver;
 import io.reactivex.schedulers.Schedulers;
 
-public class GetSelectedOfflineArea {
+public class SaveSelectedOfflineArea {
+
+    public static final String AREA_PARAM = "area";
 
     private final ThreadExecutor threadExecutor;
     private final PostExecutionThread postExecutionThread;
@@ -42,19 +44,19 @@ public class GetSelectedOfflineArea {
     private final UserRepository userRepository;
 
     @Inject
-    protected GetSelectedOfflineArea(ThreadExecutor threadExecutor,
-            PostExecutionThread postExecutionThread,
-            UserRepository userRepository) {
+    protected SaveSelectedOfflineArea(ThreadExecutor threadExecutor,
+            PostExecutionThread postExecutionThread, UserRepository userRepository) {
         this.threadExecutor = threadExecutor;
         this.postExecutionThread = postExecutionThread;
         this.disposables = new CompositeDisposable();
         this.userRepository = userRepository;
     }
 
-    public void execute(DisposableMaybeObserver observer, Map<String, Object> parameters) {
-        addDisposable(buildUseCaseObservable(parameters)
+    public void execute(DisposableCompletableObserver observer, Map<String, Object> parameters) {
+        final Completable completable = buildUseCaseObservable(parameters)
                 .subscribeOn(Schedulers.from(threadExecutor))
-                .observeOn(postExecutionThread.getScheduler()).subscribeWith(observer));
+                .observeOn(postExecutionThread.getScheduler());
+        addDisposable(completable.subscribeWith(observer));
     }
 
     public void dispose() {
@@ -63,8 +65,10 @@ public class GetSelectedOfflineArea {
         }
     }
 
-    protected <T> Maybe<OfflineArea> buildUseCaseObservable(Map<String, T> parameters) {
-        return userRepository.getSelectedOfflineArea();
+    protected <T> Completable buildUseCaseObservable(Map<String, T> parameters) {
+        OfflineArea offlineArea =
+                parameters == null ? null : (OfflineArea) parameters.get(AREA_PARAM);
+        return userRepository.saveSelectedOfflineArea(offlineArea);
     }
 
     private void addDisposable(Disposable disposable) {

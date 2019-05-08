@@ -22,11 +22,11 @@ package org.akvo.flow.presentation.datapoints.map.offline;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 
 import org.akvo.flow.domain.entity.OfflineArea;
-import org.akvo.flow.domain.entity.Optional;
+import org.akvo.flow.domain.entity.OfflineBounds;
 
 import javax.inject.Inject;
 
-import androidx.annotation.Nullable;
+import androidx.annotation.NonNull;
 
 public class OfflineAreaMapper {
 
@@ -37,14 +37,15 @@ public class OfflineAreaMapper {
         this.offlineBoundsMapper = offlineBoundsMapper;
     }
 
-    @Nullable
-    public ViewOfflineArea transform(Optional<OfflineArea> offlineAreaOptional) {
-        if (offlineAreaOptional.isEmpty()) {
-            return null;
-        } else {
-            OfflineArea area = offlineAreaOptional.get();
-            LatLngBounds latLngBounds = offlineBoundsMapper.transform(area.getBounds());
-            return new ViewOfflineArea(area.getName(), latLngBounds, area.getZoom());
-        }
+    @NonNull
+    public ViewOfflineArea transform(OfflineArea area) {
+        LatLngBounds latLngBounds = offlineBoundsMapper.transform(area.getBounds());
+        return new ViewOfflineArea(area.getName(), latLngBounds, area.getZoom());
+    }
+
+    @NonNull
+    public OfflineArea transform(ViewOfflineArea area) {
+        OfflineBounds latLngBounds = offlineBoundsMapper.transform(area.getBounds());
+        return new OfflineArea(area.getName(), latLngBounds, area.getZoom());
     }
 }

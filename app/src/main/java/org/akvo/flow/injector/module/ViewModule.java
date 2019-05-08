@@ -52,7 +52,6 @@ import org.akvo.flow.domain.interactor.apk.GetApkDataPreferences;
 import org.akvo.flow.domain.interactor.apk.SaveApkUpdateNotified;
 import org.akvo.flow.domain.interactor.forms.DownloadForm;
 import org.akvo.flow.domain.interactor.forms.ReloadForms;
-import org.akvo.flow.domain.interactor.offline.GetSelectedOfflineArea;
 import org.akvo.flow.domain.interactor.setup.SaveSetup;
 import org.akvo.flow.domain.interactor.users.CreateUser;
 import org.akvo.flow.domain.interactor.users.DeleteUser;
@@ -295,11 +294,5 @@ public class ViewModule {
     @Named("reloadForms")
     UseCase provideReloadForms(ReloadForms reloadForms) {
         return reloadForms;
-    }
-
-    @Provides
-    @Named("getSelectedOfflineArea")
-    UseCase provideGetSelectedOfflineArea(GetSelectedOfflineArea getSelectedArea) {
-        return getSelectedArea;
     }
 }

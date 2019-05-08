@@ -24,13 +24,13 @@ import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.entity.DataPoint;
 import org.akvo.flow.domain.entity.DownloadResult;
 import org.akvo.flow.domain.entity.OfflineArea;
-import org.akvo.flow.domain.entity.Optional;
 import org.akvo.flow.domain.interactor.DefaultFlowableObserver;
 import org.akvo.flow.domain.interactor.DefaultObserver;
 import org.akvo.flow.domain.interactor.DownloadDataPoints;
 import org.akvo.flow.domain.interactor.ErrorComposable;
 import org.akvo.flow.domain.interactor.GetSavedDataPoints;
 import org.akvo.flow.domain.interactor.UseCase;
+import org.akvo.flow.domain.interactor.offline.GetSelectedOfflineArea;
 import org.akvo.flow.domain.util.Constants;
 import org.akvo.flow.presentation.Presenter;
 import org.akvo.flow.presentation.datapoints.map.entity.MapDataPoint;
@@ -49,6 +49,7 @@ import javax.inject.Named;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import io.reactivex.observers.DisposableMaybeObserver;
 import timber.log.Timber;
 
 import static org.akvo.flow.domain.entity.DownloadResult.ResultCode.SUCCESS;
@@ -60,7 +61,7 @@ public class DataPointsMapPresenter implements Presenter {
     private final UseCase getSavedDataPoints;
     private final UseCase checkDeviceNotification;
     private final UseCase upload;
-    private final UseCase getSelectedOfflineAre;
+    private final GetSelectedOfflineArea getSelectedOfflineAre;
     private final OfflineAreaMapper offlineAreaMapper;
 
     private DataPointsMapView view;
@@ -70,8 +71,7 @@ public class DataPointsMapPresenter implements Presenter {
     DataPointsMapPresenter(@Named("getSavedDataPoints") UseCase getSavedDataPoints,
             MapDataPointMapper mapper, DownloadDataPoints downloadDataPoints,
             @Named("checkDeviceNotification") UseCase checkDeviceNotification,
-            @Named("uploadSync") UseCase upload,
-            @Named("getSelectedOfflineArea") UseCase getSelectedOfflineAre,
+            @Named("uploadSync") UseCase upload, GetSelectedOfflineArea getSelectedOfflineAre,
             OfflineAreaMapper offlineAreaMapper) {
         this.getSavedDataPoints = getSavedDataPoints;
         this.mapper = mapper;
@@ -125,7 +125,12 @@ public class DataPointsMapPresenter implements Presenter {
     }
 
     private void loadOfflineSettings(List<DataPoint> dataPoints) {
-        getSelectedOfflineAre.execute(new DefaultObserver<Optional<OfflineArea>>(){
+        getSelectedOfflineAre.execute(new DisposableMaybeObserver<OfflineArea>() {
+            @Override
+            public void onSuccess(OfflineArea offlineArea) {
+                displayData(dataPoints, offlineAreaMapper.transform(offlineArea));
+            }
+
             @Override
             public void onError(Throwable e) {
                 Timber.e(e);
@@ -133,8 +138,9 @@ public class DataPointsMapPresenter implements Presenter {
             }
 
             @Override
-            public void onNext(Optional<OfflineArea> offlineAreaOptional) {
-                displayData(dataPoints, offlineAreaMapper.transform(offlineAreaOptional));
+            public void onComplete() {
+                // no regions found
+                displayData(dataPoints, null);
             }
         }, null);
 

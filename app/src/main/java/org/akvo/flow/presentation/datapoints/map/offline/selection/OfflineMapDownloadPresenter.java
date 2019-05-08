@@ -67,24 +67,7 @@ public class OfflineMapDownloadPresenter implements Presenter {
                         offlineRegion.setObserver(new OfflineRegion.OfflineRegionObserver() {
                             @Override
                             public void onStatusChanged(OfflineRegionStatus status) {
-                                // Compute a percentage
-                                double percentage = status.getRequiredResourceCount() >= 0
-                                        ?
-                                        (100.0 * status.getCompletedResourceCount() / status
-                                                .getRequiredResourceCount()) : 0.0;
-
-                                if (status.isComplete()) {
-                                    // Download complete
-                                    view.hideProgress();
-                                } else if (status.isRequiredResourceCountPrecise()) {
-                                    // Switch to determinate state
-                                    view.updateProgress((int) Math.round(percentage));
-                                    // Log what is being currently downloaded
-                                    Timber.d("%s/%s resources; %s bytes downloaded.",
-                                            String.valueOf(status.getCompletedResourceCount()),
-                                            String.valueOf(status.getRequiredResourceCount()),
-                                            String.valueOf(status.getCompletedResourceSize()));
-                                }
+                                updateProgress(status);
                             }
 
                             @Override
@@ -107,9 +90,32 @@ public class OfflineMapDownloadPresenter implements Presenter {
                     @Override
                     public void onError(String error) {
                         Timber.e("Error: %s", error);
+                        //TODO: notify user
                     }
                 });
 
     }
 
+    private void updateProgress(OfflineRegionStatus status) {
+        if (status.isComplete()) {
+            view.hideProgress();
+        } else if (status.isRequiredResourceCountPrecise()) {
+            view.updateProgress(getLatestProgress(status));
+            Timber.d("%s/%s resources; %s bytes downloaded.",
+                    String.valueOf(status.getCompletedResourceCount()),
+                    String.valueOf(status.getRequiredResourceCount()),
+                    String.valueOf(status.getCompletedResourceSize()));
+        }
+    }
+
+    private int getLatestProgress(OfflineRegionStatus status) {
+        double percentage = status.getRequiredResourceCount() >= 0 ?
+                getDownloadProgress(status) : 0.0;
+        return (int) Math.round(percentage);
+    }
+
+    private double getDownloadProgress(OfflineRegionStatus status) {
+        return 100.0 * status.getCompletedResourceCount() / status
+                .getRequiredResourceCount();
+    }
 }

@@ -166,7 +166,6 @@ public class OfflineMapDownloadActivity extends BaseActivity implements OfflineM
         }
     }
 
-
     @OnClick(R.id.offline_map_save_button)
     protected void onSavePressed() {
         String styleUrl = mapboxMap.getStyle().getUrl();

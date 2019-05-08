@@ -122,6 +122,7 @@ public class OfflineMapsPresenter implements Presenter {
         saveSelectedOfflineArea.execute(new DisposableCompletableObserver() {
             @Override
             public void onComplete() {
+                view.notifyChange();
                 view.dismiss();
             }
 

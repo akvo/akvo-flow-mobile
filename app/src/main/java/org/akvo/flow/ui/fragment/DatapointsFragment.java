@@ -237,6 +237,10 @@ public class DatapointsFragment extends Fragment {
         return super.onOptionsItemSelected(item);
     }
 
+    public void refreshMap() {
+        mTabsAdapter.refreshMap();
+    }
+
     static class TabsAdapter extends FragmentPagerAdapter {
 
         private final String[] tabs;
@@ -301,6 +305,9 @@ public class DatapointsFragment extends Fragment {
             return tabs[position];
         }
 
+        public void refreshMap() {
+            getMapFragment().refreshView();
+        }
     }
 
     public void refresh(SurveyGroup surveyGroup) {

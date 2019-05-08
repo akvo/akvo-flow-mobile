@@ -36,4 +36,9 @@ public class OfflineBoundsMapper {
                 .from(offlineBounds.getLatitudeNorth(), offlineBounds.getLongitudeEast(),
                         offlineBounds.getLatitudeSouth(), offlineBounds.getLongitudeWest());
     }
+
+    public OfflineBounds transform(LatLngBounds bounds) {
+        return new OfflineBounds(bounds.getLatNorth(), bounds.getLatSouth(), bounds.getLonEast(),
+                bounds.getLonWest());
+    }
 }

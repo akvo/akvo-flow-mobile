@@ -22,11 +22,13 @@ package org.akvo.flow.data.repository;
 
 import org.akvo.flow.data.datasource.DataSourceFactory;
 import org.akvo.flow.domain.entity.OfflineArea;
-import org.akvo.flow.domain.entity.Optional;
 import org.akvo.flow.domain.repository.UserRepository;
 
 import javax.inject.Inject;
 
+import androidx.annotation.Nullable;
+import io.reactivex.Completable;
+import io.reactivex.Maybe;
 import io.reactivex.Observable;
 
 public class UserDataRepository implements UserRepository {
@@ -169,7 +171,12 @@ public class UserDataRepository implements UserRepository {
     }
 
     @Override
-    public Observable<Optional<OfflineArea>> getSelectedOfflineArea() {
+    public Maybe<OfflineArea> getSelectedOfflineArea() {
         return dataSourceFactory.getSharedPreferencesDataSource().getSelectedOfflineArea();
+    }
+
+    @Override
+    public Completable saveSelectedOfflineArea(@Nullable OfflineArea offlineArea) {
+        return dataSourceFactory.getSharedPreferencesDataSource().saveSelectedOfflineArea(offlineArea);
     }
 }

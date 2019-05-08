@@ -27,7 +27,8 @@ public interface OfflineMapsView {
 
     void showLoading();
 
-    void displayRegions(List<ViewOfflineArea> offlineRegions, @Nullable ViewOfflineArea transform);
+    void displayRegions(List<ViewOfflineArea> offlineRegions,
+            @Nullable ViewOfflineArea selectedRegion);
 
     void displayNoOfflineMaps();
 

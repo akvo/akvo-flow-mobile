@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -15,19 +15,22 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 
-package org.akvo.flow.database;
+package org.akvo.flow.util.image;
 
-import androidx.annotation.NonNull;
+import android.content.Context;
+import android.util.Log;
 
-import java.util.Set;
+import com.bumptech.glide.GlideBuilder;
+import com.bumptech.glide.annotation.GlideModule;
+import com.bumptech.glide.module.AppGlideModule;
 
-public interface SurveyLanguagesDataSource {
+@GlideModule
+public final class FlowAppGlideModule extends AppGlideModule {
 
-    void saveLanguagePreferences(long surveyGroupId, @NonNull Set<String> languagesSet);
-
-    @NonNull
-    Set<String> getLanguagePreferences(long surveyGroupId);
+    @Override
+    public void applyOptions(Context context, GlideBuilder builder) {
+        builder.setLogLevel(Log.VERBOSE);
+    }
 }

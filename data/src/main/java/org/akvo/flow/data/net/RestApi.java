@@ -20,8 +20,8 @@
 
 package org.akvo.flow.data.net;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import android.text.TextUtils;
 
 import org.akvo.flow.data.entity.ApiApkData;

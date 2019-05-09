@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -20,12 +20,9 @@
 
 package org.akvo.flow.activity.form.formfill;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
-import android.support.test.InstrumentationRegistry;
-import android.support.test.filters.MediumTest;
-import android.support.test.rule.ActivityTestRule;
-import android.support.test.runner.AndroidJUnit4;
 
 import org.akvo.flow.R;
 import org.akvo.flow.activity.FormActivity;
@@ -38,19 +35,26 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import static android.support.test.espresso.Espresso.closeSoftKeyboard;
-import static android.support.test.espresso.Espresso.onView;
-import static android.support.test.espresso.action.ViewActions.typeText;
-import static android.support.test.espresso.assertion.ViewAssertions.matches;
-import static android.support.test.espresso.matcher.ViewMatchers.hasErrorText;
-import static android.support.test.espresso.matcher.ViewMatchers.withId;
-import static android.support.test.espresso.matcher.ViewMatchers.withText;
+import androidx.test.platform.app.InstrumentationRegistry;
+import androidx.test.filters.MediumTest;
+import androidx.test.rule.ActivityTestRule;
+import androidx.test.rule.GrantPermissionRule;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
+
+import static androidx.test.espresso.Espresso.closeSoftKeyboard;
+import static androidx.test.espresso.Espresso.onView;
+import static androidx.test.espresso.action.ViewActions.typeText;
+import static androidx.test.espresso.assertion.ViewAssertions.matches;
+import static org.akvo.flow.activity.form.FormActivityTestUtil.hasErrorText;
+import static androidx.test.espresso.matcher.ViewMatchers.withId;
+import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.clickNext;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.getFormActivityIntent;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.getString;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.verifySubmitButtonDisabled;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.verifySubmitButtonEnabled;
 import static org.akvo.flow.tests.R.raw.geo_form;
+import static org.hamcrest.CoreMatchers.is;
 
 @MediumTest
 @RunWith(AndroidJUnit4.class)
@@ -60,6 +64,18 @@ public class ManualGeoQuestionViewTest {
     private static final double MOCK_LONGITUDE = 20.0;
 
     private static SurveyInstaller installer;
+
+    @Rule
+    public GrantPermissionRule permissionRule = GrantPermissionRule
+            .grant(android.Manifest.permission.ACCESS_FINE_LOCATION);
+
+    @Rule
+    public GrantPermissionRule permissionRule2 = GrantPermissionRule
+            .grant(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+
+    @Rule
+    public GrantPermissionRule permissionRule3 = GrantPermissionRule
+            .grant(Manifest.permission.READ_PHONE_STATE);
 
     @Rule
     public ActivityTestRule<FormActivity> rule = new ActivityTestRule<FormActivity>(
@@ -72,10 +88,10 @@ public class ManualGeoQuestionViewTest {
 
     @BeforeClass
     public static void beforeClass() {
-        Context targetContext = InstrumentationRegistry.getTargetContext();
+        Context targetContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
         SurveyRequisite.setRequisites(targetContext);
         installer = new SurveyInstaller(targetContext);
-        installer.installSurvey(geo_form, InstrumentationRegistry.getContext());
+        installer.installSurvey(geo_form, InstrumentationRegistry.getInstrumentation().getContext());
     }
 
     @After
@@ -85,7 +101,7 @@ public class ManualGeoQuestionViewTest {
 
     @AfterClass
     public static void afterClass() {
-        SurveyRequisite.resetRequisites(InstrumentationRegistry.getTargetContext());
+        SurveyRequisite.resetRequisites(InstrumentationRegistry.getInstrumentation().getTargetContext());
         installer.clearSurveys();
     }
 
@@ -115,7 +131,7 @@ public class ManualGeoQuestionViewTest {
         closeSoftKeyboard();
 
         onView(withId(R.id.lat_et))
-                .check(matches(hasErrorText(getString(R.string.invalid_latitude, rule))));
+                .check(matches(hasErrorText(is(getString(R.string.invalid_latitude, rule)))));
     }
 
     @Test
@@ -124,7 +140,7 @@ public class ManualGeoQuestionViewTest {
         closeSoftKeyboard();
 
         onView(withId(R.id.lat_et))
-                .check(matches(hasErrorText(getString(R.string.invalid_latitude, rule))));
+                .check(matches(hasErrorText(is(getString(R.string.invalid_latitude, rule)))));
     }
 
     @Test
@@ -133,7 +149,7 @@ public class ManualGeoQuestionViewTest {
         closeSoftKeyboard();
 
         onView(withId(R.id.lon_et))
-                .check(matches(hasErrorText(getString(R.string.invalid_longitude, rule))));
+                .check(matches(hasErrorText(is(getString(R.string.invalid_longitude, rule)))));
     }
 
     @Test
@@ -142,7 +158,7 @@ public class ManualGeoQuestionViewTest {
         closeSoftKeyboard();
 
         onView(withId(R.id.lon_et))
-                .check(matches(hasErrorText(getString(R.string.invalid_longitude, rule))));
+                .check(matches(hasErrorText(is(getString(R.string.invalid_longitude, rule)))));
     }
 
     @Test
@@ -151,7 +167,7 @@ public class ManualGeoQuestionViewTest {
         closeSoftKeyboard();
 
         onView(withId(R.id.height_et))
-                .check(matches(hasErrorText(getString(R.string.invalid_elevation, rule))));
+                .check(matches(hasErrorText(is(getString(R.string.invalid_elevation, rule)))));
     }
 
     @Test
@@ -160,7 +176,7 @@ public class ManualGeoQuestionViewTest {
         closeSoftKeyboard();
 
         onView(withId(R.id.height_et))
-                .check(matches(hasErrorText(getString(R.string.invalid_elevation, rule))));
+                .check(matches(hasErrorText(is(getString(R.string.invalid_elevation, rule)))));
     }
 
     @Test

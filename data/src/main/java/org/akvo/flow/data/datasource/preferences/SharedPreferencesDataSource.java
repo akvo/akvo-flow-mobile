@@ -21,7 +21,7 @@
 package org.akvo.flow.data.datasource.preferences;
 
 import android.content.SharedPreferences;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 
 import org.akvo.flow.domain.entity.ApkData;
 import org.akvo.flow.domain.util.GsonMapper;

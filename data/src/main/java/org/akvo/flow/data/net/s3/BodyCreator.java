@@ -19,7 +19,7 @@
 
 package org.akvo.flow.data.net.s3;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import org.akvo.flow.data.entity.S3File;
 

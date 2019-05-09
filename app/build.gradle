@@ -38,15 +38,15 @@ android {
         targetSdkVersion rootProject.ext.targetSdkVersion
         applicationId "org.akvo.flow"
         testApplicationId "org.akvo.flow.tests"
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         testHandleProfiling true
         testFunctionalTest true
         vectorDrawables.useSupportLibrary = true
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_7
-        targetCompatibility JavaVersion.VERSION_1_7
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
 
     signingConfigs {
@@ -92,6 +92,7 @@ android {
         release {
             minifyEnabled true
             multiDexEnabled true
+            shrinkResources true
             proguardFile 'proguard-files/proguard-rules.pro'
             proguardFile 'proguard-files/proguard-butterknife.pro'
             proguardFile 'proguard-files/proguard-glide.pro'
@@ -103,6 +104,9 @@ android {
             proguardFile 'proguard-files/proguard-sentry.pro'
             proguardFile 'proguard-files/proguard-square-retrofit.pro'
             proguardFile 'proguard-files/proguard-support-v7-appcompat.pro'
+            proguardFile 'proguard-files/okhttp3.pro'
+            proguardFile 'proguard-files/mapbox.pro'
+            proguardFile 'proguard-files/crashlytics.pro'
             proguardFile getDefaultProguardFile('proguard-android.txt')
             signingConfig signingConfigs.flowRelease
         }
@@ -122,6 +126,9 @@ android {
             proguardFile 'proguard-files/proguard-sentry.pro'
             proguardFile 'proguard-files/proguard-square-retrofit.pro'
             proguardFile 'proguard-files/proguard-support-v7-appcompat.pro'
+            proguardFile 'proguard-files/okhttp3.pro'
+            proguardFile 'proguard-files/mapbox.pro'
+            proguardFile 'proguard-files/crashlytics.pro'
             proguardFile getDefaultProguardFile('proguard-android.txt')
             multiDexKeepProguard file('proguard-files/proguard-multidex-rules.pro')
         }
@@ -137,6 +144,7 @@ android {
         exclude 'META-INF/notice.txt'
         exclude 'META-INF/ASL2.0'
         exclude '.readme'
+        exclude 'androidsupportmultidexversion.txt'
     }
 
     flavorDimensions "default"
@@ -189,19 +197,14 @@ private static String getBuildYear() {
     new Date().format('yyyy')
 }
 
-android.applicationVariants.all { variant ->
-    variant.outputs.all { output ->
-        outputFileName = file("/flow.apk")
-    }
-}
-
 dependencies {
-    implementation "com.android.support:appcompat-v7:${rootProject.ext.supportVersion}"
-    implementation "com.android.support:exifinterface:${rootProject.ext.supportVersion}"
-    implementation "com.android.support:recyclerview-v7:${rootProject.ext.supportVersion}"
-    implementation "com.android.support:support-annotations:${rootProject.ext.supportVersion}"
-    implementation "com.android.support:design:${rootProject.ext.supportVersion}"
-    implementation "com.android.support.constraint:constraint-layout:${rootProject.ext.constraintLayoutVersion}"
+    implementation "androidx.appcompat:appcompat:${rootProject.ext.appCompatVersion}"
+    implementation "androidx.exifinterface:exifinterface:${rootProject.ext.exifVersion}"
+    implementation "androidx.recyclerview:recyclerview:${rootProject.ext.recyclerVersion}"
+    implementation "androidx.annotation:annotation:${rootProject.ext.annotationVersion}"
+    implementation "com.google.android.material:material:${rootProject.ext.materialVersion}"
+    implementation "androidx.constraintlayout:constraintlayout:${rootProject.ext.constraintLayoutVersion}"
+    implementation "androidx.multidex:multidex:${rootProject.ext.multidexVersion}"
     implementation "com.google.android.gms:play-services-maps:${rootProject.ext.gmsVersion}"
     implementation "com.google.android.gms:play-services-gcm:${rootProject.ext.gmsVersion}"
     implementation "com.google.maps.android:android-maps-utils:${rootProject.ext.mapUtilsVersion}"
@@ -212,7 +215,9 @@ dependencies {
     implementation "com.jakewharton:butterknife:${rootProject.ext.butterKnifeVersion}"
     annotationProcessor "com.jakewharton:butterknife-compiler:${rootProject.ext.butterKnifeVersion}"
     implementation "io.sentry:sentry-android:${rootProject.ext.sentryVersion}"
+    implementation "org.slf4j:slf4j-nop:${rootProject.ext.slfVersion}"
     implementation "com.github.bumptech.glide:glide:${rootProject.ext.glideVersion}"
+    annotationProcessor "com.github.bumptech.glide:compiler:${rootProject.ext.glideVersion}"
     implementation "com.squareup.sqlbrite2:sqlbrite:${rootProject.ext.sqlbriteVersion}"
     implementation "io.reactivex.rxjava2:rxandroid:${rootProject.ext.rxAndroidVersion}"
     implementation "io.reactivex.rxjava2:rxjava:${rootProject.ext.rxJavaVersion}"
@@ -241,26 +246,13 @@ dependencies {
     testImplementation "org.powermock:powermock-api-mockito:${rootProject.ext.powerMockVersion}"
     testImplementation "org.powermock:powermock-classloading-xstream:${rootProject.ext.powerMockVersion}"
 
+    androidTestImplementation "androidx.test.ext:junit:${rootProject.ext.androidXJunit}"
+    androidTestImplementation "androidx.test:core:${rootProject.ext.androidXCore}"
     androidTestImplementation "com.google.dexmaker:dexmaker:${rootProject.ext.dexMakerVersion}"
     androidTestImplementation "com.google.dexmaker:dexmaker-mockito:${rootProject.ext.dexMakerVersion}"
-    androidTestImplementation("com.android.support.test:rules:${rootProject.ext.supportTestRulesVersion}") {
-        exclude module: 'support-annotations'
-        exclude group: 'com.android.support', module: 'appcompat'
-        exclude group: 'com.android.support', module: 'support-v4'
-        exclude module: 'recyclerview-v7'
-    }
-    androidTestImplementation("com.android.support.test.espresso:espresso-core:${rootProject.ext.espressoCoreVersion}") {
-        exclude module: 'support-annotations'
-        exclude group: 'com.android.support', module: 'appcompat'
-        exclude group: 'com.android.support', module: 'support-v4'
-        exclude module: 'recyclerview-v7'
-    }
-    androidTestImplementation("com.android.support.test.espresso:espresso-contrib:${rootProject.ext.espressoContribVersion}") {
-        exclude module: 'support-annotations'
-        exclude group: 'com.android.support', module: 'appcompat'
-        exclude group: 'com.android.support', module: 'support-v4'
-        exclude module: 'recyclerview-v7'
-    }
+    androidTestImplementation "androidx.test:rules:${rootProject.ext.supportTestRulesVersion}"
+    androidTestImplementation "androidx.test.espresso:espresso-core:${rootProject.ext.espressoCoreVersion}"
+    androidTestImplementation "androidx.test.espresso:espresso-contrib:${rootProject.ext.espressoContribVersion}"
 
     implementation project(':domain')
     implementation project(':data')

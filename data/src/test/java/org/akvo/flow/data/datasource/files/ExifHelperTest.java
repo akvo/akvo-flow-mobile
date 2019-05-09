@@ -19,8 +19,6 @@
 
 package org.akvo.flow.data.datasource.files;
 
-import android.test.suitebuilder.annotation.SmallTest;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -32,7 +30,6 @@ import java.io.InputStream;
 
 import static junit.framework.Assert.assertFalse;
 
-@SmallTest
 @RunWith(PowerMockRunner.class)
 public class ExifHelperTest {
 

@@ -20,7 +20,7 @@
 
 package org.akvo.flow.domain.interactor;
 
-import android.support.v4.util.Pair;
+import androidx.core.util.Pair;
 
 import org.akvo.flow.domain.entity.InstanceIdUuid;
 import org.akvo.flow.domain.repository.FileRepository;

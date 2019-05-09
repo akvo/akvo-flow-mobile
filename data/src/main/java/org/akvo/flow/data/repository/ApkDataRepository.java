@@ -17,7 +17,7 @@
 
 package org.akvo.flow.data.repository;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import org.akvo.flow.data.datasource.DataSourceFactory;
 import org.akvo.flow.data.entity.ApiApkData;

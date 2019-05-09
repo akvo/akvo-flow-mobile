@@ -21,8 +21,6 @@ package org.akvo.flow.presentation.datapoints.map.offline.selection;
 
 import com.mapbox.mapboxsdk.offline.OfflineManager;
 import com.mapbox.mapboxsdk.offline.OfflineRegion;
-import com.mapbox.mapboxsdk.offline.OfflineRegionError;
-import com.mapbox.mapboxsdk.offline.OfflineRegionStatus;
 import com.mapbox.mapboxsdk.offline.OfflineTilePyramidRegionDefinition;
 
 import org.akvo.flow.presentation.Presenter;
@@ -57,65 +55,20 @@ public class OfflineMapDownloadPresenter implements Presenter {
     public void downloadArea(OfflineTilePyramidRegionDefinition definition, String regionName) {
         view.showProgress();
         byte[] metadata = regionNameMapper.getRegionMetadata(regionName);
-
-        // Create the offline region and launch the download
         offlineManager.createOfflineRegion(definition, metadata,
                 new OfflineManager.CreateOfflineRegionCallback() {
                     @Override
                     public void onCreate(OfflineRegion offlineRegion) {
                         Timber.d("Offline region created: %s", regionName);
-                        offlineRegion.setObserver(new OfflineRegion.OfflineRegionObserver() {
-                            @Override
-                            public void onStatusChanged(OfflineRegionStatus status) {
-                                updateProgress(status);
-                            }
-
-                            @Override
-                            public void onError(OfflineRegionError error) {
-                                Timber.e("onError reason: %s", error.getReason());
-                                Timber.e("onError message: %s", error.getMessage());
-                            }
-
-                            @Override
-                            public void mapboxTileCountLimitExceeded(long limit) {
-                                Timber.e("Mapbox tile count limit exceeded: %s", limit);
-                                //TODO: notify user
-                            }
-                        });
-
-                        // Change the region state
                         offlineRegion.setDownloadState(OfflineRegion.STATE_ACTIVE);
+                        view.navigateToMapsList();
                     }
 
                     @Override
                     public void onError(String error) {
                         Timber.e("Error: %s", error);
-                        //TODO: notify user
+                        view.showOfflineAreaError();
                     }
                 });
-
-    }
-
-    private void updateProgress(OfflineRegionStatus status) {
-        if (status.isComplete()) {
-            view.hideProgress();
-        } else if (status.isRequiredResourceCountPrecise()) {
-            view.updateProgress(getLatestProgress(status));
-            Timber.d("%s/%s resources; %s bytes downloaded.",
-                    String.valueOf(status.getCompletedResourceCount()),
-                    String.valueOf(status.getRequiredResourceCount()),
-                    String.valueOf(status.getCompletedResourceSize()));
-        }
-    }
-
-    private int getLatestProgress(OfflineRegionStatus status) {
-        double percentage = status.getRequiredResourceCount() >= 0 ?
-                getDownloadProgress(status) : 0.0;
-        return (int) Math.round(percentage);
-    }
-
-    private double getDownloadProgress(OfflineRegionStatus status) {
-        return 100.0 * status.getCompletedResourceCount() / status
-                .getRequiredResourceCount();
     }
 }

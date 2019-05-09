@@ -25,7 +25,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.mapbox.mapboxsdk.maps.MapView;
@@ -37,6 +36,8 @@ import org.akvo.flow.R;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
 import org.akvo.flow.presentation.BaseActivity;
+import org.akvo.flow.presentation.SnackBarManager;
+import org.akvo.flow.ui.Navigator;
 
 import javax.inject.Inject;
 
@@ -56,9 +57,6 @@ public class OfflineMapDownloadActivity extends BaseActivity implements OfflineM
     @BindView(R.id.toolbar)
     Toolbar toolbar;
 
-    @BindView(R.id.offline_map_area_info)
-    TextView areInfoTv;
-
     @BindView(R.id.offline_map_save_button)
     Button saveBt;
 
@@ -70,6 +68,12 @@ public class OfflineMapDownloadActivity extends BaseActivity implements OfflineM
 
     @Inject
     OfflineMapDownloadPresenter presenter;
+
+    @Inject
+    Navigator navigator;
+
+    @Inject
+    SnackBarManager snackBarManager;
 
     private MapboxMap mapboxMap;
 
@@ -104,14 +108,13 @@ public class OfflineMapDownloadActivity extends BaseActivity implements OfflineM
     private void setUpMapBox(MapboxMap mapboxMap) {
         this.mapboxMap = mapboxMap;
         mapboxMap.setStyle(defaultMapStyle(), style -> {
-            //TODO:
+            //EMPTY
         });
     }
 
     @NonNull
     private Style.Builder defaultMapStyle() {
-        return new Style.Builder()
-                .fromUrl("mapbox://styles/mapbox/light-v10");
+        return new Style.Builder().fromUrl("mapbox://styles/mapbox/light-v10");
     }
 
     @Override
@@ -181,20 +184,19 @@ public class OfflineMapDownloadActivity extends BaseActivity implements OfflineM
     @Override
     public void showProgress() {
         saveBt.setEnabled(false);
-        downloadProgress.setIndeterminate(true);
         downloadProgress.setVisibility(View.VISIBLE);
     }
 
     @Override
-    public void hideProgress() {
-        mapNameEt.setText("");
-        downloadProgress.setVisibility(View.GONE);
-        //Show that downloaded
+    public void navigateToMapsList() {
+        navigator.navigateToOfflineAreasList(this);
+        finish();
     }
 
     @Override
-    public void updateProgress(int progress) {
-        downloadProgress.setIndeterminate(false);
-        downloadProgress.setProgress(progress);
+    public void showOfflineAreaError() {
+        downloadProgress.setVisibility(View.GONE);
+        saveBt.setEnabled(true);
+        snackBarManager.displaySnackBar(downloadProgress, R.string.offline_map_create_error, this);
     }
 }

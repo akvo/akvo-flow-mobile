@@ -17,13 +17,19 @@
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.akvo.flow.presentation.datapoints.map.offline.selection;
+package org.akvo.flow.presentation.datapoints.map.offline.list;
 
-public interface OfflineMapDownloadView {
+import android.os.Bundle;
 
-    void showProgress();
+import org.akvo.flow.R;
 
-    void navigateToMapsList();
+import androidx.appcompat.app.AppCompatActivity;
 
-    void showOfflineAreaError();
+public class OfflineAreasListActivity extends AppCompatActivity {
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_offline_areas_list);
+    }
 }

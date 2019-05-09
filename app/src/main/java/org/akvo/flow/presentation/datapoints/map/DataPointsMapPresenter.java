@@ -143,7 +143,6 @@ public class DataPointsMapPresenter implements Presenter {
                 displayData(dataPoints, null);
             }
         }, null);
-
     }
 
     private void displayData(List<DataPoint> dataPoints, @Nullable ViewOfflineArea offlineArea) {
@@ -251,5 +250,26 @@ public class DataPointsMapPresenter implements Presenter {
                 view.hideProgress();
             }
         }, params);
+    }
+
+    public void refreshSelectedArea() {
+        getSelectedOfflineAre.execute(new DisposableMaybeObserver<OfflineArea>() {
+            @Override
+            public void onSuccess(OfflineArea offlineArea) {
+                view.displayOfflineAreaOrLocation(offlineAreaMapper.transform(offlineArea));
+            }
+
+            @Override
+            public void onError(Throwable e) {
+                Timber.e(e);
+                view.displayOfflineAreaOrLocation(null);
+            }
+
+            @Override
+            public void onComplete() {
+                // no regions found
+                view.displayOfflineAreaOrLocation(null);
+            }
+        }, null);
     }
 }

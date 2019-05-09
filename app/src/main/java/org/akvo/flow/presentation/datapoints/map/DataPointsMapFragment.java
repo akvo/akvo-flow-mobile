@@ -240,7 +240,6 @@ public class DataPointsMapFragment extends SupportMapFragment implements
                 .fromUrl("mapbox://styles/mapbox/light-v10"), style -> {
                     style.addImage(MARKER_IMAGE, BitmapFactory.decodeResource(
                             getResources(), R.drawable.marker), true);
-                    enableLocationComponent(style);
                     addClusteredGeoJsonSource(style);
                     presenter.onViewReady();
                 });
@@ -513,12 +512,19 @@ public class DataPointsMapFragment extends SupportMapFragment implements
         mItems.addAll(dataPoints);
         source.setGeoJson(getFeatureCollection());
         unSelectDataPoint();
+        displayOfflineAreaOrLocation(offlineArea);
+    }
+
+    @Override
+    public void displayOfflineAreaOrLocation(@Nullable ViewOfflineArea offlineArea) {
         if (offlineArea != null && mapboxMap != null) {
             CameraPosition cameraPosition = new CameraPosition.Builder()
                     .target(offlineArea.getBounds().getCenter())
                     .zoom(offlineArea.getZoom())
                     .build();
             mapboxMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+        } else if (mapboxMap != null && mapboxMap.getStyle() != null){
+            enableLocationComponent(mapboxMap.getStyle());
         }
     }
 
@@ -579,5 +585,9 @@ public class DataPointsMapFragment extends SupportMapFragment implements
 
     public void hideFab() {
         offlineMapsFab.hide();
+    }
+
+    public void refreshView() {
+        presenter.refreshSelectedArea();
     }
 }

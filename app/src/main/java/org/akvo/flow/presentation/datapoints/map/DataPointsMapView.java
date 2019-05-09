@@ -49,6 +49,8 @@ interface DataPointsMapView {
 
     void showMonitoredMenu();
 
+    void displayOfflineAreaOrLocation(@Nullable ViewOfflineArea offlineArea);
+
     void showNonMonitoredMenu();
 
     void showFab();

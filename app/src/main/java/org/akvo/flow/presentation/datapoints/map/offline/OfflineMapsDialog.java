@@ -21,6 +21,7 @@ package org.akvo.flow.presentation.datapoints.map.offline;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -43,6 +44,7 @@ import javax.inject.Inject;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
@@ -75,6 +77,7 @@ public class OfflineMapsDialog extends DialogFragment implements OfflineMapsView
     TextView onLineMapsTextView;
 
     private OfflineAreasAdapter adapter;
+    private OfflineMapSelectedListener offlineMapSelectedListener;
 
     public OfflineMapsDialog() {
     }
@@ -96,10 +99,27 @@ public class OfflineMapsDialog extends DialogFragment implements OfflineMapsView
     }
 
     @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        FragmentActivity activity = getActivity();
+        if (!(activity instanceof OfflineMapSelectedListener)) {
+            throw new IllegalArgumentException("Activity must implement OfflineMapSelectedListener");
+        }
+        offlineMapSelectedListener = (OfflineMapSelectedListener) activity;
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        offlineMapSelectedListener = null;
+    }
+
+    @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         initializeInjector();
-        adapter = new OfflineAreasAdapter(new ArrayList<>(), (OfflineMapSelectedListener) getActivity());
+
+        adapter = new OfflineAreasAdapter(new ArrayList<>(), offlineMapSelectedListener);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(adapter);
         presenter.setView(this);
@@ -131,6 +151,11 @@ public class OfflineMapsDialog extends DialogFragment implements OfflineMapsView
     @Override
     public void hideLoading() {
         progressBar.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void notifyChange() {
+        offlineMapSelectedListener.onAreaSelected();
     }
 
     @Override

@@ -48,9 +48,9 @@ import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
 import org.akvo.flow.presentation.SnackBarManager;
 import org.akvo.flow.presentation.UserDeleteConfirmationDialog;
-import org.akvo.flow.presentation.datapoints.map.offline.ViewOfflineArea;
 import org.akvo.flow.presentation.datapoints.map.offline.OfflineMapSelectedListener;
 import org.akvo.flow.presentation.datapoints.map.offline.OfflineMapsDialog;
+import org.akvo.flow.presentation.datapoints.map.offline.ViewOfflineArea;
 import org.akvo.flow.presentation.entity.ViewApkData;
 import org.akvo.flow.presentation.navigation.CreateUserDialog;
 import org.akvo.flow.presentation.navigation.EditUserDialog;
@@ -410,8 +410,7 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
 
         selectedSurveyId = mSurveyGroup != null ? mSurveyGroup.getId() : SurveyGroup.ID_NONE;
 
-        DatapointsFragment f = (DatapointsFragment) getSupportFragmentManager().findFragmentByTag(
-                DATA_POINTS_FRAGMENT_TAG);
+        DatapointsFragment f = getDataPointsFragment();
         if (f != null) {
             f.refresh(mSurveyGroup);
         }
@@ -681,5 +680,18 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
        if (fragment != null) {
            fragment.onOfflineAreaSelected(offlineArea);
        }
+    }
+
+    @Override
+    public void onAreaSelected() {
+        DatapointsFragment fragment = getDataPointsFragment();
+        if (fragment != null) {
+            fragment.refreshMap();
+        }
+    }
+
+    private DatapointsFragment getDataPointsFragment() {
+        return (DatapointsFragment) getSupportFragmentManager().findFragmentByTag(
+                DATA_POINTS_FRAGMENT_TAG);
     }
 }

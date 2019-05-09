@@ -35,4 +35,6 @@ public interface OfflineMapsView {
     void hideLoading();
 
     void dismiss();
+
+    void notifyChange();
 }

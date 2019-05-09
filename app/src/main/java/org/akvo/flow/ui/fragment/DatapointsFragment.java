@@ -273,12 +273,12 @@ public class DatapointsFragment extends Fragment {
         }
 
         DataPointsMapFragment getMapFragment() {
-            return (DataPointsMapFragment) fragmentsRef
-                    .get(POSITION_MAP);
+            return (DataPointsMapFragment) fragmentsRef.get(POSITION_MAP);
         }
 
+        @NonNull
         @Override
-        public Object instantiateItem(ViewGroup container, int position) {
+        public Object instantiateItem(@NonNull ViewGroup container, int position) {
             if (position == POSITION_LIST) {
                 DataPointsListFragment dataPointsListFragment = (DataPointsListFragment) super
                         .instantiateItem(container, position);

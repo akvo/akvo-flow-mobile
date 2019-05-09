@@ -371,7 +371,7 @@ public class Navigator {
         }
     }
 
-    public void navigateToMapCreation(@Nullable Context context) {
+    public void navigateToOfflineMapAreasCreation(@Nullable Context context) {
         if (context != null) {
             Intent intent = new Intent(context, OfflineMapDownloadActivity.class);
             context.startActivity(intent);

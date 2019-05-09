@@ -28,7 +28,15 @@
         android:theme="@style/FlowAppTheme"
         android:usesCleartextTraffic="true"
         tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".presentation.datapoints.map.offline.list.OfflineAreasListActivity"></activity>
+        <activity
+            android:name=".presentation.datapoints.map.offline.list.OfflineAreasListActivity"
+            android:label="@string/offline_maps_list_title"
+            android:parentActivityName=".activity.SurveyActivity"
+            android:theme="@style/FlowAppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="org.akvo.flow.activity.SurveyActivity" />
+        </activity>
         <activity
             android:name=".presentation.datapoints.map.offline.selection.OfflineMapDownloadActivity"
             android:label="@string/offline_map_activity_title" />

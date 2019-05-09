@@ -105,7 +105,7 @@ public class FlowNavigationView extends NavigationView implements IFlowNavigatio
         surveyTitleTextView = findViewById(R.id.surveys_title_tv);
         surveysRecyclerView = findViewById(R.id.surveys_rv);
         usersRecyclerView = findViewById( R.id.users_rv);
-        userHeader = findViewById( R.id.user_header);
+        userHeader = findViewById(R.id.user_header);
         NavigationMenuView navigationMenuView = (NavigationMenuView) getChildAt(0);
         if (navigationMenuView != null) {
             navigationMenuView.setVerticalScrollBarEnabled(false);
@@ -144,31 +144,25 @@ public class FlowNavigationView extends NavigationView implements IFlowNavigatio
     }
 
     private void setNavigationItemListener() {
-        findViewById(R.id.settings_tv).setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (drawerNavigationListener != null) {
-                    drawerNavigationListener.navigateToSettings();
-                }
+        findViewById(R.id.settings_tv).setOnClickListener(v -> {
+            if (drawerNavigationListener != null) {
+                drawerNavigationListener.navigateToSettings();
             }
         });
 
-        findViewById(R.id.help_tv).setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (drawerNavigationListener != null) {
-                    drawerNavigationListener.navigateToHelp();
-                }
+        findViewById(R.id.help_tv).setOnClickListener(v -> {
+            if (drawerNavigationListener != null) {
+                drawerNavigationListener.navigateToHelp();
             }
         });
 
-        findViewById(R.id.about_tv).setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (drawerNavigationListener != null) {
-                    drawerNavigationListener.navigateToAbout();
-                }
+        findViewById(R.id.about_tv).setOnClickListener(v -> {
+            if (drawerNavigationListener != null) {
+                drawerNavigationListener.navigateToAbout();
             }
+        });
+        findViewById(R.id.offline_maps_tv).setOnClickListener(v -> {
+            drawerNavigationListener.navigateToOfflineMaps();
         });
     }
 
@@ -195,29 +189,23 @@ public class FlowNavigationView extends NavigationView implements IFlowNavigatio
     private void initCurrentUserText() {
         hideUsersDrawable = ContextCompat.getDrawable(getContext(), R.drawable.ic_expand_less);
         showUsersDrawable = ContextCompat.getDrawable(getContext(), R.drawable.ic_expand_more);
-        userHeader.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (surveysRecyclerView.getVisibility() == VISIBLE) {
-                    updateTextViewDrawable(hideUsersDrawable);
-                    surveyTitleTextView.setVisibility(GONE);
-                    surveysRecyclerView.setVisibility(GONE);
-                    usersRecyclerView.setVisibility(VISIBLE);
-                } else {
-                    updateTextViewDrawable(showUsersDrawable);
-                    surveyTitleTextView.setVisibility(VISIBLE);
-                    surveysRecyclerView.setVisibility(VISIBLE);
-                    usersRecyclerView.setVisibility(GONE);
+        userHeader.setOnClickListener(v -> {
+            if (surveysRecyclerView.getVisibility() == VISIBLE) {
+                updateTextViewDrawable(hideUsersDrawable);
+                surveyTitleTextView.setVisibility(GONE);
+                surveysRecyclerView.setVisibility(GONE);
+                usersRecyclerView.setVisibility(VISIBLE);
+            } else {
+                updateTextViewDrawable(showUsersDrawable);
+                surveyTitleTextView.setVisibility(VISIBLE);
+                surveysRecyclerView.setVisibility(VISIBLE);
+                usersRecyclerView.setVisibility(GONE);
 
-                }
             }
         });
-        userHeader.setOnLongClickListener(new OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                presenter.onCurrentUserLongPress();
-                return true;
-            }
+        userHeader.setOnLongClickListener(v -> {
+            presenter.onCurrentUserLongPress();
+            return true;
         });
     }
 
@@ -358,5 +346,7 @@ public class FlowNavigationView extends NavigationView implements IFlowNavigatio
         void navigateToAbout();
 
         void navigateToSettings();
+
+        void navigateToOfflineMaps();
     }
 }

@@ -21,15 +21,39 @@ package org.akvo.flow.presentation.datapoints.map.offline.list;
 
 import android.os.Bundle;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
 import org.akvo.flow.R;
+import org.akvo.flow.activity.BackActivity;
+import org.akvo.flow.injector.component.DaggerViewComponent;
+import org.akvo.flow.injector.component.ViewComponent;
+import org.akvo.flow.ui.Navigator;
 
-import androidx.appcompat.app.AppCompatActivity;
+import javax.inject.Inject;
 
-public class OfflineAreasListActivity extends AppCompatActivity {
+public class OfflineAreasListActivity extends BackActivity {
+
+    @Inject
+    Navigator navigator;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_offline_areas_list);
+        setContentView(R.layout.activity_offline_area_list);
+        setupToolBar();
+        initializeInjector();
+
+        FloatingActionButton fab = findViewById(R.id.fab);
+        fab.setOnClickListener(view -> {
+            navigator.navigateToOfflineMapAreasCreation(this);
+            finish();
+        });
+    }
+
+    private void initializeInjector() {
+        ViewComponent viewComponent =
+                DaggerViewComponent.builder().applicationComponent(getApplicationComponent())
+                        .build();
+        viewComponent.inject(this);
     }
 }

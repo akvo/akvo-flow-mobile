@@ -575,6 +575,11 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
         navigate(() -> navigator.navigateToAppSettings(SurveyActivity.this));
     }
 
+    @Override
+    public void navigateToOfflineMaps() {
+        navigate(() -> navigator.navigateToOfflineAreasList(SurveyActivity.this));
+    }
+
     private void navigate(Runnable runnable) {
         mDrawerLayout.closeDrawers();
         mDrawerLayout.postDelayed(runnable, NAVIGATION_DRAWER_DELAY_MILLIS);

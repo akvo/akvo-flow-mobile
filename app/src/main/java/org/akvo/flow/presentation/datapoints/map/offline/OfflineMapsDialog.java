@@ -180,7 +180,7 @@ public class OfflineMapsDialog extends DialogFragment implements OfflineMapsView
 
     @OnClick(R.id.addMapButton)
     public void addMapPressed() {
-        navigator.navigateToMapCreation(getActivity());
+        navigator.navigateToOfflineMapAreasCreation(getActivity());
         dismiss();
     }
 

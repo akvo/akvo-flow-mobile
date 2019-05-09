@@ -34,7 +34,7 @@
         <item name="android:singleLine">true</item>
     </style>
 
-    <style name="FlowAppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light"/>
+    <style name="FlowAppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
     <style name="FlowAppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
         <item name="searchViewStyle">@style/SearchView</item>
@@ -161,5 +161,10 @@
 
     <style name="RepeatButtonStyle" parent="Widget.AppCompat.Button.Borderless.Colored">
         <item name="android:textSize">16sp</item>
+    </style>
+
+    <style name="FlowAppTheme.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
     </style>
 </resources>

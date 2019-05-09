@@ -321,6 +321,10 @@
     <string name="offline_map_download_name">Map name</string>
     <string name="offline_map_download_button">Download map</string>
     <string name="offline_map_create_error">Error creating offline area</string>
+    <string name="offline_maps_navigation_entry">Offline Maps</string>
+    <string name="offline_maps_list_title">Offline Maps</string>
+    <string name="no_offline_maps_title">Downloaded maps will apeear here</string>
+    <string name="no_offline_maps_subtitle">Use the button below to get started</string>
 
     <plurals name="download_forms_error">
         <item quantity="one">Error downloading form</item>

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -21,14 +21,17 @@
 package org.akvo.flow.data.datasource.preferences;
 
 import android.content.SharedPreferences;
-import androidx.annotation.Nullable;
 
 import org.akvo.flow.domain.entity.ApkData;
+import org.akvo.flow.domain.entity.OfflineArea;
 import org.akvo.flow.domain.util.GsonMapper;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import androidx.annotation.Nullable;
+import io.reactivex.Completable;
+import io.reactivex.Maybe;
 import io.reactivex.Observable;
 
 @Singleton
@@ -40,6 +43,7 @@ public class SharedPreferencesDataSource {
     private static final String KEY_MAX_IMG_SIZE = "media.img.maxsize";
     private static final String KEY_DATA_PUBLISH_TIME = "data_publish_time";
     private static final String KEY_SETUP = "setup";
+    private static final String KEY_OFFLINE_AREA = "offline_area";
 
     private static final String DEFAULT_VALUE_DEVICE_IDENTIFIER = "unset";
     private static final int DEFAULT_VALUE_IMAGE_SIZE = 0;
@@ -160,6 +164,7 @@ public class SharedPreferencesDataSource {
         clearSelectedUser();
         clearSetUp();
         clearPublishDataTime();
+        removePreference(KEY_OFFLINE_AREA);
         return Observable.just(true);
     }
 
@@ -193,6 +198,24 @@ public class SharedPreferencesDataSource {
     public Observable<Boolean> clearAppUpdateNotified() {
         removePreference(KEY_APP_UPDATE_LAST_NOTIFIED);
         return Observable.just(true);
+    }
+
+    public Maybe<OfflineArea> getSelectedOfflineArea() {
+        String area = preferences.getString(KEY_OFFLINE_AREA, null);
+        if (area == null) {
+            return Maybe.empty();
+        } else {
+            return Maybe.just(gsonMapper.read(area, OfflineArea.class));
+        }
+    }
+
+    public Completable saveSelectedOfflineArea(@Nullable OfflineArea offlineArea) {
+        if (offlineArea == null) {
+            removePreference(KEY_OFFLINE_AREA);
+        } else {
+            setString(KEY_OFFLINE_AREA, gsonMapper.write(offlineArea, OfflineArea.class));
+        }
+        return Completable.complete();
     }
 
     protected String getString(String key, String defaultValue) {

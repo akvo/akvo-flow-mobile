@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -21,10 +21,14 @@
 package org.akvo.flow.data.repository;
 
 import org.akvo.flow.data.datasource.DataSourceFactory;
+import org.akvo.flow.domain.entity.OfflineArea;
 import org.akvo.flow.domain.repository.UserRepository;
 
 import javax.inject.Inject;
 
+import androidx.annotation.Nullable;
+import io.reactivex.Completable;
+import io.reactivex.Maybe;
 import io.reactivex.Observable;
 
 public class UserDataRepository implements UserRepository {
@@ -164,5 +168,15 @@ public class UserDataRepository implements UserRepository {
     @Override
     public Observable<Boolean> saveLastNotificationTime() {
         return dataSourceFactory.getSharedPreferencesDataSource().setAppUpdateNotifiedTime();
+    }
+
+    @Override
+    public Maybe<OfflineArea> getSelectedOfflineArea() {
+        return dataSourceFactory.getSharedPreferencesDataSource().getSelectedOfflineArea();
+    }
+
+    @Override
+    public Completable saveSelectedOfflineArea(@Nullable OfflineArea offlineArea) {
+        return dataSourceFactory.getSharedPreferencesDataSource().saveSelectedOfflineArea(offlineArea);
     }
 }

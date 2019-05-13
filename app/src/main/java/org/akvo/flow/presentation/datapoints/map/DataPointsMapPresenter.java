@@ -84,6 +84,7 @@ public class DataPointsMapPresenter implements Presenter {
             } else {
                 view.showNonMonitoredMenu();
             }
+            view.showFab();
         }
     }
 

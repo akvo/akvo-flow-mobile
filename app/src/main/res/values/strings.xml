@@ -310,6 +310,7 @@
 
     <string name="unpublish_service_notification_title">Deleting published files</string>
     <string name="unpublish_service_notification_ticker">Deleting</string>
+    <string name="offline_maps_dialog_title">Select map</string>
 
     <plurals name="download_forms_error">
         <item quantity="one">Error downloading form</item>

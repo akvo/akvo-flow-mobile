@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2016-2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -32,6 +32,7 @@ import org.akvo.flow.presentation.AppDownloadDialogFragment;
 import org.akvo.flow.presentation.about.AboutActivity;
 import org.akvo.flow.presentation.datapoints.list.DataPointsListFragment;
 import org.akvo.flow.presentation.datapoints.map.DataPointsMapFragment;
+import org.akvo.flow.presentation.datapoints.map.offline.OfflineMapsDialog;
 import org.akvo.flow.presentation.form.mobiledata.MobileDataSettingDialog;
 import org.akvo.flow.presentation.help.HelpActivity;
 import org.akvo.flow.presentation.legal.LegalNoticesActivity;
@@ -109,4 +110,6 @@ public interface ViewComponent {
     void inject(WalkThroughActivity walkThroughActivity);
 
     void inject(MobileDataSettingDialog mobileDataSettingDialog);
+
+    void inject(OfflineMapsDialog offlineMapsDialog);
 }

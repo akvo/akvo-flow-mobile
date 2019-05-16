@@ -311,6 +311,11 @@
     <string name="unpublish_service_notification_title">Deleting published files</string>
     <string name="unpublish_service_notification_ticker">Deleting</string>
     <string name="offline_maps_dialog_title">Select map</string>
+    <string name="offline_maps_dialog_online_label">Online</string>
+    <string name="offline_maps_dialog_live_section">Live Map</string>
+    <string name="offline_maps_dialog_offline_label">Offline</string>
+    <string name="offline_maps_dialog_empty_text">No offline maps. Download a map in order to select it.</string>
+    <string name="offline_maps_dialog_empty_button">New Offline Map</string>
 
     <plurals name="download_forms_error">
         <item quantity="one">Error downloading form</item>

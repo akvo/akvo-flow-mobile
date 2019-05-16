@@ -20,6 +20,8 @@
 package org.akvo.flow.presentation.datapoints.map.offline;
 
 import com.mapbox.mapboxsdk.offline.OfflineRegion;
+import com.mapbox.mapboxsdk.offline.OfflineRegionDefinition;
+import com.mapbox.mapboxsdk.offline.OfflineRegionStatus;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,14 +34,17 @@ public class OfflineRegionMapper {
 
     private final RegionNameMapper regionNameMapper;
 
+    private static final long  MEGABYTE = 1024L * 1024L;
+
     @Inject
     public OfflineRegionMapper(RegionNameMapper regionNameMapper) {
         this.regionNameMapper = regionNameMapper;
     }
 
     public ViewOfflineArea transform(@NonNull OfflineRegion region) {
-        return new ViewOfflineArea(regionNameMapper.getRegionName(region), region.getDefinition().getBounds(),
-                region.getDefinition().getMinZoom());
+        OfflineRegionDefinition definition = region.getDefinition();
+        return new ViewOfflineArea(regionNameMapper.getRegionName(region),
+                definition.getBounds(), definition.getMinZoom(), false, "0 MB");
     }
 
     public List<ViewOfflineArea> transform(@NonNull OfflineRegion[] regions) {
@@ -48,5 +53,14 @@ public class OfflineRegionMapper {
             offlineAreas.add(transform(r));
         }
         return offlineAreas;
+    }
+
+    public ViewOfflineArea transform(OfflineRegion region, OfflineRegionStatus status) {
+        OfflineRegionDefinition definition = region.getDefinition();
+        return new ViewOfflineArea(regionNameMapper.getRegionName(region),
+                definition.getBounds(),
+                definition.getMinZoom(),
+                status.getDownloadState() == OfflineRegion.STATE_ACTIVE,
+                status.getCompletedResourceSize() / MEGABYTE + " MB");
     }
 }

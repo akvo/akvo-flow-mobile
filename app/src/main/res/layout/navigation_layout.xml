@@ -74,6 +74,7 @@
             android:layout_marginTop="16dp"
             android:layout_marginLeft="16dp"
             android:layout_marginStart="16dp"
+            android:textColor="@color/black_main"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/offline_maps_navigation_entry" />

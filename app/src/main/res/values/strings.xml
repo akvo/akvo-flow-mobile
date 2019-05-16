@@ -325,6 +325,11 @@
     <string name="offline_maps_list_title">Offline Maps</string>
     <string name="no_offline_maps_title">Downloaded maps will apeear here</string>
     <string name="no_offline_maps_subtitle">Use the button below to get started</string>
+    <string name="view_offline_area">View</string>
+    <string name="rename_offline_area">Rename</string>
+    <string name="delete_offline_area">Delete</string>
+    <string name="offline_areas_list_button">Select to use</string>
+    <string name="offline_item_status">Downloading</string>
 
     <plurals name="download_forms_error">
         <item quantity="one">Error downloading form</item>

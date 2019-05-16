@@ -40,7 +40,7 @@ public class OfflineAreaMapper {
     @NonNull
     public ViewOfflineArea transform(OfflineArea area) {
         LatLngBounds latLngBounds = offlineBoundsMapper.transform(area.getBounds());
-        return new ViewOfflineArea(area.getName(), latLngBounds, area.getZoom());
+        return new ViewOfflineArea(area.getName(), latLngBounds, area.getZoom(), false, "0 MB");
     }
 
     @NonNull

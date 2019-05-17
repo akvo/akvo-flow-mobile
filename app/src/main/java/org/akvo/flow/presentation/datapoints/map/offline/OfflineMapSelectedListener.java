@@ -21,7 +21,7 @@ package org.akvo.flow.presentation.datapoints.map.offline;
 
 public interface OfflineMapSelectedListener {
 
-    void onOfflineAreaSelected(ViewOfflineArea offlineArea);
+    void onOfflineAreaPressed(ViewOfflineArea offlineArea);
 
-    void onAreaSelected();
+    void onNewMapAreaSaved();
 }

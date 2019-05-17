@@ -674,7 +674,7 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     }
 
     @Override
-    public void onOfflineAreaSelected(ViewOfflineArea offlineArea) {
+    public void onOfflineAreaPressed(ViewOfflineArea offlineArea) {
         OfflineMapsDialog fragment = (OfflineMapsDialog) getSupportFragmentManager().findFragmentByTag(
                OfflineMapsDialog.TAG);
        if (fragment != null) {
@@ -683,7 +683,7 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     }
 
     @Override
-    public void onAreaSelected() {
+    public void onNewMapAreaSaved() {
         DatapointsFragment fragment = getDataPointsFragment();
         if (fragment != null) {
             fragment.refreshMap();

@@ -89,13 +89,13 @@ public class OfflineAreasAdapter extends RecyclerView.Adapter<OfflineAreasAdapte
                 } else {
                     textView.setSelected(false);
                 }
-                textView.setOnClickListener(v -> onAreaSelected(offlineArea));
+                textView.setOnClickListener(v -> onOfflineAreaPressed(offlineArea));
             }
         }
 
-        private void onAreaSelected(ViewOfflineArea offlineArea) {
+        private void onOfflineAreaPressed(ViewOfflineArea offlineArea) {
             if (listener != null) {
-                listener.onOfflineAreaSelected(offlineArea);
+                listener.onOfflineAreaPressed(offlineArea);
             }
         }
     }

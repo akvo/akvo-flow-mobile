@@ -171,14 +171,16 @@ public class OfflineMapDownloadActivity extends BaseActivity implements OfflineM
 
     @OnClick(R.id.offline_map_save_button)
     protected void onSavePressed() {
-        String styleUrl = mapboxMap.getStyle().getUrl();
-        LatLngBounds bounds = mapboxMap.getProjection().getVisibleRegion().latLngBounds;
-        double minZoom = mapboxMap.getCameraPosition().zoom;
-        double maxZoom = mapboxMap.getMaxZoomLevel();
-        float pixelRatio = this.getResources().getDisplayMetrics().density;
-        OfflineTilePyramidRegionDefinition definition = new OfflineTilePyramidRegionDefinition(
-                styleUrl, bounds, minZoom, maxZoom, pixelRatio);
-        presenter.downloadArea(definition, mapNameEt.getText().toString());
+        if (mapboxMap != null && mapboxMap.getStyle() != null) {
+            String styleUrl = mapboxMap.getStyle().getUrl();
+            LatLngBounds bounds = mapboxMap.getProjection().getVisibleRegion().latLngBounds;
+            double minZoom = mapboxMap.getCameraPosition().zoom;
+            double maxZoom = mapboxMap.getMaxZoomLevel();
+            float pixelRatio = this.getResources().getDisplayMetrics().density;
+            OfflineTilePyramidRegionDefinition definition = new OfflineTilePyramidRegionDefinition(
+                    styleUrl, bounds, minZoom, maxZoom, pixelRatio);
+            presenter.downloadArea(definition, mapNameEt.getText().toString());
+        }
     }
 
     @Override

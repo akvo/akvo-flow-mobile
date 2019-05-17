@@ -106,7 +106,7 @@ public class OfflineAreasListPresenter implements Presenter {
         disposables.add(singleObserver);
     }
 
-    public Single<OfflineRegion[]> getOfflineRegions() {
+    private Single<OfflineRegion[]> getOfflineRegions() {
         return Single.create(emitter -> offlineManager
                 .listOfflineRegions(new OfflineManager.ListOfflineRegionsCallback() {
                     @Override

@@ -26,16 +26,11 @@ public class ViewOfflineArea {
     private final String name;
     private final LatLngBounds bounds;
     private final double zoom;
-    private final boolean isDownloading;
-    private final String sizeInMB;
 
-    public ViewOfflineArea(String name, LatLngBounds bounds, double zoom, boolean isDownloading,
-            String sizeInMB) {
+    public ViewOfflineArea(String name, LatLngBounds bounds, double zoom) {
         this.name = name;
         this.bounds = bounds;
         this.zoom = zoom;
-        this.isDownloading = isDownloading;
-        this.sizeInMB = sizeInMB;
     }
 
     public String getName() {
@@ -48,13 +43,5 @@ public class ViewOfflineArea {
 
     public double getZoom() {
         return zoom;
-    }
-
-    public boolean isDownloading() {
-        return isDownloading;
-    }
-
-    public String getSizeInMB() {
-        return sizeInMB;
     }
 }

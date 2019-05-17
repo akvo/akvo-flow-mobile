@@ -20,8 +20,8 @@
 package org.akvo.flow.presentation.datapoints.map.offline;
 
 import com.mapbox.mapboxsdk.offline.OfflineRegion;
-import com.mapbox.mapboxsdk.offline.OfflineRegionDefinition;
-import com.mapbox.mapboxsdk.offline.OfflineRegionStatus;
+
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,22 +29,20 @@ import java.util.List;
 import javax.inject.Inject;
 
 import androidx.annotation.NonNull;
+import timber.log.Timber;
 
 public class OfflineRegionMapper {
 
-    private final RegionNameMapper regionNameMapper;
-
-    private static final long  MEGABYTE = 1024L * 1024L;
+    private static final String JSON_CHARSET = "UTF-8";
+    private static final String JSON_FIELD_REGION_NAME = "FIELD_REGION_NAME";
 
     @Inject
-    public OfflineRegionMapper(RegionNameMapper regionNameMapper) {
-        this.regionNameMapper = regionNameMapper;
+    public OfflineRegionMapper() {
     }
 
     public ViewOfflineArea transform(@NonNull OfflineRegion region) {
-        OfflineRegionDefinition definition = region.getDefinition();
-        return new ViewOfflineArea(regionNameMapper.getRegionName(region),
-                definition.getBounds(), definition.getMinZoom(), false, "0 MB");
+        return new ViewOfflineArea(getRegionName(region), region.getDefinition().getBounds(),
+                region.getDefinition().getMinZoom());
     }
 
     public List<ViewOfflineArea> transform(@NonNull OfflineRegion[] regions) {
@@ -55,12 +53,19 @@ public class OfflineRegionMapper {
         return offlineAreas;
     }
 
-    public ViewOfflineArea transform(OfflineRegion region, OfflineRegionStatus status) {
-        OfflineRegionDefinition definition = region.getDefinition();
-        return new ViewOfflineArea(regionNameMapper.getRegionName(region),
-                definition.getBounds(),
-                definition.getMinZoom(),
-                status.getDownloadState() == OfflineRegion.STATE_ACTIVE,
-                status.getCompletedResourceSize() / MEGABYTE + " MB");
+    private String getRegionName(OfflineRegion offlineRegion) {
+        // Get the region name from the offline region metadata
+        String regionName;
+
+        try {
+            byte[] metadata = offlineRegion.getMetadata();
+            String json = new String(metadata, JSON_CHARSET);
+            JSONObject jsonObject = new JSONObject(json);
+            regionName = jsonObject.getString(JSON_FIELD_REGION_NAME);
+        } catch (Exception exception) {
+            Timber.e("Failed to decode metadata: %s", exception.getMessage());
+            regionName = offlineRegion.getID() + "";
+        }
+        return regionName;
     }
 }

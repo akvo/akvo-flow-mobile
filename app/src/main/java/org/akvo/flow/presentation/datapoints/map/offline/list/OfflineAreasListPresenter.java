@@ -25,8 +25,8 @@ import com.mapbox.mapboxsdk.offline.OfflineRegionStatus;
 
 import org.akvo.flow.domain.interactor.DefaultObserver;
 import org.akvo.flow.presentation.Presenter;
-import org.akvo.flow.presentation.datapoints.map.offline.OfflineRegionMapper;
-import org.akvo.flow.presentation.datapoints.map.offline.ViewOfflineArea;
+import org.akvo.flow.presentation.datapoints.map.offline.list.entity.ListOfflineArea;
+import org.akvo.flow.presentation.datapoints.map.offline.list.entity.ListOfflineAreaMapper;
 
 import java.util.List;
 
@@ -43,14 +43,14 @@ import timber.log.Timber;
 public class OfflineAreasListPresenter implements Presenter {
 
     private final OfflineManager offlineManager;
-    private final OfflineRegionMapper mapper;
+    private final ListOfflineAreaMapper mapper;
     private final CompositeDisposable disposables;
 
     private OfflineAreasListView view;
 
     @Inject
     public OfflineAreasListPresenter(OfflineManager offlineManager,
-            OfflineRegionMapper mapper) {
+            ListOfflineAreaMapper mapper) {
         this.offlineManager = offlineManager;
         this.mapper = mapper;
         disposables = new CompositeDisposable();
@@ -77,10 +77,10 @@ public class OfflineAreasListPresenter implements Presenter {
                         if (offlineRegions != null && offlineRegions.length > 0) {
                             DisposableObserver observer = checkOfflineRegionsStatus(offlineRegions)
                                     .subscribeWith(
-                                            new DefaultObserver<List<ViewOfflineArea>>() {
+                                            new DefaultObserver<List<ListOfflineArea>>() {
                                                 @Override
                                                 public void onNext(
-                                                        List<ViewOfflineArea> viewOfflineAreas) {
+                                                        List<ListOfflineArea> viewOfflineAreas) {
                                                     view.showOfflineRegions(viewOfflineAreas);
                                                 }
 
@@ -121,12 +121,12 @@ public class OfflineAreasListPresenter implements Presenter {
                 }));
     }
 
-    private Observable<List<ViewOfflineArea>> checkOfflineRegionsStatus(
+    private Observable<List<ListOfflineArea>> checkOfflineRegionsStatus(
             OfflineRegion[] offlineRegions) {
         return Observable.fromArray(offlineRegions)
-                .flatMap(new Function<OfflineRegion, Observable<ViewOfflineArea>>() {
+                .flatMap(new Function<OfflineRegion, Observable<ListOfflineArea>>() {
                     @Override
-                    public Observable<ViewOfflineArea> apply(OfflineRegion region) {
+                    public Observable<ListOfflineArea> apply(OfflineRegion region) {
                         return getOfflineRegion(region).toObservable();
                     }
                 })
@@ -134,7 +134,7 @@ public class OfflineAreasListPresenter implements Presenter {
                 .toObservable();
     }
 
-    private Single<ViewOfflineArea> getOfflineRegion(OfflineRegion region) {
+    private Single<ListOfflineArea> getOfflineRegion(OfflineRegion region) {
         return Single.create(emitter -> region.getStatus(
                 new OfflineRegion.OfflineRegionStatusCallback() {
                     @Override

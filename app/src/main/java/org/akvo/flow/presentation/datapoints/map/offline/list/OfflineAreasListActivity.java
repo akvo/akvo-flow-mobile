@@ -29,7 +29,7 @@ import org.akvo.flow.R;
 import org.akvo.flow.activity.BackActivity;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
-import org.akvo.flow.presentation.datapoints.map.offline.ViewOfflineArea;
+import org.akvo.flow.presentation.datapoints.map.offline.list.entity.ListOfflineArea;
 import org.akvo.flow.ui.Navigator;
 
 import java.util.ArrayList;
@@ -115,7 +115,7 @@ public class OfflineAreasListActivity extends BackActivity implements OfflineAre
     }
 
     @Override
-    public void showOfflineRegions(List<ViewOfflineArea> viewOfflineAreas) {
+    public void showOfflineRegions(List<ListOfflineArea> viewOfflineAreas) {
         Timber.d("Will show offline regions %s", viewOfflineAreas.size());
         emptyIv.setVisibility(View.GONE);
         emptyTitleTv.setVisibility(View.GONE);

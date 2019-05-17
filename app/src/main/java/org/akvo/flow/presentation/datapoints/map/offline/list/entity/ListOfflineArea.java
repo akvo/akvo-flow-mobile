@@ -17,19 +17,35 @@
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.akvo.flow.presentation.datapoints.map.offline.list;
+package org.akvo.flow.presentation.datapoints.map.offline.list.entity;
 
-import org.akvo.flow.presentation.datapoints.map.offline.list.entity.ListOfflineArea;
+public class ListOfflineArea {
 
-import java.util.List;
+    private final long id;
+    private final String name;
+    private final String size;
+    private final boolean isDownloading;
 
-public interface OfflineAreasListView {
+    protected ListOfflineArea(long id, String name, String size, boolean isDownloading) {
+        this.id = id;
+        this.name = name;
+        this.size = size;
+        this.isDownloading = isDownloading;
+    }
 
-    void showLoading();
+    public long getId() {
+        return id;
+    }
 
-    void hideLoading();
+    public String getName() {
+        return name;
+    }
 
-    void displayNoOfflineMaps();
+    public String getSize() {
+        return size;
+    }
 
-    void showOfflineRegions(List<ListOfflineArea> transform);
+    public boolean isDownloading() {
+        return isDownloading;
+    }
 }

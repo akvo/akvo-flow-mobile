@@ -30,7 +30,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import org.akvo.flow.R;
-import org.akvo.flow.presentation.datapoints.map.offline.ViewOfflineArea;
+import org.akvo.flow.presentation.datapoints.map.offline.list.entity.ListOfflineArea;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,9 +40,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 public class OfflineAreasListAdapter extends RecyclerView.Adapter<OfflineAreasListAdapter.ViewHolder> {
 
-    private final List<ViewOfflineArea> offlineAreas;
+    private final List<ListOfflineArea> offlineAreas;
 
-    public OfflineAreasListAdapter(ArrayList<ViewOfflineArea> offlineAreas) {
+    public OfflineAreasListAdapter(ArrayList<ListOfflineArea> offlineAreas) {
         this.offlineAreas = offlineAreas;
     }
 
@@ -59,7 +59,7 @@ public class OfflineAreasListAdapter extends RecyclerView.Adapter<OfflineAreasLi
         holder.setTextView(offlineAreas.get(position));
     }
 
-    public void setOfflineAreas(@NonNull List<ViewOfflineArea> results) {
+    public void setOfflineAreas(@NonNull List<ListOfflineArea> results) {
         offlineAreas.clear();
         offlineAreas.addAll(results);
         notifyDataSetChanged();
@@ -87,14 +87,14 @@ public class OfflineAreasListAdapter extends RecyclerView.Adapter<OfflineAreasLi
             this.revealMenuBt = itemView.findViewById(R.id.display_menu_bt);
         }
 
-        void setTextView(ViewOfflineArea offlineArea) {
+        void setTextView(ListOfflineArea offlineArea) {
             if (offlineArea != null) {
                 nameTv.setText(offlineArea.getName());
                 if (offlineArea.isDownloading()) {
                     stateTv.setText(nameTv.getContext().getString(R.string.offline_item_status));
                     downloadProgress.setVisibility(View.VISIBLE);
                 } else {
-                    stateTv.setText(offlineArea.getSizeInMB());
+                    stateTv.setText(offlineArea.getSize());
                     downloadProgress.setVisibility(View.GONE);
                 }
                 selectBt.setOnClickListener(v -> {

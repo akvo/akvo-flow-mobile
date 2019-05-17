@@ -154,8 +154,8 @@ public class OfflineMapsDialog extends DialogFragment implements OfflineMapsView
     }
 
     @Override
-    public void notifyChange() {
-        offlineMapSelectedListener.onAreaSelected();
+    public void notifyMapChange() {
+        offlineMapSelectedListener.onNewMapAreaSaved();
     }
 
     @Override

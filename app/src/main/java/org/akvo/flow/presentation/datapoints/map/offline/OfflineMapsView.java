@@ -36,5 +36,5 @@ public interface OfflineMapsView {
 
     void dismiss();
 
-    void notifyChange();
+    void notifyMapChange();
 }

@@ -19,6 +19,8 @@
 
 package org.akvo.flow.presentation.datapoints.map.offline.selection;
 
+import com.mapbox.mapboxsdk.constants.MapboxConstants;
+import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.mapbox.mapboxsdk.offline.OfflineManager;
 import com.mapbox.mapboxsdk.offline.OfflineRegion;
 import com.mapbox.mapboxsdk.offline.OfflineTilePyramidRegionDefinition;
@@ -52,8 +54,13 @@ public class OfflineMapDownloadPresenter implements Presenter {
         this.view = view;
     }
 
-    public void downloadArea(OfflineTilePyramidRegionDefinition definition, String regionName) {
+    public void downloadArea(String styleUrl, LatLngBounds bounds, float pixelRatio, double zoom,
+            String regionName) {
         view.showProgress();
+        double minZoom = Math.max(zoom - 2, MapboxConstants.MINIMUM_ZOOM);
+        double maxZoom = Math.min(zoom + 2, MapboxConstants.MAXIMUM_ZOOM);
+        OfflineTilePyramidRegionDefinition definition = new OfflineTilePyramidRegionDefinition(
+                styleUrl, bounds, minZoom, maxZoom, pixelRatio);
         byte[] metadata = regionNameMapper.getRegionMetadata(regionName);
         offlineManager.createOfflineRegion(definition, metadata,
                 new OfflineManager.CreateOfflineRegionCallback() {

@@ -31,8 +31,7 @@
         <activity
             android:name=".presentation.datapoints.map.offline.list.OfflineAreasListActivity"
             android:label="@string/offline_maps_list_title"
-            android:parentActivityName=".activity.SurveyActivity"
-            android:theme="@style/FlowAppTheme.NoActionBar">
+            android:parentActivityName=".activity.SurveyActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="org.akvo.flow.activity.SurveyActivity" />

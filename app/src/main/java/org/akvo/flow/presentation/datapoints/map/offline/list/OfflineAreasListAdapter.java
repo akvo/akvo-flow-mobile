@@ -38,7 +38,8 @@ import java.util.List;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-public class OfflineAreasListAdapter extends RecyclerView.Adapter<OfflineAreasListAdapter.ViewHolder> {
+public class OfflineAreasListAdapter
+        extends RecyclerView.Adapter<OfflineAreasListAdapter.ViewHolder> {
 
     private final List<ListOfflineArea> offlineAreas;
 
@@ -70,6 +71,15 @@ public class OfflineAreasListAdapter extends RecyclerView.Adapter<OfflineAreasLi
         return offlineAreas.size();
     }
 
+    public void updateOfflineArea(ListOfflineArea offlineArea) {
+        int i = offlineAreas == null ? -1 : offlineAreas.indexOf(offlineArea);
+        if (i != -1) {
+            offlineAreas.remove(offlineArea);
+            offlineAreas.add(i, offlineArea);
+            notifyItemChanged(i);
+        }
+    }
+
     static class ViewHolder extends RecyclerView.ViewHolder {
 
         private final TextView nameTv;
@@ -93,13 +103,16 @@ public class OfflineAreasListAdapter extends RecyclerView.Adapter<OfflineAreasLi
                 if (offlineArea.isDownloading()) {
                     stateTv.setText(nameTv.getContext().getString(R.string.offline_item_status));
                     downloadProgress.setVisibility(View.VISIBLE);
-                    selectBt.setEnabled(false);
-                    revealMenuBt.setEnabled(false);
                 } else {
                     stateTv.setText(offlineArea.getSize());
                     downloadProgress.setVisibility(View.GONE);
+                }
+                if (offlineArea.isAvailable()) {
                     selectBt.setEnabled(true);
                     revealMenuBt.setEnabled(true);
+                } else {
+                    selectBt.setEnabled(false);
+                    revealMenuBt.setEnabled(false);
                 }
                 selectBt.setOnClickListener(v -> {
                     //TODO:

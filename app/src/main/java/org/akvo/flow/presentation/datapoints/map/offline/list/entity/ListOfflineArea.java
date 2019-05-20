@@ -25,12 +25,15 @@ public class ListOfflineArea {
     private final String name;
     private final String size;
     private final boolean isDownloading;
+    private final boolean isAvailable;
 
-    protected ListOfflineArea(long id, String name, String size, boolean isDownloading) {
+    protected ListOfflineArea(long id, String name, String size, boolean isDownloading,
+            boolean isAvailable) {
         this.id = id;
         this.name = name;
         this.size = size;
         this.isDownloading = isDownloading;
+        this.isAvailable = isAvailable;
     }
 
     public long getId() {
@@ -47,5 +50,26 @@ public class ListOfflineArea {
 
     public boolean isDownloading() {
         return isDownloading;
+    }
+
+    public boolean isAvailable() {
+        return isAvailable;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        ListOfflineArea that = (ListOfflineArea) o;
+        return id == that.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return (int) (id ^ (id >>> 32));
     }
 }

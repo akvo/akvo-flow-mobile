@@ -20,7 +20,6 @@
 package org.akvo.flow.presentation.datapoints.map.offline.list.entity;
 
 import com.mapbox.mapboxsdk.offline.OfflineRegion;
-import com.mapbox.mapboxsdk.offline.OfflineRegionDefinition;
 import com.mapbox.mapboxsdk.offline.OfflineRegionStatus;
 
 import org.akvo.flow.presentation.datapoints.map.offline.RegionNameMapper;
@@ -39,10 +38,9 @@ public class ListOfflineAreaMapper {
     }
 
     public ListOfflineArea transform(OfflineRegion region, OfflineRegionStatus status) {
-        OfflineRegionDefinition definition = region.getDefinition();
         return new ListOfflineArea(region.getID(),
                 regionNameMapper.getRegionName(region),
                 status.getCompletedResourceSize() / MEGABYTE + " MB",
-                status.getDownloadState() == OfflineRegion.STATE_ACTIVE);
+                status.getDownloadState() == OfflineRegion.STATE_ACTIVE, status.isComplete());
     }
 }

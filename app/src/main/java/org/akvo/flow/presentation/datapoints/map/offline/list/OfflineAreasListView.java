@@ -32,4 +32,6 @@ public interface OfflineAreasListView {
     void displayNoOfflineMaps();
 
     void showOfflineRegions(List<ListOfflineArea> transform);
+
+    void updateOfflineArea(ListOfflineArea offlineArea);
 }

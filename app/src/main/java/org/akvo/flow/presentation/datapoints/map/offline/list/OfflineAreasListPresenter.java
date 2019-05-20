@@ -21,6 +21,7 @@ package org.akvo.flow.presentation.datapoints.map.offline.list;
 
 import com.mapbox.mapboxsdk.offline.OfflineManager;
 import com.mapbox.mapboxsdk.offline.OfflineRegion;
+import com.mapbox.mapboxsdk.offline.OfflineRegionError;
 import com.mapbox.mapboxsdk.offline.OfflineRegionStatus;
 
 import org.akvo.flow.domain.interactor.DefaultObserver;
@@ -143,12 +144,54 @@ public class OfflineAreasListPresenter implements Presenter {
                 new OfflineRegion.OfflineRegionStatusCallback() {
                     @Override
                     public void onStatus(OfflineRegionStatus status) {
+                        if (status.getDownloadState() == OfflineRegion.STATE_ACTIVE) {
+                            subscribeToDownloadProgress(region);
+                        }
                         emitter.onSuccess(mapper.transform(region, status));
                     }
 
                     @Override
                     public void onError(String error) {
                         emitter.onError(new Exception(error));
+                    }
+                }));
+    }
+
+    private void subscribeToDownloadProgress(OfflineRegion region) {
+        DisposableSingleObserver<ListOfflineArea> observer = getObjectSingle(region)
+                .subscribeWith(new DisposableSingleObserver<ListOfflineArea>() {
+                    @Override
+                    public void onSuccess(ListOfflineArea o) {
+                        view.updateOfflineArea(o);
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        Timber.e(e);
+                    }
+                });
+        disposables.add(observer);
+    }
+
+    private Single<ListOfflineArea> getObjectSingle(OfflineRegion region) {
+        return Single.create(emitter -> region.setObserver(
+                new OfflineRegion.OfflineRegionObserver() {
+                    @Override
+                    public void onStatusChanged(OfflineRegionStatus status) {
+                        Timber.d("status changed ");
+                        if (status.getDownloadState() == OfflineRegion.STATE_INACTIVE) {
+                            emitter.onSuccess(mapper.transform(region, status));
+                        }
+                    }
+
+                    @Override
+                    public void onError(OfflineRegionError error) {
+                        Timber.e(new Exception(error.getMessage()));
+                    }
+
+                    @Override
+                    public void mapboxTileCountLimitExceeded(long limit) {
+                        Timber.e(new Exception("mapboxTileCountLimitExceeded: limit is: " + limit));
                     }
                 }));
     }

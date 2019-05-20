@@ -123,4 +123,9 @@ public class OfflineAreasListActivity extends BackActivity implements OfflineAre
         offlineAreasRv.setVisibility(View.VISIBLE);
         adapter.setOfflineAreas(viewOfflineAreas);
     }
+
+    @Override
+    public void updateOfflineArea(ListOfflineArea offlineArea) {
+        adapter.updateOfflineArea(offlineArea);
+    }
 }

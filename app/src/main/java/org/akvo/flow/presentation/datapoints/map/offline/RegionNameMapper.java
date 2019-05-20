@@ -30,8 +30,8 @@ import androidx.annotation.Nullable;
 import timber.log.Timber;
 
 public class RegionNameMapper {
-    static final String JSON_CHARSET = "UTF-8";
-    static final String JSON_FIELD_REGION_NAME = "FIELD_REGION_NAME";
+    private static final String JSON_CHARSET = "UTF-8";
+    private static final String JSON_FIELD_REGION_NAME = "FIELD_REGION_NAME";
 
     @Inject
     public RegionNameMapper() {
@@ -39,9 +39,7 @@ public class RegionNameMapper {
 
     @NonNull
     public String getRegionName(OfflineRegion offlineRegion) {
-        // Get the region name from the offline region metadata
         String regionName;
-
         try {
             byte[] metadata = offlineRegion.getMetadata();
             String json = new String(metadata, JSON_CHARSET);

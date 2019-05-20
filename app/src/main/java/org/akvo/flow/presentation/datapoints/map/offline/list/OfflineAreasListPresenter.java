@@ -181,6 +181,7 @@ public class OfflineAreasListPresenter implements Presenter {
                         Timber.d("status changed ");
                         if (status.getDownloadState() == OfflineRegion.STATE_INACTIVE) {
                             emitter.onSuccess(mapper.transform(region, status));
+                            region.setObserver(null);
                         }
                     }
 

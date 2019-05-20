@@ -75,22 +75,7 @@ public class OfflineAreasListPresenter implements Presenter {
                     public void onSuccess(OfflineRegion[] offlineRegions) {
                         view.hideLoading();
                         if (offlineRegions != null && offlineRegions.length > 0) {
-                            DisposableObserver observer = checkOfflineRegionsStatus(offlineRegions)
-                                    .subscribeWith(
-                                            new DefaultObserver<List<ListOfflineArea>>() {
-                                                @Override
-                                                public void onNext(
-                                                        List<ListOfflineArea> viewOfflineAreas) {
-                                                    view.showOfflineRegions(viewOfflineAreas);
-                                                }
-
-                                                @Override
-                                                public void onError(Throwable e) {
-                                                    Timber.e(e);
-                                                    //TODO: show error
-                                                }
-                                            });
-                            disposables.add(observer);
+                            subscribeToOfflineRegionsStatus(offlineRegions);
                         } else {
                             view.displayNoOfflineMaps();
                         }
@@ -104,6 +89,25 @@ public class OfflineAreasListPresenter implements Presenter {
                     }
                 });
         disposables.add(singleObserver);
+    }
+
+    private void subscribeToOfflineRegionsStatus(OfflineRegion[] offlineRegions) {
+        DisposableObserver observer = checkOfflineRegionsStatus(offlineRegions)
+                .subscribeWith(
+                        new DefaultObserver<List<ListOfflineArea>>() {
+                            @Override
+                            public void onNext(
+                                    List<ListOfflineArea> viewOfflineAreas) {
+                                view.showOfflineRegions(viewOfflineAreas);
+                            }
+
+                            @Override
+                            public void onError(Throwable e) {
+                                Timber.e(e);
+                                //TODO: show error
+                            }
+                        });
+        disposables.add(observer);
     }
 
     private Single<OfflineRegion[]> getOfflineRegions() {

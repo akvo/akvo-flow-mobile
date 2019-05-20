@@ -93,9 +93,13 @@ public class OfflineAreasListAdapter extends RecyclerView.Adapter<OfflineAreasLi
                 if (offlineArea.isDownloading()) {
                     stateTv.setText(nameTv.getContext().getString(R.string.offline_item_status));
                     downloadProgress.setVisibility(View.VISIBLE);
+                    selectBt.setEnabled(false);
+                    revealMenuBt.setEnabled(false);
                 } else {
                     stateTv.setText(offlineArea.getSize());
                     downloadProgress.setVisibility(View.GONE);
+                    selectBt.setEnabled(true);
+                    revealMenuBt.setEnabled(true);
                 }
                 selectBt.setOnClickListener(v -> {
                     //TODO:

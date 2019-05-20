@@ -20,8 +20,6 @@
 
 package org.akvo.flow.ui.adapter;
 
-import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -31,6 +29,9 @@ import org.akvo.flow.ui.model.caddisfly.CaddisflyTestResult;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
 
 public class CaddisflyResultsAdapter extends RecyclerView.Adapter<CaddisflyResultsAdapter.ViewHolder> {
 

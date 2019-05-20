@@ -21,17 +21,59 @@ package org.akvo.flow.presentation.datapoints.map.offline;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.Context;
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.Button;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import org.akvo.flow.R;
+import org.akvo.flow.app.FlowApp;
+import org.akvo.flow.injector.component.ApplicationComponent;
+import org.akvo.flow.injector.component.DaggerViewComponent;
+import org.akvo.flow.injector.component.ViewComponent;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.inject.Inject;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.FragmentActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
 
-public class OfflineMapsDialog extends DialogFragment {
+public class OfflineMapsDialog extends DialogFragment implements OfflineMapsView {
 
     public static final String TAG = "OfflineMapsDialog";
+
+    @Inject
+    OfflineMapsPresenter presenter;
+
+    @BindView(R.id.progressBar)
+    ProgressBar progressBar;
+
+    @BindView(R.id.recyclerView)
+    RecyclerView recyclerView;
+
+    @BindView(R.id.addMapButton)
+    Button addMapsButton;
+
+    @BindView(R.id.noMapsTextView)
+    TextView noMapsTextView;
+
+    @BindView(R.id.onlineMapTextView)
+    TextView onLineMapsTextView;
+
+    private OfflineAreasAdapter adapter;
+    private OfflineMapSelectedListener offlineMapSelectedListener;
 
     public OfflineMapsDialog() {
     }
@@ -45,6 +87,104 @@ public class OfflineMapsDialog extends DialogFragment {
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle(getActivity().getString(R.string.offline_maps_dialog_title));
+        View main = LayoutInflater.from(getContext())
+                .inflate(R.layout.offline_maps_dialog, null);
+        ButterKnife.bind(this, main);
+        builder.setView(main);
         return builder.create();
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        FragmentActivity activity = getActivity();
+        if (!(activity instanceof OfflineMapSelectedListener)) {
+            throw new IllegalArgumentException("Activity must implement OfflineMapSelectedListener");
+        }
+        offlineMapSelectedListener = (OfflineMapSelectedListener) activity;
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        offlineMapSelectedListener = null;
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        initializeInjector();
+
+        adapter = new OfflineAreasAdapter(new ArrayList<>(), offlineMapSelectedListener);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        recyclerView.setAdapter(adapter);
+        presenter.setView(this);
+        presenter.load();
+    }
+
+    private void initializeInjector() {
+        ViewComponent viewComponent = DaggerViewComponent.builder()
+                .applicationComponent(getApplicationComponent())
+                .build();
+        viewComponent.inject(this);
+    }
+
+    /**
+     * Get the Main Application component for dependency injection.
+     *
+     * @return {@link ApplicationComponent}
+     */
+    @SuppressWarnings("ConstantConditions")
+    private ApplicationComponent getApplicationComponent() {
+        return ((FlowApp) getActivity().getApplication()).getApplicationComponent();
+    }
+
+    @Override
+    public void showLoading() {
+        progressBar.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void hideLoading() {
+        progressBar.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void notifyMapChange() {
+        offlineMapSelectedListener.onNewMapAreaSaved();
+    }
+
+    @Override
+    public void displayRegions(List<ViewOfflineArea> offlineRegions,
+           @Nullable ViewOfflineArea selectedRegion) {
+        addMapsButton.setVisibility(View.GONE);
+        noMapsTextView.setVisibility(View.GONE);
+        recyclerView.setVisibility(View.VISIBLE);
+        adapter.setOfflineAreas(offlineRegions, selectedRegion);
+        if (selectedRegion == null) {
+            onLineMapsTextView.setSelected(true);
+        }
+    }
+
+    @Override
+    public void displayNoOfflineMaps() {
+        recyclerView.setVisibility(View.GONE);
+        addMapsButton.setVisibility(View.VISIBLE);
+        noMapsTextView.setVisibility(View.VISIBLE);
+        onLineMapsTextView.setSelected(true);
+    }
+
+    @OnClick(R.id.addMapButton)
+    public void addMapPressed() {
+        //TODO: go to offline map creation
+    }
+
+    @OnClick(R.id.onlineMapTextView)
+    public void onOnLineMapSelected() {
+        presenter.onOnlineMapSelected();
+    }
+
+    public void onOfflineAreaSelected(ViewOfflineArea offlineArea) {
+        presenter.onOfflineAreaSelected(offlineArea);
     }
 }

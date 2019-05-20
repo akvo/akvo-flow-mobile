@@ -21,8 +21,11 @@
 package org.akvo.flow.presentation.datapoints.map;
 
 import org.akvo.flow.presentation.datapoints.map.entity.MapDataPoint;
+import org.akvo.flow.presentation.datapoints.map.offline.ViewOfflineArea;
 
 import java.util.List;
+
+import androidx.annotation.Nullable;
 
 interface DataPointsMapView {
 
@@ -30,7 +33,7 @@ interface DataPointsMapView {
 
     void hideProgress();
 
-    void displayData(List<MapDataPoint> surveyedLocales);
+    void displayData(List<MapDataPoint> surveyedLocales, @Nullable ViewOfflineArea offlineArea);
 
     void showSyncedResults(int numberOfSyncedItems);
 
@@ -45,6 +48,8 @@ interface DataPointsMapView {
     void hideMenu();
 
     void showMonitoredMenu();
+
+    void displayOfflineAreaOrLocation(@Nullable ViewOfflineArea offlineArea);
 
     void showNonMonitoredMenu();
 

@@ -20,22 +20,25 @@
 
 package org.akvo.flow.presentation.datapoints.map;
 
-import androidx.annotation.NonNull;
-
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.entity.DataPoint;
 import org.akvo.flow.domain.entity.DownloadResult;
+import org.akvo.flow.domain.entity.OfflineArea;
 import org.akvo.flow.domain.interactor.DefaultFlowableObserver;
 import org.akvo.flow.domain.interactor.DefaultObserver;
 import org.akvo.flow.domain.interactor.DownloadDataPoints;
 import org.akvo.flow.domain.interactor.ErrorComposable;
 import org.akvo.flow.domain.interactor.GetSavedDataPoints;
 import org.akvo.flow.domain.interactor.UseCase;
+import org.akvo.flow.domain.interactor.offline.GetSelectedOfflineArea;
 import org.akvo.flow.domain.util.Constants;
 import org.akvo.flow.presentation.Presenter;
 import org.akvo.flow.presentation.datapoints.map.entity.MapDataPoint;
 import org.akvo.flow.presentation.datapoints.map.entity.MapDataPointMapper;
+import org.akvo.flow.presentation.datapoints.map.offline.OfflineAreaMapper;
+import org.akvo.flow.presentation.datapoints.map.offline.ViewOfflineArea;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -44,6 +47,9 @@ import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import io.reactivex.observers.DisposableMaybeObserver;
 import timber.log.Timber;
 
 import static org.akvo.flow.domain.entity.DownloadResult.ResultCode.SUCCESS;
@@ -55,19 +61,25 @@ public class DataPointsMapPresenter implements Presenter {
     private final UseCase getSavedDataPoints;
     private final UseCase checkDeviceNotification;
     private final UseCase upload;
+    private final GetSelectedOfflineArea getSelectedOfflineAre;
+    private final OfflineAreaMapper offlineAreaMapper;
 
     private DataPointsMapView view;
     private SurveyGroup surveyGroup;
 
-    @Inject DataPointsMapPresenter(@Named("getSavedDataPoints") UseCase getSavedDataPoints,
+    @Inject
+    DataPointsMapPresenter(@Named("getSavedDataPoints") UseCase getSavedDataPoints,
             MapDataPointMapper mapper, DownloadDataPoints downloadDataPoints,
             @Named("checkDeviceNotification") UseCase checkDeviceNotification,
-            @Named("uploadSync") UseCase upload) {
+            @Named("uploadSync") UseCase upload, GetSelectedOfflineArea getSelectedOfflineAre,
+            OfflineAreaMapper offlineAreaMapper) {
         this.getSavedDataPoints = getSavedDataPoints;
         this.mapper = mapper;
         this.downloadDataPoints = downloadDataPoints;
         this.checkDeviceNotification = checkDeviceNotification;
         this.upload = upload;
+        this.getSelectedOfflineAre = getSelectedOfflineAre;
+        this.offlineAreaMapper = offlineAreaMapper;
     }
 
     void setView(@NonNull DataPointsMapView view) {
@@ -101,15 +113,41 @@ public class DataPointsMapPresenter implements Presenter {
                 @Override
                 public void onError(Throwable e) {
                     Timber.e(e, "Error loading saved datapoints");
+                    loadOfflineSettings(Collections.emptyList());
                 }
 
                 @Override
                 public void onNext(List<DataPoint> dataPoints) {
-                    List<MapDataPoint> mapDataPoints = mapper.transform(dataPoints);
-                    view.displayData(mapDataPoints);
+                    loadOfflineSettings(dataPoints);
                 }
             }, params);
         }
+    }
+
+    private void loadOfflineSettings(List<DataPoint> dataPoints) {
+        getSelectedOfflineAre.execute(new DisposableMaybeObserver<OfflineArea>() {
+            @Override
+            public void onSuccess(OfflineArea offlineArea) {
+                displayData(dataPoints, offlineAreaMapper.transform(offlineArea));
+            }
+
+            @Override
+            public void onError(Throwable e) {
+                Timber.e(e);
+                displayData(dataPoints, null);
+            }
+
+            @Override
+            public void onComplete() {
+                // no regions found
+                displayData(dataPoints, null);
+            }
+        }, null);
+    }
+
+    private void displayData(List<DataPoint> dataPoints, @Nullable ViewOfflineArea offlineArea) {
+        List<MapDataPoint> mapDataPoints = mapper.transform(dataPoints);
+        view.displayData(mapDataPoints, offlineArea);
     }
 
     @Override
@@ -118,6 +156,7 @@ public class DataPointsMapPresenter implements Presenter {
         downloadDataPoints.dispose();
         checkDeviceNotification.dispose();
         upload.dispose();
+        getSelectedOfflineAre.dispose();
     }
 
     public void onNewSurveySelected(SurveyGroup surveyGroup) {
@@ -211,5 +250,26 @@ public class DataPointsMapPresenter implements Presenter {
                 view.hideProgress();
             }
         }, params);
+    }
+
+    public void refreshSelectedArea() {
+        getSelectedOfflineAre.execute(new DisposableMaybeObserver<OfflineArea>() {
+            @Override
+            public void onSuccess(OfflineArea offlineArea) {
+                view.displayOfflineAreaOrLocation(offlineAreaMapper.transform(offlineArea));
+            }
+
+            @Override
+            public void onError(Throwable e) {
+                Timber.e(e);
+                view.displayOfflineAreaOrLocation(null);
+            }
+
+            @Override
+            public void onComplete() {
+                // no regions found
+                view.displayOfflineAreaOrLocation(null);
+            }
+        }, null);
     }
 }

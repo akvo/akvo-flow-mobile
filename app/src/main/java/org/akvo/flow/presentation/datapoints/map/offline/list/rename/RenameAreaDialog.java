@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2019 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -15,10 +15,9 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 
-package org.akvo.flow.presentation.navigation;
+package org.akvo.flow.presentation.datapoints.map.offline.list.rename;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -33,49 +32,45 @@ import android.widget.EditText;
 import org.akvo.flow.R;
 import org.akvo.flow.presentation.NameInputTextWatcher;
 import org.akvo.flow.presentation.PositiveButtonHandler;
-import org.akvo.flow.util.ConstantUtil;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
-import androidx.fragment.app.FragmentActivity;
 
-public class EditUserDialog extends DialogFragment implements
-        NameInputTextWatcher.UsernameWatcherListener {
+public class RenameAreaDialog extends DialogFragment
+        implements NameInputTextWatcher.UsernameWatcherListener {
 
-    public static final String TAG = "EditUserDialog";
-    private static final String USER_NAME_PARAM = "user_name";
+    public static final String TAG = "RenameAreaDialog";
 
-    private ViewUser viewUser;
-    private EditUserListener listener;
-    private EditText userNameEt;
+    private static final String PARAM_AREA_NAME = "areaName";
+    private static final String PARAM_AREA_ID = "areaId";
+
+    private String areaName;
+    private long areaId;
+
+    private EditText nameEt;
     private PositiveButtonHandler positiveButtonHandler;
+    private RenameAreaListener listener;
 
-    public EditUserDialog() {
+    public RenameAreaDialog() {
     }
 
-    public static EditUserDialog newInstance(ViewUser viewUser) {
-        EditUserDialog fragment = new EditUserDialog();
-        Bundle bundle = new Bundle();
-        bundle.putParcelable(ConstantUtil.VIEW_USER_EXTRA, viewUser);
-        fragment.setArguments(bundle);
-        return fragment;
-    }
-
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        viewUser = getArguments().getParcelable(ConstantUtil.VIEW_USER_EXTRA);
+    public static RenameAreaDialog newInstance(String oldAreaName, long areaId) {
+        RenameAreaDialog renameAreaDialog = new RenameAreaDialog();
+        Bundle args = new Bundle(2);
+        args.putString(PARAM_AREA_NAME, oldAreaName);
+        args.putLong(PARAM_AREA_ID, areaId);
+        renameAreaDialog.setArguments(args);
+        return renameAreaDialog;
     }
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        FragmentActivity activity = getActivity();
-        if (activity instanceof EditUserListener) {
-            listener = (EditUserListener) activity;
+        if (getActivity() instanceof RenameAreaListener) {
+            listener = (RenameAreaListener) getActivity();
         } else {
-            throw new IllegalArgumentException("Activity must implement EditUserListener");
+            throw new IllegalArgumentException("Activity must implement RenameAreaListener");
         }
     }
 
@@ -85,26 +80,33 @@ public class EditUserDialog extends DialogFragment implements
         listener = null;
     }
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        areaName = getArguments().getString(PARAM_AREA_NAME);
+        areaId = getArguments().getLong(PARAM_AREA_ID);
+    }
+
     @NonNull
     @Override
     public Dialog onCreateDialog(final Bundle savedInstanceState) {
         super.onCreateDialog(savedInstanceState);
         Context context = getContext();
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        View main = LayoutInflater.from(context).inflate(R.layout.user_name_input_dialog, null);
-        builder.setTitle(R.string.edit_user);
-        userNameEt = main.findViewById(R.id.user_name_et);
-        userNameEt.setText(viewUser.getName());
-        userNameEt.addTextChangedListener(new NameInputTextWatcher(this));
+        View main = LayoutInflater.from(context).inflate(R.layout.rename_area_dialog, null);
+        builder.setTitle(R.string.offline_item_rename_dialog_title);
+        nameEt = main.findViewById(R.id.name_et);
+        nameEt.setText(areaName);
+        nameEt.addTextChangedListener(new NameInputTextWatcher(this));
         builder.setView(main);
-        builder.setPositiveButton(R.string.okbutton, (dialog, which) -> {
-            String name = userNameEt.getText().toString();
-            if (name.equals(viewUser.getName())) {
+        builder.setPositiveButton(R.string.rename_offline_area, (dialog, which) -> {
+            String name = nameEt.getText().toString();
+            if (name.equals(areaName)) {
                 return;
             }
 
             if (listener != null) {
-                listener.editUser(new ViewUser(viewUser.getId(), name));
+                listener.renameAreaConfirmed(areaId, name);
             }
             dismiss();
         });
@@ -121,29 +123,29 @@ public class EditUserDialog extends DialogFragment implements
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
             @Nullable Bundle savedInstanceState) {
         positiveButtonHandler = new PositiveButtonHandler(this);
         return super.onCreateView(inflater, container, savedInstanceState);
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState) {
+    public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putString(USER_NAME_PARAM, userNameEt.getText().toString());
+        outState.putString(PARAM_AREA_NAME, nameEt.getText().toString());
     }
 
     @Override
     public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
         super.onViewStateRestored(savedInstanceState);
         if (savedInstanceState != null) {
-            userNameEt.setText(savedInstanceState.getString(USER_NAME_PARAM));
+            nameEt.setText(savedInstanceState.getString(PARAM_AREA_NAME));
         }
     }
 
     @Override
     public void updateTextChanged() {
-        String text = userNameEt.getText().toString();
+        String text = nameEt.getText().toString();
         if (TextUtils.isEmpty(text)) {
             positiveButtonHandler.disablePositiveButton();
         } else {
@@ -157,8 +159,8 @@ public class EditUserDialog extends DialogFragment implements
         updateTextChanged();
     }
 
-    public interface EditUserListener {
+    public interface RenameAreaListener {
 
-        void editUser(ViewUser user);
+        void renameAreaConfirmed(long areaId, String name);
     }
 }

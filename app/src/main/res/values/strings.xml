@@ -330,6 +330,8 @@
     <string name="delete_offline_area">Delete</string>
     <string name="offline_areas_list_button">Select to use</string>
     <string name="offline_item_status">Downloading</string>
+    <string name="offline_item_rename_dialog_title">Rename map</string>
+    <string name="offline_item_rename_error">Error renaming</string>
 
     <plurals name="download_forms_error">
         <item quantity="one">Error downloading form</item>

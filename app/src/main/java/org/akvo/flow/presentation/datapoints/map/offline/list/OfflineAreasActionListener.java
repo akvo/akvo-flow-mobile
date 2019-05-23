@@ -19,23 +19,13 @@
 
 package org.akvo.flow.presentation.datapoints.map.offline.list;
 
-import org.akvo.flow.presentation.datapoints.map.offline.list.entity.ListOfflineArea;
+public interface OfflineAreasActionListener {
 
-import java.util.List;
+    void selectArea(long areId);
 
-public interface OfflineAreasListView {
+    void renameArea(long areId, String oldName);
 
-    void showLoading();
+    void deleteArea(long areId);
 
-    void hideLoading();
-
-    void displayNoOfflineMaps();
-
-    void showOfflineRegions(List<ListOfflineArea> transform);
-
-    void updateOfflineArea(ListOfflineArea offlineArea);
-
-    void displayUpdatedName(long areaId, String newName);
-
-    void showRenameError();
+    void viewArea(long areId);
 }

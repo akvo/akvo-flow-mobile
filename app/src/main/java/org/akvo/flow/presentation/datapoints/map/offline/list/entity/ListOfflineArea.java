@@ -27,7 +27,7 @@ public class ListOfflineArea {
     private final boolean isDownloading;
     private final boolean isAvailable;
 
-    protected ListOfflineArea(long id, String name, String size, boolean isDownloading,
+    public ListOfflineArea(long id, String name, String size, boolean isDownloading,
             boolean isAvailable) {
         this.id = id;
         this.name = name;

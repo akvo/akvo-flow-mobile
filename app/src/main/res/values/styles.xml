@@ -34,7 +34,7 @@
         <item name="android:singleLine">true</item>
     </style>
 
-    <style name="FlowAppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light"/>
+    <style name="FlowAppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
     <style name="FlowAppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
         <item name="searchViewStyle">@style/SearchView</item>

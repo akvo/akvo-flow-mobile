@@ -43,6 +43,8 @@ import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.presentation.AppDownloadDialogFragment;
 import org.akvo.flow.presentation.FullImageActivity;
 import org.akvo.flow.presentation.about.AboutActivity;
+import org.akvo.flow.presentation.datapoints.map.offline.list.OfflineAreasListActivity;
+import org.akvo.flow.presentation.datapoints.map.offline.selection.OfflineMapDownloadActivity;
 import org.akvo.flow.presentation.entity.ViewApkData;
 import org.akvo.flow.presentation.help.HelpActivity;
 import org.akvo.flow.presentation.legal.LegalNoticesActivity;
@@ -365,6 +367,20 @@ public class Navigator {
             Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
                     Uri.fromParts("package", context.getPackageName(), null));
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            context.startActivity(intent);
+        }
+    }
+
+    public void navigateToOfflineMapAreasCreation(@Nullable Context context) {
+        if (context != null) {
+            Intent intent = new Intent(context, OfflineMapDownloadActivity.class);
+            context.startActivity(intent);
+        }
+    }
+
+    public void navigateToOfflineAreasList(@Nullable Context context) {
+        if (context != null) {
+            Intent intent = new Intent(context, OfflineAreasListActivity.class);
             context.startActivity(intent);
         }
     }

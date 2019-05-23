@@ -34,6 +34,7 @@ import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.injector.component.ApplicationComponent;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
+import org.akvo.flow.ui.Navigator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,6 +57,9 @@ public class OfflineMapsDialog extends DialogFragment implements OfflineMapsView
 
     @Inject
     OfflineMapsPresenter presenter;
+
+    @Inject
+    Navigator navigator;
 
     @BindView(R.id.progressBar)
     ProgressBar progressBar;
@@ -176,7 +180,8 @@ public class OfflineMapsDialog extends DialogFragment implements OfflineMapsView
 
     @OnClick(R.id.addMapButton)
     public void addMapPressed() {
-        //TODO: go to offline map creation
+        navigator.navigateToOfflineMapAreasCreation(getActivity());
+        dismiss();
     }
 
     @OnClick(R.id.onlineMapTextView)

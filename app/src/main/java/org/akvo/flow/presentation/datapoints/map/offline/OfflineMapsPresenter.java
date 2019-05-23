@@ -110,6 +110,7 @@ public class OfflineMapsPresenter implements Presenter {
                 // no regions found
                 view.displayRegions(mapper.transform(offlineRegions), null);
             }
+
         }, null);
     }
 

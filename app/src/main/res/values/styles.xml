@@ -162,9 +162,4 @@
     <style name="RepeatButtonStyle" parent="Widget.AppCompat.Button.Borderless.Colored">
         <item name="android:textSize">16sp</item>
     </style>
-
-    <style name="FlowAppTheme.NoActionBar">
-        <item name="windowActionBar">false</item>
-        <item name="windowNoTitle">true</item>
-    </style>
 </resources>

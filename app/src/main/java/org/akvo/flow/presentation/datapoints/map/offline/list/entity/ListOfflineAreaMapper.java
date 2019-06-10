@@ -20,12 +20,16 @@
 package org.akvo.flow.presentation.datapoints.map.offline.list.entity;
 
 import com.mapbox.mapboxsdk.offline.OfflineRegion;
-import com.mapbox.mapboxsdk.offline.OfflineRegionDefinition;
 import com.mapbox.mapboxsdk.offline.OfflineRegionStatus;
 
-import org.akvo.flow.presentation.datapoints.map.offline.RegionNameMapper;
+import org.akvo.flow.mapbox.offline.reactive.RegionNameMapper;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.inject.Inject;
+
+import kotlin.Pair;
 
 public class ListOfflineAreaMapper {
 
@@ -39,10 +43,17 @@ public class ListOfflineAreaMapper {
     }
 
     public ListOfflineArea transform(OfflineRegion region, OfflineRegionStatus status) {
-        OfflineRegionDefinition definition = region.getDefinition();
         return new ListOfflineArea(region.getID(),
                 regionNameMapper.getRegionName(region),
                 status.getCompletedResourceSize() / MEGABYTE + " MB",
                 status.getDownloadState() == OfflineRegion.STATE_ACTIVE);
+    }
+
+    public List<ListOfflineArea> transform(List<Pair<OfflineRegion, OfflineRegionStatus>> pairs) {
+        List<ListOfflineArea> areas = new ArrayList<>();
+        for (Pair<OfflineRegion, OfflineRegionStatus> p: pairs ) {
+            areas.add(transform(p.getFirst(), p.getSecond()));
+        }
+        return areas;
     }
 }

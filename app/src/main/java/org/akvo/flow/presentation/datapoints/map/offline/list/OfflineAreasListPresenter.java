@@ -19,40 +19,35 @@
 
 package org.akvo.flow.presentation.datapoints.map.offline.list;
 
-import com.mapbox.mapboxsdk.offline.OfflineManager;
 import com.mapbox.mapboxsdk.offline.OfflineRegion;
 import com.mapbox.mapboxsdk.offline.OfflineRegionStatus;
 
-import org.akvo.flow.domain.interactor.DefaultObserver;
+import org.akvo.flow.mapbox.offline.reactive.GetOfflineAreasList;
 import org.akvo.flow.presentation.Presenter;
-import org.akvo.flow.presentation.datapoints.map.offline.list.entity.ListOfflineArea;
 import org.akvo.flow.presentation.datapoints.map.offline.list.entity.ListOfflineAreaMapper;
 
 import java.util.List;
 
 import javax.inject.Inject;
 
-import io.reactivex.Observable;
-import io.reactivex.Single;
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.functions.Function;
-import io.reactivex.observers.DisposableObserver;
 import io.reactivex.observers.DisposableSingleObserver;
+import kotlin.Pair;
 import timber.log.Timber;
 
 public class OfflineAreasListPresenter implements Presenter {
 
-    private final OfflineManager offlineManager;
     private final ListOfflineAreaMapper mapper;
     private final CompositeDisposable disposables;
+    private final GetOfflineAreasList offlineAreasList;
 
     private OfflineAreasListView view;
 
     @Inject
-    public OfflineAreasListPresenter(OfflineManager offlineManager,
-            ListOfflineAreaMapper mapper) {
-        this.offlineManager = offlineManager;
+    public OfflineAreasListPresenter(ListOfflineAreaMapper mapper,
+            GetOfflineAreasList offlineAreasList) {
         this.mapper = mapper;
+        this.offlineAreasList = offlineAreasList;
         disposables = new CompositeDisposable();
     }
 
@@ -69,83 +64,28 @@ public class OfflineAreasListPresenter implements Presenter {
 
     public void loadAreas() {
         view.showLoading();
-        DisposableSingleObserver<OfflineRegion[]> singleObserver = getOfflineRegions()
-                .subscribeWith(new DisposableSingleObserver<OfflineRegion[]>() {
-                    @Override
-                    public void onSuccess(OfflineRegion[] offlineRegions) {
-                        view.hideLoading();
-                        if (offlineRegions != null && offlineRegions.length > 0) {
-                            DisposableObserver observer = checkOfflineRegionsStatus(offlineRegions)
-                                    .subscribeWith(
-                                            new DefaultObserver<List<ListOfflineArea>>() {
-                                                @Override
-                                                public void onNext(
-                                                        List<ListOfflineArea> viewOfflineAreas) {
-                                                    view.showOfflineRegions(viewOfflineAreas);
-                                                }
+        DisposableSingleObserver<List<Pair<OfflineRegion, OfflineRegionStatus>>> subscribeWith = offlineAreasList
+                .execute()
+                .subscribeWith(
+                        new DisposableSingleObserver<List<Pair<OfflineRegion, OfflineRegionStatus>>>() {
+                            @Override
+                            public void onSuccess(
+                                    List<Pair<OfflineRegion, OfflineRegionStatus>> pairs) {
+                                view.hideLoading();
+                                if (pairs.size() == 0) {
+                                    view.displayNoOfflineMaps();
+                                } else {
+                                    view.showOfflineRegions(mapper.transform(pairs));
+                                }
+                            }
 
-                                                @Override
-                                                public void onError(Throwable e) {
-                                                    Timber.e(e);
-                                                    //TODO: show error
-                                                }
-                                            });
-                            disposables.add(observer);
-                        } else {
-                            view.displayNoOfflineMaps();
-                        }
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        Timber.e(e);
-                        view.hideLoading();
-                        view.displayNoOfflineMaps();
-                    }
-                });
-        disposables.add(singleObserver);
-    }
-
-    private Single<OfflineRegion[]> getOfflineRegions() {
-        return Single.create(emitter -> offlineManager
-                .listOfflineRegions(new OfflineManager.ListOfflineRegionsCallback() {
-                    @Override
-                    public void onList(OfflineRegion[] offlineRegions) {
-                        emitter.onSuccess(offlineRegions);
-                    }
-
-                    @Override
-                    public void onError(String error) {
-                        emitter.onError(new Exception(error));
-                    }
-                }));
-    }
-
-    private Observable<List<ListOfflineArea>> checkOfflineRegionsStatus(
-            OfflineRegion[] offlineRegions) {
-        return Observable.fromArray(offlineRegions)
-                .flatMap(new Function<OfflineRegion, Observable<ListOfflineArea>>() {
-                    @Override
-                    public Observable<ListOfflineArea> apply(OfflineRegion region) {
-                        return getOfflineRegion(region).toObservable();
-                    }
-                })
-                .toList()
-                .toObservable();
-    }
-
-    private Single<ListOfflineArea> getOfflineRegion(OfflineRegion region) {
-        return Single.create(emitter -> region.getStatus(
-                new OfflineRegion.OfflineRegionStatusCallback() {
-                    @Override
-                    public void onStatus(OfflineRegionStatus status) {
-                        emitter.onSuccess(mapper.transform(region, status));
-                    }
-
-                    @Override
-                    public void onError(String error) {
-                        emitter.onError(new Exception(error));
-                    }
-                }));
+                            @Override
+                            public void onError(Throwable e) {
+                                Timber.e(e);
+                                view.hideLoading();
+                                view.displayNoOfflineMaps();
+                            }
+                        });
+        disposables.add(subscribeWith);
     }
 }

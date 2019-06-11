@@ -21,7 +21,7 @@ package org.akvo.flow.presentation.datapoints.map.offline;
 
 import com.mapbox.mapboxsdk.offline.OfflineRegion;
 
-import org.json.JSONObject;
+import org.akvo.flow.mapbox.offline.reactive.RegionNameMapper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,19 +29,19 @@ import java.util.List;
 import javax.inject.Inject;
 
 import androidx.annotation.NonNull;
-import timber.log.Timber;
 
 public class OfflineRegionMapper {
 
-    private static final String JSON_CHARSET = "UTF-8";
-    private static final String JSON_FIELD_REGION_NAME = "FIELD_REGION_NAME";
+    private final RegionNameMapper regionNameMapper;
 
     @Inject
-    public OfflineRegionMapper() {
+    public OfflineRegionMapper(RegionNameMapper regionNameMapper) {
+        this.regionNameMapper = regionNameMapper;
     }
 
     public ViewOfflineArea transform(@NonNull OfflineRegion region) {
-        return new ViewOfflineArea(getRegionName(region), region.getDefinition().getBounds(),
+        return new ViewOfflineArea(regionNameMapper.getRegionName(region),
+                region.getDefinition().getBounds(),
                 region.getDefinition().getMinZoom());
     }
 
@@ -51,21 +51,5 @@ public class OfflineRegionMapper {
             offlineAreas.add(transform(r));
         }
         return offlineAreas;
-    }
-
-    private String getRegionName(OfflineRegion offlineRegion) {
-        // Get the region name from the offline region metadata
-        String regionName;
-
-        try {
-            byte[] metadata = offlineRegion.getMetadata();
-            String json = new String(metadata, JSON_CHARSET);
-            JSONObject jsonObject = new JSONObject(json);
-            regionName = jsonObject.getString(JSON_FIELD_REGION_NAME);
-        } catch (Exception exception) {
-            Timber.e("Failed to decode metadata: %s", exception.getMessage());
-            regionName = offlineRegion.getID() + "";
-        }
-        return regionName;
     }
 }

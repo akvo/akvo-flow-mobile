@@ -40,9 +40,7 @@ before_install:
   - chmod +x travis/deploy_release.sh
   - chmod +x travis/setup_gcloud.sh
   - chmod +x travis/run_firebase_tests.sh
-  - if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then
-      ./travis/setup_gcloud.sh
-    fi
+  - "if [ \"$TRAVIS_PULL_REQUEST\" != \"false\" ]; then . ./travis/setup_gcloud.sh; fi"
 
 script:
   - ./gradlew check --continue -Pnodexcount=true

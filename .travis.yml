@@ -45,9 +45,7 @@ before_install:
 script:
   - ./gradlew check --continue -Pnodexcount=true
   - ./gradlew :app:assembleFlowDebugAndroidTest -Pnodexcount=true
-  - if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then
-      ./travis/run_firebase_tests.sh
-    fi
+  - "if [ \"$TRAVIS_PULL_REQUEST\" != \"false\" ]; then . ./travis/run_firebase_tests.sh; fi"
 
 after_success:
   - ./fastlane/deploy_beta.sh

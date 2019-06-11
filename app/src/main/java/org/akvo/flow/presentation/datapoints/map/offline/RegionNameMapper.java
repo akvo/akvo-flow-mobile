@@ -39,9 +39,7 @@ public class RegionNameMapper {
 
     @NonNull
     public String getRegionName(OfflineRegion offlineRegion) {
-        // Get the region name from the offline region metadata
         String regionName;
-
         try {
             byte[] metadata = offlineRegion.getMetadata();
             String json = new String(metadata, JSON_CHARSET);

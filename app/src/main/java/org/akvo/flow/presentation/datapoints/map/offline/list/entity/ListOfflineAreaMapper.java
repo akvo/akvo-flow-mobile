@@ -17,9 +17,10 @@
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.akvo.flow.presentation.datapoints.map.offline;
+package org.akvo.flow.presentation.datapoints.map.offline.list.entity;
 
 import com.mapbox.mapboxsdk.offline.OfflineRegion;
+import com.mapbox.mapboxsdk.offline.OfflineRegionStatus;
 
 import org.akvo.flow.mapbox.offline.reactive.RegionNameMapper;
 
@@ -28,28 +29,31 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import androidx.annotation.NonNull;
+import kotlin.Pair;
 
-public class OfflineRegionMapper {
+public class ListOfflineAreaMapper {
+
+    private static final long MEGABYTE = 1024L * 1024L;
 
     private final RegionNameMapper regionNameMapper;
 
     @Inject
-    public OfflineRegionMapper(RegionNameMapper regionNameMapper) {
+    public ListOfflineAreaMapper(RegionNameMapper regionNameMapper) {
         this.regionNameMapper = regionNameMapper;
     }
 
-    public ViewOfflineArea transform(@NonNull OfflineRegion region) {
-        return new ViewOfflineArea(regionNameMapper.getRegionName(region),
-                region.getDefinition().getBounds(),
-                region.getDefinition().getMinZoom());
+    public ListOfflineArea transform(OfflineRegion region, OfflineRegionStatus status) {
+        return new ListOfflineArea(region.getID(),
+                regionNameMapper.getRegionName(region),
+                status.getCompletedResourceSize() / MEGABYTE + " MB",
+                status.getDownloadState() == OfflineRegion.STATE_ACTIVE);
     }
 
-    public List<ViewOfflineArea> transform(@NonNull OfflineRegion[] regions) {
-        List<ViewOfflineArea> offlineAreas = new ArrayList<>();
-        for (OfflineRegion r : regions) {
-            offlineAreas.add(transform(r));
+    public List<ListOfflineArea> transform(List<Pair<OfflineRegion, OfflineRegionStatus>> pairs) {
+        List<ListOfflineArea> areas = new ArrayList<>();
+        for (Pair<OfflineRegion, OfflineRegionStatus> p: pairs ) {
+            areas.add(transform(p.getFirst(), p.getSecond()));
         }
-        return offlineAreas;
+        return areas;
     }
 }

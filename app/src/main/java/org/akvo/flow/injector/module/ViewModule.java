@@ -20,6 +20,8 @@
 
 package org.akvo.flow.injector.module;
 
+import android.content.Context;
+
 import org.akvo.flow.domain.MobileUploadAllowed;
 import org.akvo.flow.domain.interactor.ClearAllData;
 import org.akvo.flow.domain.interactor.ClearResponses;
@@ -59,6 +61,7 @@ import org.akvo.flow.domain.interactor.users.EditUser;
 import org.akvo.flow.domain.interactor.users.GetSelectedUser;
 import org.akvo.flow.domain.interactor.users.GetUsers;
 import org.akvo.flow.domain.interactor.users.SelectUser;
+import org.akvo.flow.mapbox.offline.reactive.GetOfflineAreasList;
 
 import javax.inject.Named;
 
@@ -294,5 +297,10 @@ public class ViewModule {
     @Named("reloadForms")
     UseCase provideReloadForms(ReloadForms reloadForms) {
         return reloadForms;
+    }
+
+    @Provides
+    GetOfflineAreasList provideOfflineAreasList(Context context) {
+        return new GetOfflineAreasList(context);
     }
 }

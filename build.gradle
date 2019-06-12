@@ -41,6 +41,7 @@ ext {
     leakCanaryVersion = "1.6.1"
     loggingInterceptorVersion = "3.12.1"
     mapboxMarkerVersion = "0.2.0"
+    mapboxOfflineRxVersion = "v1.0"
     mapboxVersion = "7.3.0"
     mapUtilsVersion = "0.5"
     prettyTimeVersion = "3.2.4.Final"

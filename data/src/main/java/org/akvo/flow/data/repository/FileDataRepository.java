@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -31,7 +31,9 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import io.reactivex.Completable;
 import io.reactivex.Observable;
+import io.reactivex.Single;
 import io.reactivex.annotations.NonNull;
 import io.reactivex.functions.Function;
 
@@ -107,12 +109,12 @@ public class FileDataRepository implements FileRepository {
     }
 
     @Override
-    public Observable<File> getZipFile(String uuid) {
+    public Single<File> getZipFile(String uuid) {
         return dataSourceFactory.getFileDataSource().getZipFile(uuid);
     }
 
     @Override
-    public Observable<Boolean> createDataZip(String zipFileName, String formInstanceData) {
+    public Completable createDataZip(String zipFileName, String formInstanceData) {
         return dataSourceFactory.getFileDataSource()
                 .writeDataToZipFile(zipFileName, formInstanceData);
     }

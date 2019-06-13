@@ -26,7 +26,9 @@ import android.net.Uri;
 import java.io.File;
 import java.util.List;
 
+import io.reactivex.Completable;
 import io.reactivex.Observable;
+import io.reactivex.Single;
 import io.reactivex.annotations.NonNull;
 
 public interface FileRepository {
@@ -52,7 +54,7 @@ public interface FileRepository {
 
     Observable<String> copyVideo(Uri uri, boolean removeOriginal);
 
-    Observable<File> getZipFile(String uuid);
+    Single<File> getZipFile(String uuid);
 
-    Observable<Boolean> createDataZip(String zipFileName, String formInstanceData);
+    Completable createDataZip(String zipFileName, String formInstanceData);
 }

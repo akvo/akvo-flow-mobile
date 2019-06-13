@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2017-2019 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -32,10 +32,9 @@ import org.akvo.flow.domain.interactor.ExportSurveyInstances;
 import org.akvo.flow.domain.interactor.MakeDataPrivate;
 import org.akvo.flow.util.ConstantUtil;
 
-import java.util.List;
-
 import javax.inject.Inject;
 
+import io.reactivex.observers.DisposableCompletableObserver;
 import timber.log.Timber;
 
 public class DataFixService extends JobIntentService {
@@ -93,7 +92,7 @@ public class DataFixService extends JobIntentService {
     }
 
     private void verify() {
-        checkSubmittedFiles.execute(new DefaultObserver<List<Boolean>>() {
+        checkSubmittedFiles.execute(new DisposableCompletableObserver() {
             @Override
             public void onError(Throwable e) {
                 export();
@@ -107,7 +106,7 @@ public class DataFixService extends JobIntentService {
     }
 
     private void export() {
-        exportSurveyInstances.execute(new DefaultObserver<Boolean>() {
+        exportSurveyInstances.execute(new DisposableCompletableObserver() {
             @Override
             public void onComplete() {
                 broadcastDataPointStatusChange();

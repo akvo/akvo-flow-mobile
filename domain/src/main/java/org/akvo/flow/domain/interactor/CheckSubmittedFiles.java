@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2018-2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -20,23 +20,25 @@
 
 package org.akvo.flow.domain.interactor;
 
-import android.support.v4.util.Pair;
-
 import org.akvo.flow.domain.entity.InstanceIdUuid;
 import org.akvo.flow.domain.repository.FileRepository;
 import org.akvo.flow.domain.repository.SurveyRepository;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
+import java.util.zip.ZipFile;
 
 import javax.inject.Inject;
 
+import io.reactivex.Completable;
+import io.reactivex.CompletableSource;
 import io.reactivex.Observable;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Function;
 import io.reactivex.functions.Predicate;
-import io.reactivex.observers.DisposableObserver;
+import io.reactivex.observers.DisposableCompletableObserver;
 import timber.log.Timber;
 
 public class CheckSubmittedFiles {
@@ -54,8 +56,8 @@ public class CheckSubmittedFiles {
     }
 
     @SuppressWarnings("unchecked")
-    public <T> void execute(DisposableObserver<T> observer) {
-        final Observable<T> observable = buildUseCaseObservable();
+    public void execute(DisposableCompletableObserver observer) {
+        final Completable observable = buildUseCaseObservable();
         addDisposable(observable.subscribeWith(observer));
     }
 
@@ -69,50 +71,64 @@ public class CheckSubmittedFiles {
         disposables.add(disposable);
     }
 
-    private Observable buildUseCaseObservable() {
+    private Completable buildUseCaseObservable() {
         return surveyRepository.getSubmittedInstances()
-                .flatMap(new Function<List<InstanceIdUuid>, Observable<List<Boolean>>>() {
+                .flatMapCompletable(new Function<List<InstanceIdUuid>, CompletableSource>() {
                     @Override
-                    public Observable<List<Boolean>> apply(List<InstanceIdUuid> instanceIdUuids) {
+                    public CompletableSource apply(List<InstanceIdUuid> instanceIdUuids) {
                         return checkExistingFiles(instanceIdUuids);
                     }
                 });
     }
 
-    private Observable<List<Boolean>> checkExistingFiles(List<InstanceIdUuid> instanceIdUuids) {
+    private Completable checkExistingFiles(List<InstanceIdUuid> instanceIdUuids) {
+        Timber.d("Found "+instanceIdUuids.size() + " survey instances");
         return Observable.fromIterable(instanceIdUuids)
-                .flatMap(new Function<InstanceIdUuid, Observable<Boolean>>() {
+                .flatMapCompletable(new Function<InstanceIdUuid, Completable>() {
                     @Override
-                    public Observable<Boolean> apply(InstanceIdUuid instanceIdUuid) {
+                    public Completable apply(InstanceIdUuid instanceIdUuid) {
+                        Timber.d("Will verify : "+instanceIdUuid.getUuid());
                         return updateMissingFileInstances(instanceIdUuid);
                     }
-                })
-                .toList().toObservable();
+                });
     }
 
-    private Observable<Boolean> updateMissingFileInstances(final InstanceIdUuid instanceIdUuid) {
+    private Completable updateMissingFileInstances(final InstanceIdUuid instanceIdUuid) {
         return fileRepository.getZipFile(instanceIdUuid.getUuid())
-                .map(new Function<File, Pair<InstanceIdUuid, File>>() {
+                .filter(new Predicate<File>() {
                     @Override
-                    public Pair<InstanceIdUuid, File> apply(File file) {
-                        return new Pair<>(instanceIdUuid, file);
+                    public boolean test(File file) {
+                        return !validFile(file);
                     }
                 })
-                .filter(new Predicate<Pair<InstanceIdUuid, File>>() {
+                .flatMapCompletable(new Function<File, Completable>() {
                     @Override
-                    public boolean test(Pair<InstanceIdUuid, File> pair) {
-                        return !pair.second.exists();
-                    }
-                })
-                .flatMap(new Function<Pair<InstanceIdUuid, File>, Observable<Boolean>>() {
-                    @Override
-                    public Observable<Boolean> apply(Pair<InstanceIdUuid, File> idUuidPair) {
-                        long surveyInstanceId = idUuidPair.first.getId();
-                        Timber.d("Exported file for survey instance %s not found. It's status " +
-                                        "will be set to 'submitted', and will be reprocessed",
-                                surveyInstanceId);
-                        return surveyRepository.setInstanceStatusToRequested(surveyInstanceId);
+                    public Completable apply(File file) {
+                        return updateInstanceStatus(instanceIdUuid);
                     }
                 });
+    }
+
+    //TODO: move to file
+    private boolean validFile(File file) {
+        return false;
+        //return file.exists() && validZipFile(file);
+    }
+
+    private boolean validZipFile(File file) {
+        try {
+            return new ZipFile(file).size() > 0;
+        } catch (IOException e) {
+            Timber.e(e);
+            return false;
+        }
+    }
+
+    private Completable updateInstanceStatus(InstanceIdUuid instanceIdUuid) {
+        long surveyInstanceId = instanceIdUuid.getId();
+        Timber.d("Exported file for survey instance %s not found. It's status " +
+                        "will be set to 'submitted', and will be reprocessed",
+                surveyInstanceId);
+        return surveyRepository.setInstanceStatusToRequested(surveyInstanceId);
     }
 }

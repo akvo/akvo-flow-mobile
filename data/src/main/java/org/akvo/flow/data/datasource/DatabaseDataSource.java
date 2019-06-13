@@ -54,7 +54,9 @@ import java.util.Set;
 
 import javax.inject.Inject;
 
+import io.reactivex.Completable;
 import io.reactivex.Observable;
+import io.reactivex.Single;
 import io.reactivex.functions.Function;
 import io.reactivex.functions.Predicate;
 
@@ -342,37 +344,37 @@ public class DatabaseDataSource {
         return Observable.just(true);
     }
 
-    public Observable<Cursor> getSubmittedInstances() {
-        return Observable.just(briteSurveyDbAdapter
+    public Single<Cursor> getSubmittedInstances() {
+        return Single.just(briteSurveyDbAdapter
                 .getSurveyInstancesByStatus(SurveyInstanceStatus.SUBMITTED));
     }
 
-    public Observable<Boolean> setInstanceStatusToRequested(long id) {
+    public Completable setInstanceStatusToRequested(long id) {
         briteSurveyDbAdapter.updateSurveyInstanceStatus(id, SurveyInstanceStatus.SUBMIT_REQUESTED);
-        return Observable.just(true);
+        return Completable.complete();
     }
 
-    public Observable<Cursor> getPendingSurveyInstances() {
-        return Observable.just(briteSurveyDbAdapter
+    public Single<Cursor> getPendingSurveyInstances() {
+        return Single.just(briteSurveyDbAdapter
                 .getSurveyInstancesByStatus(SurveyInstanceStatus.SUBMIT_REQUESTED));
     }
 
-    public Observable<Boolean> setInstanceStatusToSubmitted(long id) {
+    public Completable setInstanceStatusToSubmitted(long id) {
         briteSurveyDbAdapter.updateSurveyInstanceStatus(id, SurveyInstanceStatus.SUBMITTED);
-        return Observable.just(true);
+        return Completable.complete();
     }
 
-    public Observable<Cursor> getResponses(Long surveyInstanceId) {
-        return Observable.just(briteSurveyDbAdapter.getResponses(surveyInstanceId));
+    public Single<Cursor> getResponses(Long surveyInstanceId) {
+        return Single.just(briteSurveyDbAdapter.getResponses(surveyInstanceId));
     }
 
-    public Observable<Boolean> createTransmissions(final Long instanceId, final String formId,
+    public Completable createTransmissions(final Long instanceId, final String formId,
             Set<String> filenames) {
         if (filenames == null || filenames.isEmpty()) {
-            return Observable.just(true);
+            return Completable.complete();
         }
         briteSurveyDbAdapter.createTransmissions(instanceId, formId, filenames);
-        return Observable.just(true);
+        return Completable.complete();
     }
 
     public Observable<Boolean> installTestForm() {

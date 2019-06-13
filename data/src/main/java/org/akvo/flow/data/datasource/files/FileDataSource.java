@@ -39,7 +39,9 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import io.reactivex.Completable;
 import io.reactivex.Observable;
+import io.reactivex.Single;
 import okhttp3.ResponseBody;
 import timber.log.Timber;
 
@@ -207,19 +209,19 @@ public class FileDataSource {
         return Observable.just(externalStorageHelper.getExternalStorageAvailableSpaceInMb());
     }
 
-    public Observable<File> getZipFile(String uuid) {
+    public Single<File> getZipFile(String uuid) {
         String name = uuid + Constants.ARCHIVE_SUFFIX;
-        return Observable.just(new File(flowFileBrowser.getInternalFolder(FlowFileBrowser.DIR_DATA),
-                name));
+        File file = new File(flowFileBrowser.getInternalFolder(FlowFileBrowser.DIR_DATA), name);
+        return Single.just(file);
     }
 
-    public Observable<Boolean> writeDataToZipFile(String zipFileName, String formInstanceData) {
+    public Completable writeDataToZipFile(String zipFileName, String formInstanceData) {
         File folder = flowFileBrowser.getExistingAppInternalFolder(FlowFileBrowser.DIR_DATA);
         try {
             fileHelper.writeZipFile(folder, zipFileName, formInstanceData);
-            return Observable.just(true);
+            return Completable.complete();
         } catch (IOException e) {
-            return Observable.error(e);
+            return Completable.error(e);
         }
     }
 

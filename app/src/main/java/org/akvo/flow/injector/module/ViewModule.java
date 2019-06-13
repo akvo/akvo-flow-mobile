@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2016-2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -26,7 +26,6 @@ import org.akvo.flow.domain.interactor.ClearResponses;
 import org.akvo.flow.domain.interactor.CopyFile;
 import org.akvo.flow.domain.interactor.CopyVideo;
 import org.akvo.flow.domain.interactor.DeleteSurvey;
-import org.akvo.flow.domain.interactor.ExportSurveyInstance;
 import org.akvo.flow.domain.interactor.GetAllSurveys;
 import org.akvo.flow.domain.interactor.GetIsDeviceSetUp;
 import org.akvo.flow.domain.interactor.GetPublishDataTime;
@@ -246,12 +245,6 @@ public class ViewModule {
     @Named("checkDeviceNotification")
     UseCase provideDeviceNotificationSync(SurveyDeviceNotifications surveyDeviceNotifications) {
         return surveyDeviceNotifications;
-    }
-
-    @Provides
-    @Named("exportSurveyInstance")
-    UseCase provideExportSurveyInstanceSync(ExportSurveyInstance exportSurveyInstance) {
-        return exportSurveyInstance;
     }
 
     @Provides

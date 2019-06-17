@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -e
 
-if [ -z "$1" ]
+if [[ -z "$1" ]]
   then
     echo "At least one instance needs to be provided"
     exit 1

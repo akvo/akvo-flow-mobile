@@ -27,7 +27,6 @@ import android.support.v4.content.LocalBroadcastManager;
 
 import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.domain.interactor.CheckSubmittedFiles;
-import org.akvo.flow.domain.interactor.DefaultObserver;
 import org.akvo.flow.domain.interactor.ExportSurveyInstances;
 import org.akvo.flow.domain.interactor.MakeDataPrivate;
 import org.akvo.flow.util.ConstantUtil;
@@ -77,7 +76,7 @@ public class DataFixService extends JobIntentService {
 
     @Override
     protected void onHandleWork(@NonNull Intent intent) {
-        makeDataPrivate.execute(new DefaultObserver<Boolean>() {
+        makeDataPrivate.execute(new DisposableCompletableObserver()  {
             @Override
             public void onComplete() {
                 verify();

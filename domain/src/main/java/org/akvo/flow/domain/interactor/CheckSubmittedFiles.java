@@ -55,7 +55,6 @@ public class CheckSubmittedFiles {
         this.disposables = new CompositeDisposable();
     }
 
-    @SuppressWarnings("unchecked")
     public void execute(DisposableCompletableObserver observer) {
         final Completable observable = buildUseCaseObservable();
         addDisposable(observable.subscribeWith(observer));

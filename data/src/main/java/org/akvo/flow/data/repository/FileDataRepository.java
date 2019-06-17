@@ -61,15 +61,9 @@ public class FileDataRepository implements FileRepository {
     }
 
     @Override
-    public Observable<Boolean> moveFiles() {
-        return Observable.merge(dataSourceFactory.getFileDataSource().moveZipFiles(),
-                dataSourceFactory.getFileDataSource().moveMediaFiles())
-                .concatMap(new Function<List<String>, Observable<Boolean>>() {
-                    @Override
-                    public Observable<Boolean> apply(List<String> movedFiles) {
-                        return Observable.just(true);
-                    }
-                });
+    public Completable moveFiles() {
+        return Completable.mergeArray(dataSourceFactory.getFileDataSource().moveZipFiles(),
+                dataSourceFactory.getFileDataSource().moveMediaFiles());
     }
 
     @Override

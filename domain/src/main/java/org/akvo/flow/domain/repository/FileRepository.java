@@ -38,7 +38,7 @@ public interface FileRepository {
     Observable<Boolean> copyResizedImage(Uri fileName, String resizedFilePath, int imageSize,
             boolean removeDuplicate);
 
-    Observable<Boolean> moveFiles();
+    Completable moveFiles();
 
     Observable<Boolean> publishFiles(@NonNull List<String> fileNames);
 

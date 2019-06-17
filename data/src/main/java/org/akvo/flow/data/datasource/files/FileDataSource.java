@@ -60,16 +60,15 @@ public class FileDataSource {
         this.externalStorageHelper = externalStorageHelper;
     }
 
-    public Observable<List<String>> moveZipFiles() {
-        List<String> fileList = moveFiles(FlowFileBrowser.DIR_DATA);
-        return Observable.just(fileList);
+    public Completable moveZipFiles() {
+        moveFiles(FlowFileBrowser.DIR_DATA);
+        return Completable.complete();
     }
 
-    public Observable<List<String>> moveMediaFiles() {
-        List<String> fileList = moveFiles(
-                FlowFileBrowser.DIR_MEDIA + FlowFileBrowser.CADDISFLY_OLD_FOLDER);
-        fileList.addAll(moveFiles(FlowFileBrowser.DIR_MEDIA));
-        return Observable.just(fileList);
+    public Completable moveMediaFiles() {
+        moveFiles(FlowFileBrowser.DIR_MEDIA + FlowFileBrowser.CADDISFLY_OLD_FOLDER);
+        moveFiles(FlowFileBrowser.DIR_MEDIA);
+        return Completable.complete();
     }
 
     public Observable<Boolean> copyFile(String originFilePath, String destinationFilePath) {
@@ -82,9 +81,9 @@ public class FileDataSource {
         return Observable.just(true);
     }
 
-    private List<String> moveFiles(String folderName) {
+    private void moveFiles(String folderName) {
         File publicFolder = flowFileBrowser.getPublicFolder(folderName);
-        List<String> movedFiles = new ArrayList<>();
+        List<String> movedFiles;
         if (publicFolder != null && publicFolder.exists()) {
             File[] files = publicFolder.listFiles();
             movedFiles = copyFiles(files, folderName);
@@ -93,7 +92,6 @@ public class FileDataSource {
                 publicFolder.delete();
             }
         }
-        return movedFiles;
     }
 
     private List<String> copyFiles(@Nullable File[] files, String folderName) {

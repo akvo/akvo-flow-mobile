@@ -149,6 +149,7 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     private boolean activityJustCreated;
     private boolean permissionsResults;
     private TrackingHelper trackingHelper;
+    private boolean dataFixServiceStarted = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -381,7 +382,10 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     private void startServices() {
         startService(new Intent(this, BootstrapService.class));
         startService(new Intent(this, TimeCheckService.class));
-        DataFixService.enqueueWork(getApplicationContext(), new Intent());
+        if (!dataFixServiceStarted) {
+            DataFixService.enqueueWork(getApplicationContext(), new Intent());
+            dataFixServiceStarted = true;
+        }
     }
 
     private void displayExternalStorageMissing() {

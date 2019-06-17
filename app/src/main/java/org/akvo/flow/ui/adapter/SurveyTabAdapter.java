@@ -50,7 +50,7 @@ public class SurveyTabAdapter extends PagerAdapter implements ViewPager.OnPageCh
     private OnTabLoadedListener mOnTabLoadedListener;
 
     public interface OnTabLoadedListener {
-        void OnTabLoaded();
+        void onTabLoaded();
     }
 
     public void setOnTabLoadedListener(OnTabLoadedListener listener) {
@@ -99,7 +99,7 @@ public class SurveyTabAdapter extends PagerAdapter implements ViewPager.OnPageCh
             setupDependencies();// Dependencies might occur across tabs
 
             if (mOnTabLoadedListener != null) {
-                mOnTabLoadedListener.OnTabLoaded();
+                mOnTabLoadedListener.onTabLoaded();
             }
         }
     }

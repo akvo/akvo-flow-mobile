@@ -581,7 +581,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
         // Set the result only after the QuestionView is loaded
         mAdapter.setOnTabLoadedListener(new SurveyTabAdapter.OnTabLoadedListener() {
             @Override
-            public void OnTabLoaded() {
+            public void onTabLoaded() {
                 switch (requestCode) {
                     case ConstantUtil.PHOTO_ACTIVITY_REQUEST:
                         onImageTaken();

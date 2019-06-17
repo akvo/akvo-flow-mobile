@@ -423,8 +423,7 @@ public class SurveyDataRepository implements SurveyRepository {
                 });
     }
 
-    @VisibleForTesting
-    Observable<List<Transmission>> getFormTransmissions(String formId) {
+    private Observable<List<Transmission>> getFormTransmissions(String formId) {
         return dataSourceFactory.getDataBaseDataSource()
                 .getUnSyncedTransmissions(formId)
                 .map(new Function<Cursor, List<Transmission>>() {

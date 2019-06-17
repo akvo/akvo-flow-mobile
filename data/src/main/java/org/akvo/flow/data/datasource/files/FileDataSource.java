@@ -218,6 +218,8 @@ public class FileDataSource {
     public Completable writeDataToZipFile(String zipFileName, String formInstanceData) {
         File folder = flowFileBrowser.getExistingAppInternalFolder(FlowFileBrowser.DIR_DATA);
         try {
+            //delete any previous zip file
+            fileHelper.deleteFile(folder, zipFileName);
             fileHelper.writeZipFile(folder, zipFileName, formInstanceData);
             return Completable.complete();
         } catch (IOException e) {

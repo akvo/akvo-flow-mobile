@@ -178,6 +178,13 @@ public class FileHelper {
         return filename;
     }
 
+    public void deleteFile(File zipFolder, String zipFileName) {
+        File zipFile = new File(zipFolder, zipFileName);
+        if (zipFile.exists()) {
+            zipFile.delete();
+        }
+    }
+
     public void writeZipFile(File zipFolder, String zipFileName, String formInstanceData)
             throws IOException {
         File zipFile = new File(zipFolder, zipFileName);

@@ -60,8 +60,7 @@ public class ExportSurveyInstances {
         this.disposables = new CompositeDisposable();
     }
 
-    @SuppressWarnings("unchecked")
-    public <T> void execute(DisposableCompletableObserver observer) {
+    public void execute(DisposableCompletableObserver observer) {
         final Completable observable = buildUseCaseObservable();
         addDisposable(observable.subscribeWith(observer));
     }

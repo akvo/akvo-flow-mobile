@@ -47,6 +47,15 @@ public class SurveyTabAdapter extends PagerAdapter implements ViewPager.OnPageCh
     private List<QuestionGroup> mQuestionGroups;
     private List<QuestionGroupTab> mQuestionGroupTabs;
     private SubmitTab mSubmitTab;
+    private OnTabLoadedListener mOnTabLoadedListener;
+
+    public interface OnTabLoadedListener {
+        void OnTabLoaded();
+    }
+
+    public void setOnTabLoadedListener(OnTabLoadedListener listener) {
+        mOnTabLoadedListener = listener;
+    }
 
     public SurveyTabAdapter(Context context, ViewPager pager, SurveyListener surveyListener,
             QuestionInteractionListener questionListener) {
@@ -88,6 +97,10 @@ public class SurveyTabAdapter extends PagerAdapter implements ViewPager.OnPageCh
             tab.load();
             tab.loadState();
             setupDependencies();// Dependencies might occur across tabs
+
+            if (mOnTabLoadedListener != null) {
+                mOnTabLoadedListener.OnTabLoaded();
+            }
         }
     }
 

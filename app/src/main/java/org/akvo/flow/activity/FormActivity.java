@@ -177,6 +177,11 @@ public class FormActivity extends BackActivity implements SurveyListener,
         languageMapper = new LanguageMapper(context);
         surveyLanguagesDataSource = new SurveyLanguagesDbDataSource(context);
 
+        if (savedInstanceState != null) {
+            mRequestQuestionId = savedInstanceState.getString(ConstantUtil.REQUEST_QUESTION_ID_EXTRA);
+            imagePath = savedInstanceState.getParcelable(ConstantUtil.IMAGE_FILE_KEY);
+        }
+
         //TODO: move all loading to worker thread
         loadSurvey(surveyId);
         loadLanguages();
@@ -206,6 +211,13 @@ public class FormActivity extends BackActivity implements SurveyListener,
             }
             spaceLeftOnCard();
         }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putString(ConstantUtil.REQUEST_QUESTION_ID_EXTRA, mRequestQuestionId);
+        outState.putParcelable(ConstantUtil.IMAGE_FILE_KEY, imagePath);
+        super.onSaveInstanceState(outState);
     }
 
     private void initializeInjector() {
@@ -560,35 +572,41 @@ public class FormActivity extends BackActivity implements SurveyListener,
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent intent) {
+    public void onActivityResult(final int requestCode, int resultCode, final Intent intent) {
         if (mRequestQuestionId == null || resultCode != RESULT_OK) {
             mRequestQuestionId = null;
             return;
         }
 
-        switch (requestCode) {
-            case ConstantUtil.PHOTO_ACTIVITY_REQUEST:
-                onImageTaken();
-                break;
-            case ConstantUtil.VIDEO_ACTIVITY_REQUEST:
-                onVideoTaken(intent.getData());
-                break;
-            case ConstantUtil.GET_PHOTO_ACTIVITY_REQUEST:
-                onImageAcquired(intent.getData());
-                break;
-            case ConstantUtil.GET_VIDEO_ACTIVITY_REQUEST:
-                onVideoAcquired(intent.getData());
-                break;
-            case ConstantUtil.CADDISFLY_REQUEST:
-            case ConstantUtil.SCAN_ACTIVITY_REQUEST:
-            case ConstantUtil.PLOTTING_REQUEST:
-            case ConstantUtil.SIGNATURE_REQUEST:
-            default:
-                mAdapter.onQuestionResultReceived(mRequestQuestionId, intent.getExtras());
-                break;
-        }
-
-        mRequestQuestionId = null;
+        // Set the result only after the QuestionView is loaded
+        mAdapter.setOnTabLoadedListener(new SurveyTabAdapter.OnTabLoadedListener() {
+            @Override
+            public void OnTabLoaded() {
+                switch (requestCode) {
+                    case ConstantUtil.PHOTO_ACTIVITY_REQUEST:
+                        onImageTaken();
+                        break;
+                    case ConstantUtil.VIDEO_ACTIVITY_REQUEST:
+                        onVideoTaken(intent.getData());
+                        break;
+                    case ConstantUtil.GET_PHOTO_ACTIVITY_REQUEST:
+                        onImageAcquired(intent.getData());
+                        break;
+                    case ConstantUtil.GET_VIDEO_ACTIVITY_REQUEST:
+                        onVideoAcquired(intent.getData());
+                        break;
+                    case ConstantUtil.CADDISFLY_REQUEST:
+                    case ConstantUtil.SCAN_ACTIVITY_REQUEST:
+                    case ConstantUtil.PLOTTING_REQUEST:
+                    case ConstantUtil.SIGNATURE_REQUEST:
+                    default:
+                        mAdapter.onQuestionResultReceived(mRequestQuestionId, intent.getExtras());
+                        break;
+                }
+                mAdapter.setOnTabLoadedListener(null);
+                mRequestQuestionId = null;
+            }
+        });
     }
 
     @Override

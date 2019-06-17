@@ -578,35 +578,43 @@ public class FormActivity extends BackActivity implements SurveyListener,
             return;
         }
 
-        // Set the result only after the QuestionView is loaded
-        mAdapter.setOnTabLoadedListener(new SurveyTabAdapter.OnTabLoadedListener() {
-            @Override
-            public void onTabLoaded() {
-                switch (requestCode) {
-                    case ConstantUtil.PHOTO_ACTIVITY_REQUEST:
-                        onImageTaken();
-                        break;
-                    case ConstantUtil.VIDEO_ACTIVITY_REQUEST:
-                        onVideoTaken(intent.getData());
-                        break;
-                    case ConstantUtil.GET_PHOTO_ACTIVITY_REQUEST:
-                        onImageAcquired(intent.getData());
-                        break;
-                    case ConstantUtil.GET_VIDEO_ACTIVITY_REQUEST:
-                        onVideoAcquired(intent.getData());
-                        break;
-                    case ConstantUtil.CADDISFLY_REQUEST:
-                    case ConstantUtil.SCAN_ACTIVITY_REQUEST:
-                    case ConstantUtil.PLOTTING_REQUEST:
-                    case ConstantUtil.SIGNATURE_REQUEST:
-                    default:
-                        mAdapter.onQuestionResultReceived(mRequestQuestionId, intent.getExtras());
-                        break;
+        if (mAdapter.getQuestionView(mRequestQuestionId) == null) {
+            // Set the result only after the QuestionView is loaded
+            mAdapter.setOnTabLoadedListener(new SurveyTabAdapter.OnTabLoadedListener() {
+                @Override
+                public void onTabLoaded() {
+                    setResult(requestCode, intent, mRequestQuestionId);
+                    mAdapter.setOnTabLoadedListener(null);
                 }
-                mAdapter.setOnTabLoadedListener(null);
-                mRequestQuestionId = null;
-            }
-        });
+            });
+        } else {
+            setResult(requestCode, intent, mRequestQuestionId);
+        }
+    }
+
+    private void setResult(int requestCode, Intent intent, String requestQuestionId) {
+        switch (requestCode) {
+            case ConstantUtil.PHOTO_ACTIVITY_REQUEST:
+                onImageTaken();
+                break;
+            case ConstantUtil.VIDEO_ACTIVITY_REQUEST:
+                onVideoTaken(intent.getData());
+                break;
+            case ConstantUtil.GET_PHOTO_ACTIVITY_REQUEST:
+                onImageAcquired(intent.getData());
+                break;
+            case ConstantUtil.GET_VIDEO_ACTIVITY_REQUEST:
+                onVideoAcquired(intent.getData());
+                break;
+            case ConstantUtil.CADDISFLY_REQUEST:
+            case ConstantUtil.SCAN_ACTIVITY_REQUEST:
+            case ConstantUtil.PLOTTING_REQUEST:
+            case ConstantUtil.SIGNATURE_REQUEST:
+            default:
+                mAdapter.onQuestionResultReceived(requestQuestionId, intent.getExtras());
+                break;
+        }
+        mRequestQuestionId = null;
     }
 
     @Override

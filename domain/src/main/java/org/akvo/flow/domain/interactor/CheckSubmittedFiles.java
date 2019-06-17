@@ -82,12 +82,10 @@ public class CheckSubmittedFiles {
     }
 
     private Completable checkExistingFiles(List<InstanceIdUuid> instanceIdUuids) {
-        Timber.d("Found "+instanceIdUuids.size() + " survey instances");
         return Observable.fromIterable(instanceIdUuids)
                 .flatMapCompletable(new Function<InstanceIdUuid, Completable>() {
                     @Override
                     public Completable apply(InstanceIdUuid instanceIdUuid) {
-                        Timber.d("Will verify : "+instanceIdUuid.getUuid());
                         return updateMissingFileInstances(instanceIdUuid);
                     }
                 });
@@ -109,10 +107,8 @@ public class CheckSubmittedFiles {
                 });
     }
 
-    //TODO: move to file
     private boolean validFile(File file) {
-        return false;
-        //return file.exists() && validZipFile(file);
+        return file.exists() && validZipFile(file);
     }
 
     private boolean validZipFile(File file) {
@@ -127,7 +123,7 @@ public class CheckSubmittedFiles {
     private Completable updateInstanceStatus(InstanceIdUuid instanceIdUuid) {
         long surveyInstanceId = instanceIdUuid.getId();
         Timber.d("Exported file for survey instance %s not found. It's status " +
-                        "will be set to 'submitted', and will be reprocessed",
+                        "will be set to 'submit requested', and will be reprocessed",
                 surveyInstanceId);
         return surveyRepository.setInstanceStatusToRequested(surveyInstanceId);
     }

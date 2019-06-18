@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2018-2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -82,6 +82,15 @@ public class FlowFileBrowser {
         return new File(path);
     }
 
+    public File getExistingInternalFolder(String folderName) {
+        File folder = getInternalFolder(folderName);
+        if (!folder.exists()) {
+            //noinspection ResultOfMethodCallIgnored
+            folder.mkdirs();
+        }
+        return folder;
+    }
+
     public File getInternalFile(@NonNull String filename, @Nullable String folderName) {
         File folder = getInternalFolder(folderName);
         return new File(folder, filename);
@@ -107,13 +116,13 @@ public class FlowFileBrowser {
     }
 
     @Nullable
-    public File getExistingAppInternalFolder(String folderName) {
-        String path = getInternalFolder(folderName).getAbsolutePath();
-        File folder = new File(path);
-        if (!folder.exists()) {
-            folder.mkdirs();
+    public File getExistingAppExternalFolder(String publicFolderName) {
+        File destinationDataFolder = getAppExternalFolder(publicFolderName);
+        if (destinationDataFolder != null && !destinationDataFolder.exists()) {
+            //noinspection ResultOfMethodCallIgnored
+            destinationDataFolder.mkdirs();
         }
-        return folder;
+        return destinationDataFolder;
     }
 
     public String getVideoFilePath() {

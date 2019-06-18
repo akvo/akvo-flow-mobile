@@ -1,4 +1,6 @@
 apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-android'
 
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
@@ -63,6 +65,7 @@ dependencies {
     implementation "com.squareup.sqlbrite2:sqlbrite:${rootProject.ext.sqlbriteVersion}"
     implementation "io.reactivex.rxjava2:rxandroid:${rootProject.ext.rxAndroidVersion}"
     implementation "io.reactivex.rxjava2:rxjava:${rootProject.ext.rxJavaVersion}"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 
     testImplementation "junit:junit:${rootProject.ext.jUnitVersion}"
     testImplementation "org.mockito:mockito-core:${rootProject.ext.mockitoCoreVersion}"
@@ -71,4 +74,8 @@ dependencies {
     testImplementation "org.powermock:powermock-api-mockito:${rootProject.ext.powerMockVersion}"
     testImplementation "org.powermock:powermock-classloading-xstream:${rootProject.ext.powerMockVersion}"
     testImplementation "com.squareup.okhttp3:mockwebserver:${rootProject.ext.mockServerVersion}"
+    testImplementation "org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version"
+}
+repositories {
+    mavenCentral()
 }

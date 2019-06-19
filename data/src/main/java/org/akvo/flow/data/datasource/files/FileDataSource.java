@@ -21,6 +21,7 @@
 package org.akvo.flow.data.datasource.files;
 
 import android.support.annotation.Nullable;
+import android.support.annotation.VisibleForTesting;
 import android.text.TextUtils;
 
 import org.akvo.flow.data.util.Constants;
@@ -75,12 +76,13 @@ public class FileDataSource {
         File destinationFile = new File(destinationFilePath);
         String copiedFilePath = fileHelper.copyFile(originalFile, destinationFile);
         if (copiedFilePath == null) {
-            return Observable.error(new Exception("Error copying video file"));
+            return Observable.error(new Exception("Error copying file: " + originFilePath));
         }
         return Observable.just(true);
     }
 
-    private void moveFilesInFolder(String folderName) {
+    @VisibleForTesting
+    void moveFilesInFolder(String folderName) {
         File publicFolder = flowFileBrowser.getPublicFolder(folderName);
         if (publicFolder != null && publicFolder.exists()) {
             File[] files = publicFolder.listFiles();
@@ -88,7 +90,8 @@ public class FileDataSource {
         }
     }
 
-    private void moveAndDeleteFolder(String folderName, File publicFolder,
+    @VisibleForTesting
+    void moveAndDeleteFolder(String folderName, File publicFolder,
             @Nullable File[] files) {
         if (files != null) {
             int moveFiles = moveFiles(files, folderName);
@@ -99,7 +102,8 @@ public class FileDataSource {
         }
     }
 
-    private int moveFiles(@Nullable File[] files, String folderName) {
+    @VisibleForTesting
+    int moveFiles(@Nullable File[] files, String folderName) {
         int processedCorrectly = 0;
         if (files != null) {
             File folder = flowFileBrowser.getExistingInternalFolder(folderName);

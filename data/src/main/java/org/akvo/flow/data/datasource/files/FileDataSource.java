@@ -25,10 +25,6 @@ import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
 import android.text.TextUtils;
 import io.reactivex.Completable;
-import io.reactivex.Observable;
-import io.reactivex.Single;
-import okhttp3.ResponseBody;
-import io.reactivex.Completable;
 import io.reactivex.Maybe;
 import io.reactivex.Observable;
 import io.reactivex.Single;
@@ -40,20 +36,9 @@ import org.akvo.flow.data.util.FileHelper;
 import org.akvo.flow.data.util.FlowFileBrowser;
 import timber.log.Timber;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.List;
-import timber.log.Timber;
-
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.io.*;
-import java.util.List;
-import java.io.*;
-import java.util.ArrayList;
 import java.util.List;
 
 @Singleton

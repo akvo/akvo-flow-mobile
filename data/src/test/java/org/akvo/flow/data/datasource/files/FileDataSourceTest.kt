@@ -22,13 +22,12 @@ package org.akvo.flow.data.datasource.files
 import io.reactivex.observers.TestObserver
 import org.akvo.flow.data.util.FileHelper
 import org.akvo.flow.data.util.FlowFileBrowser
-import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Matchers.any
-import org.mockito.Matchers.anyString
 import org.mockito.Mock
 import org.mockito.Mockito.`when`
+import org.mockito.Mockito.anyString
 import org.mockito.Mockito.spy
 import org.mockito.Mockito.times
 import org.mockito.Mockito.verify
@@ -50,10 +49,6 @@ class FileDataSourceTest {
 
     @Mock
     internal var mockFile: File? = null
-
-    @Before
-    fun setUp() {
-    }
 
     @Test
     fun moveZipFilesShouldCompleteSuccessfully() {

@@ -33,19 +33,11 @@ import org.akvo.flow.data.util.Constants;
 import org.akvo.flow.data.util.ExternalStorageHelper;
 import org.akvo.flow.data.util.FileHelper;
 import org.akvo.flow.data.util.FlowFileBrowser;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.List;
 import timber.log.Timber;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.io.*;
-import java.util.ArrayList;
 import java.util.List;
 
 @Singleton

@@ -20,10 +20,11 @@
 package org.akvo.flow.data.repository
 
 import io.reactivex.Completable
-import io.reactivex.Single
+import io.reactivex.Maybe
 import io.reactivex.observers.TestObserver
 import org.akvo.flow.data.datasource.DataSourceFactory
 import org.akvo.flow.data.datasource.files.FileDataSource
+import org.akvo.flow.domain.entity.InstanceIdUuid
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -100,18 +101,18 @@ class FileDataRepositoryTest {
     }
 
     @Test(expected = NullPointerException::class)
-    fun getZipFileShouldThrowNPEIfNullUuid() {
+    fun getInstancesWithIncorrectZipShouldThrowNPEIfNullUuid() {
         val observer = TestObserver<File>()
         val fileDataRep = FileDataRepository(mockDataSourceFactory)
 
-        fileDataRep.getZipFile(null).subscribe(observer)
+        fileDataRep.getInstancesWithIncorrectZip(null).subscribe(observer)
     }
 
     @Test
-    fun getZipFileShouldFail() {
+    fun getInstancesWithIncorrectZipShouldFail() {
         val exception = Exception("test")
-        `when`(mockFileDataSource!!.getZipFile(Matchers.anyString())).thenReturn(
-            Single.error(
+        `when`(mockFileDataSource!!.getIncorrectZipFile(Matchers.anyString())).thenReturn(
+            Maybe.error(
                 exception
             )
         )
@@ -119,16 +120,16 @@ class FileDataRepositoryTest {
         val observer = TestObserver<File>()
         val fileDataRep = FileDataRepository(mockDataSourceFactory)
 
-        fileDataRep.getZipFile("123").subscribe(observer)
+        fileDataRep.getInstancesWithIncorrectZip(InstanceIdUuid(123L, "123")).subscribe(observer)
 
-        verify(mockFileDataSource, times(1))!!.getZipFile("123")
+        verify(mockFileDataSource, times(1))!!.getIncorrectZipFile("123")
         observer.assertError(exception)
     }
 
     @Test
-    fun getZipFileShouldReturnCorrectFile() {
-        `when`(mockFileDataSource!!.getZipFile(Matchers.anyString())).thenReturn(
-            Single.just(
+    fun getInstancesWithIncorrectZipShouldReturnCorrectFile() {
+        `when`(mockFileDataSource!!.getIncorrectZipFile(Matchers.anyString())).thenReturn(
+            Maybe.just(
                 mockFile
             )
         )
@@ -136,9 +137,9 @@ class FileDataRepositoryTest {
         val observer = TestObserver<File>()
         val fileDataRep = FileDataRepository(mockDataSourceFactory)
 
-        fileDataRep.getZipFile("123").subscribe(observer)
+        fileDataRep.getInstancesWithIncorrectZip(InstanceIdUuid(123L, "123")).subscribe(observer)
 
-        verify(mockFileDataSource, times(1))!!.getZipFile("123")
+        verify(mockFileDataSource, times(1))!!.getIncorrectZipFile("123")
         observer.assertNoErrors()
         observer.assertResult(mockFile)
     }

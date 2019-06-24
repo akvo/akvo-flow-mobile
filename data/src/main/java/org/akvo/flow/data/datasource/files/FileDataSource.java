@@ -20,30 +20,24 @@
 
 package org.akvo.flow.data.datasource.files;
 
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
 import android.text.TextUtils;
-
-import org.akvo.flow.data.util.Constants;
-import org.akvo.flow.data.util.ExternalStorageHelper;
-import org.akvo.flow.data.util.FileHelper;
-import org.akvo.flow.data.util.FlowFileBrowser;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.List;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
-
 import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 import okhttp3.ResponseBody;
+import org.akvo.flow.data.util.Constants;
+import org.akvo.flow.data.util.ExternalStorageHelper;
+import org.akvo.flow.data.util.FileHelper;
+import org.akvo.flow.data.util.FlowFileBrowser;
 import timber.log.Timber;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+import java.io.*;
+import java.util.List;
 
 @Singleton
 public class FileDataSource {
@@ -105,7 +99,7 @@ public class FileDataSource {
     @VisibleForTesting
     int moveFiles(@Nullable File[] files, String folderName) {
         int processedCorrectly = 0;
-        if (files != null) {
+        if (files != null && files.length > 0) {
             File folder = flowFileBrowser.getExistingInternalFolder(folderName);
             for (File originalFile : files) {
                 String destinationPath = copyFileOrDir(folderName, folder,
@@ -118,19 +112,32 @@ public class FileDataSource {
         return processedCorrectly;
     }
 
+    @VisibleForTesting
     @Nullable
-    private String copyFileOrDir(String folderName, File destinationFolder, File originalFile) {
-        String destinationPath;
+    String copyFileOrDir(String folderName, File destinationFolder, File originalFile) {
         if (originalFile.isDirectory() && FlowFileBrowser.DIR_DATA.equals(folderName)) {
-            destinationPath = originalFile.getAbsolutePath();
-            fileHelper.deleteFilesInDirectory(originalFile, true);
+            return deleteDirectory(originalFile);
         } else {
-            destinationPath = fileHelper.copyFileToFolder(originalFile, destinationFolder);
-            if (!TextUtils.isEmpty(destinationPath)) {
-                //noinspection ResultOfMethodCallIgnored
-                originalFile.delete();
-            }
+            return moveAndDeleteFile(destinationFolder, originalFile);
         }
+    }
+
+    @VisibleForTesting
+    @Nullable
+    String moveAndDeleteFile(File destinationFolder, File originalFile) {
+        String destinationPath = fileHelper.copyFileToFolder(originalFile, destinationFolder);
+        if (!TextUtils.isEmpty(destinationPath)) {
+            //noinspection ResultOfMethodCallIgnored
+            originalFile.delete();
+        }
+        return destinationPath;
+    }
+
+    @VisibleForTesting
+    @NonNull
+    String deleteDirectory(File originalFile) {
+        String destinationPath = originalFile.getAbsolutePath();
+        fileHelper.deleteFilesInDirectory(originalFile, true);
         return destinationPath;
     }
 

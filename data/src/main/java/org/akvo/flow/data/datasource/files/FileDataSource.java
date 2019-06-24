@@ -28,15 +28,32 @@ import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 import okhttp3.ResponseBody;
+import io.reactivex.Completable;
+import io.reactivex.Maybe;
+import io.reactivex.Observable;
+import io.reactivex.Single;
+import io.reactivex.functions.Predicate;
+import okhttp3.ResponseBody;
 import org.akvo.flow.data.util.Constants;
 import org.akvo.flow.data.util.ExternalStorageHelper;
 import org.akvo.flow.data.util.FileHelper;
 import org.akvo.flow.data.util.FlowFileBrowser;
 import timber.log.Timber;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.List;
+import timber.log.Timber;
+
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.io.*;
+import java.util.List;
+import java.io.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Singleton
@@ -213,10 +230,14 @@ public class FileDataSource {
         return Observable.just(externalStorageHelper.getExternalStorageAvailableSpaceInMb());
     }
 
-    public Single<File> getZipFile(String uuid) {
-        String name = uuid + Constants.ARCHIVE_SUFFIX;
-        File file = new File(flowFileBrowser.getInternalFolder(FlowFileBrowser.DIR_DATA), name);
-        return Single.just(file);
+    public Maybe<File> getIncorrectZipFile(String uuid) {
+        return getZipFile(uuid)
+                .filter(new Predicate<File>() {
+                    @Override
+                    public boolean test(File file) {
+                        return !fileHelper.validFile(file);
+                    }
+                });
     }
 
     public Completable writeDataToZipFile(String zipFileName, String formInstanceData) {
@@ -247,5 +268,11 @@ public class FileDataSource {
             return Observable.error(e);
         }
         return Observable.just(input);
+    }
+
+    private Single<File> getZipFile(String uuid) {
+        String name = uuid + Constants.ARCHIVE_SUFFIX;
+        File file = new File(flowFileBrowser.getInternalFolder(FlowFileBrowser.DIR_DATA), name);
+        return Single.just(file);
     }
 }

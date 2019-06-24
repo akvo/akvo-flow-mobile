@@ -20,26 +20,21 @@
 
 package org.akvo.flow.domain.interactor;
 
-import org.akvo.flow.domain.entity.InstanceIdUuid;
-import org.akvo.flow.domain.repository.FileRepository;
-import org.akvo.flow.domain.repository.SurveyRepository;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
-import java.util.zip.ZipFile;
-
-import javax.inject.Inject;
-
 import io.reactivex.Completable;
 import io.reactivex.CompletableSource;
 import io.reactivex.Observable;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Function;
-import io.reactivex.functions.Predicate;
 import io.reactivex.observers.DisposableCompletableObserver;
+import org.akvo.flow.domain.entity.InstanceIdUuid;
+import org.akvo.flow.domain.repository.FileRepository;
+import org.akvo.flow.domain.repository.SurveyRepository;
 import timber.log.Timber;
+
+import javax.inject.Inject;
+import java.io.File;
+import java.util.List;
 
 public class CheckSubmittedFiles {
 
@@ -91,32 +86,13 @@ public class CheckSubmittedFiles {
     }
 
     private Completable updateMissingFileInstances(final InstanceIdUuid instanceIdUuid) {
-        return fileRepository.getZipFile(instanceIdUuid.getUuid())
-                .filter(new Predicate<File>() {
-                    @Override
-                    public boolean test(File file) {
-                        return !validFile(file);
-                    }
-                })
+        return fileRepository.getInstancesWithIncorrectZip(instanceIdUuid)
                 .flatMapCompletable(new Function<File, Completable>() {
                     @Override
                     public Completable apply(File file) {
                         return updateInstanceStatus(instanceIdUuid);
                     }
                 });
-    }
-
-    private boolean validFile(File file) {
-        return file.exists() && validZipFile(file);
-    }
-
-    private boolean validZipFile(File file) {
-        try {
-            return new ZipFile(file).size() > 0;
-        } catch (IOException e) {
-            Timber.e(e);
-            return false;
-        }
     }
 
     private Completable updateInstanceStatus(InstanceIdUuid instanceIdUuid) {

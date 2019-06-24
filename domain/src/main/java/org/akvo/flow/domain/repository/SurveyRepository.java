@@ -31,8 +31,10 @@ import org.akvo.flow.domain.entity.User;
 import java.util.List;
 import java.util.Set;
 
+import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.Observable;
+import io.reactivex.Single;
 
 public interface SurveyRepository {
 
@@ -67,15 +69,15 @@ public interface SurveyRepository {
 
     Observable<Set<String>> processTransmissions(String deviceId);
 
-    Observable<List<InstanceIdUuid>> getSubmittedInstances();
+    Single<List<InstanceIdUuid>> getSubmittedInstances();
 
-    Observable<Boolean> setInstanceStatusToRequested(long id);
+    Completable setInstanceStatusToRequested(long id);
 
-    Observable<List<Long>> getPendingSurveyInstances();
+    Single<List<Long>> getPendingSurveyInstances();
 
-    Observable<FormInstanceMetadata> getFormInstanceData(Long instanceId, String deviceId);
+    Single<FormInstanceMetadata> getFormInstanceData(Long instanceId, String deviceId);
 
-    Observable<Boolean> createTransmissions(Long instanceId, String formId, Set<String> fileNames);
+    Completable createTransmissions(Long instanceId, String formId, Set<String> fileNames);
 
     Observable<List<String>> getFormIds(String surveyId);
 

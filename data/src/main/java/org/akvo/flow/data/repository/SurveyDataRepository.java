@@ -65,6 +65,7 @@ import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 
+import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.reactivex.Single;
@@ -422,8 +423,7 @@ public class SurveyDataRepository implements SurveyRepository {
                 });
     }
 
-    @VisibleForTesting
-    Observable<List<Transmission>> getFormTransmissions(String formId) {
+    private Observable<List<Transmission>> getFormTransmissions(String formId) {
         return dataSourceFactory.getDataBaseDataSource()
                 .getUnSyncedTransmissions(formId)
                 .map(new Function<Cursor, List<Transmission>>() {
@@ -445,7 +445,7 @@ public class SurveyDataRepository implements SurveyRepository {
     }
 
     @Override
-    public Observable<List<InstanceIdUuid>> getSubmittedInstances() {
+    public Single<List<InstanceIdUuid>> getSubmittedInstances() {
         return dataSourceFactory.getDataBaseDataSource().getSubmittedInstances()
                 .map(new Function<Cursor, List<InstanceIdUuid>>() {
                     @Override
@@ -456,12 +456,12 @@ public class SurveyDataRepository implements SurveyRepository {
     }
 
     @Override
-    public Observable<Boolean> setInstanceStatusToRequested(long id) {
+    public Completable setInstanceStatusToRequested(long id) {
         return dataSourceFactory.getDataBaseDataSource().setInstanceStatusToRequested(id);
     }
 
     @Override
-    public Observable<List<Long>> getPendingSurveyInstances() {
+    public Single<List<Long>> getPendingSurveyInstances() {
         return dataSourceFactory.getDataBaseDataSource().getPendingSurveyInstances()
                 .map(new Function<Cursor, List<Long>>() {
                     @Override
@@ -472,7 +472,7 @@ public class SurveyDataRepository implements SurveyRepository {
     }
 
     @Override
-    public Observable<FormInstanceMetadata> getFormInstanceData(final Long instanceId,
+    public Single<FormInstanceMetadata> getFormInstanceData(final Long instanceId,
             final String deviceId) {
         return dataSourceFactory.getDataBaseDataSource().getResponses(instanceId)
                 .map(new Function<Cursor, FormInstanceMetadata>() {
@@ -481,32 +481,27 @@ public class SurveyDataRepository implements SurveyRepository {
                         return formInstanceMetadataMapper.transform(cursor, deviceId);
                     }
                 })
-                .concatMap(new Function<FormInstanceMetadata, Observable<FormInstanceMetadata>>() {
+                .flatMap(new Function<FormInstanceMetadata, Single<FormInstanceMetadata>>() {
                     @Override
-                    public Observable<FormInstanceMetadata> apply(
+                    public Single<FormInstanceMetadata> apply(
                             FormInstanceMetadata formInstanceMetadata) {
                         if (!formInstanceMetadata.isValid()) {
-                            return Observable
+                            return Single
                                     .error(new Exception("Invalid form instance: " + instanceId));
                         } else {
-                            return Observable.just(formInstanceMetadata);
+                            return Single.just(formInstanceMetadata);
                         }
                     }
                 });
     }
 
     @Override
-    public Observable<Boolean> createTransmissions(final Long instanceId, final String formId,
+    public Completable createTransmissions(final Long instanceId, final String formId,
             Set<String> fileNames) {
         final DatabaseDataSource dataBaseDataSource = dataSourceFactory.getDataBaseDataSource();
         return dataBaseDataSource
                 .createTransmissions(instanceId, formId, fileNames)
-                .flatMap(new Function<Boolean, Observable<Boolean>>() {
-                    @Override
-                    public Observable<Boolean> apply(Boolean ignored) {
-                        return dataBaseDataSource.setInstanceStatusToSubmitted(instanceId);
-                    }
-                });
+                .andThen(dataBaseDataSource.setInstanceStatusToSubmitted(instanceId));
     }
 
     private Observable<Set<String>> updateSurveyInstance(List<UploadResult> list) {
@@ -535,8 +530,7 @@ public class SurveyDataRepository implements SurveyRepository {
                 });
     }
 
-    @VisibleForTesting
-    Observable<Set<String>> syncTransmissions(List<Transmission> transmissions,
+    private Observable<Set<String>> syncTransmissions(List<Transmission> transmissions,
             final String deviceId) {
         return Observable.fromIterable(transmissions)
                 .concatMap(new Function<Transmission, Observable<UploadResult>>() {

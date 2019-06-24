@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2018-2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -31,18 +31,19 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import io.reactivex.observers.DisposableCompletableObserver;
 import timber.log.Timber;
 
 public class FormPresenter implements Presenter {
 
-    private final UseCase exportSurveyInstance;
+    private final ExportSurveyInstance exportSurveyInstance;
     private final UseCase mobileUploadSet;
     private final UseCase mobileUploadAllowed;
 
     private FormView view;
 
     @Inject
-    public FormPresenter(@Named("exportSurveyInstance") UseCase exportSurveyInstance,
+    public FormPresenter(ExportSurveyInstance exportSurveyInstance,
             @Named("mobileUploadSet") UseCase mobileUploadSet,
             @Named("mobileUploadAllowed") UseCase mobileUploadAllowed) {
         this.exportSurveyInstance = exportSurveyInstance;
@@ -84,18 +85,18 @@ public class FormPresenter implements Presenter {
         view.showLoading();
         Map<String, Object> params = new HashMap<>(2);
         params.put(ExportSurveyInstance.SURVEY_INSTANCE_ID_PARAM, surveyInstanceId);
-        exportSurveyInstance.execute(new DefaultObserver<Boolean>() {
+        exportSurveyInstance.execute(new DisposableCompletableObserver() {
+            @Override
+            public void onComplete() {
+                view.hideLoading();
+                checkConnectionSetting();
+            }
+
             @Override
             public void onError(Throwable e) {
                 Timber.e(e);
                 view.hideLoading();
                 view.showErrorExport();
-            }
-
-            @Override
-            public void onNext(Boolean aBoolean) {
-                view.hideLoading();
-                checkConnectionSetting();
             }
         }, params);
     }
@@ -106,6 +107,7 @@ public class FormPresenter implements Presenter {
             public void onError(Throwable e) {
                 Timber.e(e);
                 view.startSync(false);
+                view.dismiss();
             }
 
             @Override

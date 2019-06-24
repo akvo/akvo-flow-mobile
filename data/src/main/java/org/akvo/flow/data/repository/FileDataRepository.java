@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -22,18 +22,18 @@ package org.akvo.flow.data.repository;
 
 import android.graphics.Bitmap;
 import android.net.Uri;
-
-import org.akvo.flow.data.datasource.DataSourceFactory;
-import org.akvo.flow.domain.repository.FileRepository;
-
-import java.io.File;
-import java.util.List;
-
-import javax.inject.Inject;
-
+import io.reactivex.Completable;
+import io.reactivex.Maybe;
 import io.reactivex.Observable;
 import io.reactivex.annotations.NonNull;
 import io.reactivex.functions.Function;
+import org.akvo.flow.data.datasource.DataSourceFactory;
+import org.akvo.flow.domain.entity.InstanceIdUuid;
+import org.akvo.flow.domain.repository.FileRepository;
+
+import javax.inject.Inject;
+import java.io.File;
+import java.util.List;
 
 public class FileDataRepository implements FileRepository {
 
@@ -59,15 +59,9 @@ public class FileDataRepository implements FileRepository {
     }
 
     @Override
-    public Observable<Boolean> moveFiles() {
-        return Observable.merge(dataSourceFactory.getFileDataSource().moveZipFiles(),
-                dataSourceFactory.getFileDataSource().moveMediaFiles())
-                .concatMap(new Function<List<String>, Observable<Boolean>>() {
-                    @Override
-                    public Observable<Boolean> apply(List<String> movedFiles) {
-                        return Observable.just(true);
-                    }
-                });
+    public Completable moveFiles() {
+        return Completable.mergeArray(dataSourceFactory.getFileDataSource().moveZipFiles(),
+                dataSourceFactory.getFileDataSource().moveMediaFiles());
     }
 
     @Override
@@ -107,12 +101,12 @@ public class FileDataRepository implements FileRepository {
     }
 
     @Override
-    public Observable<File> getZipFile(String uuid) {
-        return dataSourceFactory.getFileDataSource().getZipFile(uuid);
+    public Maybe<File> getInstancesWithIncorrectZip(InstanceIdUuid instanceIdUuid) {
+        return dataSourceFactory.getFileDataSource().getIncorrectZipFile(instanceIdUuid.getUuid());
     }
 
     @Override
-    public Observable<Boolean> createDataZip(String zipFileName, String formInstanceData) {
+    public Completable createDataZip(String zipFileName, String formInstanceData) {
         return dataSourceFactory.getFileDataSource()
                 .writeDataToZipFile(zipFileName, formInstanceData);
     }

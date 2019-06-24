@@ -22,20 +22,18 @@ package org.akvo.flow.data.repository;
 
 import android.graphics.Bitmap;
 import android.net.Uri;
-
-import org.akvo.flow.data.datasource.DataSourceFactory;
-import org.akvo.flow.domain.repository.FileRepository;
-
-import java.io.File;
-import java.util.List;
-
-import javax.inject.Inject;
-
 import io.reactivex.Completable;
+import io.reactivex.Maybe;
 import io.reactivex.Observable;
-import io.reactivex.Single;
 import io.reactivex.annotations.NonNull;
 import io.reactivex.functions.Function;
+import org.akvo.flow.data.datasource.DataSourceFactory;
+import org.akvo.flow.domain.entity.InstanceIdUuid;
+import org.akvo.flow.domain.repository.FileRepository;
+
+import javax.inject.Inject;
+import java.io.File;
+import java.util.List;
 
 public class FileDataRepository implements FileRepository {
 
@@ -103,8 +101,8 @@ public class FileDataRepository implements FileRepository {
     }
 
     @Override
-    public Single<File> getZipFile(String uuid) {
-        return dataSourceFactory.getFileDataSource().getZipFile(uuid);
+    public Maybe<File> getInstancesWithIncorrectZip(InstanceIdUuid instanceIdUuid) {
+        return dataSourceFactory.getFileDataSource().getIncorrectZipFile(instanceIdUuid.getUuid());
     }
 
     @Override

@@ -346,11 +346,13 @@ public class GeoQuestionView extends QuestionView
 
     @Override
     public boolean isValid() {
-        final String lat = geoInputContainer.getLatitudeText();
-        final String lon = geoInputContainer.getLongitudeText();
-        if (!super.isValid() || !locationValidator.validCoordinates(lat, lon)) {
-            setError(getResources().getString(R.string.error_question_mandatory));
-            return false;
+        if (getQuestion().isMandatory()) {
+            final String lat = geoInputContainer.getLatitudeText();
+            final String lon = geoInputContainer.getLongitudeText();
+            if (!super.isValid() || !locationValidator.validCoordinates(lat, lon)) {
+                setError(getResources().getString(R.string.error_question_mandatory));
+                return false;
+            }
         }
         return true;
     }

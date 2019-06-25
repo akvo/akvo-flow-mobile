@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2013-2018 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2013-2019 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -40,7 +40,7 @@ public class PlatformUtil {
     }
 
     public static String recordUuid() {
-        String base32Id = Base32.base32Uuid();
+        String base32Id = new Base32().base32Uuid();
         // Put dashes between the 4-5 and 8-9 positions to increase readability
         return base32Id.substring(0, 4) + "-" + base32Id.substring(4, 8) + "-" + base32Id
                 .substring(8);

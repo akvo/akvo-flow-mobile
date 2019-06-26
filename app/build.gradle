@@ -239,7 +239,7 @@ dependencies {
     implementation "com.android.support:multidex:${rootProject.ext.multidexVersion}"
     implementation "com.google.firebase:firebase-analytics:${rootProject.ext.firebaseVersion}"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
-    implementation "androidx.core:core-ktx:1.0.2"
+    implementation "androidx.core:core-ktx:${rootProject.ext.coreKtxVersion}"
     implementation "com.mapbox.mapboxsdk:mapbox-android-sdk:${rootProject.ext.mapboxVersion}"
     implementation "com.mapbox.mapboxsdk:mapbox-android-plugin-markerview-v7:${rootProject.ext.mapboxMarkerVersion}"
     implementation "com.github.akvo:mapbox-offline-reactive:${rootProject.ext.mapboxOfflineRxVersion}"
@@ -250,12 +250,11 @@ dependencies {
     testImplementation "org.powermock:powermock-module-junit4-rule:${rootProject.ext.powerMockVersion}"
     testImplementation "org.powermock:powermock-api-mockito:${rootProject.ext.powerMockVersion}"
     testImplementation "org.powermock:powermock-classloading-xstream:${rootProject.ext.powerMockVersion}"
+    testImplementation "io.kotlintest:kotlintest-runner-junit4:${rootProject.ext.kotlintestVerion}"
+    testImplementation "org.slf4j:slf4j-simple:${rootProject.ext.slfVersion}"
 
     androidTestImplementation "androidx.test.ext:junit:${rootProject.ext.androidXJunit}"
     androidTestImplementation "androidx.test:core:${rootProject.ext.androidXCore}"
-    testImplementation "io.kotlintest:kotlintest-runner-junit4:${rootProject.ext.kotlintestVerion}"
-    testImplementation "org.slf4j:slf4j-simple:${rootProject.ext.slf4jVersion}"
-
     androidTestImplementation "com.google.dexmaker:dexmaker:${rootProject.ext.dexMakerVersion}"
     androidTestImplementation "com.google.dexmaker:dexmaker-mockito:${rootProject.ext.dexMakerVersion}"
     androidTestImplementation "androidx.test:rules:${rootProject.ext.supportTestRulesVersion}"

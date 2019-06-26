@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2014 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2010-2014,2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -78,7 +78,7 @@ public class Deploy {
         final String version = args[VERSION];
 
         final String s3Path = "apk/" + instance + "/" + file.getName();
-        final String s3Url = "http://akvoflow.s3.amazonaws.com/apk/" + instance + '/'
+        final String s3Url = "https://akvoflow.s3.amazonaws.com/apk/" + instance + '/'
                 + file.getName();
         final String host = instance + ".appspot.com";
 

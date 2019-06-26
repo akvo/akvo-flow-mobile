@@ -125,6 +125,7 @@ public class ConstantUtil {
     public static final String FORM_SUBTITLE_EXTRA = "subtitle";
     public static final String QUESTION_ID_EXTRA = "question_id";
     public static final String VIEW_USER_EXTRA = "view_user";
+    public static final String REQUEST_QUESTION_ID_EXTRA = "request_question_id";
 
     /**
      * intents

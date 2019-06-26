@@ -22,26 +22,23 @@ package org.akvo.flow.data.datasource.files;
 
 import androidx.annotation.Nullable;
 import android.text.TextUtils;
-
+import io.reactivex.Completable;
+import io.reactivex.Maybe;
+import io.reactivex.Observable;
+import io.reactivex.Single;
+import io.reactivex.functions.Predicate;
+import okhttp3.ResponseBody;
 import org.akvo.flow.data.util.Constants;
 import org.akvo.flow.data.util.ExternalStorageHelper;
 import org.akvo.flow.data.util.FileHelper;
 import org.akvo.flow.data.util.FlowFileBrowser;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
+import timber.log.Timber;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-
-import io.reactivex.Observable;
-import okhttp3.ResponseBody;
-import timber.log.Timber;
+import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Singleton
 public class FileDataSource {
@@ -58,16 +55,15 @@ public class FileDataSource {
         this.externalStorageHelper = externalStorageHelper;
     }
 
-    public Observable<List<String>> moveZipFiles() {
-        List<String> fileList = moveFiles(FlowFileBrowser.DIR_DATA);
-        return Observable.just(fileList);
+    public Completable moveZipFiles() {
+        moveFiles(FlowFileBrowser.DIR_DATA);
+        return Completable.complete();
     }
 
-    public Observable<List<String>> moveMediaFiles() {
-        List<String> fileList = moveFiles(
-                FlowFileBrowser.DIR_MEDIA + FlowFileBrowser.CADDISFLY_OLD_FOLDER);
-        fileList.addAll(moveFiles(FlowFileBrowser.DIR_MEDIA));
-        return Observable.just(fileList);
+    public Completable moveMediaFiles() {
+        moveFiles(FlowFileBrowser.DIR_MEDIA + FlowFileBrowser.CADDISFLY_OLD_FOLDER);
+        moveFiles(FlowFileBrowser.DIR_MEDIA);
+        return Completable.complete();
     }
 
     public Observable<Boolean> copyFile(String originFilePath, String destinationFilePath) {
@@ -80,9 +76,9 @@ public class FileDataSource {
         return Observable.just(true);
     }
 
-    private List<String> moveFiles(String folderName) {
+    private void moveFiles(String folderName) {
         File publicFolder = flowFileBrowser.getPublicFolder(folderName);
-        List<String> movedFiles = new ArrayList<>();
+        List<String> movedFiles;
         if (publicFolder != null && publicFolder.exists()) {
             File[] files = publicFolder.listFiles();
             movedFiles = copyFiles(files, folderName);
@@ -91,7 +87,6 @@ public class FileDataSource {
                 publicFolder.delete();
             }
         }
-        return movedFiles;
     }
 
     private List<String> copyFiles(@Nullable File[] files, String folderName) {
@@ -207,19 +202,25 @@ public class FileDataSource {
         return Observable.just(externalStorageHelper.getExternalStorageAvailableSpaceInMb());
     }
 
-    public Observable<File> getZipFile(String uuid) {
-        String name = uuid + Constants.ARCHIVE_SUFFIX;
-        return Observable.just(new File(flowFileBrowser.getInternalFolder(FlowFileBrowser.DIR_DATA),
-                name));
+    public Maybe<File> getIncorrectZipFile(String uuid) {
+        return getZipFile(uuid)
+                .filter(new Predicate<File>() {
+                    @Override
+                    public boolean test(File file) {
+                        return !fileHelper.validFile(file);
+                    }
+                });
     }
 
-    public Observable<Boolean> writeDataToZipFile(String zipFileName, String formInstanceData) {
+    public Completable writeDataToZipFile(String zipFileName, String formInstanceData) {
         File folder = flowFileBrowser.getExistingAppInternalFolder(FlowFileBrowser.DIR_DATA);
         try {
+            //delete any previous zip file
+            fileHelper.deleteFile(folder, zipFileName);
             fileHelper.writeZipFile(folder, zipFileName, formInstanceData);
-            return Observable.just(true);
+            return Completable.complete();
         } catch (IOException e) {
-            return Observable.error(e);
+            return Completable.error(e);
         }
     }
 
@@ -239,5 +240,11 @@ public class FileDataSource {
             return Observable.error(e);
         }
         return Observable.just(input);
+    }
+
+    private Single<File> getZipFile(String uuid) {
+        String name = uuid + Constants.ARCHIVE_SUFFIX;
+        File file = new File(flowFileBrowser.getInternalFolder(FlowFileBrowser.DIR_DATA), name);
+        return Single.just(file);
     }
 }

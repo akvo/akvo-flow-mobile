@@ -12,6 +12,7 @@
 
 # Testing
 .calabash_settings
+.kotlintest
 
 app/bin
 app/gen

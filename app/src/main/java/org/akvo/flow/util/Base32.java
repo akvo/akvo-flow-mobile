@@ -31,23 +31,22 @@ public class Base32 {
      * we don't use the z as it can easily be confused with 2, especially in handwriting.
      * If we can't form the base32 version, we return an empty string.
      */
-    String base32Uuid(){
+    String base32Uuid() {
         final String uuid = UUID.randomUUID().toString();
-        String strippedUUID = (uuid.substring(0,13) + uuid.substring(24,27)).replace("-", "");
+        String strippedUUID = (uuid.substring(0, 13) + uuid.substring(24, 27)).replace("-", "");
         StringBuilder result;
         try {
-            long id = Long.parseLong(strippedUUID,16);
+            long id = Long.parseLong(strippedUUID, 16);
             result = new StringBuilder(Long.toString(id, 32).replace("l", "w").replace("o", "x").replace("i", "y"));
             //if 0 in the beginning were removed, re-add them here, we need 12 chars always
             while (result.length() < 12) {
                 result.insert(0, "0");
             }
-        } catch (NumberFormatException e){
+            return result.toString();
+        } catch (NumberFormatException e) {
             // if we can't create the base32 UUID string, return the original uuid.
-            result = new StringBuilder(uuid);
+            return uuid;
         }
-        
-        return result.toString();
     }
 
 }

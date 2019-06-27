@@ -26,38 +26,25 @@ import android.net.Uri;
 import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
 import android.test.suitebuilder.annotation.SmallTest;
-import android.text.TextUtils;
-
 import org.akvo.flow.data.util.FileHelper;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 import java.io.Closeable;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 
-import static junit.framework.Assert.assertFalse;
-import static junit.framework.Assert.assertNull;
-import static junit.framework.Assert.assertTrue;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.anyString;
+import static junit.framework.Assert.*;
+import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.powermock.api.mockito.PowerMockito.doNothing;
-import static org.powermock.api.mockito.PowerMockito.spy;
-import static org.powermock.api.mockito.PowerMockito.when;
+import static org.powermock.api.mockito.PowerMockito.*;
 
 @SmallTest
 @RunWith(PowerMockRunner.class)
-@PrepareForTest(TextUtils.class)
 public class MediaResolverHelperTest {
 
     @Mock
@@ -87,15 +74,6 @@ public class MediaResolverHelperTest {
     public void setUp() {
         helper = spy(new MediaResolverHelper(mockContext, mockExifHelper, mockFileHelper));
         when(mockContext.getContentResolver()).thenReturn(mockContentResolver);
-
-        PowerMockito.mockStatic(TextUtils.class);
-        when(TextUtils.isEmpty(any(CharSequence.class))).thenAnswer(new Answer<Boolean>() {
-            @Override
-            public Boolean answer(InvocationOnMock invocation) {
-                CharSequence a = (CharSequence) invocation.getArguments()[0];
-                return !(a != null && a.length() > 0);
-            }
-        });
     }
 
     @Test

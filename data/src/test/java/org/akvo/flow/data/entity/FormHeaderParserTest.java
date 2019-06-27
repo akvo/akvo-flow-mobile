@@ -20,16 +20,9 @@
 package org.akvo.flow.data.entity;
 
 import android.test.suitebuilder.annotation.SmallTest;
-import android.text.TextUtils;
-
 import org.akvo.flow.data.entity.form.FormHeaderParser;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 import java.util.List;
@@ -38,25 +31,10 @@ import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.TestCase.assertNotNull;
 import static junit.framework.TestCase.assertTrue;
-import static org.mockito.Matchers.any;
-import static org.powermock.api.mockito.PowerMockito.when;
 
 @SmallTest
-@PrepareForTest(TextUtils.class)
 @RunWith(PowerMockRunner.class)
 public class FormHeaderParserTest {
-
-    @Before
-    public void setUp() {
-        PowerMockito.mockStatic(TextUtils.class);
-        when(TextUtils.isEmpty(any(CharSequence.class))).thenAnswer(new Answer<Boolean>() {
-            @Override
-            public Boolean answer(InvocationOnMock invocation) {
-                CharSequence a = (CharSequence) invocation.getArguments()[0];
-                return !(a != null && a.length() > 0);
-            }
-        });
-    }
 
     @Test
     public void parseMultipleShouldReturnEmptyIfNullResponse() {

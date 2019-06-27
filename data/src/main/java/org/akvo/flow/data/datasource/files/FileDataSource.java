@@ -20,6 +20,7 @@
 
 package org.akvo.flow.data.datasource.files;
 
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
 import android.text.TextUtils;
@@ -100,7 +101,7 @@ public class FileDataSource {
     @VisibleForTesting
     int moveFiles(@Nullable File[] files, String folderName) {
         int processedCorrectly = 0;
-        if (files != null) {
+        if (files != null && files.length > 0) {
             File folder = flowFileBrowser.getExistingInternalFolder(folderName);
             for (File originalFile : files) {
                 String destinationPath = copyFileOrDir(folderName, folder,
@@ -113,19 +114,32 @@ public class FileDataSource {
         return processedCorrectly;
     }
 
+    @VisibleForTesting
     @Nullable
-    private String copyFileOrDir(String folderName, File destinationFolder, File originalFile) {
-        String destinationPath;
+    String copyFileOrDir(String folderName, File destinationFolder, File originalFile) {
         if (originalFile.isDirectory() && FlowFileBrowser.DIR_DATA.equals(folderName)) {
-            destinationPath = originalFile.getAbsolutePath();
-            fileHelper.deleteFilesInDirectory(originalFile, true);
+            return deleteDirectory(originalFile);
         } else {
-            destinationPath = fileHelper.copyFileToFolder(originalFile, destinationFolder);
-            if (!TextUtils.isEmpty(destinationPath)) {
-                //noinspection ResultOfMethodCallIgnored
-                originalFile.delete();
-            }
+            return moveAndDeleteFile(destinationFolder, originalFile);
         }
+    }
+
+    @VisibleForTesting
+    @Nullable
+    String moveAndDeleteFile(File destinationFolder, File originalFile) {
+        String destinationPath = fileHelper.copyFileToFolder(originalFile, destinationFolder);
+        if (!TextUtils.isEmpty(destinationPath)) {
+            //noinspection ResultOfMethodCallIgnored
+            originalFile.delete();
+        }
+        return destinationPath;
+    }
+
+    @VisibleForTesting
+    @NonNull
+    String deleteDirectory(File originalFile) {
+        String destinationPath = originalFile.getAbsolutePath();
+        fileHelper.deleteFilesInDirectory(originalFile, true);
         return destinationPath;
     }
 

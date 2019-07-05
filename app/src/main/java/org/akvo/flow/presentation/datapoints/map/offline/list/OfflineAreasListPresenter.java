@@ -21,35 +21,34 @@ package org.akvo.flow.presentation.datapoints.map.offline.list;
 
 import com.mapbox.mapboxsdk.offline.OfflineRegion;
 import com.mapbox.mapboxsdk.offline.OfflineRegionStatus;
-
-import org.akvo.flow.mapbox.offline.reactive.GetOfflineAreasList;
-import org.akvo.flow.presentation.Presenter;
-import org.akvo.flow.presentation.datapoints.map.offline.list.entity.ListOfflineAreaMapper;
-
-import java.util.List;
-
-import javax.inject.Inject;
-
-import androidx.annotation.Nullable;
 import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.observers.DisposableCompletableObserver;
 import io.reactivex.observers.DisposableSingleObserver;
 import kotlin.Pair;
+import org.akvo.flow.mapbox.offline.reactive.GetOfflineAreasList;
+import org.akvo.flow.mapbox.offline.reactive.RenameOfflineArea;
+import org.akvo.flow.presentation.Presenter;
+import org.akvo.flow.presentation.datapoints.map.offline.list.entity.ListOfflineAreaMapper;
 import timber.log.Timber;
+
+import javax.inject.Inject;
+import java.util.List;
 
 public class OfflineAreasListPresenter implements Presenter {
 
     private final ListOfflineAreaMapper mapper;
     private final CompositeDisposable disposables;
     private final GetOfflineAreasList offlineAreasList;
+    private final RenameOfflineArea renameOfflineArea;
 
     private OfflineAreasListView view;
-    private OfflineRegion[] offlineRegions;
 
     @Inject
     public OfflineAreasListPresenter(ListOfflineAreaMapper mapper,
-            GetOfflineAreasList offlineAreasList) {
+                                     GetOfflineAreasList offlineAreasList, RenameOfflineArea renameOfflineArea) {
         this.mapper = mapper;
         this.offlineAreasList = offlineAreasList;
+        this.renameOfflineArea = renameOfflineArea;
         disposables = new CompositeDisposable();
     }
 
@@ -92,35 +91,20 @@ public class OfflineAreasListPresenter implements Presenter {
     }
 
     public void renameArea(long areaId, String newName) {
-        OfflineRegion region = findOfflineRegion(areaId);
-        if (region != null) {
-            view.showLoading();
-            region.updateMetadata(regionNameMapper.getRegionMetadata(newName),
-                    new OfflineRegion.OfflineRegionUpdateMetadataCallback() {
-                        @Override
-                        public void onUpdate(byte[] metadata) {
-                            view.hideLoading();
-                            view.displayUpdatedName(areaId, newName);
-                        }
+        DisposableCompletableObserver subscribeWith = renameOfflineArea.execute(areaId, newName)
+                .subscribeWith(new DisposableCompletableObserver() {
+                    @Override
+                    public void onComplete() {
+                        view.hideLoading();
+                        view.displayUpdatedName(areaId, newName);
+                    }
 
-                        @Override
-                        public void onError(String error) {
-                            view.hideLoading();
-                            view.showRenameError();
-                        }
-                    });
-        }
-    }
-
-    @Nullable
-    private OfflineRegion findOfflineRegion(long areaId) {
-        if (offlineRegions != null) {
-            for (OfflineRegion r: offlineRegions) {
-                if (r.getID() == areaId) {
-                    return r;
-                }
-            }
-        }
-        return null;
+                    @Override
+                    public void onError(Throwable e) {
+                        view.hideLoading();
+                        view.showRenameError();
+                    }
+                });
+        disposables.add(subscribeWith);
     }
 }

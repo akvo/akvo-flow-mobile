@@ -21,51 +21,22 @@
 package org.akvo.flow.injector.module;
 
 import android.content.Context;
-
+import dagger.Module;
+import dagger.Provides;
 import org.akvo.flow.domain.MobileUploadAllowed;
-import org.akvo.flow.domain.interactor.ClearAllData;
-import org.akvo.flow.domain.interactor.ClearResponses;
-import org.akvo.flow.domain.interactor.CopyFile;
-import org.akvo.flow.domain.interactor.CopyVideo;
-import org.akvo.flow.domain.interactor.DeleteSurvey;
-import org.akvo.flow.domain.interactor.GetAllSurveys;
-import org.akvo.flow.domain.interactor.GetIsDeviceSetUp;
-import org.akvo.flow.domain.interactor.GetPublishDataTime;
-import org.akvo.flow.domain.interactor.GetSavedDataPoints;
-import org.akvo.flow.domain.interactor.GetUserSettings;
-import org.akvo.flow.domain.interactor.MobileUploadSet;
-import org.akvo.flow.domain.interactor.PublishData;
-import org.akvo.flow.domain.interactor.SaveAppLanguage;
-import org.akvo.flow.domain.interactor.SaveEnableMobileData;
-import org.akvo.flow.domain.interactor.SaveImage;
-import org.akvo.flow.domain.interactor.SaveImageSize;
-import org.akvo.flow.domain.interactor.SaveKeepScreenOn;
-import org.akvo.flow.domain.interactor.SaveResizedImage;
-import org.akvo.flow.domain.interactor.SaveSelectedSurvey;
-import org.akvo.flow.domain.interactor.SetWalkthroughSeen;
-import org.akvo.flow.domain.interactor.SurveyDeviceNotifications;
-import org.akvo.flow.domain.interactor.UnSyncedTransmissionsExist;
-import org.akvo.flow.domain.interactor.UploadSurveyDataPoints;
-import org.akvo.flow.domain.interactor.UseCase;
-import org.akvo.flow.domain.interactor.WasWalkthroughSeen;
+import org.akvo.flow.domain.interactor.*;
 import org.akvo.flow.domain.interactor.apk.GetApkData;
 import org.akvo.flow.domain.interactor.apk.GetApkDataPreferences;
 import org.akvo.flow.domain.interactor.apk.SaveApkUpdateNotified;
 import org.akvo.flow.domain.interactor.forms.DownloadForm;
 import org.akvo.flow.domain.interactor.forms.ReloadForms;
 import org.akvo.flow.domain.interactor.setup.SaveSetup;
-import org.akvo.flow.domain.interactor.users.CreateUser;
-import org.akvo.flow.domain.interactor.users.DeleteUser;
-import org.akvo.flow.domain.interactor.users.EditUser;
-import org.akvo.flow.domain.interactor.users.GetSelectedUser;
-import org.akvo.flow.domain.interactor.users.GetUsers;
-import org.akvo.flow.domain.interactor.users.SelectUser;
+import org.akvo.flow.domain.interactor.users.*;
 import org.akvo.flow.mapbox.offline.reactive.GetOfflineAreasList;
+import org.akvo.flow.mapbox.offline.reactive.RegionNameMapper;
+import org.akvo.flow.mapbox.offline.reactive.RenameOfflineArea;
 
 import javax.inject.Named;
-
-import dagger.Module;
-import dagger.Provides;
 
 @Module
 public class ViewModule {
@@ -295,5 +266,10 @@ public class ViewModule {
     @Provides
     GetOfflineAreasList provideOfflineAreasList(Context context) {
         return new GetOfflineAreasList(context);
+    }
+
+    @Provides
+    RenameOfflineArea provideRenameArea(Context context) {
+        return new RenameOfflineArea(context, new RegionNameMapper());
     }
 }

@@ -20,18 +20,7 @@
 
 package org.akvo.flow.domain.interactor;
 
-import org.akvo.flow.domain.entity.FormInstanceMetadata;
-import org.akvo.flow.domain.repository.FileRepository;
-import org.akvo.flow.domain.repository.SurveyRepository;
-import org.akvo.flow.domain.repository.UserRepository;
-import org.akvo.flow.domain.util.TextValueCleaner;
-
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import javax.inject.Inject;
-
+import androidx.annotation.VisibleForTesting;
 import io.reactivex.Completable;
 import io.reactivex.CompletableSource;
 import io.reactivex.Observable;
@@ -40,6 +29,16 @@ import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Function;
 import io.reactivex.observers.DisposableCompletableObserver;
+import org.akvo.flow.domain.entity.FormInstanceMetadata;
+import org.akvo.flow.domain.repository.FileRepository;
+import org.akvo.flow.domain.repository.SurveyRepository;
+import org.akvo.flow.domain.repository.UserRepository;
+import org.akvo.flow.domain.util.TextValueCleaner;
+
+import javax.inject.Inject;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public class ExportSurveyInstances {
 
@@ -71,11 +70,8 @@ public class ExportSurveyInstances {
         }
     }
 
-    private void addDisposable(Disposable disposable) {
-        disposables.add(disposable);
-    }
-
-    private Completable buildUseCaseObservable() {
+    @VisibleForTesting
+    Completable buildUseCaseObservable() {
         return userRepository.getDeviceId()
                 .map(new Function<String, String>() {
                     @Override
@@ -89,6 +85,10 @@ public class ExportSurveyInstances {
                         return createInstancesZipFiles(deviceId);
                     }
                 });
+    }
+
+    private void addDisposable(Disposable disposable) {
+        disposables.add(disposable);
     }
 
     private Completable createInstancesZipFiles(final String deviceId) {

@@ -1,6 +1,6 @@
 apply plugin: 'com.android.application'
-apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
 apply plugin: 'io.sentry.android.gradle'
 if (!project.hasProperty("nodexcount")) {
     apply plugin: 'com.getkeepsafe.dexcount'
@@ -167,6 +167,12 @@ android {
         unitTests.returnDefaultValues = true
     }
 
+    testOptions.unitTests.all {
+        testLogging {
+            events 'passed', 'skipped', 'failed', 'standardOut', 'standardError'
+        }
+    }
+
     lintOptions {
         // set to true to turn off analysis progress reporting by lint
         quiet false
@@ -251,7 +257,7 @@ dependencies {
     testImplementation "org.powermock:powermock-api-mockito:${rootProject.ext.powerMockVersion}"
     testImplementation "org.powermock:powermock-classloading-xstream:${rootProject.ext.powerMockVersion}"
     testImplementation "io.kotlintest:kotlintest-runner-junit4:${rootProject.ext.kotlintestVerion}"
-    testImplementation "org.slf4j:slf4j-simple:${rootProject.ext.slfVersion}"
+    //testImplementation "org.slf4j:slf4j-simple:${rootProject.ext.slfVersion}"
 
     androidTestImplementation "androidx.test.ext:junit:${rootProject.ext.androidXJunit}"
     androidTestImplementation "androidx.test:core:${rootProject.ext.androidXCore}"

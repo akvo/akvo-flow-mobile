@@ -1,4 +1,6 @@
 apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
 
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
@@ -33,8 +35,15 @@ android {
         abortOnError false
         ignore 'InvalidPackage'
     }
+
     testOptions {
         unitTests.returnDefaultValues = true
+    }
+
+    testOptions.unitTests.all {
+        testLogging {
+            events 'passed', 'skipped', 'failed', 'standardOut', 'standardError'
+        }
     }
 }
 
@@ -53,4 +62,9 @@ dependencies {
     testImplementation "org.powermock:powermock-module-junit4-rule:${rootProject.ext.powerMockVersion}"
     testImplementation "org.powermock:powermock-api-mockito:${rootProject.ext.powerMockVersion}"
     testImplementation "org.powermock:powermock-classloading-xstream:${rootProject.ext.powerMockVersion}"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+    implementation "androidx.core:core-ktx:${rootProject.ext.coreKtxVersion}"
+}
+repositories {
+    mavenCentral()
 }

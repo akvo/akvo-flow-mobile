@@ -133,7 +133,7 @@ public class FileHelper {
      * deletes all files in the directory (recursively) AND then deletes the
      * directory itself if the "deleteFlag" is true
      */
-    @SuppressWarnings({ "unchecked", "ResultOfMethodCallIgnored" })
+    @SuppressWarnings({ "ResultOfMethodCallIgnored" })
     public void deleteFilesInDirectory(File folder, boolean deleteFolder) {
         if (folder != null && folder.exists() && folder.isDirectory()) {
             File[] files = folder.listFiles();

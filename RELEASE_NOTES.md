@@ -1,5 +1,17 @@
 Akvo FLOW app release notes
 ===========================
+# ver 2.7.4
+Date: 04 July 2019
+
+* **Store app URL with https when deploying** - [#1379](https://github.com/akvo/akvo-flow-mobile/issues/1379)
+* **Update deploy jar with new changes** - [#1381](https://github.com/akvo/akvo-flow-mobile/issues/1381)
+* **Travis deployments fixes** - [#1399](https://github.com/akvo/akvo-flow-mobile/issues/1399)
+* **Corrupt zip files issue fix attempt** - [#1403](https://github.com/akvo/akvo-flow-mobile/issues/1403)
+* **External result is lost if activity is destroyed due to low memory** - [#1406](https://github.com/akvo/akvo-flow-mobile/issues/1406)
+* **Update Firebase config file** - [#1408](https://github.com/akvo/akvo-flow-mobile/issues/1408)
+* **Ensure new Data Point (Record) identifiers are 14 chars long** - [#1411](https://github.com/akvo/akvo-flow-mobile/issues/1411)
+
+---------------
 # ver 2.7.3
 Date: 23 April 2019
 

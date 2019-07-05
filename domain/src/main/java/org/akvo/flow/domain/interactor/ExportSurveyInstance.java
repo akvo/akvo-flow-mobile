@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2018-2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -34,11 +34,16 @@ import java.util.Set;
 
 import javax.inject.Inject;
 
-import io.reactivex.Observable;
+import io.reactivex.Completable;
+import io.reactivex.CompletableSource;
 import io.reactivex.annotations.NonNull;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Function;
+import io.reactivex.observers.DisposableCompletableObserver;
+import io.reactivex.schedulers.Schedulers;
 
-public class ExportSurveyInstance extends UseCase {
+public class ExportSurveyInstance {
 
     public static final String SURVEY_INSTANCE_ID_PARAM = "survey_instance_id";
 
@@ -46,23 +51,44 @@ public class ExportSurveyInstance extends UseCase {
     private final TextValueCleaner valueCleaner;
     private final SurveyRepository surveyRepository;
     private final FileRepository fileRepository;
+    private final ThreadExecutor threadExecutor;
+    private final PostExecutionThread postExecutionThread;
+    private final CompositeDisposable disposables;
 
     @Inject
     protected ExportSurveyInstance(ThreadExecutor threadExecutor,
             PostExecutionThread postExecutionThread, UserRepository userRepository,
             TextValueCleaner valueCleaner, SurveyRepository surveyRepository,
             FileRepository fileRepository) {
-        super(threadExecutor, postExecutionThread);
+        this.threadExecutor = threadExecutor;
+        this.postExecutionThread = postExecutionThread;
+        this.disposables = new CompositeDisposable();
         this.userRepository = userRepository;
         this.valueCleaner = valueCleaner;
         this.surveyRepository = surveyRepository;
         this.fileRepository = fileRepository;
     }
 
-    @Override
-    protected <T> Observable buildUseCaseObservable(Map<String, T> parameters) {
-        if (parameters == null || parameters.get(SURVEY_INSTANCE_ID_PARAM) == null)  {
-            return Observable.error(new IllegalArgumentException("Missing survey instance id"));
+    public void execute(DisposableCompletableObserver observer, Map<String, Object> parameters) {
+        final Completable observable = buildUseCaseObservable(parameters)
+                .subscribeOn(Schedulers.from(threadExecutor))
+                .observeOn(postExecutionThread.getScheduler());
+        addDisposable(observable.subscribeWith(observer));
+    }
+
+    public void dispose() {
+        if (!disposables.isDisposed()) {
+            disposables.clear();
+        }
+    }
+
+    private void addDisposable(Disposable disposable) {
+        disposables.add(disposable);
+    }
+
+    protected <T> Completable buildUseCaseObservable(Map<String, T> parameters) {
+        if (parameters == null || parameters.get(SURVEY_INSTANCE_ID_PARAM) == null) {
+            return Completable.error(new IllegalArgumentException("Missing survey instance id"));
         }
         final Long surveyInstanceId = (Long) parameters.get(SURVEY_INSTANCE_ID_PARAM);
         return userRepository.getDeviceId()
@@ -72,44 +98,38 @@ public class ExportSurveyInstance extends UseCase {
                         return valueCleaner.cleanVal(deviceId);
                     }
                 })
-                .flatMap(new Function<String, Observable<Boolean>>() {
+                .flatMapCompletable(new Function<String, Completable>() {
                     @Override
-                    public Observable<Boolean> apply(final String deviceId) {
+                    public Completable apply(final String deviceId) {
                         return createInstanceZipFile(surveyInstanceId, deviceId);
                     }
                 });
     }
 
-    private Observable<Boolean> createInstanceZipFile(@NonNull final Long instanceId,
+    private Completable createInstanceZipFile(@NonNull final Long instanceId,
             final String deviceId) {
         return surveyRepository.setInstanceStatusToRequested(instanceId)
-                .concatMap(new Function<Boolean, Observable<Boolean>>() {
-                    @Override
-                    public Observable<Boolean> apply(Boolean aBoolean) {
-                        return surveyRepository.getFormInstanceData(instanceId, deviceId)
-                                .concatMap(
-                                        new Function<FormInstanceMetadata, Observable<Boolean>>() {
+                .andThen(surveyRepository.getFormInstanceData(instanceId, deviceId)
+                                .flatMapCompletable(
+                                        new Function<FormInstanceMetadata, CompletableSource>() {
                                             @Override
-                                            public Observable<Boolean> apply(
-                                                    final FormInstanceMetadata metadata) {
+                                            public CompletableSource apply(
+                                                    FormInstanceMetadata metadata) {
                                                 return exportSurveyInstance(metadata, instanceId);
                                             }
-                                        });
-                    }
-                });
+                                        }));
     }
 
-    private Observable<Boolean> exportSurveyInstance(final FormInstanceMetadata metadata,
+    private Completable exportSurveyInstance(final FormInstanceMetadata metadata,
             @NonNull final Long instanceId) {
-        return fileRepository.createDataZip(metadata.getZipFileName(), metadata.getFormInstanceData())
-                .concatMap(new Function<Boolean, Observable<Boolean>>() {
-                    @Override
-                    public Observable<Boolean> apply(Boolean ignored) {
-                        Set<String> filenames = new HashSet<>(metadata.getMediaFileNames());
-                        filenames.add(metadata.getZipFileName());
-                        return surveyRepository
-                                .createTransmissions(instanceId, metadata.getFormId(), filenames);
-                    }
-                });
+        return fileRepository
+                .createDataZip(metadata.getZipFileName(), metadata.getFormInstanceData())
+                .andThen(insertToDataBase(metadata, instanceId));
+    }
+
+    private Completable insertToDataBase(FormInstanceMetadata metadata, @NonNull Long instanceId) {
+        Set<String> filenames = new HashSet<>(metadata.getMediaFileNames());
+        filenames.add(metadata.getZipFileName());
+        return surveyRepository.createTransmissions(instanceId, metadata.getFormId(), filenames);
     }
 }

@@ -46,22 +46,14 @@ before_install:
   - echo "android.enableR8=false" >> app/gradle.properties
   - chmod +x fastlane/deploy_beta.sh
   - chmod +x travis/deploy_release.sh
-  - gcloud version || true
-  - if [ ! -d ${HOME}/google-cloud-sdk/bin ]; then
-      rm -rf $HOME/google-cloud-sdk;
-      curl https://sdk.cloud.google.com | bash;
-    fi
-  - $HOME/google-cloud-sdk/bin/gcloud version
-  - $HOME/google-cloud-sdk/bin/gcloud auth activate-service-account firebase-adminsdk-48ycx@akvoflowapp.iam.gserviceaccount.com --key-file=akvoflowapp-firebase-adminsdk-48ycx-c664041e03.json
-  - $HOME/google-cloud-sdk/bin/gcloud config set project akvoflowapp --quiet
+  - chmod +x travis/setup_gcloud.sh
+  - chmod +x travis/run_firebase_tests.sh
+  - "if [ \"$TRAVIS_PULL_REQUEST\" != \"false\" ]; then . ./travis/setup_gcloud.sh; fi"
 
 script:
   - ./gradlew check --continue -Pnodexcount=true
   - ./gradlew :app:assembleFlowDebugAndroidTest -Pnodexcount=true
-  # Firebase Test Lab will only run when there is a PR to not get over our quota limitation
-  - if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then
-      $HOME/google-cloud-sdk/bin/gcloud firebase test android run --type instrumentation --app app/build/outputs/apk/flow/debug/app-flow-debug.apk --test app/build/outputs/apk/androidTest/flow/debug/app-flow-debug-androidTest.apk --device model=Nexus5,version=21,locale=en,orientation=portrait;
-    fi
+  - "if [ \"$TRAVIS_PULL_REQUEST\" != \"false\" ]; then . ./travis/run_firebase_tests.sh; fi"
 
 after_success:
   - ./fastlane/deploy_beta.sh

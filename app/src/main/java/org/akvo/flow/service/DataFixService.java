@@ -27,15 +27,13 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.domain.interactor.CheckSubmittedFiles;
-import org.akvo.flow.domain.interactor.DefaultObserver;
 import org.akvo.flow.domain.interactor.ExportSurveyInstances;
 import org.akvo.flow.domain.interactor.MakeDataPrivate;
 import org.akvo.flow.util.ConstantUtil;
 
-import java.util.List;
-
 import javax.inject.Inject;
 
+import io.reactivex.observers.DisposableCompletableObserver;
 import timber.log.Timber;
 
 public class DataFixService extends JobIntentService {
@@ -78,7 +76,7 @@ public class DataFixService extends JobIntentService {
 
     @Override
     protected void onHandleWork(@NonNull Intent intent) {
-        makeDataPrivate.execute(new DefaultObserver<Boolean>() {
+        makeDataPrivate.execute(new DisposableCompletableObserver()  {
             @Override
             public void onComplete() {
                 verify();
@@ -93,7 +91,7 @@ public class DataFixService extends JobIntentService {
     }
 
     private void verify() {
-        checkSubmittedFiles.execute(new DefaultObserver<List<Boolean>>() {
+        checkSubmittedFiles.execute(new DisposableCompletableObserver() {
             @Override
             public void onError(Throwable e) {
                 export();
@@ -107,7 +105,7 @@ public class DataFixService extends JobIntentService {
     }
 
     private void export() {
-        exportSurveyInstances.execute(new DefaultObserver<Boolean>() {
+        exportSurveyInstances.execute(new DisposableCompletableObserver() {
             @Override
             public void onComplete() {
                 broadcastDataPointStatusChange();

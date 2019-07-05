@@ -22,12 +22,14 @@ package org.akvo.flow.domain.repository;
 
 import android.graphics.Bitmap;
 import android.net.Uri;
+import io.reactivex.Completable;
+import io.reactivex.Maybe;
+import io.reactivex.Observable;
+import io.reactivex.annotations.NonNull;
+import org.akvo.flow.domain.entity.InstanceIdUuid;
 
 import java.io.File;
 import java.util.List;
-
-import io.reactivex.Observable;
-import io.reactivex.annotations.NonNull;
 
 public interface FileRepository {
 
@@ -36,7 +38,7 @@ public interface FileRepository {
     Observable<Boolean> copyResizedImage(Uri fileName, String resizedFilePath, int imageSize,
             boolean removeDuplicate);
 
-    Observable<Boolean> moveFiles();
+    Completable moveFiles();
 
     Observable<Boolean> publishFiles(@NonNull List<String> fileNames);
 
@@ -52,7 +54,7 @@ public interface FileRepository {
 
     Observable<String> copyVideo(Uri uri, boolean removeOriginal);
 
-    Observable<File> getZipFile(String uuid);
+    Completable createDataZip(String zipFileName, String formInstanceData);
 
-    Observable<Boolean> createDataZip(String zipFileName, String formInstanceData);
+    Maybe<File> getInstancesWithIncorrectZip(InstanceIdUuid instanceIdUuid);
 }

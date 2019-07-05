@@ -12,6 +12,7 @@
 
 # Testing
 .calabash_settings
+.kotlintest
 
 app/bin
 app/gen
@@ -58,4 +59,5 @@ app/fabric.properties
 
 #errors
 hs_err_*
+.attach_pid*
 

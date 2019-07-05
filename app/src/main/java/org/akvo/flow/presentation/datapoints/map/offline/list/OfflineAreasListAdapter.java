@@ -164,7 +164,7 @@ public class OfflineAreasListAdapter
                     listener.renameArea(offlineArea.getId(), offlineArea.getName());
                     break;
                 case R.id.delete_area:
-                    listener.deleteArea(offlineArea.getId());
+                    listener.deleteArea(offlineArea.getId(), offlineArea.getName());
                     break;
                     default:
                         break;

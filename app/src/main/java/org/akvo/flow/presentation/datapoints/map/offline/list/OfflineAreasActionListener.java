@@ -25,7 +25,7 @@ public interface OfflineAreasActionListener {
 
     void renameArea(long areId, String oldName);
 
-    void deleteArea(long areId);
+    void deleteArea(long areId, String name);
 
     void viewArea(long areId);
 }

@@ -26,14 +26,17 @@ public class ListOfflineArea {
     private final String size;
     private final boolean isDownloading;
     private final boolean isAvailable;
+    private final MapInfo mapInfo;
 
     public ListOfflineArea(long id, String name, String size, boolean isDownloading,
-            boolean isAvailable) {
+            boolean isAvailable,
+            MapInfo mapInfo) {
         this.id = id;
         this.name = name;
         this.size = size;
         this.isDownloading = isDownloading;
         this.isAvailable = isAvailable;
+        this.mapInfo = mapInfo;
     }
 
     public long getId() {
@@ -71,5 +74,9 @@ public class ListOfflineArea {
     @Override
     public int hashCode() {
         return (int) (id ^ (id >>> 32));
+    }
+
+    public MapInfo getMapInfo() {
+        return mapInfo;
     }
 }

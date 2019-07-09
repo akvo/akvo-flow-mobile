@@ -38,4 +38,6 @@ public interface OfflineAreasListView {
     void displayUpdatedName(long areaId, String newName);
 
     void showRenameError();
+
+    void showDeleteError();
 }

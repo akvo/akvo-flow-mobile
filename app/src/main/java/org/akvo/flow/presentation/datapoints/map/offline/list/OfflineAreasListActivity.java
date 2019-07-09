@@ -30,7 +30,9 @@ import org.akvo.flow.activity.BackActivity;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
 import org.akvo.flow.presentation.SnackBarManager;
+import org.akvo.flow.presentation.datapoints.map.offline.list.delete.DeleteAreaDialog;
 import org.akvo.flow.presentation.datapoints.map.offline.list.entity.ListOfflineArea;
+import org.akvo.flow.presentation.datapoints.map.offline.list.entity.MapInfo;
 import org.akvo.flow.presentation.datapoints.map.offline.list.rename.RenameAreaDialog;
 import org.akvo.flow.ui.Navigator;
 
@@ -49,7 +51,7 @@ import timber.log.Timber;
 
 public class OfflineAreasListActivity extends BackActivity
         implements OfflineAreasListView, OfflineAreasActionListener,
-        RenameAreaDialog.RenameAreaListener {
+        RenameAreaDialog.RenameAreaListener, DeleteAreaDialog.DeleteAreaListener {
 
     @Inject
     Navigator navigator;
@@ -150,7 +152,12 @@ public class OfflineAreasListActivity extends BackActivity
 
     @Override
     public void showRenameError() {
-        snackBarManager.displaySnackBar(offlineAreasRv, R.string.offline_map_create_error, this);
+        snackBarManager.displaySnackBar(offlineAreasRv, R.string.offline_map_rename_error, this);
+    }
+
+    @Override
+    public void showDeleteError() {
+        snackBarManager.displaySnackBar(offlineAreasRv, R.string.offline_map_delete_error, this);
     }
 
     @Override
@@ -165,17 +172,23 @@ public class OfflineAreasListActivity extends BackActivity
     }
 
     @Override
-    public void deleteArea(long areaId) {
-
+    public void deleteArea(long areaId, String name) {
+        DialogFragment dialog = DeleteAreaDialog.newInstance(areaId, name);
+        dialog.show(getSupportFragmentManager(), DeleteAreaDialog.TAG);
     }
 
     @Override
-    public void viewArea(long areaId) {
-
+    public void viewArea(String mapName, MapInfo mapInfo) {
+        navigator.navigateToViewOffline(this, mapName, mapInfo);
     }
 
     @Override
     public void renameAreaConfirmed(long areaId, String name) {
         presenter.renameArea(areaId, name);
+    }
+
+    @Override
+    public void deleteAreaConfirmed(long areaId) {
+        presenter.deleteArea(areaId);
     }
 }

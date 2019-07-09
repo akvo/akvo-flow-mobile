@@ -21,18 +21,22 @@ package org.akvo.flow.presentation.datapoints.map.offline.list;
 
 import com.mapbox.mapboxsdk.offline.OfflineRegion;
 import com.mapbox.mapboxsdk.offline.OfflineRegionStatus;
-import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.observers.DisposableCompletableObserver;
-import io.reactivex.observers.DisposableSingleObserver;
-import kotlin.Pair;
+
+import org.akvo.flow.mapbox.offline.reactive.DeleteOfflineArea;
 import org.akvo.flow.mapbox.offline.reactive.GetOfflineAreasList;
 import org.akvo.flow.mapbox.offline.reactive.RenameOfflineArea;
 import org.akvo.flow.presentation.Presenter;
 import org.akvo.flow.presentation.datapoints.map.offline.list.entity.ListOfflineAreaMapper;
-import timber.log.Timber;
+
+import java.util.List;
 
 import javax.inject.Inject;
-import java.util.List;
+
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.observers.DisposableCompletableObserver;
+import io.reactivex.observers.DisposableSingleObserver;
+import kotlin.Pair;
+import timber.log.Timber;
 
 public class OfflineAreasListPresenter implements Presenter {
 
@@ -40,15 +44,18 @@ public class OfflineAreasListPresenter implements Presenter {
     private final CompositeDisposable disposables;
     private final GetOfflineAreasList offlineAreasList;
     private final RenameOfflineArea renameOfflineArea;
+    private final DeleteOfflineArea deleteOfflineArea;
 
     private OfflineAreasListView view;
 
     @Inject
     public OfflineAreasListPresenter(ListOfflineAreaMapper mapper,
-                                     GetOfflineAreasList offlineAreasList, RenameOfflineArea renameOfflineArea) {
+            GetOfflineAreasList offlineAreasList, RenameOfflineArea renameOfflineArea,
+            DeleteOfflineArea deleteOfflineArea) {
         this.mapper = mapper;
         this.offlineAreasList = offlineAreasList;
         this.renameOfflineArea = renameOfflineArea;
+        this.deleteOfflineArea = deleteOfflineArea;
         disposables = new CompositeDisposable();
     }
 
@@ -91,18 +98,36 @@ public class OfflineAreasListPresenter implements Presenter {
     }
 
     public void renameArea(long areaId, String newName) {
+        view.showLoading();
         DisposableCompletableObserver subscribeWith = renameOfflineArea.execute(areaId, newName)
                 .subscribeWith(new DisposableCompletableObserver() {
                     @Override
                     public void onComplete() {
-                        view.hideLoading();
-                        view.displayUpdatedName(areaId, newName);
+                        loadAreas();
                     }
 
                     @Override
                     public void onError(Throwable e) {
                         view.hideLoading();
                         view.showRenameError();
+                    }
+                });
+        disposables.add(subscribeWith);
+    }
+
+    public void deleteArea(long areaId) {
+        view.showLoading();
+        DisposableCompletableObserver subscribeWith = deleteOfflineArea.execute(areaId)
+                .subscribeWith(new DisposableCompletableObserver() {
+                    @Override
+                    public void onComplete() {
+                        loadAreas();
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        view.hideLoading();
+                        view.showDeleteError();
                     }
                 });
         disposables.add(subscribeWith);

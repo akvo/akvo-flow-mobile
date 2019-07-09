@@ -91,7 +91,8 @@ public class OfflineAreasListAdapter
             int i = offlineAreas.indexOf(offlineArea);
             offlineAreas.remove(offlineArea);
             offlineAreas.add(i, new ListOfflineArea(areaId, newName, offlineArea.getSize(),
-                    offlineArea.isDownloading(), offlineArea.isAvailable()));
+                    offlineArea.isDownloading(), offlineArea.isAvailable(),
+                    offlineArea.getMapInfo()));
             notifyItemChanged(i);
         }
     }
@@ -158,7 +159,7 @@ public class OfflineAreasListAdapter
         private boolean onMenuItemClicked(MenuItem item, ListOfflineArea offlineArea) {
             switch (item.getItemId()) {
                 case R.id.view_area:
-                    listener.viewArea(offlineArea.getId());
+                    listener.viewArea(offlineArea.getName(), offlineArea.getMapInfo());
                 break;
                 case R.id.rename_area:
                     listener.renameArea(offlineArea.getId(), offlineArea.getName());

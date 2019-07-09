@@ -19,6 +19,8 @@
 
 package org.akvo.flow.presentation.datapoints.map.offline.list;
 
+import org.akvo.flow.presentation.datapoints.map.offline.list.entity.MapInfo;
+
 public interface OfflineAreasActionListener {
 
     void selectArea(long areId);
@@ -27,5 +29,5 @@ public interface OfflineAreasActionListener {
 
     void deleteArea(long areId, String name);
 
-    void viewArea(long areId);
+    void viewArea(String mapName, MapInfo mapInfo);
 }

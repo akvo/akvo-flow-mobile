@@ -32,6 +32,7 @@ import org.akvo.flow.injector.component.ViewComponent;
 import org.akvo.flow.presentation.SnackBarManager;
 import org.akvo.flow.presentation.datapoints.map.offline.list.delete.DeleteAreaDialog;
 import org.akvo.flow.presentation.datapoints.map.offline.list.entity.ListOfflineArea;
+import org.akvo.flow.presentation.datapoints.map.offline.list.entity.MapInfo;
 import org.akvo.flow.presentation.datapoints.map.offline.list.rename.RenameAreaDialog;
 import org.akvo.flow.ui.Navigator;
 
@@ -177,8 +178,8 @@ public class OfflineAreasListActivity extends BackActivity
     }
 
     @Override
-    public void viewArea(long areaId) {
-
+    public void viewArea(String mapName, MapInfo mapInfo) {
+        navigator.navigateToViewOffline(this, mapName, mapInfo);
     }
 
     @Override

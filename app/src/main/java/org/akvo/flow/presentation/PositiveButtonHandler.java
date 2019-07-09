@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2019 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -15,31 +15,31 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 
-package org.akvo.flow.presentation.navigation;
+package org.akvo.flow.presentation;
 
 import android.app.AlertDialog;
-import androidx.annotation.NonNull;
-import androidx.fragment.app.DialogFragment;
 import android.widget.Button;
 
-class PositiveButtonHandler {
+import androidx.annotation.NonNull;
+import androidx.fragment.app.DialogFragment;
+
+public class PositiveButtonHandler {
 
     @NonNull
     private final DialogFragment dialogFragment;
 
-    PositiveButtonHandler(@NonNull DialogFragment dialogFragment) {
+    public PositiveButtonHandler(@NonNull DialogFragment dialogFragment) {
         this.dialogFragment = dialogFragment;
     }
 
-    void disablePositiveButton() {
+    public void disablePositiveButton() {
         Button button = getPositiveButton();
         button.setEnabled(false);
     }
 
-    void enablePositiveButton() {
+    public void enablePositiveButton() {
         Button button = getPositiveButton();
         button.setEnabled(true);
     }

@@ -29,7 +29,9 @@ import org.akvo.flow.R;
 import org.akvo.flow.activity.BackActivity;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
+import org.akvo.flow.presentation.SnackBarManager;
 import org.akvo.flow.presentation.datapoints.map.offline.list.entity.ListOfflineArea;
+import org.akvo.flow.presentation.datapoints.map.offline.list.rename.RenameAreaDialog;
 import org.akvo.flow.ui.Navigator;
 
 import java.util.ArrayList;
@@ -37,6 +39,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import androidx.fragment.app.DialogFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
@@ -44,7 +47,9 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import timber.log.Timber;
 
-public class OfflineAreasListActivity extends BackActivity implements OfflineAreasListView {
+public class OfflineAreasListActivity extends BackActivity
+        implements OfflineAreasListView, OfflineAreasActionListener,
+        RenameAreaDialog.RenameAreaListener {
 
     @Inject
     Navigator navigator;
@@ -67,6 +72,9 @@ public class OfflineAreasListActivity extends BackActivity implements OfflineAre
     @Inject
     OfflineAreasListPresenter presenter;
 
+    @Inject
+    SnackBarManager snackBarManager;
+
     private OfflineAreasListAdapter adapter;
 
     @Override
@@ -77,7 +85,7 @@ public class OfflineAreasListActivity extends BackActivity implements OfflineAre
         initializeInjector();
         ButterKnife.bind(this);
         offlineAreasRv.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new OfflineAreasListAdapter(new ArrayList<>());
+        adapter = new OfflineAreasListAdapter(new ArrayList<>(), this);
         offlineAreasRv.setAdapter(adapter);
         presenter.setView(this);
         presenter.loadAreas();
@@ -88,6 +96,12 @@ public class OfflineAreasListActivity extends BackActivity implements OfflineAre
                 DaggerViewComponent.builder().applicationComponent(getApplicationComponent())
                         .build();
         viewComponent.inject(this);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        presenter.destroy();
     }
 
     @OnClick(R.id.create_offline_area_fab)
@@ -122,5 +136,46 @@ public class OfflineAreasListActivity extends BackActivity implements OfflineAre
         emptySubTitleTv.setVisibility(View.GONE);
         offlineAreasRv.setVisibility(View.VISIBLE);
         adapter.setOfflineAreas(viewOfflineAreas);
+    }
+
+    @Override
+    public void updateOfflineArea(ListOfflineArea offlineArea) {
+        adapter.updateOfflineArea(offlineArea);
+    }
+
+    @Override
+    public void displayUpdatedName(long areaId, String newName) {
+        adapter.updateDisplayedName(areaId, newName);
+    }
+
+    @Override
+    public void showRenameError() {
+        snackBarManager.displaySnackBar(offlineAreasRv, R.string.offline_map_create_error, this);
+    }
+
+    @Override
+    public void selectArea(long areaId) {
+        //TODO
+    }
+
+    @Override
+    public void renameArea(long areaId, String oldName) {
+        DialogFragment dialog = RenameAreaDialog.newInstance(oldName, areaId);
+        dialog.show(getSupportFragmentManager(), RenameAreaDialog.TAG);
+    }
+
+    @Override
+    public void deleteArea(long areaId) {
+
+    }
+
+    @Override
+    public void viewArea(long areaId) {
+
+    }
+
+    @Override
+    public void renameAreaConfirmed(long areaId, String name) {
+        presenter.renameArea(areaId, name);
     }
 }

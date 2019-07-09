@@ -38,12 +38,18 @@ import java.util.List;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-public class OfflineAreasListAdapter extends RecyclerView.Adapter<OfflineAreasListAdapter.ViewHolder> {
+public class OfflineAreasListAdapter
+        extends RecyclerView.Adapter<OfflineAreasListAdapter.ViewHolder> {
+
+    private static final int INVALID_POSITION = -1;
 
     private final List<ListOfflineArea> offlineAreas;
+    private final OfflineAreasActionListener listener;
 
-    public OfflineAreasListAdapter(ArrayList<ListOfflineArea> offlineAreas) {
+    public OfflineAreasListAdapter(ArrayList<ListOfflineArea> offlineAreas,
+            OfflineAreasActionListener listener) {
         this.offlineAreas = offlineAreas;
+        this.listener = listener;
     }
 
     @NonNull
@@ -51,7 +57,7 @@ public class OfflineAreasListAdapter extends RecyclerView.Adapter<OfflineAreasLi
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.offline_area_list_item, parent, false);
-        return new ViewHolder(view);
+        return new ViewHolder(view, listener);
     }
 
     @Override
@@ -70,6 +76,35 @@ public class OfflineAreasListAdapter extends RecyclerView.Adapter<OfflineAreasLi
         return offlineAreas.size();
     }
 
+    public void updateOfflineArea(ListOfflineArea offlineArea) {
+        int i = offlineAreas == null ? INVALID_POSITION : offlineAreas.indexOf(offlineArea);
+        if (i != INVALID_POSITION) {
+            offlineAreas.remove(offlineArea);
+            offlineAreas.add(i, offlineArea);
+            notifyItemChanged(i);
+        }
+    }
+
+    public void updateDisplayedName(long areaId, String newName) {
+        ListOfflineArea offlineArea = getItem(areaId);
+        if (offlineArea != null) {
+            int i = offlineAreas.indexOf(offlineArea);
+            offlineAreas.remove(offlineArea);
+            offlineAreas.add(i, new ListOfflineArea(areaId, newName, offlineArea.getSize(),
+                    offlineArea.isDownloading(), offlineArea.isAvailable()));
+            notifyItemChanged(i);
+        }
+    }
+
+    private ListOfflineArea getItem(long areaId) {
+        for(ListOfflineArea listOfflineArea: offlineAreas) {
+            if (listOfflineArea.getId() == areaId) {
+                return listOfflineArea;
+            }
+        }
+        return null;
+    }
+
     static class ViewHolder extends RecyclerView.ViewHolder {
 
         private final TextView nameTv;
@@ -77,14 +112,16 @@ public class OfflineAreasListAdapter extends RecyclerView.Adapter<OfflineAreasLi
         private final ProgressBar downloadProgress;
         private final Button selectBt;
         private final ImageButton revealMenuBt;
+        private final OfflineAreasActionListener listener;
 
-        ViewHolder(View itemView) {
+        ViewHolder(View itemView, OfflineAreasActionListener listener) {
             super(itemView);
             this.nameTv = itemView.findViewById(R.id.title_tv);
             this.stateTv = itemView.findViewById(R.id.subtitle_tv);
             this.downloadProgress = itemView.findViewById(R.id.loading_pb);
             this.selectBt = itemView.findViewById(R.id.select_bt);
             this.revealMenuBt = itemView.findViewById(R.id.display_menu_bt);
+            this.listener = listener;
         }
 
         void setTextView(ListOfflineArea offlineArea) {
@@ -97,22 +134,41 @@ public class OfflineAreasListAdapter extends RecyclerView.Adapter<OfflineAreasLi
                     stateTv.setText(offlineArea.getSize());
                     downloadProgress.setVisibility(View.GONE);
                 }
+                if (offlineArea.isAvailable()) {
+                    selectBt.setEnabled(true);
+                    revealMenuBt.setEnabled(true);
+                } else {
+                    selectBt.setEnabled(false);
+                    revealMenuBt.setEnabled(false);
+                }
                 selectBt.setOnClickListener(v -> {
-                    //TODO:
+                    listener.selectArea(offlineArea.getId());
                 });
-                revealMenuBt.setOnClickListener(v -> showMenu(revealMenuBt));
+                revealMenuBt.setOnClickListener(v -> showMenu(revealMenuBt, offlineArea));
             }
         }
 
-        void showMenu(View anchor) {
+        void showMenu(View anchor, ListOfflineArea offlineArea) {
             PopupMenu popup = new PopupMenu(anchor.getContext(), anchor);
             popup.getMenuInflater().inflate(R.menu.offline_area_popup, popup.getMenu());
             popup.show();
-            popup.setOnMenuItemClickListener(this::onMenuItemClicked);
+            popup.setOnMenuItemClickListener(item -> onMenuItemClicked(item, offlineArea));
         }
 
-        private boolean onMenuItemClicked(MenuItem item) {
-            //TODO:
+        private boolean onMenuItemClicked(MenuItem item, ListOfflineArea offlineArea) {
+            switch (item.getItemId()) {
+                case R.id.view_area:
+                    listener.viewArea(offlineArea.getId());
+                break;
+                case R.id.rename_area:
+                    listener.renameArea(offlineArea.getId(), offlineArea.getName());
+                    break;
+                case R.id.delete_area:
+                    listener.deleteArea(offlineArea.getId());
+                    break;
+                    default:
+                        break;
+            }
             return false;
         }
     }

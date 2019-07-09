@@ -17,6 +17,7 @@
         android:layout_gravity="bottom|end"
         android:layout_margin="@dimen/fab_margin"
         android:tint="@color/white"
+        app:layout_behavior="@string/hide_bottom_view_on_scroll_behavior"
         app:srcCompat="@drawable/ic_offline_maps" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

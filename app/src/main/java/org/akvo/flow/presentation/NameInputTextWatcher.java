@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -18,16 +18,16 @@
  *
  */
 
-package org.akvo.flow.presentation.navigation;
+package org.akvo.flow.presentation;
 
 import android.text.Editable;
 import android.text.TextWatcher;
 
-public class UsernameInputTextWatcher implements TextWatcher {
+public class NameInputTextWatcher implements TextWatcher {
 
     private UsernameWatcherListener usernameWatcherListener;
 
-    public UsernameInputTextWatcher(UsernameWatcherListener usernameWatcherListener) {
+    public NameInputTextWatcher(UsernameWatcherListener usernameWatcherListener) {
         this.usernameWatcherListener = usernameWatcherListener;
     }
 

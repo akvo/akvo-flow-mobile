@@ -29,6 +29,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import androidx.annotation.NonNull;
 import kotlin.Pair;
 
 public class ListOfflineAreaMapper {
@@ -46,9 +47,10 @@ public class ListOfflineAreaMapper {
         return new ListOfflineArea(region.getID(),
                 regionNameMapper.getRegionName(region),
                 status.getCompletedResourceSize() / MEGABYTE + " MB",
-                status.getDownloadState() == OfflineRegion.STATE_ACTIVE);
+                status.getDownloadState() == OfflineRegion.STATE_ACTIVE, status.isComplete());
     }
 
+    @NonNull
     public List<ListOfflineArea> transform(List<Pair<OfflineRegion, OfflineRegionStatus>> pairs) {
         List<ListOfflineArea> areas = new ArrayList<>();
         for (Pair<OfflineRegion, OfflineRegionStatus> p: pairs ) {

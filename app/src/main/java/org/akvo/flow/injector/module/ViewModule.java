@@ -61,6 +61,8 @@ import org.akvo.flow.domain.interactor.users.GetSelectedUser;
 import org.akvo.flow.domain.interactor.users.GetUsers;
 import org.akvo.flow.domain.interactor.users.SelectUser;
 import org.akvo.flow.mapbox.offline.reactive.GetOfflineAreasList;
+import org.akvo.flow.mapbox.offline.reactive.RegionNameMapper;
+import org.akvo.flow.mapbox.offline.reactive.RenameOfflineArea;
 
 import javax.inject.Named;
 
@@ -295,5 +297,10 @@ public class ViewModule {
     @Provides
     GetOfflineAreasList provideOfflineAreasList(Context context) {
         return new GetOfflineAreasList(context);
+    }
+
+    @Provides
+    RenameOfflineArea provideRenameArea(Context context) {
+        return new RenameOfflineArea(context, new RegionNameMapper());
     }
 }

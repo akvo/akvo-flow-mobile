@@ -235,11 +235,11 @@ dependencies {
         transitive = true
     }
     if (isCi) {
+        implementation "com.squareup.leakcanary:leakcanary-android-no-op:${rootProject.ext.leakCanaryVersion}"
+    } else {
         debugImplementation "com.squareup.leakcanary:leakcanary-android:${rootProject.ext.leakCanaryVersion}"
         releaseImplementation "com.squareup.leakcanary:leakcanary-android-no-op:${rootProject.ext.leakCanaryVersion}"
         debugImplementation "com.squareup.leakcanary:leakcanary-support-fragment:${rootProject.ext.leakCanaryVersion}"
-    } else {
-        implementation "com.squareup.leakcanary:leakcanary-android-no-op:${rootProject.ext.leakCanaryVersion}"
     }
 
     implementation "com.android.support:multidex:${rootProject.ext.multidexVersion}"

@@ -68,7 +68,7 @@ import org.akvo.flow.injector.component.ViewComponent;
 import org.akvo.flow.presentation.datapoints.DataPointSyncSnackBarManager;
 import org.akvo.flow.presentation.datapoints.map.entity.MapDataPoint;
 import org.akvo.flow.presentation.datapoints.map.offline.OfflineMapsDialog;
-import org.akvo.flow.presentation.datapoints.map.offline.ViewOfflineArea;
+import org.akvo.flow.presentation.datapoints.map.offline.list.entity.MapInfo;
 import org.akvo.flow.ui.Navigator;
 import org.akvo.flow.ui.fragment.RecordListListener;
 import org.akvo.flow.util.ConstantUtil;
@@ -507,20 +507,20 @@ public class DataPointsMapFragment extends SupportMapFragment implements
     }
 
     @Override
-    public void displayData(List<MapDataPoint> dataPoints, @Nullable ViewOfflineArea offlineArea) {
+    public void displayData(List<MapDataPoint> dataPoints, @Nullable MapInfo mapInfo) {
         mItems.clear();
         mItems.addAll(dataPoints);
         source.setGeoJson(getFeatureCollection());
         unSelectDataPoint();
-        displayOfflineAreaOrLocation(offlineArea);
+        displayOfflineAreaOrLocation(mapInfo);
     }
 
     @Override
-    public void displayOfflineAreaOrLocation(@Nullable ViewOfflineArea offlineArea) {
-        if (offlineArea != null && mapboxMap != null) {
+    public void displayOfflineAreaOrLocation(@Nullable MapInfo mapInfo) {
+        if (mapInfo != null && mapboxMap != null) {
             CameraPosition cameraPosition = new CameraPosition.Builder()
-                    .target(offlineArea.getBounds().getCenter())
-                    .zoom(offlineArea.getZoom())
+                    .target(new LatLng(mapInfo.getLatitude(), mapInfo.getLongitude()))
+                    .zoom(mapInfo.getZoom())
                     .build();
             mapboxMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
         } else if (mapboxMap != null && mapboxMap.getStyle() != null){

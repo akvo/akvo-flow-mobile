@@ -35,7 +35,7 @@ public class OfflineAreasAdapter extends RecyclerView.Adapter<OfflineAreasAdapte
 
     private final List<ViewOfflineArea> offlineAreas;
     private final OfflineMapSelectedListener areaSelectionListener;
-    private ViewOfflineArea selectedArea;
+    private long selectedAreaId;
 
     public OfflineAreasAdapter(ArrayList<ViewOfflineArea> offlineAreas,
             OfflineMapSelectedListener listener) {
@@ -53,12 +53,12 @@ public class OfflineAreasAdapter extends RecyclerView.Adapter<OfflineAreasAdapte
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        holder.setTextView(offlineAreas.get(position), selectedArea);
+        holder.setTextView(offlineAreas.get(position), selectedAreaId);
     }
 
     public void setOfflineAreas(@NonNull List<ViewOfflineArea> results,
-            ViewOfflineArea selectedArea) {
-        this.selectedArea = selectedArea;
+            long selectedAreaId) {
+        this.selectedAreaId = selectedAreaId;
         offlineAreas.clear();
         offlineAreas.addAll(results);
         notifyDataSetChanged();
@@ -80,11 +80,11 @@ public class OfflineAreasAdapter extends RecyclerView.Adapter<OfflineAreasAdapte
             this.listener = listener;
         }
 
-        void setTextView(ViewOfflineArea offlineArea,
-                ViewOfflineArea selectedArea) {
+        void setTextView(ViewOfflineArea offlineArea, long selectedAreaId) {
             if (offlineArea != null) {
                 textView.setText(offlineArea.getName());
-                if (selectedArea != null && selectedArea.getName().equals(offlineArea.getName())) {
+                if (selectedAreaId != ViewOfflineArea.UNSELECTED_REGION
+                        && selectedAreaId == offlineArea.getId()) {
                     textView.setSelected(true);
                 } else {
                     textView.setSelected(false);

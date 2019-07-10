@@ -21,14 +21,11 @@ package org.akvo.flow.presentation.datapoints.map.offline;
 
 import java.util.List;
 
-import androidx.annotation.Nullable;
-
 public interface OfflineMapsView {
 
     void showLoading();
 
-    void displayRegions(List<ViewOfflineArea> offlineRegions,
-            @Nullable ViewOfflineArea selectedRegion);
+    void displayRegions(List<ViewOfflineArea> offlineRegions, long selectedRegionId);
 
     void displayNoOfflineMaps();
 

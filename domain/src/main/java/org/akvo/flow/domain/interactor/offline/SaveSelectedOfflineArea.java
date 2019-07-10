@@ -19,7 +19,6 @@
 
 package org.akvo.flow.domain.interactor.offline;
 
-import org.akvo.flow.domain.entity.OfflineArea;
 import org.akvo.flow.domain.executor.PostExecutionThread;
 import org.akvo.flow.domain.executor.ThreadExecutor;
 import org.akvo.flow.domain.repository.UserRepository;
@@ -36,7 +35,7 @@ import io.reactivex.schedulers.Schedulers;
 
 public class SaveSelectedOfflineArea {
 
-    public static final String AREA_PARAM = "area";
+    public static final String AREA_ID_PARAM = "area-id";
 
     private final ThreadExecutor threadExecutor;
     private final PostExecutionThread postExecutionThread;
@@ -66,9 +65,12 @@ public class SaveSelectedOfflineArea {
     }
 
     protected <T> Completable buildUseCaseObservable(Map<String, T> parameters) {
-        OfflineArea offlineArea =
-                parameters == null ? null : (OfflineArea) parameters.get(AREA_PARAM);
-        return userRepository.saveSelectedOfflineArea(offlineArea);
+        if (parameters == null || !parameters.containsKey(AREA_ID_PARAM)) {
+            return Completable.error(new IllegalArgumentException("missing area id"));
+        } else {
+            long offlineAreaId = (Long) parameters.get(AREA_ID_PARAM);
+            return userRepository.saveSelectedOfflineArea(offlineAreaId);
+        }
     }
 
     private void addDisposable(Disposable disposable) {

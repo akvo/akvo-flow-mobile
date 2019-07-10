@@ -323,6 +323,7 @@
     <string name="offline_map_create_error">Error creating offline area</string>
     <string name="offline_map_rename_error">Error renaming offline area</string>
     <string name="offline_map_delete_error">Error deleting offline area</string>
+    <string name="offline_map_select_error">Error selecting offline area</string>
     <string name="offline_maps_navigation_entry">Offline Maps</string>
     <string name="offline_maps_list_title">Offline Maps</string>
     <string name="no_offline_maps_title">Downloaded maps will apeear here</string>

@@ -83,8 +83,7 @@ public class OfflineAreasAdapter extends RecyclerView.Adapter<OfflineAreasAdapte
         void setTextView(ViewOfflineArea offlineArea, long selectedAreaId) {
             if (offlineArea != null) {
                 textView.setText(offlineArea.getName());
-                if (selectedAreaId != ViewOfflineArea.UNSELECTED_REGION
-                        && selectedAreaId == offlineArea.getId()) {
+                if (selectedAreaId == offlineArea.getId()) {
                     textView.setSelected(true);
                 } else {
                     textView.setSelected(false);

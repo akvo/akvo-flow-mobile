@@ -151,6 +151,11 @@ public class OfflineAreasListActivity extends BackActivity
     }
 
     @Override
+    public void showSelectError() {
+        snackBarManager.displaySnackBar(offlineAreasRv, R.string.offline_map_delete_error, this);
+    }
+
+    @Override
     public void selectRegion(long regionId) {
         adapter.selectRegion(regionId);
         presenter.selectRegion(regionId);

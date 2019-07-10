@@ -182,8 +182,8 @@ public class OfflineAreasListPresenter implements Presenter {
             @Override
             public void onError(Throwable e) {
                 Timber.e(e);
-                //TODO: notify user
-                //undo UI changes
+                view.showSelectError();
+                loadAreas();
             }
         }, params);
     }

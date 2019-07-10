@@ -36,4 +36,6 @@ public interface OfflineAreasListView {
     void showRenameError();
 
     void showDeleteError();
+
+    void showSelectError();
 }

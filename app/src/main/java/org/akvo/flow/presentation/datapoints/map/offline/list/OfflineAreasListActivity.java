@@ -141,16 +141,6 @@ public class OfflineAreasListActivity extends BackActivity
     }
 
     @Override
-    public void updateOfflineArea(ListOfflineArea offlineArea) {
-        adapter.updateOfflineArea(offlineArea);
-    }
-
-    @Override
-    public void displayUpdatedName(long areaId, String newName) {
-        adapter.updateDisplayedName(areaId, newName);
-    }
-
-    @Override
     public void showRenameError() {
         snackBarManager.displaySnackBar(offlineAreasRv, R.string.offline_map_rename_error, this);
     }

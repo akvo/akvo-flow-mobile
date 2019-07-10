@@ -76,27 +76,6 @@ public class OfflineAreasListAdapter
         return offlineAreas.size();
     }
 
-    public void updateOfflineArea(ListOfflineArea offlineArea) {
-        int i = offlineAreas == null ? INVALID_POSITION : offlineAreas.indexOf(offlineArea);
-        if (i != INVALID_POSITION) {
-            offlineAreas.remove(offlineArea);
-            offlineAreas.add(i, offlineArea);
-            notifyItemChanged(i);
-        }
-    }
-
-    public void updateDisplayedName(long areaId, String newName) {
-        ListOfflineArea offlineArea = getItem(areaId);
-        if (offlineArea != null) {
-            int i = offlineAreas.indexOf(offlineArea);
-            offlineAreas.remove(offlineArea);
-            offlineAreas.add(i, new ListOfflineArea(areaId, newName, offlineArea.getSize(),
-                    offlineArea.isDownloading(), offlineArea.isAvailable(),
-                    offlineArea.getMapInfo()));
-            notifyItemChanged(i);
-        }
-    }
-
     private ListOfflineArea getItem(long areaId) {
         for(ListOfflineArea listOfflineArea: offlineAreas) {
             if (listOfflineArea.getId() == areaId) {

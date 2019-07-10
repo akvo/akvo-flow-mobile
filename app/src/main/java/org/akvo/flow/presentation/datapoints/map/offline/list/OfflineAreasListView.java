@@ -33,10 +33,6 @@ public interface OfflineAreasListView {
 
     void showOfflineRegions(List<ListOfflineArea> transform);
 
-    void updateOfflineArea(ListOfflineArea offlineArea);
-
-    void displayUpdatedName(long areaId, String newName);
-
     void showRenameError();
 
     void showDeleteError();

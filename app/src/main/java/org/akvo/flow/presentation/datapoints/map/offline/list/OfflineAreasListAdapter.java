@@ -140,7 +140,7 @@ public class OfflineAreasListAdapter
                     revealMenuBt.setEnabled(true);
                 } else {
                     selectBt.setEnabled(false);
-                    revealMenuBt.setEnabled(false);
+                    revealMenuBt.setEnabled(true);
                 }
                 selectBt.setOnClickListener(v -> {
                     listener.selectArea(offlineArea.getId());

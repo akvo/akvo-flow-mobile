@@ -41,7 +41,9 @@ import androidx.recyclerview.widget.RecyclerView;
 public class OfflineAreasListAdapter
         extends RecyclerView.Adapter<OfflineAreasListAdapter.ViewHolder> {
 
-    private static final int INVALID_POSITION = -1;
+    public static final int NONE_SELECTED = -1;
+
+    private long selectedRegionId = NONE_SELECTED;
 
     private final List<ListOfflineArea> offlineAreas;
     private final OfflineAreasActionListener listener;
@@ -62,10 +64,11 @@ public class OfflineAreasListAdapter
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        holder.setTextView(offlineAreas.get(position));
+        holder.setTextView(offlineAreas.get(position), selectedRegionId);
     }
 
-    public void setOfflineAreas(@NonNull List<ListOfflineArea> results) {
+    public void setOfflineAreas(@NonNull List<ListOfflineArea> results, long selectedRegionId) {
+        this.selectedRegionId = selectedRegionId;
         offlineAreas.clear();
         offlineAreas.addAll(results);
         notifyDataSetChanged();
@@ -76,13 +79,9 @@ public class OfflineAreasListAdapter
         return offlineAreas.size();
     }
 
-    private ListOfflineArea getItem(long areaId) {
-        for(ListOfflineArea listOfflineArea: offlineAreas) {
-            if (listOfflineArea.getId() == areaId) {
-                return listOfflineArea;
-            }
-        }
-        return null;
+    public void selectRegion(long regionId) {
+        this.selectedRegionId = regionId;
+        notifyItemRangeChanged(0, offlineAreas.size());
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {
@@ -91,6 +90,7 @@ public class OfflineAreasListAdapter
         private final TextView stateTv;
         private final ProgressBar downloadProgress;
         private final Button selectBt;
+        private final Button deSelectBt;
         private final ImageButton revealMenuBt;
         private final OfflineAreasActionListener listener;
 
@@ -100,11 +100,12 @@ public class OfflineAreasListAdapter
             this.stateTv = itemView.findViewById(R.id.subtitle_tv);
             this.downloadProgress = itemView.findViewById(R.id.loading_pb);
             this.selectBt = itemView.findViewById(R.id.select_bt);
+            this.deSelectBt = itemView.findViewById(R.id.deselect_bt);
             this.revealMenuBt = itemView.findViewById(R.id.display_menu_bt);
             this.listener = listener;
         }
 
-        void setTextView(ListOfflineArea offlineArea) {
+        void setTextView(ListOfflineArea offlineArea, long selectedRegionId) {
             if (offlineArea != null) {
                 nameTv.setText(offlineArea.getName());
                 if (offlineArea.isDownloading()) {
@@ -114,16 +115,24 @@ public class OfflineAreasListAdapter
                     stateTv.setText(offlineArea.getSize());
                     downloadProgress.setVisibility(View.GONE);
                 }
+                if (selectedRegionId == offlineArea.getId()) {
+                    selectBt.setVisibility(View.GONE);
+                    deSelectBt.setVisibility(View.VISIBLE);
+                } else {
+                    selectBt.setVisibility(View.VISIBLE);
+                    deSelectBt.setVisibility(View.GONE);
+                }
                 if (offlineArea.isAvailable()) {
                     selectBt.setEnabled(true);
+                    deSelectBt.setEnabled(true);
                     revealMenuBt.setEnabled(true);
                 } else {
                     selectBt.setEnabled(false);
+                    deSelectBt.setEnabled(false);
                     revealMenuBt.setEnabled(true);
                 }
-                selectBt.setOnClickListener(v -> {
-                    listener.selectArea(offlineArea.getId());
-                });
+                selectBt.setOnClickListener(v -> listener.selectRegion(offlineArea.getId()));
+                deSelectBt.setOnClickListener(v -> listener.deSelectRegion());
                 revealMenuBt.setOnClickListener(v -> showMenu(revealMenuBt, offlineArea));
             }
         }

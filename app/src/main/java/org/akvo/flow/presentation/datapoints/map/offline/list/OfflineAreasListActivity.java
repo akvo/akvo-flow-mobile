@@ -131,13 +131,13 @@ public class OfflineAreasListActivity extends BackActivity
     }
 
     @Override
-    public void showOfflineRegions(List<ListOfflineArea> viewOfflineAreas) {
+    public void showOfflineRegions(List<ListOfflineArea> viewOfflineAreas, long selectedRegionId) {
         Timber.d("Will show offline regions %s", viewOfflineAreas.size());
         emptyIv.setVisibility(View.GONE);
         emptyTitleTv.setVisibility(View.GONE);
         emptySubTitleTv.setVisibility(View.GONE);
         offlineAreasRv.setVisibility(View.VISIBLE);
-        adapter.setOfflineAreas(viewOfflineAreas);
+        adapter.setOfflineAreas(viewOfflineAreas, selectedRegionId);
     }
 
     @Override
@@ -151,8 +151,15 @@ public class OfflineAreasListActivity extends BackActivity
     }
 
     @Override
-    public void selectArea(long areaId) {
-        //TODO
+    public void selectRegion(long regionId) {
+        adapter.selectRegion(regionId);
+        presenter.selectRegion(regionId);
+    }
+
+    @Override
+    public void deSelectRegion() {
+        adapter.selectRegion(OfflineAreasListAdapter.NONE_SELECTED);
+        presenter.selectRegion(OfflineAreasListAdapter.NONE_SELECTED);
     }
 
     @Override

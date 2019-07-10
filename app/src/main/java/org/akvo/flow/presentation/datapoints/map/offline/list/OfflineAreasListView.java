@@ -31,7 +31,7 @@ public interface OfflineAreasListView {
 
     void displayNoOfflineMaps();
 
-    void showOfflineRegions(List<ListOfflineArea> transform);
+    void showOfflineRegions(List<ListOfflineArea> transform, long selectedRegionId);
 
     void showRenameError();
 

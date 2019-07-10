@@ -29,8 +29,7 @@ public class ListOfflineArea {
     private final MapInfo mapInfo;
 
     public ListOfflineArea(long id, String name, String size, boolean isDownloading,
-            boolean isAvailable,
-            MapInfo mapInfo) {
+            boolean isAvailable, MapInfo mapInfo) {
         this.id = id;
         this.name = name;
         this.size = size;
@@ -57,23 +56,6 @@ public class ListOfflineArea {
 
     public boolean isAvailable() {
         return isAvailable;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        ListOfflineArea that = (ListOfflineArea) o;
-        return id == that.id;
-    }
-
-    @Override
-    public int hashCode() {
-        return (int) (id ^ (id >>> 32));
     }
 
     public MapInfo getMapInfo() {

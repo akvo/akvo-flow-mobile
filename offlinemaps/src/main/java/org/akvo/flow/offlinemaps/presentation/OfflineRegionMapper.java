@@ -26,15 +26,12 @@ import org.akvo.flow.mapbox.offline.reactive.RegionNameMapper;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.inject.Inject;
-
 import androidx.annotation.NonNull;
 
 public class OfflineRegionMapper {
 
     private final RegionNameMapper regionNameMapper;
 
-    @Inject
     public OfflineRegionMapper(RegionNameMapper regionNameMapper) {
         this.regionNameMapper = regionNameMapper;
     }

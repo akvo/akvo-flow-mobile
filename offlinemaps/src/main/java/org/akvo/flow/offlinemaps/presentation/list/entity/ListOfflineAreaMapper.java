@@ -27,8 +27,6 @@ import org.akvo.flow.mapbox.offline.reactive.RegionNameMapper;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.inject.Inject;
-
 import androidx.annotation.NonNull;
 import kotlin.Pair;
 
@@ -39,7 +37,6 @@ public class ListOfflineAreaMapper {
     private final RegionNameMapper regionNameMapper;
     private final MapInfoMapper mapInfoMapper;
 
-    @Inject
     public ListOfflineAreaMapper(RegionNameMapper regionNameMapper, MapInfoMapper mapInfoMapper) {
         this.regionNameMapper = regionNameMapper;
         this.mapInfoMapper = mapInfoMapper;

@@ -28,8 +28,6 @@ import org.akvo.flow.offlinemaps.domain.SaveSelectedOfflineArea;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.inject.Inject;
-
 import io.reactivex.observers.DisposableCompletableObserver;
 import io.reactivex.observers.DisposableMaybeObserver;
 import timber.log.Timber;
@@ -43,7 +41,6 @@ public class OfflineMapsPresenter {
     private final GetSelectedOfflineArea getSelectedOfflineAre;
     private final SaveSelectedOfflineArea saveSelectedOfflineArea;
 
-    @Inject
     public OfflineMapsPresenter(OfflineRegionMapper mapper, OfflineManager offlineManager,
             GetSelectedOfflineArea getSelectedOfflineAre,
             SaveSelectedOfflineArea saveSelectedOfflineArea) {

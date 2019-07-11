@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".offlinemaps.selection.OfflineMapDownloadActivity">
+    tools:context=".presentation.selection.OfflineMapDownloadActivity">
 
     <include layout="@layout/app_bar_layout" />
 
@@ -20,7 +20,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"></com.mapbox.mapboxsdk.maps.MapView>
+            app:layout_constraintTop_toTopOf="parent"/>
 
         <TextView
             android:id="@+id/offline_map_hint"
@@ -59,7 +59,9 @@
 
             <Button
                 android:id="@+id/offline_map_save_button"
-                style="@style/PrimaryButtonStyle"
+                style="@style/Widget.AppCompat.Button.Colored"
+                android:textSize="16sp"
+                android:textColor="@color/white"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="16dp"

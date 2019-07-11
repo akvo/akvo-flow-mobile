@@ -7,4 +7,4 @@
     android:paddingLeft="32dp"
     android:paddingTop="8dp"
     android:paddingRight="32dp"
-    android:paddingBottom="8dp"></TextView>
+    android:paddingBottom="8dp"/>

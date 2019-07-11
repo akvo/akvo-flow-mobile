@@ -23,13 +23,10 @@ import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.offline.OfflineRegion;
 import com.mapbox.mapboxsdk.offline.OfflineRegionDefinition;
 
-import javax.inject.Inject;
-
 import androidx.annotation.Nullable;
 
 public class MapInfoMapper {
 
-    @Inject
     public MapInfoMapper() {
     }
 

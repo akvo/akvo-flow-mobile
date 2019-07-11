@@ -27,8 +27,6 @@ import com.mapbox.mapboxsdk.offline.OfflineTilePyramidRegionDefinition;
 
 import org.akvo.flow.mapbox.offline.reactive.RegionNameMapper;
 
-import javax.inject.Inject;
-
 import timber.log.Timber;
 
 public class OfflineMapDownloadPresenter {
@@ -37,7 +35,6 @@ public class OfflineMapDownloadPresenter {
     private final RegionNameMapper regionNameMapper;
     private OfflineMapDownloadView view;
 
-    @Inject
     public OfflineMapDownloadPresenter(OfflineManager offlineManager,
             RegionNameMapper regionNameMapper) {
         this.offlineManager = offlineManager;

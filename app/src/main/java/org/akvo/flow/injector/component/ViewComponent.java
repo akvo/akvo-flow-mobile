@@ -28,13 +28,12 @@ import org.akvo.flow.activity.SurveyActivity;
 import org.akvo.flow.activity.TransmissionHistoryActivity;
 import org.akvo.flow.injector.PerActivity;
 import org.akvo.flow.injector.module.ViewModule;
+import org.akvo.flow.offlinemaps.presentation.list.OfflineAreasListActivity;
+import org.akvo.flow.offlinemaps.presentation.selection.OfflineMapDownloadActivity;
 import org.akvo.flow.presentation.AppDownloadDialogFragment;
 import org.akvo.flow.presentation.about.AboutActivity;
 import org.akvo.flow.presentation.datapoints.list.DataPointsListFragment;
 import org.akvo.flow.presentation.datapoints.map.DataPointsMapFragment;
-import org.akvo.flow.presentation.datapoints.map.offline.OfflineMapsDialog;
-import org.akvo.flow.presentation.datapoints.map.offline.list.OfflineAreasListActivity;
-import org.akvo.flow.presentation.datapoints.map.offline.selection.OfflineMapDownloadActivity;
 import org.akvo.flow.presentation.form.mobiledata.MobileDataSettingDialog;
 import org.akvo.flow.presentation.help.HelpActivity;
 import org.akvo.flow.presentation.legal.LegalNoticesActivity;
@@ -112,8 +111,6 @@ public interface ViewComponent {
     void inject(WalkThroughActivity walkThroughActivity);
 
     void inject(MobileDataSettingDialog mobileDataSettingDialog);
-
-    void inject(OfflineMapsDialog offlineMapsDialog);
 
     void inject(OfflineMapDownloadActivity offlineMapDownloadActivity);
 

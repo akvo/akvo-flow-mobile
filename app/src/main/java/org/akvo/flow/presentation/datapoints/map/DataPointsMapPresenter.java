@@ -31,13 +31,13 @@ import org.akvo.flow.domain.interactor.DownloadDataPoints;
 import org.akvo.flow.domain.interactor.ErrorComposable;
 import org.akvo.flow.domain.interactor.GetSavedDataPoints;
 import org.akvo.flow.domain.interactor.UseCase;
-import org.akvo.flow.domain.interactor.offline.GetSelectedOfflineArea;
 import org.akvo.flow.domain.util.Constants;
 import org.akvo.flow.mapbox.offline.reactive.GetOfflineRegion;
+import org.akvo.flow.offlinemaps.domain.GetSelectedOfflineArea;
+import org.akvo.flow.offlinemaps.presentation.list.entity.MapInfoMapper;
 import org.akvo.flow.presentation.Presenter;
 import org.akvo.flow.presentation.datapoints.map.entity.MapDataPoint;
 import org.akvo.flow.presentation.datapoints.map.entity.MapDataPointMapper;
-import org.akvo.flow.presentation.datapoints.map.offline.list.entity.MapInfoMapper;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -72,7 +72,8 @@ public class DataPointsMapPresenter implements Presenter {
     private DataPointsMapView view;
     private SurveyGroup surveyGroup;
 
-    @Inject DataPointsMapPresenter(@Named("getSavedDataPoints") UseCase getSavedDataPoints,
+    @Inject
+    DataPointsMapPresenter(@Named("getSavedDataPoints") UseCase getSavedDataPoints,
             MapDataPointMapper dataPointMapper, DownloadDataPoints downloadDataPoints,
             @Named("checkDeviceNotification") UseCase checkDeviceNotification,
             @Named("uploadSync") UseCase upload, GetSelectedOfflineArea getSelectedOfflineAre,
@@ -149,7 +150,7 @@ public class DataPointsMapPresenter implements Presenter {
                 // no regions found
                 displayData(dataPoints, null);
             }
-        }, null);
+        });
     }
 
     private void loadOfflineRegion(long selectedAreaId, List<DataPoint> dataPoints) {
@@ -307,6 +308,6 @@ public class DataPointsMapPresenter implements Presenter {
                 // no regions found
                 view.displayOfflineAreaOrLocation(null);
             }
-        }, null);
+        });
     }
 }

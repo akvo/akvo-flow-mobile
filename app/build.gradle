@@ -257,7 +257,6 @@ dependencies {
     testImplementation "org.powermock:powermock-api-mockito:${rootProject.ext.powerMockVersion}"
     testImplementation "org.powermock:powermock-classloading-xstream:${rootProject.ext.powerMockVersion}"
     testImplementation "io.kotlintest:kotlintest-runner-junit4:${rootProject.ext.kotlintestVerion}"
-    //testImplementation "org.slf4j:slf4j-simple:${rootProject.ext.slfVersion}"
 
     androidTestImplementation "androidx.test.ext:junit:${rootProject.ext.androidXJunit}"
     androidTestImplementation "androidx.test:core:${rootProject.ext.androidXCore}"
@@ -270,6 +269,7 @@ dependencies {
     implementation project(':domain')
     implementation project(':data')
     implementation project(':database')
+    implementation project(':offlinemaps')
 
     apply plugin: 'com.google.gms.google-services'
 }

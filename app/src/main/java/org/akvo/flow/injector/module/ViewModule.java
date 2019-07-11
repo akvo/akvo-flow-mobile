@@ -65,6 +65,8 @@ import org.akvo.flow.mapbox.offline.reactive.GetOfflineRegion;
 import org.akvo.flow.mapbox.offline.reactive.GetOfflineRegions;
 import org.akvo.flow.mapbox.offline.reactive.RegionNameMapper;
 import org.akvo.flow.mapbox.offline.reactive.RenameOfflineRegion;
+import org.akvo.flow.offlinemaps.data.DataPreferenceRepository;
+import org.akvo.flow.offlinemaps.domain.GetSelectedOfflineArea;
 
 import javax.inject.Named;
 
@@ -314,5 +316,10 @@ public class ViewModule {
     @Provides
     GetOfflineRegion provideGetRegion(Context context) {
         return new GetOfflineRegion(context);
+    }
+
+    @Provides
+    GetSelectedOfflineArea provideGetSelectedOfflineArea() {
+        return new GetSelectedOfflineArea(new DataPreferenceRepository());
     }
 }

@@ -29,9 +29,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 
-import com.google.android.material.snackbar.Snackbar;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
@@ -45,8 +43,6 @@ import org.akvo.flow.offlinemaps.presentation.list.OfflineAreasListActivity;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.StringRes;
-import androidx.core.content.ContextCompat;
 
 public class OfflineMapDownloadActivity extends ToolBarBackActivity
         implements OfflineMapDownloadView {
@@ -56,7 +52,7 @@ public class OfflineMapDownloadActivity extends ToolBarBackActivity
     private EditText mapNameEt;
     private ProgressBar downloadProgress;
 
-    OfflineMapDownloadPresenter presenter;
+    private OfflineMapDownloadPresenter presenter;
 
     private MapboxMap mapboxMap;
 

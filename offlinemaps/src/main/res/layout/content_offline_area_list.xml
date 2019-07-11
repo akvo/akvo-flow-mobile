@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context=".offlinemaps.list.OfflineAreasListActivity"
+    tools:context=".presentation.list.OfflineAreasListActivity"
     tools:showIn="@layout/activity_offline_area_list">
 
     <androidx.recyclerview.widget.RecyclerView

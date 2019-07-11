@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".offlinemaps.list.OfflineAreasListActivity">
+    tools:context="presentation.list.OfflineAreasListActivity">
 
     <include layout="@layout/app_bar_layout" />
 
@@ -16,7 +16,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="@dimen/fab_margin"
-        android:tint="@color/white"
+        android:tint="@android:color/white"
         app:layout_behavior="@string/hide_bottom_view_on_scroll_behavior"
         app:srcCompat="@drawable/ic_offline_maps" />
 

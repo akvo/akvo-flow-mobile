@@ -17,7 +17,9 @@
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.akvo.flow.offlinemaps.domain;
+package org.akvo.flow.offlinemaps.domain.interactor;
+
+import org.akvo.flow.offlinemaps.domain.PreferencesRepository;
 
 import io.reactivex.Maybe;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -26,12 +28,12 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.observers.DisposableMaybeObserver;
 import io.reactivex.schedulers.Schedulers;
 
-public class GetSelectedOfflineArea {
+public class GetSelectedOfflineRegionId {
 
     private final CompositeDisposable disposables;
     private final PreferencesRepository userRepository;
 
-   public GetSelectedOfflineArea(PreferencesRepository userRepository) {
+    public GetSelectedOfflineRegionId(PreferencesRepository userRepository) {
         this.disposables = new CompositeDisposable();
         this.userRepository = userRepository;
     }
@@ -49,7 +51,7 @@ public class GetSelectedOfflineArea {
         }
     }
 
-    protected <T> Maybe<Long> buildUseCaseObservable() {
+    protected Maybe<Long> buildUseCaseObservable() {
         return userRepository.getSelectedOfflineArea();
     }
 

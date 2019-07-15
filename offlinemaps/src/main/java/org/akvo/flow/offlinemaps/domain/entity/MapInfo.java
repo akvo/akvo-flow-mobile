@@ -17,7 +17,7 @@
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.akvo.flow.offlinemaps.presentation.list.entity;
+package org.akvo.flow.offlinemaps.domain.entity;
 
 import android.os.Parcel;
 import android.os.Parcelable;

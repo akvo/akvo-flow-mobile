@@ -28,7 +28,7 @@ import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.Style;
 
 import org.akvo.flow.offlinemaps.R;
-import org.akvo.flow.offlinemaps.presentation.list.entity.MapInfo;
+import org.akvo.flow.offlinemaps.domain.entity.MapInfo;
 
 public class OfflineAreaViewActivity extends ToolBarBackActivity {
 

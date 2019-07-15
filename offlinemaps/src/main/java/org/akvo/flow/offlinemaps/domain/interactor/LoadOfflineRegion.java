@@ -17,25 +17,7 @@
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.akvo.flow.offlinemaps.presentation;
+package org.akvo.flow.offlinemaps.domain.interactor;
 
-public class ViewOfflineArea {
-
-    public static final long UNSELECTED_REGION = -1;
-
-    private final long id;
-    private final String name;
-
-    public ViewOfflineArea(long id, String name) {
-        this.id = id;
-        this.name = name;
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
+public class LoadOfflineRegion {
 }

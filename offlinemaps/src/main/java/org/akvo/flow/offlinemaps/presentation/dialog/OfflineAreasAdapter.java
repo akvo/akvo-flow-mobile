@@ -17,13 +17,15 @@
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.akvo.flow.offlinemaps.presentation;
+package org.akvo.flow.offlinemaps.presentation.dialog;
 
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import org.akvo.flow.offlinemaps.R;
+import org.akvo.flow.offlinemaps.domain.entity.DomainOfflineArea;
+import org.akvo.flow.offlinemaps.presentation.OfflineMapSelectedListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,11 +35,11 @@ import androidx.recyclerview.widget.RecyclerView;
 
 public class OfflineAreasAdapter extends RecyclerView.Adapter<OfflineAreasAdapter.ViewHolder> {
 
-    private final List<ViewOfflineArea> offlineAreas;
+    private final List<DomainOfflineArea> offlineAreas;
     private final OfflineMapSelectedListener areaSelectionListener;
     private long selectedAreaId;
 
-    public OfflineAreasAdapter(ArrayList<ViewOfflineArea> offlineAreas,
+    public OfflineAreasAdapter(ArrayList<DomainOfflineArea> offlineAreas,
             OfflineMapSelectedListener listener) {
         this.offlineAreas = offlineAreas;
         this.areaSelectionListener = listener;
@@ -56,7 +58,7 @@ public class OfflineAreasAdapter extends RecyclerView.Adapter<OfflineAreasAdapte
         holder.setTextView(offlineAreas.get(position), selectedAreaId);
     }
 
-    public void setOfflineAreas(@NonNull List<ViewOfflineArea> results,
+    public void setOfflineAreas(@NonNull List<DomainOfflineArea> results,
             long selectedAreaId) {
         this.selectedAreaId = selectedAreaId;
         offlineAreas.clear();
@@ -80,7 +82,7 @@ public class OfflineAreasAdapter extends RecyclerView.Adapter<OfflineAreasAdapte
             this.listener = listener;
         }
 
-        void setTextView(ViewOfflineArea offlineArea, long selectedAreaId) {
+        void setTextView(DomainOfflineArea offlineArea, long selectedAreaId) {
             if (offlineArea != null) {
                 textView.setText(offlineArea.getName());
                 if (selectedAreaId == offlineArea.getId()) {
@@ -92,7 +94,7 @@ public class OfflineAreasAdapter extends RecyclerView.Adapter<OfflineAreasAdapte
             }
         }
 
-        private void onOfflineAreaPressed(ViewOfflineArea offlineArea) {
+        private void onOfflineAreaPressed(DomainOfflineArea offlineArea) {
             if (listener != null) {
                 listener.onOfflineAreaPressed(offlineArea);
             }

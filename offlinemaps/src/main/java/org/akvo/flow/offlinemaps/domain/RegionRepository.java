@@ -17,28 +17,19 @@
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.akvo.flow.offlinemaps.data;
+package org.akvo.flow.offlinemaps.domain;
 
-import org.akvo.flow.offlinemaps.domain.PreferencesRepository;
+import org.akvo.flow.offlinemaps.domain.entity.DomainOfflineArea;
+import org.akvo.flow.offlinemaps.domain.entity.MapInfo;
 
-import io.reactivex.Completable;
+import java.util.List;
+
 import io.reactivex.Maybe;
+import io.reactivex.Single;
 
-public class DataPreferenceRepository implements PreferencesRepository {
+public interface RegionRepository {
 
-    private final OfflineSharedPreferenceDataSource dataSource;
+    Single<List<DomainOfflineArea>> getOfflineRegions();
 
-    public DataPreferenceRepository(OfflineSharedPreferenceDataSource dataSource) {
-        this.dataSource = dataSource;
-    }
-
-    @Override
-    public Completable saveSelectedOfflineArea(long offlineAreaId) {
-        return dataSource.saveSelectedOfflineArea(offlineAreaId);
-    }
-
-    @Override
-    public Maybe<Long> getSelectedOfflineArea() {
-       return dataSource.getSelectedOfflineArea();
-    }
+    Maybe<MapInfo> getOfflineRegion(Long regionId);
 }

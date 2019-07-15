@@ -19,7 +19,7 @@
 
 package org.akvo.flow.offlinemaps.presentation.list;
 
-import org.akvo.flow.offlinemaps.presentation.list.entity.ListOfflineArea;
+import org.akvo.flow.offlinemaps.domain.entity.DomainOfflineArea;
 
 import java.util.List;
 
@@ -31,7 +31,7 @@ public interface OfflineAreasListView {
 
     void displayNoOfflineMaps();
 
-    void showOfflineRegions(List<ListOfflineArea> transform, long selectedRegionId);
+    void showOfflineRegions(List<DomainOfflineArea> transform, long selectedRegionId);
 
     void showRenameError();
 

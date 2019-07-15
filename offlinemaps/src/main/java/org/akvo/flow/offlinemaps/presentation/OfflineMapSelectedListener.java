@@ -19,9 +19,11 @@
 
 package org.akvo.flow.offlinemaps.presentation;
 
+import org.akvo.flow.offlinemaps.domain.entity.DomainOfflineArea;
+
 public interface OfflineMapSelectedListener {
 
-    void onOfflineAreaPressed(ViewOfflineArea offlineArea);
+    void onOfflineAreaPressed(DomainOfflineArea offlineArea);
 
     void onNewMapAreaSaved();
 }

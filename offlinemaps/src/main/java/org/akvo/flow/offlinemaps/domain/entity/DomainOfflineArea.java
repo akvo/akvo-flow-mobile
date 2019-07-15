@@ -17,9 +17,11 @@
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.akvo.flow.offlinemaps.presentation.list.entity;
+package org.akvo.flow.offlinemaps.domain.entity;
 
-public class ListOfflineArea {
+public class DomainOfflineArea {
+
+    public static final long UNSELECTED_REGION = -1;
 
     private final long id;
     private final String name;
@@ -28,7 +30,7 @@ public class ListOfflineArea {
     private final boolean isAvailable;
     private final MapInfo mapInfo;
 
-    public ListOfflineArea(long id, String name, String size, boolean isDownloading,
+    public DomainOfflineArea(long id, String name, String size, boolean isDownloading,
             boolean isAvailable, MapInfo mapInfo) {
         this.id = id;
         this.name = name;

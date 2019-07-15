@@ -17,12 +17,13 @@
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.akvo.flow.offlinemaps.presentation;
+package org.akvo.flow.offlinemaps.presentation.dialog;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,13 +31,20 @@ import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.mapbox.mapboxsdk.offline.OfflineManager;
-
+import org.akvo.flow.mapbox.offline.reactive.GetOfflineRegion;
+import org.akvo.flow.mapbox.offline.reactive.GetOfflineRegions;
 import org.akvo.flow.mapbox.offline.reactive.RegionNameMapper;
 import org.akvo.flow.offlinemaps.R;
 import org.akvo.flow.offlinemaps.data.DataPreferenceRepository;
-import org.akvo.flow.offlinemaps.domain.GetSelectedOfflineArea;
-import org.akvo.flow.offlinemaps.domain.SaveSelectedOfflineArea;
+import org.akvo.flow.offlinemaps.data.DataRegionRepository;
+import org.akvo.flow.offlinemaps.data.OfflineSharedPreferenceDataSource;
+import org.akvo.flow.offlinemaps.domain.entity.DomainOfflineArea;
+import org.akvo.flow.offlinemaps.domain.entity.DomainOfflineAreaMapper;
+import org.akvo.flow.offlinemaps.domain.entity.MapInfoMapper;
+import org.akvo.flow.offlinemaps.domain.interactor.GetSelectedOfflineRegionId;
+import org.akvo.flow.offlinemaps.domain.interactor.LoadOfflineRegions;
+import org.akvo.flow.offlinemaps.domain.interactor.SaveSelectedOfflineArea;
+import org.akvo.flow.offlinemaps.presentation.OfflineMapSelectedListener;
 import org.akvo.flow.offlinemaps.presentation.selection.OfflineMapDownloadActivity;
 
 import java.util.ArrayList;
@@ -97,7 +105,8 @@ public class OfflineMapsDialog extends DialogFragment implements OfflineMapsView
         super.onAttach(context);
         FragmentActivity activity = getActivity();
         if (!(activity instanceof OfflineMapSelectedListener)) {
-            throw new IllegalArgumentException("Activity must implement OfflineMapSelectedListener");
+            throw new IllegalArgumentException(
+                    "Activity must implement OfflineMapSelectedListener");
         }
         offlineMapSelectedListener = (OfflineMapSelectedListener) activity;
     }
@@ -111,11 +120,20 @@ public class OfflineMapsDialog extends DialogFragment implements OfflineMapsView
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        DataPreferenceRepository userRepository = new DataPreferenceRepository();
-        presenter = new OfflineMapsPresenter(new OfflineRegionMapper(new RegionNameMapper()),
-                OfflineManager
-                        .getInstance(getContext()), new GetSelectedOfflineArea(userRepository),
-                new SaveSelectedOfflineArea(userRepository));
+        //TODO: inject
+        SharedPreferences offlinePrefs = getActivity().getApplicationContext()
+                .getSharedPreferences("offline_prefs", Context.MODE_PRIVATE);
+        DataPreferenceRepository preferenceRepository = new DataPreferenceRepository(
+                new OfflineSharedPreferenceDataSource(offlinePrefs));
+        MapInfoMapper mapInfoMapper = new MapInfoMapper();
+        RegionNameMapper regionNameMapper = new RegionNameMapper();
+        DataRegionRepository regionRepository = new DataRegionRepository(
+                new GetOfflineRegions(getActivity()),
+                new DomainOfflineAreaMapper(regionNameMapper, mapInfoMapper),
+                new GetOfflineRegion(getActivity()), mapInfoMapper);
+        presenter = new OfflineMapsPresenter(new GetSelectedOfflineRegionId(preferenceRepository),
+                new SaveSelectedOfflineArea(preferenceRepository),
+                new LoadOfflineRegions(regionRepository));
         adapter = new OfflineAreasAdapter(new ArrayList<>(), offlineMapSelectedListener);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(adapter);
@@ -139,12 +157,12 @@ public class OfflineMapsDialog extends DialogFragment implements OfflineMapsView
     }
 
     @Override
-    public void displayRegions(List<ViewOfflineArea> offlineRegions, long selectedRegionId) {
+    public void displayRegions(List<DomainOfflineArea> offlineRegions, long selectedRegionId) {
         addMapButton.setVisibility(View.GONE);
         noMapsTextView.setVisibility(View.GONE);
         recyclerView.setVisibility(View.VISIBLE);
         adapter.setOfflineAreas(offlineRegions, selectedRegionId);
-        if (selectedRegionId == ViewOfflineArea.UNSELECTED_REGION) {
+        if (selectedRegionId == DomainOfflineArea.UNSELECTED_REGION) {
             onLineMapTextView.setSelected(true);
         }
     }
@@ -157,7 +175,7 @@ public class OfflineMapsDialog extends DialogFragment implements OfflineMapsView
         onLineMapTextView.setSelected(true);
     }
 
-    public void onOfflineAreaSelected(ViewOfflineArea offlineArea) {
+    public void onOfflineAreaSelected(DomainOfflineArea offlineArea) {
         presenter.onOfflineAreaSelected(offlineArea);
     }
 

@@ -17,7 +17,9 @@
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.akvo.flow.offlinemaps.domain;
+package org.akvo.flow.offlinemaps.domain.interactor;
+
+import org.akvo.flow.offlinemaps.domain.PreferencesRepository;
 
 import java.util.Map;
 

@@ -19,26 +19,34 @@
 
 package org.akvo.flow.offlinemaps.data;
 
-import org.akvo.flow.offlinemaps.domain.PreferencesRepository;
+import android.content.SharedPreferences;
 
 import io.reactivex.Completable;
 import io.reactivex.Maybe;
 
-public class DataPreferenceRepository implements PreferencesRepository {
+public class OfflineSharedPreferenceDataSource {
 
-    private final OfflineSharedPreferenceDataSource dataSource;
+    private static final long LONG_VALUE_UNSET = -1;
+    private final SharedPreferences preferences;
 
-    public DataPreferenceRepository(OfflineSharedPreferenceDataSource dataSource) {
-        this.dataSource = dataSource;
+    public OfflineSharedPreferenceDataSource(SharedPreferences preferences) {
+        this.preferences = preferences;
     }
 
-    @Override
-    public Completable saveSelectedOfflineArea(long offlineAreaId) {
-        return dataSource.saveSelectedOfflineArea(offlineAreaId);
-    }
+    private static final String KEY_OFFLINE_AREA_ID = "offline_area_id";
 
-    @Override
+
     public Maybe<Long> getSelectedOfflineArea() {
-       return dataSource.getSelectedOfflineArea();
+        long areaId = preferences.getLong(KEY_OFFLINE_AREA_ID, LONG_VALUE_UNSET);
+        if (areaId == LONG_VALUE_UNSET) {
+            return Maybe.empty();
+        } else {
+            return Maybe.just(areaId);
+        }
+    }
+
+    public Completable saveSelectedOfflineArea(long areaId) {
+        preferences.edit().putLong(KEY_OFFLINE_AREA_ID, areaId).apply();
+        return Completable.complete();
     }
 }

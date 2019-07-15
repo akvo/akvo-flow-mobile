@@ -19,16 +19,12 @@
 
 package org.akvo.flow.offlinemaps.presentation.list;
 
-import com.mapbox.mapboxsdk.offline.OfflineRegion;
-import com.mapbox.mapboxsdk.offline.OfflineRegionStatus;
-
 import org.akvo.flow.mapbox.offline.reactive.DeleteOfflineRegion;
-import org.akvo.flow.mapbox.offline.reactive.GetOfflineRegions;
 import org.akvo.flow.mapbox.offline.reactive.RenameOfflineRegion;
-import org.akvo.flow.offlinemaps.domain.GetSelectedOfflineArea;
-import org.akvo.flow.offlinemaps.domain.SaveSelectedOfflineArea;
-import org.akvo.flow.offlinemaps.presentation.ViewOfflineArea;
-import org.akvo.flow.offlinemaps.presentation.list.entity.ListOfflineAreaMapper;
+import org.akvo.flow.offlinemaps.domain.entity.DomainOfflineArea;
+import org.akvo.flow.offlinemaps.domain.interactor.GetSelectedOfflineRegionId;
+import org.akvo.flow.offlinemaps.domain.interactor.LoadOfflineRegions;
+import org.akvo.flow.offlinemaps.domain.interactor.SaveSelectedOfflineArea;
 
 import java.util.HashMap;
 import java.util.List;
@@ -38,28 +34,25 @@ import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.observers.DisposableCompletableObserver;
 import io.reactivex.observers.DisposableMaybeObserver;
 import io.reactivex.observers.DisposableSingleObserver;
-import kotlin.Pair;
 import timber.log.Timber;
 
 public class OfflineAreasListPresenter {
 
-    private final ListOfflineAreaMapper mapper;
+    private final LoadOfflineRegions loadOfflineRegions;
     private final CompositeDisposable disposables;
-    private final GetOfflineRegions getOfflineRegions;
     private final RenameOfflineRegion renameOfflineRegion;
     private final DeleteOfflineRegion deleteOfflineRegion;
     private final SaveSelectedOfflineArea saveSelectedOfflineArea;
-    private final GetSelectedOfflineArea getSelectedOfflineRegion;
+    private final GetSelectedOfflineRegionId getSelectedOfflineRegion;
 
     private OfflineAreasListView view;
 
-    public OfflineAreasListPresenter(ListOfflineAreaMapper mapper,
-            GetOfflineRegions getOfflineRegions, RenameOfflineRegion renameOfflineRegion,
+    public OfflineAreasListPresenter(RenameOfflineRegion renameOfflineRegion,
             DeleteOfflineRegion deleteOfflineRegion,
             SaveSelectedOfflineArea saveSelectedOfflineArea,
-            GetSelectedOfflineArea getSelectedOfflineRegion) {
-        this.mapper = mapper;
-        this.getOfflineRegions = getOfflineRegions;
+            GetSelectedOfflineRegionId getSelectedOfflineRegion,
+            LoadOfflineRegions loadOfflineRegions) {
+        this.loadOfflineRegions = loadOfflineRegions;
         this.renameOfflineRegion = renameOfflineRegion;
         this.deleteOfflineRegion = deleteOfflineRegion;
         this.saveSelectedOfflineArea = saveSelectedOfflineArea;
@@ -73,6 +66,7 @@ public class OfflineAreasListPresenter {
         }
         saveSelectedOfflineArea.dispose();
         getSelectedOfflineRegion.dispose();
+        loadOfflineRegions.dispose();
     }
 
     public void setView(OfflineAreasListView view) {
@@ -81,50 +75,43 @@ public class OfflineAreasListPresenter {
 
     public void loadAreas() {
         view.showLoading();
-        DisposableSingleObserver<List<Pair<OfflineRegion, OfflineRegionStatus>>> subscribeWith = getOfflineRegions
-                .execute()
-                .subscribeWith(
-                        new DisposableSingleObserver<List<Pair<OfflineRegion, OfflineRegionStatus>>>() {
-                            @Override
-                            public void onSuccess(
-                                    List<Pair<OfflineRegion, OfflineRegionStatus>> pairs) {
-                                view.hideLoading();
-                                if (pairs.size() == 0) {
-                                    view.displayNoOfflineMaps();
-                                } else {
-                                    fetchSelectedArea(pairs);
-                                }
-                            }
+        loadOfflineRegions.execute(new DisposableSingleObserver<List<DomainOfflineArea>>() {
+            @Override
+            public void onSuccess(List<DomainOfflineArea> domainOfflineAreas) {
+                view.hideLoading();
+                if (domainOfflineAreas.size() == 0) {
+                    view.displayNoOfflineMaps();
+                } else {
+                    fetchSelectedArea(domainOfflineAreas);
+                }
+            }
 
-                            @Override
-                            public void onError(Throwable e) {
-                                Timber.e(e);
-                                view.hideLoading();
-                                view.displayNoOfflineMaps();
-                            }
-                        });
-        disposables.add(subscribeWith);
+            @Override
+            public void onError(Throwable e) {
+                Timber.e(e);
+                view.hideLoading();
+                view.displayNoOfflineMaps();
+            }
+        });
     }
 
-    private void fetchSelectedArea(List<Pair<OfflineRegion, OfflineRegionStatus>> pairs) {
+    private void fetchSelectedArea(List<DomainOfflineArea> regions) {
         getSelectedOfflineRegion
                 .execute(new DisposableMaybeObserver<Long>() {
                     @Override
                     public void onSuccess(Long selectedRegionId) {
-                        view.showOfflineRegions(mapper.transform(pairs), selectedRegionId);
+                        view.showOfflineRegions(regions, selectedRegionId);
                     }
 
                     @Override
                     public void onError(Throwable e) {
                         Timber.e(e);
-                        view.showOfflineRegions(mapper.transform(pairs),
-                                ViewOfflineArea.UNSELECTED_REGION);
+                        view.showOfflineRegions(regions, DomainOfflineArea.UNSELECTED_REGION);
                     }
 
                     @Override
                     public void onComplete() {
-                        view.showOfflineRegions(mapper.transform(pairs),
-                                ViewOfflineArea.UNSELECTED_REGION);
+                        view.showOfflineRegions(regions, DomainOfflineArea.UNSELECTED_REGION);
                     }
                 });
     }

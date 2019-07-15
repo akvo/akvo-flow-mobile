@@ -17,7 +17,9 @@
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.akvo.flow.offlinemaps.presentation;
+package org.akvo.flow.offlinemaps.presentation.dialog;
+
+import org.akvo.flow.offlinemaps.domain.entity.DomainOfflineArea;
 
 import java.util.List;
 
@@ -25,7 +27,7 @@ public interface OfflineMapsView {
 
     void showLoading();
 
-    void displayRegions(List<ViewOfflineArea> offlineRegions, long selectedRegionId);
+    void displayRegions(List<DomainOfflineArea> offlineRegions, long selectedRegionId);
 
     void displayNoOfflineMaps();
 

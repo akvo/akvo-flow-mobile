@@ -30,7 +30,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import org.akvo.flow.offlinemaps.R;
-import org.akvo.flow.offlinemaps.presentation.list.entity.ListOfflineArea;
+import org.akvo.flow.offlinemaps.domain.entity.DomainOfflineArea;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,10 +45,10 @@ public class OfflineAreasListAdapter
 
     private long selectedRegionId = NONE_SELECTED;
 
-    private final List<ListOfflineArea> offlineAreas;
+    private final List<DomainOfflineArea> offlineAreas;
     private final OfflineAreasActionListener listener;
 
-    public OfflineAreasListAdapter(ArrayList<ListOfflineArea> offlineAreas,
+    public OfflineAreasListAdapter(ArrayList<DomainOfflineArea> offlineAreas,
             OfflineAreasActionListener listener) {
         this.offlineAreas = offlineAreas;
         this.listener = listener;
@@ -67,7 +67,7 @@ public class OfflineAreasListAdapter
         holder.setTextView(offlineAreas.get(position), selectedRegionId);
     }
 
-    public void setOfflineAreas(@NonNull List<ListOfflineArea> results, long selectedRegionId) {
+    public void setOfflineAreas(@NonNull List<DomainOfflineArea> results, long selectedRegionId) {
         this.selectedRegionId = selectedRegionId;
         offlineAreas.clear();
         offlineAreas.addAll(results);
@@ -105,7 +105,7 @@ public class OfflineAreasListAdapter
             this.listener = listener;
         }
 
-        void setTextView(ListOfflineArea offlineArea, long selectedRegionId) {
+        void setTextView(DomainOfflineArea offlineArea, long selectedRegionId) {
             if (offlineArea != null) {
                 nameTv.setText(offlineArea.getName());
                 if (offlineArea.isDownloading()) {
@@ -137,14 +137,14 @@ public class OfflineAreasListAdapter
             }
         }
 
-        void showMenu(View anchor, ListOfflineArea offlineArea) {
+        void showMenu(View anchor, DomainOfflineArea offlineArea) {
             PopupMenu popup = new PopupMenu(anchor.getContext(), anchor);
             popup.getMenuInflater().inflate(R.menu.offline_area_popup, popup.getMenu());
             popup.show();
             popup.setOnMenuItemClickListener(item -> onMenuItemClicked(item, offlineArea));
         }
 
-        private boolean onMenuItemClicked(MenuItem item, ListOfflineArea offlineArea) {
+        private boolean onMenuItemClicked(MenuItem item, DomainOfflineArea offlineArea) {
             int i = item.getItemId();
             if (i == R.id.view_area) {
                 listener.viewArea(offlineArea.getName(), offlineArea.getMapInfo());

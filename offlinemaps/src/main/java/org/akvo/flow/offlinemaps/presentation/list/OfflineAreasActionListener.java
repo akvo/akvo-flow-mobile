@@ -19,7 +19,7 @@
 
 package org.akvo.flow.offlinemaps.presentation.list;
 
-import org.akvo.flow.offlinemaps.presentation.list.entity.MapInfo;
+import org.akvo.flow.offlinemaps.domain.entity.MapInfo;
 
 public interface OfflineAreasActionListener {
 

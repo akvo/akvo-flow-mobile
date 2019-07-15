@@ -29,8 +29,6 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import androidx.annotation.Nullable;
-import io.reactivex.Completable;
-import io.reactivex.Maybe;
 import io.reactivex.Observable;
 
 @Singleton
@@ -42,7 +40,6 @@ public class SharedPreferencesDataSource {
     private static final String KEY_MAX_IMG_SIZE = "media.img.maxsize";
     private static final String KEY_DATA_PUBLISH_TIME = "data_publish_time";
     private static final String KEY_SETUP = "setup";
-    private static final String KEY_OFFLINE_AREA_ID = "offline_area_id";
 
     private static final String DEFAULT_VALUE_DEVICE_IDENTIFIER = "unset";
     private static final int DEFAULT_VALUE_IMAGE_SIZE = 0;
@@ -163,7 +160,6 @@ public class SharedPreferencesDataSource {
         clearSelectedUser();
         clearSetUp();
         clearPublishDataTime();
-        removePreference(KEY_OFFLINE_AREA_ID);
         return Observable.just(true);
     }
 
@@ -199,19 +195,6 @@ public class SharedPreferencesDataSource {
         return Observable.just(true);
     }
 
-    public Maybe<Long> getSelectedOfflineArea() {
-        long areaId = getLong(KEY_OFFLINE_AREA_ID, LONG_VALUE_UNSET);
-        if (areaId == LONG_VALUE_UNSET) {
-            return Maybe.empty();
-        } else {
-            return Maybe.just(areaId);
-        }
-    }
-
-    public Completable saveSelectedOfflineArea(long areaId) {
-        setLong(KEY_OFFLINE_AREA_ID, areaId);
-        return Completable.complete();
-    }
 
     protected String getString(String key, String defaultValue) {
         return preferences.getString(key, defaultValue);

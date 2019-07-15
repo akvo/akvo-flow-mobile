@@ -21,7 +21,7 @@
 package org.akvo.flow.presentation.datapoints.map;
 
 import org.akvo.flow.presentation.datapoints.map.entity.MapDataPoint;
-import org.akvo.flow.offlinemaps.presentation.list.entity.MapInfo;
+import org.akvo.flow.offlinemaps.domain.entity.MapInfo;
 
 import java.util.List;
 

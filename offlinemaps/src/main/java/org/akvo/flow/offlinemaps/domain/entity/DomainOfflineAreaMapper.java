@@ -17,7 +17,7 @@
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.akvo.flow.offlinemaps.presentation.list.entity;
+package org.akvo.flow.offlinemaps.domain.entity;
 
 import com.mapbox.mapboxsdk.offline.OfflineRegion;
 import com.mapbox.mapboxsdk.offline.OfflineRegionStatus;
@@ -30,20 +30,20 @@ import java.util.List;
 import androidx.annotation.NonNull;
 import kotlin.Pair;
 
-public class ListOfflineAreaMapper {
+public class DomainOfflineAreaMapper {
 
     private static final long MEGABYTE = 1024L * 1024L;
 
     private final RegionNameMapper regionNameMapper;
     private final MapInfoMapper mapInfoMapper;
 
-    public ListOfflineAreaMapper(RegionNameMapper regionNameMapper, MapInfoMapper mapInfoMapper) {
+    public DomainOfflineAreaMapper(RegionNameMapper regionNameMapper, MapInfoMapper mapInfoMapper) {
         this.regionNameMapper = regionNameMapper;
         this.mapInfoMapper = mapInfoMapper;
     }
 
-    public ListOfflineArea transform(OfflineRegion region, OfflineRegionStatus status) {
-        return new ListOfflineArea(region.getID(),
+    public DomainOfflineArea transform(OfflineRegion region, OfflineRegionStatus status) {
+        return new DomainOfflineArea(region.getID(),
                 regionNameMapper.getRegionName(region),
                 status.getCompletedResourceSize() / MEGABYTE + " MB",
                 status.getDownloadState() == OfflineRegion.STATE_ACTIVE, status.isComplete(),
@@ -51,8 +51,8 @@ public class ListOfflineAreaMapper {
     }
 
     @NonNull
-    public List<ListOfflineArea> transform(List<Pair<OfflineRegion, OfflineRegionStatus>> pairs) {
-        List<ListOfflineArea> areas = new ArrayList<>();
+    public List<DomainOfflineArea> transform(List<Pair<OfflineRegion, OfflineRegionStatus>> pairs) {
+        List<DomainOfflineArea> areas = new ArrayList<>();
         for (Pair<OfflineRegion, OfflineRegionStatus> p: pairs ) {
             areas.add(transform(p.getFirst(), p.getSecond()));
         }

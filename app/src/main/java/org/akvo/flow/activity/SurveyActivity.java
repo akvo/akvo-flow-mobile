@@ -46,9 +46,9 @@ import org.akvo.flow.domain.util.VersionHelper;
 import org.akvo.flow.injector.component.ApplicationComponent;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
+import org.akvo.flow.offlinemaps.domain.entity.DomainOfflineArea;
 import org.akvo.flow.offlinemaps.presentation.OfflineMapSelectedListener;
-import org.akvo.flow.offlinemaps.presentation.OfflineMapsDialog;
-import org.akvo.flow.offlinemaps.presentation.ViewOfflineArea;
+import org.akvo.flow.offlinemaps.presentation.dialog.OfflineMapsDialog;
 import org.akvo.flow.presentation.SnackBarManager;
 import org.akvo.flow.presentation.UserDeleteConfirmationDialog;
 import org.akvo.flow.presentation.entity.ViewApkData;
@@ -683,7 +683,7 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     }
 
     @Override
-    public void onOfflineAreaPressed(ViewOfflineArea offlineArea) {
+    public void onOfflineAreaPressed(DomainOfflineArea offlineArea) {
         OfflineMapsDialog fragment = (OfflineMapsDialog) getSupportFragmentManager().findFragmentByTag(
                OfflineMapsDialog.TAG);
        if (fragment != null) {

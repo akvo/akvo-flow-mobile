@@ -142,6 +142,12 @@ public class OfflineMapsDialog extends DialogFragment implements OfflineMapsView
     }
 
     @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        presenter.destroy();
+    }
+
+    @Override
     public void showLoading() {
         progressBar.setVisibility(View.VISIBLE);
     }
@@ -179,7 +185,7 @@ public class OfflineMapsDialog extends DialogFragment implements OfflineMapsView
         presenter.onOfflineAreaSelected(offlineArea);
     }
 
-    public void navigateToOfflineMapAreasCreation(@Nullable Context context) {
+    private void navigateToOfflineMapAreasCreation(@Nullable Context context) {
         if (context != null) {
             Intent intent = new Intent(context, OfflineMapDownloadActivity.class);
             context.startActivity(intent);

@@ -27,13 +27,13 @@ import io.reactivex.Maybe;
 public class OfflineSharedPreferenceDataSource {
 
     private static final long LONG_VALUE_UNSET = -1;
+    private static final String KEY_OFFLINE_AREA_ID = "offline_area_id";
+
     private final SharedPreferences preferences;
 
     public OfflineSharedPreferenceDataSource(SharedPreferences preferences) {
         this.preferences = preferences;
     }
-
-    private static final String KEY_OFFLINE_AREA_ID = "offline_area_id";
 
     public Maybe<Long> getSelectedOfflineArea() {
         long areaId = preferences.getLong(KEY_OFFLINE_AREA_ID, LONG_VALUE_UNSET);

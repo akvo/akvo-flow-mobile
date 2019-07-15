@@ -60,10 +60,11 @@ import org.akvo.flow.domain.interactor.users.EditUser;
 import org.akvo.flow.domain.interactor.users.GetSelectedUser;
 import org.akvo.flow.domain.interactor.users.GetUsers;
 import org.akvo.flow.domain.interactor.users.SelectUser;
-import org.akvo.flow.mapbox.offline.reactive.DeleteOfflineArea;
-import org.akvo.flow.mapbox.offline.reactive.GetOfflineAreasList;
+import org.akvo.flow.mapbox.offline.reactive.DeleteOfflineRegion;
+import org.akvo.flow.mapbox.offline.reactive.GetOfflineRegion;
+import org.akvo.flow.mapbox.offline.reactive.GetOfflineRegions;
 import org.akvo.flow.mapbox.offline.reactive.RegionNameMapper;
-import org.akvo.flow.mapbox.offline.reactive.RenameOfflineArea;
+import org.akvo.flow.mapbox.offline.reactive.RenameOfflineRegion;
 
 import javax.inject.Named;
 
@@ -296,17 +297,22 @@ public class ViewModule {
     }
 
     @Provides
-    GetOfflineAreasList provideOfflineAreasList(Context context) {
-        return new GetOfflineAreasList(context);
+    GetOfflineRegions provideGetOfflineRegions(Context context) {
+        return new GetOfflineRegions(context);
     }
 
     @Provides
-    RenameOfflineArea provideRenameArea(Context context) {
-        return new RenameOfflineArea(context, new RegionNameMapper());
+    RenameOfflineRegion provideRenameOfflineRegion(Context context) {
+        return new RenameOfflineRegion(context, new RegionNameMapper());
     }
 
     @Provides
-    DeleteOfflineArea provideDeleteArea(Context context) {
-        return new DeleteOfflineArea(context);
+    DeleteOfflineRegion provideDeleteRegion(Context context) {
+        return new DeleteOfflineRegion(context);
+    }
+
+    @Provides
+    GetOfflineRegion provideGetRegion(Context context) {
+        return new GetOfflineRegion(context);
     }
 }

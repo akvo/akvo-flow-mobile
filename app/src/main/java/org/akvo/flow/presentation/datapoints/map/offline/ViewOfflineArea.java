@@ -19,29 +19,23 @@
 
 package org.akvo.flow.presentation.datapoints.map.offline;
 
-import com.mapbox.mapboxsdk.geometry.LatLngBounds;
-
 public class ViewOfflineArea {
 
-    private final String name;
-    private final LatLngBounds bounds;
-    private final double zoom;
+    public static final long UNSELECTED_REGION = -1;
 
-    public ViewOfflineArea(String name, LatLngBounds bounds, double zoom) {
+    private final long id;
+    private final String name;
+
+    public ViewOfflineArea(long id, String name) {
+        this.id = id;
         this.name = name;
-        this.bounds = bounds;
-        this.zoom = zoom;
+    }
+
+    public long getId() {
+        return id;
     }
 
     public String getName() {
         return name;
-    }
-
-    public LatLngBounds getBounds() {
-        return bounds;
-    }
-
-    public double getZoom() {
-        return zoom;
     }
 }

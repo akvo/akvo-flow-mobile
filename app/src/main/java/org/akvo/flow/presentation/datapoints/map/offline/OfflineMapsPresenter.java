@@ -22,7 +22,6 @@ package org.akvo.flow.presentation.datapoints.map.offline;
 import com.mapbox.mapboxsdk.offline.OfflineManager;
 import com.mapbox.mapboxsdk.offline.OfflineRegion;
 
-import org.akvo.flow.domain.entity.OfflineArea;
 import org.akvo.flow.domain.interactor.offline.GetSelectedOfflineArea;
 import org.akvo.flow.domain.interactor.offline.SaveSelectedOfflineArea;
 import org.akvo.flow.presentation.Presenter;
@@ -44,18 +43,15 @@ public class OfflineMapsPresenter implements Presenter {
     private final OfflineManager offlineManager;
     private final GetSelectedOfflineArea getSelectedOfflineAre;
     private final SaveSelectedOfflineArea saveSelectedOfflineArea;
-    private final OfflineAreaMapper offlineAreaMapper;
 
     @Inject
     public OfflineMapsPresenter(OfflineRegionMapper mapper, OfflineManager offlineManager,
             GetSelectedOfflineArea getSelectedOfflineAre,
-            SaveSelectedOfflineArea saveSelectedOfflineArea,
-            OfflineAreaMapper offlineAreaMapper) {
+            SaveSelectedOfflineArea saveSelectedOfflineArea) {
         this.mapper = mapper;
         this.offlineManager = offlineManager;
         this.getSelectedOfflineAre = getSelectedOfflineAre;
         this.saveSelectedOfflineArea = saveSelectedOfflineArea;
-        this.offlineAreaMapper = offlineAreaMapper;
     }
 
     @Override
@@ -92,23 +88,24 @@ public class OfflineMapsPresenter implements Presenter {
     }
 
     private void checkSelectedRegion(OfflineRegion[] offlineRegions) {
-        getSelectedOfflineAre.execute(new DisposableMaybeObserver<OfflineArea>() {
+        getSelectedOfflineAre.execute(new DisposableMaybeObserver<Long>() {
             @Override
-            public void onSuccess(OfflineArea offlineArea) {
-                view.displayRegions(mapper.transform(offlineRegions),
-                        offlineAreaMapper.transform(offlineArea));
+            public void onSuccess(Long offlineAreaId) {
+                view.displayRegions(mapper.transform(offlineRegions), offlineAreaId);
             }
 
             @Override
             public void onError(Throwable e) {
                 Timber.e(e);
-                view.displayRegions(mapper.transform(offlineRegions), null);
+                view.displayRegions(mapper.transform(offlineRegions),
+                        ViewOfflineArea.UNSELECTED_REGION);
             }
 
             @Override
             public void onComplete() {
                 // no regions found
-                view.displayRegions(mapper.transform(offlineRegions), null);
+                view.displayRegions(mapper.transform(offlineRegions),
+                        ViewOfflineArea.UNSELECTED_REGION);
             }
 
         }, null);
@@ -117,6 +114,13 @@ public class OfflineMapsPresenter implements Presenter {
     public void onOnlineMapSelected() {
         //setup selected maps to online
         saveSelectedArea(null);
+    }
+
+    public void onOfflineAreaSelected(ViewOfflineArea offlineArea) {
+        Map<String, Object> params = new HashMap<>(2);
+        params.put(SaveSelectedOfflineArea.AREA_ID_PARAM,
+                offlineArea == null ? ViewOfflineArea.UNSELECTED_REGION : offlineArea.getId());
+        saveSelectedArea(params);
     }
 
     private void saveSelectedArea(Map<String, Object> parameters) {
@@ -133,11 +137,5 @@ public class OfflineMapsPresenter implements Presenter {
                 //TODO: notify user
             }
         }, parameters);
-    }
-
-    public void onOfflineAreaSelected(ViewOfflineArea offlineArea) {
-        Map<String, Object> params = new HashMap<>(2);
-        params.put(SaveSelectedOfflineArea.AREA_PARAM, offlineAreaMapper.transform(offlineArea));
-        saveSelectedArea(params);
     }
 }

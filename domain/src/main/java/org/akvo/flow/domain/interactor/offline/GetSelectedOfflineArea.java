@@ -19,7 +19,6 @@
 
 package org.akvo.flow.domain.interactor.offline;
 
-import org.akvo.flow.domain.entity.OfflineArea;
 import org.akvo.flow.domain.executor.PostExecutionThread;
 import org.akvo.flow.domain.executor.ThreadExecutor;
 import org.akvo.flow.domain.repository.UserRepository;
@@ -63,7 +62,7 @@ public class GetSelectedOfflineArea {
         }
     }
 
-    protected <T> Maybe<OfflineArea> buildUseCaseObservable(Map<String, T> parameters) {
+    protected <T> Maybe<Long> buildUseCaseObservable(Map<String, T> parameters) {
         return userRepository.getSelectedOfflineArea();
     }
 

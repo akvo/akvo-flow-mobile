@@ -159,13 +159,12 @@ public class OfflineMapsDialog extends DialogFragment implements OfflineMapsView
     }
 
     @Override
-    public void displayRegions(List<ViewOfflineArea> offlineRegions,
-           @Nullable ViewOfflineArea selectedRegion) {
+    public void displayRegions(List<ViewOfflineArea> offlineRegions, long selectedRegionId) {
         addMapsButton.setVisibility(View.GONE);
         noMapsTextView.setVisibility(View.GONE);
         recyclerView.setVisibility(View.VISIBLE);
-        adapter.setOfflineAreas(offlineRegions, selectedRegion);
-        if (selectedRegion == null) {
+        adapter.setOfflineAreas(offlineRegions, selectedRegionId);
+        if (selectedRegionId == ViewOfflineArea.UNSELECTED_REGION) {
             onLineMapsTextView.setSelected(true);
         }
     }

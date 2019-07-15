@@ -22,18 +22,24 @@ package org.akvo.flow.presentation.datapoints.map.offline.list;
 import com.mapbox.mapboxsdk.offline.OfflineRegion;
 import com.mapbox.mapboxsdk.offline.OfflineRegionStatus;
 
-import org.akvo.flow.mapbox.offline.reactive.DeleteOfflineArea;
-import org.akvo.flow.mapbox.offline.reactive.GetOfflineAreasList;
-import org.akvo.flow.mapbox.offline.reactive.RenameOfflineArea;
+import org.akvo.flow.domain.interactor.offline.GetSelectedOfflineArea;
+import org.akvo.flow.domain.interactor.offline.SaveSelectedOfflineArea;
+import org.akvo.flow.mapbox.offline.reactive.DeleteOfflineRegion;
+import org.akvo.flow.mapbox.offline.reactive.GetOfflineRegions;
+import org.akvo.flow.mapbox.offline.reactive.RenameOfflineRegion;
 import org.akvo.flow.presentation.Presenter;
+import org.akvo.flow.presentation.datapoints.map.offline.ViewOfflineArea;
 import org.akvo.flow.presentation.datapoints.map.offline.list.entity.ListOfflineAreaMapper;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Inject;
 
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.observers.DisposableCompletableObserver;
+import io.reactivex.observers.DisposableMaybeObserver;
 import io.reactivex.observers.DisposableSingleObserver;
 import kotlin.Pair;
 import timber.log.Timber;
@@ -42,20 +48,26 @@ public class OfflineAreasListPresenter implements Presenter {
 
     private final ListOfflineAreaMapper mapper;
     private final CompositeDisposable disposables;
-    private final GetOfflineAreasList offlineAreasList;
-    private final RenameOfflineArea renameOfflineArea;
-    private final DeleteOfflineArea deleteOfflineArea;
+    private final GetOfflineRegions getOfflineRegions;
+    private final RenameOfflineRegion renameOfflineRegion;
+    private final DeleteOfflineRegion deleteOfflineRegion;
+    private final SaveSelectedOfflineArea saveSelectedOfflineArea;
+    private final GetSelectedOfflineArea getSelectedOfflineRegion;
 
     private OfflineAreasListView view;
 
     @Inject
     public OfflineAreasListPresenter(ListOfflineAreaMapper mapper,
-            GetOfflineAreasList offlineAreasList, RenameOfflineArea renameOfflineArea,
-            DeleteOfflineArea deleteOfflineArea) {
+            GetOfflineRegions getOfflineRegions, RenameOfflineRegion renameOfflineRegion,
+            DeleteOfflineRegion deleteOfflineRegion,
+            SaveSelectedOfflineArea saveSelectedOfflineArea,
+            GetSelectedOfflineArea getSelectedOfflineRegion) {
         this.mapper = mapper;
-        this.offlineAreasList = offlineAreasList;
-        this.renameOfflineArea = renameOfflineArea;
-        this.deleteOfflineArea = deleteOfflineArea;
+        this.getOfflineRegions = getOfflineRegions;
+        this.renameOfflineRegion = renameOfflineRegion;
+        this.deleteOfflineRegion = deleteOfflineRegion;
+        this.saveSelectedOfflineArea = saveSelectedOfflineArea;
+        this.getSelectedOfflineRegion = getSelectedOfflineRegion;
         disposables = new CompositeDisposable();
     }
 
@@ -64,6 +76,8 @@ public class OfflineAreasListPresenter implements Presenter {
         if (!disposables.isDisposed()) {
             disposables.clear();
         }
+        saveSelectedOfflineArea.dispose();
+        getSelectedOfflineRegion.dispose();
     }
 
     public void setView(OfflineAreasListView view) {
@@ -72,7 +86,7 @@ public class OfflineAreasListPresenter implements Presenter {
 
     public void loadAreas() {
         view.showLoading();
-        DisposableSingleObserver<List<Pair<OfflineRegion, OfflineRegionStatus>>> subscribeWith = offlineAreasList
+        DisposableSingleObserver<List<Pair<OfflineRegion, OfflineRegionStatus>>> subscribeWith = getOfflineRegions
                 .execute()
                 .subscribeWith(
                         new DisposableSingleObserver<List<Pair<OfflineRegion, OfflineRegionStatus>>>() {
@@ -83,7 +97,7 @@ public class OfflineAreasListPresenter implements Presenter {
                                 if (pairs.size() == 0) {
                                     view.displayNoOfflineMaps();
                                 } else {
-                                    view.showOfflineRegions(mapper.transform(pairs));
+                                    fetchSelectedArea(pairs);
                                 }
                             }
 
@@ -97,9 +111,32 @@ public class OfflineAreasListPresenter implements Presenter {
         disposables.add(subscribeWith);
     }
 
+    private void fetchSelectedArea(List<Pair<OfflineRegion, OfflineRegionStatus>> pairs) {
+        getSelectedOfflineRegion
+                .execute(new DisposableMaybeObserver<Long>() {
+                    @Override
+                    public void onSuccess(Long selectedRegionId) {
+                        view.showOfflineRegions(mapper.transform(pairs), selectedRegionId);
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        Timber.e(e);
+                        view.showOfflineRegions(mapper.transform(pairs),
+                                ViewOfflineArea.UNSELECTED_REGION);
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        view.showOfflineRegions(mapper.transform(pairs),
+                                ViewOfflineArea.UNSELECTED_REGION);
+                    }
+                }, null);
+    }
+
     public void renameArea(long areaId, String newName) {
         view.showLoading();
-        DisposableCompletableObserver subscribeWith = renameOfflineArea.execute(areaId, newName)
+        DisposableCompletableObserver subscribeWith = renameOfflineRegion.execute(areaId, newName)
                 .subscribeWith(new DisposableCompletableObserver() {
                     @Override
                     public void onComplete() {
@@ -117,7 +154,7 @@ public class OfflineAreasListPresenter implements Presenter {
 
     public void deleteArea(long areaId) {
         view.showLoading();
-        DisposableCompletableObserver subscribeWith = deleteOfflineArea.execute(areaId)
+        DisposableCompletableObserver subscribeWith = deleteOfflineRegion.execute(areaId)
                 .subscribeWith(new DisposableCompletableObserver() {
                     @Override
                     public void onComplete() {
@@ -131,5 +168,23 @@ public class OfflineAreasListPresenter implements Presenter {
                     }
                 });
         disposables.add(subscribeWith);
+    }
+
+    public void selectRegion(long regionId) {
+        Map<String, Object> params = new HashMap<>(2);
+        params.put(SaveSelectedOfflineArea.AREA_ID_PARAM, regionId);
+        saveSelectedOfflineArea.execute(new DisposableCompletableObserver() {
+            @Override
+            public void onComplete() {
+                // EMPTY
+            }
+
+            @Override
+            public void onError(Throwable e) {
+                Timber.e(e);
+                view.showSelectError();
+                loadAreas();
+            }
+        }, params);
     }
 }

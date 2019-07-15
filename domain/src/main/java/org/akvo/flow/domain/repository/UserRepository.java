@@ -20,9 +20,6 @@
 
 package org.akvo.flow.domain.repository;
 
-import org.akvo.flow.domain.entity.OfflineArea;
-
-import androidx.annotation.Nullable;
 import io.reactivex.Completable;
 import io.reactivex.Maybe;
 import io.reactivex.Observable;
@@ -81,7 +78,7 @@ public interface UserRepository {
 
     Observable<Boolean> saveLastNotificationTime();
 
-    Maybe<OfflineArea> getSelectedOfflineArea();
+    Maybe<Long> getSelectedOfflineArea();
 
-    Completable saveSelectedOfflineArea(@Nullable OfflineArea offlineArea);
+    Completable saveSelectedOfflineArea(long areaId);
 }

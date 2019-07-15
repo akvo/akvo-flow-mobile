@@ -17,37 +17,33 @@
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.akvo.flow.presentation.datapoints.map.offline;
+package org.akvo.flow.presentation.datapoints.map.offline.list.entity;
 
+import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.offline.OfflineRegion;
-
-import org.akvo.flow.mapbox.offline.reactive.RegionNameMapper;
-
-import java.util.ArrayList;
-import java.util.List;
+import com.mapbox.mapboxsdk.offline.OfflineRegionDefinition;
 
 import javax.inject.Inject;
 
-import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
-public class OfflineRegionMapper {
-
-    private final RegionNameMapper regionNameMapper;
+public class MapInfoMapper {
 
     @Inject
-    public OfflineRegionMapper(RegionNameMapper regionNameMapper) {
-        this.regionNameMapper = regionNameMapper;
+    public MapInfoMapper() {
     }
 
-    public ViewOfflineArea transform(@NonNull OfflineRegion region) {
-        return new ViewOfflineArea(region.getID(), regionNameMapper.getRegionName(region));
-    }
-
-    public List<ViewOfflineArea> transform(@NonNull OfflineRegion[] regions) {
-        List<ViewOfflineArea> offlineAreas = new ArrayList<>();
-        for (OfflineRegion r : regions) {
-            offlineAreas.add(transform(r));
+    @Nullable
+    public MapInfo getMapInfo(@Nullable OfflineRegion region) {
+        if (region == null) {
+            return null;
         }
-        return offlineAreas;
+        OfflineRegionDefinition definition = region.getDefinition();
+        LatLng center = definition.getBounds().getCenter();
+        return new MapInfo(center.getLatitude(), center.getLongitude(), getZoom(definition));
+    }
+
+    private double getZoom(OfflineRegionDefinition definition) {
+        return definition.getMinZoom() + MapInfo.ZOOM_MAX;
     }
 }

@@ -33,9 +33,9 @@ public class GetSelectedOfflineRegionId {
     private final CompositeDisposable disposables;
     private final PreferencesRepository userRepository;
 
-    public GetSelectedOfflineRegionId(PreferencesRepository userRepository) {
+    public GetSelectedOfflineRegionId(PreferencesRepository preferencesRepository) {
         this.disposables = new CompositeDisposable();
-        this.userRepository = userRepository;
+        this.userRepository = preferencesRepository;
     }
 
     public void execute(DisposableMaybeObserver observer) {

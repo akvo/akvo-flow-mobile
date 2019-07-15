@@ -35,7 +35,7 @@ import org.akvo.flow.mapbox.offline.reactive.GetOfflineRegion;
 import org.akvo.flow.mapbox.offline.reactive.GetOfflineRegions;
 import org.akvo.flow.mapbox.offline.reactive.RegionNameMapper;
 import org.akvo.flow.offlinemaps.R;
-import org.akvo.flow.offlinemaps.data.DataPreferenceRepository;
+import org.akvo.flow.offlinemaps.data.DataPreferencesRepository;
 import org.akvo.flow.offlinemaps.data.DataRegionRepository;
 import org.akvo.flow.offlinemaps.data.OfflineSharedPreferenceDataSource;
 import org.akvo.flow.offlinemaps.domain.entity.DomainOfflineArea;
@@ -123,7 +123,7 @@ public class OfflineMapsDialog extends DialogFragment implements OfflineMapsView
         //TODO: inject
         SharedPreferences offlinePrefs = getActivity().getApplicationContext()
                 .getSharedPreferences("offline_prefs", Context.MODE_PRIVATE);
-        DataPreferenceRepository preferenceRepository = new DataPreferenceRepository(
+        DataPreferencesRepository preferenceRepository = new DataPreferencesRepository(
                 new OfflineSharedPreferenceDataSource(offlinePrefs));
         MapInfoMapper mapInfoMapper = new MapInfoMapper();
         RegionNameMapper regionNameMapper = new RegionNameMapper();

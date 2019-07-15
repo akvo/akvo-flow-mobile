@@ -34,7 +34,7 @@ import org.akvo.flow.mapbox.offline.reactive.GetOfflineRegions;
 import org.akvo.flow.mapbox.offline.reactive.RegionNameMapper;
 import org.akvo.flow.mapbox.offline.reactive.RenameOfflineRegion;
 import org.akvo.flow.offlinemaps.R;
-import org.akvo.flow.offlinemaps.data.DataPreferenceRepository;
+import org.akvo.flow.offlinemaps.data.DataPreferencesRepository;
 import org.akvo.flow.offlinemaps.data.DataRegionRepository;
 import org.akvo.flow.offlinemaps.data.OfflineSharedPreferenceDataSource;
 import org.akvo.flow.offlinemaps.domain.interactor.GetSelectedOfflineRegionId;
@@ -86,7 +86,7 @@ public class OfflineAreasListActivity extends ToolBarBackActivity
         RegionNameMapper regionNameMapper = new RegionNameMapper();
         SharedPreferences offlinePrefs = getApplicationContext()
                 .getSharedPreferences("offline_prefs", Context.MODE_PRIVATE);
-        DataPreferenceRepository userRepository = new DataPreferenceRepository(
+        DataPreferencesRepository userRepository = new DataPreferencesRepository(
                 new OfflineSharedPreferenceDataSource(
                         offlinePrefs));
         MapInfoMapper mapInfoMapper = new MapInfoMapper();

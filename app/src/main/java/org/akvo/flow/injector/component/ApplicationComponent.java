@@ -23,7 +23,6 @@ package org.akvo.flow.injector.component;
 import android.content.Context;
 
 import com.google.gson.Gson;
-import com.mapbox.mapboxsdk.offline.OfflineManager;
 import com.squareup.sqlbrite2.BriteDatabase;
 
 import org.akvo.flow.app.FlowApp;
@@ -39,7 +38,6 @@ import org.akvo.flow.domain.repository.SurveyRepository;
 import org.akvo.flow.domain.repository.UserRepository;
 import org.akvo.flow.injector.module.ApplicationModule;
 import org.akvo.flow.injector.module.ViewModule;
-import org.akvo.flow.mapbox.offline.reactive.RegionNameMapper;
 import org.akvo.flow.presentation.BaseActivity;
 import org.akvo.flow.service.ApkUpdateService;
 import org.akvo.flow.service.BootstrapService;
@@ -83,10 +81,6 @@ public interface ApplicationComponent {
     MissingAndDeletedRepository missingAndDeletedRepository();
 
     Gson gson();
-
-    OfflineManager offlineManager();
-
-    RegionNameMapper regionNameMapper();
 
     void inject(FileChangeTrackingService fileChangeTrackingService);
 

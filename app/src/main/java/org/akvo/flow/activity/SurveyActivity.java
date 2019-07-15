@@ -684,11 +684,11 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
 
     @Override
     public void onOfflineAreaPressed(DomainOfflineArea offlineArea) {
-        OfflineMapsDialog fragment = (OfflineMapsDialog) getSupportFragmentManager().findFragmentByTag(
-               OfflineMapsDialog.TAG);
-       if (fragment != null) {
-           fragment.onOfflineAreaSelected(offlineArea);
-       }
+        OfflineMapsDialog fragment = (OfflineMapsDialog) getSupportFragmentManager()
+                .findFragmentByTag(OfflineMapsDialog.TAG);
+        if (fragment != null) {
+            fragment.onOfflineAreaSelected(offlineArea);
+        }
     }
 
     @Override

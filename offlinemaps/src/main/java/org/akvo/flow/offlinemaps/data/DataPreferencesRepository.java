@@ -24,11 +24,11 @@ import org.akvo.flow.offlinemaps.domain.PreferencesRepository;
 import io.reactivex.Completable;
 import io.reactivex.Maybe;
 
-public class DataPreferenceRepository implements PreferencesRepository {
+public class DataPreferencesRepository implements PreferencesRepository {
 
     private final OfflineSharedPreferenceDataSource dataSource;
 
-    public DataPreferenceRepository(OfflineSharedPreferenceDataSource dataSource) {
+    public DataPreferencesRepository(OfflineSharedPreferenceDataSource dataSource) {
         this.dataSource = dataSource;
     }
 

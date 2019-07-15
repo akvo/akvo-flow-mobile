@@ -36,11 +36,11 @@ public class GetSelectedOfflineMapInfo {
     private final PreferencesRepository userRepository;
     private final RegionRepository regionRepository;
 
-    public GetSelectedOfflineMapInfo(PreferencesRepository userRepository,
+    public GetSelectedOfflineMapInfo(PreferencesRepository preferencesRepository,
             RegionRepository regionRepository) {
         this.regionRepository = regionRepository;
         this.disposables = new CompositeDisposable();
-        this.userRepository = userRepository;
+        this.userRepository = preferencesRepository;
     }
 
     public void execute(DisposableMaybeObserver observer) {

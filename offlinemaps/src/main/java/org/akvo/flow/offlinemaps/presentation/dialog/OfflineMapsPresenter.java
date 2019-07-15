@@ -104,18 +104,17 @@ public class OfflineMapsPresenter {
     }
 
     public void onOnlineMapSelected() {
-        //setup selected maps to online
         saveSelectedArea(null);
     }
 
     public void onOfflineAreaSelected(DomainOfflineArea offlineArea) {
+        saveSelectedArea(offlineArea);
+    }
+
+    private void saveSelectedArea(DomainOfflineArea offlineArea) {
         Map<String, Object> params = new HashMap<>(2);
         params.put(SaveSelectedOfflineArea.AREA_ID_PARAM,
                 offlineArea == null ? DomainOfflineArea.UNSELECTED_REGION : offlineArea.getId());
-        saveSelectedArea(params);
-    }
-
-    private void saveSelectedArea(Map<String, Object> parameters) {
         saveSelectedOfflineArea.execute(new DisposableCompletableObserver() {
             @Override
             public void onComplete() {
@@ -128,6 +127,6 @@ public class OfflineMapsPresenter {
                 Timber.e(e);
                 //TODO: notify user
             }
-        }, parameters);
+        }, params);
     }
 }

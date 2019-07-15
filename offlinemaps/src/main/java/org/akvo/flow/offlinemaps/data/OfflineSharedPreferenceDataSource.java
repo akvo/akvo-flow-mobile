@@ -35,7 +35,6 @@ public class OfflineSharedPreferenceDataSource {
 
     private static final String KEY_OFFLINE_AREA_ID = "offline_area_id";
 
-
     public Maybe<Long> getSelectedOfflineArea() {
         long areaId = preferences.getLong(KEY_OFFLINE_AREA_ID, LONG_VALUE_UNSET);
         if (areaId == LONG_VALUE_UNSET) {

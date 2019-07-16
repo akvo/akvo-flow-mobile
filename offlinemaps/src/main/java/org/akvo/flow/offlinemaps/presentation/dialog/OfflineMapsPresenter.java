@@ -28,6 +28,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Inject;
+
 import io.reactivex.observers.DisposableCompletableObserver;
 import io.reactivex.observers.DisposableMaybeObserver;
 import io.reactivex.observers.DisposableSingleObserver;
@@ -41,6 +43,7 @@ public class OfflineMapsPresenter {
     private final SaveSelectedOfflineArea saveSelectedOfflineArea;
     private final LoadOfflineRegions loadOfflineRegions;
 
+    @Inject
     public OfflineMapsPresenter(GetSelectedOfflineRegionId getSelectedOfflineAre,
             SaveSelectedOfflineArea saveSelectedOfflineArea,
             LoadOfflineRegions loadOfflineRegions) {

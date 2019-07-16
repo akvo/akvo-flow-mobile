@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".presentation.OfflineAreaViewActivity">
+    tools:context=".presentation.view.OfflineAreaViewActivity">
 
     <include layout="@layout/app_bar_layout" />
 

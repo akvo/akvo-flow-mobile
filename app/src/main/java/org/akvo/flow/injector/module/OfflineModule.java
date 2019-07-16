@@ -32,19 +32,12 @@ import org.akvo.flow.offlinemaps.domain.PreferencesRepository;
 import org.akvo.flow.offlinemaps.domain.entity.DomainOfflineAreaMapper;
 import org.akvo.flow.offlinemaps.domain.entity.MapInfoMapper;
 import org.akvo.flow.offlinemaps.domain.interactor.GetSelectedOfflineMapInfo;
-import org.akvo.flow.offlinemaps.domain.interactor.GetSelectedOfflineRegionId;
 
 import dagger.Module;
 import dagger.Provides;
 
 @Module
 public class OfflineModule {
-
-    @Provides
-    GetSelectedOfflineRegionId provideGetSelectedOfflineAreaId(
-            PreferencesRepository preferenceRepository) {
-        return new GetSelectedOfflineRegionId(preferenceRepository);
-    }
 
     @Provides
     GetSelectedOfflineMapInfo provideGetSelectedOfflineMapInfo(Context context,

@@ -3,7 +3,7 @@
 
     <application>
         <activity
-            android:name="org.akvo.flow.offlinemaps.presentation.OfflineAreaViewActivity"
+            android:name="org.akvo.flow.offlinemaps.presentation.view.OfflineAreaViewActivity"
             android:parentActivityName=".presentation.list.OfflineAreasListActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -14,7 +14,7 @@
             android:label="@string/offline_maps_list_title">
         </activity>
         <activity
-            android:name="org.akvo.flow.offlinemaps.presentation.selection.OfflineMapDownloadActivity"
+            android:name="org.akvo.flow.offlinemaps.presentation.download.OfflineMapDownloadActivity"
             android:label="@string/offline_map_activity_title" />
     </application>
 </manifest>

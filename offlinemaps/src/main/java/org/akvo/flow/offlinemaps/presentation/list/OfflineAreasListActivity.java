@@ -21,37 +21,27 @@ package org.akvo.flow.offlinemaps.presentation.list;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import org.akvo.flow.mapbox.offline.reactive.DeleteOfflineRegion;
-import org.akvo.flow.mapbox.offline.reactive.GetOfflineRegion;
-import org.akvo.flow.mapbox.offline.reactive.GetOfflineRegions;
-import org.akvo.flow.mapbox.offline.reactive.RegionNameMapper;
-import org.akvo.flow.mapbox.offline.reactive.RenameOfflineRegion;
 import org.akvo.flow.offlinemaps.R;
-import org.akvo.flow.offlinemaps.data.DataPreferencesRepository;
-import org.akvo.flow.offlinemaps.data.DataRegionRepository;
-import org.akvo.flow.offlinemaps.data.OfflineSharedPreferenceDataSource;
-import org.akvo.flow.offlinemaps.domain.interactor.GetSelectedOfflineRegionId;
-import org.akvo.flow.offlinemaps.domain.interactor.LoadOfflineRegions;
-import org.akvo.flow.offlinemaps.domain.interactor.SaveSelectedOfflineArea;
-import org.akvo.flow.offlinemaps.presentation.OfflineAreaViewActivity;
+import org.akvo.flow.offlinemaps.di.DaggerOfflineFeatureComponent;
+import org.akvo.flow.offlinemaps.di.OfflineFeatureModule;
+import org.akvo.flow.offlinemaps.domain.entity.DomainOfflineArea;
+import org.akvo.flow.offlinemaps.domain.entity.MapInfo;
 import org.akvo.flow.offlinemaps.presentation.ToolBarBackActivity;
 import org.akvo.flow.offlinemaps.presentation.list.delete.DeleteAreaDialog;
-import org.akvo.flow.offlinemaps.domain.entity.DomainOfflineArea;
-import org.akvo.flow.offlinemaps.domain.entity.DomainOfflineAreaMapper;
-import org.akvo.flow.offlinemaps.domain.entity.MapInfo;
-import org.akvo.flow.offlinemaps.domain.entity.MapInfoMapper;
 import org.akvo.flow.offlinemaps.presentation.list.rename.RenameAreaDialog;
-import org.akvo.flow.offlinemaps.presentation.selection.OfflineMapDownloadActivity;
+import org.akvo.flow.offlinemaps.presentation.download.OfflineMapDownloadActivity;
+import org.akvo.flow.offlinemaps.presentation.view.OfflineAreaViewActivity;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.inject.Inject;
 
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
@@ -69,36 +59,30 @@ public class OfflineAreasListActivity extends ToolBarBackActivity
     private RecyclerView offlineAreasRv;
     private ProgressBar offlineAreasPb;
 
-    private OfflineAreasListPresenter presenter;
     private OfflineAreasListAdapter adapter;
+
+    @Inject
+    OfflineAreasListPresenter presenter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_offline_area_list);
+        initialiseInjector();
         setupToolBar();
         setUpViews();
         setUpPresenter();
     }
 
+    private void initialiseInjector() {
+        DaggerOfflineFeatureComponent
+                .builder()
+                .offlineFeatureModule(new OfflineFeatureModule(getApplication()))
+                .build()
+                .inject(this);
+    }
+
     private void setUpPresenter() {
-        //TODO: inject
-        RegionNameMapper regionNameMapper = new RegionNameMapper();
-        SharedPreferences offlinePrefs = getApplicationContext()
-                .getSharedPreferences("offline_prefs", Context.MODE_PRIVATE);
-        DataPreferencesRepository userRepository = new DataPreferencesRepository(
-                new OfflineSharedPreferenceDataSource(
-                        offlinePrefs));
-        MapInfoMapper mapInfoMapper = new MapInfoMapper();
-        DataRegionRepository regionRepository = new DataRegionRepository(
-                new GetOfflineRegions(this),
-                new DomainOfflineAreaMapper(regionNameMapper, mapInfoMapper),
-                new GetOfflineRegion(this), mapInfoMapper);
-        presenter = new OfflineAreasListPresenter(new RenameOfflineRegion(this,
-                regionNameMapper), new DeleteOfflineRegion(this),
-                new SaveSelectedOfflineArea(userRepository),
-                new GetSelectedOfflineRegionId(userRepository), new LoadOfflineRegions(
-                regionRepository));
         presenter.setView(this);
         presenter.loadAreas();
     }

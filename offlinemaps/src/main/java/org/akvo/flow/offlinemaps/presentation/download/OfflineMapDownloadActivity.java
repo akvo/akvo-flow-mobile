@@ -17,7 +17,7 @@
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.akvo.flow.offlinemaps.presentation.selection;
+package org.akvo.flow.offlinemaps.presentation.download;
 
 import android.content.Context;
 import android.content.Intent;
@@ -34,12 +34,14 @@ import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.Style;
-import com.mapbox.mapboxsdk.offline.OfflineManager;
 
-import org.akvo.flow.mapbox.offline.reactive.RegionNameMapper;
 import org.akvo.flow.offlinemaps.R;
+import org.akvo.flow.offlinemaps.di.DaggerOfflineFeatureComponent;
+import org.akvo.flow.offlinemaps.di.OfflineFeatureModule;
 import org.akvo.flow.offlinemaps.presentation.ToolBarBackActivity;
 import org.akvo.flow.offlinemaps.presentation.list.OfflineAreasListActivity;
+
+import javax.inject.Inject;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -51,20 +53,28 @@ public class OfflineMapDownloadActivity extends ToolBarBackActivity
     private Button saveBt;
     private EditText mapNameEt;
     private ProgressBar downloadProgress;
-
-    private OfflineMapDownloadPresenter presenter;
     private MapboxMap mapboxMap;
+
+    @Inject
+    OfflineMapDownloadPresenter presenter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_offline_map_download);
+        initialiseInjector();
         setupToolBar();
         setUpViews();
         setupMap(savedInstanceState);
-        presenter = new OfflineMapDownloadPresenter(OfflineManager.getInstance(this),
-                new RegionNameMapper());
         presenter.setView(this);
+    }
+
+    private void initialiseInjector() {
+        DaggerOfflineFeatureComponent
+                .builder()
+                .offlineFeatureModule(new OfflineFeatureModule(getApplication()))
+                .build()
+                .inject(this);
     }
 
     private void setupMap(Bundle savedInstanceState) {

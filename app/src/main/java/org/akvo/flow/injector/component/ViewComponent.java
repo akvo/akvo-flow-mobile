@@ -29,8 +29,6 @@ import org.akvo.flow.activity.TransmissionHistoryActivity;
 import org.akvo.flow.injector.PerActivity;
 import org.akvo.flow.injector.module.OfflineModule;
 import org.akvo.flow.injector.module.ViewModule;
-import org.akvo.flow.offlinemaps.presentation.list.OfflineAreasListActivity;
-import org.akvo.flow.offlinemaps.presentation.selection.OfflineMapDownloadActivity;
 import org.akvo.flow.presentation.AppDownloadDialogFragment;
 import org.akvo.flow.presentation.about.AboutActivity;
 import org.akvo.flow.presentation.datapoints.list.DataPointsListFragment;
@@ -114,8 +112,4 @@ public interface ViewComponent {
     void inject(WalkThroughActivity walkThroughActivity);
 
     void inject(MobileDataSettingDialog mobileDataSettingDialog);
-
-    void inject(OfflineMapDownloadActivity offlineMapDownloadActivity);
-
-    void inject(OfflineAreasListActivity offlineAreasListActivity);
 }

@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context=".presentation.OfflineAreaViewActivity"
+    tools:context=".presentation.view.OfflineAreaViewActivity"
     tools:showIn="@layout/activity_offline_area_view">
 
     <com.mapbox.mapboxsdk.maps.MapView

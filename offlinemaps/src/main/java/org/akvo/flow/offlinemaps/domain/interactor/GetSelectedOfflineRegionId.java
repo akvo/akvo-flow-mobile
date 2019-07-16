@@ -21,6 +21,8 @@ package org.akvo.flow.offlinemaps.domain.interactor;
 
 import org.akvo.flow.offlinemaps.domain.PreferencesRepository;
 
+import javax.inject.Inject;
+
 import io.reactivex.Maybe;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
@@ -33,6 +35,7 @@ public class GetSelectedOfflineRegionId {
     private final CompositeDisposable disposables;
     private final PreferencesRepository userRepository;
 
+    @Inject
     public GetSelectedOfflineRegionId(PreferencesRepository preferencesRepository) {
         this.disposables = new CompositeDisposable();
         this.userRepository = preferencesRepository;

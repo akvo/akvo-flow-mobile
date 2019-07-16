@@ -21,6 +21,8 @@ package org.akvo.flow.offlinemaps.data;
 
 import android.content.SharedPreferences;
 
+import javax.inject.Inject;
+
 import io.reactivex.Completable;
 import io.reactivex.Maybe;
 
@@ -31,6 +33,7 @@ public class OfflineSharedPreferenceDataSource {
 
     private final SharedPreferences preferences;
 
+    @Inject
     public OfflineSharedPreferenceDataSource(SharedPreferences preferences) {
         this.preferences = preferences;
     }

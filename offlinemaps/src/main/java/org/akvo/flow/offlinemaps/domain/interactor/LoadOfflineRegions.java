@@ -24,6 +24,8 @@ import org.akvo.flow.offlinemaps.domain.entity.DomainOfflineArea;
 
 import java.util.List;
 
+import javax.inject.Inject;
+
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
@@ -36,6 +38,7 @@ public class LoadOfflineRegions {
     private final CompositeDisposable disposables;
     private final RegionRepository regionRepository;
 
+    @Inject
     public LoadOfflineRegions(RegionRepository userRepository) {
         this.disposables = new CompositeDisposable();
         this.regionRepository = userRepository;

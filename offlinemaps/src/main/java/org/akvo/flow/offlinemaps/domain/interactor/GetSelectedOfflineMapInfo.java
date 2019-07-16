@@ -23,6 +23,8 @@ import org.akvo.flow.offlinemaps.domain.PreferencesRepository;
 import org.akvo.flow.offlinemaps.domain.RegionRepository;
 import org.akvo.flow.offlinemaps.domain.entity.MapInfo;
 
+import javax.inject.Inject;
+
 import io.reactivex.Maybe;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
@@ -36,6 +38,7 @@ public class GetSelectedOfflineMapInfo {
     private final PreferencesRepository userRepository;
     private final RegionRepository regionRepository;
 
+    @Inject
     public GetSelectedOfflineMapInfo(PreferencesRepository preferencesRepository,
             RegionRepository regionRepository) {
         this.regionRepository = regionRepository;

@@ -17,7 +17,7 @@
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.akvo.flow.offlinemaps.presentation;
+package org.akvo.flow.offlinemaps.presentation.view;
 
 import android.os.Bundle;
 
@@ -29,6 +29,7 @@ import com.mapbox.mapboxsdk.maps.Style;
 
 import org.akvo.flow.offlinemaps.R;
 import org.akvo.flow.offlinemaps.domain.entity.MapInfo;
+import org.akvo.flow.offlinemaps.presentation.ToolBarBackActivity;
 
 public class OfflineAreaViewActivity extends ToolBarBackActivity {
 

@@ -23,6 +23,8 @@ import org.akvo.flow.offlinemaps.domain.PreferencesRepository;
 
 import java.util.Map;
 
+import javax.inject.Inject;
+
 import io.reactivex.Completable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
@@ -37,9 +39,10 @@ public class SaveSelectedOfflineArea {
     private final CompositeDisposable disposables;
     private final PreferencesRepository userRepository;
 
-    public SaveSelectedOfflineArea(PreferencesRepository userRepository) {
+    @Inject
+    public SaveSelectedOfflineArea(PreferencesRepository preferencesRepository) {
         this.disposables = new CompositeDisposable();
-        this.userRepository = userRepository;
+        this.userRepository = preferencesRepository;
     }
 
     public void execute(DisposableCompletableObserver observer, Map<String, Object> parameters) {

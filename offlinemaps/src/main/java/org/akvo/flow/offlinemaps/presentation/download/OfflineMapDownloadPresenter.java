@@ -17,7 +17,7 @@
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.akvo.flow.offlinemaps.presentation.selection;
+package org.akvo.flow.offlinemaps.presentation.download;
 
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
@@ -27,6 +27,8 @@ import com.mapbox.mapboxsdk.offline.OfflineTilePyramidRegionDefinition;
 
 import org.akvo.flow.mapbox.offline.reactive.RegionNameMapper;
 
+import javax.inject.Inject;
+
 import timber.log.Timber;
 
 public class OfflineMapDownloadPresenter {
@@ -35,6 +37,7 @@ public class OfflineMapDownloadPresenter {
     private final RegionNameMapper regionNameMapper;
     private OfflineMapDownloadView view;
 
+    @Inject
     public OfflineMapDownloadPresenter(OfflineManager offlineManager,
             RegionNameMapper regionNameMapper) {
         this.offlineManager = offlineManager;

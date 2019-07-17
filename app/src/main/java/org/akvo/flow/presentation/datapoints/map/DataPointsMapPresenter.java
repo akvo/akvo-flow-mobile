@@ -80,7 +80,7 @@ public class DataPointsMapPresenter implements Presenter {
         this.view = view;
     }
 
-    void onDataReady(SurveyGroup surveyGroup) {
+    void onSurveyGroupReady(SurveyGroup surveyGroup) {
         this.surveyGroup = surveyGroup;
         if (surveyGroup == null) {
             view.hideMenu();
@@ -154,7 +154,7 @@ public class DataPointsMapPresenter implements Presenter {
         getSavedDataPoints.dispose();
         downloadDataPoints.dispose();
         view.hideProgress();
-        onDataReady(surveyGroup);
+        onSurveyGroupReady(surveyGroup);
         loadDataPoints();
     }
 

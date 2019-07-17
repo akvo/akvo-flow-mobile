@@ -25,8 +25,8 @@ import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
-import com.mapbox.mapboxsdk.maps.Style;
 
+import org.akvo.flow.offlinemaps.Constants;
 import org.akvo.flow.offlinemaps.R;
 import org.akvo.flow.offlinemaps.domain.entity.MapInfo;
 import org.akvo.flow.offlinemaps.presentation.ToolBarBackActivity;
@@ -53,15 +53,14 @@ public class OfflineAreaViewActivity extends ToolBarBackActivity {
             mapName = extras.getString(NAME_EXTRA);
         }
         setTitle(mapName);
-        mapView.getMapAsync(mapboxMap -> mapboxMap.setStyle(new Style.Builder()
-                .fromUrl("mapbox://styles/mapbox/light-v10"), style -> {
+        mapView.getMapAsync(mapboxMap -> mapboxMap.setStyle(Constants.MAPBOX_MAP_STYLE, style -> {
             double zoom = mapInfo.getZoom();
             CameraPosition cameraPosition = new CameraPosition.Builder()
                     .target(new LatLng(mapInfo.getLatitude(), mapInfo.getLongitude()))
                     .zoom(zoom)
                     .build();
-            mapboxMap.setMaxZoomPreference(zoom + MapInfo.ZOOM_MAX);
-            mapboxMap.setMinZoomPreference(zoom - MapInfo.ZOOM_MAX);
+            mapboxMap.setMaxZoomPreference(zoom + Constants.MAP_BOX_ZOOM_MAX);
+            mapboxMap.setMinZoomPreference(zoom - Constants.MAP_BOX_ZOOM_MAX);
             mapboxMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
         }));
     }

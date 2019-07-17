@@ -196,7 +196,7 @@ public class DataPointsMapFragment extends SupportMapFragment implements
         presenter.setView(this);
         SurveyGroup surveyGroup = (SurveyGroup) getArguments()
                 .getSerializable(ConstantUtil.SURVEY_GROUP_EXTRA);
-        presenter.onDataReady(surveyGroup);
+        presenter.onSurveyGroupReady(surveyGroup);
         customView = LayoutInflater.from(getActivity()).inflate(
                 R.layout.symbol_layer_info_window_layout_callout, null);
         customView.setLayoutParams(new FrameLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT));
@@ -229,8 +229,7 @@ public class DataPointsMapFragment extends SupportMapFragment implements
         this.mapboxMap = mapboxMap;
         this.mapboxMap.addOnMapClickListener(this);
         markerViewManager = new MarkerViewManager((MapView) getView(), mapboxMap);
-        this.mapboxMap.setStyle(new Style.Builder()
-                .fromUrl("mapbox://styles/mapbox/light-v10"), style -> {
+        this.mapboxMap.setStyle(Style.MAPBOX_STREETS, style -> {
             style.addImage(MARKER_IMAGE, BitmapFactory.decodeResource(
                     getResources(), R.drawable.marker), true);
             addClusteredGeoJsonSource(style);

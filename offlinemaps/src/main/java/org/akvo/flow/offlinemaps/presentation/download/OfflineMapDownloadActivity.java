@@ -43,7 +43,6 @@ import org.akvo.flow.offlinemaps.presentation.list.OfflineAreasListActivity;
 
 import javax.inject.Inject;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 public class OfflineMapDownloadActivity extends ToolBarBackActivity
@@ -122,14 +121,9 @@ public class OfflineMapDownloadActivity extends ToolBarBackActivity
 
     private void setUpMapBox(MapboxMap mapboxMap) {
         this.mapboxMap = mapboxMap;
-        mapboxMap.setStyle(defaultMapStyle(), style -> {
+        mapboxMap.setStyle(Style.MAPBOX_STREETS, style -> {
             //EMPTY
         });
-    }
-
-    @NonNull
-    private Style.Builder defaultMapStyle() {
-        return new Style.Builder().fromUrl("mapbox://styles/mapbox/light-v10");
     }
 
     @Override

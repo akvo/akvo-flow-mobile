@@ -65,7 +65,6 @@ import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.injector.component.ApplicationComponent;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
-import org.akvo.flow.offlinemaps.presentation.dialog.OfflineMapsDialog;
 import org.akvo.flow.offlinemaps.domain.entity.MapInfo;
 import org.akvo.flow.presentation.datapoints.DataPointSyncSnackBarManager;
 import org.akvo.flow.presentation.datapoints.map.entity.MapDataPoint;
@@ -83,7 +82,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.PermissionChecker;
-import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.FragmentActivity;
 
 import static android.graphics.Color.rgb;
@@ -186,11 +184,6 @@ public class DataPointsMapFragment extends SupportMapFragment implements
                 View.inflate(activity, R.layout.map_offline_maps_button, viewGroup);
                 progressBar = view.findViewById(R.id.progressBar);
                 offlineMapsFab = view.findViewById(R.id.offline_maps_fab);
-                offlineMapsFab.setOnClickListener(v -> {
-                    DialogFragment dialogFragment = OfflineMapsDialog.newInstance();
-                    dialogFragment
-                            .show(activity.getSupportFragmentManager(), OfflineMapsDialog.TAG);
-                });
             }
         }
         return view;
@@ -238,11 +231,11 @@ public class DataPointsMapFragment extends SupportMapFragment implements
         markerViewManager = new MarkerViewManager((MapView) getView(), mapboxMap);
         this.mapboxMap.setStyle(new Style.Builder()
                 .fromUrl("mapbox://styles/mapbox/light-v10"), style -> {
-                    style.addImage(MARKER_IMAGE, BitmapFactory.decodeResource(
-                            getResources(), R.drawable.marker), true);
-                    addClusteredGeoJsonSource(style);
-                    presenter.onViewReady();
-                });
+            style.addImage(MARKER_IMAGE, BitmapFactory.decodeResource(
+                    getResources(), R.drawable.marker), true);
+            addClusteredGeoJsonSource(style);
+            presenter.onViewReady();
+        });
     }
 
     @SuppressWarnings({ "MissingPermission" })
@@ -396,7 +389,7 @@ public class DataPointsMapFragment extends SupportMapFragment implements
         if (mItems == null || selectedItemId == null) {
             return null;
         }
-        for (MapDataPoint dp: mItems) {
+        for (MapDataPoint dp : mItems) {
             if (selectedItemId.equals(dp.getId())) {
                 return dp;
             }
@@ -523,7 +516,7 @@ public class DataPointsMapFragment extends SupportMapFragment implements
                     .zoom(mapInfo.getZoom())
                     .build();
             mapboxMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-        } else if (mapboxMap != null && mapboxMap.getStyle() != null){
+        } else if (mapboxMap != null && mapboxMap.getStyle() != null) {
             enableLocationComponent(mapboxMap.getStyle());
         }
     }
@@ -571,7 +564,8 @@ public class DataPointsMapFragment extends SupportMapFragment implements
 
     @Override
     public void showErrorSync() {
-        dataPointSyncSnackBarManager.showErrorSync(getView(), v -> presenter.onSyncRecordsPressed());
+        dataPointSyncSnackBarManager
+                .showErrorSync(getView(), v -> presenter.onSyncRecordsPressed());
     }
 
     @Override

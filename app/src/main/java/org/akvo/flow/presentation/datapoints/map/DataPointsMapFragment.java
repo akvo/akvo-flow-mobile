@@ -50,7 +50,6 @@ import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.maps.Projection;
 import com.mapbox.mapboxsdk.maps.Style;
-import com.mapbox.mapboxsdk.maps.SupportMapFragment;
 import com.mapbox.mapboxsdk.plugins.markerview.MarkerView;
 import com.mapbox.mapboxsdk.plugins.markerview.MarkerViewManager;
 import com.mapbox.mapboxsdk.style.expressions.Expression;
@@ -82,6 +81,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.PermissionChecker;
+import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 
 import static android.graphics.Color.rgb;
@@ -104,7 +104,7 @@ import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textField;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textIgnorePlacement;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textSize;
 
-public class DataPointsMapFragment extends SupportMapFragment implements
+public class DataPointsMapFragment extends Fragment implements
         MapboxMap.OnMapClickListener, OnMapReadyCallback, DataPointsMapView {
 
     private static final String MARKER_IMAGE = "custom-marker";
@@ -143,6 +143,7 @@ public class DataPointsMapFragment extends SupportMapFragment implements
     private TextView snippetTextView;
     private MapDataPoint currentSelected = null;
     private FloatingActionButton offlineMapsFab;
+    private MapView mapView;
 
     public static DataPointsMapFragment newInstance(SurveyGroup surveyGroup) {
         DataPointsMapFragment fragment = new DataPointsMapFragment();
@@ -173,20 +174,24 @@ public class DataPointsMapFragment extends SupportMapFragment implements
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
-        View view = super.onCreateView(inflater, container, savedInstanceState);
-        if (view instanceof ViewGroup) {
-            ViewGroup viewGroup = (ViewGroup) view;
-            FragmentActivity activity = getActivity();
-            if (activity != null) {
-                View.inflate(activity, R.layout.map_progress_bar, viewGroup);
-                View.inflate(activity, R.layout.map_offline_maps_button, viewGroup);
-                progressBar = view.findViewById(R.id.progressBar);
-                offlineMapsFab = view.findViewById(R.id.offline_maps_fab);
-            }
-        }
+        View view = inflater.inflate(R.layout.fragment_map_box_map, container, false);
+        progressBar = view.findViewById(R.id.progressBar);
+        offlineMapsFab = view.findViewById(R.id.offline_maps_fab);
+        customView = inflater.inflate(
+                R.layout.symbol_layer_info_window_layout_callout, container, false);
+        customView.setLayoutParams(new FrameLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT));
         return view;
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        mapView = view.findViewById(R.id.mapView);
+        mapView.onCreate(savedInstanceState);
+        mapView.getMapAsync(this);
+        setUpSymbolView();
     }
 
     @Override
@@ -197,14 +202,13 @@ public class DataPointsMapFragment extends SupportMapFragment implements
         SurveyGroup surveyGroup = (SurveyGroup) getArguments()
                 .getSerializable(ConstantUtil.SURVEY_GROUP_EXTRA);
         presenter.onSurveyGroupReady(surveyGroup);
-        customView = LayoutInflater.from(getActivity()).inflate(
-                R.layout.symbol_layer_info_window_layout_callout, null);
-        customView.setLayoutParams(new FrameLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT));
+        activityJustCreated = true;
+    }
+
+    private void setUpSymbolView() {
         titleTextView = customView.findViewById(R.id.info_window_title);
         snippetTextView = customView.findViewById(R.id.info_window_description);
         customView.setOnClickListener(v -> onInfoWindowClick((String) customView.getTag()));
-        getMapAsync(this);
-        activityJustCreated = true;
     }
 
     private void initializeInjector() {
@@ -228,7 +232,7 @@ public class DataPointsMapFragment extends SupportMapFragment implements
     public void onMapReady(@NonNull MapboxMap mapboxMap) {
         this.mapboxMap = mapboxMap;
         this.mapboxMap.addOnMapClickListener(this);
-        markerViewManager = new MarkerViewManager((MapView) getView(), mapboxMap);
+        markerViewManager = new MarkerViewManager(mapView, mapboxMap);
         this.mapboxMap.setStyle(Style.MAPBOX_STREETS, style -> {
             style.addImage(MARKER_IMAGE, BitmapFactory.decodeResource(
                     getResources(), R.drawable.marker), true);
@@ -428,10 +432,51 @@ public class DataPointsMapFragment extends SupportMapFragment implements
     @Override
     public void onResume() {
         super.onResume();
+        mapView.onResume();
         if (!activityJustCreated) {
             presenter.loadDataPoints();
         }
         activityJustCreated = false;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        mapView.onStart();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        mapView.onStop();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        mapView.onPause();
+    }
+
+    @Override
+    public void onLowMemory() {
+        super.onLowMemory();
+        if (mapView != null) {
+            mapView.onLowMemory();
+        }
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        mapView.onDestroy();
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if (mapView != null) {
+            mapView.onSaveInstanceState(outState);
+        }
     }
 
     @Override

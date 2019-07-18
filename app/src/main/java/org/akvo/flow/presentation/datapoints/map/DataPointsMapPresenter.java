@@ -30,11 +30,7 @@ import org.akvo.flow.domain.interactor.ErrorComposable;
 import org.akvo.flow.domain.interactor.GetSavedDataPoints;
 import org.akvo.flow.domain.interactor.UseCase;
 import org.akvo.flow.domain.util.Constants;
-import org.akvo.flow.offlinemaps.domain.entity.MapInfo;
-import org.akvo.flow.offlinemaps.domain.interactor.GetSelectedOfflineMapInfo;
 import org.akvo.flow.presentation.Presenter;
-import org.akvo.flow.presentation.datapoints.map.entity.MapDataPoint;
-import org.akvo.flow.presentation.datapoints.map.entity.MapDataPointMapper;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -46,34 +42,28 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import androidx.annotation.NonNull;
-import io.reactivex.observers.DisposableMaybeObserver;
 import timber.log.Timber;
 
 import static org.akvo.flow.domain.entity.DownloadResult.ResultCode.SUCCESS;
 
 public class DataPointsMapPresenter implements Presenter {
 
-    private final MapDataPointMapper dataPointMapper;
     private final DownloadDataPoints downloadDataPoints;
     private final UseCase getSavedDataPoints;
     private final UseCase checkDeviceNotification;
     private final UseCase upload;
-    private final GetSelectedOfflineMapInfo getSelectedOfflineMapInfo;
 
     private DataPointsMapView view;
     private SurveyGroup surveyGroup;
 
     @Inject DataPointsMapPresenter(@Named("getSavedDataPoints") UseCase getSavedDataPoints,
-            MapDataPointMapper dataPointMapper, DownloadDataPoints downloadDataPoints,
+            DownloadDataPoints downloadDataPoints,
             @Named("checkDeviceNotification") UseCase checkDeviceNotification,
-            @Named("uploadSync") UseCase upload,
-            GetSelectedOfflineMapInfo getSelectedOfflineMapInfo) {
+            @Named("uploadSync") UseCase upload) {
         this.getSavedDataPoints = getSavedDataPoints;
-        this.dataPointMapper = dataPointMapper;
         this.downloadDataPoints = downloadDataPoints;
         this.checkDeviceNotification = checkDeviceNotification;
         this.upload = upload;
-        this.getSelectedOfflineMapInfo = getSelectedOfflineMapInfo;
     }
 
     void setView(@NonNull DataPointsMapView view) {
@@ -94,10 +84,6 @@ public class DataPointsMapPresenter implements Presenter {
         }
     }
 
-    void onViewReady() {
-        loadDataPoints();
-    }
-
     void loadDataPoints() {
         getSavedDataPoints.dispose();
         if (surveyGroup != null) {
@@ -107,38 +93,15 @@ public class DataPointsMapPresenter implements Presenter {
                 @Override
                 public void onError(Throwable e) {
                     Timber.e(e, "Error loading saved datapoints");
-                    loadOfflineSettings(Collections.emptyList());
+                    view.displayDataPoints(Collections.EMPTY_LIST);
                 }
 
                 @Override
                 public void onNext(List<DataPoint> dataPoints) {
-                    loadOfflineSettings(dataPoints);
+                    view.displayDataPoints(dataPoints);
                 }
             }, params);
         }
-    }
-
-    private void loadOfflineSettings(List<DataPoint> dataPoints) {
-        getSelectedOfflineMapInfo.execute(new DisposableMaybeObserver<MapInfo>() {
-            @Override
-            public void onSuccess(MapInfo mapInfo) {
-                List<MapDataPoint> mapDataPoints = dataPointMapper.transform(dataPoints);
-                view.displayData(mapDataPoints, mapInfo);
-            }
-
-            @Override
-            public void onError(Throwable e) {
-                Timber.e(e);
-                List<MapDataPoint> mapDataPoints = dataPointMapper.transform(dataPoints);
-                view.displayData(mapDataPoints, null);
-            }
-
-            @Override
-            public void onComplete() {
-                List<MapDataPoint> mapDataPoints = dataPointMapper.transform(dataPoints);
-                view.displayData(mapDataPoints, null);
-            }
-        });
     }
 
     @Override
@@ -147,7 +110,6 @@ public class DataPointsMapPresenter implements Presenter {
         downloadDataPoints.dispose();
         checkDeviceNotification.dispose();
         upload.dispose();
-        getSelectedOfflineMapInfo.dispose();
     }
 
     public void onNewSurveySelected(SurveyGroup surveyGroup) {
@@ -243,7 +205,7 @@ public class DataPointsMapPresenter implements Presenter {
         }, params);
     }
 
-    public void refreshSelectedArea() {
+ /*   public void refreshSelectedArea() {
         getSelectedOfflineMapInfo.execute(new DisposableMaybeObserver<MapInfo>() {
             @Override
             public void onSuccess(MapInfo mapInfo) {
@@ -262,5 +224,5 @@ public class DataPointsMapPresenter implements Presenter {
                 view.displayOfflineAreaOrLocation(null);
             }
         });
-    }
+    }*/
 }

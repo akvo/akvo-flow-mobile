@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     tools:context=".presentation.datapoints.map.DataPointsMapFragment">
 
-    <com.mapbox.mapboxsdk.maps.MapView
+    <org.akvo.flow.offlinemaps.presentation.FlowMapViewImpl
         android:id="@+id/mapView"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />

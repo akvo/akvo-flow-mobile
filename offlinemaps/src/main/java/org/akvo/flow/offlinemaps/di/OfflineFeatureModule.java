@@ -37,6 +37,7 @@ import org.akvo.flow.offlinemaps.domain.PreferencesRepository;
 import org.akvo.flow.offlinemaps.domain.RegionRepository;
 import org.akvo.flow.offlinemaps.domain.entity.DomainOfflineAreaMapper;
 import org.akvo.flow.offlinemaps.domain.entity.MapInfoMapper;
+import org.akvo.flow.offlinemaps.domain.interactor.GetSelectedOfflineMapInfo;
 
 import javax.inject.Singleton;
 
@@ -116,5 +117,11 @@ public class OfflineFeatureModule {
     @Provides
     OfflineManager providesOfflineManager(Context context) {
         return OfflineManager.getInstance(context);
+    }
+
+    @Provides
+    GetSelectedOfflineMapInfo provideGetSelectedOfflineMapInfo(
+            PreferencesRepository preferenceRepository, RegionRepository regionRepository) {
+        return new GetSelectedOfflineMapInfo(preferenceRepository, regionRepository);
     }
 }

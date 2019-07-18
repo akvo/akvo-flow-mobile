@@ -109,7 +109,6 @@ public class MapBoxMapViewImpl extends MapView implements OnMapReadyCallback,
 
     @Nullable
     private MapboxMap mapboxMap;
-
     private MarkerView markerView;
     private MarkerViewManager markerViewManager;
     private View customView;
@@ -117,10 +116,10 @@ public class MapBoxMapViewImpl extends MapView implements OnMapReadyCallback,
     private TextView snippetTextView;
     private Feature currentSelected;
     private GeoJsonSource source;
+    private MapReadyCallback callback;
 
     @Inject
     MapBoxMapPresenter presenter;
-    private MapReadyCallback callback;
 
     public MapBoxMapViewImpl(@NonNull Context context) {
         super(context);

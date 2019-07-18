@@ -20,6 +20,7 @@
 package org.akvo.flow.offlinemaps.presentation;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -36,6 +37,7 @@ import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.location.LocationComponent;
+import com.mapbox.mapboxsdk.location.LocationComponentActivationOptions;
 import com.mapbox.mapboxsdk.location.modes.CameraMode;
 import com.mapbox.mapboxsdk.location.modes.RenderMode;
 import com.mapbox.mapboxsdk.maps.MapView;
@@ -338,9 +340,16 @@ public class MapBoxMapViewImpl extends MapView implements OnMapReadyCallback,
         currentSelected = null;
     }
 
+    @SuppressLint("MissingPermission")
     @Override
     public void displayOfflineMap(@NonNull MapInfo mapInfo) {
         if (mapboxMap != null) {
+            if (isLocationAllowed()) {
+                LocationComponent locationComponent = mapboxMap.getLocationComponent();
+                if (locationComponent.isLocationComponentActivated()) {
+                    locationComponent.setLocationComponentEnabled(false);
+                }
+            }
             CameraPosition cameraPosition = new CameraPosition.Builder()
                     .target(new LatLng(mapInfo.getLatitude(), mapInfo.getLongitude()))
                     .zoom(mapInfo.getZoom())
@@ -349,19 +358,16 @@ public class MapBoxMapViewImpl extends MapView implements OnMapReadyCallback,
         }
     }
 
+    @SuppressLint("MissingPermission")
     @Override
     public void displayUserLocation() {
-        enableLocationComponent();
-    }
-
-    @SuppressWarnings({ "MissingPermission" })
-    private void enableLocationComponent() {
         Context context = getContext();
         if (isLocationAllowed() && mapboxMap != null && context != null
                 && mapboxMap.getStyle() != null) {
             LocationComponent locationComponent = mapboxMap.getLocationComponent();
-            //TODO: replace deprecated method
-            locationComponent.activateLocationComponent(context, mapboxMap.getStyle());
+            locationComponent.activateLocationComponent(
+                    LocationComponentActivationOptions.builder(context, mapboxMap.getStyle())
+                            .build());
             locationComponent.setLocationComponentEnabled(true);
             locationComponent.setCameraMode(CameraMode.TRACKING);
             locationComponent.setRenderMode(RenderMode.NORMAL);

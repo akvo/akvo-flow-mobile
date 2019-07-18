@@ -33,8 +33,6 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.mapbox.geojson.Feature;
 import com.mapbox.geojson.FeatureCollection;
 import com.mapbox.geojson.Point;
-import com.mapbox.mapboxsdk.maps.MapboxMap;
-import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 
 import org.akvo.flow.R;
 import org.akvo.flow.app.FlowApp;
@@ -43,7 +41,7 @@ import org.akvo.flow.domain.entity.DataPoint;
 import org.akvo.flow.injector.component.ApplicationComponent;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
-import org.akvo.flow.offlinemaps.presentation.FlowMapViewImpl;
+import org.akvo.flow.offlinemaps.presentation.MapBoxMapViewImpl;
 import org.akvo.flow.presentation.datapoints.DataPointSyncSnackBarManager;
 import org.akvo.flow.ui.Navigator;
 import org.akvo.flow.ui.fragment.RecordListListener;
@@ -60,7 +58,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 
 public class DataPointsMapFragment extends Fragment implements DataPointsMapView,
-        OnMapReadyCallback {
+        MapBoxMapViewImpl.MapReadyCallback {
 
     @Inject
     DataPointSyncSnackBarManager dataPointSyncSnackBarManager;
@@ -74,8 +72,6 @@ public class DataPointsMapFragment extends Fragment implements DataPointsMapView
     @Nullable
     private RecordListListener mListener;
 
-    private List<DataPoint> mItems;
-
     @Nullable
     private ProgressBar progressBar;
 
@@ -83,7 +79,7 @@ public class DataPointsMapFragment extends Fragment implements DataPointsMapView
     private Integer menuRes = null;
 
     private FloatingActionButton offlineMapsFab;
-    private FlowMapViewImpl mapView;
+    private MapBoxMapViewImpl mapView;
 
     public static DataPointsMapFragment newInstance(SurveyGroup surveyGroup) {
         DataPointsMapFragment fragment = new DataPointsMapFragment();
@@ -96,7 +92,6 @@ public class DataPointsMapFragment extends Fragment implements DataPointsMapView
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mItems = new ArrayList<>();
         setHasOptionsMenu(true);
     }
 
@@ -127,8 +122,7 @@ public class DataPointsMapFragment extends Fragment implements DataPointsMapView
         super.onViewCreated(view, savedInstanceState);
         mapView = view.findViewById(R.id.mapView);
         mapView.onCreate(savedInstanceState);
-        mapView.getMapAsync(mapView);
-        mapView.getMapAsync(this);
+        mapView.getMapAsyncWithCallback(this);
     }
 
     @Override
@@ -159,15 +153,15 @@ public class DataPointsMapFragment extends Fragment implements DataPointsMapView
         return ((FlowApp) getActivity().getApplication()).getApplicationComponent();
     }
 
-    private FeatureCollection getFeatureCollection() {
+    private FeatureCollection getFeatureCollection(List<DataPoint> dataPoints) {
         List<Feature> features = new ArrayList<>();
-        for (DataPoint item : mItems) {
+        for (DataPoint item : dataPoints) {
             Feature feature = Feature.fromGeometry(
                     Point.fromLngLat(item.getLongitude(), item.getLatitude()));
-            feature.addStringProperty(FlowMapViewImpl.ID_PROPERTY, item.getId());
-            feature.addStringProperty(FlowMapViewImpl.NAME_PROPERTY, item.getName());
-            feature.addNumberProperty(FlowMapViewImpl.LATITUDE_PROPERTY, item.getLatitude());
-            feature.addNumberProperty(FlowMapViewImpl.LONGITUDE_PROPERTY, item.getLongitude());
+            feature.addStringProperty(MapBoxMapViewImpl.ID_PROPERTY, item.getId());
+            feature.addStringProperty(MapBoxMapViewImpl.NAME_PROPERTY, item.getName());
+            feature.addNumberProperty(MapBoxMapViewImpl.LATITUDE_PROPERTY, item.getLatitude());
+            feature.addNumberProperty(MapBoxMapViewImpl.LONGITUDE_PROPERTY, item.getLongitude());
             features.add(feature);
         }
         return FeatureCollection.fromFeatures(features);
@@ -178,7 +172,7 @@ public class DataPointsMapFragment extends Fragment implements DataPointsMapView
         super.onResume();
         mapView.onResume();
         if (!activityJustCreated) {
-            mapView.getMapAsync(this);
+            mapView.getMapAsyncWithCallback(this);
         }
         activityJustCreated = false;
     }
@@ -283,9 +277,7 @@ public class DataPointsMapFragment extends Fragment implements DataPointsMapView
 
     @Override
     public void displayDataPoints(List<DataPoint> dataPoints) {
-        mItems.clear();
-        mItems.addAll(dataPoints);
-        mapView.displayDataPoints(getFeatureCollection());
+        mapView.displayDataPoints(getFeatureCollection(dataPoints));
     }
 
     @Override
@@ -352,9 +344,8 @@ public class DataPointsMapFragment extends Fragment implements DataPointsMapView
         mapView.refreshSelectedArea();
     }
 
-    //TODO: use our own listener
     @Override
-    public void onMapReady(@NonNull MapboxMap mapboxMap) {
+    public void onMapReady() {
         presenter.loadDataPoints();
     }
 }

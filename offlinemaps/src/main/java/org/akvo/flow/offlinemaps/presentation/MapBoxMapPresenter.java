@@ -27,19 +27,19 @@ import javax.inject.Inject;
 import io.reactivex.observers.DisposableMaybeObserver;
 import timber.log.Timber;
 
-public class FlowMapPresenter {
+public class MapBoxMapPresenter {
 
     private final GetSelectedOfflineMapInfo getSelectedOfflineMapInfo;
 
-    private FlowMapView view;
+    private MapboxMapView view;
 
     @Inject
-    public FlowMapPresenter(GetSelectedOfflineMapInfo getSelectedOfflineMapInfo) {
+    public MapBoxMapPresenter(GetSelectedOfflineMapInfo getSelectedOfflineMapInfo) {
         this.getSelectedOfflineMapInfo = getSelectedOfflineMapInfo;
     }
 
-    public void setView(FlowMapView flowMapView) {
-        this.view = flowMapView;
+    public void setView(MapboxMapView mapboxMapView) {
+        this.view = mapboxMapView;
     }
 
     public void loadOfflineSettings() {

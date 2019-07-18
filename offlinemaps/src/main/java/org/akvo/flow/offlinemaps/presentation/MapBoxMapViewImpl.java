@@ -90,8 +90,11 @@ import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textField;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textIgnorePlacement;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textSize;
 
-public class FlowMapViewImpl extends MapView implements OnMapReadyCallback,
-        MapboxMap.OnMapClickListener, FlowMapView {
+/**
+ * Map using mapbox which can display offline maps
+ */
+public class MapBoxMapViewImpl extends MapView implements OnMapReadyCallback,
+        MapboxMap.OnMapClickListener, MapboxMapView {
 
     public static final String LATITUDE_PROPERTY = "latitude";
     public static final String LONGITUDE_PROPERTY = "longitude";
@@ -114,26 +117,27 @@ public class FlowMapViewImpl extends MapView implements OnMapReadyCallback,
     private GeoJsonSource source;
 
     @Inject
-    FlowMapPresenter presenter;
+    MapBoxMapPresenter presenter;
+    private MapReadyCallback callback;
 
-    public FlowMapViewImpl(@NonNull Context context) {
+    public MapBoxMapViewImpl(@NonNull Context context) {
         super(context);
         init(context);
     }
 
-    public FlowMapViewImpl(@NonNull Context context,
+    public MapBoxMapViewImpl(@NonNull Context context,
             @Nullable AttributeSet attrs) {
         super(context, attrs);
         init(context);
     }
 
-    public FlowMapViewImpl(@NonNull Context context, @Nullable AttributeSet attrs,
+    public MapBoxMapViewImpl(@NonNull Context context, @Nullable AttributeSet attrs,
             int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         init(context);
     }
 
-    public FlowMapViewImpl(@NonNull Context context, @Nullable MapboxMapOptions options) {
+    public MapBoxMapViewImpl(@NonNull Context context, @Nullable MapboxMapOptions options) {
         super(context, options);
         init(context);
     }
@@ -152,14 +156,24 @@ public class FlowMapViewImpl extends MapView implements OnMapReadyCallback,
     private void initialiseInjector(Context context) {
         DaggerOfflineFeatureComponent
                 .builder()
-                .offlineFeatureModule(new OfflineFeatureModule(((AppCompatActivity)context).getApplication()))
+                .offlineFeatureModule(
+                        new OfflineFeatureModule(((AppCompatActivity) context).getApplication()))
                 .build()
                 .inject(this);
     }
 
-
     private void onInfoWindowClick(String featureId) {
-        //TODO: add listener to activity
+        Context context = getContext();
+        if (context instanceof MapPointSelectedListener) {
+            ((MapPointSelectedListener)context).onPointSelected(featureId);
+        } else {
+            throw new IllegalArgumentException("Activity must implement MapPointSelectedListener");
+        }
+    }
+
+    public void getMapAsyncWithCallback(MapReadyCallback callback) {
+        this.callback = callback;
+        getMapAsync(this);
     }
 
     @Override
@@ -171,6 +185,10 @@ public class FlowMapViewImpl extends MapView implements OnMapReadyCallback,
             style.addImage(MARKER_IMAGE, BitmapFactory.decodeResource(
                     getResources(), R.drawable.marker), true);
             addClusteredGeoJsonSource(style, new ArrayList<>());
+            if (callback != null) {
+                callback.onMapReady();
+                callback = null;
+            }
             presenter.loadOfflineSettings();
         });
     }
@@ -301,7 +319,6 @@ public class FlowMapViewImpl extends MapView implements OnMapReadyCallback,
             titleTextView.setText(feature.getStringProperty(NAME_PROPERTY));
             snippetTextView.setText(id);
 
-            //TODO: from geometry or point to latLng???
             LatLng latLng = new LatLng(feature.getNumberProperty(LATITUDE_PROPERTY).doubleValue(),
                     feature.getNumberProperty(LONGITUDE_PROPERTY).doubleValue());
             if (markerView == null) {
@@ -357,7 +374,6 @@ public class FlowMapViewImpl extends MapView implements OnMapReadyCallback,
                 Manifest.permission.ACCESS_FINE_LOCATION) == PermissionChecker.PERMISSION_GRANTED;
     }
 
-    //TODO: weird, see if better solution
     public void refreshSelectedArea() {
         presenter.loadOfflineSettings();
     }
@@ -371,5 +387,15 @@ public class FlowMapViewImpl extends MapView implements OnMapReadyCallback,
     public void onDestroy() {
         super.onDestroy();
         presenter.destroy();
+    }
+
+    public interface MapReadyCallback {
+
+        void onMapReady();
+    }
+
+    public interface MapPointSelectedListener {
+
+        void onPointSelected(String id);
     }
 }

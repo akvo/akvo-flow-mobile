@@ -32,7 +32,7 @@ import org.akvo.flow.domain.interactor.UseCase;
 import org.akvo.flow.domain.util.Constants;
 import org.akvo.flow.presentation.Presenter;
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -93,7 +93,7 @@ public class DataPointsMapPresenter implements Presenter {
                 @Override
                 public void onError(Throwable e) {
                     Timber.e(e, "Error loading saved datapoints");
-                    view.displayDataPoints(Collections.EMPTY_LIST);
+                    view.displayDataPoints(new ArrayList<>());
                 }
 
                 @Override

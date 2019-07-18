@@ -204,25 +204,4 @@ public class DataPointsMapPresenter implements Presenter {
             }
         }, params);
     }
-
- /*   public void refreshSelectedArea() {
-        getSelectedOfflineMapInfo.execute(new DisposableMaybeObserver<MapInfo>() {
-            @Override
-            public void onSuccess(MapInfo mapInfo) {
-                view.displayOfflineAreaOrLocation(mapInfo);
-            }
-
-            @Override
-            public void onError(Throwable e) {
-                Timber.e(e);
-                view.displayOfflineAreaOrLocation(null);
-            }
-
-            @Override
-            public void onComplete() {
-                // no regions found
-                view.displayOfflineAreaOrLocation(null);
-            }
-        });
-    }*/
 }

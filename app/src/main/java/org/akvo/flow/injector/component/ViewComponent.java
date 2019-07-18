@@ -53,7 +53,7 @@ import org.akvo.flow.ui.view.signature.SignatureQuestionView;
 import dagger.Component;
 
 @PerActivity
-@Component(dependencies = ApplicationComponent.class, modules = { ViewModule.class })
+@Component(dependencies = ApplicationComponent.class, modules = ViewModule.class)
 public interface ViewComponent {
 
     void inject(DatapointsFragment datapointsFragment);

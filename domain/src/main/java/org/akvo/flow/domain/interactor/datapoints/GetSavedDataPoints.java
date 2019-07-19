@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -15,16 +15,16 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 
-package org.akvo.flow.domain.interactor;
+package org.akvo.flow.domain.interactor.datapoints;
 
 import android.text.TextUtils;
 
 import org.akvo.flow.domain.entity.DataPoint;
 import org.akvo.flow.domain.executor.PostExecutionThread;
 import org.akvo.flow.domain.executor.ThreadExecutor;
+import org.akvo.flow.domain.interactor.UseCase;
 import org.akvo.flow.domain.repository.SurveyRepository;
 
 import java.util.List;

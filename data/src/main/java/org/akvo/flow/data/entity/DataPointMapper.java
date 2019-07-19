@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017,2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -21,7 +21,6 @@
 package org.akvo.flow.data.entity;
 
 import android.database.Cursor;
-import androidx.annotation.NonNull;
 
 import org.akvo.flow.database.SurveyDbAdapter;
 import org.akvo.flow.database.SurveyInstanceColumns;
@@ -32,13 +31,15 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import androidx.annotation.NonNull;
+
 public class DataPointMapper {
 
     @Inject
     public DataPointMapper() {
     }
 
-    private DataPoint getDataPoint(Cursor cursor) {
+    public DataPoint getDataPoint(Cursor cursor) {
         String id = cursor.getString(SurveyDbAdapter.RecordQuery.RECORD_ID);
         long surveyGroupId = cursor.getLong(SurveyDbAdapter.RecordQuery.SURVEY_GROUP_ID);
         long lastModified = cursor.getLong(SurveyDbAdapter.RecordQuery.LAST_MODIFIED);

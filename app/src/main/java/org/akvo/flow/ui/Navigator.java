@@ -97,7 +97,7 @@ public class Navigator {
         Intent intent = new Intent(context, RecordActivity.class);
         Bundle extras = new Bundle();
         extras.putSerializable(ConstantUtil.SURVEY_GROUP_EXTRA, mSurveyGroup);
-        extras.putString(ConstantUtil.RECORD_ID_EXTRA, surveyedLocaleId);
+        extras.putString(ConstantUtil.DATA_POINT_ID_EXTRA, surveyedLocaleId);
         intent.putExtras(extras);
         context.startActivity(intent);
     }
@@ -190,7 +190,7 @@ public class Navigator {
 
     public void navigateToMapActivity(@NonNull Context context, String recordId) {
         context.startActivity(new Intent(context, MapActivity.class)
-                .putExtra(ConstantUtil.SURVEYED_LOCALE_ID_EXTRA, recordId));
+                .putExtra(ConstantUtil.DATA_POINT_ID_EXTRA, recordId));
     }
 
     public void navigateToTransmissionActivity(Context context, long surveyInstanceId) {

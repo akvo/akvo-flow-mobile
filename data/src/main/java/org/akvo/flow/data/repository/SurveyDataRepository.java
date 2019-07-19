@@ -21,8 +21,6 @@
 package org.akvo.flow.data.repository;
 
 import android.database.Cursor;
-import androidx.annotation.NonNull;
-import androidx.annotation.VisibleForTesting;
 
 import org.akvo.flow.data.datasource.DataSourceFactory;
 import org.akvo.flow.data.datasource.DatabaseDataSource;
@@ -30,7 +28,6 @@ import org.akvo.flow.data.entity.ApiDataPoint;
 import org.akvo.flow.data.entity.ApiLocaleResult;
 import org.akvo.flow.data.entity.ApiSurveyInstance;
 import org.akvo.flow.data.entity.DataPointMapper;
-import org.akvo.flow.data.entity.form.FormIdMapper;
 import org.akvo.flow.data.entity.FormInstanceMapper;
 import org.akvo.flow.data.entity.FormInstanceMetadataMapper;
 import org.akvo.flow.data.entity.S3File;
@@ -44,6 +41,7 @@ import org.akvo.flow.data.entity.UploadFormDeletedError;
 import org.akvo.flow.data.entity.UploadResult;
 import org.akvo.flow.data.entity.UploadSuccess;
 import org.akvo.flow.data.entity.UserMapper;
+import org.akvo.flow.data.entity.form.FormIdMapper;
 import org.akvo.flow.data.net.RestApi;
 import org.akvo.flow.domain.entity.DataPoint;
 import org.akvo.flow.domain.entity.FormInstanceMetadata;
@@ -65,6 +63,8 @@ import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.VisibleForTesting;
 import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.Observable;
@@ -136,6 +136,18 @@ public class SurveyDataRepository implements SurveyRepository {
                                 return Observable.just(dataPointMapper.getDataPoints(cursor));
                             }
                         });
+    }
+
+    @Override
+    public Single<DataPoint> getDataPoint(String datapointId) {
+        return  dataSourceFactory.getDataBaseDataSource()
+                .getDataPoint(datapointId)
+                .map(new Function<Cursor, DataPoint>() {
+                    @Override
+                    public DataPoint apply(Cursor cursor) {
+                        return dataPointMapper.getDataPoint(cursor);
+                    }
+                });
     }
 
     @Override

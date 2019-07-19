@@ -28,6 +28,7 @@
         android:theme="@style/FlowAppTheme"
         android:usesCleartextTraffic="true"
         tools:ignore="GoogleAppIndexingWarning">
+        <activity android:name=".presentation.datapoints.one.DataPointMapActivity"></activity>
 
         <meta-data
             android:name="io.fabric.ApiKey"

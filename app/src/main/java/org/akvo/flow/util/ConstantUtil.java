@@ -117,8 +117,7 @@ public class ConstantUtil {
     public static final String RESPONDENT_ID_EXTRA = "survey_respondent_id";
     public static final String READ_ONLY_EXTRA = "readonly";
     public static final String SURVEY_GROUP_EXTRA = "survey_group";
-    public static final String SURVEYED_LOCALE_ID_EXTRA = "surveyed_locale_id";
-    public static final String RECORD_ID_EXTRA = "record_id";
+    public static final String DATA_POINT_ID_EXTRA = "datapoint_id";
     public static final String SURVEY_GROUP_ID_EXTRA = "survey_group_id";
     public static final String IMAGE_URL_EXTRA = "image_url";
     public static final String FORM_TITLE_EXTRA = "title";

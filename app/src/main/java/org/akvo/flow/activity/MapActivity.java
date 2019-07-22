@@ -25,9 +25,6 @@ import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.loader.app.LoaderManager;
-import androidx.loader.content.Loader;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -40,6 +37,10 @@ import org.akvo.flow.R;
 import org.akvo.flow.data.loader.SurveyedLocaleItemLoader;
 import org.akvo.flow.domain.SurveyedLocale;
 import org.akvo.flow.util.ConstantUtil;
+
+import androidx.annotation.NonNull;
+import androidx.loader.app.LoaderManager;
+import androidx.loader.content.Loader;
 
 public class MapActivity extends BackActivity implements OnMapReadyCallback,
         LoaderManager.LoaderCallbacks<SurveyedLocale> {
@@ -58,7 +59,7 @@ public class MapActivity extends BackActivity implements OnMapReadyCallback,
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-        datapointId = getIntent().getStringExtra(ConstantUtil.SURVEYED_LOCALE_ID_EXTRA);
+        datapointId = getIntent().getStringExtra(ConstantUtil.DATA_POINT_ID_EXTRA);
         loadDataPoint();
     }
 

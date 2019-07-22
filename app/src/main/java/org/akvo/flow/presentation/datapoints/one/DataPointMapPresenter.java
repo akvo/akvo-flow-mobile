@@ -19,18 +19,53 @@
 
 package org.akvo.flow.presentation.datapoints.one;
 
+import org.akvo.flow.domain.entity.DataPoint;
+import org.akvo.flow.domain.interactor.datapoints.GetDataPoint;
 import org.akvo.flow.presentation.Presenter;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.inject.Inject;
 
+import io.reactivex.observers.DisposableSingleObserver;
+import timber.log.Timber;
+
 public class DataPointMapPresenter implements Presenter {
 
+    private final GetDataPoint getDataPoint;
+
+    private DataPointMapView view;
+
     @Inject
-    public DataPointMapPresenter() {
+    public DataPointMapPresenter(GetDataPoint getDataPoint) {
+        this.getDataPoint = getDataPoint;
+    }
+
+    public void setView(DataPointMapView view) {
+        this.view = view;
     }
 
     @Override
     public void destroy() {
+        getDataPoint.dispose();
+    }
 
+    public void loadDataPoint(String dataPointId) {
+        Map<String, Object> params = new HashMap<>(2);
+        params.put(GetDataPoint.PARAM_DATA_POINT_ID, dataPointId);
+        getDataPoint.execute(new DisposableSingleObserver<DataPoint>() {
+            @Override
+            public void onSuccess(DataPoint dataPoint) {
+                view.showDataPoint(dataPoint);
+            }
+
+            @Override
+            public void onError(Throwable e) {
+                Timber.e(e);
+                view.showDataPointError();
+                view.dismiss();
+            }
+        }, params);
     }
 }

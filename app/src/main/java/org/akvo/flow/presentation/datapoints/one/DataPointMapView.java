@@ -19,5 +19,13 @@
 
 package org.akvo.flow.presentation.datapoints.one;
 
+import org.akvo.flow.domain.entity.DataPoint;
+
 public interface DataPointMapView {
+
+    void showDataPoint(DataPoint dataPoint);
+
+    void showDataPointError();
+
+    void dismiss();
 }

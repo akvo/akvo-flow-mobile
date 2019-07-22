@@ -35,7 +35,6 @@ import org.akvo.flow.activity.AddUserActivity;
 import org.akvo.flow.activity.AppUpdateActivity;
 import org.akvo.flow.activity.FormActivity;
 import org.akvo.flow.activity.GeoshapeActivity;
-import org.akvo.flow.activity.MapActivity;
 import org.akvo.flow.activity.RecordActivity;
 import org.akvo.flow.activity.SurveyActivity;
 import org.akvo.flow.activity.TransmissionHistoryActivity;
@@ -44,6 +43,7 @@ import org.akvo.flow.offlinemaps.presentation.list.OfflineAreasListActivity;
 import org.akvo.flow.presentation.AppDownloadDialogFragment;
 import org.akvo.flow.presentation.FullImageActivity;
 import org.akvo.flow.presentation.about.AboutActivity;
+import org.akvo.flow.presentation.datapoints.one.DataPointMapActivity;
 import org.akvo.flow.presentation.entity.ViewApkData;
 import org.akvo.flow.presentation.help.HelpActivity;
 import org.akvo.flow.presentation.legal.LegalNoticesActivity;
@@ -103,12 +103,12 @@ public class Navigator {
     }
 
     //TODO: confusing, too many params, use object
-    public void navigateToFormActivity(Activity activity, String surveyedLocaleId, String formId,
+    public void navigateToFormActivity(Activity activity, String dataPointId, String formId,
             long formInstanceId, boolean readOnly, SurveyGroup mSurveyGroup) {
         Intent i = new Intent(activity, FormActivity.class);
         i.putExtra(ConstantUtil.FORM_ID_EXTRA, formId);
         i.putExtra(ConstantUtil.SURVEY_GROUP_EXTRA, mSurveyGroup);
-        i.putExtra(ConstantUtil.SURVEYED_LOCALE_ID_EXTRA, surveyedLocaleId);
+        i.putExtra(ConstantUtil.DATA_POINT_ID_EXTRA, dataPointId);
         i.putExtra(ConstantUtil.RESPONDENT_ID_EXTRA, formInstanceId);
         i.putExtra(ConstantUtil.READ_ONLY_EXTRA, readOnly);
         activity.startActivityForResult(i, ConstantUtil.FORM_FILLING_REQUEST);
@@ -189,7 +189,7 @@ public class Navigator {
     }
 
     public void navigateToMapActivity(@NonNull Context context, String recordId) {
-        context.startActivity(new Intent(context, MapActivity.class)
+        context.startActivity(new Intent(context, DataPointMapActivity.class)
                 .putExtra(ConstantUtil.DATA_POINT_ID_EXTRA, recordId));
     }
 

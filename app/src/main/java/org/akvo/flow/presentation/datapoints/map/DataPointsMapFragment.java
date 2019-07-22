@@ -156,13 +156,17 @@ public class DataPointsMapFragment extends Fragment implements DataPointsMapView
     private FeatureCollection getFeatureCollection(List<DataPoint> dataPoints) {
         List<Feature> features = new ArrayList<>();
         for (DataPoint item : dataPoints) {
-            Feature feature = Feature.fromGeometry(
-                    Point.fromLngLat(item.getLongitude(), item.getLatitude()));
-            feature.addStringProperty(MapBoxMapViewImpl.ID_PROPERTY, item.getId());
-            feature.addStringProperty(MapBoxMapViewImpl.NAME_PROPERTY, item.getName());
-            feature.addNumberProperty(MapBoxMapViewImpl.LATITUDE_PROPERTY, item.getLatitude());
-            feature.addNumberProperty(MapBoxMapViewImpl.LONGITUDE_PROPERTY, item.getLongitude());
-            features.add(feature);
+            Double longitude = item.getLongitude();
+            Double latitude = item.getLatitude();
+            if (latitude != null && longitude != null) {
+                Feature feature = Feature.fromGeometry(
+                        Point.fromLngLat(longitude, latitude));
+                feature.addStringProperty(MapBoxMapViewImpl.ID_PROPERTY, item.getId());
+                feature.addStringProperty(MapBoxMapViewImpl.NAME_PROPERTY, item.getName());
+                feature.addNumberProperty(MapBoxMapViewImpl.LATITUDE_PROPERTY, latitude);
+                feature.addNumberProperty(MapBoxMapViewImpl.LONGITUDE_PROPERTY, longitude);
+                features.add(feature);
+            }
         }
         return FeatureCollection.fromFeatures(features);
     }

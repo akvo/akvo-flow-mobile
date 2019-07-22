@@ -19,11 +19,13 @@
 
 package org.akvo.flow.presentation.datapoints.one;
 
-import org.akvo.flow.domain.entity.DataPoint;
+import org.akvo.flow.presentation.datapoints.map.entity.MapDataPoint;
+
+import androidx.annotation.NonNull;
 
 public interface DataPointMapView {
 
-    void showDataPoint(DataPoint dataPoint);
+    void showDataPoint(@NonNull MapDataPoint dataPoint);
 
     void showDataPointError();
 

@@ -19,9 +19,6 @@
 
 package org.akvo.flow.presentation.datapoints.map.entity;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-
 import org.akvo.flow.domain.entity.DataPoint;
 import org.akvo.flow.presentation.datapoints.DisplayNameMapper;
 
@@ -30,6 +27,9 @@ import java.util.Collections;
 import java.util.List;
 
 import javax.inject.Inject;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 public class MapDataPointMapper {
 
@@ -41,7 +41,7 @@ public class MapDataPointMapper {
     }
 
     @Nullable
-    private MapDataPoint transform(@Nullable DataPoint dataPoint) {
+    public MapDataPoint transform(@Nullable DataPoint dataPoint) {
         if (dataPoint == null || dataPoint.getLatitude() == null
                 || dataPoint.getLongitude() == null) {
             //a map datapoint needs to have location data or it will not be displayed

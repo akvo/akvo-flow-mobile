@@ -139,13 +139,18 @@ public class SurveyDataRepository implements SurveyRepository {
     }
 
     @Override
-    public Single<DataPoint> getDataPoint(String datapointId) {
-        return  dataSourceFactory.getDataBaseDataSource()
+    public Single<DataPoint> getDataPoint(final String datapointId) {
+        return dataSourceFactory.getDataBaseDataSource()
                 .getDataPoint(datapointId)
-                .map(new Function<Cursor, DataPoint>() {
+                .flatMap(new Function<Cursor, Single<DataPoint>>() {
                     @Override
-                    public DataPoint apply(Cursor cursor) {
-                        return dataPointMapper.getDataPoint(cursor);
+                    public Single<DataPoint> apply(Cursor cursor) {
+                        DataPoint dataPoint = dataPointMapper.mapOneDataPoint(cursor);
+                        if (dataPoint == null) {
+                            return Single.error(new Exception(
+                                    "Datapoint with id: " + datapointId + " not found"));
+                        }
+                        return Single.just(dataPoint);
                     }
                 });
     }

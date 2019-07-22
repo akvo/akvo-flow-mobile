@@ -145,6 +145,7 @@ public class BriteSurveyDbAdapter {
     public Cursor getDataPoint(String dataPointId) {
         String sqlQuery =
                 "SELECT  "
+                        + RecordColumns._ID + ","
                         + RecordColumns.RECORD_ID + ","
                         + RecordColumns.SURVEY_GROUP_ID + ","
                         + RecordColumns.NAME + ","

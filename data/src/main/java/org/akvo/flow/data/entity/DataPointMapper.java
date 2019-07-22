@@ -32,6 +32,7 @@ import java.util.List;
 import javax.inject.Inject;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 public class DataPointMapper {
 
@@ -39,7 +40,15 @@ public class DataPointMapper {
     public DataPointMapper() {
     }
 
-    public DataPoint getDataPoint(Cursor cursor) {
+    @Nullable
+    public DataPoint mapOneDataPoint(Cursor cursor) {
+        if (cursor != null && cursor.moveToFirst()) {
+            return getDataPoint(cursor);
+        }
+        return null;
+    }
+
+    private DataPoint getDataPoint(Cursor cursor) {
         String id = cursor.getString(SurveyDbAdapter.RecordQuery.RECORD_ID);
         long surveyGroupId = cursor.getLong(SurveyDbAdapter.RecordQuery.SURVEY_GROUP_ID);
         long lastModified = cursor.getLong(SurveyDbAdapter.RecordQuery.LAST_MODIFIED);

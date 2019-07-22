@@ -21,6 +21,7 @@ package org.akvo.flow.presentation.datapoints.one;
 
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.widget.Toast;
 
 import com.mapbox.geojson.Feature;
 import com.mapbox.geojson.Point;
@@ -36,8 +37,10 @@ import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 
 import org.akvo.flow.R;
 import org.akvo.flow.activity.BackActivity;
-import org.akvo.flow.domain.entity.DataPoint;
+import org.akvo.flow.injector.component.DaggerViewComponent;
+import org.akvo.flow.injector.component.ViewComponent;
 import org.akvo.flow.offlinemaps.Constants;
+import org.akvo.flow.presentation.datapoints.map.entity.MapDataPoint;
 import org.akvo.flow.util.ConstantUtil;
 
 import javax.inject.Inject;
@@ -63,12 +66,12 @@ public class DataPointMapActivity extends BackActivity implements DataPointMapVi
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_data_point_map);
         setupToolBar();
+        initializeInjector();
+        presenter.setView(this);
         mapView = findViewById(org.akvo.flow.offlinemaps.R.id.mapView);
         mapView.onCreate(savedInstanceState);
         dataPointId = getIntent().getStringExtra(ConstantUtil.DATA_POINT_ID_EXTRA);
-        //setTitle(mapName);
         mapView.getMapAsync(mapboxMap -> mapboxMap.setStyle(Constants.MAPBOX_MAP_STYLE, style -> {
-
             style.addImage(MARKER_IMAGE, BitmapFactory.decodeResource(
                     DataPointMapActivity.this.getResources(), R.drawable.marker));
             addMarkers(style);
@@ -77,14 +80,13 @@ public class DataPointMapActivity extends BackActivity implements DataPointMapVi
         }));
     }
 
+    private void initializeInjector() {
+        ViewComponent viewComponent = DaggerViewComponent.builder()
+                .applicationComponent(getApplicationComponent()).build();
+        viewComponent.inject(this);
+    }
+
     private void addMarkers(@NonNull Style loadedMapStyle) {
-        //        List<Feature> features = new ArrayList<>();
-        Feature e = Feature.fromGeometry(Point.fromLngLat(-77.9406, 38.8119));
-        //        features.add(e);
-
-        loadedMapStyle.addSource(
-                new GeoJsonSource(MARKER_SOURCE, e));
-
         loadedMapStyle.addLayer(new SymbolLayer(MARKER_STYLE_LAYER, MARKER_SOURCE)
                 .withProperties(
                         PropertyFactory.iconAllowOverlap(true),
@@ -137,21 +139,28 @@ public class DataPointMapActivity extends BackActivity implements DataPointMapVi
     }
 
     @Override
-    public void showDataPoint(DataPoint dataPoint) {
-        if (mapBoxMap != null && dataPoint.getLatitude() != null
-                && dataPoint.getLongitude() != null) {
+    public void showDataPoint(@NonNull MapDataPoint dataPoint) {
+        setTitle(dataPoint.getName());
+        if (mapBoxMap != null) {
             CameraPosition cameraPosition = new CameraPosition.Builder()
                     .target(new LatLng(dataPoint.getLatitude(), dataPoint.getLongitude()))
                     .zoom(10)
                     .build();
             mapBoxMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+
+            Style style = mapBoxMap.getStyle();
+            if (style != null) {
+                Feature e = Feature.fromGeometry(
+                        Point.fromLngLat(dataPoint.getLongitude(), dataPoint.getLatitude()));
+                style.addSource(new GeoJsonSource(MARKER_SOURCE, e));
+            }
         }
-        //TODO: inform cannot display datapoint
     }
 
     @Override
     public void showDataPointError() {
-        //TODO
+        Toast.makeText(getApplicationContext(), R.string.error_displaying_datapoint,
+                Toast.LENGTH_LONG).show();
     }
 
     @Override

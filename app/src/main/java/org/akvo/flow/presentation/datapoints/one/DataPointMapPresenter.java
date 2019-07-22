@@ -22,6 +22,8 @@ package org.akvo.flow.presentation.datapoints.one;
 import org.akvo.flow.domain.entity.DataPoint;
 import org.akvo.flow.domain.interactor.datapoints.GetDataPoint;
 import org.akvo.flow.presentation.Presenter;
+import org.akvo.flow.presentation.datapoints.map.entity.MapDataPoint;
+import org.akvo.flow.presentation.datapoints.map.entity.MapDataPointMapper;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -34,12 +36,14 @@ import timber.log.Timber;
 public class DataPointMapPresenter implements Presenter {
 
     private final GetDataPoint getDataPoint;
+    private final MapDataPointMapper mapper;
 
     private DataPointMapView view;
 
     @Inject
-    public DataPointMapPresenter(GetDataPoint getDataPoint) {
+    public DataPointMapPresenter(GetDataPoint getDataPoint, MapDataPointMapper mapper) {
         this.getDataPoint = getDataPoint;
+        this.mapper = mapper;
     }
 
     public void setView(DataPointMapView view) {
@@ -57,15 +61,24 @@ public class DataPointMapPresenter implements Presenter {
         getDataPoint.execute(new DisposableSingleObserver<DataPoint>() {
             @Override
             public void onSuccess(DataPoint dataPoint) {
-                view.showDataPoint(dataPoint);
+                MapDataPoint mapDataPoint = mapper.transform(dataPoint);
+                if (mapDataPoint != null) {
+                    view.showDataPoint(mapDataPoint);
+                } else {
+                    onDataPointError();
+                }
             }
 
             @Override
             public void onError(Throwable e) {
                 Timber.e(e);
-                view.showDataPointError();
-                view.dismiss();
+                onDataPointError();
             }
         }, params);
+    }
+
+    private void onDataPointError() {
+        view.showDataPointError();
+        view.dismiss();
     }
 }

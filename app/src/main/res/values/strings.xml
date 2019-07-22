@@ -310,6 +310,7 @@
 
     <string name="unpublish_service_notification_title">Deleting published files</string>
     <string name="unpublish_service_notification_ticker">Deleting</string>
+    <string name="error_displaying_datapoint">This datapoint cannot be viewed on a map</string>
 
     <plurals name="download_forms_error">
         <item quantity="one">Error downloading form</item>

@@ -12,7 +12,8 @@
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
-    <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" /> <!-- For GcmTaskService -->
+    <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
+    <!-- For GcmTaskService -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <uses-feature
@@ -29,12 +30,9 @@
         android:usesCleartextTraffic="true"
         tools:ignore="GoogleAppIndexingWarning">
 
-
         <meta-data
             android:name="io.fabric.ApiKey"
             android:value="89dc21727e76a10511ecda549cab1b2d3aff2ec7" />
-
-        <activity android:name=".presentation.datapoints.one.DataPointMapActivity"/>
 
         <activity
             android:name=".presentation.main.MainActivity"
@@ -84,6 +82,8 @@
             android:name=".presentation.signature.SignatureActivity"
             android:configChanges="locale|layoutDirection"
             android:screenOrientation="landscape" />
+
+        <activity android:name=".presentation.datapoints.one.DataPointMapActivity" />
 
         <service
             android:name=".service.DataFixService"

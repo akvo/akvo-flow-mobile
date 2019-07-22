@@ -28,11 +28,13 @@
         android:theme="@style/FlowAppTheme"
         android:usesCleartextTraffic="true"
         tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".presentation.datapoints.one.DataPointMapActivity"></activity>
+
 
         <meta-data
             android:name="io.fabric.ApiKey"
             android:value="89dc21727e76a10511ecda549cab1b2d3aff2ec7" />
+
+        <activity android:name=".presentation.datapoints.one.DataPointMapActivity"/>
 
         <activity
             android:name=".presentation.main.MainActivity"

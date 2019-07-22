@@ -68,7 +68,7 @@ public class DataPointMapActivity extends BackActivity implements DataPointMapVi
         setupToolBar();
         initializeInjector();
         presenter.setView(this);
-        mapView = findViewById(org.akvo.flow.offlinemaps.R.id.mapView);
+        mapView = findViewById(R.id.mapView);
         mapView.onCreate(savedInstanceState);
         dataPointId = getIntent().getStringExtra(ConstantUtil.DATA_POINT_ID_EXTRA);
         mapView.getMapAsync(mapboxMap -> mapboxMap.setStyle(Constants.MAPBOX_MAP_STYLE, style -> {

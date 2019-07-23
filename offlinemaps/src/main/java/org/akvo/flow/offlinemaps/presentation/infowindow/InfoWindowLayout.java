@@ -22,9 +22,8 @@ package org.akvo.flow.offlinemaps.presentation.infowindow;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.TextView;
-
-import com.mapbox.mapboxsdk.annotations.BubbleLayout;
 
 import org.akvo.flow.offlinemaps.R;
 
@@ -32,7 +31,8 @@ import androidx.annotation.Nullable;
 
 import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 
-public class InfoWindowLayout extends BubbleLayout {
+public class InfoWindowLayout extends LinearLayout {
+
     private TextView titleTextView;
     private TextView snippetTextView;
     private InfoWindowSelectionListener listener;
@@ -73,7 +73,6 @@ public class InfoWindowLayout extends BubbleLayout {
         titleTextView.setText(name);
         snippetTextView.setText(id);
     }
-
 
     public interface InfoWindowSelectionListener {
 

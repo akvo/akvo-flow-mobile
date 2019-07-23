@@ -17,17 +17,11 @@
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.akvo.flow.presentation.datapoints.one;
+package org.akvo.flow.offlinemaps.presentation;
 
-import org.akvo.flow.presentation.datapoints.map.entity.MapDataPoint;
-
-import androidx.annotation.NonNull;
-
-public interface DataPointMapView {
-
-    void showDataPoint(@NonNull MapDataPoint dataPoint);
-
-    void showDataPointError();
-
-    void dismiss();
+public class FeatureConstants {
+    public static final String LATITUDE_PROPERTY = "latitude";
+    public static final String LONGITUDE_PROPERTY = "longitude";
+    public static final String ID_PROPERTY = "id";
+    public static final String NAME_PROPERTY = "name";
 }

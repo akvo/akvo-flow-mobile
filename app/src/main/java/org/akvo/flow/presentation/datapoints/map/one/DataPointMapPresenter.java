@@ -17,13 +17,15 @@
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.akvo.flow.presentation.datapoints.one;
+package org.akvo.flow.presentation.datapoints.map.one;
+
+import com.mapbox.geojson.Feature;
 
 import org.akvo.flow.domain.entity.DataPoint;
 import org.akvo.flow.domain.interactor.datapoints.GetDataPoint;
 import org.akvo.flow.presentation.Presenter;
-import org.akvo.flow.presentation.datapoints.map.entity.MapDataPoint;
-import org.akvo.flow.presentation.datapoints.map.entity.MapDataPointMapper;
+import org.akvo.flow.presentation.datapoints.DisplayNameMapper;
+import org.akvo.flow.presentation.datapoints.map.FeatureMapper;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -36,14 +38,18 @@ import timber.log.Timber;
 public class DataPointMapPresenter implements Presenter {
 
     private final GetDataPoint getDataPoint;
-    private final MapDataPointMapper mapper;
+    private final FeatureMapper featureMapper;
+    private final DisplayNameMapper displayNameMapper;
 
     private DataPointMapView view;
 
     @Inject
-    public DataPointMapPresenter(GetDataPoint getDataPoint, MapDataPointMapper mapper) {
+    public DataPointMapPresenter(GetDataPoint getDataPoint,
+            FeatureMapper featureMapper,
+            DisplayNameMapper displayNameMapper) {
         this.getDataPoint = getDataPoint;
-        this.mapper = mapper;
+        this.featureMapper = featureMapper;
+        this.displayNameMapper = displayNameMapper;
     }
 
     public void setView(DataPointMapView view) {
@@ -61,9 +67,10 @@ public class DataPointMapPresenter implements Presenter {
         getDataPoint.execute(new DisposableSingleObserver<DataPoint>() {
             @Override
             public void onSuccess(DataPoint dataPoint) {
-                MapDataPoint mapDataPoint = mapper.transform(dataPoint);
-                if (mapDataPoint != null) {
-                    view.showDataPoint(mapDataPoint);
+                Feature feature = featureMapper.getFeature(dataPoint);
+                if (feature != null) {
+                    view.showDataPoint(displayNameMapper.createDisplayName(dataPoint.getName()),
+                            feature);
                 } else {
                     onDataPointError();
                 }

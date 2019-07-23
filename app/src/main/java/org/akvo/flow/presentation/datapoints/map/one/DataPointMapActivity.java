@@ -17,14 +17,13 @@
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.akvo.flow.presentation.datapoints.one;
+package org.akvo.flow.presentation.datapoints.map.one;
 
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.widget.Toast;
 
 import com.mapbox.geojson.Feature;
-import com.mapbox.geojson.Point;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
@@ -40,7 +39,7 @@ import org.akvo.flow.activity.BackActivity;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
 import org.akvo.flow.offlinemaps.Constants;
-import org.akvo.flow.presentation.datapoints.map.entity.MapDataPoint;
+import org.akvo.flow.offlinemaps.presentation.FeatureConstants;
 import org.akvo.flow.util.ConstantUtil;
 
 import javax.inject.Inject;
@@ -139,21 +138,26 @@ public class DataPointMapActivity extends BackActivity implements DataPointMapVi
     }
 
     @Override
-    public void showDataPoint(@NonNull MapDataPoint dataPoint) {
-        setTitle(dataPoint.getName());
+    public void showDataPoint(String displayName, Feature feature) {
+        setTitle(displayName);
         if (mapBoxMap != null) {
-            CameraPosition cameraPosition = new CameraPosition.Builder()
-                    .target(new LatLng(dataPoint.getLatitude(), dataPoint.getLongitude()))
-                    .zoom(10)
-                    .build();
-            mapBoxMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+            displayFeature(feature);
+        }
+    }
 
-            Style style = mapBoxMap.getStyle();
-            if (style != null) {
-                Feature e = Feature.fromGeometry(
-                        Point.fromLngLat(dataPoint.getLongitude(), dataPoint.getLatitude()));
-                style.addSource(new GeoJsonSource(MARKER_SOURCE, e));
-            }
+    private void displayFeature(@NonNull Feature feature) {
+        CameraPosition cameraPosition = new CameraPosition.Builder()
+                .target(new LatLng(
+                        feature.getNumberProperty(FeatureConstants.LATITUDE_PROPERTY).doubleValue(),
+                        feature.getNumberProperty(FeatureConstants.LONGITUDE_PROPERTY)
+                                .doubleValue()))
+                .zoom(10)
+                .build();
+        mapBoxMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+
+        Style style = mapBoxMap.getStyle();
+        if (style != null) {
+            style.addSource(new GeoJsonSource(MARKER_SOURCE, feature));
         }
     }
 

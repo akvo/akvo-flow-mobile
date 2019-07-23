@@ -19,7 +19,6 @@
 
 package org.akvo.flow.presentation.datapoints.map;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -30,25 +29,18 @@ import android.view.ViewGroup;
 import android.widget.ProgressBar;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.mapbox.geojson.Feature;
 import com.mapbox.geojson.FeatureCollection;
-import com.mapbox.geojson.Point;
 
 import org.akvo.flow.R;
 import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.domain.SurveyGroup;
-import org.akvo.flow.domain.entity.DataPoint;
 import org.akvo.flow.injector.component.ApplicationComponent;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
 import org.akvo.flow.offlinemaps.presentation.MapBoxMapViewImpl;
 import org.akvo.flow.presentation.datapoints.DataPointSyncSnackBarManager;
 import org.akvo.flow.ui.Navigator;
-import org.akvo.flow.ui.fragment.RecordListListener;
 import org.akvo.flow.util.ConstantUtil;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.inject.Inject;
 
@@ -68,9 +60,6 @@ public class DataPointsMapFragment extends Fragment implements DataPointsMapView
 
     @Inject
     Navigator navigator;
-
-    @Nullable
-    private RecordListListener mListener;
 
     @Nullable
     private ProgressBar progressBar;
@@ -93,19 +82,6 @@ public class DataPointsMapFragment extends Fragment implements DataPointsMapView
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-    }
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        // This makes sure that the container activity has implemented
-        // the callback interface. If not, it throws an exception
-        try {
-            mListener = (RecordListListener) context;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(
-                    context.toString() + " must implement RecordListListener");
-        }
     }
 
     @Override
@@ -151,24 +127,6 @@ public class DataPointsMapFragment extends Fragment implements DataPointsMapView
     @SuppressWarnings("ConstantConditions")
     private ApplicationComponent getApplicationComponent() {
         return ((FlowApp) getActivity().getApplication()).getApplicationComponent();
-    }
-
-    private FeatureCollection getFeatureCollection(List<DataPoint> dataPoints) {
-        List<Feature> features = new ArrayList<>();
-        for (DataPoint item : dataPoints) {
-            Double longitude = item.getLongitude();
-            Double latitude = item.getLatitude();
-            if (latitude != null && longitude != null) {
-                Feature feature = Feature.fromGeometry(
-                        Point.fromLngLat(longitude, latitude));
-                feature.addStringProperty(MapBoxMapViewImpl.ID_PROPERTY, item.getId());
-                feature.addStringProperty(MapBoxMapViewImpl.NAME_PROPERTY, item.getName());
-                feature.addNumberProperty(MapBoxMapViewImpl.LATITUDE_PROPERTY, latitude);
-                feature.addNumberProperty(MapBoxMapViewImpl.LONGITUDE_PROPERTY, longitude);
-                features.add(feature);
-            }
-        }
-        return FeatureCollection.fromFeatures(features);
     }
 
     @Override
@@ -219,12 +177,6 @@ public class DataPointsMapFragment extends Fragment implements DataPointsMapView
         if (mapView != null) {
             mapView.onSaveInstanceState(outState);
         }
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        mListener = null;
     }
 
     @Override
@@ -280,8 +232,8 @@ public class DataPointsMapFragment extends Fragment implements DataPointsMapView
     }
 
     @Override
-    public void displayDataPoints(List<DataPoint> dataPoints) {
-        mapView.displayDataPoints(getFeatureCollection(dataPoints));
+    public void displayDataPoints(FeatureCollection dataPoints) {
+        mapView.displayDataPoints(dataPoints);
     }
 
     @Override

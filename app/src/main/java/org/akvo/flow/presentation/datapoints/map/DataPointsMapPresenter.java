@@ -52,6 +52,7 @@ public class DataPointsMapPresenter implements Presenter {
     private final UseCase getSavedDataPoints;
     private final UseCase checkDeviceNotification;
     private final UseCase upload;
+    private final FeatureMapper featureMapper;
 
     private DataPointsMapView view;
     private SurveyGroup surveyGroup;
@@ -59,11 +60,13 @@ public class DataPointsMapPresenter implements Presenter {
     @Inject DataPointsMapPresenter(@Named("getSavedDataPoints") UseCase getSavedDataPoints,
             DownloadDataPoints downloadDataPoints,
             @Named("checkDeviceNotification") UseCase checkDeviceNotification,
-            @Named("uploadSync") UseCase upload) {
+            @Named("uploadSync") UseCase upload,
+            FeatureMapper featureMapper) {
         this.getSavedDataPoints = getSavedDataPoints;
         this.downloadDataPoints = downloadDataPoints;
         this.checkDeviceNotification = checkDeviceNotification;
         this.upload = upload;
+        this.featureMapper = featureMapper;
     }
 
     void setView(@NonNull DataPointsMapView view) {
@@ -93,12 +96,12 @@ public class DataPointsMapPresenter implements Presenter {
                 @Override
                 public void onError(Throwable e) {
                     Timber.e(e, "Error loading saved datapoints");
-                    view.displayDataPoints(new ArrayList<>());
+                    view.displayDataPoints(featureMapper.getFeatureCollection(new ArrayList<>()));
                 }
 
                 @Override
                 public void onNext(List<DataPoint> dataPoints) {
-                    view.displayDataPoints(dataPoints);
+                    view.displayDataPoints(featureMapper.getFeatureCollection(dataPoints));
                 }
             }, params);
         }

@@ -42,7 +42,6 @@ import com.mapbox.mapboxsdk.maps.MapboxMapOptions;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.maps.Projection;
 import com.mapbox.mapboxsdk.maps.Style;
-import com.mapbox.mapboxsdk.plugins.markerview.MarkerViewManager;
 import com.mapbox.mapboxsdk.style.expressions.Expression;
 import com.mapbox.mapboxsdk.style.layers.CircleLayer;
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer;
@@ -54,7 +53,6 @@ import org.akvo.flow.offlinemaps.di.DaggerOfflineFeatureComponent;
 import org.akvo.flow.offlinemaps.di.OfflineFeatureModule;
 import org.akvo.flow.offlinemaps.domain.entity.MapInfo;
 import org.akvo.flow.offlinemaps.presentation.infowindow.InfoWindowLayout;
-import org.akvo.flow.offlinemaps.presentation.infowindow.InfoWindowMarkerView;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -94,20 +92,15 @@ import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textSize;
 public class MapBoxMapViewImpl extends MapView implements OnMapReadyCallback,
         MapboxMap.OnMapClickListener, MapboxMapView {
 
-    public static final String LATITUDE_PROPERTY = "latitude";
-    public static final String LONGITUDE_PROPERTY = "longitude";
     private static final String MARKER_IMAGE = "custom-marker";
-    private static final String SOURCE_ID = "datapoints";
-    private static final String UNCLUSTERED_POINTS = "unclustered-points";
+    private static final String SOURCE_ID = "points";
     private static final String POINT_COUNT = "point_count";
-    public static final String ID_PROPERTY = "id";
-    public static final String NAME_PROPERTY = "name";
+    private static final String UN_CLUSTERED_POINTS = "un-clustered-points";
+
+    private SelectionManager selectionManager;
 
     @Nullable
     private MapboxMap mapboxMap;
-    private InfoWindowMarkerView markerView;
-    private MarkerViewManager markerViewManager;
-    private Feature currentSelected;
     private GeoJsonSource source;
     private MapReadyCallback callback;
 
@@ -139,17 +132,6 @@ public class MapBoxMapViewImpl extends MapView implements OnMapReadyCallback,
     private void init(Context context) {
         initialiseInjector(context);
         presenter.setView(this);
-        initialiseInfoWindow(context);
-    }
-
-    private void initialiseInfoWindow(Context context) {
-        InfoWindowLayout customView = new InfoWindowLayout(context);
-        if (context instanceof InfoWindowLayout.InfoWindowSelectionListener) {
-            customView.setSelectionListener((InfoWindowLayout.InfoWindowSelectionListener) context);
-        } else {
-            throw new IllegalArgumentException("Activity must implement InfoWindowSelectionListener");
-        }
-        markerView = new InfoWindowMarkerView(customView);
     }
 
     private void initialiseInjector(Context context) {
@@ -170,7 +152,9 @@ public class MapBoxMapViewImpl extends MapView implements OnMapReadyCallback,
     public void onMapReady(@NonNull MapboxMap mapboxMap) {
         this.mapboxMap = mapboxMap;
         this.mapboxMap.addOnMapClickListener(this);
-        markerViewManager = new MarkerViewManager(this, mapboxMap);
+        selectionManager = new SelectionManager(this, mapboxMap,
+                getSelectionListener(getContext()));
+
         this.mapboxMap.setStyle(Style.MAPBOX_STREETS, style -> {
             style.addImage(MARKER_IMAGE, BitmapFactory.decodeResource(
                     getResources(), R.drawable.marker), true);
@@ -181,6 +165,15 @@ public class MapBoxMapViewImpl extends MapView implements OnMapReadyCallback,
             }
             presenter.loadOfflineSettings();
         });
+    }
+
+    private InfoWindowLayout.InfoWindowSelectionListener getSelectionListener(Context context) {
+        if (context instanceof InfoWindowLayout.InfoWindowSelectionListener) {
+            return (InfoWindowLayout.InfoWindowSelectionListener) context;
+        } else {
+            throw new IllegalArgumentException(
+                    "Activity must implement InfoWindowSelectionListener");
+        }
     }
 
     private void addClusteredGeoJsonSource(@NonNull Style loadedMapStyle, List<Feature> features) {
@@ -236,7 +229,7 @@ public class MapBoxMapViewImpl extends MapView implements OnMapReadyCallback,
     }
 
     private void addUnClusteredLayer(@NonNull Style loadedMapStyle) {
-        SymbolLayer unClustered = new SymbolLayer(UNCLUSTERED_POINTS, SOURCE_ID);
+        SymbolLayer unClustered = new SymbolLayer(UN_CLUSTERED_POINTS, SOURCE_ID);
 
         unClustered.setProperties(
                 iconImage(MARKER_IMAGE),
@@ -262,67 +255,19 @@ public class MapBoxMapViewImpl extends MapView implements OnMapReadyCallback,
     public boolean onMapClick(@NonNull LatLng point) {
         if (mapboxMap != null) {
             Projection projection = mapboxMap.getProjection();
-            return handlePointClick(projection.toScreenLocation(point));
+            Feature selected = getSelectedFeature(projection.toScreenLocation(point), mapboxMap);
+            return selectionManager.handleFeatureClick(selected);
         } else {
             return false;
         }
     }
 
-    private boolean handlePointClick(PointF screenPoint) {
-        Feature feature = getSelectedFeature(screenPoint);
-        if (featureSelected(feature)) {
-            return true;
-        }
-        if (currentSelected != null) {
-            unSelectFeature();
-            return true;
-        }
-        return false;
-    }
-
-    private boolean featureSelected(@Nullable Feature feature) {
-        if (feature != null && feature.hasNonNullValueForProperty(ID_PROPERTY)) {
-            onDataPointSelected(feature);
-            return true;
-        }
-        return false;
-    }
-
     @Nullable
-    private Feature getSelectedFeature(PointF screenPoint) {
+    private Feature getSelectedFeature(PointF screenPoint, MapboxMap mapboxMap) {
         List<Feature> features = mapboxMap == null ?
                 Collections.emptyList() :
-                mapboxMap.queryRenderedFeatures(screenPoint, UNCLUSTERED_POINTS);
+                mapboxMap.queryRenderedFeatures(screenPoint, UN_CLUSTERED_POINTS);
         return features.isEmpty() ? null : features.get(0);
-    }
-
-    private void onDataPointSelected(Feature feature) {
-        if (selectedFeatureClicked(feature)) {
-            unSelectFeature();
-        } else {
-            selectFeature(feature);
-        }
-    }
-
-    private void selectFeature(Feature feature) {
-        if (currentSelected != null) {
-            markerViewManager.removeMarker(markerView);
-        }
-        markerView.updateSelectedFeature(feature);
-        markerViewManager.addMarker(markerView);
-        currentSelected = feature;
-    }
-
-    private boolean selectedFeatureClicked(Feature feature) {
-        return currentSelected != null && currentSelected.getStringProperty(ID_PROPERTY)
-                .equals(feature.getStringProperty(ID_PROPERTY));
-    }
-
-    private void unSelectFeature() {
-        if (markerView != null) {
-            markerViewManager.removeMarker(markerView);
-        }
-        currentSelected = null;
     }
 
     @SuppressLint("MissingPermission")
@@ -371,7 +316,7 @@ public class MapBoxMapViewImpl extends MapView implements OnMapReadyCallback,
 
     public void displayDataPoints(FeatureCollection featureCollection) {
         source.setGeoJson(featureCollection);
-        unSelectFeature();
+        selectionManager.unSelectFeature();
     }
 
     @Override

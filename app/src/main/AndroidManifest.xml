@@ -83,7 +83,7 @@
             android:configChanges="locale|layoutDirection"
             android:screenOrientation="landscape" />
 
-        <activity android:name=".presentation.datapoints.one.DataPointMapActivity" />
+        <activity android:name=".presentation.datapoints.map.one.DataPointMapActivity" />
 
         <service
             android:name=".service.DataFixService"

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2019 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -15,36 +15,17 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 
-package org.akvo.flow.presentation.datapoints.map;
+package org.akvo.flow.presentation.datapoints.map.one;
 
-import com.mapbox.geojson.FeatureCollection;
+import com.mapbox.geojson.Feature;
 
-interface DataPointsMapView {
+public interface DataPointMapView {
 
-    void showProgress();
+    void showDataPointError();
 
-    void hideProgress();
+    void dismiss();
 
-    void displayDataPoints(FeatureCollection dataPoints);
-
-    void showSyncedResults(int numberOfSyncedItems);
-
-    void showErrorAssignmentMissing();
-
-    void showErrorNoNetwork();
-
-    void showErrorSync();
-
-    void showNoDataPointsToSync();
-
-    void hideMenu();
-
-    void showMonitoredMenu();
-
-    void showNonMonitoredMenu();
-
-    void showFab();
+    void showDataPoint(String displayName, Feature feature);
 }

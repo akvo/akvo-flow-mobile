@@ -43,7 +43,7 @@ import org.akvo.flow.offlinemaps.presentation.list.OfflineAreasListActivity;
 import org.akvo.flow.presentation.AppDownloadDialogFragment;
 import org.akvo.flow.presentation.FullImageActivity;
 import org.akvo.flow.presentation.about.AboutActivity;
-import org.akvo.flow.presentation.datapoints.one.DataPointMapActivity;
+import org.akvo.flow.presentation.datapoints.map.one.DataPointMapActivity;
 import org.akvo.flow.presentation.entity.ViewApkData;
 import org.akvo.flow.presentation.help.HelpActivity;
 import org.akvo.flow.presentation.legal.LegalNoticesActivity;

@@ -32,7 +32,7 @@ import org.akvo.flow.presentation.AppDownloadDialogFragment;
 import org.akvo.flow.presentation.about.AboutActivity;
 import org.akvo.flow.presentation.datapoints.list.DataPointsListFragment;
 import org.akvo.flow.presentation.datapoints.map.DataPointsMapFragment;
-import org.akvo.flow.presentation.datapoints.one.DataPointMapActivity;
+import org.akvo.flow.presentation.datapoints.map.one.DataPointMapActivity;
 import org.akvo.flow.presentation.form.mobiledata.MobileDataSettingDialog;
 import org.akvo.flow.presentation.help.HelpActivity;
 import org.akvo.flow.presentation.legal.LegalNoticesActivity;

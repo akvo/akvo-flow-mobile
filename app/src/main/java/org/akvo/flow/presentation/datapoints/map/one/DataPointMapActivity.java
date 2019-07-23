@@ -29,6 +29,7 @@ import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
+import com.mapbox.mapboxsdk.maps.Projection;
 import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.style.layers.PropertyFactory;
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer;
@@ -40,25 +41,30 @@ import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
 import org.akvo.flow.offlinemaps.Constants;
 import org.akvo.flow.offlinemaps.presentation.FeatureConstants;
+import org.akvo.flow.offlinemaps.presentation.SelectionManager;
 import org.akvo.flow.util.ConstantUtil;
+
+import java.util.List;
 
 import javax.inject.Inject;
 
 import androidx.annotation.NonNull;
 
-public class DataPointMapActivity extends BackActivity implements DataPointMapView {
+public class DataPointMapActivity extends BackActivity implements DataPointMapView,
+        MapboxMap.OnMapClickListener {
 
     private static final String MARKER_SOURCE = "markers-source";
     private static final String MARKER_STYLE_LAYER = "markers-style-layer";
     private static final String MARKER_IMAGE = "custom-marker";
 
     private MapView mapView;
-    private MapboxMap mapBoxMap;
+    private MapboxMap mapboxMap;
 
     private String dataPointId;
 
     @Inject
     DataPointMapPresenter presenter;
+    private SelectionManager selectionManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,13 +76,17 @@ public class DataPointMapActivity extends BackActivity implements DataPointMapVi
         mapView = findViewById(R.id.mapView);
         mapView.onCreate(savedInstanceState);
         dataPointId = getIntent().getStringExtra(ConstantUtil.DATA_POINT_ID_EXTRA);
-        mapView.getMapAsync(mapboxMap -> mapboxMap.setStyle(Constants.MAPBOX_MAP_STYLE, style -> {
-            style.addImage(MARKER_IMAGE, BitmapFactory.decodeResource(
-                    DataPointMapActivity.this.getResources(), R.drawable.marker));
-            addMarkers(style);
-            this.mapBoxMap = mapboxMap;
-            presenter.loadDataPoint(dataPointId);
-        }));
+        mapView.getMapAsync(mapboxMap -> {
+            this.mapboxMap = mapboxMap;
+            this.mapboxMap.addOnMapClickListener(this);
+            selectionManager = new SelectionManager(mapView, mapboxMap, null);
+            mapboxMap.setStyle(Constants.MAPBOX_MAP_STYLE, style -> {
+                style.addImage(MARKER_IMAGE, BitmapFactory.decodeResource(
+                        DataPointMapActivity.this.getResources(), R.drawable.marker));
+                addMarkers(style);
+                presenter.loadDataPoint(dataPointId);
+            });
+        });
     }
 
     private void initializeInjector() {
@@ -140,7 +150,7 @@ public class DataPointMapActivity extends BackActivity implements DataPointMapVi
     @Override
     public void showDataPoint(String displayName, Feature feature) {
         setTitle(displayName);
-        if (mapBoxMap != null) {
+        if (mapboxMap != null) {
             displayFeature(feature);
         }
     }
@@ -153,9 +163,9 @@ public class DataPointMapActivity extends BackActivity implements DataPointMapVi
                                 .doubleValue()))
                 .zoom(10)
                 .build();
-        mapBoxMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+        mapboxMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
 
-        Style style = mapBoxMap.getStyle();
+        Style style = mapboxMap.getStyle();
         if (style != null) {
             style.addSource(new GeoJsonSource(MARKER_SOURCE, feature));
         }
@@ -171,4 +181,18 @@ public class DataPointMapActivity extends BackActivity implements DataPointMapVi
     public void dismiss() {
         finish();
     }
+
+    @Override
+    public boolean onMapClick(@NonNull LatLng point) {
+        if (mapboxMap != null) {
+            Projection projection = mapboxMap.getProjection();
+            List<Feature> features = mapboxMap
+                    .queryRenderedFeatures(projection.toScreenLocation(point), MARKER_STYLE_LAYER);
+            Feature selected = features.isEmpty() ? null : features.get(0);
+            return selectionManager.handleFeatureClick(selected);
+        } else {
+            return false;
+        }
+    }
+
 }

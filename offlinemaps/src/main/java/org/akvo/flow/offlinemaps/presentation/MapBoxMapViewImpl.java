@@ -24,7 +24,6 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.graphics.PointF;
 import android.util.AttributeSet;
 
 import com.mapbox.geojson.Feature;
@@ -55,7 +54,6 @@ import org.akvo.flow.offlinemaps.domain.entity.MapInfo;
 import org.akvo.flow.offlinemaps.presentation.infowindow.InfoWindowLayout;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -151,9 +149,9 @@ public class MapBoxMapViewImpl extends MapView implements OnMapReadyCallback,
     @Override
     public void onMapReady(@NonNull MapboxMap mapboxMap) {
         this.mapboxMap = mapboxMap;
-        this.mapboxMap.addOnMapClickListener(this);
         selectionManager = new SelectionManager(this, mapboxMap,
                 getSelectionListener(getContext()));
+        this.mapboxMap.addOnMapClickListener(this);
 
         this.mapboxMap.setStyle(Style.MAPBOX_STREETS, style -> {
             style.addImage(MARKER_IMAGE, BitmapFactory.decodeResource(
@@ -255,19 +253,13 @@ public class MapBoxMapViewImpl extends MapView implements OnMapReadyCallback,
     public boolean onMapClick(@NonNull LatLng point) {
         if (mapboxMap != null) {
             Projection projection = mapboxMap.getProjection();
-            Feature selected = getSelectedFeature(projection.toScreenLocation(point), mapboxMap);
+            List<Feature> features = mapboxMap
+                    .queryRenderedFeatures(projection.toScreenLocation(point), UN_CLUSTERED_POINTS);
+            Feature selected = features.isEmpty() ? null : features.get(0);
             return selectionManager.handleFeatureClick(selected);
         } else {
             return false;
         }
-    }
-
-    @Nullable
-    private Feature getSelectedFeature(PointF screenPoint, MapboxMap mapboxMap) {
-        List<Feature> features = mapboxMap == null ?
-                Collections.emptyList() :
-                mapboxMap.queryRenderedFeatures(screenPoint, UN_CLUSTERED_POINTS);
-        return features.isEmpty() ? null : features.get(0);
     }
 
     @SuppressLint("MissingPermission")

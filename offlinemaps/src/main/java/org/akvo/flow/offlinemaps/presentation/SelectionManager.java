@@ -50,7 +50,7 @@ public class SelectionManager {
         markerView = new MarkerView(new LatLng(), markerLayout);
     }
 
-    boolean handleFeatureClick(Feature feature) {
+    public boolean handleFeatureClick(Feature feature) {
         if (featureSelected(feature)) {
             return true;
         }

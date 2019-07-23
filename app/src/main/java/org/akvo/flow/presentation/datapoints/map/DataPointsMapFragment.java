@@ -37,7 +37,8 @@ import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.injector.component.ApplicationComponent;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
-import org.akvo.flow.offlinemaps.presentation.MapBoxMapViewImpl;
+import org.akvo.flow.offlinemaps.presentation.MapBoxMapItemListViewImpl;
+import org.akvo.flow.offlinemaps.presentation.MapReadyCallback;
 import org.akvo.flow.presentation.datapoints.DataPointSyncSnackBarManager;
 import org.akvo.flow.ui.Navigator;
 import org.akvo.flow.util.ConstantUtil;
@@ -50,7 +51,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 
 public class DataPointsMapFragment extends Fragment implements DataPointsMapView,
-        MapBoxMapViewImpl.MapReadyCallback {
+        MapReadyCallback {
 
     @Inject
     DataPointSyncSnackBarManager dataPointSyncSnackBarManager;
@@ -68,7 +69,7 @@ public class DataPointsMapFragment extends Fragment implements DataPointsMapView
     private Integer menuRes = null;
 
     private FloatingActionButton offlineMapsFab;
-    private MapBoxMapViewImpl mapView;
+    private MapBoxMapItemListViewImpl mapView;
 
     public static DataPointsMapFragment newInstance(SurveyGroup surveyGroup) {
         DataPointsMapFragment fragment = new DataPointsMapFragment();

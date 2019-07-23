@@ -87,8 +87,8 @@ import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textSize;
 /**
  * Map using mapbox which can display offline maps
  */
-public class MapBoxMapViewImpl extends MapView implements OnMapReadyCallback,
-        MapboxMap.OnMapClickListener, MapboxMapView {
+public class MapBoxMapItemListViewImpl extends MapView implements OnMapReadyCallback,
+        MapboxMap.OnMapClickListener, MapBoxMapItemListView {
 
     private static final String MARKER_IMAGE = "custom-marker";
     private static final String SOURCE_ID = "points";
@@ -105,24 +105,24 @@ public class MapBoxMapViewImpl extends MapView implements OnMapReadyCallback,
     @Inject
     MapBoxMapPresenter presenter;
 
-    public MapBoxMapViewImpl(@NonNull Context context) {
+    public MapBoxMapItemListViewImpl(@NonNull Context context) {
         super(context);
         init(context);
     }
 
-    public MapBoxMapViewImpl(@NonNull Context context,
+    public MapBoxMapItemListViewImpl(@NonNull Context context,
             @Nullable AttributeSet attrs) {
         super(context, attrs);
         init(context);
     }
 
-    public MapBoxMapViewImpl(@NonNull Context context, @Nullable AttributeSet attrs,
+    public MapBoxMapItemListViewImpl(@NonNull Context context, @Nullable AttributeSet attrs,
             int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         init(context);
     }
 
-    public MapBoxMapViewImpl(@NonNull Context context, @Nullable MapboxMapOptions options) {
+    public MapBoxMapItemListViewImpl(@NonNull Context context, @Nullable MapboxMapOptions options) {
         super(context, options);
         init(context);
     }
@@ -315,10 +315,5 @@ public class MapBoxMapViewImpl extends MapView implements OnMapReadyCallback,
     public void onDestroy() {
         super.onDestroy();
         presenter.destroy();
-    }
-
-    public interface MapReadyCallback {
-
-        void onMapReady();
     }
 }

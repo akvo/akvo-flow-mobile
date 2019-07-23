@@ -17,27 +17,9 @@
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.akvo.flow.offlinemaps.di;
+package org.akvo.flow.offlinemaps.presentation;
 
-import org.akvo.flow.offlinemaps.presentation.MapBoxMapItemListViewImpl;
-import org.akvo.flow.offlinemaps.presentation.dialog.OfflineMapsDialog;
-import org.akvo.flow.offlinemaps.presentation.download.OfflineMapDownloadActivity;
-import org.akvo.flow.offlinemaps.presentation.list.OfflineAreasListActivity;
+public interface MapReadyCallback {
 
-import javax.inject.Singleton;
-
-import dagger.Component;
-
-@Singleton
-@PerFeature
-@Component(modules = OfflineFeatureModule.class)
-public interface OfflineFeatureComponent {
-
-    void inject(OfflineAreasListActivity activity);
-
-    void inject(OfflineMapDownloadActivity activity);
-
-    void inject(OfflineMapsDialog dialog);
-
-    void inject(MapBoxMapItemListViewImpl flowMapView);
+    void onMapReady();
 }

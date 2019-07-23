@@ -8,7 +8,7 @@
 
     <include layout="@layout/app_bar_layout"/>
 
-    <com.mapbox.mapboxsdk.maps.MapView
+    <org.akvo.flow.presentation.datapoints.map.one.MapBoxMapItemView
         android:id="@+id/mapView"
         android:layout_marginTop="?actionBarSize"
         android:layout_width="match_parent"

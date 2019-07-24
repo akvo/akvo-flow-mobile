@@ -50,7 +50,7 @@ public class OfflineMapDownloadActivity extends ToolBarBackActivity
     private EditText mapNameEt;
     private ProgressBar downloadProgress;
     private MapboxMap mapboxMap;
-    private int callingActivity;
+    private int callingScreen;
 
     @Inject
     OfflineMapDownloadPresenter presenter;
@@ -66,7 +66,7 @@ public class OfflineMapDownloadActivity extends ToolBarBackActivity
         setupToolBar();
         setUpViews();
         setupMap(savedInstanceState);
-        callingActivity = getIntent()
+        callingScreen = getIntent()
                 .getIntExtra(Constants.CALLING_SCREEN_EXTRA, Constants.CALLING_SCREEN_EXTRA_LIST);
         presenter.setView(this);
     }
@@ -180,7 +180,7 @@ public class OfflineMapDownloadActivity extends ToolBarBackActivity
 
     @Override
     public void navigateToMapsList() {
-        if (callingActivity == Constants.CALLING_SCREEN_EXTRA_DIALOG) {
+        if (callingScreen == Constants.CALLING_SCREEN_EXTRA_DIALOG) {
             navigator.navigateToOfflineAreasList(this);
         }
         finish();

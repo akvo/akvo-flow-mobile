@@ -33,6 +33,7 @@ import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.Style;
 
+import org.akvo.flow.offlinemaps.Constants;
 import org.akvo.flow.offlinemaps.R;
 import org.akvo.flow.offlinemaps.di.DaggerOfflineFeatureComponent;
 import org.akvo.flow.offlinemaps.di.OfflineFeatureModule;
@@ -49,6 +50,7 @@ public class OfflineMapDownloadActivity extends ToolBarBackActivity
     private EditText mapNameEt;
     private ProgressBar downloadProgress;
     private MapboxMap mapboxMap;
+    private int callingActivity;
 
     @Inject
     OfflineMapDownloadPresenter presenter;
@@ -64,6 +66,8 @@ public class OfflineMapDownloadActivity extends ToolBarBackActivity
         setupToolBar();
         setUpViews();
         setupMap(savedInstanceState);
+        callingActivity = getIntent()
+                .getIntExtra(Constants.CALLING_SCREEN_EXTRA, Constants.CALLING_SCREEN_EXTRA_LIST);
         presenter.setView(this);
     }
 
@@ -176,7 +180,9 @@ public class OfflineMapDownloadActivity extends ToolBarBackActivity
 
     @Override
     public void navigateToMapsList() {
-        navigator.navigateToOfflineAreasList(this);
+        if (callingActivity == Constants.CALLING_SCREEN_EXTRA_DIALOG) {
+            navigator.navigateToOfflineAreasList(this);
+        }
         finish();
     }
 

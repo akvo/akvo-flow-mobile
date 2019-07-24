@@ -62,7 +62,7 @@ public class SelectionManager {
     }
 
     private boolean featureSelected(@Nullable Feature feature) {
-        if (feature != null && feature.hasNonNullValueForProperty(FeatureConstants.ID_PROPERTY)) {
+        if (feature != null && feature.hasNonNullValueForProperty(ID_PROPERTY)) {
             if (selectedFeatureClicked(feature)) {
                 unSelectFeature();
             } else {
@@ -82,10 +82,9 @@ public class SelectionManager {
         currentSelected = feature;
     }
 
-    boolean selectedFeatureClicked(Feature feature) {
-        return currentSelected != null && currentSelected.getStringProperty(
-                FeatureConstants.ID_PROPERTY)
-                .equals(feature.getStringProperty(FeatureConstants.ID_PROPERTY));
+    private boolean selectedFeatureClicked(Feature feature) {
+        return currentSelected != null && currentSelected.getStringProperty(ID_PROPERTY)
+                .equals(feature.getStringProperty(ID_PROPERTY));
     }
 
     void unSelectFeature() {
@@ -96,7 +95,7 @@ public class SelectionManager {
         currentSelected = null;
     }
 
-    public void updateSelectedFeature(Feature feature) {
+    private void updateSelectedFeature(Feature feature) {
         markerLayout.setUpMarkerInfo(feature.getStringProperty(ID_PROPERTY),
                 feature.getStringProperty(NAME_PROPERTY));
         double latitude = feature.getNumberProperty(LATITUDE_PROPERTY).doubleValue();

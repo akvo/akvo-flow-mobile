@@ -11,9 +11,11 @@
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/offline_areas_rv"
-        android:visibility="gone"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:visibility="gone"
+        android:clipToPadding="false"
+        android:paddingBottom="32dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

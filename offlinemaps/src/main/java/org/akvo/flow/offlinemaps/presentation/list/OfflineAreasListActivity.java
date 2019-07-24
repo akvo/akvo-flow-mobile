@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -90,8 +90,24 @@ public class OfflineAreasListActivity extends ToolBarBackActivity
         emptyTitleTv = findViewById(R.id.empty_title_tv);
         emptySubTitleTv = findViewById(R.id.empty_subtitle_tv);
         offlineAreasRv = findViewById(R.id.offline_areas_rv);
+        View fab = findViewById(R.id.create_offline_area_fab);
+        fab.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
+            @Override
+            public void onLayoutChange(View v, int left, int top, int right, int bottom,
+                    int oldLeft, int oldTop, int oldRight, int oldBottom) {
+                int fabHeight = bottom - top;
+                if (fabHeight > 0) {
+                    fab.removeOnLayoutChangeListener(this);
+                    offlineAreasRv
+                            .setPadding(offlineAreasRv.getPaddingLeft(), offlineAreasRv.getPaddingTop(),
+                                    offlineAreasRv.getPaddingRight(),
+                                    offlineAreasRv.getPaddingBottom() + fabHeight);
+                }
+            }
+        });
+
         offlineAreasPb = findViewById(R.id.offline_areas_pb);
-        findViewById(R.id.create_offline_area_fab).setOnClickListener(
+        fab.setOnClickListener(
                 v -> navigator.navigateToOfflineMapAreasCreation(OfflineAreasListActivity.this,
                         Constants.CALLING_SCREEN_EXTRA_LIST));
         offlineAreasRv.setLayoutManager(new LinearLayoutManager(this));

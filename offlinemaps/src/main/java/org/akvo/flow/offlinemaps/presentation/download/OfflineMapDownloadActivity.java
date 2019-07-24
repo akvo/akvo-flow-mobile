@@ -19,8 +19,6 @@
 
 package org.akvo.flow.offlinemaps.presentation.download;
 
-import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextUtils;
@@ -38,12 +36,10 @@ import com.mapbox.mapboxsdk.maps.Style;
 import org.akvo.flow.offlinemaps.R;
 import org.akvo.flow.offlinemaps.di.DaggerOfflineFeatureComponent;
 import org.akvo.flow.offlinemaps.di.OfflineFeatureModule;
+import org.akvo.flow.offlinemaps.presentation.Navigator;
 import org.akvo.flow.offlinemaps.presentation.ToolBarBackActivity;
-import org.akvo.flow.offlinemaps.presentation.list.OfflineAreasListActivity;
 
 import javax.inject.Inject;
-
-import androidx.annotation.Nullable;
 
 public class OfflineMapDownloadActivity extends ToolBarBackActivity
         implements OfflineMapDownloadView {
@@ -56,6 +52,9 @@ public class OfflineMapDownloadActivity extends ToolBarBackActivity
 
     @Inject
     OfflineMapDownloadPresenter presenter;
+
+    @Inject
+    Navigator navigator;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -177,7 +176,7 @@ public class OfflineMapDownloadActivity extends ToolBarBackActivity
 
     @Override
     public void navigateToMapsList() {
-        navigateToOfflineAreasList(this);
+        navigator.navigateToOfflineAreasList(this);
         finish();
     }
 
@@ -186,12 +185,5 @@ public class OfflineMapDownloadActivity extends ToolBarBackActivity
         downloadProgress.setVisibility(View.GONE);
         saveBt.setEnabled(true);
         displaySnackBar(downloadProgress, R.string.offline_map_create_error);
-    }
-
-    public void navigateToOfflineAreasList(@Nullable Context context) {
-        if (context != null) {
-            Intent intent = new Intent(context, OfflineAreasListActivity.class);
-            context.startActivity(intent);
-        }
     }
 }

@@ -19,31 +19,28 @@
 
 package org.akvo.flow.offlinemaps.presentation.list;
 
-import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import org.akvo.flow.offlinemaps.Constants;
 import org.akvo.flow.offlinemaps.R;
 import org.akvo.flow.offlinemaps.di.DaggerOfflineFeatureComponent;
 import org.akvo.flow.offlinemaps.di.OfflineFeatureModule;
 import org.akvo.flow.offlinemaps.domain.entity.DomainOfflineArea;
 import org.akvo.flow.offlinemaps.domain.entity.MapInfo;
+import org.akvo.flow.offlinemaps.presentation.Navigator;
 import org.akvo.flow.offlinemaps.presentation.ToolBarBackActivity;
 import org.akvo.flow.offlinemaps.presentation.list.delete.DeleteAreaDialog;
 import org.akvo.flow.offlinemaps.presentation.list.rename.RenameAreaDialog;
-import org.akvo.flow.offlinemaps.presentation.download.OfflineMapDownloadActivity;
-import org.akvo.flow.offlinemaps.presentation.view.OfflineAreaViewActivity;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
 
-import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -58,11 +55,13 @@ public class OfflineAreasListActivity extends ToolBarBackActivity
     private TextView emptySubTitleTv;
     private RecyclerView offlineAreasRv;
     private ProgressBar offlineAreasPb;
-
     private OfflineAreasListAdapter adapter;
 
     @Inject
     OfflineAreasListPresenter presenter;
+
+    @Inject
+    Navigator navigator;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,7 +83,6 @@ public class OfflineAreasListActivity extends ToolBarBackActivity
 
     private void setUpPresenter() {
         presenter.setView(this);
-        presenter.loadAreas();
     }
 
     private void setUpViews() {
@@ -93,13 +91,18 @@ public class OfflineAreasListActivity extends ToolBarBackActivity
         emptySubTitleTv = findViewById(R.id.empty_subtitle_tv);
         offlineAreasRv = findViewById(R.id.offline_areas_rv);
         offlineAreasPb = findViewById(R.id.offline_areas_pb);
-        findViewById(R.id.create_offline_area_fab).setOnClickListener(v -> {
-            navigateToOfflineMapAreasCreation(OfflineAreasListActivity.this);
-            finish();
-        });
+        findViewById(R.id.create_offline_area_fab).setOnClickListener(
+                v -> navigator.navigateToOfflineMapAreasCreation(OfflineAreasListActivity.this,
+                        Constants.CALLING_SCREEN_EXTRA_LIST));
         offlineAreasRv.setLayoutManager(new LinearLayoutManager(this));
         adapter = new OfflineAreasListAdapter(new ArrayList<>(), this);
         offlineAreasRv.setAdapter(adapter);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        presenter.loadAreas();
     }
 
     @Override
@@ -177,7 +180,7 @@ public class OfflineAreasListActivity extends ToolBarBackActivity
 
     @Override
     public void viewArea(String mapName, MapInfo mapInfo) {
-        navigateToViewOffline(this, mapName, mapInfo);
+        navigator.navigateToViewOffline(this, mapName, mapInfo);
     }
 
     @Override
@@ -188,21 +191,5 @@ public class OfflineAreasListActivity extends ToolBarBackActivity
     @Override
     public void deleteAreaConfirmed(long areaId) {
         presenter.deleteArea(areaId);
-    }
-
-    public void navigateToViewOffline(@Nullable Context context, String mapName, MapInfo mapInfo) {
-        if (context != null) {
-            Intent intent = new Intent(context, OfflineAreaViewActivity.class);
-            intent.putExtra(OfflineAreaViewActivity.NAME_EXTRA, mapName);
-            intent.putExtra(OfflineAreaViewActivity.MAP_INFO_EXTRA, mapInfo);
-            context.startActivity(intent);
-        }
-    }
-
-    public void navigateToOfflineMapAreasCreation(@Nullable Context context) {
-        if (context != null) {
-            Intent intent = new Intent(context, OfflineMapDownloadActivity.class);
-            context.startActivity(intent);
-        }
     }
 }

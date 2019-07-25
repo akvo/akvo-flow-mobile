@@ -3,7 +3,7 @@
     package="org.akvo.flow.walkthrough">
 
     <application>
-        <activity android:name=".WalkThroughActivity"></activity>
+        <activity android:name=".OfflineMapsWalkThroughActivity"/>
     </application>
 
 </manifest>

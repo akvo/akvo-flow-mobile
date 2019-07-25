@@ -67,7 +67,7 @@ public class WalkThroughActivity extends BaseActivity implements WalkthroughView
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_walkthrough);
+        setContentView(R.layout.activity_offline_maps_walkthrough);
         initializeInjector();
         ButterKnife.bind(this);
         presenter.setView(this);

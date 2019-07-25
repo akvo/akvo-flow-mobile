@@ -26,13 +26,17 @@ import android.view.View;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
-public class WalkThroughActivity extends AppCompatActivity {
+public class OfflineMapsWalkThroughActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_walkthrough);
+        setContentView(R.layout.activity_offline_maps_walkthrough);
         setStatusBackgroundColor();
+        findViewById(R.id.floatingActionButton).setOnClickListener(v -> {
+            //TODO
+            finish();
+        });
     }
 
     private void setStatusBackgroundColor() {

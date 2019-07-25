@@ -82,11 +82,12 @@ public class MainPresenter implements Presenter {
 
             @Override
             public void onNext(Boolean seen) {
-                if (seen) {
+                view.navigateToWalkThrough();
+             /*   if (seen) {
                     checkDeviceSetup();
                 } else {
                     view.navigateToWalkThrough();
-                }
+                }*/
             }
         }, null);
     }

@@ -49,9 +49,9 @@ import org.akvo.flow.presentation.help.HelpActivity;
 import org.akvo.flow.presentation.legal.LegalNoticesActivity;
 import org.akvo.flow.presentation.settings.PreferenceActivity;
 import org.akvo.flow.presentation.signature.SignatureActivity;
-import org.akvo.flow.presentation.walkthrough.WalkThroughActivity;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.StringUtil;
+import org.akvo.flow.walkthrough.OfflineMapsWalkThroughActivity;
 
 import java.io.File;
 import java.util.List;
@@ -339,7 +339,7 @@ public class Navigator {
     }
 
     public void navigateToWalkThrough(Context context) {
-        Intent intent = new Intent(context, WalkThroughActivity.class);
+        Intent intent = new Intent(context, OfflineMapsWalkThroughActivity.class);
         context.startActivity(intent);
     }
 

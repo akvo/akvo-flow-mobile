@@ -46,11 +46,11 @@ import org.akvo.flow.domain.util.VersionHelper;
 import org.akvo.flow.injector.component.ApplicationComponent;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
+import org.akvo.flow.offlinemaps.domain.entity.DomainOfflineArea;
+import org.akvo.flow.offlinemaps.presentation.OfflineMapSelectedListener;
+import org.akvo.flow.offlinemaps.presentation.dialog.OfflineMapsDialog;
 import org.akvo.flow.presentation.SnackBarManager;
 import org.akvo.flow.presentation.UserDeleteConfirmationDialog;
-import org.akvo.flow.presentation.datapoints.map.offline.OfflineMapSelectedListener;
-import org.akvo.flow.presentation.datapoints.map.offline.OfflineMapsDialog;
-import org.akvo.flow.presentation.datapoints.map.offline.ViewOfflineArea;
 import org.akvo.flow.presentation.entity.ViewApkData;
 import org.akvo.flow.presentation.navigation.CreateUserDialog;
 import org.akvo.flow.presentation.navigation.EditUserDialog;
@@ -683,12 +683,12 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     }
 
     @Override
-    public void onOfflineAreaPressed(ViewOfflineArea offlineArea) {
-        OfflineMapsDialog fragment = (OfflineMapsDialog) getSupportFragmentManager().findFragmentByTag(
-               OfflineMapsDialog.TAG);
-       if (fragment != null) {
-           fragment.onOfflineAreaSelected(offlineArea);
-       }
+    public void onOfflineAreaPressed(DomainOfflineArea offlineArea) {
+        OfflineMapsDialog fragment = (OfflineMapsDialog) getSupportFragmentManager()
+                .findFragmentByTag(OfflineMapsDialog.TAG);
+        if (fragment != null) {
+            fragment.onOfflineAreaSelected(offlineArea);
+        }
     }
 
     @Override

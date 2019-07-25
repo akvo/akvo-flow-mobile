@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black_disabled">#8f8f8f</color>
+    <color name="black_main">#000000</color>
+    <color name="black_transparent">#20000000</color>
+    <color name="white">#ffffff</color>
+</resources>

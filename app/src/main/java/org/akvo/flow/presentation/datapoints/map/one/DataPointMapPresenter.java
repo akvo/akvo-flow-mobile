@@ -69,8 +69,8 @@ public class DataPointMapPresenter implements Presenter {
             public void onSuccess(DataPoint dataPoint) {
                 Feature feature = featureMapper.getFeature(dataPoint);
                 if (feature != null) {
-                    view.showDataPoint(displayNameMapper.createDisplayName(dataPoint.getName()),
-                            feature);
+                    String displayName = displayNameMapper.createDisplayName(dataPoint.getName());
+                    view.showDataPoint(displayName, feature);
                 } else {
                     onDataPointError();
                 }

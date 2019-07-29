@@ -39,7 +39,6 @@ import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 
 import org.akvo.flow.R;
 import org.akvo.flow.offlinemaps.Constants;
-import org.akvo.flow.offlinemaps.presentation.FeatureConstants;
 import org.akvo.flow.offlinemaps.presentation.MapReadyCallback;
 import org.akvo.flow.offlinemaps.presentation.SelectionManager;
 
@@ -103,9 +102,9 @@ public class MapBoxMapItemView extends MapView implements OnMapReadyCallback,
         if (mapboxMap != null) {
             CameraPosition cameraPosition = new CameraPosition.Builder()
                     .target(new LatLng(
-                            feature.getNumberProperty(FeatureConstants.LATITUDE_PROPERTY)
+                            feature.getNumberProperty(Constants.LATITUDE_PROPERTY)
                                     .doubleValue(),
-                            feature.getNumberProperty(FeatureConstants.LONGITUDE_PROPERTY)
+                            feature.getNumberProperty(Constants.LONGITUDE_PROPERTY)
                                     .doubleValue()))
                     .zoom(10)
                     .build();

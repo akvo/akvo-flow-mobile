@@ -33,8 +33,8 @@ import org.akvo.flow.util.ConstantUtil;
 
 import javax.inject.Inject;
 
-public class DataPointMapActivity extends BackActivity
-        implements DataPointMapView, MapReadyCallback {
+public class DataPointMapActivity extends BackActivity implements DataPointMapView,
+        MapReadyCallback {
 
     @Inject
     DataPointMapPresenter presenter;

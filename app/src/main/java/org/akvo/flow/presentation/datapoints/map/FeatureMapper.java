@@ -24,7 +24,7 @@ import com.mapbox.geojson.FeatureCollection;
 import com.mapbox.geojson.Point;
 
 import org.akvo.flow.domain.entity.DataPoint;
-import org.akvo.flow.offlinemaps.presentation.FeatureConstants;
+import org.akvo.flow.offlinemaps.Constants;
 import org.akvo.flow.presentation.datapoints.DisplayNameMapper;
 
 import java.util.ArrayList;
@@ -57,11 +57,11 @@ public class FeatureMapper {
         Double latitude = item.getLatitude();
         if (latitude != null && longitude != null) {
             Feature feature = Feature.fromGeometry(Point.fromLngLat(longitude, latitude));
-            feature.addStringProperty(FeatureConstants.ID_PROPERTY, item.getId());
-            feature.addStringProperty(FeatureConstants.NAME_PROPERTY,
+            feature.addStringProperty(Constants.ID_PROPERTY, item.getId());
+            feature.addStringProperty(Constants.NAME_PROPERTY,
                     displayNameMapper.createDisplayName(item.getName()));
-            feature.addNumberProperty(FeatureConstants.LATITUDE_PROPERTY, latitude);
-            feature.addNumberProperty(FeatureConstants.LONGITUDE_PROPERTY, longitude);
+            feature.addNumberProperty(Constants.LATITUDE_PROPERTY, latitude);
+            feature.addNumberProperty(Constants.LONGITUDE_PROPERTY, longitude);
             return feature;
         }
         return null;

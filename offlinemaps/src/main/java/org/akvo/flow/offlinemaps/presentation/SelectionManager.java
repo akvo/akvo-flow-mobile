@@ -30,10 +30,10 @@ import org.akvo.flow.offlinemaps.presentation.infowindow.InfoWindowLayout;
 
 import androidx.annotation.Nullable;
 
-import static org.akvo.flow.offlinemaps.presentation.FeatureConstants.ID_PROPERTY;
-import static org.akvo.flow.offlinemaps.presentation.FeatureConstants.LATITUDE_PROPERTY;
-import static org.akvo.flow.offlinemaps.presentation.FeatureConstants.LONGITUDE_PROPERTY;
-import static org.akvo.flow.offlinemaps.presentation.FeatureConstants.NAME_PROPERTY;
+import static org.akvo.flow.offlinemaps.Constants.ID_PROPERTY;
+import static org.akvo.flow.offlinemaps.Constants.LATITUDE_PROPERTY;
+import static org.akvo.flow.offlinemaps.Constants.LONGITUDE_PROPERTY;
+import static org.akvo.flow.offlinemaps.Constants.NAME_PROPERTY;
 
 public class SelectionManager {
     private final InfoWindowLayout markerLayout;

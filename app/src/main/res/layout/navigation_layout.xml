@@ -69,9 +69,14 @@
 
         </androidx.recyclerview.widget.RecyclerView>
 
+        <View
+            android:layout_width="match_parent"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp"
+            android:layout_height="1dp"
+            android:background="#88989898"/>
         <TextView
             android:id="@+id/offline_maps_tv"
-            android:layout_marginTop="16dp"
             android:layout_marginLeft="16dp"
             android:layout_marginStart="16dp"
             android:textColor="@color/black_main"

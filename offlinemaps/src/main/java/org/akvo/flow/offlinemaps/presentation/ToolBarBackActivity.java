@@ -37,7 +37,6 @@ public class ToolBarBackActivity extends AppCompatActivity {
 
     protected void setupToolBar() {
         Toolbar toolbar = findViewById(R.id.toolbar);
-        toolbar.setNavigationIcon(R.drawable.ic_close);
         setSupportActionBar(toolbar);
         ActionBar supportActionBar = getSupportActionBar();
         if (supportActionBar != null) {

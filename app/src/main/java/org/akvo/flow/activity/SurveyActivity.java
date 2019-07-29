@@ -47,6 +47,7 @@ import org.akvo.flow.injector.component.ApplicationComponent;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
 import org.akvo.flow.offlinemaps.domain.entity.DomainOfflineArea;
+import org.akvo.flow.offlinemaps.presentation.MapBoxMapViewImpl;
 import org.akvo.flow.offlinemaps.presentation.OfflineMapSelectedListener;
 import org.akvo.flow.offlinemaps.presentation.dialog.OfflineMapsDialog;
 import org.akvo.flow.presentation.SnackBarManager;
@@ -101,7 +102,7 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
         SurveyDeleteConfirmationDialog.SurveyDeleteListener, UserOptionsDialog.UserOptionListener,
         UserDeleteConfirmationDialog.UserDeleteListener, EditUserDialog.EditUserListener,
         CreateUserDialog.CreateUserListener, SurveyView, TrackingListener, FABListener,
-        OfflineMapSelectedListener {
+        OfflineMapSelectedListener, MapBoxMapViewImpl.MapPointSelectedListener {
 
     public static final int NAVIGATION_DRAWER_DELAY_MILLIS = 250;
     private static final String DATA_POINTS_FRAGMENT_TAG = "datapoints_fragment";
@@ -702,5 +703,10 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     private DatapointsFragment getDataPointsFragment() {
         return (DatapointsFragment) getSupportFragmentManager().findFragmentByTag(
                 DATA_POINTS_FRAGMENT_TAG);
+    }
+
+    @Override
+    public void onPointSelected(String id) {
+        onRecordSelected(id);
     }
 }

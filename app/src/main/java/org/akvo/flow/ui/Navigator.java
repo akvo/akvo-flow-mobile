@@ -40,13 +40,10 @@ import org.akvo.flow.activity.RecordActivity;
 import org.akvo.flow.activity.SurveyActivity;
 import org.akvo.flow.activity.TransmissionHistoryActivity;
 import org.akvo.flow.domain.SurveyGroup;
+import org.akvo.flow.offlinemaps.presentation.list.OfflineAreasListActivity;
 import org.akvo.flow.presentation.AppDownloadDialogFragment;
 import org.akvo.flow.presentation.FullImageActivity;
 import org.akvo.flow.presentation.about.AboutActivity;
-import org.akvo.flow.presentation.datapoints.map.offline.OfflineAreaViewActivity;
-import org.akvo.flow.presentation.datapoints.map.offline.list.OfflineAreasListActivity;
-import org.akvo.flow.presentation.datapoints.map.offline.list.entity.MapInfo;
-import org.akvo.flow.presentation.datapoints.map.offline.selection.OfflineMapDownloadActivity;
 import org.akvo.flow.presentation.entity.ViewApkData;
 import org.akvo.flow.presentation.help.HelpActivity;
 import org.akvo.flow.presentation.legal.LegalNoticesActivity;
@@ -373,25 +370,9 @@ public class Navigator {
         }
     }
 
-    public void navigateToOfflineMapAreasCreation(@Nullable Context context) {
-        if (context != null) {
-            Intent intent = new Intent(context, OfflineMapDownloadActivity.class);
-            context.startActivity(intent);
-        }
-    }
-
     public void navigateToOfflineAreasList(@Nullable Context context) {
         if (context != null) {
             Intent intent = new Intent(context, OfflineAreasListActivity.class);
-            context.startActivity(intent);
-        }
-    }
-
-    public void navigateToViewOffline(@Nullable Context context, String mapName, MapInfo mapInfo) {
-        if (context != null) {
-            Intent intent = new Intent(context, OfflineAreaViewActivity.class);
-            intent.putExtra(OfflineAreaViewActivity.NAME_EXTRA, mapName);
-            intent.putExtra(OfflineAreaViewActivity.MAP_INFO_EXTRA, mapInfo);
             context.startActivity(intent);
         }
     }

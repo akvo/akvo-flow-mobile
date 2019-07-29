@@ -6,7 +6,7 @@
     <string name="offline_maps_dialog_empty_text">No offline maps. Download a map in order to select it.</string>
     <string name="offline_maps_dialog_empty_button">New Offline Map</string>
     <string name="offline_map_activity_title">New map</string>
-    <string name="offline_map_download_hint">Drag area to download into the blue square</string>
+    <string name="offline_map_download_hint">Select area to download</string>
     <string name="offline_map_download_name">Map name</string>
     <string name="offline_map_download_button">Download map</string>
     <string name="offline_map_create_error">Error creating offline area</string>
@@ -15,7 +15,7 @@
     <string name="offline_map_select_error">Error selecting offline area</string>
     <string name="offline_maps_navigation_entry">Offline Maps</string>
     <string name="offline_maps_list_title">Offline Maps</string>
-    <string name="no_offline_maps_title">Downloaded maps will apeear here</string>
+    <string name="no_offline_maps_title">Downloaded maps will appear here</string>
     <string name="no_offline_maps_subtitle">Use the button below to get started</string>
     <string name="view_offline_area">View</string>
     <string name="rename_offline_area">Rename</string>

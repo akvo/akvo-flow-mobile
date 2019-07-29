@@ -20,8 +20,6 @@
 
 package org.akvo.flow.domain.repository;
 
-import io.reactivex.Completable;
-import io.reactivex.Maybe;
 import io.reactivex.Observable;
 
 public interface UserRepository {
@@ -77,8 +75,4 @@ public interface UserRepository {
     Observable<Long> getLastNotificationTime();
 
     Observable<Boolean> saveLastNotificationTime();
-
-    Maybe<Long> getSelectedOfflineArea();
-
-    Completable saveSelectedOfflineArea(long areaId);
 }

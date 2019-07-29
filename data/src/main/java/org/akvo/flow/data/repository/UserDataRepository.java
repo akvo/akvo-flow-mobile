@@ -25,8 +25,6 @@ import org.akvo.flow.domain.repository.UserRepository;
 
 import javax.inject.Inject;
 
-import io.reactivex.Completable;
-import io.reactivex.Maybe;
 import io.reactivex.Observable;
 
 public class UserDataRepository implements UserRepository {
@@ -166,15 +164,5 @@ public class UserDataRepository implements UserRepository {
     @Override
     public Observable<Boolean> saveLastNotificationTime() {
         return dataSourceFactory.getSharedPreferencesDataSource().setAppUpdateNotifiedTime();
-    }
-
-    @Override
-    public Maybe<Long> getSelectedOfflineArea() {
-        return dataSourceFactory.getSharedPreferencesDataSource().getSelectedOfflineArea();
-    }
-
-    @Override
-    public Completable saveSelectedOfflineArea(long areaId) {
-        return dataSourceFactory.getSharedPreferencesDataSource().saveSelectedOfflineArea(areaId);
     }
 }

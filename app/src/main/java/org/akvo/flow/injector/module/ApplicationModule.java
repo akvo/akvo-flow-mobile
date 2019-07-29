@@ -24,7 +24,6 @@ import android.content.Context;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import com.google.gson.Gson;
-import com.mapbox.mapboxsdk.offline.OfflineManager;
 import com.squareup.sqlbrite2.BriteDatabase;
 import com.squareup.sqlbrite2.SqlBrite;
 
@@ -61,7 +60,6 @@ import org.akvo.flow.domain.repository.SurveyRepository;
 import org.akvo.flow.domain.repository.UserRepository;
 import org.akvo.flow.domain.util.DeviceHelper;
 import org.akvo.flow.domain.util.GsonMapper;
-import org.akvo.flow.mapbox.offline.reactive.RegionNameMapper;
 import org.akvo.flow.thread.UIThread;
 import org.akvo.flow.util.logging.DebugLoggingHelper;
 import org.akvo.flow.util.logging.LoggingHelper;
@@ -253,18 +251,6 @@ public class ApplicationModule {
     @Singleton
     Gson provideGson() {
         return new Gson();
-    }
-
-    @Provides
-    @Singleton
-    OfflineManager provideOfflineManager() {
-        return OfflineManager.getInstance(application);
-    }
-
-    @Provides
-    @Singleton
-    RegionNameMapper providesRegionNameMapper() {
-        return new RegionNameMapper();
     }
 
     @NonNull

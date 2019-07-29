@@ -20,8 +20,6 @@
 
 package org.akvo.flow.injector.module;
 
-import android.content.Context;
-
 import org.akvo.flow.domain.MobileUploadAllowed;
 import org.akvo.flow.domain.interactor.ClearAllData;
 import org.akvo.flow.domain.interactor.ClearResponses;
@@ -60,11 +58,6 @@ import org.akvo.flow.domain.interactor.users.EditUser;
 import org.akvo.flow.domain.interactor.users.GetSelectedUser;
 import org.akvo.flow.domain.interactor.users.GetUsers;
 import org.akvo.flow.domain.interactor.users.SelectUser;
-import org.akvo.flow.mapbox.offline.reactive.DeleteOfflineRegion;
-import org.akvo.flow.mapbox.offline.reactive.GetOfflineRegion;
-import org.akvo.flow.mapbox.offline.reactive.GetOfflineRegions;
-import org.akvo.flow.mapbox.offline.reactive.RegionNameMapper;
-import org.akvo.flow.mapbox.offline.reactive.RenameOfflineRegion;
 
 import javax.inject.Named;
 
@@ -294,25 +287,5 @@ public class ViewModule {
     @Named("reloadForms")
     UseCase provideReloadForms(ReloadForms reloadForms) {
         return reloadForms;
-    }
-
-    @Provides
-    GetOfflineRegions provideGetOfflineRegions(Context context) {
-        return new GetOfflineRegions(context);
-    }
-
-    @Provides
-    RenameOfflineRegion provideRenameOfflineRegion(Context context) {
-        return new RenameOfflineRegion(context, new RegionNameMapper());
-    }
-
-    @Provides
-    DeleteOfflineRegion provideDeleteRegion(Context context) {
-        return new DeleteOfflineRegion(context);
-    }
-
-    @Provides
-    GetOfflineRegion provideGetRegion(Context context) {
-        return new GetOfflineRegion(context);
     }
 }

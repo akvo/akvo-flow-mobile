@@ -310,34 +310,6 @@
 
     <string name="unpublish_service_notification_title">Deleting published files</string>
     <string name="unpublish_service_notification_ticker">Deleting</string>
-    <string name="offline_maps_dialog_title">Select map</string>
-    <string name="offline_maps_dialog_online_label">Online</string>
-    <string name="offline_maps_dialog_live_section">Live Map</string>
-    <string name="offline_maps_dialog_offline_label">Offline</string>
-    <string name="offline_maps_dialog_empty_text">No offline maps. Download a map in order to select it.</string>
-    <string name="offline_maps_dialog_empty_button">New Offline Map</string>
-    <string name="offline_map_activity_title">New map</string>
-    <string name="offline_map_download_hint">Drag area to download into the blue square</string>
-    <string name="offline_map_download_name">Map name</string>
-    <string name="offline_map_download_button">Download map</string>
-    <string name="offline_map_create_error">Error creating offline area</string>
-    <string name="offline_map_rename_error">Error renaming offline area</string>
-    <string name="offline_map_delete_error">Error deleting offline area</string>
-    <string name="offline_map_select_error">Error selecting offline area</string>
-    <string name="offline_maps_navigation_entry">Offline Maps</string>
-    <string name="offline_maps_list_title">Offline Maps</string>
-    <string name="no_offline_maps_title">Downloaded maps will apeear here</string>
-    <string name="no_offline_maps_subtitle">Use the button below to get started</string>
-    <string name="view_offline_area">View</string>
-    <string name="rename_offline_area">Rename</string>
-    <string name="delete_offline_area">Delete</string>
-    <string name="offline_areas_list_button">Select to use</string>
-    <string name="offline_areas_list_button_deselect">Deselect</string>
-    <string name="offline_item_status">Downloading</string>
-    <string name="offline_item_rename_dialog_title">Rename map</string>
-    <string name="offline_item_rename_error">Error renaming</string>
-    <string name="offline_item_delete_dialog_title">Delete map?</string>
-    <string name="offline_item_delete_dialog_message">%1$s will no longer be available for use</string>
 
     <plurals name="download_forms_error">
         <item quantity="one">Error downloading form</item>

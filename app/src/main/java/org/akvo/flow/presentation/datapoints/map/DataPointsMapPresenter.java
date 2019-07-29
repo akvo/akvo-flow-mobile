@@ -20,8 +20,6 @@
 
 package org.akvo.flow.presentation.datapoints.map;
 
-import com.mapbox.mapboxsdk.offline.OfflineRegion;
-
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.entity.DataPoint;
 import org.akvo.flow.domain.entity.DownloadResult;
@@ -31,15 +29,10 @@ import org.akvo.flow.domain.interactor.DownloadDataPoints;
 import org.akvo.flow.domain.interactor.ErrorComposable;
 import org.akvo.flow.domain.interactor.GetSavedDataPoints;
 import org.akvo.flow.domain.interactor.UseCase;
-import org.akvo.flow.domain.interactor.offline.GetSelectedOfflineArea;
 import org.akvo.flow.domain.util.Constants;
-import org.akvo.flow.mapbox.offline.reactive.GetOfflineRegion;
 import org.akvo.flow.presentation.Presenter;
-import org.akvo.flow.presentation.datapoints.map.entity.MapDataPoint;
-import org.akvo.flow.presentation.datapoints.map.entity.MapDataPointMapper;
-import org.akvo.flow.presentation.datapoints.map.offline.list.entity.MapInfoMapper;
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -49,50 +42,35 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.observers.DisposableMaybeObserver;
-import io.reactivex.observers.DisposableSingleObserver;
 import timber.log.Timber;
 
 import static org.akvo.flow.domain.entity.DownloadResult.ResultCode.SUCCESS;
 
 public class DataPointsMapPresenter implements Presenter {
 
-    private final MapDataPointMapper dataPointMapper;
     private final DownloadDataPoints downloadDataPoints;
     private final UseCase getSavedDataPoints;
     private final UseCase checkDeviceNotification;
     private final UseCase upload;
-    private final GetSelectedOfflineArea getSelectedOfflineArea;
-    private final MapInfoMapper mapInfoMapper;
-    private final GetOfflineRegion getOfflineRegion;
-    private final CompositeDisposable disposables;
 
     private DataPointsMapView view;
     private SurveyGroup surveyGroup;
 
     @Inject DataPointsMapPresenter(@Named("getSavedDataPoints") UseCase getSavedDataPoints,
-            MapDataPointMapper dataPointMapper, DownloadDataPoints downloadDataPoints,
+            DownloadDataPoints downloadDataPoints,
             @Named("checkDeviceNotification") UseCase checkDeviceNotification,
-            @Named("uploadSync") UseCase upload, GetSelectedOfflineArea getSelectedOfflineAre,
-            MapInfoMapper mapInfoMapper, GetOfflineRegion getOfflineRegion) {
+            @Named("uploadSync") UseCase upload) {
         this.getSavedDataPoints = getSavedDataPoints;
-        this.dataPointMapper = dataPointMapper;
         this.downloadDataPoints = downloadDataPoints;
         this.checkDeviceNotification = checkDeviceNotification;
         this.upload = upload;
-        this.getSelectedOfflineArea = getSelectedOfflineAre;
-        this.mapInfoMapper = mapInfoMapper;
-        this.getOfflineRegion = getOfflineRegion;
-        disposables = new CompositeDisposable();
     }
 
     void setView(@NonNull DataPointsMapView view) {
         this.view = view;
     }
 
-    void onDataReady(SurveyGroup surveyGroup) {
+    void onSurveyGroupReady(SurveyGroup surveyGroup) {
         this.surveyGroup = surveyGroup;
         if (surveyGroup == null) {
             view.hideMenu();
@@ -106,10 +84,6 @@ public class DataPointsMapPresenter implements Presenter {
         }
     }
 
-    void onViewReady() {
-        loadDataPoints();
-    }
-
     void loadDataPoints() {
         getSavedDataPoints.dispose();
         if (surveyGroup != null) {
@@ -119,59 +93,15 @@ public class DataPointsMapPresenter implements Presenter {
                 @Override
                 public void onError(Throwable e) {
                     Timber.e(e, "Error loading saved datapoints");
-                    loadOfflineSettings(Collections.emptyList());
+                    view.displayDataPoints(new ArrayList<>());
                 }
 
                 @Override
                 public void onNext(List<DataPoint> dataPoints) {
-                    loadOfflineSettings(dataPoints);
+                    view.displayDataPoints(dataPoints);
                 }
             }, params);
         }
-    }
-
-    private void loadOfflineSettings(List<DataPoint> dataPoints) {
-        getSelectedOfflineArea.execute(new DisposableMaybeObserver<Long>() {
-
-            @Override
-            public void onSuccess(Long selectedAreaId) {
-                loadOfflineRegion(selectedAreaId, dataPoints);
-            }
-
-            @Override
-            public void onError(Throwable e) {
-                Timber.e(e);
-                displayData(dataPoints, null);
-            }
-
-            @Override
-            public void onComplete() {
-                // no regions found
-                displayData(dataPoints, null);
-            }
-        }, null);
-    }
-
-    private void loadOfflineRegion(long selectedAreaId, List<DataPoint> dataPoints) {
-        DisposableSingleObserver subscribeWith = getOfflineRegion.execute(selectedAreaId)
-                .subscribeWith(new DisposableSingleObserver<OfflineRegion>() {
-                    @Override
-                    public void onSuccess(OfflineRegion region) {
-                        displayData(dataPoints, region);
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        Timber.e(e);
-                        displayData(dataPoints, null);
-                    }
-                });
-        disposables.add(subscribeWith);
-    }
-
-    private void displayData(List<DataPoint> dataPoints, @Nullable OfflineRegion offlineRegion) {
-        List<MapDataPoint> mapDataPoints = dataPointMapper.transform(dataPoints);
-        view.displayData(mapDataPoints, mapInfoMapper.getMapInfo(offlineRegion));
     }
 
     @Override
@@ -180,14 +110,13 @@ public class DataPointsMapPresenter implements Presenter {
         downloadDataPoints.dispose();
         checkDeviceNotification.dispose();
         upload.dispose();
-        getSelectedOfflineArea.dispose();
     }
 
     public void onNewSurveySelected(SurveyGroup surveyGroup) {
         getSavedDataPoints.dispose();
         downloadDataPoints.dispose();
         view.hideProgress();
-        onDataReady(surveyGroup);
+        onSurveyGroupReady(surveyGroup);
         loadDataPoints();
     }
 
@@ -274,39 +203,5 @@ public class DataPointsMapPresenter implements Presenter {
                 view.hideProgress();
             }
         }, params);
-    }
-
-    public void refreshSelectedArea() {
-        getSelectedOfflineArea.execute(new DisposableMaybeObserver<Long>() {
-            @Override
-            public void onSuccess(Long selectedAreaId) {
-                DisposableSingleObserver subscribeWith = getOfflineRegion.execute(selectedAreaId)
-                        .subscribeWith(new DisposableSingleObserver<OfflineRegion>() {
-                            @Override
-                            public void onSuccess(OfflineRegion region) {
-                                view.displayOfflineAreaOrLocation(mapInfoMapper.getMapInfo(region));
-                            }
-
-                            @Override
-                            public void onError(Throwable e) {
-                                Timber.e(e);
-                                view.displayOfflineAreaOrLocation(null);
-                            }
-                        });
-                disposables.add(subscribeWith);
-            }
-
-            @Override
-            public void onError(Throwable e) {
-                Timber.e(e);
-                view.displayOfflineAreaOrLocation(null);
-            }
-
-            @Override
-            public void onComplete() {
-                // no regions found
-                view.displayOfflineAreaOrLocation(null);
-            }
-        }, null);
     }
 }

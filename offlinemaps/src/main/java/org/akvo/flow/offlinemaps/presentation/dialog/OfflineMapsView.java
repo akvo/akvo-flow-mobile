@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2019 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -15,38 +15,25 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 
-package org.akvo.flow.presentation.datapoints.map;
+package org.akvo.flow.offlinemaps.presentation.dialog;
 
-import org.akvo.flow.domain.entity.DataPoint;
+import org.akvo.flow.offlinemaps.domain.entity.DomainOfflineArea;
 
 import java.util.List;
 
-interface DataPointsMapView {
+public interface OfflineMapsView {
 
-    void showProgress();
+    void showLoading();
 
-    void hideProgress();
+    void displayRegions(List<DomainOfflineArea> offlineRegions, long selectedRegionId);
 
-    void displayDataPoints(List<DataPoint> dataPoints);
+    void displayNoOfflineMaps();
 
-    void showSyncedResults(int numberOfSyncedItems);
+    void hideLoading();
 
-    void showErrorAssignmentMissing();
+    void dismiss();
 
-    void showErrorNoNetwork();
-
-    void showErrorSync();
-
-    void showNoDataPointsToSync();
-
-    void hideMenu();
-
-    void showMonitoredMenu();
-
-    void showNonMonitoredMenu();
-
-    void showFab();
+    void notifyMapChange();
 }

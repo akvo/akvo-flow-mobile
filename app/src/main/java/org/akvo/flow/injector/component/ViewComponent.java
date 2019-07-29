@@ -27,7 +27,6 @@ import org.akvo.flow.activity.RecordActivity;
 import org.akvo.flow.activity.SurveyActivity;
 import org.akvo.flow.activity.TransmissionHistoryActivity;
 import org.akvo.flow.injector.PerActivity;
-import org.akvo.flow.injector.module.OfflineModule;
 import org.akvo.flow.injector.module.ViewModule;
 import org.akvo.flow.presentation.AppDownloadDialogFragment;
 import org.akvo.flow.presentation.about.AboutActivity;
@@ -54,9 +53,7 @@ import org.akvo.flow.ui.view.signature.SignatureQuestionView;
 import dagger.Component;
 
 @PerActivity
-@Component(dependencies = ApplicationComponent.class, modules = { ViewModule.class,
-        OfflineModule.class
-})
+@Component(dependencies = ApplicationComponent.class, modules = ViewModule.class)
 public interface ViewComponent {
 
     void inject(DatapointsFragment datapointsFragment);

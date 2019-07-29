@@ -17,7 +17,7 @@
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.akvo.flow.presentation.datapoints.map.one;
+package org.akvo.flow.offlinemaps.presentation;
 
 import android.content.Context;
 import android.graphics.BitmapFactory;
@@ -37,10 +37,8 @@ import com.mapbox.mapboxsdk.style.layers.PropertyFactory;
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 
-import org.akvo.flow.R;
 import org.akvo.flow.offlinemaps.Constants;
-import org.akvo.flow.offlinemaps.presentation.MapReadyCallback;
-import org.akvo.flow.offlinemaps.presentation.SelectionManager;
+import org.akvo.flow.offlinemaps.R;
 
 import java.util.List;
 

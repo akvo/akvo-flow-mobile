@@ -28,6 +28,7 @@ import org.akvo.flow.R;
 import org.akvo.flow.activity.BackActivity;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
+import org.akvo.flow.offlinemaps.presentation.MapBoxMapItemView;
 import org.akvo.flow.offlinemaps.presentation.MapReadyCallback;
 import org.akvo.flow.util.ConstantUtil;
 

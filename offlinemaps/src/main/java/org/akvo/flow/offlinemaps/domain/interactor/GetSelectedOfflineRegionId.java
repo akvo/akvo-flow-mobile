@@ -41,7 +41,7 @@ public class GetSelectedOfflineRegionId {
         this.userRepository = preferencesRepository;
     }
 
-    public void execute(DisposableMaybeObserver observer) {
+    public void execute(DisposableMaybeObserver<Long> observer) {
         addDisposable(buildUseCaseObservable()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -54,7 +54,7 @@ public class GetSelectedOfflineRegionId {
         }
     }
 
-    protected Maybe<Long> buildUseCaseObservable() {
+    private Maybe<Long> buildUseCaseObservable() {
         return userRepository.getSelectedOfflineArea();
     }
 

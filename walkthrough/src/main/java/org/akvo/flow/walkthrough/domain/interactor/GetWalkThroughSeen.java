@@ -41,7 +41,7 @@ public class GetWalkThroughSeen  {
         this.preferencesRepository = userRepository;
     }
 
-    public void execute(DisposableSingleObserver observer) {
+    public void execute(DisposableSingleObserver<Boolean> observer) {
         addDisposable(buildUseCaseObservable()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())

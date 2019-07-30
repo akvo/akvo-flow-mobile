@@ -11,8 +11,7 @@
         </activity>
         <activity
             android:name="org.akvo.flow.offlinemaps.presentation.list.OfflineAreasListActivity"
-            android:label="@string/offline_maps_list_title">
-        </activity>
+            android:label="@string/offline_maps_list_title"/>
         <activity
             android:name="org.akvo.flow.offlinemaps.presentation.download.OfflineMapDownloadActivity"
             android:label="@string/offline_map_activity_title" />

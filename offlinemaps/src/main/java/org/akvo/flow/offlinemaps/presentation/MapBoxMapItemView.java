@@ -60,8 +60,7 @@ public class MapBoxMapItemView extends MapView implements OnMapReadyCallback,
         super(context);
     }
 
-    public MapBoxMapItemView(@NonNull Context context,
-            @Nullable AttributeSet attrs) {
+    public MapBoxMapItemView(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
     }
 
@@ -70,8 +69,7 @@ public class MapBoxMapItemView extends MapView implements OnMapReadyCallback,
         super(context, attrs, defStyleAttr);
     }
 
-    public MapBoxMapItemView(@NonNull Context context,
-            @Nullable MapboxMapOptions options) {
+    public MapBoxMapItemView(@NonNull Context context, @Nullable MapboxMapOptions options) {
         super(context, options);
     }
 

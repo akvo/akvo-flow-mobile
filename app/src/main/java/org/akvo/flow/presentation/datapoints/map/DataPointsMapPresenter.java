@@ -60,8 +60,7 @@ public class DataPointsMapPresenter implements Presenter {
     @Inject DataPointsMapPresenter(@Named("getSavedDataPoints") UseCase getSavedDataPoints,
             DownloadDataPoints downloadDataPoints,
             @Named("checkDeviceNotification") UseCase checkDeviceNotification,
-            @Named("uploadSync") UseCase upload,
-            FeatureMapper featureMapper) {
+            @Named("uploadSync") UseCase upload, FeatureMapper featureMapper) {
         this.getSavedDataPoints = getSavedDataPoints;
         this.downloadDataPoints = downloadDataPoints;
         this.checkDeviceNotification = checkDeviceNotification;

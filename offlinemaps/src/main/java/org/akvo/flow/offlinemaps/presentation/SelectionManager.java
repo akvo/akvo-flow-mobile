@@ -89,8 +89,7 @@ public class SelectionManager {
 
     void unSelectFeature() {
         if (markerView != null) {
-            markerViewManager
-                    .removeMarker(markerView);
+            markerViewManager.removeMarker(markerView);
         }
         currentSelected = null;
     }

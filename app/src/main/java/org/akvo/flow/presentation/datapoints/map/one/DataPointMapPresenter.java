@@ -44,8 +44,7 @@ public class DataPointMapPresenter implements Presenter {
     private DataPointMapView view;
 
     @Inject
-    public DataPointMapPresenter(GetDataPoint getDataPoint,
-            FeatureMapper featureMapper,
+    public DataPointMapPresenter(GetDataPoint getDataPoint, FeatureMapper featureMapper,
             DisplayNameMapper displayNameMapper) {
         this.getDataPoint = getDataPoint;
         this.featureMapper = featureMapper;

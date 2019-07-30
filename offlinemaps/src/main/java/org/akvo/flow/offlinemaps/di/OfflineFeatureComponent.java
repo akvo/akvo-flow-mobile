@@ -19,7 +19,7 @@
 
 package org.akvo.flow.offlinemaps.di;
 
-import org.akvo.flow.offlinemaps.presentation.MapBoxMapViewImpl;
+import org.akvo.flow.offlinemaps.presentation.MapBoxMapItemListViewImpl;
 import org.akvo.flow.offlinemaps.presentation.dialog.OfflineMapsDialog;
 import org.akvo.flow.offlinemaps.presentation.download.OfflineMapDownloadActivity;
 import org.akvo.flow.offlinemaps.presentation.list.OfflineAreasListActivity;
@@ -39,5 +39,5 @@ public interface OfflineFeatureComponent {
 
     void inject(OfflineMapsDialog dialog);
 
-    void inject(MapBoxMapViewImpl flowMapView);
+    void inject(MapBoxMapItemListViewImpl flowMapView);
 }

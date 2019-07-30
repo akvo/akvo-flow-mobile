@@ -29,7 +29,7 @@ import org.akvo.flow.domain.interactor.DeleteSurvey;
 import org.akvo.flow.domain.interactor.GetAllSurveys;
 import org.akvo.flow.domain.interactor.GetIsDeviceSetUp;
 import org.akvo.flow.domain.interactor.GetPublishDataTime;
-import org.akvo.flow.domain.interactor.GetSavedDataPoints;
+import org.akvo.flow.domain.interactor.datapoints.GetSavedDataPoints;
 import org.akvo.flow.domain.interactor.GetUserSettings;
 import org.akvo.flow.domain.interactor.MobileUploadSet;
 import org.akvo.flow.domain.interactor.PublishData;

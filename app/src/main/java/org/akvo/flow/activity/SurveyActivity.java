@@ -47,9 +47,9 @@ import org.akvo.flow.injector.component.ApplicationComponent;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
 import org.akvo.flow.offlinemaps.domain.entity.DomainOfflineArea;
-import org.akvo.flow.offlinemaps.presentation.MapBoxMapViewImpl;
 import org.akvo.flow.offlinemaps.presentation.OfflineMapSelectedListener;
 import org.akvo.flow.offlinemaps.presentation.dialog.OfflineMapsDialog;
+import org.akvo.flow.offlinemaps.presentation.infowindow.InfoWindowLayout;
 import org.akvo.flow.presentation.SnackBarManager;
 import org.akvo.flow.presentation.UserDeleteConfirmationDialog;
 import org.akvo.flow.presentation.entity.ViewApkData;
@@ -102,7 +102,7 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
         SurveyDeleteConfirmationDialog.SurveyDeleteListener, UserOptionsDialog.UserOptionListener,
         UserDeleteConfirmationDialog.UserDeleteListener, EditUserDialog.EditUserListener,
         CreateUserDialog.CreateUserListener, SurveyView, TrackingListener, FABListener,
-        OfflineMapSelectedListener, MapBoxMapViewImpl.MapPointSelectedListener {
+        OfflineMapSelectedListener, InfoWindowLayout.InfoWindowSelectionListener {
 
     public static final int NAVIGATION_DRAWER_DELAY_MILLIS = 250;
     private static final String DATA_POINTS_FRAGMENT_TAG = "datapoints_fragment";
@@ -706,7 +706,7 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     }
 
     @Override
-    public void onPointSelected(String id) {
+    public void onWindowSelected(String id) {
         onRecordSelected(id);
     }
 }

@@ -20,9 +20,7 @@
 
 package org.akvo.flow.presentation.datapoints.map;
 
-import org.akvo.flow.domain.entity.DataPoint;
-
-import java.util.List;
+import com.mapbox.geojson.FeatureCollection;
 
 interface DataPointsMapView {
 
@@ -30,7 +28,7 @@ interface DataPointsMapView {
 
     void hideProgress();
 
-    void displayDataPoints(List<DataPoint> dataPoints);
+    void displayDataPoints(FeatureCollection dataPoints);
 
     void showSyncedResults(int numberOfSyncedItems);
 

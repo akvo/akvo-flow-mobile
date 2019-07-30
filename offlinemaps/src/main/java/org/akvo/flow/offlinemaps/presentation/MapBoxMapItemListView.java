@@ -21,7 +21,7 @@ package org.akvo.flow.offlinemaps.presentation;
 
 import org.akvo.flow.offlinemaps.domain.entity.MapInfo;
 
-public interface MapboxMapView {
+public interface MapBoxMapItemListView {
 
     void displayOfflineMap(MapInfo mapInfo);
 

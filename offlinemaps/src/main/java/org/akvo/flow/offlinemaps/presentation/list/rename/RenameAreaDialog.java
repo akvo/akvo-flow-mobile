@@ -23,21 +23,22 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
-import android.text.Editable;
 import android.text.TextUtils;
-import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.Button;
+import android.view.ViewGroup;
 import android.widget.EditText;
 
 import org.akvo.flow.offlinemaps.R;
+import org.akvo.flow.uicomponents.NameInputTextWatcher;
+import org.akvo.flow.uicomponents.PositiveButtonHandler;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
-public class RenameAreaDialog extends DialogFragment {
+public class RenameAreaDialog extends DialogFragment
+        implements NameInputTextWatcher.UsernameWatcherListener {
 
     public static final String TAG = "RenameAreaDialog";
 
@@ -49,6 +50,7 @@ public class RenameAreaDialog extends DialogFragment {
 
     private EditText nameEt;
     private RenameAreaListener listener;
+    private PositiveButtonHandler positiveButtonHandler;
 
     public RenameAreaDialog() {
     }
@@ -95,23 +97,7 @@ public class RenameAreaDialog extends DialogFragment {
         builder.setTitle(R.string.offline_item_rename_dialog_title);
         nameEt = main.findViewById(R.id.name_et);
         nameEt.setText(areaName);
-        nameEt.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count,
-                    int after) {
-                //EMPTY
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                //EMPTY
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                updateTextChanged();
-            }
-        });
+        nameEt.addTextChangedListener(new NameInputTextWatcher(this));
         builder.setView(main);
         builder.setPositiveButton(R.string.rename_offline_area, (dialog, which) -> {
             String name = nameEt.getText().toString();
@@ -135,6 +121,14 @@ public class RenameAreaDialog extends DialogFragment {
         return builder.create();
     }
 
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+            @Nullable Bundle savedInstanceState) {
+        positiveButtonHandler = new PositiveButtonHandler(this);
+        return super.onCreateView(inflater, container, savedInstanceState);
+    }
+
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
@@ -149,12 +143,13 @@ public class RenameAreaDialog extends DialogFragment {
         }
     }
 
+    @Override
     public void updateTextChanged() {
         String text = nameEt.getText().toString();
         if (TextUtils.isEmpty(text)) {
-            disablePositiveButton();
+            positiveButtonHandler.disablePositiveButton();
         } else {
-            enablePositiveButton();
+            positiveButtonHandler.enablePositiveButton();
         }
     }
 
@@ -167,20 +162,5 @@ public class RenameAreaDialog extends DialogFragment {
     public interface RenameAreaListener {
 
         void renameAreaConfirmed(long areaId, String name);
-    }
-
-    public void disablePositiveButton() {
-        Button button = getPositiveButton();
-        button.setEnabled(false);
-    }
-
-    public void enablePositiveButton() {
-        Button button = getPositiveButton();
-        button.setEnabled(true);
-    }
-
-    private Button getPositiveButton() {
-        AlertDialog dialog = (AlertDialog) getDialog();
-        return dialog.getButton(AlertDialog.BUTTON_POSITIVE);
     }
 }

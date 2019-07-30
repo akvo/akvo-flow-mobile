@@ -270,6 +270,7 @@ dependencies {
     implementation project(':database')
     implementation project(':offlinemaps')
     implementation project(':walkthrough')
+    implementation project(':uicomponents')
 
     apply plugin: 'com.google.gms.google-services'
 }

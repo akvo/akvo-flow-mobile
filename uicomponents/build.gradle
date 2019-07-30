@@ -14,5 +14,10 @@ android {
         implementation "androidx.appcompat:appcompat:${rootProject.ext.appCompatVersion}"
         implementation "com.google.android.material:material:${rootProject.ext.materialVersion}"
     }
+
+    lintOptions {
+        abortOnError false
+        ignore 'InvalidPackage'
+    }
 }
 

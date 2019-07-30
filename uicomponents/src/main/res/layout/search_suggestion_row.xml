@@ -9,7 +9,7 @@
          the placement of the text views. -->
     <ImageView
             android:id="@android:id/icon1"
-            android:layout_width="@dimen/abc_dropdownitem_icon_width"
+            android:layout_width="32dip"
             android:layout_height="48dip"
             android:scaleType="centerInside"
             android:layout_alignParentTop="true"

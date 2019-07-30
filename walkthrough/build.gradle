@@ -56,4 +56,9 @@ dependencies {
     implementation "androidx.appcompat:appcompat:${rootProject.ext.appCompatVersion}"
     implementation "androidx.constraintlayout:constraintlayout:${rootProject.ext.constraintLayoutVersion}"
     implementation "com.google.android.material:material:${rootProject.ext.materialVersion}"
+    implementation "com.google.dagger:dagger:${rootProject.ext.daggerVersion}"
+    annotationProcessor "com.google.dagger:dagger-compiler:${rootProject.ext.daggerVersion}"
+    implementation "io.reactivex.rxjava2:rxandroid:${rootProject.ext.rxAndroidVersion}"
+    implementation "io.reactivex.rxjava2:rxjava:${rootProject.ext.rxJavaVersion}"
+    implementation "com.jakewharton.timber:timber:${rootProject.ext.timberVersion}"
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2019 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -15,34 +15,30 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 
-package org.akvo.flow.presentation.walkthrough;
+package org.akvo.flow.walkthrough.data;
 
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentStatePagerAdapter;
+import org.akvo.flow.walkthrough.domain.PreferencesRepository;
 
-public class WalthroughFragmentAdapter extends FragmentStatePagerAdapter {
+import io.reactivex.Completable;
+import io.reactivex.Single;
 
-    private static final int FIRST_PAGE = 0;
+public class DataPreferencesRepository implements PreferencesRepository {
 
-    public WalthroughFragmentAdapter(FragmentManager fm) {
-        super(fm);
+    private final WalkThroughSharedPreferenceDataSource dataSource;
+
+    public DataPreferencesRepository(WalkThroughSharedPreferenceDataSource dataSource) {
+        this.dataSource = dataSource;
     }
 
     @Override
-    public Fragment getItem(int position) {
-        if (position == FIRST_PAGE) {
-            return WalkThrough1Fragment.newInstance();
-        } else {
-            return WalkThrough2Fragment.newInstance();
-        }
+    public Completable saveWalkThroughSeen() {
+        return dataSource.saveWalkThroughSeen();
     }
 
     @Override
-    public int getCount() {
-        return 2;
+    public Single<Boolean> wasWalkThroughSeen() {
+        return dataSource.walkThroughSeen();
     }
 }

@@ -282,10 +282,6 @@
     <string name="preference_publish_data_error_generic">Error publishing data, please try again.</string>
     <string name="preference_publish_data_error_no_space">Error publishing data. No storage space. Please delete unneeded files and try again.</string>
     <string name="pass_code">Passcode</string>
-    <string name="secure_data_walkthrough_title">Data Storage</string>
-    <string name="walthrough_next_button">Next</string>
-    <string name="secure_collected_walkthrough_page1_subtitle">Data collected with Flow app is now stored privately in the device</string>
-    <string name="secure_collected_walkthrough_page2_subtitle">Use the Publish data option in Settings to make data collected offline available for bulk upload</string>
 
     <string name="submit_tab_description">You can view but not edit submitted responses</string>
     <string name="snackbar_submitted">Submitted</string>

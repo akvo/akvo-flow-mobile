@@ -17,24 +17,38 @@
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.akvo.flow.walkthrough;
+package org.akvo.flow.walkthrough.presentation;
 
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
+
+import org.akvo.flow.walkthrough.R;
+import org.akvo.flow.walkthrough.di.DaggerWalkThroughFeatureComponent;
+import org.akvo.flow.walkthrough.di.WalkThroughFeatureModule;
+
+import javax.inject.Inject;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
 public class OfflineMapsWalkThroughActivity extends AppCompatActivity {
 
+    @Inject
+    OfflineMapsWalkThroughPresenter presenter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_offline_maps_walkthrough);
+        initialiseInjector();
         setStatusBackgroundColor();
+        setupFab();
+        presenter.setWalkThroughSeen();
+    }
+
+    private void setupFab() {
         findViewById(R.id.floatingActionButton).setOnClickListener(v -> {
-            //TODO
             finish();
         });
     }
@@ -46,5 +60,13 @@ public class OfflineMapsWalkThroughActivity extends AppCompatActivity {
                             | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
             getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.black_main));
         }
+    }
+
+    private void initialiseInjector() {
+        DaggerWalkThroughFeatureComponent
+                .builder()
+                .walkThroughFeatureModule(new WalkThroughFeatureModule(getApplication()))
+                .build()
+                .inject(this);
     }
 }

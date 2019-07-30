@@ -51,7 +51,7 @@ import org.akvo.flow.presentation.settings.PreferenceActivity;
 import org.akvo.flow.presentation.signature.SignatureActivity;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.StringUtil;
-import org.akvo.flow.walkthrough.OfflineMapsWalkThroughActivity;
+import org.akvo.flow.walkthrough.presentation.OfflineMapsWalkThroughActivity;
 
 import java.io.File;
 import java.util.List;
@@ -62,6 +62,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.TaskStackBuilder;
 import androidx.core.content.FileProvider;
 import timber.log.Timber;
 
@@ -339,8 +340,10 @@ public class Navigator {
     }
 
     public void navigateToWalkThrough(Context context) {
-        Intent intent = new Intent(context, OfflineMapsWalkThroughActivity.class);
-        context.startActivity(intent);
+        TaskStackBuilder.create(context)
+                .addParentStack(OfflineMapsWalkThroughActivity.class)
+                .addNextIntent(new Intent(context, OfflineMapsWalkThroughActivity.class))
+                .startActivities();
     }
 
     public void navigateToGetPhoto(AppCompatActivity activity) {

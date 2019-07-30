@@ -163,6 +163,12 @@
             android:configChanges="locale|layoutDirection"
             android:label="" />
         <activity android:name=".presentation.walkthrough.WalkThroughActivity" />
+        <activity android:name="org.akvo.flow.walkthrough.presentation.OfflineMapsWalkThroughActivity"
+            android:parentActivityName=".activity.SurveyActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activity.SurveyActivity" />
+        </activity>
 
         <provider
             android:name="androidx.core.content.FileProvider"

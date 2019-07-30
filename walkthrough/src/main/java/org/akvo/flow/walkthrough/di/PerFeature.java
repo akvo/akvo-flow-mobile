@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -15,14 +15,16 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 
-package org.akvo.flow.presentation.walkthrough;
+package org.akvo.flow.walkthrough.di;
 
-public interface WalkthroughView {
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 
-    void navigateToDeviceSetUp();
+import javax.inject.Scope;
 
-    void navigateToSurvey();
+@Scope
+@Retention(RetentionPolicy.RUNTIME)
+public @interface PerFeature {
 }

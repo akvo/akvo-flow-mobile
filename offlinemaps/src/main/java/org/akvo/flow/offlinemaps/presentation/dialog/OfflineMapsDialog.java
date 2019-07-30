@@ -22,7 +22,6 @@ package org.akvo.flow.offlinemaps.presentation.dialog;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,12 +29,13 @@ import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import org.akvo.flow.offlinemaps.Constants;
 import org.akvo.flow.offlinemaps.R;
 import org.akvo.flow.offlinemaps.di.DaggerOfflineFeatureComponent;
 import org.akvo.flow.offlinemaps.di.OfflineFeatureModule;
 import org.akvo.flow.offlinemaps.domain.entity.DomainOfflineArea;
+import org.akvo.flow.offlinemaps.presentation.Navigator;
 import org.akvo.flow.offlinemaps.presentation.OfflineMapSelectedListener;
-import org.akvo.flow.offlinemaps.presentation.download.OfflineMapDownloadActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -55,6 +55,9 @@ public class OfflineMapsDialog extends DialogFragment implements OfflineMapsView
 
     @Inject
     OfflineMapsPresenter presenter;
+
+    @Inject
+    Navigator navigator;
 
     private ProgressBar progressBar;
     private RecyclerView recyclerView;
@@ -84,7 +87,8 @@ public class OfflineMapsDialog extends DialogFragment implements OfflineMapsView
         recyclerView = main.findViewById(R.id.recyclerView);
         addMapButton = main.findViewById(R.id.addMapButton);
         addMapButton.setOnClickListener(v -> {
-            navigateToOfflineMapAreasCreation(getActivity());
+            navigator.navigateToOfflineMapAreasCreation(getActivity(),
+                    Constants.CALLING_SCREEN_EXTRA_DIALOG);
             dismiss();
         });
         noMapsTextView = main.findViewById(R.id.noMapsTextView);
@@ -171,12 +175,5 @@ public class OfflineMapsDialog extends DialogFragment implements OfflineMapsView
 
     public void onOfflineAreaSelected(DomainOfflineArea offlineArea) {
         presenter.onOfflineAreaSelected(offlineArea);
-    }
-
-    private void navigateToOfflineMapAreasCreation(@Nullable Context context) {
-        if (context != null) {
-            Intent intent = new Intent(context, OfflineMapDownloadActivity.class);
-            context.startActivity(intent);
-        }
     }
 }

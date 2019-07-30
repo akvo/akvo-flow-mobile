@@ -29,4 +29,8 @@ public class Constants {
     public static final String LONGITUDE_PROPERTY = "longitude";
     public static final String ID_PROPERTY = "id";
     public static final String NAME_PROPERTY = "name";
+
+    public static final String CALLING_SCREEN_EXTRA = "calling-screen-extra";
+    public static final int CALLING_SCREEN_EXTRA_DIALOG = 0;
+    public static final int CALLING_SCREEN_EXTRA_LIST = 1;
 }

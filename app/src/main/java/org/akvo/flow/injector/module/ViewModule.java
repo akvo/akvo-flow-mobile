@@ -40,12 +40,10 @@ import org.akvo.flow.domain.interactor.SaveImageSize;
 import org.akvo.flow.domain.interactor.SaveKeepScreenOn;
 import org.akvo.flow.domain.interactor.SaveResizedImage;
 import org.akvo.flow.domain.interactor.SaveSelectedSurvey;
-import org.akvo.flow.domain.interactor.SetWalkthroughSeen;
 import org.akvo.flow.domain.interactor.SurveyDeviceNotifications;
 import org.akvo.flow.domain.interactor.UnSyncedTransmissionsExist;
 import org.akvo.flow.domain.interactor.UploadSurveyDataPoints;
 import org.akvo.flow.domain.interactor.UseCase;
-import org.akvo.flow.domain.interactor.WasWalkthroughSeen;
 import org.akvo.flow.domain.interactor.apk.GetApkData;
 import org.akvo.flow.domain.interactor.apk.GetApkDataPreferences;
 import org.akvo.flow.domain.interactor.apk.SaveApkUpdateNotified;
@@ -209,18 +207,6 @@ public class ViewModule {
     @Named("getIsDeviceSetUp")
     UseCase provideIsDeviceSetup(GetIsDeviceSetUp isDeviceSetUp) {
         return isDeviceSetUp;
-    }
-
-    @Provides
-    @Named("wasWalkthroughSeen")
-    UseCase provideWasWalkthroughSeen(WasWalkthroughSeen wasWalkthroughSeen) {
-        return wasWalkthroughSeen;
-    }
-
-    @Provides
-    @Named("setWalkthroughSeen")
-    UseCase provideSetWalkthroughSeen(SetWalkthroughSeen setWalkthroughSeen) {
-        return setWalkthroughSeen;
     }
 
     @Provides

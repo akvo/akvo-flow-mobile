@@ -1,5 +1,4 @@
 <resources>
-
     <string name="walkthrough_title">Offline maps</string>
     <string name="walkthrough_subtitle">Download a map of your pre-selected area and use it when collecting data offline</string>
 </resources>

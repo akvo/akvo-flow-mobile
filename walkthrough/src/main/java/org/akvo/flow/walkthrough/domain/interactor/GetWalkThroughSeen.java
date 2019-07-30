@@ -54,7 +54,7 @@ public class GetWalkThroughSeen  {
         }
     }
 
-    protected Single<Boolean> buildUseCaseObservable() {
+    private Single<Boolean> buildUseCaseObservable() {
         return preferencesRepository.wasWalkThroughSeen();
     }
 

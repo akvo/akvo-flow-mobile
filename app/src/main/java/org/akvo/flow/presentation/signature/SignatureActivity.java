@@ -38,7 +38,6 @@ import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.ViewUtil;
 import org.akvo.flow.util.image.GlideImageLoader;
 import org.akvo.flow.util.image.ImageLoader;
-import org.akvo.flow.util.image.ImageLoaderListener;
 
 import java.io.File;
 
@@ -51,7 +50,8 @@ import butterknife.OnTextChanged;
 
 import static org.akvo.flow.R.id.signature;
 
-public class SignatureActivity extends BaseActivity implements SignatureDrawView.SignatureViewListener,
+public class SignatureActivity extends BaseActivity
+        implements SignatureDrawView.SignatureViewListener,
         SignatureView {
 
     @BindView(signature)
@@ -106,18 +106,14 @@ public class SignatureActivity extends BaseActivity implements SignatureDrawView
                                 this);
                         File originalSignatureImage = presenter.getOriginalSignatureFile();
                         if (originalSignatureImage.exists()) {
-                            //noinspection unchecked
                             imageLoader.loadFromFile(originalSignatureImage,
-                                    new ImageLoaderListener() {
-                                        @Override
-                                        public void onImageReady(Bitmap bitmap) {
-                                            if (bitmap != null) {
-                                                mSignatureDrawView.setBitmap(bitmap);
-                                                mSignatureDrawView.invalidate();
-                                                onViewContentChanged();
-                                            }
+                                    bitmap -> runOnUiThread(() -> {
+                                        if (bitmap != null) {
+                                            mSignatureDrawView.setBitmap(bitmap);
+                                            mSignatureDrawView.invalidate();
+                                            onViewContentChanged();
                                         }
-                                    });
+                                    }));
                         }
                     }
                 });

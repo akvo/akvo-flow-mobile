@@ -34,8 +34,11 @@ import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 
+import org.akvo.flow.domain.util.ImageSize;
+
 import java.io.File;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
@@ -78,25 +81,32 @@ public class GlideImageLoader implements ImageLoader {
     }
 
     @Override
-    public void loadFromFile(ImageView imageView, File file, ImageLoaderListener listener) {
-        requestManager.asBitmap().load(file)
-                .skipMemoryCache(true)
-                .diskCacheStrategy(DiskCacheStrategy.NONE)
-                .listener(new RequestListener<Bitmap>() {
-                    @Override
-                    public boolean onLoadFailed(@Nullable GlideException e, Object model,
-                            Target<Bitmap> target, boolean isFirstResource) {
-                        return false;
-                    }
+    public void loadFromFile(ImageView imageView, File file, ImageLoaderListener listener,
+            @NonNull ImageSize size) {
+        try {
+            requestManager.asBitmap().load(file)
+                    .skipMemoryCache(true)
+                    .diskCacheStrategy(DiskCacheStrategy.NONE)
+                    .listener(new RequestListener<Bitmap>() {
+                        @Override
+                        public boolean onLoadFailed(@Nullable GlideException e, Object model,
+                                Target<Bitmap> target, boolean isFirstResource) {
+                            return false;
+                        }
 
-                    @Override
-                    public boolean onResourceReady(Bitmap resource, Object model,
-                            Target<Bitmap> target, DataSource dataSource, boolean isFirstResource) {
-                        listener.onImageReady(resource);
-                        return false;
-                    }
-                })
-                .into(imageView);
+                        @Override
+                        public boolean onResourceReady(Bitmap resource, Object model,
+                                Target<Bitmap> target, DataSource dataSource,
+                                boolean isFirstResource) {
+                            listener.onImageReady(resource);
+                            return false;
+                        }
+                    })
+                    .override(size.getWidth(), size.getHeight())
+                    .into(imageView);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

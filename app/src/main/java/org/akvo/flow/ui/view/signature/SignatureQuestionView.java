@@ -33,6 +33,7 @@ import org.akvo.flow.R;
 import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionResponse;
 import org.akvo.flow.domain.response.value.Signature;
+import org.akvo.flow.domain.util.ImageSize;
 import org.akvo.flow.event.QuestionInteractionEvent;
 import org.akvo.flow.event.SurveyListener;
 import org.akvo.flow.injector.component.DaggerViewComponent;
@@ -48,6 +49,8 @@ import org.akvo.flow.util.image.ImageLoader;
 import java.io.File;
 
 import javax.inject.Inject;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import static org.akvo.flow.util.files.SignatureFileBrowser.RESIZED_SUFFIX;
 
@@ -111,15 +114,15 @@ public class SignatureQuestionView extends QuestionView {
             File imageFile = signatureFileBrowser
                     .getSignatureImageFile(RESIZED_SUFFIX, mQuestion.getId(),
                             mSurveyListener.getDatapointId());
-            //noinspection unchecked
-            imageLoader.loadFromFile(mImage, imageFile, bitmap -> {
-                mImage.setVisibility(VISIBLE);
-                updateSignButton();
-                if (bitmap != null) {
-                    mSignature.setImage(ImageUtil.encodeBase64(bitmap));
-                }
-                captureResponse();
-            });
+            imageLoader.loadFromFile(mImage, imageFile,
+                    bitmap -> ((AppCompatActivity) getContext()).runOnUiThread(() -> {
+                        mImage.setVisibility(VISIBLE);
+                        updateSignButton();
+                        if (bitmap != null) {
+                            mSignature.setImage(ImageUtil.encodeBase64(bitmap));
+                        }
+                        captureResponse();
+                    }), new ImageSize(320, 240));
         }
     }
 
@@ -139,7 +142,8 @@ public class SignatureQuestionView extends QuestionView {
         if (!TextUtils.isEmpty(base64ImageString)) {
             setUpName(name);
             mImage.setVisibility(VISIBLE);
-            imageLoader.loadFromBase64String(base64ImageString, mImage, bitmap -> updateSignButton());
+            imageLoader
+                    .loadFromBase64String(base64ImageString, mImage, bitmap -> updateSignButton());
         } else {
             resetResponse(name);
         }

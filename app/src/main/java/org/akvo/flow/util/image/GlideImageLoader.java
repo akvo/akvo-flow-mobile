@@ -34,8 +34,11 @@ import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 
+import org.akvo.flow.domain.util.ImageSize;
+
 import java.io.File;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
@@ -78,7 +81,8 @@ public class GlideImageLoader implements ImageLoader {
     }
 
     @Override
-    public void loadFromFile(ImageView imageView, File file, ImageLoaderListener listener) {
+    public void loadFromFile(ImageView imageView, File file, ImageLoaderListener listener,
+            @NonNull ImageSize size) {
         requestManager.asBitmap().load(file)
                 .skipMemoryCache(true)
                 .diskCacheStrategy(DiskCacheStrategy.NONE)
@@ -96,6 +100,7 @@ public class GlideImageLoader implements ImageLoader {
                         return false;
                     }
                 })
+                .override(size.getWidth(), size.getHeight())
                 .into(imageView);
     }
 

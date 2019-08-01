@@ -20,9 +20,13 @@
 
 package org.akvo.flow.util.image;
 
-import android.widget.ImageView;
+        import android.widget.ImageView;
 
-import java.io.File;
+        import org.akvo.flow.domain.util.ImageSize;
+
+        import java.io.File;
+
+        import androidx.annotation.NonNull;
 
 public interface ImageLoader {
 
@@ -32,5 +36,6 @@ public interface ImageLoader {
 
     void loadFromBase64String(String image, ImageView imageView, ImageLoaderListener listener);
 
-    void loadFromFile(ImageView imageView, File file, ImageLoaderListener listener);
+    void loadFromFile(ImageView imageView, File file, ImageLoaderListener listener,
+            @NonNull ImageSize size);
 }

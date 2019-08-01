@@ -307,7 +307,9 @@ public class MapBoxMapItemListViewImpl extends MapView implements OnMapReadyCall
     }
 
     public void displayDataPoints(FeatureCollection featureCollection) {
-        source.setGeoJson(featureCollection);
+        if (source != null) {
+            source.setGeoJson(featureCollection);
+        }
         selectionManager.unSelectFeature();
     }
 

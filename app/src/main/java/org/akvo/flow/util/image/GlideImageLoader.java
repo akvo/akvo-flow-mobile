@@ -83,30 +83,25 @@ public class GlideImageLoader implements ImageLoader {
     @Override
     public void loadFromFile(ImageView imageView, File file, ImageLoaderListener listener,
             @NonNull ImageSize size) {
-        try {
-            requestManager.asBitmap().load(file)
-                    .skipMemoryCache(true)
-                    .diskCacheStrategy(DiskCacheStrategy.NONE)
-                    .listener(new RequestListener<Bitmap>() {
-                        @Override
-                        public boolean onLoadFailed(@Nullable GlideException e, Object model,
-                                Target<Bitmap> target, boolean isFirstResource) {
-                            return false;
-                        }
+        requestManager.asBitmap().load(file)
+                .skipMemoryCache(true)
+                .diskCacheStrategy(DiskCacheStrategy.NONE)
+                .listener(new RequestListener<Bitmap>() {
+                    @Override
+                    public boolean onLoadFailed(@Nullable GlideException e, Object model,
+                            Target<Bitmap> target, boolean isFirstResource) {
+                        return false;
+                    }
 
-                        @Override
-                        public boolean onResourceReady(Bitmap resource, Object model,
-                                Target<Bitmap> target, DataSource dataSource,
-                                boolean isFirstResource) {
-                            listener.onImageReady(resource);
-                            return false;
-                        }
-                    })
-                    .override(size.getWidth(), size.getHeight())
-                    .into(imageView);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+                    @Override
+                    public boolean onResourceReady(Bitmap resource, Object model,
+                            Target<Bitmap> target, DataSource dataSource, boolean isFirstResource) {
+                        listener.onImageReady(resource);
+                        return false;
+                    }
+                })
+                .override(size.getWidth(), size.getHeight())
+                .into(imageView);
     }
 
     @Override

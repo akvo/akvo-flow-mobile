@@ -25,6 +25,10 @@ public class Constants {
 
     public static final String MAPBOX_MAP_STYLE = Style.MAPBOX_STREETS;
     public static final int MAP_BOX_ZOOM_MAX = 2;
+    public static final String LATITUDE_PROPERTY = "latitude";
+    public static final String LONGITUDE_PROPERTY = "longitude";
+    public static final String ID_PROPERTY = "id";
+    public static final String NAME_PROPERTY = "name";
 
     public static final String CALLING_SCREEN_EXTRA = "calling-screen-extra";
     public static final int CALLING_SCREEN_EXTRA_DIALOG = 0;

@@ -78,11 +78,12 @@
             android:label="@string/time_check_activity"
             android:launchMode="singleTop"
             android:theme="@style/Flow.Dialog" />
-        <activity android:name=".activity.MapActivity" />
         <activity
             android:name=".presentation.signature.SignatureActivity"
             android:configChanges="locale|layoutDirection"
             android:screenOrientation="landscape" />
+
+        <activity android:name=".presentation.datapoints.map.one.DataPointMapActivity" />
 
         <service
             android:name=".service.DataFixService"

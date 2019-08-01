@@ -84,7 +84,7 @@ public class FormActivityTestUtil {
         result.putExtra(ConstantUtil.RESPONDENT_ID_EXTRA, dataPointId);
         result.putExtra(ConstantUtil.SURVEY_GROUP_EXTRA,
                 new SurveyGroup(surveyGroupId, formTitle, null, false));
-        result.putExtra(ConstantUtil.SURVEYED_LOCALE_ID_EXTRA,
+        result.putExtra(ConstantUtil.DATA_POINT_ID_EXTRA,
                 Constants.TEST_FORM_SURVEY_INSTANCE_ID);
         result.putExtra(ConstantUtil.READ_ONLY_EXTRA, readOnly);
         return result;

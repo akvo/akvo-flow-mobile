@@ -29,7 +29,7 @@ import org.akvo.flow.domain.interactor.DefaultFlowableObserver;
 import org.akvo.flow.domain.interactor.DefaultObserver;
 import org.akvo.flow.domain.interactor.DownloadDataPoints;
 import org.akvo.flow.domain.interactor.ErrorComposable;
-import org.akvo.flow.domain.interactor.GetSavedDataPoints;
+import org.akvo.flow.domain.interactor.datapoints.GetSavedDataPoints;
 import org.akvo.flow.domain.interactor.UseCase;
 import org.akvo.flow.domain.util.Constants;
 import org.akvo.flow.presentation.Presenter;

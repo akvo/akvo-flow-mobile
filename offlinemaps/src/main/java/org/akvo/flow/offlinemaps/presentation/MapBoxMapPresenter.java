@@ -31,14 +31,14 @@ public class MapBoxMapPresenter {
 
     private final GetSelectedOfflineMapInfo getSelectedOfflineMapInfo;
 
-    private MapboxMapView view;
+    private MapBoxMapItemListView view;
 
     @Inject
     public MapBoxMapPresenter(GetSelectedOfflineMapInfo getSelectedOfflineMapInfo) {
         this.getSelectedOfflineMapInfo = getSelectedOfflineMapInfo;
     }
 
-    public void setView(MapboxMapView mapboxMapView) {
+    public void setView(MapBoxMapItemListView mapboxMapView) {
         this.view = mapboxMapView;
     }
 

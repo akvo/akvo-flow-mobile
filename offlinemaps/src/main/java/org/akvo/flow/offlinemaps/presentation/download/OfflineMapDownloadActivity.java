@@ -41,6 +41,7 @@ import org.akvo.flow.offlinemaps.di.DaggerOfflineFeatureComponent;
 import org.akvo.flow.offlinemaps.di.OfflineFeatureModule;
 import org.akvo.flow.offlinemaps.presentation.Navigator;
 import org.akvo.flow.offlinemaps.presentation.ToolBarBackActivity;
+import org.akvo.flow.offlinemaps.tracking.TrackingHelper;
 
 import javax.inject.Inject;
 
@@ -53,6 +54,7 @@ public class OfflineMapDownloadActivity extends ToolBarBackActivity
     private ProgressBar downloadProgress;
     private MapboxMap mapboxMap;
     private int callingScreen;
+    private TrackingHelper trackingHelper;
 
     @Inject
     OfflineMapDownloadPresenter presenter;
@@ -75,6 +77,7 @@ public class OfflineMapDownloadActivity extends ToolBarBackActivity
         callingScreen = getIntent()
                 .getIntExtra(Constants.CALLING_SCREEN_EXTRA, Constants.CALLING_SCREEN_EXTRA_LIST);
         presenter.setView(this);
+        trackingHelper = new TrackingHelper(this);
     }
 
     private void initialiseInjector() {
@@ -101,6 +104,9 @@ public class OfflineMapDownloadActivity extends ToolBarBackActivity
                 double zoom = mapboxMap.getCameraPosition().zoom;
                 presenter.downloadArea(styleUrl, bounds, pixelRatio, zoom,
                         mapNameEt.getText().toString());
+            }
+            if (trackingHelper != null) {
+                trackingHelper.logOfflineAreaDownloadPressed();
             }
         });
         mapNameEt = findViewById(R.id.offline_map_name);

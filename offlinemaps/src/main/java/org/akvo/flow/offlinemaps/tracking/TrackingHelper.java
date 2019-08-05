@@ -34,4 +34,8 @@ public class TrackingHelper {
     public void logOfflineAreasListDialogOpened() {
         firebaseAnalytics.logEvent("offline_areas_list_dialog_opened", null);
     }
+
+    public void logOfflineAreaDownloadPressed() {
+        firebaseAnalytics.logEvent("offline_area_download_pressed", null);
+    }
 }

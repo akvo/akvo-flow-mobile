@@ -95,7 +95,12 @@ public class OfflineMapsDialog extends DialogFragment implements OfflineMapsView
         });
         noMapsTextView = main.findViewById(R.id.noMapsTextView);
         onLineMapTextView = main.findViewById(R.id.onlineMapTextView);
-        onLineMapTextView.setOnClickListener(v -> presenter.onOnlineMapSelected());
+        onLineMapTextView.setOnClickListener(v -> {
+            presenter.onOnlineMapSelected();
+            if (trackingHelper != null) {
+                trackingHelper.logUseOnlineMapSelected();
+            }
+        });
         return builder.create();
     }
 
@@ -182,5 +187,8 @@ public class OfflineMapsDialog extends DialogFragment implements OfflineMapsView
 
     public void onOfflineAreaSelected(DomainOfflineArea offlineArea) {
         presenter.onOfflineAreaSelected(offlineArea);
+        if (trackingHelper != null) {
+            trackingHelper.logUseOfflineAreaSelected(offlineArea.getName());
+        }
     }
 }

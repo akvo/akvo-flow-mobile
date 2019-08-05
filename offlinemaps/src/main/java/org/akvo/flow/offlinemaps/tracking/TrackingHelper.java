@@ -20,6 +20,7 @@
 package org.akvo.flow.offlinemaps.tracking;
 
 import android.content.Context;
+import android.os.Bundle;
 
 import com.google.firebase.analytics.FirebaseAnalytics;
 
@@ -37,5 +38,15 @@ public class TrackingHelper {
 
     public void logOfflineAreaDownloadPressed() {
         firebaseAnalytics.logEvent("offline_area_download_pressed", null);
+    }
+
+    public void logUseOnlineMapSelected() {
+        firebaseAnalytics.logEvent("use_online_map_selected", null);
+    }
+
+    public void logUseOfflineAreaSelected(String name) {
+        Bundle params = new Bundle();
+        params.putString("area_name", name);
+        firebaseAnalytics.logEvent("use_offline_area_selected", params);
     }
 }

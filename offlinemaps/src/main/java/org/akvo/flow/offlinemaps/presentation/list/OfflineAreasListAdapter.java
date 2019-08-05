@@ -131,7 +131,7 @@ public class OfflineAreasListAdapter
                     deSelectBt.setEnabled(false);
                     revealMenuBt.setEnabled(true);
                 }
-                selectBt.setOnClickListener(v -> listener.selectRegion(offlineArea.getId()));
+                selectBt.setOnClickListener(v -> listener.selectRegion(offlineArea));
                 deSelectBt.setOnClickListener(v -> listener.deSelectRegion());
                 revealMenuBt.setOnClickListener(v -> showMenu(revealMenuBt, offlineArea));
             }

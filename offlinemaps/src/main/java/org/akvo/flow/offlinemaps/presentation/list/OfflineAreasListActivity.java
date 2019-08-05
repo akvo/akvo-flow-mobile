@@ -35,6 +35,7 @@ import org.akvo.flow.offlinemaps.presentation.Navigator;
 import org.akvo.flow.offlinemaps.presentation.ToolBarBackActivity;
 import org.akvo.flow.offlinemaps.presentation.list.delete.DeleteAreaDialog;
 import org.akvo.flow.offlinemaps.presentation.list.rename.RenameAreaDialog;
+import org.akvo.flow.offlinemaps.tracking.TrackingHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,6 +57,7 @@ public class OfflineAreasListActivity extends ToolBarBackActivity
     private RecyclerView offlineAreasRv;
     private ProgressBar offlineAreasPb;
     private OfflineAreasListAdapter adapter;
+    private TrackingHelper trackingHelper;
 
     @Inject
     OfflineAreasListPresenter presenter;
@@ -71,6 +73,7 @@ public class OfflineAreasListActivity extends ToolBarBackActivity
         setupToolBar();
         setUpViews();
         setUpPresenter();
+        trackingHelper = new TrackingHelper(this);
     }
 
     private void initialiseInjector() {
@@ -171,15 +174,21 @@ public class OfflineAreasListActivity extends ToolBarBackActivity
     }
 
     @Override
-    public void selectRegion(long regionId) {
-        adapter.selectRegion(regionId);
-        presenter.selectRegion(regionId);
+    public void selectRegion(DomainOfflineArea offlineArea) {
+        adapter.selectRegion(offlineArea.getId());
+        presenter.selectRegion(offlineArea.getId());
+        if (trackingHelper != null) {
+            trackingHelper.logUseOfflineAreaSelected(offlineArea.getName());
+        }
     }
 
     @Override
     public void deSelectRegion() {
         adapter.selectRegion(OfflineAreasListAdapter.NONE_SELECTED);
         presenter.selectRegion(OfflineAreasListAdapter.NONE_SELECTED);
+        if (trackingHelper != null) {
+            trackingHelper.logUseOnlineMapSelected();
+        }
     }
 
     @Override

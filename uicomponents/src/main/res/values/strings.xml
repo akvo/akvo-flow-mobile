@@ -309,7 +309,7 @@
     <string name="error_displaying_datapoint">This datapoint cannot be viewed on a map</string>
 
     <string name="walkthrough_title">Offline maps</string>
-    <string name="walkthrough_subtitle">Download a map of your pre-selected area and use it when collecting data offline</string>
+    <string name="walkthrough_subtitle">Collecting data offline? Simply download a map of your desired area and use it while you’re off-grid.</string>
 
     <string name="offline_maps_dialog_title">Select map</string>
     <string name="offline_maps_dialog_online_label">Online</string>

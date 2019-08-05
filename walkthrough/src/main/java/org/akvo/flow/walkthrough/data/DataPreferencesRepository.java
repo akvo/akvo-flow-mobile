@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -15,36 +15,30 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 
-package org.akvo.flow.domain.interactor;
+package org.akvo.flow.walkthrough.data;
 
-import io.reactivex.annotations.NonNull;
-import io.reactivex.functions.Action;
-import io.reactivex.functions.Consumer;
+import org.akvo.flow.walkthrough.domain.PreferencesRepository;
 
-/**
- * Default subscriber base class to be used whenever you want to avoid having to implement all
- * 3 methods.
- */
-public class DefaultFlowableObserver<T> implements Consumer<T>, Action {
+import io.reactivex.Completable;
+import io.reactivex.Single;
 
-    public void onComplete() {
-        // no-op by default.
-    }
+public class DataPreferencesRepository implements PreferencesRepository {
 
-    public void onNext(T t) {
-        // no-op by default.
+    private final WalkThroughSharedPreferenceDataSource dataSource;
+
+    public DataPreferencesRepository(WalkThroughSharedPreferenceDataSource dataSource) {
+        this.dataSource = dataSource;
     }
 
     @Override
-    public void run() {
-        onComplete();
+    public Completable saveWalkThroughSeen() {
+        return dataSource.saveWalkThroughSeen();
     }
 
     @Override
-    public void accept(@NonNull T t) {
-        onNext(t);
+    public Single<Boolean> wasWalkThroughSeen() {
+        return dataSource.walkThroughSeen();
     }
 }

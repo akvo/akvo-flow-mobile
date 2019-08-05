@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
     <integer name="surveyidkey">1</integer>
     <integer name="respidkey">3</integer>
     <integer name="finishedkey">4</integer>
-
 </resources>

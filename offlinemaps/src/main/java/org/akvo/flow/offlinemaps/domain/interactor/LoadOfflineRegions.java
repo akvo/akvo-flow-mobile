@@ -44,7 +44,7 @@ public class LoadOfflineRegions {
         this.regionRepository = userRepository;
     }
 
-    public void execute(DisposableSingleObserver observer) {
+    public void execute(DisposableSingleObserver<List<DomainOfflineArea>> observer) {
         addDisposable(buildUseCaseObservable()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -57,7 +57,7 @@ public class LoadOfflineRegions {
         }
     }
 
-    protected Single<List<DomainOfflineArea>> buildUseCaseObservable() {
+    private Single<List<DomainOfflineArea>> buildUseCaseObservable() {
         return regionRepository.getOfflineRegions();
     }
 

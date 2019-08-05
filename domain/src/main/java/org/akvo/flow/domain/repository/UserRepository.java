@@ -64,10 +64,6 @@ public interface UserRepository {
 
     Observable<Boolean> isDeviceSetUp();
 
-    Observable<Boolean> wasWalkThroughSeen();
-
-    Observable<Boolean> setWalkThroughSeen();
-
     Observable<Boolean> mobileUploadSet();
 
     Observable<Boolean> clearAppUpdateNotified();

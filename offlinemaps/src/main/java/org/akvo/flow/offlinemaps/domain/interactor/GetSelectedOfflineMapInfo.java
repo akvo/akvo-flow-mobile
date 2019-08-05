@@ -46,7 +46,7 @@ public class GetSelectedOfflineMapInfo {
         this.userRepository = preferencesRepository;
     }
 
-    public void execute(DisposableMaybeObserver observer) {
+    public void execute(DisposableMaybeObserver<MapInfo> observer) {
         addDisposable(buildUseCaseObservable()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())

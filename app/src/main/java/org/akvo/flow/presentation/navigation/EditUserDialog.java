@@ -31,8 +31,8 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 
 import org.akvo.flow.R;
-import org.akvo.flow.presentation.NameInputTextWatcher;
-import org.akvo.flow.presentation.PositiveButtonHandler;
+import org.akvo.flow.uicomponents.NameInputTextWatcher;
+import org.akvo.flow.uicomponents.PositiveButtonHandler;
 import org.akvo.flow.util.ConstantUtil;
 
 import androidx.annotation.NonNull;

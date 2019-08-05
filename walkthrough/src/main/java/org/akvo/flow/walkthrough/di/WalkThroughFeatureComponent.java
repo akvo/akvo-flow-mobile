@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -15,36 +15,20 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 
-package org.akvo.flow.domain.interactor;
+package org.akvo.flow.walkthrough.di;
 
-import io.reactivex.annotations.NonNull;
-import io.reactivex.functions.Action;
-import io.reactivex.functions.Consumer;
+import org.akvo.flow.walkthrough.presentation.OfflineMapsWalkThroughActivity;
 
-/**
- * Default subscriber base class to be used whenever you want to avoid having to implement all
- * 3 methods.
- */
-public class DefaultFlowableObserver<T> implements Consumer<T>, Action {
+import javax.inject.Singleton;
 
-    public void onComplete() {
-        // no-op by default.
-    }
+import dagger.Component;
 
-    public void onNext(T t) {
-        // no-op by default.
-    }
+@Singleton
+@PerFeature
+@Component(modules = WalkThroughFeatureModule.class)
+public interface WalkThroughFeatureComponent {
 
-    @Override
-    public void run() {
-        onComplete();
-    }
-
-    @Override
-    public void accept(@NonNull T t) {
-        onNext(t);
-    }
+    void inject(OfflineMapsWalkThroughActivity offlineMapsWalkThroughActivity);
 }

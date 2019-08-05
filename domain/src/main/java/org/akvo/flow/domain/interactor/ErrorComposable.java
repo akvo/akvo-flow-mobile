@@ -27,7 +27,7 @@ public abstract class ErrorComposable implements Consumer<Throwable> {
 
 
     @Override
-    public void accept(@NonNull Throwable throwable) throws Exception {
+    public void accept(@NonNull Throwable throwable) {
         onError(throwable);
     }
 

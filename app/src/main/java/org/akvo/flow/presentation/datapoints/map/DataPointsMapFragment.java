@@ -19,6 +19,7 @@
 
 package org.akvo.flow.presentation.datapoints.map;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -40,6 +41,7 @@ import org.akvo.flow.injector.component.ViewComponent;
 import org.akvo.flow.offlinemaps.presentation.MapBoxMapItemListViewImpl;
 import org.akvo.flow.offlinemaps.presentation.MapReadyCallback;
 import org.akvo.flow.presentation.datapoints.DataPointSyncSnackBarManager;
+import org.akvo.flow.tracking.TrackingListener;
 import org.akvo.flow.ui.Navigator;
 import org.akvo.flow.util.ConstantUtil;
 
@@ -52,6 +54,8 @@ import androidx.fragment.app.FragmentActivity;
 
 public class DataPointsMapFragment extends Fragment implements DataPointsMapView,
         MapReadyCallback {
+
+    private static final int MAP_TAB = 1;
 
     @Inject
     DataPointSyncSnackBarManager dataPointSyncSnackBarManager;
@@ -71,6 +75,8 @@ public class DataPointsMapFragment extends Fragment implements DataPointsMapView
     private FloatingActionButton offlineMapsFab;
     private MapBoxMapItemListViewImpl mapView;
 
+    private TrackingListener trackingListener;
+
     public static DataPointsMapFragment newInstance(SurveyGroup surveyGroup) {
         DataPointsMapFragment fragment = new DataPointsMapFragment();
         Bundle args = new Bundle();
@@ -83,6 +89,18 @@ public class DataPointsMapFragment extends Fragment implements DataPointsMapView
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+
+        FragmentActivity activity = getActivity();
+        if (! (activity instanceof TrackingListener)) {
+            throw new IllegalArgumentException("Activity must implement TrackingListener");
+        } else {
+            trackingListener = (TrackingListener) activity;
+        }
     }
 
     @Override
@@ -209,9 +227,15 @@ public class DataPointsMapFragment extends Fragment implements DataPointsMapView
         switch (item.getItemId()) {
             case R.id.download:
                 presenter.onSyncRecordsPressed();
+                if (trackingListener != null) {
+                    trackingListener.logDownloadEvent(MAP_TAB);
+                }
                 return true;
             case R.id.upload:
                 presenter.onUploadPressed();
+                if (trackingListener != null) {
+                    trackingListener.logUploadEvent(MAP_TAB);
+                }
                 return true;
             default:
                 return false;

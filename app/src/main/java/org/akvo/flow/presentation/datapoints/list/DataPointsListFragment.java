@@ -79,6 +79,8 @@ import timber.log.Timber;
 public class DataPointsListFragment extends Fragment implements LocationListener,
         OnItemClickListener, OrderByDialogListener, DataPointsListView {
 
+    private static final int LIST_TAB = 0;
+
     @Inject
     DataPointSyncSnackBarManager dataPointSyncSnackBarManager;
 
@@ -372,13 +374,13 @@ public class DataPointsListFragment extends Fragment implements LocationListener
             case R.id.download:
                 presenter.onDownloadPressed();
                 if (trackingListener != null) {
-                    trackingListener.logDownloadEvent(0);
+                    trackingListener.logDownloadEvent(LIST_TAB);
                 }
                 return true;
             case R.id.upload:
                 presenter.onUploadPressed();
                 if (trackingListener != null) {
-                    trackingListener.logUploadEvent(0);
+                    trackingListener.logUploadEvent(LIST_TAB);
                 }
                 return true;
             default:

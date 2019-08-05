@@ -607,7 +607,7 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     @Override
     public void logStatsEvent(int selectedTab) {
         if (trackingHelper != null) {
-            String fromTab = selectedTab == 0 ? "list" : "google_map";
+            String fromTab = selectedTab == 0 ? "list" : "map";
             trackingHelper.logStatsEvent(fromTab);
         }
     }
@@ -622,7 +622,7 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     @Override
     public void logDownloadEvent(int selectedTab) {
         if (trackingHelper != null) {
-            String fromTab = selectedTab == 0 ? "list" : "google_map";
+            String fromTab = selectedTab == 0 ? "list" : "map";
             trackingHelper.logDownloadEvent(fromTab);
         }
     }
@@ -630,7 +630,7 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     @Override
     public void logUploadEvent(int selectedTab) {
         if (trackingHelper != null) {
-            String fromTab = selectedTab == 0 ? "list" : "google_map";
+            String fromTab = selectedTab == 0 ? "list" : "map";
             trackingHelper.logUploadEvent(fromTab);
         }
     }

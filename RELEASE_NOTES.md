@@ -1,5 +1,11 @@
 Akvo FLOW app release notes
 ===========================
+# ver 2.8.0.1
+Date: 06 August 2019
+
+* **Crash when trying to create a geoshape in Android 9.0** - [#1458](https://github.com/akvo/akvo-flow-mobile/issues/1458)
+
+---------------
 # ver 2.8.0
 Date: 06 August 2019
 

@@ -20,15 +20,15 @@
 package org.akvo.flow.app;
 
 import android.content.res.Configuration;
-import android.support.annotation.Nullable;
-import android.support.multidex.MultiDexApplication;
 import android.text.TextUtils;
 
 import com.crashlytics.android.Crashlytics;
 import com.crashlytics.android.core.CrashlyticsCore;
+import com.mapbox.mapboxsdk.Mapbox;
 import com.squareup.leakcanary.LeakCanary;
 
 import org.akvo.flow.BuildConfig;
+import org.akvo.flow.R;
 import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.domain.entity.User;
 import org.akvo.flow.domain.interactor.DefaultObserver;
@@ -49,6 +49,8 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import androidx.annotation.Nullable;
+import androidx.multidex.MultiDexApplication;
 import io.fabric.sdk.android.Fabric;
 import timber.log.Timber;
 
@@ -78,6 +80,8 @@ public class FlowApp extends MultiDexApplication {
             // You should not init your app in this process.
             return;
         }
+
+        Mapbox.getInstance(this, getString(R.string.mapbox_token));
 
         installLeakCanary();
         initializeInjector();

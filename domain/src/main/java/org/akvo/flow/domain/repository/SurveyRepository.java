@@ -20,7 +20,7 @@
 
 package org.akvo.flow.domain.repository;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import org.akvo.flow.domain.entity.DataPoint;
 import org.akvo.flow.domain.entity.FormInstanceMetadata;
@@ -42,6 +42,8 @@ public interface SurveyRepository {
 
     Observable<List<DataPoint>> getDataPoints(Long surveyGroupId, Double latitude,
             Double longitude, Integer orderBy);
+
+    Single<DataPoint> getDataPoint(String datapointId);
 
     Flowable<Integer> downloadDataPoints(long surveyGroupId);
 

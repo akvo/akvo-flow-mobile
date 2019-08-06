@@ -25,7 +25,6 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
-import android.test.suitebuilder.annotation.SmallTest;
 import org.akvo.flow.data.util.FileHelper;
 import org.junit.Before;
 import org.junit.Test;
@@ -43,7 +42,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.powermock.api.mockito.PowerMockito.*;
 
-@SmallTest
 @RunWith(PowerMockRunner.class)
 public class MediaResolverHelperTest {
 

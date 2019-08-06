@@ -29,39 +29,41 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.content.FileProvider;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 
 import org.akvo.flow.R;
 import org.akvo.flow.activity.AddUserActivity;
 import org.akvo.flow.activity.AppUpdateActivity;
 import org.akvo.flow.activity.FormActivity;
 import org.akvo.flow.activity.GeoshapeActivity;
-import org.akvo.flow.activity.MapActivity;
 import org.akvo.flow.activity.RecordActivity;
 import org.akvo.flow.activity.SurveyActivity;
 import org.akvo.flow.activity.TransmissionHistoryActivity;
 import org.akvo.flow.domain.SurveyGroup;
+import org.akvo.flow.offlinemaps.presentation.list.OfflineAreasListActivity;
 import org.akvo.flow.presentation.AppDownloadDialogFragment;
 import org.akvo.flow.presentation.FullImageActivity;
 import org.akvo.flow.presentation.about.AboutActivity;
+import org.akvo.flow.presentation.datapoints.map.one.DataPointMapActivity;
 import org.akvo.flow.presentation.entity.ViewApkData;
 import org.akvo.flow.presentation.help.HelpActivity;
 import org.akvo.flow.presentation.legal.LegalNoticesActivity;
 import org.akvo.flow.presentation.settings.PreferenceActivity;
 import org.akvo.flow.presentation.signature.SignatureActivity;
-import org.akvo.flow.presentation.walkthrough.WalkThroughActivity;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.StringUtil;
+import org.akvo.flow.walkthrough.presentation.OfflineMapsWalkThroughActivity;
 
 import java.io.File;
 import java.util.List;
 
 import javax.inject.Inject;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.TaskStackBuilder;
+import androidx.core.content.FileProvider;
 import timber.log.Timber;
 
 public class Navigator {
@@ -96,18 +98,18 @@ public class Navigator {
         Intent intent = new Intent(context, RecordActivity.class);
         Bundle extras = new Bundle();
         extras.putSerializable(ConstantUtil.SURVEY_GROUP_EXTRA, mSurveyGroup);
-        extras.putString(ConstantUtil.RECORD_ID_EXTRA, surveyedLocaleId);
+        extras.putString(ConstantUtil.DATA_POINT_ID_EXTRA, surveyedLocaleId);
         intent.putExtras(extras);
         context.startActivity(intent);
     }
 
     //TODO: confusing, too many params, use object
-    public void navigateToFormActivity(Activity activity, String surveyedLocaleId, String formId,
+    public void navigateToFormActivity(Activity activity, String dataPointId, String formId,
             long formInstanceId, boolean readOnly, SurveyGroup mSurveyGroup) {
         Intent i = new Intent(activity, FormActivity.class);
         i.putExtra(ConstantUtil.FORM_ID_EXTRA, formId);
         i.putExtra(ConstantUtil.SURVEY_GROUP_EXTRA, mSurveyGroup);
-        i.putExtra(ConstantUtil.SURVEYED_LOCALE_ID_EXTRA, surveyedLocaleId);
+        i.putExtra(ConstantUtil.DATA_POINT_ID_EXTRA, dataPointId);
         i.putExtra(ConstantUtil.RESPONDENT_ID_EXTRA, formInstanceId);
         i.putExtra(ConstantUtil.READ_ONLY_EXTRA, readOnly);
         activity.startActivityForResult(i, ConstantUtil.FORM_FILLING_REQUEST);
@@ -188,8 +190,8 @@ public class Navigator {
     }
 
     public void navigateToMapActivity(@NonNull Context context, String recordId) {
-        context.startActivity(new Intent(context, MapActivity.class)
-                .putExtra(ConstantUtil.SURVEYED_LOCALE_ID_EXTRA, recordId));
+        context.startActivity(new Intent(context, DataPointMapActivity.class)
+                .putExtra(ConstantUtil.DATA_POINT_ID_EXTRA, recordId));
     }
 
     public void navigateToTransmissionActivity(Context context, long surveyInstanceId) {
@@ -338,8 +340,10 @@ public class Navigator {
     }
 
     public void navigateToWalkThrough(Context context) {
-        Intent intent = new Intent(context, WalkThroughActivity.class);
-        context.startActivity(intent);
+        TaskStackBuilder.create(context)
+                .addParentStack(OfflineMapsWalkThroughActivity.class)
+                .addNextIntent(new Intent(context, OfflineMapsWalkThroughActivity.class))
+                .startActivities();
     }
 
     public void navigateToGetPhoto(AppCompatActivity activity) {
@@ -365,6 +369,13 @@ public class Navigator {
             Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
                     Uri.fromParts("package", context.getPackageName(), null));
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            context.startActivity(intent);
+        }
+    }
+
+    public void navigateToOfflineAreasList(@Nullable Context context) {
+        if (context != null) {
+            Intent intent = new Intent(context, OfflineAreasListActivity.class);
             context.startActivity(intent);
         }
     }

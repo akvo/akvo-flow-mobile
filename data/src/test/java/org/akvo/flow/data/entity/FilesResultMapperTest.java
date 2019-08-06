@@ -20,8 +20,6 @@
 
 package org.akvo.flow.data.entity;
 
-import android.test.suitebuilder.annotation.SmallTest;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.modules.junit4.PowerMockRunner;
@@ -35,7 +33,6 @@ import static org.junit.Assert.assertEquals;
 import static org.powermock.api.mockito.PowerMockito.spy;
 import static org.powermock.api.mockito.PowerMockito.when;
 
-@SmallTest
 @RunWith(PowerMockRunner.class)
 public class FilesResultMapperTest {
 

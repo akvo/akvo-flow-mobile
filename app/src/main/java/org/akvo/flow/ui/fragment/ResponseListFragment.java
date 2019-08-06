@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2013-2018 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2013-2019 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -27,12 +27,12 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.ListFragment;
-import android.support.v4.app.LoaderManager.LoaderCallbacks;
-import android.support.v4.content.Loader;
-import android.support.v4.content.LocalBroadcastManager;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.ListFragment;
+import androidx.loader.app.LoaderManager.LoaderCallbacks;
+import androidx.loader.content.Loader;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.MenuItem;
@@ -57,7 +57,7 @@ import javax.inject.Inject;
 import timber.log.Timber;
 
 import static org.akvo.flow.util.ConstantUtil.READ_ONLY_TAG_KEY;
-import static org.akvo.flow.util.ConstantUtil.RECORD_ID_EXTRA;
+import static org.akvo.flow.util.ConstantUtil.DATA_POINT_ID_EXTRA;
 import static org.akvo.flow.util.ConstantUtil.RESPONDENT_ID_TAG_KEY;
 import static org.akvo.flow.util.ConstantUtil.SURVEY_GROUP_EXTRA;
 import static org.akvo.flow.util.ConstantUtil.SURVEY_ID_TAG_KEY;
@@ -98,7 +98,7 @@ public class ResponseListFragment extends ListFragment implements LoaderCallback
         super.onActivityCreated(savedInstanceState);
         Intent intent = getActivity().getIntent();
         mSurveyGroup = (SurveyGroup) intent.getSerializableExtra(SURVEY_GROUP_EXTRA);
-        recordId = intent.getStringExtra(RECORD_ID_EXTRA);
+        recordId = intent.getStringExtra(DATA_POINT_ID_EXTRA);
 
         if (mAdapter == null) {
             mAdapter = new ResponseListAdapter(getActivity());

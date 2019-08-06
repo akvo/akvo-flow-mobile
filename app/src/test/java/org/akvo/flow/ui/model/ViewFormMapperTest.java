@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2010-2017,2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -20,7 +20,6 @@
 
 package org.akvo.flow.ui.model;
 
-import android.test.suitebuilder.annotation.SmallTest;
 import android.text.TextUtils;
 
 import org.akvo.flow.data.loader.models.FormInfo;
@@ -46,7 +45,6 @@ import static junit.framework.Assert.assertTrue;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 
-@SmallTest
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(TextUtils.class)
 public class ViewFormMapperTest {

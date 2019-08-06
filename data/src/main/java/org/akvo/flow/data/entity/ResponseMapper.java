@@ -21,9 +21,9 @@
 package org.akvo.flow.data.entity;
 
 import android.database.Cursor;
-import android.support.annotation.NonNull;
-import android.support.annotation.VisibleForTesting;
-import android.support.v4.util.Pair;
+import androidx.annotation.NonNull;
+import androidx.annotation.VisibleForTesting;
+import androidx.core.util.Pair;
 
 import org.akvo.flow.database.ResponseColumns;
 import org.akvo.flow.domain.entity.Response;

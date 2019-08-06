@@ -20,7 +20,6 @@
 
 package org.akvo.flow.data.entity;
 
-import android.test.suitebuilder.annotation.SmallTest;
 import org.akvo.flow.data.util.FileHelper;
 import org.akvo.flow.data.util.FlowFileBrowser;
 import org.junit.Test;
@@ -36,7 +35,6 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 
-@SmallTest
 @RunWith(PowerMockRunner.class)
 public class S3FileMapperTest {
 

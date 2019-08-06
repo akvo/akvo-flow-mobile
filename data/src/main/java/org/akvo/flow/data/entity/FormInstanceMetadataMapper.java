@@ -21,7 +21,7 @@
 package org.akvo.flow.data.entity;
 
 import android.database.Cursor;
-import android.support.v4.util.Pair;
+import androidx.core.util.Pair;
 
 import org.akvo.flow.data.util.Constants;
 import org.akvo.flow.domain.entity.FormInstanceMetadata;

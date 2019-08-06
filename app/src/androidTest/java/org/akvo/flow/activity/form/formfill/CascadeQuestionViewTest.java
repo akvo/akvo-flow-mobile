@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -22,11 +22,6 @@ package org.akvo.flow.activity.form.formfill;
 
 import android.content.Context;
 import android.content.Intent;
-import android.support.test.InstrumentationRegistry;
-import android.support.test.espresso.ViewInteraction;
-import android.support.test.filters.MediumTest;
-import android.support.test.rule.ActivityTestRule;
-import android.support.test.runner.AndroidJUnit4;
 import android.util.SparseArray;
 import android.widget.AdapterView;
 
@@ -52,16 +47,22 @@ import org.junit.runner.RunWith;
 import java.util.List;
 import java.util.Random;
 
-import static android.support.test.espresso.Espresso.onData;
-import static android.support.test.espresso.Espresso.onView;
-import static android.support.test.espresso.action.ViewActions.click;
-import static android.support.test.espresso.action.ViewActions.scrollTo;
-import static android.support.test.espresso.assertion.ViewAssertions.matches;
-import static android.support.test.espresso.matcher.ViewMatchers.isAssignableFrom;
-import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
-import static android.support.test.espresso.matcher.ViewMatchers.withId;
-import static android.support.test.espresso.matcher.ViewMatchers.withSpinnerText;
-import static android.support.test.espresso.matcher.ViewMatchers.withTagValue;
+import androidx.test.espresso.ViewInteraction;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
+import androidx.test.filters.MediumTest;
+import androidx.test.platform.app.InstrumentationRegistry;
+import androidx.test.rule.ActivityTestRule;
+
+import static androidx.test.espresso.Espresso.onData;
+import static androidx.test.espresso.Espresso.onView;
+import static androidx.test.espresso.action.ViewActions.click;
+import static androidx.test.espresso.action.ViewActions.scrollTo;
+import static androidx.test.espresso.assertion.ViewAssertions.matches;
+import static androidx.test.espresso.matcher.ViewMatchers.isAssignableFrom;
+import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
+import static androidx.test.espresso.matcher.ViewMatchers.withId;
+import static androidx.test.espresso.matcher.ViewMatchers.withSpinnerText;
+import static androidx.test.espresso.matcher.ViewMatchers.withTagValue;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.addExecutionDelay;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.getFormActivityIntent;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.verifyCascadeLevelNumber;
@@ -90,10 +91,10 @@ public class CascadeQuestionViewTest {
 
     @BeforeClass
     public static void beforeClass() {
-        Context targetContext = InstrumentationRegistry.getTargetContext();
+        Context targetContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
         SurveyRequisite.setRequisites(targetContext);
         installer = new SurveyInstaller(targetContext);
-        survey = installer.installSurvey(cascade_form, InstrumentationRegistry.getContext());
+        survey = installer.installSurvey(cascade_form, InstrumentationRegistry.getInstrumentation().getContext());
     }
 
     @After
@@ -103,16 +104,16 @@ public class CascadeQuestionViewTest {
 
     @AfterClass
     public static void afterClass() {
-        SurveyRequisite.resetRequisites(InstrumentationRegistry.getTargetContext());
+        SurveyRequisite.resetRequisites(InstrumentationRegistry.getInstrumentation().getTargetContext());
         installer.clearSurveys();
     }
 
     @Test
-    public void ensureCascadesFullyDisplayed() throws Exception {
+    public void ensureCascadesFullyDisplayed() {
         final List<QuestionGroup> questionGroups = survey.getQuestionGroups();
         final Question question = questionGroups.get(0).getQuestions().get(0);
         final SparseArray<List<Node>> cascadeNodes = installer
-                .getAllNodes(question, InstrumentationRegistry.getContext());
+                .getAllNodes(question, InstrumentationRegistry.getInstrumentation().getContext());
         List<Node> levelNodes = cascadeNodes.get(0);
         List<Level> levels = question.getLevels();
         if (levels != null && levels.size() > 0) {
@@ -121,7 +122,7 @@ public class CascadeQuestionViewTest {
                 verifyCascadeLevelNumber(level);
 
                 ViewInteraction cascadeLevelSpinner = onView(
-                        allOf(withId(R.id.cascade_level_spinner), withTagValue(is((Object) i))));
+                        allOf(withId(R.id.cascade_level_spinner), withTagValue(is(i))));
 
                 verifyCascadeInitialState(cascadeLevelSpinner);
 

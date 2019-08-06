@@ -19,7 +19,6 @@
 
 package org.akvo.flow.data.entity;
 
-import android.test.suitebuilder.annotation.SmallTest;
 import org.akvo.flow.data.entity.form.FormHeaderParser;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -32,7 +31,6 @@ import static junit.framework.Assert.assertFalse;
 import static junit.framework.TestCase.assertNotNull;
 import static junit.framework.TestCase.assertTrue;
 
-@SmallTest
 @RunWith(PowerMockRunner.class)
 public class FormHeaderParserTest {
 

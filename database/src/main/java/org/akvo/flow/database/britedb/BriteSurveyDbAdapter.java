@@ -22,8 +22,6 @@ package org.akvo.flow.database.britedb;
 
 import android.content.ContentValues;
 import android.database.Cursor;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import com.squareup.sqlbrite2.BriteDatabase;
@@ -45,6 +43,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
 import io.reactivex.functions.Function;
@@ -140,6 +140,21 @@ public class BriteSurveyDbAdapter {
      */
     private double correctDistanceForShortening(Double latitude) {
         return Math.pow(Math.cos(Math.toRadians(latitude)), 2);
+    }
+
+    public Cursor getDataPoint(String dataPointId) {
+        String sqlQuery =
+                "SELECT  "
+                        + RecordColumns._ID + ","
+                        + RecordColumns.RECORD_ID + ","
+                        + RecordColumns.SURVEY_GROUP_ID + ","
+                        + RecordColumns.NAME + ","
+                        + RecordColumns.LATITUDE + ","
+                        + RecordColumns.LONGITUDE + ","
+                        + RecordColumns.LAST_MODIFIED
+                        + " FROM " + Tables.RECORD
+                        + " WHERE " + RecordColumns.RECORD_ID + " = ?";
+        return briteDatabase.query(sqlQuery, dataPointId);
     }
 
     public Observable<Cursor> getDataPoints(long surveyGroupId) {

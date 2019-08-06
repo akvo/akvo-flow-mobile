@@ -22,8 +22,6 @@ package org.akvo.flow.data.datasource;
 
 import android.content.ContentValues;
 import android.database.Cursor;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import com.squareup.sqlbrite2.BriteDatabase;
@@ -54,6 +52,8 @@ import java.util.Set;
 
 import javax.inject.Inject;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.Single;
@@ -91,6 +91,10 @@ public class DatabaseDataSource {
         } else {
             return briteSurveyDbAdapter.getDataPoints(surveyGroupId);
         }
+    }
+
+    public Single<Cursor> getDataPoint(String dataPointId) {
+        return Single.just(briteSurveyDbAdapter.getDataPoint(dataPointId));
     }
 
     public Cursor getSyncedTime(long surveyGroupId) {

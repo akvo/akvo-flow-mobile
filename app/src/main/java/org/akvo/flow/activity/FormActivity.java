@@ -26,13 +26,6 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.design.widget.TabLayout;
-import android.support.v4.app.DialogFragment;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.FileProvider;
-import android.support.v4.view.ViewPager;
-import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -43,6 +36,8 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
+
+import com.google.android.material.tabs.TabLayout;
 
 import org.akvo.flow.R;
 import org.akvo.flow.app.FlowApp;
@@ -95,6 +90,12 @@ import java.util.Set;
 
 import javax.inject.Inject;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.FileProvider;
+import androidx.fragment.app.DialogFragment;
+import androidx.viewpager.widget.ViewPager;
 import timber.log.Timber;
 
 import static org.akvo.flow.util.ViewUtil.showConfirmDialog;
@@ -168,7 +169,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
         mReadOnly = intent.getBooleanExtra(ConstantUtil.READ_ONLY_EXTRA, false);
         mSurveyInstanceId = intent.getLongExtra(ConstantUtil.RESPONDENT_ID_EXTRA, 0);
         mSurveyGroup = (SurveyGroup) intent.getSerializableExtra(ConstantUtil.SURVEY_GROUP_EXTRA);
-        mRecordId = intent.getStringExtra(ConstantUtil.SURVEYED_LOCALE_ID_EXTRA);
+        mRecordId = intent.getStringExtra(ConstantUtil.DATA_POINT_ID_EXTRA);
 
         mQuestionResponses = new HashMap<>();
         mDatabase.open();

@@ -1,5 +1,27 @@
 Akvo FLOW app release notes
 ===========================
+# ver 2.8.0
+Date: 06 August 2019
+
+* **Offline maps** - [#238](https://github.com/akvo/akvo-flow-mobile/issues/238)
+* **Display data points map using Mapbox** - [#1339](https://github.com/akvo/akvo-flow-mobile/issues/1339)
+* **Offline maps button** - [#1340](https://github.com/akvo/akvo-flow-mobile/issues/1340)
+* **Display dialog to chose from offline or live map** - [#1341](https://github.com/akvo/akvo-flow-mobile/issues/1341)
+* **Offline area creation** - [#1342](https://github.com/akvo/akvo-flow-mobile/issues/1342)
+* **Add details about offline maps to walkthrough** - [#1343](https://github.com/akvo/akvo-flow-mobile/issues/1343)
+* **Offline maps list** - [#1344](https://github.com/akvo/akvo-flow-mobile/issues/1344)
+* **Offline maps list actions** - [#1345](https://github.com/akvo/akvo-flow-mobile/issues/1345)
+* **Offline maps tracking** - [#1359](https://github.com/akvo/akvo-flow-mobile/issues/1359)
+* **Migrate to jetpack** - [#1365](https://github.com/akvo/akvo-flow-mobile/issues/1365)
+* **Move offline maps to separate module** - [#1421](https://github.com/akvo/akvo-flow-mobile/issues/1421)
+* **Abstract maps in datapoints** - [#1424](https://github.com/akvo/akvo-flow-mobile/issues/1424)
+* **View single datapoint also to use mapbox** - [#1426](https://github.com/akvo/akvo-flow-mobile/issues/1426)
+* **Testing offline maps** - [#1428](https://github.com/akvo/akvo-flow-mobile/issues/1428)
+* **Move values to another module** - [#1443](https://github.com/akvo/akvo-flow-mobile/issues/1443)
+* **Offline maps issues part2** - [#1445](https://github.com/akvo/akvo-flow-mobile/issues/1445)
+* **Signature question not complete** - [#1446](https://github.com/akvo/akvo-flow-mobile/issues/1446)
+
+---------------
 # ver 2.7.4
 Date: 04 July 2019
 

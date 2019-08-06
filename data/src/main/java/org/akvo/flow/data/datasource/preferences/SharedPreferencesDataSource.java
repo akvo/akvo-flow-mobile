@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -21,7 +21,6 @@
 package org.akvo.flow.data.datasource.preferences;
 
 import android.content.SharedPreferences;
-import android.support.annotation.Nullable;
 
 import org.akvo.flow.domain.entity.ApkData;
 import org.akvo.flow.domain.util.GsonMapper;
@@ -29,6 +28,7 @@ import org.akvo.flow.domain.util.GsonMapper;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import androidx.annotation.Nullable;
 import io.reactivex.Observable;
 
 @Singleton
@@ -47,7 +47,6 @@ public class SharedPreferencesDataSource {
     private static final String KEY_CELL_UPLOAD = "data.cellular.upload";
     private static final String KEY_SURVEY_GROUP_ID = "surveyGroupId";
     private static final String KEY_USER_ID = "userId";
-    private static final String KEY_SECURITY_WALKTHROUGH_SEEN = "security_walkthrough_seen";
     private static final boolean DEFAULT_VALUE_CELL_UPLOAD = false;
     private static final long LONG_VALUE_UNSET = -1;
     private static final String KEY_APK_DATA = "apk_data";
@@ -146,15 +145,6 @@ public class SharedPreferencesDataSource {
         return Observable.just(preferences.getBoolean(KEY_SETUP, false));
     }
 
-    public Observable<Boolean> wasSecurityWalkThroughSeen() {
-        return Observable.just(preferences.getBoolean(KEY_SECURITY_WALKTHROUGH_SEEN, false));
-    }
-
-    public Observable<Boolean> setSecurityWalkThroughSeen() {
-        setBoolean(KEY_SECURITY_WALKTHROUGH_SEEN, true);
-        return Observable.just(true);
-    }
-
     public Observable<Boolean> clearUserPreferences() {
         clearSelectedSurvey();
         clearSelectedUser();
@@ -194,6 +184,7 @@ public class SharedPreferencesDataSource {
         removePreference(KEY_APP_UPDATE_LAST_NOTIFIED);
         return Observable.just(true);
     }
+
 
     protected String getString(String key, String defaultValue) {
         return preferences.getString(key, defaultValue);

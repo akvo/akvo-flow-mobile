@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -63,10 +63,6 @@ public interface UserRepository {
     Observable<Boolean> clearUserPreferences();
 
     Observable<Boolean> isDeviceSetUp();
-
-    Observable<Boolean> wasWalkThroughSeen();
-
-    Observable<Boolean> setWalkThroughSeen();
 
     Observable<Boolean> mobileUploadSet();
 

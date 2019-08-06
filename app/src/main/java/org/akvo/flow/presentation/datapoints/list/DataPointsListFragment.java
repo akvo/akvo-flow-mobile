@@ -32,12 +32,12 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.v4.app.DialogFragment;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.content.LocalBroadcastManager;
-import android.support.v7.widget.SearchView;
+import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
+import androidx.core.content.ContextCompat;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.appcompat.widget.SearchView;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -78,6 +78,8 @@ import timber.log.Timber;
 
 public class DataPointsListFragment extends Fragment implements LocationListener,
         OnItemClickListener, OrderByDialogListener, DataPointsListView {
+
+    private static final int LIST_TAB = 0;
 
     @Inject
     DataPointSyncSnackBarManager dataPointSyncSnackBarManager;
@@ -372,13 +374,13 @@ public class DataPointsListFragment extends Fragment implements LocationListener
             case R.id.download:
                 presenter.onDownloadPressed();
                 if (trackingListener != null) {
-                    trackingListener.logDownloadEvent(0);
+                    trackingListener.logDownloadEvent(LIST_TAB);
                 }
                 return true;
             case R.id.upload:
                 presenter.onUploadPressed();
                 if (trackingListener != null) {
-                    trackingListener.logUploadEvent(0);
+                    trackingListener.logUploadEvent(LIST_TAB);
                 }
                 return true;
             default:

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -134,16 +134,6 @@ public class UserDataRepository implements UserRepository {
     @Override
     public Observable<Boolean> isDeviceSetUp() {
         return dataSourceFactory.getSharedPreferencesDataSource().isDeviceSetup();
-    }
-
-    @Override
-    public Observable<Boolean> wasWalkThroughSeen() {
-        return dataSourceFactory.getSharedPreferencesDataSource().wasSecurityWalkThroughSeen();
-    }
-
-    @Override
-    public Observable<Boolean> setWalkThroughSeen() {
-        return dataSourceFactory.getSharedPreferencesDataSource().setSecurityWalkThroughSeen();
     }
 
     @Override

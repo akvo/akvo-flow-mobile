@@ -20,27 +20,16 @@
 package org.akvo.flow.activity;
 
 import android.Manifest;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.DialogFragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
-import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
+
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import org.akvo.flow.R;
 import org.akvo.flow.app.FlowApp;
@@ -57,6 +46,10 @@ import org.akvo.flow.domain.util.VersionHelper;
 import org.akvo.flow.injector.component.ApplicationComponent;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
+import org.akvo.flow.offlinemaps.domain.entity.DomainOfflineArea;
+import org.akvo.flow.offlinemaps.presentation.OfflineMapSelectedListener;
+import org.akvo.flow.offlinemaps.presentation.dialog.OfflineMapsDialog;
+import org.akvo.flow.offlinemaps.presentation.infowindow.InfoWindowLayout;
 import org.akvo.flow.presentation.SnackBarManager;
 import org.akvo.flow.presentation.UserDeleteConfirmationDialog;
 import org.akvo.flow.presentation.entity.ViewApkData;
@@ -66,14 +59,15 @@ import org.akvo.flow.presentation.navigation.FlowNavigationView;
 import org.akvo.flow.presentation.navigation.SurveyDeleteConfirmationDialog;
 import org.akvo.flow.presentation.navigation.UserOptionsDialog;
 import org.akvo.flow.presentation.navigation.ViewUser;
+import org.akvo.flow.presentation.survey.FABListener;
 import org.akvo.flow.presentation.survey.SurveyPresenter;
 import org.akvo.flow.presentation.survey.SurveyView;
 import org.akvo.flow.service.BootstrapService;
 import org.akvo.flow.service.DataFixService;
 import org.akvo.flow.service.SurveyDownloadService;
 import org.akvo.flow.service.TimeCheckService;
-import org.akvo.flow.tracking.TrackingListener;
 import org.akvo.flow.tracking.TrackingHelper;
+import org.akvo.flow.tracking.TrackingListener;
 import org.akvo.flow.ui.Navigator;
 import org.akvo.flow.ui.fragment.DatapointsFragment;
 import org.akvo.flow.ui.fragment.RecordListListener;
@@ -88,6 +82,16 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.FragmentManager;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -97,7 +101,8 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
         FlowNavigationView.DrawerNavigationListener,
         SurveyDeleteConfirmationDialog.SurveyDeleteListener, UserOptionsDialog.UserOptionListener,
         UserDeleteConfirmationDialog.UserDeleteListener, EditUserDialog.EditUserListener,
-        CreateUserDialog.CreateUserListener, SurveyView, TrackingListener {
+        CreateUserDialog.CreateUserListener, SurveyView, TrackingListener, FABListener,
+        OfflineMapSelectedListener, InfoWindowLayout.InfoWindowSelectionListener {
 
     public static final int NAVIGATION_DRAWER_DELAY_MILLIS = 250;
     private static final String DATA_POINTS_FRAGMENT_TAG = "datapoints_fragment";
@@ -155,6 +160,7 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.survey_activity);
+
         initializeInjector();
         ButterKnife.bind(this);
 
@@ -320,14 +326,11 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     }
 
     private void permissionsNotGranted() {
-        final View.OnClickListener retryListener = new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (appPermissionsHelper.userPressedDoNotShowAgain(SurveyActivity.this)) {
-                    navigator.navigateToAppSystemSettings(SurveyActivity.this);
-                } else {
-                    handlePermissions();
-                }
+        final View.OnClickListener retryListener = v -> {
+            if (appPermissionsHelper.userPressedDoNotShowAgain(SurveyActivity.this)) {
+                navigator.navigateToAppSystemSettings(SurveyActivity.this);
+            } else {
+                handlePermissions();
             }
         };
         snackBarManager
@@ -338,17 +341,17 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
 
     private void updateAddDataPointFab() {
         if (mSurveyGroup != null) {
-            addDataPointFab.setVisibility(View.VISIBLE);
+            addDataPointFab.show();
             addDataPointFab.setEnabled(true);
         } else {
-            addDataPointFab.setVisibility(View.GONE);
+            addDataPointFab.hide();
         }
     }
 
     @Override
     public void onBackPressed() {
-        if (mDrawerLayout.isDrawerOpen(Gravity.START)) {
-            mDrawerLayout.closeDrawer(Gravity.START);
+        if (mDrawerLayout.isDrawerOpen(GravityCompat.START)) {
+            mDrawerLayout.closeDrawer(GravityCompat.START);
         } else {
             super.onBackPressed();
         }
@@ -391,12 +394,7 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     private void displayExternalStorageMissing() {
         ViewUtil.showConfirmDialog(R.string.checksd, R.string.sdmissing, this,
                 false,
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        SurveyActivity.this.finish();
-                    }
-                },
+                (dialog, which) -> SurveyActivity.this.finish(),
                 null);
     }
 
@@ -417,8 +415,7 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
 
         selectedSurveyId = mSurveyGroup != null ? mSurveyGroup.getId() : SurveyGroup.ID_NONE;
 
-        DatapointsFragment f = (DatapointsFragment) getSupportFragmentManager().findFragmentByTag(
-                DATA_POINTS_FRAGMENT_TAG);
+        DatapointsFragment f = getDataPointsFragment();
         if (f != null) {
             f.refresh(mSurveyGroup);
         }
@@ -570,32 +567,22 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
 
     @Override
     public void navigateToHelp() {
-        navigate(new Runnable() {
-            @Override
-            public void run() {
-                navigator.navigateToHelp(SurveyActivity.this);
-            }
-        });
+        navigate(() -> navigator.navigateToHelp(SurveyActivity.this));
     }
 
     @Override
     public void navigateToAbout() {
-        navigate(new Runnable() {
-            @Override
-            public void run() {
-                navigator.navigateToAbout(SurveyActivity.this);
-            }
-        });
+        navigate(() -> navigator.navigateToAbout(SurveyActivity.this));
     }
 
     @Override
     public void navigateToSettings() {
-        navigate(new Runnable() {
-            @Override
-            public void run() {
-                navigator.navigateToAppSettings(SurveyActivity.this);
-            }
-        });
+        navigate(() -> navigator.navigateToAppSettings(SurveyActivity.this));
+    }
+
+    @Override
+    public void navigateToOfflineMaps() {
+        navigate(() -> navigator.navigateToOfflineAreasList(SurveyActivity.this));
     }
 
     private void navigate(Runnable runnable) {
@@ -620,7 +607,7 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     @Override
     public void logStatsEvent(int selectedTab) {
         if (trackingHelper != null) {
-            String fromTab = selectedTab == 0 ? "list" : "google_map";
+            String fromTab = selectedTab == 0 ? "list" : "map";
             trackingHelper.logStatsEvent(fromTab);
         }
     }
@@ -635,7 +622,7 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     @Override
     public void logDownloadEvent(int selectedTab) {
         if (trackingHelper != null) {
-            String fromTab = selectedTab == 0 ? "list" : "google_map";
+            String fromTab = selectedTab == 0 ? "list" : "map";
             trackingHelper.logDownloadEvent(fromTab);
         }
     }
@@ -643,7 +630,7 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     @Override
     public void logUploadEvent(int selectedTab) {
         if (trackingHelper != null) {
-            String fromTab = selectedTab == 0 ? "list" : "google_map";
+            String fromTab = selectedTab == 0 ? "list" : "map";
             trackingHelper.logUploadEvent(fromTab);
         }
     }
@@ -679,5 +666,47 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
         if (trackingHelper != null) {
             trackingHelper.logSearchEvent();
         }
+    }
+
+    @Override
+    public void showFab() {
+        if (mSurveyGroup != null) {
+            addDataPointFab.show();
+            addDataPointFab.setEnabled(true);
+        }
+    }
+
+    @Override
+    public void hideFab() {
+        if (mSurveyGroup != null) {
+            addDataPointFab.hide();
+        }
+    }
+
+    @Override
+    public void onOfflineAreaPressed(DomainOfflineArea offlineArea) {
+        OfflineMapsDialog fragment = (OfflineMapsDialog) getSupportFragmentManager()
+                .findFragmentByTag(OfflineMapsDialog.TAG);
+        if (fragment != null) {
+            fragment.onOfflineAreaSelected(offlineArea);
+        }
+    }
+
+    @Override
+    public void onNewMapAreaSaved() {
+        DatapointsFragment fragment = getDataPointsFragment();
+        if (fragment != null) {
+            fragment.refreshMap();
+        }
+    }
+
+    private DatapointsFragment getDataPointsFragment() {
+        return (DatapointsFragment) getSupportFragmentManager().findFragmentByTag(
+                DATA_POINTS_FRAGMENT_TAG);
+    }
+
+    @Override
+    public void onWindowSelected(String id) {
+        onRecordSelected(id);
     }
 }

@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2013-2017 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2013-2017,2019 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -23,10 +23,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v4.app.ListFragment;
-import android.support.v4.app.LoaderManager.LoaderCallbacks;
-import android.support.v4.content.Loader;
 import android.text.SpannableString;
 import android.text.TextUtils;
 import android.text.style.AbsoluteSizeSpan;
@@ -50,10 +46,14 @@ import org.akvo.flow.util.PlatformUtil;
 import java.util.ArrayList;
 import java.util.List;
 
+import androidx.annotation.NonNull;
+import androidx.fragment.app.ListFragment;
+import androidx.loader.app.LoaderManager.LoaderCallbacks;
+import androidx.loader.content.Loader;
 import timber.log.Timber;
 
 import static android.text.Spanned.SPAN_INCLUSIVE_INCLUSIVE;
-import static org.akvo.flow.util.ConstantUtil.RECORD_ID_EXTRA;
+import static org.akvo.flow.util.ConstantUtil.DATA_POINT_ID_EXTRA;
 
 public class FormListFragment extends ListFragment
         implements LoaderCallbacks<List<FormInfo>>, OnItemClickListener {
@@ -91,7 +91,7 @@ public class FormListFragment extends ListFragment
         super.onActivityCreated(savedInstanceState);
         Intent intent = getActivity().getIntent();
         mSurveyGroup = (SurveyGroup) intent.getSerializableExtra(ConstantUtil.SURVEY_GROUP_EXTRA);
-        recordId = intent.getStringExtra(RECORD_ID_EXTRA);
+        recordId = intent.getStringExtra(DATA_POINT_ID_EXTRA);
         setHasOptionsMenu(true);
         if (mAdapter == null) {
             mAdapter = new SurveyAdapter(getActivity());

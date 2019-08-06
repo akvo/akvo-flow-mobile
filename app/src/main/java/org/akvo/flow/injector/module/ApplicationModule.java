@@ -22,7 +22,6 @@ package org.akvo.flow.injector.module;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.support.annotation.NonNull;
 
 import com.google.gson.Gson;
 import com.squareup.sqlbrite2.BriteDatabase;
@@ -74,6 +73,7 @@ import java.util.concurrent.TimeUnit;
 
 import javax.inject.Singleton;
 
+import androidx.annotation.NonNull;
 import dagger.Module;
 import dagger.Provides;
 import io.reactivex.schedulers.Schedulers;

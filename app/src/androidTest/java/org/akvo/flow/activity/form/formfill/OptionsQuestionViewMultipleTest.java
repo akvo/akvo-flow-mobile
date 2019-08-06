@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017,2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -22,12 +22,6 @@ package org.akvo.flow.activity.form.formfill;
 
 import android.content.Context;
 import android.content.Intent;
-import android.support.test.InstrumentationRegistry;
-import android.support.test.espresso.ViewInteraction;
-import android.support.test.filters.MediumTest;
-import android.support.test.rule.ActivityTestRule;
-import android.support.test.runner.AndroidJUnit4;
-import android.view.View;
 import android.widget.CheckBox;
 
 import org.akvo.flow.R;
@@ -42,14 +36,20 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import static android.support.test.espresso.Espresso.onView;
-import static android.support.test.espresso.action.ViewActions.click;
-import static android.support.test.espresso.action.ViewActions.typeText;
-import static android.support.test.espresso.assertion.ViewAssertions.matches;
-import static android.support.test.espresso.matcher.ViewMatchers.isChecked;
-import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
-import static android.support.test.espresso.matcher.ViewMatchers.withId;
-import static android.support.test.espresso.matcher.ViewMatchers.withText;
+import androidx.test.espresso.ViewInteraction;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
+import androidx.test.filters.MediumTest;
+import androidx.test.platform.app.InstrumentationRegistry;
+import androidx.test.rule.ActivityTestRule;
+
+import static androidx.test.espresso.Espresso.onView;
+import static androidx.test.espresso.action.ViewActions.click;
+import static androidx.test.espresso.action.ViewActions.typeText;
+import static androidx.test.espresso.assertion.ViewAssertions.matches;
+import static androidx.test.espresso.matcher.ViewMatchers.isChecked;
+import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
+import static androidx.test.espresso.matcher.ViewMatchers.withId;
+import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.clickNext;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.getFormActivityIntent;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.verifyQuestionTitleDisplayed;
@@ -76,10 +76,10 @@ public class OptionsQuestionViewMultipleTest {
 
     @BeforeClass
     public static void beforeClass() {
-        Context targetContext = InstrumentationRegistry.getTargetContext();
+        Context targetContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
         SurveyRequisite.setRequisites(targetContext);
         installer = new SurveyInstaller(targetContext);
-        installer.installSurvey(option_multiple_other_form, InstrumentationRegistry.getContext());
+        installer.installSurvey(option_multiple_other_form, InstrumentationRegistry.getInstrumentation().getContext());
     }
 
     @After
@@ -89,12 +89,12 @@ public class OptionsQuestionViewMultipleTest {
 
     @AfterClass
     public static void afterClass() {
-        SurveyRequisite.resetRequisites(InstrumentationRegistry.getTargetContext());
+        SurveyRequisite.resetRequisites(InstrumentationRegistry.getInstrumentation().getTargetContext());
         installer.clearSurveys();
     }
 
     @Test
-    public void ensureCanFillOneOptionsQuestion() throws Exception {
+    public void ensureCanFillOneOptionsQuestion() {
         verifyQuestionTitleDisplayed();
 
         fillOptionsQuestion(0);
@@ -107,7 +107,7 @@ public class OptionsQuestionViewMultipleTest {
     }
 
     @Test
-    public void ensureCanFillMultipleOptionsQuestion() throws Exception {
+    public void ensureCanFillMultipleOptionsQuestion() {
         verifyQuestionTitleDisplayed();
 
         fillOptionsQuestion(0);
@@ -122,7 +122,7 @@ public class OptionsQuestionViewMultipleTest {
     }
 
     @Test
-    public void ensureCanFillOtherOptionsQuestion() throws Exception {
+    public void ensureCanFillOtherOptionsQuestion() {
         verifyQuestionTitleDisplayed();
 
         fillOptionsQuestion(2);
@@ -148,7 +148,7 @@ public class OptionsQuestionViewMultipleTest {
     }
 
     @Test
-    public void ensureCannotSubmitIfNoOptionSelected() throws Exception {
+    public void ensureCannotSubmitIfNoOptionSelected() {
         verifyQuestionTitleDisplayed();
 
         clickNext();
@@ -167,6 +167,6 @@ public class OptionsQuestionViewMultipleTest {
     }
 
     private ViewInteraction getCheckbox(int option) {
-        return onView(allOf(withId(option), IsInstanceOf.<View>instanceOf(CheckBox.class)));
+        return onView(allOf(withId(option), IsInstanceOf.instanceOf(CheckBox.class)));
     }
 }

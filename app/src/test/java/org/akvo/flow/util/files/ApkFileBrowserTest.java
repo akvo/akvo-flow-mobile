@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -21,7 +21,6 @@
 package org.akvo.flow.util.files;
 
 import android.content.Context;
-import android.test.suitebuilder.annotation.SmallTest;
 
 import org.akvo.flow.BuildConfig;
 import org.akvo.flow.domain.util.VersionHelper;
@@ -46,7 +45,6 @@ import static org.powermock.api.mockito.PowerMockito.doReturn;
 import static org.powermock.api.mockito.PowerMockito.mock;
 import static org.powermock.api.mockito.PowerMockito.spy;
 
-@SmallTest
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(FileUtil.class)
 public class ApkFileBrowserTest {

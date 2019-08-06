@@ -36,6 +36,7 @@ import org.akvo.flow.offlinemaps.di.OfflineFeatureModule;
 import org.akvo.flow.offlinemaps.domain.entity.DomainOfflineArea;
 import org.akvo.flow.offlinemaps.presentation.Navigator;
 import org.akvo.flow.offlinemaps.presentation.OfflineMapSelectedListener;
+import org.akvo.flow.offlinemaps.tracking.TrackingHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -67,6 +68,7 @@ public class OfflineMapsDialog extends DialogFragment implements OfflineMapsView
 
     private OfflineAreasAdapter adapter;
     private OfflineMapSelectedListener offlineMapSelectedListener;
+    private TrackingHelper trackingHelper;
 
     public OfflineMapsDialog() {
     }
@@ -93,7 +95,12 @@ public class OfflineMapsDialog extends DialogFragment implements OfflineMapsView
         });
         noMapsTextView = main.findViewById(R.id.noMapsTextView);
         onLineMapTextView = main.findViewById(R.id.onlineMapTextView);
-        onLineMapTextView.setOnClickListener(v -> presenter.onOnlineMapSelected());
+        onLineMapTextView.setOnClickListener(v -> {
+            presenter.onOnlineMapSelected();
+            if (trackingHelper != null) {
+                trackingHelper.logUseOnlineMapSelected();
+            }
+        });
         return builder.create();
     }
 
@@ -106,12 +113,14 @@ public class OfflineMapsDialog extends DialogFragment implements OfflineMapsView
                     "Activity must implement OfflineMapSelectedListener");
         }
         offlineMapSelectedListener = (OfflineMapSelectedListener) activity;
+        trackingHelper = new TrackingHelper(activity);
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
         offlineMapSelectedListener = null;
+        trackingHelper = null;
     }
 
     @Override
@@ -123,6 +132,9 @@ public class OfflineMapsDialog extends DialogFragment implements OfflineMapsView
         recyclerView.setAdapter(adapter);
         presenter.setView(this);
         presenter.load();
+        if (trackingHelper != null) {
+            trackingHelper.logOfflineAreasListDialogOpened();
+        }
     }
 
     private void initialiseInjector() {
@@ -175,5 +187,8 @@ public class OfflineMapsDialog extends DialogFragment implements OfflineMapsView
 
     public void onOfflineAreaSelected(DomainOfflineArea offlineArea) {
         presenter.onOfflineAreaSelected(offlineArea);
+        if (trackingHelper != null) {
+            trackingHelper.logUseOfflineAreaSelected(offlineArea.getName());
+        }
     }
 }

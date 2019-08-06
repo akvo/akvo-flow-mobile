@@ -19,11 +19,12 @@
 
 package org.akvo.flow.offlinemaps.presentation.list;
 
+import org.akvo.flow.offlinemaps.domain.entity.DomainOfflineArea;
 import org.akvo.flow.offlinemaps.domain.entity.MapInfo;
 
 public interface OfflineAreasActionListener {
 
-    void selectRegion(long regionId);
+    void selectRegion(DomainOfflineArea regionId);
 
     void renameArea(long areId, String oldName);
 

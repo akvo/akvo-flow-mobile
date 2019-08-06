@@ -20,13 +20,10 @@
 package org.akvo.flow.activity;
 
 import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
-import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -64,6 +61,8 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
+import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import timber.log.Timber;
 
 public class GeoshapeActivity extends BackActivity
@@ -107,13 +106,14 @@ public class GeoshapeActivity extends BackActivity
         setupToolBar();
 
         mFeatures = new ArrayList<>();
-        ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map)).getMapAsync(this);
+        ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map))
+                .getMapAsync(this);
 
         View addPointBtn = findViewById(R.id.add_point_btn);
         View clearFeatureBtn = findViewById(R.id.clear_feature_btn);
         mFeatureMenu = findViewById(R.id.feature_menu);
-        mFeatureName = (TextView) findViewById(R.id.feature_name);
-        mAccuracy = (TextView) findViewById(R.id.accuracy);
+        mFeatureName = findViewById(R.id.feature_name);
+        mAccuracy = findViewById(R.id.accuracy);
         mClearPointBtn = findViewById(R.id.clear_point_btn);
         findViewById(R.id.properties).setOnClickListener(mFeatureMenuListener);
 
@@ -261,7 +261,9 @@ public class GeoshapeActivity extends BackActivity
     private void setShapeResult() {
         Intent intent = new Intent();
         if (isValidShape()) {
-            intent.putExtra(ConstantUtil.GEOSHAPE_RESULT, geoJson());
+            String value = geoJson();
+            Timber.d("value");
+            intent.putExtra(ConstantUtil.GEOSHAPE_RESULT, value);
             setResult(RESULT_OK, intent);
         } else {
             setResult(RESULT_CANCELED, intent);
@@ -277,13 +279,16 @@ public class GeoshapeActivity extends BackActivity
 
             switch (v.getId()) {
                 case R.id.add_point_btn:
-                    Location location = mMap == null || !isLocationAllowed()? null : mMap.getMyLocation();
+                    Location location =
+                            mMap == null || !isLocationAllowed() ? null : mMap.getMyLocation();
                     if (location != null && location.getAccuracy() <= ACCURACY_THRESHOLD) {
                         addPoint(new LatLng(location.getLatitude(), location.getLongitude()));
                     } else {
                         Toast.makeText(GeoshapeActivity.this,
-                                       location != null ? R.string.location_inaccurate : R.string.location_unknown,
-                                       Toast.LENGTH_LONG).show();
+                                location != null ?
+                                        R.string.location_inaccurate :
+                                        R.string.location_unknown,
+                                Toast.LENGTH_LONG).show();
                     }
                     break;
                 case R.id.clear_point_btn:
@@ -302,12 +307,14 @@ public class GeoshapeActivity extends BackActivity
     };
 
     private void displayProperties() {
-        final ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line);
+        final ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
+                android.R.layout.simple_dropdown_item_1line);
         for (Feature.Property property : mCurrentFeature.getProperties()) {
             adapter.add(String.format("%s: %s", property.mDisplayName, property.mDisplayValue));
         }
 
-        new AlertDialog.Builder(GeoshapeActivity.this).setTitle("Properties").setAdapter(adapter, null).show();
+        new AlertDialog.Builder(GeoshapeActivity.this).setTitle("Properties")
+                .setAdapter(adapter, null).show();
     }
 
     /**
@@ -362,7 +369,7 @@ public class GeoshapeActivity extends BackActivity
             }
             jObject.put(JSON_FEATURES, jFeatures);
         } catch (JSONException e) {
-            Timber.e("geoJSON() - " + e.getMessage());
+            Timber.e("geoJSON() - %s", e.getMessage());
             return null;
         }
         return jObject.toString();
@@ -370,7 +377,7 @@ public class GeoshapeActivity extends BackActivity
 
     private boolean isValidShape() {
         for (Feature feature : mFeatures) {
-            if (feature!= null && !feature.getPoints().isEmpty()) {
+            if (feature != null && !feature.getPoints().isEmpty()) {
                 return true;
             }
         }
@@ -406,7 +413,8 @@ public class GeoshapeActivity extends BackActivity
                 for (int j = 0; j < lastCoordinate; j++) {
                     JSONArray jPoint = jCoordinates.getJSONArray(j);
                     LatLng point =
-                        new LatLng(jPoint.getDouble(1), jPoint.getDouble(0));// [lon, lat] -> LatLng(lat, lon)
+                            new LatLng(jPoint.getDouble(1),
+                                    jPoint.getDouble(0));// [lon, lat] -> LatLng(lat, lon)
                     points.add(point);
                     builder.include(point);
                 }
@@ -429,16 +437,14 @@ public class GeoshapeActivity extends BackActivity
                 mFeatures.add(feature);
             }
             final LatLngBounds bounds = builder.build();
-            mMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
-                @Override
-                public void onMapLoaded() {
-                    mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 60));
-                }
-            });
+            if (mMap != null) {
+                mMap.setOnMapLoadedCallback(
+                        () -> mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 60)));
+            }
         } catch (JSONException e) {
             //TODO: extract this string, what should the error message even be?
             Toast.makeText(this, "Error", Toast.LENGTH_LONG).show();
-            Timber.e("geoJSON() - " + e.getMessage());
+            Timber.e("geoJSON() - %s", e.getMessage());
             // TODO: Remove features?
         }
     }
@@ -448,13 +454,9 @@ public class GeoshapeActivity extends BackActivity
         if (mCurrentFeature == null) {
             return;
         }
-        ViewUtil.showConfirmDialog(R.string.add_point_title, R.string.add_point_text, GeoshapeActivity.this, true,
-                                   new DialogInterface.OnClickListener() {
-                                       @Override
-                                       public void onClick(DialogInterface dialog, int which) {
-                                           addPoint(latLng);
-                                       }
-                                   });
+        ViewUtil.showConfirmDialog(R.string.add_point_title, R.string.add_point_text,
+                GeoshapeActivity.this, true,
+                (dialog, which) -> addPoint(latLng));
     }
 
     @Override
@@ -478,7 +480,8 @@ public class GeoshapeActivity extends BackActivity
     @Override
     public void onMarkerDrag(Marker marker) {
         LatLng position = marker.getPosition();
-        marker.setTitle(String.format("lat/lng: %.5f, %.5f", position.latitude, position.longitude));
+        marker.setTitle(
+                String.format("lat/lng: %.5f, %.5f", position.latitude, position.longitude));
         marker.showInfoWindow();
     }
 

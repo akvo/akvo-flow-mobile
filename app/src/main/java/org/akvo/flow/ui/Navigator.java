@@ -45,6 +45,7 @@ import org.akvo.flow.presentation.FullImageActivity;
 import org.akvo.flow.presentation.about.AboutActivity;
 import org.akvo.flow.presentation.datapoints.map.one.DataPointMapActivity;
 import org.akvo.flow.presentation.entity.ViewApkData;
+import org.akvo.flow.presentation.geoshape.ViewGeoShapeActivity;
 import org.akvo.flow.presentation.help.HelpActivity;
 import org.akvo.flow.presentation.legal.LegalNoticesActivity;
 import org.akvo.flow.presentation.settings.PreferenceActivity;
@@ -173,12 +174,20 @@ public class Navigator {
                 ConstantUtil.CADDISFLY_REQUEST);
     }
 
-    public void navigateToGeoShapeActivity(@NonNull Activity activity, @Nullable Bundle data) {
+    public void navigateToCreateGeoShapeActivity(@NonNull Activity activity, @Nullable Bundle data) {
         Intent i = new Intent(activity, GeoshapeActivity.class);
         if (data != null) {
             i.putExtras(data);
         }
         activity.startActivityForResult(i, ConstantUtil.PLOTTING_REQUEST);
+    }
+
+    public void navigateToViewGeoShapeActivity(@NonNull Context context, @Nullable Bundle data) {
+        Intent i = new Intent(context, ViewGeoShapeActivity.class);
+        if (data != null) {
+            i.putExtras(data);
+        }
+        context.startActivity(i);
     }
 
     public void navigateToSignatureActivity(@NonNull Activity activity, @Nullable Bundle data) {

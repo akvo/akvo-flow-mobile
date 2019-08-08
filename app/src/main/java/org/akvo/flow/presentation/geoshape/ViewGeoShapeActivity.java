@@ -70,8 +70,8 @@ public class ViewGeoShapeActivity extends BackActivity {
     private static final String LINE_LAYER_ID = "line-layer-id";
     private static final int FILL_COLOR = 0x88736357;
     private static final int LINE_COLOR = 0xEE736357;
-    private static final int POINT_COLOR = 0xEE736357;
-    private static final int POINT_LINE_COLOR = 0xFF736357;
+    private static final int POINT_COLOR = 0xFF736357;
+    private static final int POINT_LINE_COLOR = 0xFF5B5048;
 
     private MapView mapView;
     private MapboxMap mapboxMap;

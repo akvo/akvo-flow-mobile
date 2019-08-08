@@ -29,8 +29,6 @@
         android:theme="@style/FlowAppTheme"
         android:usesCleartextTraffic="true"
         tools:ignore="GoogleAppIndexingWarning">
-        <activity
-            android:name=".presentation.geoshape.ViewGeoShapeActivity"/>
 
         <uses-library
             android:name="org.apache.http.legacy"
@@ -174,6 +172,8 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".activity.SurveyActivity" />
         </activity>
+        <activity android:name=".presentation.geoshape.ViewGeoShapeActivity"/>
+        <activity android:name=".presentation.geoshape.CreateGeoShapeActivity" />
 
         <provider
             android:name="androidx.core.content.FileProvider"

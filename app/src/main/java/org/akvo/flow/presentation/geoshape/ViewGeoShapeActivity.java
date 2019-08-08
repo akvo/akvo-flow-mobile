@@ -86,7 +86,7 @@ public class ViewGeoShapeActivity extends BackActivity {
         setContentView(R.layout.activity_view_geo_shape);
         setupToolBar();
         setUpFeatures();
-        setUMapView(savedInstanceState);
+        setUpMapView(savedInstanceState);
     }
 
     private void setUpMapView(Bundle savedInstanceState) {

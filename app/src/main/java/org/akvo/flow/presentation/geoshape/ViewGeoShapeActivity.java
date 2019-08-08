@@ -89,7 +89,7 @@ public class ViewGeoShapeActivity extends BackActivity {
         setUMapView(savedInstanceState);
     }
 
-    private void setUMapView(Bundle savedInstanceState) {
+    private void setUpMapView(Bundle savedInstanceState) {
         mapView = findViewById(org.akvo.flow.offlinemaps.R.id.mapView);
         mapView.onCreate(savedInstanceState);
         mapView.getMapAsync(mapboxMap -> {

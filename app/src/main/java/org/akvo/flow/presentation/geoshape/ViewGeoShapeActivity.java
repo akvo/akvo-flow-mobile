@@ -72,13 +72,19 @@ public class ViewGeoShapeActivity extends BackActivity {
     private static final int LINE_COLOR = 0xEE736357;
     private static final int POINT_COLOR = 0xFF736357;
     private static final int POINT_LINE_COLOR = 0xFF5B5048;
+    public static final int ANIMATION_DURATION_MS = 400;
+    public static final int ONE_POINT_ZOOM = 12;
 
     private MapView mapView;
     private MapboxMap mapboxMap;
 
-    private Style.OnStyleLoaded callback = this::updateSources;
+    private Style.OnStyleLoaded callback = style -> {
+        updateSources(style);
+        centerMap();
+    };
+
     private FeatureCollection features;
-    private LatLngBounds latLngBounds;
+    private final List<LatLng> listOfCoordinates = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,7 +96,7 @@ public class ViewGeoShapeActivity extends BackActivity {
     }
 
     private void setUpMapView(Bundle savedInstanceState) {
-        mapView = findViewById(org.akvo.flow.offlinemaps.R.id.mapView);
+        mapView = findViewById(R.id.mapView);
         mapView.onCreate(savedInstanceState);
         mapView.getMapAsync(mapboxMap -> {
             this.mapboxMap = mapboxMap;
@@ -107,25 +113,24 @@ public class ViewGeoShapeActivity extends BackActivity {
 
         List<Feature> features = this.features.features();
         if (features != null && !features.isEmpty()) {
-            LatLngBounds.Builder builder = new LatLngBounds.Builder();
+
             for (Feature feature : features) {
                 Geometry geometry = feature.geometry();
                 if (geometry instanceof Polygon) {
                     List<List<Point>> coordinates = ((Polygon) geometry).coordinates();
                     for (List<Point> points : coordinates) {
                         for (Point p : points) {
-                            builder.include(new LatLng(p.latitude(), p.longitude()));
+                            listOfCoordinates.add(new LatLng(p.latitude(), p.longitude()));
                         }
                     }
                 } else if (geometry instanceof LineString) {
                     List<Point> coordinates = ((LineString) geometry).coordinates();
-                    builder.includes(getListOfCoordinates(coordinates));
+                    listOfCoordinates.addAll(getListOfCoordinates(coordinates));
                 } else if (geometry instanceof MultiPoint) {
                     List<Point> coordinates = ((MultiPoint) geometry).coordinates();
-                    builder.includes(getListOfCoordinates(coordinates));
+                    listOfCoordinates.addAll(getListOfCoordinates(coordinates));
                 }
             }
-            latLngBounds = builder.build();
         }
     }
 
@@ -141,10 +146,21 @@ public class ViewGeoShapeActivity extends BackActivity {
         fillSource.setGeoJson(features);
         lineSource.setGeoJson(features);
         circleSource.setGeoJson(features);
+    }
 
-        if (latLngBounds != null) {
-            CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngBounds(latLngBounds, 100);
-            mapboxMap.animateCamera(cameraUpdate, 400);
+    private void centerMap() {
+        if (mapboxMap != null) {
+            if (listOfCoordinates.size() == 1) {
+                CameraUpdate cameraUpdate = CameraUpdateFactory
+                        .newLatLngZoom(listOfCoordinates.get(0), ONE_POINT_ZOOM);
+                mapboxMap.animateCamera(cameraUpdate, ANIMATION_DURATION_MS);
+            } else if (listOfCoordinates.size() > 1) {
+                LatLngBounds.Builder builder = new LatLngBounds.Builder();
+                builder.includes(listOfCoordinates);
+                LatLngBounds latLngBounds = builder.build();
+                CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngBounds(latLngBounds, 100);
+                mapboxMap.animateCamera(cameraUpdate, ANIMATION_DURATION_MS);
+            }
         }
     }
 

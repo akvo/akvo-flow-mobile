@@ -101,12 +101,14 @@ public class ViewGeoShapeActivity extends BackActivity {
     private void setUpFeatures() {
         String geoJSON = getIntent().getStringExtra(ConstantUtil.GEOSHAPE_RESULT);
         Timber.d(geoJSON);
-        features = FeatureCollection.fromJson(geoJSON);
+        features = geoJSON == null ?
+                FeatureCollection.fromFeatures(new Feature[0]) :
+                FeatureCollection.fromJson(geoJSON);
 
         List<Feature> features = this.features.features();
-        if (features != null) {
+        if (features != null && !features.isEmpty()) {
             LatLngBounds.Builder builder = new LatLngBounds.Builder();
-            for (Feature feature: features) {
+            for (Feature feature : features) {
                 Geometry geometry = feature.geometry();
                 if (geometry instanceof Polygon) {
                     List<List<Point>> coordinates = ((Polygon) geometry).coordinates();
@@ -123,9 +125,7 @@ public class ViewGeoShapeActivity extends BackActivity {
                     builder.includes(getListOfCoordinates(coordinates));
                 }
             }
-            if (!features.isEmpty()) {
-                latLngBounds = builder.build();
-            }
+            latLngBounds = builder.build();
         }
     }
 
@@ -141,7 +141,6 @@ public class ViewGeoShapeActivity extends BackActivity {
         fillSource.setGeoJson(features);
         lineSource.setGeoJson(features);
         circleSource.setGeoJson(features);
-
 
         if (latLngBounds != null) {
             CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngBounds(latLngBounds, 100);

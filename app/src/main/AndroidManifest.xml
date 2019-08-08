@@ -29,6 +29,8 @@
         android:theme="@style/FlowAppTheme"
         android:usesCleartextTraffic="true"
         tools:ignore="GoogleAppIndexingWarning">
+        <activity
+            android:name=".presentation.geoshape.ViewGeoShapeActivity"/>
 
         <uses-library
             android:name="org.apache.http.legacy"
@@ -86,7 +88,6 @@
             android:name=".presentation.signature.SignatureActivity"
             android:configChanges="locale|layoutDirection"
             android:screenOrientation="landscape" />
-
         <activity android:name=".presentation.datapoints.map.one.DataPointMapActivity" />
 
         <service
@@ -167,7 +168,6 @@
             android:name=".presentation.FullImageActivity"
             android:configChanges="locale|layoutDirection"
             android:label="" />
-        <activity android:name=".presentation.walkthrough.WalkThroughActivity" />
         <activity android:name="org.akvo.flow.walkthrough.presentation.OfflineMapsWalkThroughActivity"
             android:parentActivityName=".activity.SurveyActivity">
             <meta-data

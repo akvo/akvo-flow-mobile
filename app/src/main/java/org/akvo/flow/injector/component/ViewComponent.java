@@ -46,6 +46,7 @@ import org.akvo.flow.ui.fragment.DatapointsFragment;
 import org.akvo.flow.ui.fragment.ResponseListFragment;
 import org.akvo.flow.ui.view.CaddisflyQuestionView;
 import org.akvo.flow.ui.view.CascadeQuestionView;
+import org.akvo.flow.ui.view.GeoshapeQuestionView;
 import org.akvo.flow.ui.view.geolocation.GeoQuestionView;
 import org.akvo.flow.ui.view.media.photo.PhotoQuestionView;
 import org.akvo.flow.ui.view.media.video.VideoQuestionView;
@@ -98,6 +99,8 @@ public interface ViewComponent {
     void inject(CaddisflyQuestionView caddisflyQuestionView);
 
     void inject(GeoQuestionView geoQuestionView);
+
+    void inject(GeoshapeQuestionView geoshapeQuestionView);
 
     void inject(AddUserActivity addUserActivity);
 

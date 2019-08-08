@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:flowapp="http://schemas.android.com/apk/res-auto" >
+
+    <item
+        android:id="@+id/mapmode"
+        android:orderInCategory="99"
+        android:title="MAP"
+        android:icon="@drawable/ic_menu_map"
+        flowapp:showAsAction="always">
+        <menu>
+            <item android:id="@+id/map_normal"
+                android:title="Normal"/>
+            <item android:id="@+id/map_satellite"
+                android:title="Satellite"/>
+            <item android:id="@+id/map_terrain"
+                android:title="Terrain"/>
+        </menu>
+    </item>
+</menu>

@@ -838,7 +838,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
 
     private void navigateToGeoShapeActivity(QuestionInteractionEvent event) {
         mRequestQuestionId = event.getSource().getQuestion().getId();
-        navigator.navigateToGeoShapeActivity(this, event.getData());
+        navigator.navigateToCreateGeoShapeActivity(this, event.getData());
     }
 
     private void navigateToCaddisfly(QuestionInteractionEvent event) {

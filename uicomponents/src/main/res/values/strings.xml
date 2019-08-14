@@ -340,6 +340,11 @@
     <string name="offline_item_delete_dialog_title">Delete map?</string>
     <string name="offline_item_delete_dialog_message">%1$s will no longer be available for use</string>
 
+    <string name="geoshape_bottom_item_info">Info</string>
+    <string name="geoshape_bottom_item_add_point">Add point</string>
+    <string name="geoshape_bottom_item_delete_point">Delete point</string>
+    <string name="geoshape_bottom_item_delete_feature">Delete feature</string>
+
     <plurals name="download_forms_error">
         <item quantity="one">Error downloading form</item>
         <item quantity="other">Error downloading forms</item>

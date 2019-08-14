@@ -19,17 +19,26 @@
     </item>
 
     <item
+        android:id="@+id/add_feature"
+        android:orderInCategory="100"
+        android:icon="@drawable/ic_add_feature"
+        android:title="Add feature"
+        flowapp:showAsAction="always">
+        <menu>
+            <item android:id="@+id/add_points"
+                android:title="Points"/>
+            <item android:id="@+id/add_line"
+                android:title="Line"/>
+            <item android:id="@+id/add_polygon"
+                android:title="Area"/>
+        </menu>
+    </item>
+
+    <item
         android:id="@+id/save"
         android:orderInCategory="101"
         android:title="SAVE"
         android:icon="@drawable/ic_save"
         flowapp:showAsAction="always"/>
-
- <!--   <item
-        android:id="@+id/add"
-        android:orderInCategory="102"
-        android:title="ADD"
-        android:icon="@android:drawable/ic_menu_add"
-        flowapp:showAsAction="always"/>-->
 
 </menu>

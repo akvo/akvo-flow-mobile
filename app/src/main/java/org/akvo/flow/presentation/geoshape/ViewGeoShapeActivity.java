@@ -135,13 +135,13 @@ public class ViewGeoShapeActivity extends BackActivity {
     }
 
     private void updateSources(Style style) {
-        GeoJsonSource circleSource = initCircleSource(style, features);
         GeoJsonSource fillSource = initFillSource(style, features);
-        GeoJsonSource lineSource = initLineSource(style, features);
+        GeoJsonSource circleSource = initCircleSource(style, FeatureCollection.fromFeatures(features.features()));
+        GeoJsonSource lineSource = initLineSource(style, FeatureCollection.fromFeatures(features.features()));
 
-        initFillLayer(style);
-        initLineLayer(style);
+       initFillLayer(style);
         initCircleLayer(style);
+        initLineLayer(style);
 
         fillSource.setGeoJson(features);
         lineSource.setGeoJson(features);
@@ -264,7 +264,7 @@ public class ViewGeoShapeActivity extends BackActivity {
                 lineColor(LINE_COLOR),
                 lineWidth(4f)
         );
-        loadedMapStyle.addLayerAbove(lineLayer, FILL_LAYER_ID);
+        loadedMapStyle.addLayer(lineLayer);
     }
 
     /**
@@ -278,7 +278,7 @@ public class ViewGeoShapeActivity extends BackActivity {
                 circleStrokeWidth(1f),
                 circleStrokeColor(POINT_LINE_COLOR)
         );
-        loadedMapStyle.addLayerAbove(circleLayer, LINE_LAYER_ID);
+        loadedMapStyle.addLayer(circleLayer);
     }
 
     /**

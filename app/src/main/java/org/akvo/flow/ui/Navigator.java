@@ -44,7 +44,7 @@ import org.akvo.flow.presentation.FullImageActivity;
 import org.akvo.flow.presentation.about.AboutActivity;
 import org.akvo.flow.presentation.datapoints.map.one.DataPointMapActivity;
 import org.akvo.flow.presentation.entity.ViewApkData;
-import org.akvo.flow.presentation.geoshape.CreateGeoShapeActivity;
+import org.akvo.flow.presentation.geoshape.create.CreateGeoShapeActivity;
 import org.akvo.flow.presentation.help.HelpActivity;
 import org.akvo.flow.presentation.legal.LegalNoticesActivity;
 import org.akvo.flow.presentation.settings.PreferenceActivity;

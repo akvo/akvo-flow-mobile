@@ -17,7 +17,7 @@
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.akvo.flow.presentation.geoshape;
+package org.akvo.flow.presentation.geoshape.create;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
@@ -32,11 +32,7 @@ import android.widget.Toast;
 import com.google.android.material.bottomappbar.BottomAppBar;
 import com.mapbox.geojson.Feature;
 import com.mapbox.geojson.FeatureCollection;
-import com.mapbox.geojson.Geometry;
-import com.mapbox.geojson.LineString;
-import com.mapbox.geojson.MultiPoint;
 import com.mapbox.geojson.Point;
-import com.mapbox.geojson.Polygon;
 import com.mapbox.mapboxsdk.camera.CameraUpdate;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
@@ -47,6 +43,7 @@ import com.mapbox.mapboxsdk.location.modes.CameraMode;
 import com.mapbox.mapboxsdk.location.modes.RenderMode;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
+import com.mapbox.mapboxsdk.maps.Projection;
 import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.maps.UiSettings;
 import com.mapbox.mapboxsdk.style.layers.CircleLayer;
@@ -62,9 +59,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import androidx.annotation.NonNull;
-import timber.log.Timber;
 
 import static com.mapbox.mapboxsdk.style.expressions.Expression.all;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.any;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.has;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.not;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.circleColor;
@@ -75,7 +72,7 @@ import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.fillColor;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.lineColor;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.lineWidth;
 
-public class CreateGeoShapeActivity extends BackActivity {
+public class CreateGeoShapeActivity extends BackActivity implements MapboxMap.OnMapClickListener {
 
     private static final String CIRCLE_SOURCE_ID = "circle-source-id";
     private static final String FILL_SOURCE_ID = "fill-source-id";
@@ -93,12 +90,9 @@ public class CreateGeoShapeActivity extends BackActivity {
     public static final int ONE_POINT_ZOOM = 12;
     private static final float ACCURACY_THRESHOLD = 20f;
 
-    private static final String POINT_SELECTED_PROPERTY = "isPointSelected";
-    private static final String SHAPE_SELECTED_PROPERTY = "isShapeSelected";
-
     private MapView mapView;
     private MapboxMap mapboxMap;
-    private boolean changed = false; //TODO
+    private boolean changed = true; //TODO
     private boolean allowPoints;
     private boolean allowLine;
     private boolean allowPolygon;
@@ -112,13 +106,12 @@ public class CreateGeoShapeActivity extends BackActivity {
         displayUserLocation();
     };
 
-    private FeatureCollection features;
-    private final List<LatLng> listOfCoordinates = new ArrayList<>();
     private boolean manualInputEnabled; //TODO:
     private TextView bottomBarTitle;
     private BottomAppBar bottomAppBar;
-    private FeatureCollection pointList;
-    private ArrayList<Feature> pointFeatureList;
+    private FeatureMapper featureMapper = new FeatureMapper();
+    private ViewFeatures viewFeatures = new ViewFeatures(new ArrayList<>(), new ArrayList<>(),
+            new ArrayList<>());
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -145,8 +138,8 @@ public class CreateGeoShapeActivity extends BackActivity {
                 case R.id.add_point:
                     addLocationPoint(); //TODO: check selected shape
                     break;
-                    default:
-                        break;
+                default:
+                    break;
             }
             return true;
         });
@@ -212,57 +205,13 @@ public class CreateGeoShapeActivity extends BackActivity {
 
     private void setUpFeatures() {
         String geoJSON = getIntent().getStringExtra(ConstantUtil.GEOSHAPE_RESULT);
-        Timber.d(geoJSON);
-        features = geoJSON == null ?
-                FeatureCollection.fromFeatures(new ArrayList<>()) :
-                FeatureCollection.fromJson(geoJSON);
-
-        List<Feature> features = this.features.features();
-        pointFeatureList = new ArrayList<>(listOfCoordinates.size());
-        if (features != null && !features.isEmpty()) {
-            for (Feature feature : features) {
-                Geometry geometry = feature.geometry();
-                if (geometry instanceof Polygon) {
-                    List<List<Point>> coordinates = ((Polygon) geometry).coordinates();
-                    for (List<Point> points : coordinates) {
-                        int i = 0; //TODO: remove
-                        for (Point p : points) {
-                            listOfCoordinates.add(new LatLng(p.latitude(), p.longitude()));
-                            Feature f =  Feature.fromGeometry(p);
-                            if (i == 0) {
-                                f.addBooleanProperty(POINT_SELECTED_PROPERTY, true);
-                            } else {
-                                f.addBooleanProperty(SHAPE_SELECTED_PROPERTY, true);
-                            }
-                            pointFeatureList.add(f);
-                            i++;
-                        }
-                    }
-                } else if (geometry instanceof LineString) {
-                    List<Point> coordinates = ((LineString) geometry).coordinates();
-                    List<LatLng> listOfCoordinates = getListOfCoordinates(coordinates);
-                    this.listOfCoordinates.addAll(listOfCoordinates);
-                    for (LatLng ll : listOfCoordinates) {
-                        Feature f = Feature.fromGeometry(
-                                Point.fromLngLat(ll.getLongitude(), ll.getLatitude()));
-                        pointFeatureList.add(f);
-                    }
-                } else if (geometry instanceof MultiPoint) {
-                    List<Point> coordinates = ((MultiPoint) geometry).coordinates();
-                    List<LatLng> listOfCoordinates = getListOfCoordinates(coordinates);
-                    this.listOfCoordinates.addAll(listOfCoordinates);
-                    for (LatLng ll : listOfCoordinates) {
-                        Feature f = Feature.fromGeometry(
-                                Point.fromLngLat(ll.getLongitude(), ll.getLatitude()));
-                        pointFeatureList.add(f);
-                    }
-                }
-            }
-        }
-        pointList = FeatureCollection.fromFeatures(pointFeatureList);
+        viewFeatures = featureMapper.toViewFeatures(geoJSON);
     }
 
     private void updateSources(Style style) {
+        FeatureCollection features = FeatureCollection.fromFeatures(viewFeatures.getFeatures());
+        FeatureCollection pointList = FeatureCollection
+                .fromFeatures(viewFeatures.getPointFeatures());
         initFillSource(style, features);
         initLineSource(style, features);
         initCircleSource(style, pointList);
@@ -276,6 +225,7 @@ public class CreateGeoShapeActivity extends BackActivity {
 
     private void centerMap() {
         if (mapboxMap != null) {
+            List<LatLng> listOfCoordinates = viewFeatures.getListOfCoordinates();
             if (listOfCoordinates.size() == 1) {
                 CameraUpdate cameraUpdate = CameraUpdateFactory
                         .newLatLngZoom(listOfCoordinates.get(0), ONE_POINT_ZOOM);
@@ -289,6 +239,7 @@ public class CreateGeoShapeActivity extends BackActivity {
             }
         }
     }
+
     @SuppressLint("MissingPermission")
     public void displayUserLocation() {
         if (isLocationAllowed() && mapboxMap != null && mapboxMap.getStyle() != null) {
@@ -301,7 +252,6 @@ public class CreateGeoShapeActivity extends BackActivity {
             locationComponent.setRenderMode(RenderMode.NORMAL);
         }
     }
-
 
     private void setMapClicks() {
         if (mapboxMap != null) {
@@ -332,23 +282,17 @@ public class CreateGeoShapeActivity extends BackActivity {
 
     private void addPoint(LatLng latLng) {
         Point mapTargetPoint = Point.fromLngLat(latLng.getLongitude(), latLng.getLatitude());
-        for(Feature feature: pointFeatureList) {
-            feature.removeProperty(SHAPE_SELECTED_PROPERTY);
-            feature.removeProperty(POINT_SELECTED_PROPERTY);
+        List<Feature> pointFeatureList = viewFeatures.getPointFeatures();
+        for (Feature feature : pointFeatureList) {
+            feature.removeProperty(ViewFeatures.SHAPE_SELECTED_PROPERTY);
+            feature.removeProperty(ViewFeatures.POINT_SELECTED_PROPERTY);
         }
         Feature feature = Feature.fromGeometry(mapTargetPoint);
-        feature.addBooleanProperty(POINT_SELECTED_PROPERTY, true);
+        feature.addBooleanProperty(ViewFeatures.POINT_SELECTED_PROPERTY, true);
         pointFeatureList.add(feature);
-        ((GeoJsonSource) mapboxMap.getStyle().getSource(CIRCLE_SOURCE_ID)).setGeoJson(FeatureCollection.fromFeatures(pointFeatureList));
-    }
-
-    private List<LatLng> getListOfCoordinates(List<Point> coordinates) {
-        List<LatLng> latLngs = new ArrayList<>();
-        for (Point p : coordinates) {
-            LatLng latLng = new LatLng(p.latitude(), p.longitude());
-            latLngs.add(latLng);
-        }
-        return latLngs;
+        FeatureCollection features = FeatureCollection.fromFeatures(pointFeatureList);
+        ((GeoJsonSource) mapboxMap.getStyle().getSource(CIRCLE_SOURCE_ID))
+                .setGeoJson(features);
     }
 
     @Override
@@ -416,6 +360,8 @@ public class CreateGeoShapeActivity extends BackActivity {
     private void setShapeResult() {
         Intent intent = new Intent();
         if (isValidShape() && changed) {
+            FeatureCollection features = FeatureCollection.fromFeatures(viewFeatures.getFeatures());
+            //TODO: shall we remove the id property?
             intent.putExtra(ConstantUtil.GEOSHAPE_RESULT, features.toJson());
             setResult(RESULT_OK, intent);
         } else {
@@ -425,8 +371,8 @@ public class CreateGeoShapeActivity extends BackActivity {
 
     //TODO: validate shapes
     private boolean isValidShape() {
-        return features != null && features.features() != null && features.features().size() > 0
-                && changed;
+        List<Feature> features = viewFeatures.getFeatures();
+        return features.size() > 0 && changed;
     }
 
     @Override
@@ -479,18 +425,17 @@ public class CreateGeoShapeActivity extends BackActivity {
         fillLayer.setProperties(
                 fillColor(FILL_COLOR)
         );
+        fillLayer.setFilter(has(ViewFeatures.FEATURE_POLYGON));
         loadedMapStyle.addLayer(fillLayer);
     }
 
-    /**
-     * Set up the LineLayer for showing the set boundaries' polygons
-     */
     private void initLineLayer(@NonNull Style loadedMapStyle) {
         LineLayer lineLayer = new LineLayer(LINE_LAYER_ID, LINE_SOURCE_ID);
         lineLayer.setProperties(
                 lineColor(LINE_COLOR),
                 lineWidth(4f)
         );
+        lineLayer.setFilter(any(has(ViewFeatures.FEATURE_POLYGON), has(ViewFeatures.FEATURE_LINE)));
         loadedMapStyle.addLayer(lineLayer);
     }
 
@@ -502,61 +447,72 @@ public class CreateGeoShapeActivity extends BackActivity {
                 circleStrokeWidth(1f),
                 circleStrokeColor(UNSELECTED_POINT_LINE_COLOR)
         );
-        circleLayer.setFilter(all(not(has(POINT_SELECTED_PROPERTY)), not(has(SHAPE_SELECTED_PROPERTY))));
+        circleLayer.setFilter(
+                all(not(has(ViewFeatures.POINT_SELECTED_PROPERTY)),
+                        not(has(ViewFeatures.SHAPE_SELECTED_PROPERTY))));
         loadedMapStyle.addLayer(circleLayer);
     }
 
+    /**
+     * Selecting a point, also selects it's shape, to show that a shape is selected, all its points
+     * will be drawn in orange (except the actual selected point which is green)
+     */
     private void initShapeSelectedCircleLayer(@NonNull Style loadedMapStyle) {
-        CircleLayer circleLayer = new CircleLayer(SELECTED_FEATURE_POINT_LAYER_ID, CIRCLE_SOURCE_ID);
+        CircleLayer circleLayer = new CircleLayer(SELECTED_FEATURE_POINT_LAYER_ID,
+                CIRCLE_SOURCE_ID);
         circleLayer.setProperties(
                 circleRadius(6f),
                 circleColor(0xFFE27C00)
         );
-        circleLayer.setFilter(all(has(SHAPE_SELECTED_PROPERTY), not(has(POINT_SELECTED_PROPERTY))));
+        circleLayer.setFilter(all(has(ViewFeatures.SHAPE_SELECTED_PROPERTY),
+                not(has(ViewFeatures.POINT_SELECTED_PROPERTY))));
         loadedMapStyle.addLayer(circleLayer);
     }
 
+    /**
+     * A selected point will be drawn in a greenish color
+     */
     private void initPointSelectedCircleLayer(@NonNull Style loadedMapStyle) {
         CircleLayer circleLayer = new CircleLayer(SELECTED_POINT_LAYER_ID, CIRCLE_SOURCE_ID);
         circleLayer.setProperties(
                 circleRadius(8f),
                 circleColor(0xFF00A79D)
         );
-        circleLayer.setFilter(all(has(POINT_SELECTED_PROPERTY), not(has(SHAPE_SELECTED_PROPERTY))));
+        circleLayer.setFilter(all(has(ViewFeatures.POINT_SELECTED_PROPERTY), not(has(ViewFeatures.SHAPE_SELECTED_PROPERTY))));
         loadedMapStyle.addLayer(circleLayer);
     }
 
-    /**
-     * Set up the LineLayer source for showing map click points
-     */
     private void initLineSource(@NonNull Style loadedMapStyle,
             FeatureCollection featureCollection) {
         GeoJsonSource lineGeoJsonSource = new GeoJsonSource(LINE_SOURCE_ID, featureCollection);
         loadedMapStyle.addSource(lineGeoJsonSource);
     }
 
-    /**
-     * Set up the FillLayer source for showing map click points
-     */
     private void initFillSource(@NonNull Style loadedMapStyle,
             FeatureCollection featureCollection) {
         GeoJsonSource fillGeoJsonSource = new GeoJsonSource(FILL_SOURCE_ID, featureCollection);
         loadedMapStyle.addSource(fillGeoJsonSource);
     }
 
-    /**
-     * Set up the CircleLayer source for showing map click points
-     */
     private void initCircleSource(@NonNull Style loadedMapStyle,
             FeatureCollection featureCollection) {
         GeoJsonSource circleGeoJsonSource = new GeoJsonSource(CIRCLE_SOURCE_ID, featureCollection);
         loadedMapStyle.addSource(circleGeoJsonSource);
     }
 
-    public enum DrawMode {
-        NONE,
-        POINT,
-        LINE,
-        AREA
+    @Override
+    public boolean onMapClick(@NonNull LatLng point) {
+        if (mapboxMap != null) {
+            Projection projection = mapboxMap.getProjection();
+            List<Feature> features = mapboxMap
+                    .queryRenderedFeatures(projection.toScreenLocation(point),
+                            UNSELECTED_POINT_LAYER_ID, SELECTED_FEATURE_POINT_LAYER_ID);
+            Feature selected = features.isEmpty() ? null : features.get(0);
+
+            //TODO:
+        } else {
+            return false;
+        }
+        return false;
     }
 }

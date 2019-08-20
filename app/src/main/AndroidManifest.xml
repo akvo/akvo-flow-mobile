@@ -173,7 +173,7 @@
                 android:value=".activity.SurveyActivity" />
         </activity>
         <activity android:name=".presentation.geoshape.ViewGeoShapeActivity"/>
-        <activity android:name=".presentation.geoshape.CreateGeoShapeActivity" />
+        <activity android:name=".presentation.geoshape.create.CreateGeoShapeActivity" />
 
         <provider
             android:name="androidx.core.content.FileProvider"

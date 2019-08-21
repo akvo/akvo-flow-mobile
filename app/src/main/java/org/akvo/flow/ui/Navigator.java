@@ -44,6 +44,7 @@ import org.akvo.flow.presentation.FullImageActivity;
 import org.akvo.flow.presentation.about.AboutActivity;
 import org.akvo.flow.presentation.datapoints.map.one.DataPointMapActivity;
 import org.akvo.flow.presentation.entity.ViewApkData;
+import org.akvo.flow.presentation.geoshape.ViewGeoShapeActivity;
 import org.akvo.flow.presentation.geoshape.create.CreateGeoShapeActivity;
 import org.akvo.flow.presentation.help.HelpActivity;
 import org.akvo.flow.presentation.legal.LegalNoticesActivity;
@@ -182,7 +183,7 @@ public class Navigator {
     }
 
     public void navigateToViewGeoShapeActivity(@NonNull Context context, @Nullable Bundle data) {
-        Intent i = new Intent(context, CreateGeoShapeActivity.class);
+        Intent i = new Intent(context, ViewGeoShapeActivity.class);
         if (data != null) {
             i.putExtras(data);
         }

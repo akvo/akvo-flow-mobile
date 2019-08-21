@@ -32,6 +32,7 @@ import android.widget.Toast;
 import com.google.android.material.bottomappbar.BottomAppBar;
 import com.mapbox.geojson.Feature;
 import com.mapbox.geojson.FeatureCollection;
+import com.mapbox.geojson.MultiPoint;
 import com.mapbox.geojson.Point;
 import com.mapbox.mapboxsdk.camera.CameraUpdate;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
@@ -53,10 +54,15 @@ import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 
 import org.akvo.flow.R;
 import org.akvo.flow.activity.BackActivity;
+import org.akvo.flow.injector.component.DaggerViewComponent;
+import org.akvo.flow.injector.component.ViewComponent;
 import org.akvo.flow.util.ConstantUtil;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
+
+import javax.inject.Inject;
 
 import androidx.annotation.NonNull;
 
@@ -86,13 +92,13 @@ public class CreateGeoShapeActivity extends BackActivity implements MapboxMap.On
     private static final int LINE_COLOR = 0xEE736357;
     private static final int UNSELECTED_POINT_COLOR = 0xFF736357;
     private static final int UNSELECTED_POINT_LINE_COLOR = 0xFF5B5048;
-    public static final int ANIMATION_DURATION_MS = 400;
-    public static final int ONE_POINT_ZOOM = 12;
+    private static final int ANIMATION_DURATION_MS = 400;
+    private static final int ONE_POINT_ZOOM = 12;
     private static final float ACCURACY_THRESHOLD = 20f;
 
     private MapView mapView;
     private MapboxMap mapboxMap;
-    private boolean changed = true; //TODO
+    private boolean changed = false;
     private boolean allowPoints;
     private boolean allowLine;
     private boolean allowPolygon;
@@ -100,7 +106,7 @@ public class CreateGeoShapeActivity extends BackActivity implements MapboxMap.On
     private DrawMode drawMode = DrawMode.NONE;
 
     private Style.OnStyleLoaded callback = style -> {
-        updateSources(style);
+        initSources(style);
         centerMap();
         setMapClicks();
         displayUserLocation();
@@ -109,14 +115,21 @@ public class CreateGeoShapeActivity extends BackActivity implements MapboxMap.On
     private boolean manualInputEnabled; //TODO:
     private TextView bottomBarTitle;
     private BottomAppBar bottomAppBar;
-    private FeatureMapper featureMapper = new FeatureMapper();
+
     private ViewFeatures viewFeatures = new ViewFeatures(new ArrayList<>(), new ArrayList<>(),
             new ArrayList<>());
+
+    @Inject
+    FeatureMapper featureMapper;
+
+    @Inject
+    CoordinatesMapper coordinatesMapper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_geo_shape);
+        initializeInjector();
         setupToolBar();
         setUpBottomBar();
         setUpFeatures();
@@ -126,6 +139,14 @@ public class CreateGeoShapeActivity extends BackActivity implements MapboxMap.On
         allowLine = getIntent().getBooleanExtra(ConstantUtil.EXTRA_ALLOW_LINE, true);
         allowPolygon = getIntent().getBooleanExtra(ConstantUtil.EXTRA_ALLOW_POLYGON, true);
         manualInputEnabled = getIntent().getBooleanExtra(ConstantUtil.EXTRA_MANUAL_INPUT, true);
+    }
+
+    private void initializeInjector() {
+        ViewComponent viewComponent =
+                DaggerViewComponent.builder()
+                        .applicationComponent(getApplicationComponent())
+                        .build();
+        viewComponent.inject(this);
     }
 
     private void setUpBottomBar() {
@@ -208,7 +229,7 @@ public class CreateGeoShapeActivity extends BackActivity implements MapboxMap.On
         viewFeatures = featureMapper.toViewFeatures(geoJSON);
     }
 
-    private void updateSources(Style style) {
+    private void initSources(Style style) {
         FeatureCollection features = FeatureCollection.fromFeatures(viewFeatures.getFeatures());
         FeatureCollection pointList = FeatureCollection
                 .fromFeatures(viewFeatures.getPointFeatures());
@@ -282,17 +303,49 @@ public class CreateGeoShapeActivity extends BackActivity implements MapboxMap.On
 
     private void addPoint(LatLng latLng) {
         Point mapTargetPoint = Point.fromLngLat(latLng.getLongitude(), latLng.getLatitude());
-        List<Feature> pointFeatureList = viewFeatures.getPointFeatures();
-        for (Feature feature : pointFeatureList) {
-            feature.removeProperty(ViewFeatures.SHAPE_SELECTED_PROPERTY);
-            feature.removeProperty(ViewFeatures.POINT_SELECTED_PROPERTY);
+        Feature selectedFeature = viewFeatures.getSelectedFeature();
+
+        List<Point> points;
+        String featureId;
+        if (selectedFeature != null && selectedFeature.geometry() instanceof MultiPoint) {
+            points = ((MultiPoint) selectedFeature.geometry()).coordinates();
+            points.add(mapTargetPoint);
+            featureId = selectedFeature.getStringProperty(ViewFeatures.FEATURE_ID);
+        } else {
+            points = new ArrayList<>();
+            points.add(mapTargetPoint);
+            selectedFeature = Feature.fromGeometry(MultiPoint.fromLngLats(points));
+            selectedFeature.addBooleanProperty(ViewFeatures.POINT_SELECTED_PROPERTY, true);
+            featureId = UUID.randomUUID().toString();
+            selectedFeature.addStringProperty(ViewFeatures.FEATURE_ID, featureId);
+            viewFeatures.setSelectedFeature(selectedFeature);
+            viewFeatures.getFeatures().add(selectedFeature);
         }
+
         Feature feature = Feature.fromGeometry(mapTargetPoint);
         feature.addBooleanProperty(ViewFeatures.POINT_SELECTED_PROPERTY, true);
+        feature.addStringProperty(ViewFeatures.FEATURE_ID, featureId);
+        feature.addStringProperty(ViewFeatures.POINT_ID, UUID.randomUUID().toString());
+        List<Feature> pointFeatureList = viewFeatures.getPointFeatures();
+        for (Feature f : pointFeatureList) {
+            if (f.getStringProperty(ViewFeatures.FEATURE_ID).equals(featureId)) {
+                f.addBooleanProperty(ViewFeatures.SHAPE_SELECTED_PROPERTY, true);
+            } else {
+                f.removeProperty(ViewFeatures.SHAPE_SELECTED_PROPERTY);
+            }
+            f.removeProperty(ViewFeatures.POINT_SELECTED_PROPERTY);
+        }
         pointFeatureList.add(feature);
-        FeatureCollection features = FeatureCollection.fromFeatures(pointFeatureList);
-        ((GeoJsonSource) mapboxMap.getStyle().getSource(CIRCLE_SOURCE_ID))
-                .setGeoJson(features);
+        updateSources(mapboxMap.getStyle());
+    }
+
+    private void updateSources(Style style) {
+        FeatureCollection features = FeatureCollection.fromFeatures(viewFeatures.getFeatures());
+        FeatureCollection pointList = FeatureCollection
+                .fromFeatures(viewFeatures.getPointFeatures());
+        ((GeoJsonSource)style.getSource(FILL_SOURCE_ID)).setGeoJson(features);
+        ((GeoJsonSource)style.getSource(LINE_SOURCE_ID)).setGeoJson(features);
+        ((GeoJsonSource)style.getSource(CIRCLE_SOURCE_ID)).setGeoJson(pointList);
     }
 
     @Override
@@ -478,7 +531,8 @@ public class CreateGeoShapeActivity extends BackActivity implements MapboxMap.On
                 circleRadius(8f),
                 circleColor(0xFF00A79D)
         );
-        circleLayer.setFilter(all(has(ViewFeatures.POINT_SELECTED_PROPERTY), not(has(ViewFeatures.SHAPE_SELECTED_PROPERTY))));
+        circleLayer.setFilter(all(has(ViewFeatures.POINT_SELECTED_PROPERTY),
+                not(has(ViewFeatures.SHAPE_SELECTED_PROPERTY))));
         loadedMapStyle.addLayer(circleLayer);
     }
 

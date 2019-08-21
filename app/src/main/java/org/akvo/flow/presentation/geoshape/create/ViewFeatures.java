@@ -25,6 +25,7 @@ import com.mapbox.mapboxsdk.geometry.LatLng;
 import java.util.List;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 public class ViewFeatures {
 
@@ -39,6 +40,9 @@ public class ViewFeatures {
     private final List<Feature> features;
     private final List<Feature> pointFeatures;
     private final List<LatLng> listOfCoordinates;
+
+    @Nullable
+    private Feature selectedFeature;
 
     public ViewFeatures(@NonNull List<Feature> features, @NonNull  List<Feature> pointFeatures,
             @NonNull List<LatLng> listOfCoordinates) {
@@ -57,5 +61,14 @@ public class ViewFeatures {
 
     public List<LatLng> getListOfCoordinates() {
         return listOfCoordinates;
+    }
+
+    @Nullable
+    public Feature getSelectedFeature() {
+        return selectedFeature;
+    }
+
+    public void setSelectedFeature(@Nullable Feature selectedFeature) {
+        this.selectedFeature = selectedFeature;
     }
 }

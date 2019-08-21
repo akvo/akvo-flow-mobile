@@ -32,10 +32,19 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import javax.inject.Inject;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 public class FeatureMapper {
+
+    private final CoordinatesMapper coordinatesMapper;
+
+    @Inject
+    public FeatureMapper(CoordinatesMapper coordinatesMapper) {
+        this.coordinatesMapper = coordinatesMapper;
+    }
 
     public ViewFeatures toViewFeatures(@Nullable String gson) {
         FeatureCollection featureCollection = gson == null ?
@@ -57,7 +66,8 @@ public class FeatureMapper {
                     feature.addBooleanProperty(ViewFeatures.FEATURE_POLYGON, true);
                     List<List<Point>> coordinatesList = ((Polygon) geometry).coordinates();
                     for (List<Point> coordinates : coordinatesList) {
-                        List<LatLng> listOfPointsCoordinates = getListOfCoordinates(coordinates);
+                        List<LatLng> listOfPointsCoordinates = coordinatesMapper
+                                .toLatLng(coordinates);
                         listOfCoordinates.addAll(listOfPointsCoordinates);
                         for (LatLng latLng : listOfPointsCoordinates) {
                             pointFeatures.add(getPointFeature(latLng, featureId));
@@ -66,7 +76,8 @@ public class FeatureMapper {
                 } else if (geometry instanceof LineString) {
                     feature.addBooleanProperty(ViewFeatures.FEATURE_LINE, true);
                     List<Point> coordinates = ((LineString) geometry).coordinates();
-                    List<LatLng> listOfLinesCoordinates = getListOfCoordinates(coordinates);
+                    List<LatLng> listOfLinesCoordinates = coordinatesMapper
+                            .toLatLng(coordinates);
                     listOfCoordinates.addAll(listOfLinesCoordinates);
                     for (LatLng latLng : listOfLinesCoordinates) {
                         pointFeatures
@@ -75,7 +86,8 @@ public class FeatureMapper {
                 } else if (geometry instanceof MultiPoint) {
                     feature.addBooleanProperty(ViewFeatures.FEATURE_POINT, true);
                     List<Point> coordinates = ((MultiPoint) geometry).coordinates();
-                    List<LatLng> listOfPointsCoordinates = getListOfCoordinates(coordinates);
+                    List<LatLng> listOfPointsCoordinates = coordinatesMapper
+                            .toLatLng(coordinates);
                     listOfCoordinates.addAll(listOfPointsCoordinates);
                     for (LatLng latLng : listOfCoordinates) {
                         pointFeatures.add(getPointFeature(latLng, featureId));
@@ -93,14 +105,5 @@ public class FeatureMapper {
         feature.addStringProperty(ViewFeatures.FEATURE_ID, featureId);
         feature.addStringProperty(ViewFeatures.POINT_ID, UUID.randomUUID().toString());
         return feature;
-    }
-
-    private List<LatLng> getListOfCoordinates(List<Point> coordinates) {
-        List<LatLng> latLngs = new ArrayList<>();
-        for (Point p : coordinates) {
-            LatLng latLng = new LatLng(p.latitude(), p.longitude());
-            latLngs.add(latLng);
-        }
-        return latLngs;
     }
 }

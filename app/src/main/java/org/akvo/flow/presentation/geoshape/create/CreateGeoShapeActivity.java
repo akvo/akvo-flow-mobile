@@ -32,8 +32,10 @@ import android.widget.Toast;
 import com.google.android.material.bottomappbar.BottomAppBar;
 import com.mapbox.geojson.Feature;
 import com.mapbox.geojson.FeatureCollection;
+import com.mapbox.geojson.LineString;
 import com.mapbox.geojson.MultiPoint;
 import com.mapbox.geojson.Point;
+import com.mapbox.geojson.Polygon;
 import com.mapbox.mapboxsdk.camera.CameraUpdate;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
@@ -65,6 +67,7 @@ import java.util.UUID;
 import javax.inject.Inject;
 
 import androidx.annotation.NonNull;
+import timber.log.Timber;
 
 import static com.mapbox.mapboxsdk.style.expressions.Expression.all;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.any;
@@ -226,6 +229,7 @@ public class CreateGeoShapeActivity extends BackActivity implements MapboxMap.On
 
     private void setUpFeatures() {
         String geoJSON = getIntent().getStringExtra(ConstantUtil.GEOSHAPE_RESULT);
+        Timber.d(geoJSON);
         viewFeatures = featureMapper.toViewFeatures(geoJSON);
     }
 
@@ -278,19 +282,17 @@ public class CreateGeoShapeActivity extends BackActivity implements MapboxMap.On
         if (mapboxMap != null) {
             mapboxMap.addOnMapLongClickListener(point -> {
                 if (!manualInputEnabled) {
+                    //TODO: should notify user?
                     return false;
                 }
-                switch (drawMode) {
-                    case POINT:
-                        addPoint(point);
-                        updateChanged();
-                        break;
-                    default:
-                        break;
+                if (drawMode == DrawMode.POINT || drawMode == DrawMode.AREA
+                        || drawMode == DrawMode.LINE) {
+                    addPoint(point);
+                    updateChanged();
                 }
+                //TODO: should notify user?
                 return true;
             });
-
         }
     }
 
@@ -303,25 +305,91 @@ public class CreateGeoShapeActivity extends BackActivity implements MapboxMap.On
 
     private void addPoint(LatLng latLng) {
         Point mapTargetPoint = Point.fromLngLat(latLng.getLongitude(), latLng.getLatitude());
-        Feature selectedFeature = viewFeatures.getSelectedFeature();
+        String featureId = updateFeature(mapTargetPoint);
+        updatePointsList(mapTargetPoint, featureId);
+        updateSources(mapboxMap.getStyle());
+    }
 
+
+    //TODO: polygon has a different logic
+    private String updateFeature(Point mapTargetPoint) {
+        Feature selectedFeature = viewFeatures.getSelectedFeature();
         List<Point> points;
         String featureId;
-        if (selectedFeature != null && selectedFeature.geometry() instanceof MultiPoint) {
-            points = ((MultiPoint) selectedFeature.geometry()).coordinates();
+        if (isValidFeature(selectedFeature)) {
+            points = getCoordinates(selectedFeature);
             points.add(mapTargetPoint);
             featureId = selectedFeature.getStringProperty(ViewFeatures.FEATURE_ID);
         } else {
             points = new ArrayList<>();
             points.add(mapTargetPoint);
-            selectedFeature = Feature.fromGeometry(MultiPoint.fromLngLats(points));
+            selectedFeature = createFeatureFromGeometry(points);
             selectedFeature.addBooleanProperty(ViewFeatures.POINT_SELECTED_PROPERTY, true);
             featureId = UUID.randomUUID().toString();
             selectedFeature.addStringProperty(ViewFeatures.FEATURE_ID, featureId);
             viewFeatures.setSelectedFeature(selectedFeature);
             viewFeatures.getFeatures().add(selectedFeature);
         }
+        return featureId;
+    }
 
+    @NonNull
+    private Feature createFeatureFromGeometry(List<Point> points) {
+        Feature feature;
+        switch (drawMode) {
+            case LINE:
+                feature = Feature.fromGeometry(LineString.fromLngLats(points));
+                feature.addBooleanProperty(ViewFeatures.FEATURE_LINE, true);
+                break;
+            case AREA:
+                List<List<Point>> es = new ArrayList<>();
+                es.add(points);
+                feature = Feature.fromGeometry(Polygon.fromLngLats(es));
+                feature.addBooleanProperty(ViewFeatures.FEATURE_POLYGON, true);
+                break;
+            case POINT:
+            default:
+                feature = Feature.fromGeometry(MultiPoint.fromLngLats(points));
+                feature.addBooleanProperty(ViewFeatures.FEATURE_POINT, true);
+                break;
+        }
+        return feature;
+    }
+
+    @NonNull
+    private List<Point> getCoordinates(Feature selectedFeature) {
+        //TODO: check NPE
+        switch (drawMode) {
+            case POINT:
+                return ((MultiPoint) selectedFeature.geometry()).coordinates();
+            case LINE:
+                return ((LineString) selectedFeature.geometry()).coordinates();
+            case AREA:
+                return ((Polygon) selectedFeature.geometry()).coordinates().get(0);
+            default:
+                return new ArrayList<>();
+        }
+
+    }
+
+    private boolean isValidFeature(Feature selectedFeature) {
+        if (selectedFeature == null) {
+            return false;
+        } else {
+            switch (drawMode) {
+                case POINT:
+                    return selectedFeature.geometry() instanceof MultiPoint;
+                case LINE:
+                    return selectedFeature.geometry() instanceof LineString;
+                case AREA:
+                    return selectedFeature.geometry() instanceof Polygon;
+                default:
+                    return false;
+            }
+        }
+    }
+
+    private void updatePointsList(Point mapTargetPoint, String featureId) {
         Feature feature = Feature.fromGeometry(mapTargetPoint);
         feature.addBooleanProperty(ViewFeatures.POINT_SELECTED_PROPERTY, true);
         feature.addStringProperty(ViewFeatures.FEATURE_ID, featureId);
@@ -336,7 +404,6 @@ public class CreateGeoShapeActivity extends BackActivity implements MapboxMap.On
             f.removeProperty(ViewFeatures.POINT_SELECTED_PROPERTY);
         }
         pointFeatureList.add(feature);
-        updateSources(mapboxMap.getStyle());
     }
 
     private void updateSources(Style style) {

@@ -19,6 +19,7 @@
 
 package org.akvo.flow.offlinemaps.presentation.geoshapes;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.location.Location;
 import android.util.AttributeSet;
@@ -183,6 +184,7 @@ public class GeoShapesMapView extends MapView implements OnMapReadyCallback {
         }
     }
 
+    @SuppressLint("MissingPermission")
     public void displayUserLocation() {
         if (mapboxMap != null && mapboxMap.getStyle() != null) {
             LocationComponent locationComponent = mapboxMap.getLocationComponent();

@@ -37,27 +37,15 @@ import com.mapbox.geojson.LineString;
 import com.mapbox.geojson.MultiPoint;
 import com.mapbox.geojson.Point;
 import com.mapbox.geojson.Polygon;
-import com.mapbox.mapboxsdk.camera.CameraUpdate;
-import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
-import com.mapbox.mapboxsdk.geometry.LatLngBounds;
-import com.mapbox.mapboxsdk.location.LocationComponent;
-import com.mapbox.mapboxsdk.location.LocationComponentActivationOptions;
-import com.mapbox.mapboxsdk.location.modes.CameraMode;
-import com.mapbox.mapboxsdk.location.modes.RenderMode;
-import com.mapbox.mapboxsdk.maps.MapView;
-import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.Style;
-import com.mapbox.mapboxsdk.maps.UiSettings;
-import com.mapbox.mapboxsdk.style.layers.CircleLayer;
-import com.mapbox.mapboxsdk.style.layers.FillLayer;
-import com.mapbox.mapboxsdk.style.layers.LineLayer;
-import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 
 import org.akvo.flow.R;
 import org.akvo.flow.activity.BackActivity;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
+import org.akvo.flow.offlinemaps.presentation.geoshapes.GeoShapeConstants;
+import org.akvo.flow.offlinemaps.presentation.geoshapes.GeoShapesMapView;
 import org.akvo.flow.util.ConstantUtil;
 
 import java.util.ArrayList;
@@ -68,54 +56,21 @@ import java.util.UUID;
 import javax.inject.Inject;
 
 import androidx.annotation.NonNull;
-import timber.log.Timber;
 
-import static com.mapbox.mapboxsdk.style.expressions.Expression.all;
-import static com.mapbox.mapboxsdk.style.expressions.Expression.any;
-import static com.mapbox.mapboxsdk.style.expressions.Expression.has;
-import static com.mapbox.mapboxsdk.style.expressions.Expression.not;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.circleColor;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.circleRadius;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.circleStrokeColor;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.circleStrokeWidth;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.fillColor;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.lineColor;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.lineWidth;
-import static org.akvo.flow.presentation.geoshape.GeoShapeConstants.ACCURACY_THRESHOLD;
-import static org.akvo.flow.presentation.geoshape.GeoShapeConstants.ANIMATION_DURATION_MS;
-import static org.akvo.flow.presentation.geoshape.GeoShapeConstants.CIRCLE_COLOR;
-import static org.akvo.flow.presentation.geoshape.GeoShapeConstants.CIRCLE_LAYER_ID;
-import static org.akvo.flow.presentation.geoshape.GeoShapeConstants.CIRCLE_SOURCE_ID;
-import static org.akvo.flow.presentation.geoshape.GeoShapeConstants.FILL_COLOR;
-import static org.akvo.flow.presentation.geoshape.GeoShapeConstants.FILL_LAYER_ID;
-import static org.akvo.flow.presentation.geoshape.GeoShapeConstants.FILL_SOURCE_ID;
-import static org.akvo.flow.presentation.geoshape.GeoShapeConstants.LINE_COLOR;
-import static org.akvo.flow.presentation.geoshape.GeoShapeConstants.LINE_LAYER_ID;
-import static org.akvo.flow.presentation.geoshape.GeoShapeConstants.LINE_SOURCE_ID;
-import static org.akvo.flow.presentation.geoshape.GeoShapeConstants.ONE_POINT_ZOOM;
-import static org.akvo.flow.presentation.geoshape.GeoShapeConstants.POINT_LINE_COLOR;
-import static org.akvo.flow.presentation.geoshape.GeoShapeConstants.SELECTED_FEATURE_POINT_LAYER_ID;
-import static org.akvo.flow.presentation.geoshape.GeoShapeConstants.SELECTED_POINT_COLOR;
-import static org.akvo.flow.presentation.geoshape.GeoShapeConstants.SELECTED_POINT_LAYER_ID;
-import static org.akvo.flow.presentation.geoshape.GeoShapeConstants.SELECTED_SHAPE_COLOR;
+import static org.akvo.flow.offlinemaps.presentation.geoshapes.GeoShapeConstants.ACCURACY_THRESHOLD;
+import static org.akvo.flow.offlinemaps.presentation.geoshapes.GeoShapeConstants.CIRCLE_SOURCE_ID;
+import static org.akvo.flow.offlinemaps.presentation.geoshapes.GeoShapeConstants.FILL_SOURCE_ID;
+import static org.akvo.flow.offlinemaps.presentation.geoshapes.GeoShapeConstants.LINE_SOURCE_ID;
 
 public class CreateGeoShapeActivity extends BackActivity {
 
-    private MapView mapView;
-    private MapboxMap mapboxMap;
+    private GeoShapesMapView mapView;
     private boolean changed = false;
     private boolean allowPoints;
     private boolean allowLine;
     private boolean allowPolygon;
 
     private DrawMode drawMode = DrawMode.NONE;
-
-    private Style.OnStyleLoaded callback = style -> {
-        initSources(style);
-        centerMap();
-        setMapClicks();
-        displayUserLocation();
-    };
 
     private boolean manualInputEnabled; //TODO:
     private TextView bottomBarTitle;
@@ -172,11 +127,8 @@ public class CreateGeoShapeActivity extends BackActivity {
     }
 
     private void addLocationPoint() {
-        Location location =
-                mapboxMap == null || !isLocationAllowed() || !mapboxMap.getLocationComponent()
-                        .isLocationComponentActivated() ?
-                        null :
-                        mapboxMap.getLocationComponent().getLastKnownLocation();
+        //TODO: if location permission lacking we should prompt the used to give them
+        Location location = isLocationAllowed() ? mapView.getLocation() : null;
         if (location != null && location.getAccuracy() <= ACCURACY_THRESHOLD) {
             addPoint(new LatLng(location.getLatitude(), location.getLongitude()));
             updateChanged();
@@ -193,10 +145,15 @@ public class CreateGeoShapeActivity extends BackActivity {
     private void setUpMapView(Bundle savedInstanceState) {
         mapView = findViewById(R.id.mapView);
         mapView.onCreate(savedInstanceState);
-        mapView.getMapAsync(mapboxMap -> {
-            this.mapboxMap = mapboxMap;
-            updateMapStyle(Style.OUTDOORS);
+        mapView.getMapAsyncWithCallback(() -> {
+            //TODO: maybe only when a shape type is selected
             updateAttributionMargin();
+            mapView.initSources(FeatureCollection.fromFeatures(viewFeatures.getFeatures()),
+                    FeatureCollection.fromFeatures(viewFeatures.getPointFeatures()));
+            mapView.initCircleSelectionSources();
+            mapView.centerMap(viewFeatures.getListOfCoordinates());
+            setMapClicks();
+            displayUserLocation();
         });
     }
 
@@ -204,7 +161,7 @@ public class CreateGeoShapeActivity extends BackActivity {
         View view = findViewById(R.id.toolbar);
         int height = view.getHeight();
         if (height > 0) {
-            setBottomMargin(height);
+            mapView.setBottomMargin(height);
         } else {
             view.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
                 @Override
@@ -213,89 +170,39 @@ public class CreateGeoShapeActivity extends BackActivity {
                     int toolBarHeight = bottom - top;
                     if (toolBarHeight > 0) {
                         view.removeOnLayoutChangeListener(this);
-                        setBottomMargin(toolBarHeight);
+                        mapView.setBottomMargin(toolBarHeight);
                     }
                 }
             });
         }
     }
 
-    private void setBottomMargin(int height) {
-        UiSettings uiSettings = mapboxMap.getUiSettings();
-        uiSettings.setAttributionMargins(uiSettings.getAttributionMarginLeft(),
-                uiSettings.getAttributionMarginTop(), uiSettings.getAttributionMarginRight(),
-                uiSettings.getAttributionMarginBottom() + height);
-        uiSettings.setLogoMargins(uiSettings.getLogoMarginLeft(), uiSettings.getLogoMarginTop(),
-                uiSettings.getLogoMarginRight(), uiSettings.getLogoMarginBottom() + height);
-    }
-
     private void setUpFeatures() {
         String geoJSON = getIntent().getStringExtra(ConstantUtil.GEOSHAPE_RESULT);
-        Timber.d(geoJSON);
         viewFeatures = featureMapper.toViewFeatures(geoJSON);
-    }
-
-    private void initSources(Style style) {
-        FeatureCollection features = FeatureCollection.fromFeatures(viewFeatures.getFeatures());
-        FeatureCollection pointList = FeatureCollection
-                .fromFeatures(viewFeatures.getPointFeatures());
-        initFillSource(style, features);
-        initLineSource(style, features);
-        initCircleSource(style, pointList);
-
-        initFillLayer(style);
-        initLineLayer(style);
-        initCircleLayer(style);
-        initShapeSelectedCircleLayer(style);
-        initPointSelectedCircleLayer(style);
-    }
-
-    private void centerMap() {
-        if (mapboxMap != null) {
-            List<LatLng> listOfCoordinates = viewFeatures.getListOfCoordinates();
-            if (listOfCoordinates.size() == 1) {
-                CameraUpdate cameraUpdate = CameraUpdateFactory
-                        .newLatLngZoom(listOfCoordinates.get(0), ONE_POINT_ZOOM);
-                mapboxMap.animateCamera(cameraUpdate, ANIMATION_DURATION_MS);
-            } else if (listOfCoordinates.size() > 1) {
-                LatLngBounds.Builder builder = new LatLngBounds.Builder();
-                builder.includes(listOfCoordinates);
-                LatLngBounds latLngBounds = builder.build();
-                CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngBounds(latLngBounds, 100);
-                mapboxMap.animateCamera(cameraUpdate, ANIMATION_DURATION_MS);
-            }
-        }
     }
 
     @SuppressLint("MissingPermission")
     public void displayUserLocation() {
-        if (isLocationAllowed() && mapboxMap != null && mapboxMap.getStyle() != null) {
-            LocationComponent locationComponent = mapboxMap.getLocationComponent();
-            locationComponent.activateLocationComponent(
-                    LocationComponentActivationOptions.builder(this, mapboxMap.getStyle())
-                            .build());
-            locationComponent.setLocationComponentEnabled(true);
-            locationComponent.setCameraMode(CameraMode.TRACKING);
-            locationComponent.setRenderMode(RenderMode.NORMAL);
+        if (isLocationAllowed()) {
+            mapView.displayUserLocation();
         }
     }
 
     private void setMapClicks() {
-        if (mapboxMap != null) {
-            mapboxMap.addOnMapLongClickListener(point -> {
-                if (!manualInputEnabled) {
-                    //TODO: should notify user?
-                    return false;
-                }
-                if (drawMode == DrawMode.POINT || drawMode == DrawMode.AREA
-                        || drawMode == DrawMode.LINE) {
-                    addPoint(point);
-                    updateChanged();
-                }
+        mapView.setMapClicks(point -> {
+            if (!manualInputEnabled) {
                 //TODO: should notify user?
-                return true;
-            });
-        }
+                return false;
+            }
+            if (drawMode == DrawMode.POINT || drawMode == DrawMode.AREA
+                    || drawMode == DrawMode.LINE) {
+                addPoint(point);
+                updateChanged();
+            }
+            //TODO: should notify user?
+            return true;
+        });
     }
 
     private void updateChanged() {
@@ -309,7 +216,7 @@ public class CreateGeoShapeActivity extends BackActivity {
         Point mapTargetPoint = Point.fromLngLat(latLng.getLongitude(), latLng.getLatitude());
         String featureId = updateFeature(mapTargetPoint);
         updatePointsList(mapTargetPoint, featureId);
-        updateSources(mapboxMap.getStyle());
+        updateSources();
     }
 
     private String updateFeature(Point mapTargetPoint) {
@@ -324,7 +231,7 @@ public class CreateGeoShapeActivity extends BackActivity {
             points = new ArrayList<>();
             points.add(mapTargetPoint);
             selectedFeature = createFeatureFromGeometry(points);
-            selectedFeature.addBooleanProperty(ViewFeatures.POINT_SELECTED_PROPERTY, true);
+            selectedFeature.addBooleanProperty(GeoShapeConstants.POINT_SELECTED_PROPERTY, true);
             featureId = UUID.randomUUID().toString();
             selectedFeature.addStringProperty(ViewFeatures.FEATURE_ID, featureId);
             viewFeatures.setSelectedFeature(selectedFeature);
@@ -339,18 +246,18 @@ public class CreateGeoShapeActivity extends BackActivity {
         switch (drawMode) {
             case LINE:
                 feature = Feature.fromGeometry(LineString.fromLngLats(points));
-                feature.addBooleanProperty(ViewFeatures.FEATURE_LINE, true);
+                feature.addBooleanProperty(GeoShapeConstants.FEATURE_LINE, true);
                 break;
             case AREA:
                 List<List<Point>> es = new ArrayList<>();
                 es.add(points);
                 feature = Feature.fromGeometry(Polygon.fromLngLats(es));
-                feature.addBooleanProperty(ViewFeatures.FEATURE_POLYGON, true);
+                feature.addBooleanProperty(GeoShapeConstants.FEATURE_POLYGON, true);
                 break;
             case POINT:
             default:
                 feature = Feature.fromGeometry(MultiPoint.fromLngLats(points));
-                feature.addBooleanProperty(ViewFeatures.FEATURE_POINT, true);
+                feature.addBooleanProperty(GeoShapeConstants.FEATURE_POINT, true);
                 break;
         }
         return feature;
@@ -393,35 +300,28 @@ public class CreateGeoShapeActivity extends BackActivity {
 
     private void updatePointsList(Point mapTargetPoint, String featureId) {
         Feature feature = Feature.fromGeometry(mapTargetPoint);
-        feature.addBooleanProperty(ViewFeatures.POINT_SELECTED_PROPERTY, true);
+        feature.addBooleanProperty(GeoShapeConstants.POINT_SELECTED_PROPERTY, true);
         feature.addStringProperty(ViewFeatures.FEATURE_ID, featureId);
         feature.addStringProperty(ViewFeatures.POINT_ID, UUID.randomUUID().toString());
         List<Feature> pointFeatureList = viewFeatures.getPointFeatures();
         for (Feature f : pointFeatureList) {
             if (f.getStringProperty(ViewFeatures.FEATURE_ID).equals(featureId)) {
-                f.addBooleanProperty(ViewFeatures.SHAPE_SELECTED_PROPERTY, true);
+                f.addBooleanProperty(GeoShapeConstants.SHAPE_SELECTED_PROPERTY, true);
             } else {
-                f.removeProperty(ViewFeatures.SHAPE_SELECTED_PROPERTY);
+                f.removeProperty(GeoShapeConstants.SHAPE_SELECTED_PROPERTY);
             }
-            f.removeProperty(ViewFeatures.POINT_SELECTED_PROPERTY);
+            f.removeProperty(GeoShapeConstants.POINT_SELECTED_PROPERTY);
         }
         pointFeatureList.add(feature);
     }
 
-    private void updateSources(Style style) {
+    private void updateSources() {
         FeatureCollection features = FeatureCollection.fromFeatures(viewFeatures.getFeatures());
         FeatureCollection pointList = FeatureCollection
                 .fromFeatures(viewFeatures.getPointFeatures());
-        setSource(style, features, FILL_SOURCE_ID);
-        setSource(style, features, LINE_SOURCE_ID);
-        setSource(style, pointList, CIRCLE_SOURCE_ID);
-    }
-
-    private void setSource(Style style, FeatureCollection features, String sourceId) {
-        GeoJsonSource source = (GeoJsonSource) style.getSource(sourceId);
-        if (source != null) {
-            source.setGeoJson(features);
-        }
+        mapView.setSource(features, FILL_SOURCE_ID);
+        mapView.setSource(features, LINE_SOURCE_ID);
+        mapView.setSource(pointList, CIRCLE_SOURCE_ID);
     }
 
     @Override
@@ -488,10 +388,12 @@ public class CreateGeoShapeActivity extends BackActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private void updateMapStyle(String light) {
-        if (mapboxMap != null) {
-            mapboxMap.setStyle(light, callback);
-        }
+    private void updateMapStyle(String style) {
+        mapView.updateMapStyle(style, callback -> {
+            FeatureCollection features = FeatureCollection.fromFeatures(viewFeatures.getFeatures());
+            mapView.initSources(features, features);
+            mapView.centerMap(viewFeatures.getListOfCoordinates());
+        });
     }
 
     private void setShapeResult() {
@@ -552,85 +454,5 @@ public class CreateGeoShapeActivity extends BackActivity {
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         mapView.onSaveInstanceState(outState);
-    }
-
-    private void initFillLayer(@NonNull Style style) {
-        FillLayer fillLayer = new FillLayer(FILL_LAYER_ID, FILL_SOURCE_ID);
-        fillLayer.setProperties(
-                fillColor(FILL_COLOR)
-        );
-        fillLayer.setFilter(has(ViewFeatures.FEATURE_POLYGON));
-        style.addLayer(fillLayer);
-    }
-
-    private void initLineLayer(@NonNull Style style) {
-        LineLayer lineLayer = new LineLayer(LINE_LAYER_ID, LINE_SOURCE_ID);
-        lineLayer.setProperties(
-                lineColor(LINE_COLOR),
-                lineWidth(4f)
-        );
-        lineLayer.setFilter(any(has(ViewFeatures.FEATURE_POLYGON), has(ViewFeatures.FEATURE_LINE)));
-        style.addLayer(lineLayer);
-    }
-
-    private void initCircleLayer(@NonNull Style style) {
-        CircleLayer circleLayer = new CircleLayer(CIRCLE_LAYER_ID, CIRCLE_SOURCE_ID);
-        circleLayer.setProperties(
-                circleRadius(6f),
-                circleColor(CIRCLE_COLOR),
-                circleStrokeWidth(1f),
-                circleStrokeColor(POINT_LINE_COLOR)
-        );
-        circleLayer.setFilter(
-                all(not(has(ViewFeatures.POINT_SELECTED_PROPERTY)),
-                        not(has(ViewFeatures.SHAPE_SELECTED_PROPERTY))));
-        style.addLayer(circleLayer);
-    }
-
-    /**
-     * Selecting a point, also selects it's shape, to show that a shape is selected, all its points
-     * will be drawn in orange (except the actual selected point which is green)
-     */
-    private void initShapeSelectedCircleLayer(@NonNull Style style) {
-        CircleLayer circleLayer = new CircleLayer(SELECTED_FEATURE_POINT_LAYER_ID, CIRCLE_SOURCE_ID);
-        circleLayer.setProperties(
-                circleRadius(6f),
-                circleColor(SELECTED_SHAPE_COLOR)
-        );
-        circleLayer.setFilter(all(has(ViewFeatures.SHAPE_SELECTED_PROPERTY),
-                not(has(ViewFeatures.POINT_SELECTED_PROPERTY))));
-        style.addLayer(circleLayer);
-    }
-
-    /**
-     * A selected point will be drawn in a greenish color
-     */
-    private void initPointSelectedCircleLayer(@NonNull Style style) {
-        CircleLayer circleLayer = new CircleLayer(SELECTED_POINT_LAYER_ID, CIRCLE_SOURCE_ID);
-        circleLayer.setProperties(
-                circleRadius(8f),
-                circleColor(SELECTED_POINT_COLOR)
-        );
-        circleLayer.setFilter(all(has(ViewFeatures.POINT_SELECTED_PROPERTY),
-                not(has(ViewFeatures.SHAPE_SELECTED_PROPERTY))));
-        style.addLayer(circleLayer);
-    }
-
-    private void initLineSource(@NonNull Style style, FeatureCollection featureCollection) {
-        addJsonSourceToStyle(style, featureCollection, LINE_SOURCE_ID);
-    }
-
-    private void initFillSource(@NonNull Style style, FeatureCollection featureCollection) {
-        addJsonSourceToStyle(style, featureCollection, FILL_SOURCE_ID);
-    }
-
-    private void initCircleSource(@NonNull Style style, FeatureCollection featureCollection) {
-        addJsonSourceToStyle(style, featureCollection, CIRCLE_SOURCE_ID);
-    }
-
-    private void addJsonSourceToStyle(@NonNull Style style, @NonNull FeatureCollection collection,
-            @NonNull String sourceId) {
-        GeoJsonSource fillGeoJsonSource = new GeoJsonSource(sourceId, collection);
-        style.addSource(fillGeoJsonSource);
     }
 }

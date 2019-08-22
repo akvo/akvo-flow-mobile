@@ -8,7 +8,7 @@
 
     <include layout="@layout/app_bar_layout" />
 
-    <include layout="@layout/content_view_geo_shape" />
+    <include layout="@layout/content_geo_shape" />
 
     <com.google.android.material.bottomappbar.BottomAppBar
         android:id="@+id/bottomBar"

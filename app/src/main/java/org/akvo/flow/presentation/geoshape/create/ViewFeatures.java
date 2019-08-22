@@ -29,13 +29,8 @@ import androidx.annotation.Nullable;
 
 public class ViewFeatures {
 
-    public static final String POINT_SELECTED_PROPERTY = "is-point-selected";
-    public static final String SHAPE_SELECTED_PROPERTY = "is-shape-selected";
     public static final String POINT_ID = "point-id";
     public static final String FEATURE_ID = "shape-id";
-    public static final String FEATURE_LINE = "is-line";
-    public static final String FEATURE_POINT = "is-point";
-    public static final String FEATURE_POLYGON = "is-polygon";
 
     private final List<Feature> features;
     private final List<Feature> pointFeatures;

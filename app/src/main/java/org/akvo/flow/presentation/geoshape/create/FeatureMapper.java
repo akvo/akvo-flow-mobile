@@ -28,6 +28,8 @@ import com.mapbox.geojson.Point;
 import com.mapbox.geojson.Polygon;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 
+import org.akvo.flow.offlinemaps.presentation.geoshapes.GeoShapeConstants;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -47,14 +49,7 @@ public class FeatureMapper {
     }
 
     public ViewFeatures toViewFeatures(@Nullable String gson) {
-        FeatureCollection featureCollection = gson == null ?
-                FeatureCollection.fromFeatures(new ArrayList<>()) :
-                FeatureCollection.fromJson(gson);
-
-        List<Feature> features = featureCollection.features();
-        if (features == null) {
-            features = new ArrayList<>();
-        }
+        List<Feature> features = createFeatureList(gson);
         final List<Feature> pointFeatures = new ArrayList<>();
         final List<LatLng> listOfCoordinates = new ArrayList<>();
         if (!features.isEmpty()) {
@@ -63,34 +58,30 @@ public class FeatureMapper {
                 feature.addStringProperty(ViewFeatures.FEATURE_ID, featureId);
                 Geometry geometry = feature.geometry();
                 if (geometry instanceof Polygon) {
-                    feature.addBooleanProperty(ViewFeatures.FEATURE_POLYGON, true);
+                    feature.addBooleanProperty(GeoShapeConstants.FEATURE_POLYGON, true);
                     List<List<Point>> coordinatesList = ((Polygon) geometry).coordinates();
                     for (List<Point> coordinates : coordinatesList) {
-                        List<LatLng> listOfPointsCoordinates = coordinatesMapper
-                                .toLatLng(coordinates);
+                        List<LatLng> listOfPointsCoordinates = coordinatesMapper.toLatLng(coordinates);
                         listOfCoordinates.addAll(listOfPointsCoordinates);
                         for (LatLng latLng : listOfPointsCoordinates) {
-                            pointFeatures.add(getPointFeature(latLng, featureId));
+                            pointFeatures.add(createPointFeature(latLng, featureId));
                         }
                     }
                 } else if (geometry instanceof LineString) {
-                    feature.addBooleanProperty(ViewFeatures.FEATURE_LINE, true);
+                    feature.addBooleanProperty(GeoShapeConstants.FEATURE_LINE, true);
                     List<Point> coordinates = ((LineString) geometry).coordinates();
-                    List<LatLng> listOfLinesCoordinates = coordinatesMapper
-                            .toLatLng(coordinates);
+                    List<LatLng> listOfLinesCoordinates = coordinatesMapper.toLatLng(coordinates);
                     listOfCoordinates.addAll(listOfLinesCoordinates);
                     for (LatLng latLng : listOfLinesCoordinates) {
-                        pointFeatures
-                                .add(getPointFeature(latLng, featureId));
+                        pointFeatures.add(createPointFeature(latLng, featureId));
                     }
                 } else if (geometry instanceof MultiPoint) {
-                    feature.addBooleanProperty(ViewFeatures.FEATURE_POINT, true);
+                    feature.addBooleanProperty(GeoShapeConstants.FEATURE_POINT, true);
                     List<Point> coordinates = ((MultiPoint) geometry).coordinates();
-                    List<LatLng> listOfPointsCoordinates = coordinatesMapper
-                            .toLatLng(coordinates);
+                    List<LatLng> listOfPointsCoordinates = coordinatesMapper.toLatLng(coordinates);
                     listOfCoordinates.addAll(listOfPointsCoordinates);
                     for (LatLng latLng : listOfCoordinates) {
-                        pointFeatures.add(getPointFeature(latLng, featureId));
+                        pointFeatures.add(createPointFeature(latLng, featureId));
                     }
                 }
             }
@@ -99,7 +90,20 @@ public class FeatureMapper {
     }
 
     @NonNull
-    private Feature getPointFeature(LatLng latLng, String featureId) {
+    private List<Feature> createFeatureList(@Nullable String gson) {
+        FeatureCollection featureCollection = gson == null ?
+                FeatureCollection.fromFeatures(new ArrayList<>()) :
+                FeatureCollection.fromJson(gson);
+
+        List<Feature> features = featureCollection.features();
+        if (features == null) {
+            features = new ArrayList<>();
+        }
+        return features;
+    }
+
+    @NonNull
+    private Feature createPointFeature(LatLng latLng, String featureId) {
         Feature feature = Feature.fromGeometry(
                 Point.fromLngLat(latLng.getLongitude(), latLng.getLatitude()));
         feature.addStringProperty(ViewFeatures.FEATURE_ID, featureId);

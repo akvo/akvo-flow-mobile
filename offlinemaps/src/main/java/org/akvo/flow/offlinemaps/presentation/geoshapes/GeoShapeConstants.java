@@ -17,7 +17,7 @@
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.akvo.flow.presentation.geoshape;
+package org.akvo.flow.offlinemaps.presentation.geoshapes;
 
 public class GeoShapeConstants {
     public static final String CIRCLE_SOURCE_ID = "circle-source-id";
@@ -37,4 +37,9 @@ public class GeoShapeConstants {
     public static final float ACCURACY_THRESHOLD = 20f;
     public static final int SELECTED_SHAPE_COLOR = 0xFFE27C00;
     public static final int SELECTED_POINT_COLOR = 0xFF00A79D;
+    public static final String FEATURE_LINE = "is-line";
+    public static final String FEATURE_POINT = "is-point";
+    public static final String FEATURE_POLYGON = "is-polygon";
+    public static final String POINT_SELECTED_PROPERTY = "is-point-selected";
+    public static final String SHAPE_SELECTED_PROPERTY = "is-shape-selected";
 }

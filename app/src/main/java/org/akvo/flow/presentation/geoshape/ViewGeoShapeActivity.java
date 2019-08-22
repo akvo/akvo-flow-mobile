@@ -63,20 +63,6 @@ import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.lineColor;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.lineWidth;
 
 public class ViewGeoShapeActivity extends BackActivity {
-
-    private static final String CIRCLE_SOURCE_ID = "circle-source-id";
-    private static final String FILL_SOURCE_ID = "fill-source-id";
-    private static final String LINE_SOURCE_ID = "line-source-id";
-    private static final String CIRCLE_LAYER_ID = "circle-layer-id";
-    private static final String FILL_LAYER_ID = "fill-layer-polygon-id";
-    private static final String LINE_LAYER_ID = "line-layer-id";
-    private static final int FILL_COLOR = 0x88736357;
-    private static final int LINE_COLOR = 0xEE736357;
-    private static final int POINT_COLOR = 0xFF736357;
-    private static final int POINT_LINE_COLOR = 0xFF5B5048;
-    public static final int ANIMATION_DURATION_MS = 400;
-    public static final int ONE_POINT_ZOOM = 12;
-
     private MapView mapView;
     private MapboxMap mapboxMap;
 
@@ -140,14 +126,14 @@ public class ViewGeoShapeActivity extends BackActivity {
             List<LatLng> listOfCoordinates = viewFeatures.getListOfCoordinates();
             if (listOfCoordinates.size() == 1) {
                 CameraUpdate cameraUpdate = CameraUpdateFactory
-                        .newLatLngZoom(listOfCoordinates.get(0), ONE_POINT_ZOOM);
-                mapboxMap.animateCamera(cameraUpdate, ANIMATION_DURATION_MS);
+                        .newLatLngZoom(listOfCoordinates.get(0), GeoShapeConstants.ONE_POINT_ZOOM);
+                mapboxMap.animateCamera(cameraUpdate, GeoShapeConstants.ANIMATION_DURATION_MS);
             } else if (listOfCoordinates.size() > 1) {
                 LatLngBounds.Builder builder = new LatLngBounds.Builder();
                 builder.includes(listOfCoordinates);
                 LatLngBounds latLngBounds = builder.build();
                 CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngBounds(latLngBounds, 100);
-                mapboxMap.animateCamera(cameraUpdate, ANIMATION_DURATION_MS);
+                mapboxMap.animateCamera(cameraUpdate, GeoShapeConstants.ANIMATION_DURATION_MS);
             }
         }
     }
@@ -228,18 +214,18 @@ public class ViewGeoShapeActivity extends BackActivity {
     }
 
     private void initFillLayer(@NonNull Style style) {
-        FillLayer fillLayer = new FillLayer(FILL_LAYER_ID, FILL_SOURCE_ID);
+        FillLayer fillLayer = new FillLayer(GeoShapeConstants.FILL_LAYER_ID, GeoShapeConstants.FILL_SOURCE_ID);
         fillLayer.setProperties(
-                fillColor(FILL_COLOR)
+                fillColor(GeoShapeConstants.FILL_COLOR)
         );
         fillLayer.setFilter(has(ViewFeatures.FEATURE_POLYGON));
         style.addLayer(fillLayer);
     }
 
     private void initLineLayer(@NonNull Style style) {
-        LineLayer lineLayer = new LineLayer(LINE_LAYER_ID, LINE_SOURCE_ID);
+        LineLayer lineLayer = new LineLayer(GeoShapeConstants.LINE_LAYER_ID,GeoShapeConstants.LINE_SOURCE_ID);
         lineLayer.setProperties(
-                lineColor(LINE_COLOR),
+                lineColor(GeoShapeConstants.LINE_COLOR),
                 lineWidth(4f)
         );
         lineLayer.setFilter(any(has(ViewFeatures.FEATURE_POLYGON), has(ViewFeatures.FEATURE_LINE)));
@@ -247,26 +233,26 @@ public class ViewGeoShapeActivity extends BackActivity {
     }
 
     private void initCircleLayer(@NonNull Style style) {
-        CircleLayer circleLayer = new CircleLayer(CIRCLE_LAYER_ID, CIRCLE_SOURCE_ID);
+        CircleLayer circleLayer = new CircleLayer(GeoShapeConstants.UNSELECTED_POINT_LAYER_ID, GeoShapeConstants.CIRCLE_SOURCE_ID);
         circleLayer.setProperties(
                 circleRadius(6f),
-                circleColor(POINT_COLOR),
+                circleColor(GeoShapeConstants.UNSELECTED_POINT_COLOR),
                 circleStrokeWidth(1f),
-                circleStrokeColor(POINT_LINE_COLOR)
+                circleStrokeColor(GeoShapeConstants.UNSELECTED_POINT_LINE_COLOR)
         );
         style.addLayer(circleLayer);
     }
 
     private void initLineSource(@NonNull Style style, FeatureCollection featureCollection) {
-        addJsonSourceToStyle(style, featureCollection, LINE_SOURCE_ID);
+        addJsonSourceToStyle(style, featureCollection, GeoShapeConstants.LINE_SOURCE_ID);
     }
 
     private void initFillSource(@NonNull Style style, FeatureCollection featureCollection) {
-        addJsonSourceToStyle(style, featureCollection, FILL_SOURCE_ID);
+        addJsonSourceToStyle(style, featureCollection, GeoShapeConstants.FILL_SOURCE_ID);
     }
 
     private void initCircleSource(@NonNull Style style, FeatureCollection featureCollection) {
-        addJsonSourceToStyle(style, featureCollection, CIRCLE_SOURCE_ID);
+        addJsonSourceToStyle(style, featureCollection, GeoShapeConstants.CIRCLE_SOURCE_ID);
     }
 
     private void addJsonSourceToStyle(@NonNull Style style, @NonNull FeatureCollection collection,

@@ -104,8 +104,6 @@ public class FeatureMapper {
         List<Point> points = getPointInList(mapTargetPoint);
         Feature feature = Feature.fromGeometry(MultiPoint.fromLngLats(points));
         feature.addBooleanProperty(GeoShapeConstants.FEATURE_POINT, true);
-        feature.addBooleanProperty(GeoShapeConstants.POINT_SELECTED_PROPERTY,
-                true); //do we need this?
         feature.addStringProperty(ViewFeatures.FEATURE_ID, UUID.randomUUID().toString());
         return feature;
     }
@@ -114,8 +112,6 @@ public class FeatureMapper {
         List<Point> points = getPointInList(mapTargetPoint);
         Feature feature = Feature.fromGeometry(LineString.fromLngLats(points));
         feature.addBooleanProperty(GeoShapeConstants.FEATURE_LINE, true);
-        feature.addBooleanProperty(GeoShapeConstants.POINT_SELECTED_PROPERTY,
-                true); //do we need this?
         feature.addStringProperty(ViewFeatures.FEATURE_ID, UUID.randomUUID().toString());
         return feature;
     }
@@ -127,8 +123,6 @@ public class FeatureMapper {
         es.add(points);
         Feature selectedFeature = Feature.fromGeometry(Polygon.fromLngLats(es));
         selectedFeature.addBooleanProperty(GeoShapeConstants.FEATURE_POLYGON, true);
-        selectedFeature.addBooleanProperty(GeoShapeConstants.POINT_SELECTED_PROPERTY,
-                true); //do we need this?
         selectedFeature.addStringProperty(ViewFeatures.FEATURE_ID, UUID.randomUUID().toString());
         return selectedFeature;
     }

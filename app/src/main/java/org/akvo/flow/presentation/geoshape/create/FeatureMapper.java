@@ -31,6 +31,7 @@ import com.mapbox.mapboxsdk.geometry.LatLng;
 import org.akvo.flow.offlinemaps.presentation.geoshapes.GeoShapeConstants;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -61,7 +62,8 @@ public class FeatureMapper {
                     feature.addBooleanProperty(GeoShapeConstants.FEATURE_POLYGON, true);
                     List<List<Point>> coordinatesList = ((Polygon) geometry).coordinates();
                     for (List<Point> coordinates : coordinatesList) {
-                        List<LatLng> listOfPointsCoordinates = coordinatesMapper.toLatLng(coordinates);
+                        List<LatLng> listOfPointsCoordinates = coordinatesMapper
+                                .toLatLng(coordinates);
                         listOfCoordinates.addAll(listOfPointsCoordinates);
                         for (LatLng latLng : listOfPointsCoordinates) {
                             pointFeatures.add(createPointFeature(latLng, featureId));
@@ -89,6 +91,77 @@ public class FeatureMapper {
         return new ViewFeatures(features, pointFeatures, listOfCoordinates);
     }
 
+    public Feature createPointFeature(Point mapTargetPoint, Feature containingFeature) {
+        String containingFeatureId = containingFeature.getStringProperty(ViewFeatures.FEATURE_ID);
+        Feature feature = Feature.fromGeometry(mapTargetPoint);
+        feature.addBooleanProperty(GeoShapeConstants.POINT_SELECTED_PROPERTY, true);
+        feature.addStringProperty(ViewFeatures.FEATURE_ID, containingFeatureId);
+        feature.addStringProperty(ViewFeatures.POINT_ID, UUID.randomUUID().toString());
+        return feature;
+    }
+
+    public Feature createNewMultiPointFeature(Point mapTargetPoint) {
+        List<Point> points = getPointInList(mapTargetPoint);
+        Feature feature = Feature.fromGeometry(MultiPoint.fromLngLats(points));
+        feature.addBooleanProperty(GeoShapeConstants.FEATURE_POINT, true);
+        feature.addBooleanProperty(GeoShapeConstants.POINT_SELECTED_PROPERTY,
+                true); //do we need this?
+        feature.addStringProperty(ViewFeatures.FEATURE_ID, UUID.randomUUID().toString());
+        return feature;
+    }
+
+    public Feature createNewLineStringFeature(Point mapTargetPoint) {
+        List<Point> points = getPointInList(mapTargetPoint);
+        Feature feature = Feature.fromGeometry(LineString.fromLngLats(points));
+        feature.addBooleanProperty(GeoShapeConstants.FEATURE_LINE, true);
+        feature.addBooleanProperty(GeoShapeConstants.POINT_SELECTED_PROPERTY,
+                true); //do we need this?
+        feature.addStringProperty(ViewFeatures.FEATURE_ID, UUID.randomUUID().toString());
+        return feature;
+    }
+
+    public Feature createNewPolygonFeature(Point mapTargetPoint) {
+        List<Point> points = new ArrayList<>();
+        points.add(mapTargetPoint);
+        List<List<Point>> es = new ArrayList<>();
+        es.add(points);
+        Feature selectedFeature = Feature.fromGeometry(Polygon.fromLngLats(es));
+        selectedFeature.addBooleanProperty(GeoShapeConstants.FEATURE_POLYGON, true);
+        selectedFeature.addBooleanProperty(GeoShapeConstants.POINT_SELECTED_PROPERTY,
+                true); //do we need this?
+        selectedFeature.addStringProperty(ViewFeatures.FEATURE_ID, UUID.randomUUID().toString());
+        return selectedFeature;
+    }
+
+    public boolean isValidMultiPointFeature(Feature selectedFeature) {
+        return selectedFeature != null && selectedFeature.geometry() instanceof MultiPoint;
+    }
+
+    public boolean isValidLineStringFeature(Feature selectedFeature) {
+        return selectedFeature != null && selectedFeature.geometry() instanceof LineString;
+    }
+
+    public boolean isValidPolygonFeature(Feature selectedFeature) {
+        return selectedFeature != null && selectedFeature.geometry() instanceof Polygon;
+    }
+
+    public List<Point> getMultiPointCoordinates(Feature selectedFeature) {
+        Geometry geometry = selectedFeature == null ? null : selectedFeature.geometry();
+        return geometry == null ? Collections.emptyList() : ((MultiPoint) geometry).coordinates();
+    }
+
+    public List<Point> getLineStringCoordinates(Feature selectedFeature) {
+        Geometry geometry = selectedFeature == null ? null : selectedFeature.geometry();
+        return geometry == null ? Collections.emptyList() : ((LineString) geometry).coordinates();
+    }
+
+    public List<Point> getPolygonCoordinates(Feature selectedFeature) {
+        Geometry geometry = selectedFeature == null ? null : selectedFeature.geometry();
+        return geometry == null ?
+                Collections.emptyList() :
+                ((Polygon) geometry).coordinates().get(0);
+    }
+
     @NonNull
     private List<Feature> createFeatureList(@Nullable String gson) {
         FeatureCollection featureCollection = gson == null ?
@@ -109,5 +182,12 @@ public class FeatureMapper {
         feature.addStringProperty(ViewFeatures.FEATURE_ID, featureId);
         feature.addStringProperty(ViewFeatures.POINT_ID, UUID.randomUUID().toString());
         return feature;
+    }
+
+    @NonNull
+    private List<Point> getPointInList(Point mapTargetPoint) {
+        List<Point> points = new ArrayList<>(1);
+        points.add(mapTargetPoint);
+        return points;
     }
 }

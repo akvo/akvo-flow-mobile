@@ -20,13 +20,11 @@
 package org.akvo.flow.presentation.geoshape.create;
 
 import com.mapbox.geojson.Feature;
-import com.mapbox.geojson.Point;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 
 import org.akvo.flow.offlinemaps.presentation.geoshapes.GeoShapeConstants;
 
 import java.util.List;
-import java.util.UUID;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -71,11 +69,8 @@ public class ViewFeatures {
         this.selectedFeature = selectedFeature;
     }
 
-    public void updateSelectedPoint(Point mapTargetPoint, String selectedFeatureId) {
-        Feature feature = Feature.fromGeometry(mapTargetPoint);
-        feature.addBooleanProperty(GeoShapeConstants.POINT_SELECTED_PROPERTY, true);
-        feature.addStringProperty(ViewFeatures.FEATURE_ID, selectedFeatureId);
-        feature.addStringProperty(ViewFeatures.POINT_ID, UUID.randomUUID().toString());
+    public void updatePointsList(Feature newPointFeature) {
+        String selectedFeatureId = newPointFeature.getStringProperty(ViewFeatures.FEATURE_ID);
         List<Feature> pointFeatureList = getPointFeatures();
         for (Feature f : pointFeatureList) {
             if (f.getStringProperty(ViewFeatures.FEATURE_ID).equals(selectedFeatureId)) {
@@ -85,6 +80,11 @@ public class ViewFeatures {
             }
             f.removeProperty(GeoShapeConstants.POINT_SELECTED_PROPERTY);
         }
-        pointFeatureList.add(feature);
+        pointFeatureList.add(newPointFeature);
+    }
+
+    public void addSelectedFeature(Feature feature) {
+        setSelectedFeature(feature);
+        getFeatures().add(feature);
     }
 }

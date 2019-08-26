@@ -55,12 +55,11 @@ import java.util.UUID;
 
 import javax.inject.Inject;
 
-import androidx.annotation.NonNull;
-
 import static org.akvo.flow.offlinemaps.presentation.geoshapes.GeoShapeConstants.ACCURACY_THRESHOLD;
 import static org.akvo.flow.offlinemaps.presentation.geoshapes.GeoShapeConstants.CIRCLE_SOURCE_ID;
 import static org.akvo.flow.offlinemaps.presentation.geoshapes.GeoShapeConstants.FILL_SOURCE_ID;
 import static org.akvo.flow.offlinemaps.presentation.geoshapes.GeoShapeConstants.LINE_SOURCE_ID;
+import static org.akvo.flow.presentation.geoshape.create.DrawMode.AREA;
 
 public class CreateGeoShapeActivity extends BackActivity {
 
@@ -195,10 +194,10 @@ public class CreateGeoShapeActivity extends BackActivity {
                 //TODO: should notify user?
                 return false;
             }
-            if (drawMode == DrawMode.POINT || drawMode == DrawMode.AREA
-                    || drawMode == DrawMode.LINE) {
+            if (drawMode != DrawMode.NONE) {
                 addPoint(point);
                 updateChanged();
+                updateSources();
             }
             //TODO: should notify user?
             return true;
@@ -214,105 +213,143 @@ public class CreateGeoShapeActivity extends BackActivity {
 
     private void addPoint(LatLng latLng) {
         Point mapTargetPoint = Point.fromLngLat(latLng.getLongitude(), latLng.getLatitude());
-        String featureId = updateFeature(mapTargetPoint);
-        updatePointsList(mapTargetPoint, featureId);
-        updateSources();
+        switch (drawMode) {
+            case POINT:
+                addPointToMultipoint(mapTargetPoint);
+                break;
+            case LINE:
+                addPointToLineString(mapTargetPoint);
+                break;
+            case AREA:
+                addPointToPolygon(mapTargetPoint);
+                break;
+            default:
+                break;
+        }
     }
 
-    private String updateFeature(Point mapTargetPoint) {
-        Feature selectedFeature = viewFeatures.getSelectedFeature();
-        List<Point> points;
+    private void addPointToMultipoint(Point mapTargetPoint) {
         String featureId;
-        if (isValidFeature(selectedFeature)) {
-            points = getCoordinates(selectedFeature);
-            points.add(mapTargetPoint);
-            featureId = selectedFeature.getStringProperty(ViewFeatures.FEATURE_ID);
+        Feature selectedFeature = viewFeatures.getSelectedFeature();
+        if (isValidMultiPointFeature(selectedFeature)) {
+            featureId = updateExistingMultiPoint(mapTargetPoint, selectedFeature);
         } else {
-            points = new ArrayList<>();
-            points.add(mapTargetPoint);
-            selectedFeature = createFeatureFromGeometry(points);
-            selectedFeature.addBooleanProperty(GeoShapeConstants.POINT_SELECTED_PROPERTY, true);
-            featureId = UUID.randomUUID().toString();
-            selectedFeature.addStringProperty(ViewFeatures.FEATURE_ID, featureId);
-            viewFeatures.setSelectedFeature(selectedFeature);
-            viewFeatures.getFeatures().add(selectedFeature);
+            featureId = createNewMultiPointFeature(mapTargetPoint);
         }
+        viewFeatures.updateSelectedPoint(mapTargetPoint, featureId);
+    }
+
+    private void addPointToLineString(Point mapTargetPoint) {
+        String featureId;
+        Feature selectedFeature = viewFeatures.getSelectedFeature();
+        if (isValidLineStringFeature(selectedFeature)) {
+            featureId = updateExistingLineString(mapTargetPoint, selectedFeature);
+        } else {
+            featureId = createNewLineStringFeature(mapTargetPoint);
+        }
+        viewFeatures.updateSelectedPoint(mapTargetPoint, featureId);
+    }
+
+    private void addPointToPolygon(Point mapTargetPoint) {
+        String featureId;
+        Feature selectedFeature = viewFeatures.getSelectedFeature();
+        if (isValidPolygonFeature(selectedFeature)) {
+            featureId = updateExistingPolygon(mapTargetPoint, selectedFeature);
+        } else {
+            featureId = createNewPolygonFeature(mapTargetPoint);
+        }
+        viewFeatures.updateSelectedPoint(mapTargetPoint, featureId);
+    }
+
+    private String createNewMultiPointFeature(Point mapTargetPoint) {
+        final String featureId = UUID.randomUUID().toString();
+        List<Point> points = new ArrayList<>();
+        points.add(mapTargetPoint);
+        Feature selectedFeature = Feature.fromGeometry(MultiPoint.fromLngLats(points));
+        selectedFeature.addBooleanProperty(GeoShapeConstants.FEATURE_POINT, true);
+        selectedFeature.addBooleanProperty(GeoShapeConstants.POINT_SELECTED_PROPERTY,
+                true); //do we need this?
+        selectedFeature.addStringProperty(ViewFeatures.FEATURE_ID, featureId);
+        viewFeatures.setSelectedFeature(selectedFeature);
+        viewFeatures.getFeatures().add(selectedFeature);
         return featureId;
     }
 
-    @NonNull
-    private Feature createFeatureFromGeometry(List<Point> points) {
-        Feature feature;
-        switch (drawMode) {
-            case LINE:
-                feature = Feature.fromGeometry(LineString.fromLngLats(points));
-                feature.addBooleanProperty(GeoShapeConstants.FEATURE_LINE, true);
-                break;
-            case AREA:
-                List<List<Point>> es = new ArrayList<>();
-                es.add(points);
-                feature = Feature.fromGeometry(Polygon.fromLngLats(es));
-                feature.addBooleanProperty(GeoShapeConstants.FEATURE_POLYGON, true);
-                break;
-            case POINT:
-            default:
-                feature = Feature.fromGeometry(MultiPoint.fromLngLats(points));
-                feature.addBooleanProperty(GeoShapeConstants.FEATURE_POINT, true);
-                break;
-        }
-        return feature;
+    private String createNewLineStringFeature(Point mapTargetPoint) {
+        final String featureId = UUID.randomUUID().toString();
+        List<Point> points = new ArrayList<>();
+        points.add(mapTargetPoint);
+        Feature selectedFeature = Feature.fromGeometry(LineString.fromLngLats(points));
+        selectedFeature.addBooleanProperty(GeoShapeConstants.FEATURE_LINE, true);
+        selectedFeature.addBooleanProperty(GeoShapeConstants.POINT_SELECTED_PROPERTY,
+                true); //do we need this?
+        selectedFeature.addStringProperty(ViewFeatures.FEATURE_ID, featureId);
+        viewFeatures.setSelectedFeature(selectedFeature);
+        viewFeatures.getFeatures().add(selectedFeature);
+        return featureId;
     }
 
-    @NonNull
-    private List<Point> getCoordinates(Feature selectedFeature) {
-        Geometry geometry = selectedFeature.geometry();
-        if (geometry == null) {
-            return Collections.emptyList();
-        }
-        switch (drawMode) {
-            case POINT:
-                return ((MultiPoint) geometry).coordinates();
-            case LINE:
-                return ((LineString) geometry).coordinates();
-            case AREA:
-                return ((Polygon) geometry).coordinates().get(0);
-            default:
-                return Collections.emptyList();
-        }
+    private String createNewPolygonFeature(Point mapTargetPoint) {
+        final String featureId = UUID.randomUUID().toString();
+        List<Point> points = new ArrayList<>();
+        points.add(mapTargetPoint);
+        List<List<Point>> es = new ArrayList<>();
+        es.add(points);
+        Feature selectedFeature = Feature.fromGeometry(Polygon.fromLngLats(es));
+        selectedFeature.addBooleanProperty(GeoShapeConstants.FEATURE_POLYGON, true);
+        selectedFeature.addBooleanProperty(GeoShapeConstants.POINT_SELECTED_PROPERTY,
+                true); //do we need this?
+        selectedFeature.addStringProperty(ViewFeatures.FEATURE_ID, featureId);
+        viewFeatures.setSelectedFeature(selectedFeature);
+        viewFeatures.getFeatures().add(selectedFeature);
+        return featureId;
     }
 
-    private boolean isValidFeature(Feature selectedFeature) {
-        if (selectedFeature == null) {
-            return false;
-        } else {
-            switch (drawMode) {
-                case POINT:
-                    return selectedFeature.geometry() instanceof MultiPoint;
-                case LINE:
-                    return selectedFeature.geometry() instanceof LineString;
-                case AREA:
-                    return selectedFeature.geometry() instanceof Polygon;
-                default:
-                    return false;
-            }
-        }
+    private String updateExistingMultiPoint(Point mapTargetPoint, Feature selectedFeature) {
+        List<Point> points = getMultiPointCoordinates(selectedFeature);
+        points.add(mapTargetPoint);
+        return selectedFeature.getStringProperty(ViewFeatures.FEATURE_ID);
     }
 
-    private void updatePointsList(Point mapTargetPoint, String featureId) {
-        Feature feature = Feature.fromGeometry(mapTargetPoint);
-        feature.addBooleanProperty(GeoShapeConstants.POINT_SELECTED_PROPERTY, true);
-        feature.addStringProperty(ViewFeatures.FEATURE_ID, featureId);
-        feature.addStringProperty(ViewFeatures.POINT_ID, UUID.randomUUID().toString());
-        List<Feature> pointFeatureList = viewFeatures.getPointFeatures();
-        for (Feature f : pointFeatureList) {
-            if (f.getStringProperty(ViewFeatures.FEATURE_ID).equals(featureId)) {
-                f.addBooleanProperty(GeoShapeConstants.SHAPE_SELECTED_PROPERTY, true);
-            } else {
-                f.removeProperty(GeoShapeConstants.SHAPE_SELECTED_PROPERTY);
-            }
-            f.removeProperty(GeoShapeConstants.POINT_SELECTED_PROPERTY);
-        }
-        pointFeatureList.add(feature);
+    private String updateExistingLineString(Point mapTargetPoint, Feature selectedFeature) {
+        List<Point> points = getLineStringCoordinates(selectedFeature);
+        points.add(mapTargetPoint);
+        return selectedFeature.getStringProperty(ViewFeatures.FEATURE_ID);
+    }
+
+    private String updateExistingPolygon(Point mapTargetPoint, Feature selectedFeature) {
+        List<Point> points = getPolygonCoordinates(selectedFeature);
+        points.add(mapTargetPoint);
+        return selectedFeature.getStringProperty(ViewFeatures.FEATURE_ID);
+    }
+
+    private List<Point> getMultiPointCoordinates(Feature selectedFeature) {
+        Geometry geometry = selectedFeature == null ? null : selectedFeature.geometry();
+        return geometry == null ? Collections.emptyList() : ((MultiPoint) geometry).coordinates();
+    }
+
+    private List<Point> getLineStringCoordinates(Feature selectedFeature) {
+        Geometry geometry = selectedFeature == null ? null : selectedFeature.geometry();
+        return geometry == null ? Collections.emptyList() : ((LineString) geometry).coordinates();
+    }
+
+    private List<Point> getPolygonCoordinates(Feature selectedFeature) {
+        Geometry geometry = selectedFeature == null ? null : selectedFeature.geometry();
+        return geometry == null ?
+                Collections.emptyList() :
+                ((Polygon) geometry).coordinates().get(0);
+    }
+
+    private boolean isValidMultiPointFeature(Feature selectedFeature) {
+        return selectedFeature != null && selectedFeature.geometry() instanceof MultiPoint;
+    }
+
+    private boolean isValidLineStringFeature(Feature selectedFeature) {
+        return selectedFeature != null && selectedFeature.geometry() instanceof LineString;
+    }
+
+    private boolean isValidPolygonFeature(Feature selectedFeature) {
+        return selectedFeature != null && selectedFeature.geometry() instanceof Polygon;
     }
 
     private void updateSources() {
@@ -375,7 +412,7 @@ public class CreateGeoShapeActivity extends BackActivity {
             case R.id.add_polygon:
                 bottomAppBar.setVisibility(View.VISIBLE);
                 bottomBarTitle.setText(R.string.geoshape_area);
-                drawMode = DrawMode.AREA;
+                drawMode = AREA;
                 break;
             case R.id.save:
                 setShapeResult();

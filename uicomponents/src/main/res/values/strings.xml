@@ -354,4 +354,6 @@
         <item quantity="other">Forms downloaded</item>
     </plurals>
 
+    <string name="geoshapes_error_manual_disabled">Manual input is disabled for this question</string>
+    <string name="geoshapes_error_select_shape">Please select at least one shape in the menu</string>
 </resources>

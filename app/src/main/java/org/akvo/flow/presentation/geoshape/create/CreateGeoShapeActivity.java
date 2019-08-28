@@ -188,15 +188,20 @@ public class CreateGeoShapeActivity extends BackActivity {
     private void setMapClicks() {
         mapView.setMapClicks(point -> {
             if (!manualInputEnabled) {
-                //TODO: should notify user?
+                snackBarManager
+                        .displaySnackBar(bottomAppBar, R.string.geoshapes_error_manual_disabled,
+                                this);
                 return false;
             }
             if (drawMode != DrawMode.NONE) {
                 addPoint(point);
                 updateChanged();
                 updateSources();
+            } else {
+                snackBarManager
+                        .displaySnackBar(bottomAppBar, R.string.geoshapes_error_select_shape,
+                                this);
             }
-            //TODO: should notify user?
             return true;
         });
     }

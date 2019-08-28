@@ -41,6 +41,9 @@ import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
 import org.akvo.flow.offlinemaps.presentation.geoshapes.GeoShapesMapView;
 import org.akvo.flow.presentation.SnackBarManager;
+import org.akvo.flow.presentation.geoshape.DeletePointDialog;
+import org.akvo.flow.presentation.geoshape.DeleteShapeDialog;
+import org.akvo.flow.presentation.geoshape.PropertiesDialog;
 import org.akvo.flow.util.ConstantUtil;
 
 import java.util.ArrayList;
@@ -114,14 +117,45 @@ public class CreateGeoShapeActivity extends BackActivity {
         bottomAppBar.replaceMenu(R.menu.create_geoshape_activity_bottom);
         bottomAppBar.setOnMenuItemClickListener(item -> {
             switch (item.getItemId()) {
+                case R.id.shape_info:
+                    displaySelectedShapeInfo();
+                    break;
                 case R.id.add_point:
-                    addLocationPoint(); //TODO: check selected shape
+                    if (drawMode != DrawMode.NONE) {
+                        addLocationPoint();
+                    } else {
+                        snackBarManager
+                                .displaySnackBar(bottomAppBar, R.string.geoshapes_error_select_shape,
+                                        this);
+                    }
+                    break;
+                case R.id.delete_point:
+                    DeletePointDialog pointDelete = DeletePointDialog.newInstance();
+                    pointDelete.show(getSupportFragmentManager(), DeletePointDialog.TAG);
+                    break;
+                case R.id.delete_feature:
+                    DeleteShapeDialog shapeDelete = DeleteShapeDialog.newInstance();
+                    shapeDelete.show(getSupportFragmentManager(), DeleteShapeDialog.TAG);
                     break;
                 default:
                     break;
             }
             return true;
         });
+    }
+
+    private void displaySelectedShapeInfo() {
+        Feature selectedFeature = viewFeatures.getSelectedFeature();
+        if (selectedFeature != null) {
+            String pointCount = selectedFeature
+                    .getStringProperty(FeatureMapper.POINT_COUNT_PROPERTY_NAME);
+            String length = selectedFeature.hasProperty(FeatureMapper.LENGTH_PROPERTY_NAME) ?
+                    selectedFeature.getStringProperty(FeatureMapper.LENGTH_PROPERTY_NAME) : "";
+            String area = selectedFeature.hasProperty(FeatureMapper.AREA_PROPERTY_NAME) ?
+                    selectedFeature.getStringProperty(FeatureMapper.AREA_PROPERTY_NAME) : "";
+            PropertiesDialog dialog = PropertiesDialog.newInstance(pointCount, length, area);
+            dialog.show(getSupportFragmentManager(), PropertiesDialog.TAG);
+        }
     }
 
     private void addLocationPoint() {

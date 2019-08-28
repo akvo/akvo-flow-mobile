@@ -356,4 +356,8 @@
 
     <string name="geoshapes_error_manual_disabled">Manual input is disabled for this question</string>
     <string name="geoshapes_error_select_shape">Please select at least one shape in the menu</string>
+    <string name="geoshape_properties_point_count">Point Count: %1$s</string>
+    <string name="geoshape_properties_length">Length: %1$s</string>
+    <string name="geoshape_properties_area">Area: %1$s</string>
+    <string name="geoshape_properties_title">Properties</string>
 </resources>

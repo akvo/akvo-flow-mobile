@@ -45,6 +45,10 @@ import androidx.annotation.Nullable;
 
 public class FeatureMapper {
 
+    public static final String POINT_COUNT_PROPERTY_NAME = "pointCount";
+    public static final String LENGTH_PROPERTY_NAME = "length";
+    public static final String AREA_PROPERTY_NAME = "area";
+
     private final CoordinatesMapper coordinatesMapper;
     private final LengthCounter lengthCounter;
     private final AreaCounter areaCounter;
@@ -114,7 +118,7 @@ public class FeatureMapper {
     public Feature createNewMultiPointFeature(Point mapTargetPoint) {
         List<Point> points = getPointInList(mapTargetPoint);
         Feature feature = Feature.fromGeometry(MultiPoint.fromLngLats(points));
-        feature.addStringProperty("pointCount", "1");
+        feature.addStringProperty(POINT_COUNT_PROPERTY_NAME, "1");
         feature.addBooleanProperty(GeoShapeConstants.FEATURE_POINT, true);
         feature.addStringProperty(ViewFeatures.FEATURE_ID, UUID.randomUUID().toString());
         return feature;
@@ -123,8 +127,8 @@ public class FeatureMapper {
     public Feature createNewLineStringFeature(Point mapTargetPoint) {
         List<Point> points = getPointInList(mapTargetPoint);
         Feature feature = Feature.fromGeometry(LineString.fromLngLats(points));
-        feature.addStringProperty("pointCount", "1");
-        feature.addStringProperty("length", "0.00");
+        feature.addStringProperty(POINT_COUNT_PROPERTY_NAME, "1");
+        feature.addStringProperty(LENGTH_PROPERTY_NAME, "0.00");
         feature.addBooleanProperty(GeoShapeConstants.FEATURE_LINE, true);
         feature.addStringProperty(ViewFeatures.FEATURE_ID, UUID.randomUUID().toString());
         return feature;
@@ -136,9 +140,9 @@ public class FeatureMapper {
         List<List<Point>> es = new ArrayList<>();
         es.add(points);
         Feature feature = Feature.fromGeometry(Polygon.fromLngLats(es));
-        feature.addStringProperty("pointCount", "1");
-        feature.addStringProperty("length", "0.00");
-        feature.addStringProperty("area", "0.00");
+        feature.addStringProperty(POINT_COUNT_PROPERTY_NAME, "1");
+        feature.addStringProperty(LENGTH_PROPERTY_NAME, "0.00");
+        feature.addStringProperty(AREA_PROPERTY_NAME, "0.00");
         feature.addBooleanProperty(GeoShapeConstants.FEATURE_POLYGON, true);
         feature.addStringProperty(ViewFeatures.FEATURE_ID, UUID.randomUUID().toString());
         return feature;
@@ -159,14 +163,14 @@ public class FeatureMapper {
     public void updateExistingMultiPoint(Point mapTargetPoint, Feature selectedFeature) {
         List<Point> points = getMultiPointCoordinates(selectedFeature);
         points.add(mapTargetPoint);
-        selectedFeature.addStringProperty("pointCount", points.size() + "");
+        selectedFeature.addStringProperty(POINT_COUNT_PROPERTY_NAME, points.size() + "");
     }
 
     public void updateExistingLineString(Point mapTargetPoint, Feature selectedFeature) {
         List<Point> points = getLineStringCoordinates(selectedFeature);
         points.add(mapTargetPoint);
-        selectedFeature.addStringProperty("pointCount", points.size() + "");
-        selectedFeature.addStringProperty("length",
+        selectedFeature.addStringProperty(POINT_COUNT_PROPERTY_NAME, points.size() + "");
+        selectedFeature.addStringProperty(LENGTH_PROPERTY_NAME,
                 geoUtil.getDisplayLength(lengthCounter.computeLength(points)));
     }
 
@@ -185,10 +189,10 @@ public class FeatureMapper {
             points.add(size - 2, mapTargetPoint);
             count = points.size() - 1;
         }
-        selectedFeature.addStringProperty("pointCount", count + "");
-        selectedFeature.addStringProperty("length",
+        selectedFeature.addStringProperty(POINT_COUNT_PROPERTY_NAME, count + "");
+        selectedFeature.addStringProperty(LENGTH_PROPERTY_NAME,
                 geoUtil.getDisplayLength(lengthCounter.computeLength(points)));
-        selectedFeature.addStringProperty("area",
+        selectedFeature.addStringProperty(AREA_PROPERTY_NAME,
                 geoUtil.getDisplayArea(areaCounter.area(points)));
     }
 

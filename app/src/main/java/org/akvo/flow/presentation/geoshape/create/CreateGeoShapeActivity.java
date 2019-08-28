@@ -27,7 +27,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.material.bottomappbar.BottomAppBar;
 import com.mapbox.geojson.Feature;
@@ -41,6 +40,7 @@ import org.akvo.flow.activity.BackActivity;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
 import org.akvo.flow.offlinemaps.presentation.geoshapes.GeoShapesMapView;
+import org.akvo.flow.presentation.SnackBarManager;
 import org.akvo.flow.util.ConstantUtil;
 
 import java.util.ArrayList;
@@ -79,6 +79,9 @@ public class CreateGeoShapeActivity extends BackActivity {
 
     @Inject
     CoordinatesMapper coordinatesMapper;
+
+    @Inject
+    SnackBarManager snackBarManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -128,12 +131,10 @@ public class CreateGeoShapeActivity extends BackActivity {
             addPoint(new LatLng(location.getLatitude(), location.getLongitude()));
             updateChanged();
         } else {
-            //TODO: use snackbar
-            Toast.makeText(CreateGeoShapeActivity.this,
-                    location != null ?
-                            R.string.location_inaccurate :
-                            R.string.location_unknown,
-                    Toast.LENGTH_LONG).show();
+            int messageId = location != null ?
+                    R.string.location_inaccurate :
+                    R.string.location_unknown;
+            snackBarManager.displaySnackBar(bottomAppBar, messageId, this);
         }
     }
 

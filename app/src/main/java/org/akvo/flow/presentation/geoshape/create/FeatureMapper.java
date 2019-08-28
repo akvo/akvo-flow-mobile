@@ -29,6 +29,9 @@ import com.mapbox.geojson.Polygon;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 
 import org.akvo.flow.offlinemaps.presentation.geoshapes.GeoShapeConstants;
+import org.akvo.flow.presentation.geoshape.AreaCounter;
+import org.akvo.flow.presentation.geoshape.LengthCounter;
+import org.akvo.flow.util.GeoUtil;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -43,10 +46,18 @@ import androidx.annotation.Nullable;
 public class FeatureMapper {
 
     private final CoordinatesMapper coordinatesMapper;
+    private final LengthCounter lengthCounter;
+    private final AreaCounter areaCounter;
+    private final GeoUtil geoUtil;
 
     @Inject
-    public FeatureMapper(CoordinatesMapper coordinatesMapper) {
+    public FeatureMapper(CoordinatesMapper coordinatesMapper,
+            LengthCounter lengthCounter,
+            AreaCounter areaCounter, GeoUtil geoUtil) {
         this.coordinatesMapper = coordinatesMapper;
+        this.lengthCounter = lengthCounter;
+        this.areaCounter = areaCounter;
+        this.geoUtil = geoUtil;
     }
 
     public ViewFeatures toViewFeatures(@Nullable String gson) {
@@ -103,6 +114,7 @@ public class FeatureMapper {
     public Feature createNewMultiPointFeature(Point mapTargetPoint) {
         List<Point> points = getPointInList(mapTargetPoint);
         Feature feature = Feature.fromGeometry(MultiPoint.fromLngLats(points));
+        feature.addStringProperty("pointCount", "1");
         feature.addBooleanProperty(GeoShapeConstants.FEATURE_POINT, true);
         feature.addStringProperty(ViewFeatures.FEATURE_ID, UUID.randomUUID().toString());
         return feature;
@@ -111,6 +123,8 @@ public class FeatureMapper {
     public Feature createNewLineStringFeature(Point mapTargetPoint) {
         List<Point> points = getPointInList(mapTargetPoint);
         Feature feature = Feature.fromGeometry(LineString.fromLngLats(points));
+        feature.addStringProperty("pointCount", "1");
+        feature.addStringProperty("length", "0.00");
         feature.addBooleanProperty(GeoShapeConstants.FEATURE_LINE, true);
         feature.addStringProperty(ViewFeatures.FEATURE_ID, UUID.randomUUID().toString());
         return feature;
@@ -121,10 +135,13 @@ public class FeatureMapper {
         points.add(mapTargetPoint);
         List<List<Point>> es = new ArrayList<>();
         es.add(points);
-        Feature selectedFeature = Feature.fromGeometry(Polygon.fromLngLats(es));
-        selectedFeature.addBooleanProperty(GeoShapeConstants.FEATURE_POLYGON, true);
-        selectedFeature.addStringProperty(ViewFeatures.FEATURE_ID, UUID.randomUUID().toString());
-        return selectedFeature;
+        Feature feature = Feature.fromGeometry(Polygon.fromLngLats(es));
+        feature.addStringProperty("pointCount", "1");
+        feature.addStringProperty("length", "0.00");
+        feature.addStringProperty("area", "0.00");
+        feature.addBooleanProperty(GeoShapeConstants.FEATURE_POLYGON, true);
+        feature.addStringProperty(ViewFeatures.FEATURE_ID, UUID.randomUUID().toString());
+        return feature;
     }
 
     public boolean isValidMultiPointFeature(Feature selectedFeature) {
@@ -139,21 +156,57 @@ public class FeatureMapper {
         return selectedFeature != null && selectedFeature.geometry() instanceof Polygon;
     }
 
-    public List<Point> getMultiPointCoordinates(Feature selectedFeature) {
-        Geometry geometry = selectedFeature == null ? null : selectedFeature.geometry();
-        return geometry == null ? Collections.emptyList() : ((MultiPoint) geometry).coordinates();
+    public void updateExistingMultiPoint(Point mapTargetPoint, Feature selectedFeature) {
+        List<Point> points = getMultiPointCoordinates(selectedFeature);
+        points.add(mapTargetPoint);
+        selectedFeature.addStringProperty("pointCount", points.size() + "");
     }
 
-    public List<Point> getLineStringCoordinates(Feature selectedFeature) {
+    public void updateExistingLineString(Point mapTargetPoint, Feature selectedFeature) {
+        List<Point> points = getLineStringCoordinates(selectedFeature);
+        points.add(mapTargetPoint);
+        selectedFeature.addStringProperty("pointCount", points.size() + "");
+        selectedFeature.addStringProperty("length",
+                geoUtil.getDisplayLength(lengthCounter.computeLength(points)));
+    }
+
+    public void updateExistingPolygon(Point mapTargetPoint, Feature selectedFeature) {
+        List<Point> points = getPolygonCoordinates(selectedFeature);
+        int size = points.size();
+        int count;
+        if (size < 2) {
+            points.add(mapTargetPoint);
+            count = points.size();
+        } else if (size == 2) {
+            points.add(mapTargetPoint);
+            points.add(points.get(0));
+            count = points.size() - 1;
+        } else {
+            points.add(size - 2, mapTargetPoint);
+            count = points.size() - 1;
+        }
+        selectedFeature.addStringProperty("pointCount", count + "");
+        selectedFeature.addStringProperty("length",
+                geoUtil.getDisplayLength(lengthCounter.computeLength(points)));
+        selectedFeature.addStringProperty("area",
+                geoUtil.getDisplayArea(areaCounter.area(points)));
+    }
+
+    private List<Point> getLineStringCoordinates(Feature selectedFeature) {
         Geometry geometry = selectedFeature == null ? null : selectedFeature.geometry();
         return geometry == null ? Collections.emptyList() : ((LineString) geometry).coordinates();
     }
 
-    public List<Point> getPolygonCoordinates(Feature selectedFeature) {
+    private List<Point> getPolygonCoordinates(Feature selectedFeature) {
         Geometry geometry = selectedFeature == null ? null : selectedFeature.geometry();
         return geometry == null ?
                 Collections.emptyList() :
                 ((Polygon) geometry).coordinates().get(0);
+    }
+
+    private List<Point> getMultiPointCoordinates(Feature selectedFeature) {
+        Geometry geometry = selectedFeature == null ? null : selectedFeature.geometry();
+        return geometry == null ? Collections.emptyList() : ((MultiPoint) geometry).coordinates();
     }
 
     @NonNull

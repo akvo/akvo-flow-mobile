@@ -103,12 +103,12 @@ public class PolygonFeature extends Feature {
             previous = point;
         }
         String lengthVal = String.format("%.2f", length);
-        mProperties.add(new Property("length", lengthVal, "Length", GeoUtil.getDisplayLength(length)));
+        mProperties.add(new Property("length", lengthVal, "Length", new GeoUtil().getDisplayLength(length)));
 
         // Area
         final double area = area();
         String areaVal = String.format("%.2f", area);
-        mProperties.add(new Property("area", areaVal, "Area", GeoUtil.getDisplayArea(area)));
+        mProperties.add(new Property("area", areaVal, "Area", new GeoUtil().getDisplayArea(area)));
     }
 
     @Override

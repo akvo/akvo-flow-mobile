@@ -39,6 +39,8 @@ import java.util.ArrayList;
 
 import javax.inject.Inject;
 
+import timber.log.Timber;
+
 public class ViewGeoShapeActivity extends BackActivity {
 
     private GeoShapesMapView mapView;
@@ -72,13 +74,16 @@ public class ViewGeoShapeActivity extends BackActivity {
         mapView.onCreate(savedInstanceState);
         mapView.getMapAsyncWithCallback(() -> {
             FeatureCollection features = FeatureCollection.fromFeatures(viewFeatures.getFeatures());
-            mapView.initSources(features, features);
+            FeatureCollection pointFeatures = FeatureCollection
+                    .fromFeatures(viewFeatures.getPointFeatures());
+            mapView.initSources(features, pointFeatures);
             mapView.centerMap(viewFeatures.getListOfCoordinates());
         });
     }
 
     private void setUpFeatures() {
         String geoJSON = getIntent().getStringExtra(ConstantUtil.GEOSHAPE_RESULT);
+        Timber.d(geoJSON);
         viewFeatures = featureMapper.toViewFeatures(geoJSON);
     }
 

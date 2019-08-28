@@ -29,13 +29,17 @@ import com.google.android.gms.maps.model.PolylineOptions;
 import org.akvo.flow.R;
 import org.akvo.flow.util.GeoUtil;
 
+import java.util.List;
+
 public class PolylineFeature extends Feature {
     public static final String GEOMETRY_TYPE = "LineString";
 
     private Polyline mPolyline;
+    private final GeoUtil geoUtil;
 
     public PolylineFeature(GoogleMap map) {
         super(map);
+        geoUtil = new GeoUtil();
     }
 
     @Override
@@ -72,9 +76,15 @@ public class PolylineFeature extends Feature {
         }
 
         // Compute line length
+        float length = computeLength(mPoints);
+        String lengthVal = String.format("%.2f", length);
+        mProperties.add(new Property("length", lengthVal, "Length", geoUtil.getDisplayLength(length)));
+    }
+
+    private float computeLength(List<LatLng> points) {
         float length = 0f;
         LatLng previous = null;
-        for (LatLng point : mPoints) {
+        for (LatLng point : points) {
             if (previous != null) {
                 float[] distance = new float[1];
                 Location.distanceBetween(previous.latitude, previous.longitude, point.latitude, point.longitude, distance);
@@ -82,8 +92,7 @@ public class PolylineFeature extends Feature {
             }
             previous = point;
         }
-        String lengthVal = String.format("%.2f", length);
-        mProperties.add(new Property("length", lengthVal, "Length", GeoUtil.getDisplayLength(length)));
+        return length;
     }
 
     @Override

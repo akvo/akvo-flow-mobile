@@ -49,6 +49,7 @@ import java.util.List;
 import javax.inject.Inject;
 
 import androidx.annotation.NonNull;
+import timber.log.Timber;
 
 import static org.akvo.flow.offlinemaps.presentation.geoshapes.GeoShapeConstants.ACCURACY_THRESHOLD;
 import static org.akvo.flow.offlinemaps.presentation.geoshapes.GeoShapeConstants.CIRCLE_SOURCE_ID;
@@ -226,7 +227,7 @@ public class CreateGeoShapeActivity extends BackActivity {
     private void addPointToMultiPoint(Point mapTargetPoint) {
         Feature selectedFeature = viewFeatures.getSelectedFeature();
         if (featureMapper.isValidMultiPointFeature(selectedFeature)) {
-            updateExistingMultiPoint(mapTargetPoint, selectedFeature);
+            featureMapper.updateExistingMultiPoint(mapTargetPoint, selectedFeature);
         } else {
             selectedFeature = createNewMultiPointFeature(mapTargetPoint);
         }
@@ -239,7 +240,7 @@ public class CreateGeoShapeActivity extends BackActivity {
     private void addPointToLineString(Point mapTargetPoint) {
         Feature selectedFeature = viewFeatures.getSelectedFeature();
         if (featureMapper.isValidLineStringFeature(selectedFeature)) {
-            updateExistingLineString(mapTargetPoint, selectedFeature);
+            featureMapper.updateExistingLineString(mapTargetPoint, selectedFeature);
         } else {
             selectedFeature = createNewLineStringFeature(mapTargetPoint);
         }
@@ -252,7 +253,7 @@ public class CreateGeoShapeActivity extends BackActivity {
     private void addPointToPolygon(Point mapTargetPoint) {
         Feature selectedFeature = viewFeatures.getSelectedFeature();
         if (featureMapper.isValidPolygonFeature(selectedFeature)) {
-            updateExistingPolygon(mapTargetPoint, selectedFeature);
+            featureMapper.updateExistingPolygon(mapTargetPoint, selectedFeature);
         } else {
             selectedFeature = createNewPolygonFeature(mapTargetPoint);
         }
@@ -279,22 +280,6 @@ public class CreateGeoShapeActivity extends BackActivity {
         final Feature feature = featureMapper.createNewPolygonFeature(mapTargetPoint);
         viewFeatures.addSelectedFeature(feature);
         return feature;
-    }
-
-    private void updateExistingMultiPoint(Point mapTargetPoint, Feature selectedFeature) {
-        List<Point> points = featureMapper.getMultiPointCoordinates(selectedFeature);
-        points.add(mapTargetPoint);
-        selectedFeature.getStringProperty(ViewFeatures.FEATURE_ID);
-    }
-
-    private void updateExistingLineString(Point mapTargetPoint, Feature selectedFeature) {
-        List<Point> points = featureMapper.getLineStringCoordinates(selectedFeature);
-        points.add(mapTargetPoint);
-    }
-
-    private void updateExistingPolygon(Point mapTargetPoint, Feature selectedFeature) {
-        List<Point> points = featureMapper.getPolygonCoordinates(selectedFeature);
-        points.add(mapTargetPoint);
     }
 
     private void updateSources() {
@@ -383,6 +368,7 @@ public class CreateGeoShapeActivity extends BackActivity {
         if (isValidShape() && changed) {
             FeatureCollection features = FeatureCollection.fromFeatures(viewFeatures.getFeatures());
             //TODO: shall we remove the id property?
+            Timber.d(features.toJson());
             intent.putExtra(ConstantUtil.GEOSHAPE_RESULT, features.toJson());
             setResult(RESULT_OK, intent);
         } else {

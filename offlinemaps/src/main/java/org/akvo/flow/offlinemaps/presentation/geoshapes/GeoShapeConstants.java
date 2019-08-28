@@ -31,12 +31,14 @@ public class GeoShapeConstants {
     public static final int FILL_COLOR = 0x88736357;
     public static final int LINE_COLOR = 0xEE736357;
     public static final int CIRCLE_COLOR = 0xFF736357;
-    public static final int POINT_LINE_COLOR = 0xFF5B5048;
+    public static final int CIRCLE_LINE_COLOR = 0xFF5B5048;
     public static final int ANIMATION_DURATION_MS = 400;
     public static final int ONE_POINT_ZOOM = 12;
     public static final float ACCURACY_THRESHOLD = 20f;
     public static final int SELECTED_SHAPE_COLOR = 0xFFE27C00;
+    public static final int SELECTED_SHAPE_BORDER_COLOR = 0xFFA65E07;
     public static final int SELECTED_POINT_COLOR = 0xFF00A79D;
+    public static final int SELECTED_POINT_BORDER_COLOR = 0xFF027A73;
     public static final String FEATURE_LINE = "is-line";
     public static final String FEATURE_POINT = "is-point";
     public static final String FEATURE_POLYGON = "is-polygon";

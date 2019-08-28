@@ -75,10 +75,12 @@ import static org.akvo.flow.offlinemaps.presentation.geoshapes.GeoShapeConstants
 import static org.akvo.flow.offlinemaps.presentation.geoshapes.GeoShapeConstants.LINE_LAYER_ID;
 import static org.akvo.flow.offlinemaps.presentation.geoshapes.GeoShapeConstants.LINE_SOURCE_ID;
 import static org.akvo.flow.offlinemaps.presentation.geoshapes.GeoShapeConstants.ONE_POINT_ZOOM;
-import static org.akvo.flow.offlinemaps.presentation.geoshapes.GeoShapeConstants.POINT_LINE_COLOR;
+import static org.akvo.flow.offlinemaps.presentation.geoshapes.GeoShapeConstants.CIRCLE_LINE_COLOR;
 import static org.akvo.flow.offlinemaps.presentation.geoshapes.GeoShapeConstants.SELECTED_FEATURE_POINT_LAYER_ID;
+import static org.akvo.flow.offlinemaps.presentation.geoshapes.GeoShapeConstants.SELECTED_POINT_BORDER_COLOR;
 import static org.akvo.flow.offlinemaps.presentation.geoshapes.GeoShapeConstants.SELECTED_POINT_COLOR;
 import static org.akvo.flow.offlinemaps.presentation.geoshapes.GeoShapeConstants.SELECTED_POINT_LAYER_ID;
+import static org.akvo.flow.offlinemaps.presentation.geoshapes.GeoShapeConstants.SELECTED_SHAPE_BORDER_COLOR;
 import static org.akvo.flow.offlinemaps.presentation.geoshapes.GeoShapeConstants.SELECTED_SHAPE_COLOR;
 
 public class GeoShapesMapView extends MapView implements OnMapReadyCallback {
@@ -222,7 +224,7 @@ public class GeoShapesMapView extends MapView implements OnMapReadyCallback {
                 circleRadius(6f),
                 circleColor(CIRCLE_COLOR),
                 circleStrokeWidth(1f),
-                circleStrokeColor(POINT_LINE_COLOR)
+                circleStrokeColor(CIRCLE_LINE_COLOR)
         );
         circleLayer.setFilter(
                 all(not(has(GeoShapeConstants.POINT_SELECTED_PROPERTY)),
@@ -257,7 +259,9 @@ public class GeoShapesMapView extends MapView implements OnMapReadyCallback {
                 CIRCLE_SOURCE_ID);
         circleLayer.setProperties(
                 circleRadius(6f),
-                circleColor(SELECTED_SHAPE_COLOR)
+                circleColor(SELECTED_SHAPE_COLOR),
+                circleStrokeWidth(1f),
+                circleStrokeColor(SELECTED_SHAPE_BORDER_COLOR)
         );
         circleLayer.setFilter(all(has(GeoShapeConstants.SHAPE_SELECTED_PROPERTY),
                 not(has(GeoShapeConstants.POINT_SELECTED_PROPERTY))));
@@ -271,7 +275,9 @@ public class GeoShapesMapView extends MapView implements OnMapReadyCallback {
         CircleLayer circleLayer = new CircleLayer(SELECTED_POINT_LAYER_ID, CIRCLE_SOURCE_ID);
         circleLayer.setProperties(
                 circleRadius(8f),
-                circleColor(SELECTED_POINT_COLOR)
+                circleColor(SELECTED_POINT_COLOR),
+                circleStrokeWidth(1f),
+                circleStrokeColor(SELECTED_POINT_BORDER_COLOR)
         );
         circleLayer.setFilter(all(has(GeoShapeConstants.POINT_SELECTED_PROPERTY),
                 not(has(GeoShapeConstants.SHAPE_SELECTED_PROPERTY))));

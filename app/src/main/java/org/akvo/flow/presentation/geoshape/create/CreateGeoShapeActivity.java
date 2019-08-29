@@ -164,6 +164,7 @@ public class CreateGeoShapeActivity extends BackActivity {
         if (location != null && location.getAccuracy() <= ACCURACY_THRESHOLD) {
             addPoint(new LatLng(location.getLatitude(), location.getLongitude()));
             updateChanged();
+            updateSources();
         } else {
             int messageId = location != null ?
                     R.string.location_inaccurate :

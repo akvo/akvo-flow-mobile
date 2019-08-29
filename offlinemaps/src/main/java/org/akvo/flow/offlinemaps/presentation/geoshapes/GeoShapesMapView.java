@@ -21,6 +21,7 @@ package org.akvo.flow.offlinemaps.presentation.geoshapes;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.graphics.Color;
 import android.location.Location;
 import android.util.AttributeSet;
 
@@ -31,6 +32,7 @@ import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.mapbox.mapboxsdk.location.LocationComponent;
 import com.mapbox.mapboxsdk.location.LocationComponentActivationOptions;
+import com.mapbox.mapboxsdk.location.LocationComponentOptions;
 import com.mapbox.mapboxsdk.location.modes.CameraMode;
 import com.mapbox.mapboxsdk.location.modes.RenderMode;
 import com.mapbox.mapboxsdk.maps.MapView;
@@ -201,9 +203,16 @@ public class GeoShapesMapView extends MapView implements OnMapReadyCallback {
     public void displayUserLocation() {
         if (mapboxMap != null && mapboxMap.getStyle() != null) {
             LocationComponent locationComponent = mapboxMap.getLocationComponent();
-            locationComponent.activateLocationComponent(
-                    LocationComponentActivationOptions.builder(getContext(), mapboxMap.getStyle())
-                            .build());
+            LocationComponentOptions componentOptions = LocationComponentOptions
+                    .builder(getContext())
+                    .foregroundTintColor(Color.parseColor("#904A90E2"))
+                    .backgroundTintColor(Color.parseColor("#404A90E2"))
+                    .build();
+            LocationComponentActivationOptions activationOptions = LocationComponentActivationOptions
+                    .builder(getContext(), mapboxMap.getStyle())
+                    .locationComponentOptions(componentOptions)
+                    .build();
+            locationComponent.activateLocationComponent(activationOptions);
             locationComponent.setLocationComponentEnabled(true);
             locationComponent.setCameraMode(CameraMode.TRACKING);
             locationComponent.setRenderMode(RenderMode.NORMAL);

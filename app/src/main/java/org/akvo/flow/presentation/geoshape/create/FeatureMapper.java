@@ -110,6 +110,8 @@ public class FeatureMapper {
         String containingFeatureId = containingFeature.getStringProperty(ViewFeatures.FEATURE_ID);
         Feature feature = Feature.fromGeometry(mapTargetPoint);
         feature.addBooleanProperty(GeoShapeConstants.POINT_SELECTED_PROPERTY, true);
+        feature.addStringProperty(GeoShapeConstants.LAT_LNG_PROPERTY,
+                mapTargetPoint.latitude() + ", " + mapTargetPoint.longitude());
         feature.addStringProperty(ViewFeatures.FEATURE_ID, containingFeatureId);
         feature.addStringProperty(ViewFeatures.POINT_ID, UUID.randomUUID().toString());
         return feature;

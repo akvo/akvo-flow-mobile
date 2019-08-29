@@ -70,7 +70,7 @@ public class CreateGeoShapeActivity extends BackActivity {
 
     private DrawMode drawMode = DrawMode.NONE;
 
-    private boolean manualInputEnabled; //TODO:
+    private boolean manualInputEnabled;
     private TextView bottomBarTitle;
     private BottomAppBar bottomAppBar;
 
@@ -397,8 +397,9 @@ public class CreateGeoShapeActivity extends BackActivity {
 
     private void updateMapStyle(String style) {
         mapView.updateMapStyle(style, callback -> {
-            FeatureCollection features = FeatureCollection.fromFeatures(viewFeatures.getFeatures());
-            mapView.initSources(features, features);
+            mapView.initSources(FeatureCollection.fromFeatures(viewFeatures.getFeatures()),
+                    FeatureCollection.fromFeatures(viewFeatures.getPointFeatures()));
+            mapView.initCircleSelectionSources();
             mapView.centerMap(viewFeatures.getListOfCoordinates());
         });
     }

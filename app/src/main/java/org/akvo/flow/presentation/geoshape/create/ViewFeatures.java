@@ -83,13 +83,43 @@ public class ViewFeatures {
     public void removeFeature(Feature feature) {
         getFeatures().remove(feature);
         getPointFeatures().removeAll(
-                getSelectedFeaturePoints(feature.getStringProperty(ViewFeatures.FEATURE_ID)));
+                getSelectedFeaturePoints(feature.getStringProperty(FEATURE_ID)));
+    }
+
+    public void selectFeatureFromPoint(Feature pointFeature) {
+        String selectedFeatureId = pointFeature.getStringProperty(FEATURE_ID);
+        String selectedPointId = pointFeature.getStringProperty(POINT_ID);
+        for (Feature f : pointFeatures) {
+            if (f.getStringProperty(FEATURE_ID).equals(selectedFeatureId)) {
+                f.addBooleanProperty(GeoShapeConstants.SHAPE_SELECTED_PROPERTY, true);
+            } else {
+                f.removeProperty(GeoShapeConstants.SHAPE_SELECTED_PROPERTY);
+            }
+            if (selectedPointId.equals(f.getStringProperty(POINT_ID))) {
+                f.addBooleanProperty(GeoShapeConstants.POINT_SELECTED_PROPERTY, true);
+                f.removeProperty(GeoShapeConstants.SHAPE_SELECTED_PROPERTY);
+            } else {
+                f.removeProperty(GeoShapeConstants.POINT_SELECTED_PROPERTY);
+            }
+        }
+        Feature feature = getFeatureById(selectedFeatureId);
+        setSelectedFeature(feature);
+    }
+
+    private Feature getFeatureById(String featureId) {
+        List<Feature> features = getPointFeatures();
+        for (Feature feature : features) {
+            if (featureId.equals(feature.getStringProperty(FEATURE_ID))) {
+                return feature;
+            }
+        }
+        return null;
     }
 
     private Feature getSelectedPointFeature(String featureId) {
         List<Feature> features = getPointFeatures();
         for (Feature feature : features) {
-            if (featureId.equals(feature.getStringProperty(ViewFeatures.FEATURE_ID))
+            if (featureId.equals(feature.getStringProperty(FEATURE_ID))
                     && feature.hasProperty(GeoShapeConstants.POINT_SELECTED_PROPERTY)
                     && feature.getBooleanProperty(GeoShapeConstants.POINT_SELECTED_PROPERTY)) {
                 return feature;
@@ -102,7 +132,7 @@ public class ViewFeatures {
         List<Feature> pointFeatures = getPointFeatures();
         List<Feature> selectedFeaturePoints = new ArrayList<>();
         for (Feature feature : pointFeatures) {
-            if (featureId.equals(feature.getStringProperty(ViewFeatures.FEATURE_ID))) {
+            if (featureId.equals(feature.getStringProperty(FEATURE_ID))) {
                 selectedFeaturePoints.add(feature);
             }
         }

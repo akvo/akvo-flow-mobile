@@ -25,6 +25,7 @@ import android.graphics.Color;
 import android.location.Location;
 import android.util.AttributeSet;
 
+import com.mapbox.geojson.Feature;
 import com.mapbox.geojson.FeatureCollection;
 import com.mapbox.mapboxsdk.camera.CameraUpdate;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
@@ -39,6 +40,7 @@ import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.MapboxMapOptions;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
+import com.mapbox.mapboxsdk.maps.Projection;
 import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.maps.UiSettings;
 import com.mapbox.mapboxsdk.style.expressions.Expression;
@@ -207,6 +209,9 @@ public class GeoShapesMapView extends MapView implements OnMapReadyCallback {
                     .builder(getContext())
                     .foregroundTintColor(Color.parseColor("#904A90E2"))
                     .backgroundTintColor(Color.parseColor("#404A90E2"))
+                    .enableStaleState(false)
+                    .accuracyAnimationEnabled(false)
+                    .accuracyAlpha(0f)
                     .build();
             LocationComponentActivationOptions activationOptions = LocationComponentActivationOptions
                     .builder(getContext(), mapboxMap.getStyle())
@@ -329,9 +334,21 @@ public class GeoShapesMapView extends MapView implements OnMapReadyCallback {
         return locationUnavailable ? null : mapboxMap.getLocationComponent().getLastKnownLocation();
     }
 
-    public void setMapClicks(MapboxMap.OnMapLongClickListener listener) {
+    public void setMapClicks(MapboxMap.OnMapLongClickListener longClickListener,
+            GeoShapesClickListener clickListener) {
         if (mapboxMap != null) {
-            mapboxMap.addOnMapLongClickListener(listener);
+            mapboxMap.addOnMapLongClickListener(longClickListener);
+            mapboxMap.addOnMapClickListener(point -> {
+                if (mapboxMap != null) {
+                    Projection projection = mapboxMap.getProjection();
+                    List<Feature> features = mapboxMap
+                            .queryRenderedFeatures(projection.toScreenLocation(point), CIRCLE_LAYER_ID);
+                    Feature selected = features.isEmpty() ? null : features.get(0);
+                    return selected != null && clickListener.onGeoShapeSelected(selected);
+                } else {
+                    return false;
+                }
+            });
         }
     }
 }

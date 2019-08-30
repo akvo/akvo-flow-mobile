@@ -244,7 +244,15 @@ public class CreateGeoShapeActivity extends BackActivity implements
                                 this);
             }
             return true;
+        }, feature -> {
+            selectFeature(feature);
+            return true;
         });
+    }
+
+    private void selectFeature(Feature feature) {
+        viewFeatures.selectFeatureFromPoint(feature);
+        updateSources();
     }
 
     private void updateChanged() {

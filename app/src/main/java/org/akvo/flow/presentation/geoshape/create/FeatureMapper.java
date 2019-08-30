@@ -211,13 +211,6 @@ public class FeatureMapper {
         pointFeatures.add(newPointFeature);
     }
 
-    public void unSelectPointsList(List<Feature> pointFeatures) {
-        for (Feature f : pointFeatures) {
-            f.removeProperty(GeoShapeConstants.SHAPE_SELECTED_PROPERTY);
-            f.removeProperty(GeoShapeConstants.POINT_SELECTED_PROPERTY);
-        }
-    }
-
     public List<Point> removeLastPointFromFeature(@Nullable Feature feature) {
         List<Point> points = new ArrayList<>();
         if (feature != null) {

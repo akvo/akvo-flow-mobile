@@ -126,17 +126,22 @@ public class CreateGeoShapeActivity extends BackActivity implements
                         addLocationPoint();
                     } else {
                         snackBarManager
-                                .displaySnackBar(bottomAppBar, R.string.geoshapes_error_select_shape,
+                                .displaySnackBar(bottomAppBar,
+                                        R.string.geoshapes_error_select_shape,
                                         this);
                     }
                     break;
                 case R.id.delete_point:
-                    DeletePointDialog pointDelete = DeletePointDialog.newInstance();
-                    pointDelete.show(getSupportFragmentManager(), DeletePointDialog.TAG);
+                    if (viewFeatures.getSelectedFeature() != null) {
+                        DeletePointDialog pointDelete = DeletePointDialog.newInstance();
+                        pointDelete.show(getSupportFragmentManager(), DeletePointDialog.TAG);
+                    }
                     break;
                 case R.id.delete_feature:
-                    DeleteShapeDialog shapeDelete = DeleteShapeDialog.newInstance();
-                    shapeDelete.show(getSupportFragmentManager(), DeleteShapeDialog.TAG);
+                    if (viewFeatures.getSelectedFeature() != null) {
+                        DeleteShapeDialog shapeDelete = DeleteShapeDialog.newInstance();
+                        shapeDelete.show(getSupportFragmentManager(), DeleteShapeDialog.TAG);
+                    }
                     break;
                 default:
                     break;
@@ -472,8 +477,10 @@ public class CreateGeoShapeActivity extends BackActivity implements
             if (remainingPoints.size() == 0) {
                 viewFeatures.setSelectedFeature(null);
                 viewFeatures.removeFeature(feature);
+            } else {
+                viewFeatures
+                        .removeSelectedPoint(feature.getStringProperty(ViewFeatures.FEATURE_ID));
             }
-            viewFeatures.removeSelectedPoint(feature.getStringProperty(ViewFeatures.FEATURE_ID));
             updateSources();
             updateChanged();
         }
@@ -481,8 +488,12 @@ public class CreateGeoShapeActivity extends BackActivity implements
 
     @Override
     public void deleteShape() {
-        //TODO:
-        updateSources();
-        updateChanged();
+        Feature feature = viewFeatures.getSelectedFeature();
+        if (feature != null) {
+            viewFeatures.setSelectedFeature(null);
+            viewFeatures.removeFeature(feature);
+            updateSources();
+            updateChanged();
+        }
     }
 }

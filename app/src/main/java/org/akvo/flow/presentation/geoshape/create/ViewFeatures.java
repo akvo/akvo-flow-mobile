@@ -24,6 +24,7 @@ import com.mapbox.mapboxsdk.geometry.LatLng;
 
 import org.akvo.flow.offlinemaps.presentation.geoshapes.GeoShapeConstants;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import androidx.annotation.NonNull;
@@ -69,22 +70,42 @@ public class ViewFeatures {
         this.selectedFeature = selectedFeature;
     }
 
-    public void updatePointsList(Feature newPointFeature) {
-        String selectedFeatureId = newPointFeature.getStringProperty(ViewFeatures.FEATURE_ID);
-        List<Feature> pointFeatureList = getPointFeatures();
-        for (Feature f : pointFeatureList) {
-            if (f.getStringProperty(ViewFeatures.FEATURE_ID).equals(selectedFeatureId)) {
-                f.addBooleanProperty(GeoShapeConstants.SHAPE_SELECTED_PROPERTY, true);
-            } else {
-                f.removeProperty(GeoShapeConstants.SHAPE_SELECTED_PROPERTY);
-            }
-            f.removeProperty(GeoShapeConstants.POINT_SELECTED_PROPERTY);
-        }
-        pointFeatureList.add(newPointFeature);
-    }
-
     public void addSelectedFeature(Feature feature) {
         setSelectedFeature(feature);
         getFeatures().add(feature);
+    }
+
+    public void removeSelectedPoint(String featureId) {
+        Feature feature = getSelectedPointFeature(featureId);
+        getPointFeatures().remove(feature);
+    }
+
+    public void removeFeature(Feature feature) {
+        getFeatures().remove(feature);
+        getPointFeatures().removeAll(
+                getSelectedFeaturePoints(feature.getStringProperty(ViewFeatures.FEATURE_ID)));
+    }
+
+    private Feature getSelectedPointFeature(String featureId) {
+        List<Feature> features = getPointFeatures();
+        for (Feature feature : features) {
+            if (featureId.equals(feature.getStringProperty(ViewFeatures.FEATURE_ID))
+                    && feature.hasProperty(GeoShapeConstants.POINT_SELECTED_PROPERTY)
+                    && feature.getBooleanProperty(GeoShapeConstants.POINT_SELECTED_PROPERTY)) {
+                return feature;
+            }
+        }
+        return null;
+    }
+
+    private List<Feature> getSelectedFeaturePoints(String featureId) {
+        List<Feature> pointFeatures = getPointFeatures();
+        List<Feature> selectedFeaturePoints = new ArrayList<>();
+        for (Feature feature : pointFeatures) {
+            if (featureId.equals(feature.getStringProperty(ViewFeatures.FEATURE_ID))) {
+                selectedFeaturePoints.add(feature);
+            }
+        }
+        return selectedFeaturePoints;
     }
 }

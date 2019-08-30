@@ -150,15 +150,15 @@ public class FeatureMapper {
         return feature;
     }
 
-    public boolean isValidMultiPointFeature(Feature selectedFeature) {
+    public boolean isMultiPointFeature(Feature selectedFeature) {
         return selectedFeature != null && selectedFeature.geometry() instanceof MultiPoint;
     }
 
-    public boolean isValidLineStringFeature(Feature selectedFeature) {
+    public boolean isLineStringFeature(Feature selectedFeature) {
         return selectedFeature != null && selectedFeature.geometry() instanceof LineString;
     }
 
-    public boolean isValidPolygonFeature(Feature selectedFeature) {
+    public boolean isPolygonFeature(Feature selectedFeature) {
         return selectedFeature != null && selectedFeature.geometry() instanceof Polygon;
     }
 
@@ -196,6 +196,48 @@ public class FeatureMapper {
                 geoUtil.getDisplayLength(lengthCounter.computeLength(points)));
         selectedFeature.addStringProperty(AREA_PROPERTY_NAME,
                 geoUtil.getDisplayArea(areaCounter.area(points)));
+    }
+
+    public void updatePointsList(Feature newPointFeature, List<Feature> pointFeatures) {
+        String selectedFeatureId = newPointFeature.getStringProperty(ViewFeatures.FEATURE_ID);
+        for (Feature f : pointFeatures) {
+            if (f.getStringProperty(ViewFeatures.FEATURE_ID).equals(selectedFeatureId)) {
+                f.addBooleanProperty(GeoShapeConstants.SHAPE_SELECTED_PROPERTY, true);
+            } else {
+                f.removeProperty(GeoShapeConstants.SHAPE_SELECTED_PROPERTY);
+            }
+            f.removeProperty(GeoShapeConstants.POINT_SELECTED_PROPERTY);
+        }
+        pointFeatures.add(newPointFeature);
+    }
+
+    public void unSelectPointsList(List<Feature> pointFeatures) {
+        for (Feature f : pointFeatures) {
+            f.removeProperty(GeoShapeConstants.SHAPE_SELECTED_PROPERTY);
+            f.removeProperty(GeoShapeConstants.POINT_SELECTED_PROPERTY);
+        }
+    }
+
+    public List<Point> removeLastPointFromFeature(@Nullable Feature feature) {
+        List<Point> points = new ArrayList<>();
+        if (feature != null) {
+            Geometry geometry = feature.geometry();
+            if (geometry instanceof Polygon) {
+                points = getPolygonCoordinates(feature);
+                if (points.size() < 3) {
+                    points.remove(points.size() - 1);
+                } else {
+                    points.remove(points.size() - 2);
+                }
+            } else if (geometry instanceof LineString) {
+                points = getLineStringCoordinates(feature);
+                points.remove(points.size() - 1);
+            } else if (geometry instanceof MultiPoint) {
+                points = getMultiPointCoordinates(feature);
+                points.remove(points.size() - 1);
+            }
+        }
+        return points;
     }
 
     private List<Point> getLineStringCoordinates(Feature selectedFeature) {

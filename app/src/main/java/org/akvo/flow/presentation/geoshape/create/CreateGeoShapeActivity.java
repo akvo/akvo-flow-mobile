@@ -60,7 +60,8 @@ import static org.akvo.flow.offlinemaps.presentation.geoshapes.GeoShapeConstants
 import static org.akvo.flow.offlinemaps.presentation.geoshapes.GeoShapeConstants.LINE_SOURCE_ID;
 import static org.akvo.flow.presentation.geoshape.create.DrawMode.AREA;
 
-public class CreateGeoShapeActivity extends BackActivity {
+public class CreateGeoShapeActivity extends BackActivity implements
+        DeletePointDialog.PointDeleteListener, DeleteShapeDialog.ShapeDeleteListener {
 
     private GeoShapesMapView mapView;
     private boolean changed = false;
@@ -242,10 +243,8 @@ public class CreateGeoShapeActivity extends BackActivity {
     }
 
     private void updateChanged() {
-        if (!changed) {
-            changed = true;
-            invalidateOptionsMenu();
-        }
+        changed = true;
+        invalidateOptionsMenu();
     }
 
     private void addPoint(LatLng latLng) {
@@ -267,40 +266,40 @@ public class CreateGeoShapeActivity extends BackActivity {
 
     private void addPointToMultiPoint(Point mapTargetPoint) {
         Feature selectedFeature = viewFeatures.getSelectedFeature();
-        if (featureMapper.isValidMultiPointFeature(selectedFeature)) {
+        if (featureMapper.isMultiPointFeature(selectedFeature)) {
             featureMapper.updateExistingMultiPoint(mapTargetPoint, selectedFeature);
         } else {
             selectedFeature = createNewMultiPointFeature(mapTargetPoint);
         }
         if (selectedFeature != null) {
             Feature feature = featureMapper.createPointFeature(mapTargetPoint, selectedFeature);
-            viewFeatures.updatePointsList(feature);
+            featureMapper.updatePointsList(feature, viewFeatures.getPointFeatures());
         }
     }
 
     private void addPointToLineString(Point mapTargetPoint) {
         Feature selectedFeature = viewFeatures.getSelectedFeature();
-        if (featureMapper.isValidLineStringFeature(selectedFeature)) {
+        if (featureMapper.isLineStringFeature(selectedFeature)) {
             featureMapper.updateExistingLineString(mapTargetPoint, selectedFeature);
         } else {
             selectedFeature = createNewLineStringFeature(mapTargetPoint);
         }
         if (selectedFeature != null) {
             Feature feature = featureMapper.createPointFeature(mapTargetPoint, selectedFeature);
-            viewFeatures.updatePointsList(feature);
+            featureMapper.updatePointsList(feature, viewFeatures.getPointFeatures());
         }
     }
 
     private void addPointToPolygon(Point mapTargetPoint) {
         Feature selectedFeature = viewFeatures.getSelectedFeature();
-        if (featureMapper.isValidPolygonFeature(selectedFeature)) {
+        if (featureMapper.isPolygonFeature(selectedFeature)) {
             featureMapper.updateExistingPolygon(mapTargetPoint, selectedFeature);
         } else {
             selectedFeature = createNewPolygonFeature(mapTargetPoint);
         }
         if (selectedFeature != null) {
             Feature feature = featureMapper.createPointFeature(mapTargetPoint, selectedFeature);
-            viewFeatures.updatePointsList(feature);
+            featureMapper.updatePointsList(feature, viewFeatures.getPointFeatures());
         }
     }
 
@@ -346,7 +345,7 @@ public class CreateGeoShapeActivity extends BackActivity {
         }
         MenuItem item = menu.findItem(R.id.save);
         if (item != null) {
-            item.setVisible(isValidShape());
+            item.setVisible(isValidShape() && changed);
         }
         return super.onCreateOptionsMenu(menu);
     }
@@ -389,7 +388,6 @@ public class CreateGeoShapeActivity extends BackActivity {
                 setShapeResult();
                 finish();
                 break;
-
             default:
                 break;
         }
@@ -421,7 +419,7 @@ public class CreateGeoShapeActivity extends BackActivity {
     //TODO: validate shapes
     private boolean isValidShape() {
         List<Feature> features = viewFeatures.getFeatures();
-        return features.size() > 0 && changed;
+        return features.size() > 0;
     }
 
     @Override
@@ -464,5 +462,27 @@ public class CreateGeoShapeActivity extends BackActivity {
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         mapView.onSaveInstanceState(outState);
+    }
+
+    @Override
+    public void deletePoint() {
+        Feature feature = viewFeatures.getSelectedFeature();
+        if (feature != null) {
+            List<Point> remainingPoints = featureMapper.removeLastPointFromFeature(feature);
+            if (remainingPoints.size() == 0) {
+                viewFeatures.setSelectedFeature(null);
+                viewFeatures.removeFeature(feature);
+            }
+            viewFeatures.removeSelectedPoint(feature.getStringProperty(ViewFeatures.FEATURE_ID));
+            updateSources();
+            updateChanged();
+        }
+    }
+
+    @Override
+    public void deleteShape() {
+        //TODO:
+        updateSources();
+        updateChanged();
     }
 }

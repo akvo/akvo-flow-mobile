@@ -59,6 +59,8 @@ import static org.akvo.flow.offlinemaps.presentation.geoshapes.GeoShapeConstants
 import static org.akvo.flow.offlinemaps.presentation.geoshapes.GeoShapeConstants.FILL_SOURCE_ID;
 import static org.akvo.flow.offlinemaps.presentation.geoshapes.GeoShapeConstants.LINE_SOURCE_ID;
 import static org.akvo.flow.presentation.geoshape.create.DrawMode.AREA;
+import static org.akvo.flow.presentation.geoshape.create.DrawMode.LINE;
+import static org.akvo.flow.presentation.geoshape.create.DrawMode.POINT;
 
 public class CreateGeoShapeActivity extends BackActivity implements
         DeletePointDialog.PointDeleteListener, DeleteShapeDialog.ShapeDeleteListener {
@@ -245,14 +247,18 @@ public class CreateGeoShapeActivity extends BackActivity implements
             }
             return true;
         }, feature -> {
-            selectFeature(feature);
+            viewFeatures.selectFeatureFromPoint(feature);
+            Feature selectedFeature = viewFeatures.getSelectedFeature();
+            if (featureMapper.isMultiPointFeature(selectedFeature)) {
+                enableShapeDrawMode(R.string.geoshape_points, POINT);
+            } else  if (featureMapper.isLineStringFeature(selectedFeature)) {
+                enableShapeDrawMode(R.string.geoshape_line, LINE);
+            } else  if (featureMapper.isPolygonFeature(selectedFeature)) {
+                enableShapeDrawMode(R.string.geoshape_area, AREA);
+            }
+            updateSources();
             return true;
         });
-    }
-
-    private void selectFeature(Feature feature) {
-        viewFeatures.selectFeatureFromPoint(feature);
-        updateSources();
     }
 
     private void updateChanged() {
@@ -383,19 +389,19 @@ public class CreateGeoShapeActivity extends BackActivity implements
                 onBackPressed();
                 break;
             case R.id.add_points:
-                bottomAppBar.setVisibility(View.VISIBLE);
-                bottomBarTitle.setText(R.string.geoshape_points);
-                drawMode = DrawMode.POINT;
+                enableShapeDrawMode(R.string.geoshape_points, POINT);
+                viewFeatures.unSelectFeature();
+                updateSources();
                 break;
             case R.id.add_line:
-                bottomAppBar.setVisibility(View.VISIBLE);
-                bottomBarTitle.setText(R.string.geoshape_line);
-                drawMode = DrawMode.LINE;
+                enableShapeDrawMode(R.string.geoshape_line, DrawMode.LINE);
+                viewFeatures.unSelectFeature();
+                updateSources();
                 break;
             case R.id.add_polygon:
-                bottomAppBar.setVisibility(View.VISIBLE);
-                bottomBarTitle.setText(R.string.geoshape_area);
-                drawMode = AREA;
+                enableShapeDrawMode(R.string.geoshape_area, AREA);
+                viewFeatures.unSelectFeature();
+                updateSources();
                 break;
             case R.id.save:
                 setShapeResult();
@@ -405,6 +411,12 @@ public class CreateGeoShapeActivity extends BackActivity implements
                 break;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void enableShapeDrawMode(int textStringId, DrawMode point) {
+        bottomAppBar.setVisibility(View.VISIBLE);
+        bottomBarTitle.setText(textStringId);
+        drawMode = point;
     }
 
     private void updateMapStyle(String style) {

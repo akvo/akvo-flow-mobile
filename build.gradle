@@ -11,7 +11,6 @@ buildscript {
         classpath 'com.android.tools.build:gradle:3.3.2'
         classpath 'io.sentry:sentry-android-gradle-plugin:1.7.22'
         classpath 'com.getkeepsafe.dexcount:dexcount-gradle-plugin:0.8.6'
-        classpath 'io.fabric.tools:gradle:1.28.0'
         classpath 'com.google.gms:google-services:3.2.1'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
@@ -34,7 +33,6 @@ ext {
 
     adapterRxJava2Version = "2.3.0"
     butterKnifeVersion = "10.1.0"
-    crashlyticsVersion = "2.9.9@aar"
     converterGsonVersion = "2.3.0"
     converterScalarsVersion = "2.3.0"
     daggerVersion = "2.21"

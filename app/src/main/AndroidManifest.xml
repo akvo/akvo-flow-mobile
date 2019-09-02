@@ -59,7 +59,7 @@
             android:configChanges="locale|layoutDirection"
             android:label="@string/app_name" />
         <activity
-            android:name=".activity.RecordActivity"
+            android:name=".presentation.record.RecordActivity"
             android:configChanges="locale|layoutDirection" />
         <activity
             android:name=".activity.FormActivity"

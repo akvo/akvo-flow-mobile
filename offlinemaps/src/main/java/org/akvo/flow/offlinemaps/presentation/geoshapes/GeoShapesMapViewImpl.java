@@ -19,6 +19,7 @@
 
 package org.akvo.flow.offlinemaps.presentation.geoshapes;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Color;
@@ -27,6 +28,7 @@ import android.util.AttributeSet;
 
 import com.mapbox.geojson.Feature;
 import com.mapbox.geojson.FeatureCollection;
+import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.camera.CameraUpdate;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
@@ -50,12 +52,21 @@ import com.mapbox.mapboxsdk.style.layers.LineLayer;
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 
+import org.akvo.flow.offlinemaps.di.DaggerOfflineFeatureComponent;
+import org.akvo.flow.offlinemaps.di.OfflineFeatureModule;
+import org.akvo.flow.offlinemaps.domain.entity.MapInfo;
 import org.akvo.flow.offlinemaps.presentation.MapReadyCallback;
 
 import java.util.List;
 
+import javax.inject.Inject;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.PermissionChecker;
+import androidx.fragment.app.FragmentActivity;
 
 import static com.mapbox.mapboxsdk.style.expressions.Expression.all;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.any;
@@ -97,28 +108,49 @@ import static org.akvo.flow.offlinemaps.presentation.geoshapes.GeoShapeConstants
 import static org.akvo.flow.offlinemaps.presentation.geoshapes.GeoShapeConstants.SELECTED_SHAPE_BORDER_COLOR;
 import static org.akvo.flow.offlinemaps.presentation.geoshapes.GeoShapeConstants.SELECTED_SHAPE_COLOR;
 
-public class GeoShapesMapViewImpl extends MapView implements OnMapReadyCallback {
+public class GeoShapesMapViewImpl extends MapView implements OnMapReadyCallback, GeoShapesMapView {
 
     private MapboxMap mapboxMap;
     private MapReadyCallback mapReadyCallback;
 
+    @Inject
+    GeoShapesMapPresenter presenter;
+
     public GeoShapesMapViewImpl(@NonNull Context context) {
         super(context);
+        init(context);
     }
 
     public GeoShapesMapViewImpl(@NonNull Context context,
             @Nullable AttributeSet attrs) {
         super(context, attrs);
+        init(context);
     }
 
     public GeoShapesMapViewImpl(@NonNull Context context, @Nullable AttributeSet attrs,
             int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+        init(context);
     }
 
     public GeoShapesMapViewImpl(@NonNull Context context,
             @Nullable MapboxMapOptions options) {
         super(context, options);
+        init(context);
+    }
+
+    private void init(Context context) {
+        initialiseInjector(context);
+        presenter.setView(this);
+    }
+
+    private void initialiseInjector(Context context) {
+        DaggerOfflineFeatureComponent
+                .builder()
+                .offlineFeatureModule(
+                        new OfflineFeatureModule(((AppCompatActivity) context).getApplication()))
+                .build()
+                .inject(this);
     }
 
     public void getMapAsyncWithCallback(MapReadyCallback callback) {
@@ -166,6 +198,11 @@ public class GeoShapesMapViewImpl extends MapView implements OnMapReadyCallback 
     }
 
     public void centerMap(List<LatLng> listOfCoordinates) {
+        presenter.loadOfflineSettings(listOfCoordinates);
+    }
+
+    @Override
+    public void displayCoordinates(List<LatLng> listOfCoordinates) {
         if (mapboxMap != null) {
             if (listOfCoordinates.size() == 1) {
                 CameraUpdate cameraUpdate = CameraUpdateFactory
@@ -222,6 +259,49 @@ public class GeoShapesMapViewImpl extends MapView implements OnMapReadyCallback 
             locationComponent.setCameraMode(CameraMode.TRACKING);
             locationComponent.setRenderMode(RenderMode.NORMAL);
         }
+    }
+
+    @SuppressLint("MissingPermission")
+    @Override
+    public void displayOfflineMap(@NonNull MapInfo mapInfo) {
+        if (mapboxMap != null) {
+            CameraPosition cameraPosition = new CameraPosition.Builder()
+                    .target(new LatLng(mapInfo.getLatitude(), mapInfo.getLongitude()))
+                    .zoom(mapInfo.getZoom())
+                    .build();
+            mapboxMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+        }
+    }
+
+    @Nullable
+    public Location getLocation() {
+        boolean locationUnavailable = mapboxMap == null || !mapboxMap.getLocationComponent()
+                .isLocationComponentActivated();
+        return locationUnavailable ? null : mapboxMap.getLocationComponent().getLastKnownLocation();
+    }
+
+    public void setMapClicks(MapboxMap.OnMapLongClickListener longClickListener,
+            GeoShapesClickListener clickListener) {
+        if (mapboxMap != null) {
+            mapboxMap.addOnMapLongClickListener(longClickListener);
+            mapboxMap.addOnMapClickListener(point -> {
+                if (mapboxMap != null) {
+                    Projection projection = mapboxMap.getProjection();
+                    List<Feature> features = mapboxMap
+                            .queryRenderedFeatures(projection.toScreenLocation(point), CIRCLE_LAYER_ID);
+                    Feature selected = features.isEmpty() ? null : features.get(0);
+                    return selected != null && clickListener.onGeoShapeSelected(selected);
+                } else {
+                    return false;
+                }
+            });
+        }
+    }
+
+    private boolean isLocationAllowed() {
+        FragmentActivity activity = (FragmentActivity) getContext();
+        return activity != null && ContextCompat.checkSelfPermission(activity,
+                Manifest.permission.ACCESS_FINE_LOCATION) == PermissionChecker.PERMISSION_GRANTED;
     }
 
     private void initFillLayer(@NonNull Style style) {
@@ -325,30 +405,5 @@ public class GeoShapesMapViewImpl extends MapView implements OnMapReadyCallback 
         symbolLayer.setFilter(all(has(GeoShapeConstants.POINT_SELECTED_PROPERTY),
                 not(has(GeoShapeConstants.SHAPE_SELECTED_PROPERTY))));
         style.addLayer(symbolLayer);
-    }
-
-    @Nullable
-    public Location getLocation() {
-        boolean locationUnavailable = mapboxMap == null || !mapboxMap.getLocationComponent()
-                .isLocationComponentActivated();
-        return locationUnavailable ? null : mapboxMap.getLocationComponent().getLastKnownLocation();
-    }
-
-    public void setMapClicks(MapboxMap.OnMapLongClickListener longClickListener,
-            GeoShapesClickListener clickListener) {
-        if (mapboxMap != null) {
-            mapboxMap.addOnMapLongClickListener(longClickListener);
-            mapboxMap.addOnMapClickListener(point -> {
-                if (mapboxMap != null) {
-                    Projection projection = mapboxMap.getProjection();
-                    List<Feature> features = mapboxMap
-                            .queryRenderedFeatures(projection.toScreenLocation(point), CIRCLE_LAYER_ID);
-                    Feature selected = features.isEmpty() ? null : features.get(0);
-                    return selected != null && clickListener.onGeoShapeSelected(selected);
-                } else {
-                    return false;
-                }
-            });
-        }
     }
 }

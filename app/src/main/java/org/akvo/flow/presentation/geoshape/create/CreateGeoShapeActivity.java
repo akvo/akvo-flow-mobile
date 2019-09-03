@@ -187,9 +187,9 @@ public class CreateGeoShapeActivity extends BackActivity implements
             mapView.initSources(FeatureCollection.fromFeatures(viewFeatures.getFeatures()),
                     FeatureCollection.fromFeatures(viewFeatures.getPointFeatures()));
             mapView.initCircleSelectionSources();
+            displayUserLocation();
             mapView.centerMap(viewFeatures.getListOfCoordinates());
             setMapClicks();
-            displayUserLocation();
         });
     }
 

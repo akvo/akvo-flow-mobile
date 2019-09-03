@@ -84,9 +84,6 @@ public class CreateGeoShapeActivity extends BackActivity implements
     FeatureMapper featureMapper;
 
     @Inject
-    CoordinatesMapper coordinatesMapper;
-
-    @Inject
     SnackBarManager snackBarManager;
 
     @Override
@@ -377,7 +374,7 @@ public class CreateGeoShapeActivity extends BackActivity implements
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.map_normal:
-                updateMapStyle(Style.LIGHT);
+                updateMapStyle(Style.MAPBOX_STREETS);
                 break;
             case R.id.map_satellite:
                 updateMapStyle(Style.SATELLITE_STREETS);

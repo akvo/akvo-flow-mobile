@@ -129,7 +129,7 @@ public class GeoShapesMapView extends MapView implements OnMapReadyCallback {
     @Override
     public void onMapReady(@NonNull MapboxMap mapboxMap) {
         this.mapboxMap = mapboxMap;
-        updateMapStyle(Style.OUTDOORS, style -> {
+        updateMapStyle(Style.MAPBOX_STREETS, style -> {
             if (mapReadyCallback != null) {
                 mapReadyCallback.onMapReady();
                 mapReadyCallback = null;

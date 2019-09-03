@@ -97,26 +97,26 @@ import static org.akvo.flow.offlinemaps.presentation.geoshapes.GeoShapeConstants
 import static org.akvo.flow.offlinemaps.presentation.geoshapes.GeoShapeConstants.SELECTED_SHAPE_BORDER_COLOR;
 import static org.akvo.flow.offlinemaps.presentation.geoshapes.GeoShapeConstants.SELECTED_SHAPE_COLOR;
 
-public class GeoShapesMapView extends MapView implements OnMapReadyCallback {
+public class GeoShapesMapViewImpl extends MapView implements OnMapReadyCallback {
 
     private MapboxMap mapboxMap;
     private MapReadyCallback mapReadyCallback;
 
-    public GeoShapesMapView(@NonNull Context context) {
+    public GeoShapesMapViewImpl(@NonNull Context context) {
         super(context);
     }
 
-    public GeoShapesMapView(@NonNull Context context,
+    public GeoShapesMapViewImpl(@NonNull Context context,
             @Nullable AttributeSet attrs) {
         super(context, attrs);
     }
 
-    public GeoShapesMapView(@NonNull Context context, @Nullable AttributeSet attrs,
+    public GeoShapesMapViewImpl(@NonNull Context context, @Nullable AttributeSet attrs,
             int defStyleAttr) {
         super(context, attrs, defStyleAttr);
     }
 
-    public GeoShapesMapView(@NonNull Context context,
+    public GeoShapesMapViewImpl(@NonNull Context context,
             @Nullable MapboxMapOptions options) {
         super(context, options);
     }

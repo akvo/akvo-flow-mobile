@@ -30,7 +30,7 @@ import org.akvo.flow.R;
 import org.akvo.flow.activity.BackActivity;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
-import org.akvo.flow.offlinemaps.presentation.geoshapes.GeoShapesMapView;
+import org.akvo.flow.offlinemaps.presentation.geoshapes.GeoShapesMapViewImpl;
 import org.akvo.flow.presentation.geoshape.create.FeatureMapper;
 import org.akvo.flow.presentation.geoshape.create.ViewFeatures;
 import org.akvo.flow.util.ConstantUtil;
@@ -43,7 +43,7 @@ import timber.log.Timber;
 
 public class ViewGeoShapeActivity extends BackActivity {
 
-    private GeoShapesMapView mapView;
+    private GeoShapesMapViewImpl mapView;
 
     private ViewFeatures viewFeatures = new ViewFeatures(new ArrayList<>(), new ArrayList<>(),
             new ArrayList<>());

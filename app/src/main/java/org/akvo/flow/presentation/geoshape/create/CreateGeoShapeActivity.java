@@ -39,7 +39,7 @@ import org.akvo.flow.R;
 import org.akvo.flow.activity.BackActivity;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
-import org.akvo.flow.offlinemaps.presentation.geoshapes.GeoShapesMapView;
+import org.akvo.flow.offlinemaps.presentation.geoshapes.GeoShapesMapViewImpl;
 import org.akvo.flow.presentation.SnackBarManager;
 import org.akvo.flow.presentation.geoshape.DeletePointDialog;
 import org.akvo.flow.presentation.geoshape.DeleteShapeDialog;
@@ -65,7 +65,7 @@ import static org.akvo.flow.presentation.geoshape.create.DrawMode.POINT;
 public class CreateGeoShapeActivity extends BackActivity implements
         DeletePointDialog.PointDeleteListener, DeleteShapeDialog.ShapeDeleteListener {
 
-    private GeoShapesMapView mapView;
+    private GeoShapesMapViewImpl mapView;
     private boolean changed = false;
     private boolean allowPoints;
     private boolean allowLine;

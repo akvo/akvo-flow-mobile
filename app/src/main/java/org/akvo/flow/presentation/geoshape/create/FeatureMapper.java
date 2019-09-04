@@ -31,6 +31,11 @@ import com.mapbox.mapboxsdk.geometry.LatLng;
 import org.akvo.flow.offlinemaps.presentation.geoshapes.GeoShapeConstants;
 import org.akvo.flow.presentation.geoshape.AreaCounter;
 import org.akvo.flow.presentation.geoshape.LengthCounter;
+import org.akvo.flow.presentation.geoshape.create.entities.AreaShape;
+import org.akvo.flow.presentation.geoshape.create.entities.LineShape;
+import org.akvo.flow.presentation.geoshape.create.entities.PointShape;
+import org.akvo.flow.presentation.geoshape.create.entities.Shape;
+import org.akvo.flow.presentation.geoshape.create.entities.ShapePoint;
 import org.akvo.flow.util.GeoUtil;
 
 import java.util.ArrayList;
@@ -61,6 +66,64 @@ public class FeatureMapper {
         this.lengthCounter = lengthCounter;
         this.areaCounter = areaCounter;
         this.geoUtil = geoUtil;
+    }
+
+    public List<Shape> toShapes(@Nullable String gson) {
+        List<Shape> shapes = new ArrayList<>();
+        List<Feature> features = createFeatureList(gson);
+        if (!features.isEmpty()) {
+            for (Feature feature : features) {
+                String featureId = UUID.randomUUID().toString();
+                Geometry geometry = feature.geometry();
+                if (geometry instanceof Polygon) {
+                    shapes.add(createArea(featureId, (Polygon) geometry));
+                } else if (geometry instanceof LineString) {
+                    shapes.add(createLine(featureId, (LineString) geometry));
+                } else if (geometry instanceof MultiPoint) {
+                    shapes.add(createPoint(featureId, (MultiPoint) geometry));
+                }
+            }
+        }
+        return shapes;
+    }
+
+    @NonNull
+    private Shape createArea(String featureId, Polygon geometry) {
+        List<ShapePoint> shapePoints = new ArrayList<>();
+        List<LatLng> latLngs = coordinatesMapper.toLatLng(geometry.coordinates().get(0));
+        for (LatLng latLng : latLngs) {
+            String pointId = UUID.randomUUID().toString();
+            double latitude = latLng.getLatitude();
+            double longitude = latLng.getLongitude();
+            shapePoints.add(new ShapePoint(pointId, featureId, latitude, longitude));
+        }
+        return new AreaShape(featureId, shapePoints);
+    }
+
+    @NonNull
+    private LineShape createLine(String featureId, LineString geometry) {
+        List<ShapePoint> shapePoints = new ArrayList<>();
+        List<LatLng> latLngs = coordinatesMapper.toLatLng(geometry.coordinates());
+        for (LatLng latLng : latLngs) {
+            String pointId = UUID.randomUUID().toString();
+            double latitude = latLng.getLatitude();
+            double longitude = latLng.getLongitude();
+            shapePoints.add(new ShapePoint(pointId, featureId, latitude, longitude));
+        }
+        return new LineShape(featureId, shapePoints);
+    }
+
+    @NonNull
+    private PointShape createPoint(String featureId, MultiPoint geometry) {
+        List<ShapePoint> shapePoints = new ArrayList<>();
+        List<LatLng> latLngs = coordinatesMapper.toLatLng(geometry.coordinates());
+        for (LatLng latLng : latLngs) {
+            String pointId = UUID.randomUUID().toString();
+            double latitude = latLng.getLatitude();
+            double longitude = latLng.getLongitude();
+            shapePoints.add(new ShapePoint(pointId, featureId, latitude, longitude));
+        }
+        return new PointShape(featureId, shapePoints);
     }
 
     public ViewFeatures toViewFeatures(@Nullable String gson) {

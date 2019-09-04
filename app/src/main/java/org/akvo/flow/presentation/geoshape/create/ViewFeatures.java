@@ -23,6 +23,7 @@ import com.mapbox.geojson.Feature;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 
 import org.akvo.flow.offlinemaps.presentation.geoshapes.GeoShapeConstants;
+import org.akvo.flow.presentation.geoshape.create.entities.Shape;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,6 +39,8 @@ public class ViewFeatures {
     private final List<Feature> features;
     private final List<Feature> pointFeatures;
     private final List<LatLng> listOfCoordinates;
+
+    private final List<Shape> shapes = new ArrayList<>();
 
     @Nullable
     private Feature selectedFeature;

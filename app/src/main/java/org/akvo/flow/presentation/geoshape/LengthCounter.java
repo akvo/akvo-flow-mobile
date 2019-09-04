@@ -40,8 +40,7 @@ public class LengthCounter {
             if (previous != null) {
                 float[] distance = new float[1];
                 Location.distanceBetween(previous.latitude(), previous.longitude(),
-                        point.latitude(),
-                        point.longitude(), distance);
+                        point.latitude(), point.longitude(), distance);
                 length += distance[0];
             }
             previous = point;

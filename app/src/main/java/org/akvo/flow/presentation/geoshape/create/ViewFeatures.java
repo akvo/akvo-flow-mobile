@@ -75,9 +75,10 @@ public class ViewFeatures {
         getFeatures().add(feature);
     }
 
-    public void removeSelectedPoint(String featureId) {
-        Feature feature = getSelectedPointFeature(featureId);
-        getPointFeatures().remove(feature);
+    public void removeSelectedPoint(Feature feature) {
+        Feature pointFeature = getSelectedPointFeature(
+                feature.getStringProperty(ViewFeatures.FEATURE_ID));
+        getPointFeatures().remove(pointFeature);
     }
 
     public void removeFeature(Feature feature) {

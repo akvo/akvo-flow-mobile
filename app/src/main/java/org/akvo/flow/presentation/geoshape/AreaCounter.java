@@ -40,9 +40,9 @@ public class AreaCounter {
             return 0f;
         }
 
-        // First we compute an equal-are projection of the polygon. We use a sinusoidal
+        // First we compute an equal-area projection of the polygon. We use a sinusoidal
         // projection for now: http://en.wikipedia.org/wiki/Sinusoidal_projection
-        List<AreaCounterPoint> points = new ArrayList<>();
+        List<ProjectedPoint> points = new ArrayList<>();
         for (Point location : originalPoints) {
             points.add(project(location));
         }
@@ -50,10 +50,10 @@ public class AreaCounter {
         // Now we calculate the area, using regular planar techniques.
         // http://mathworld.wolfram.com/PolygonArea.html
         double area = 0.0;
-        AreaCounterPoint prev = points.get(points.size() - 1);// start form the last point
+        ProjectedPoint prev = points.get(points.size() - 1);// start from the last point
         int i = 0;
         while (i < points.size()) {
-            AreaCounterPoint point = points.get(i);
+            ProjectedPoint point = points.get(i);
             area += prev.x * point.y - point.x * prev.y;
             prev = point;
             i++;
@@ -61,19 +61,19 @@ public class AreaCounter {
         return Math.abs(area) / 2;
     }
 
-    private AreaCounterPoint project(Point location) {
+    private ProjectedPoint project(Point location) {
         // Sinusoidal projection (equal-area)
-        double y = location.latitude() * LATITUDE_SIZE;
         double x = location.longitude() * LATITUDE_SIZE * Math
                 .cos(Math.toRadians(location.latitude()));
-        return new AreaCounterPoint(x, y);
+        double y = location.latitude() * LATITUDE_SIZE;
+        return new ProjectedPoint(x, y);
     }
 
-    class AreaCounterPoint {
+    class ProjectedPoint {
         final double x;
         final double y;
 
-        AreaCounterPoint(double x, double y) {
+        ProjectedPoint(double x, double y) {
             this.x = x;
             this.y = y;
         }

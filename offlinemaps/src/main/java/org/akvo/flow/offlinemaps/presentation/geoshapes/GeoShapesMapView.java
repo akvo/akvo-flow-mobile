@@ -27,7 +27,7 @@ import java.util.List;
 
 public interface GeoShapesMapView {
 
-    void displayCoordinates(List<LatLng> listOfCoordinates);
+    void centerOnCoordinates(List<LatLng> listOfCoordinates);
 
-    void displayOfflineMap(MapInfo mapInfo);
+    void centerOnOfflineArea(MapInfo mapInfo);
 }

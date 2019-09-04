@@ -52,7 +52,7 @@ import java.util.List;
 import javax.inject.Inject;
 
 import androidx.annotation.NonNull;
-import timber.log.Timber;
+import androidx.annotation.StringRes;
 
 import static org.akvo.flow.offlinemaps.presentation.geoshapes.GeoShapeConstants.ACCURACY_THRESHOLD;
 import static org.akvo.flow.offlinemaps.presentation.geoshapes.GeoShapeConstants.CIRCLE_SOURCE_ID;
@@ -124,10 +124,7 @@ public class CreateGeoShapeActivity extends BackActivity implements
                     if (drawMode != DrawMode.NONE) {
                         addLocationPoint();
                     } else {
-                        snackBarManager
-                                .displaySnackBar(bottomAppBar,
-                                        R.string.geoshapes_error_select_shape,
-                                        this);
+                        showMessage(R.string.geoshapes_error_select_shape);
                     }
                     break;
                 case R.id.delete_point:
@@ -174,7 +171,7 @@ public class CreateGeoShapeActivity extends BackActivity implements
             int messageId = location != null ?
                     R.string.location_inaccurate :
                     R.string.location_unknown;
-            snackBarManager.displaySnackBar(bottomAppBar, messageId, this);
+            showMessage(messageId);
         }
     }
 
@@ -226,36 +223,40 @@ public class CreateGeoShapeActivity extends BackActivity implements
     }
 
     private void setMapClicks() {
-        mapView.setMapClicks(point -> {
-            if (!manualInputEnabled) {
-                snackBarManager
-                        .displaySnackBar(bottomAppBar, R.string.geoshapes_error_manual_disabled,
-                                this);
-                return false;
-            }
-            if (drawMode != DrawMode.NONE) {
-                addPoint(point);
-                updateChanged();
-                updateSources();
-            } else {
-                snackBarManager
-                        .displaySnackBar(bottomAppBar, R.string.geoshapes_error_select_shape,
-                                this);
-            }
-            return true;
-        }, feature -> {
-            viewFeatures.selectFeatureFromPoint(feature);
-            Feature selectedFeature = viewFeatures.getSelectedFeature();
-            if (featureMapper.isMultiPointFeature(selectedFeature)) {
-                enableShapeDrawMode(R.string.geoshape_points, POINT);
-            } else  if (featureMapper.isLineStringFeature(selectedFeature)) {
-                enableShapeDrawMode(R.string.geoshape_line, LINE);
-            } else  if (featureMapper.isPolygonFeature(selectedFeature)) {
-                enableShapeDrawMode(R.string.geoshape_area, AREA);
-            }
+        mapView.setMapClicks(this::onMapLongClick, this::onMapClick);
+    }
+
+    private boolean onMapClick(Feature feature) {
+        viewFeatures.selectFeatureFromPoint(feature);
+        Feature selectedFeature = viewFeatures.getSelectedFeature();
+        if (featureMapper.isMultiPointFeature(selectedFeature)) {
+            enableShapeDrawMode(R.string.geoshape_points, POINT);
+        } else  if (featureMapper.isLineStringFeature(selectedFeature)) {
+            enableShapeDrawMode(R.string.geoshape_line, LINE);
+        } else  if (featureMapper.isPolygonFeature(selectedFeature)) {
+            enableShapeDrawMode(R.string.geoshape_area, AREA);
+        }
+        updateSources();
+        return true;
+    }
+
+    private boolean onMapLongClick(LatLng point) {
+        if (!manualInputEnabled) {
+            showMessage(R.string.geoshapes_error_manual_disabled);
+            return false;
+        }
+        if (drawMode != DrawMode.NONE) {
+            addPoint(point);
+            updateChanged();
             updateSources();
-            return true;
-        });
+        } else {
+            showMessage(R.string.geoshapes_error_select_shape);
+        }
+        return true;
+    }
+
+    private void showMessage(@StringRes int messageResId) {
+        snackBarManager.displaySnackBar(bottomAppBar, messageResId, this);
     }
 
     private void updateChanged() {
@@ -386,19 +387,13 @@ public class CreateGeoShapeActivity extends BackActivity implements
                 onBackPressed();
                 break;
             case R.id.add_points:
-                enableShapeDrawMode(R.string.geoshape_points, POINT);
-                viewFeatures.unSelectFeature();
-                updateSources();
+                enableNewShapeType(POINT, R.string.geoshape_points);
                 break;
             case R.id.add_line:
-                enableShapeDrawMode(R.string.geoshape_line, DrawMode.LINE);
-                viewFeatures.unSelectFeature();
-                updateSources();
+                enableNewShapeType(LINE, R.string.geoshape_line);
                 break;
             case R.id.add_polygon:
-                enableShapeDrawMode(R.string.geoshape_area, AREA);
-                viewFeatures.unSelectFeature();
-                updateSources();
+                enableNewShapeType(AREA, R.string.geoshape_area);
                 break;
             case R.id.save:
                 setShapeResult();
@@ -410,7 +405,15 @@ public class CreateGeoShapeActivity extends BackActivity implements
         return super.onOptionsItemSelected(item);
     }
 
-    private void enableShapeDrawMode(int textStringId, DrawMode point) {
+    private void enableNewShapeType(DrawMode point, @StringRes int stringRes) {
+        if (drawMode != point) {
+            enableShapeDrawMode(stringRes, point);
+            viewFeatures.unSelectFeature();
+            updateSources();
+        }
+    }
+
+    private void enableShapeDrawMode(@StringRes int textStringId, DrawMode point) {
         bottomAppBar.setVisibility(View.VISIBLE);
         bottomBarTitle.setText(textStringId);
         drawMode = point;
@@ -430,7 +433,6 @@ public class CreateGeoShapeActivity extends BackActivity implements
         if (isValidShape() && changed) {
             FeatureCollection features = FeatureCollection.fromFeatures(viewFeatures.getFeatures());
             //TODO: shall we remove the id property?
-            Timber.d(features.toJson());
             intent.putExtra(ConstantUtil.GEOSHAPE_RESULT, features.toJson());
             setResult(RESULT_OK, intent);
         } else {
@@ -495,8 +497,7 @@ public class CreateGeoShapeActivity extends BackActivity implements
                 viewFeatures.setSelectedFeature(null);
                 viewFeatures.removeFeature(feature);
             } else {
-                viewFeatures
-                        .removeSelectedPoint(feature.getStringProperty(ViewFeatures.FEATURE_ID));
+                viewFeatures.removeSelectedPoint(feature);
             }
             updateSources();
             updateChanged();

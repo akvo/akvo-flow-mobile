@@ -38,8 +38,7 @@ public class GeoShapesMapPresenter {
     private GeoShapesMapView view;
 
     @Inject
-    public GeoShapesMapPresenter(
-            GetSelectedOfflineMapInfo getSelectedOfflineMapInfo) {
+    public GeoShapesMapPresenter(GetSelectedOfflineMapInfo getSelectedOfflineMapInfo) {
         this.getSelectedOfflineMapInfo = getSelectedOfflineMapInfo;
     }
 
@@ -51,18 +50,18 @@ public class GeoShapesMapPresenter {
         getSelectedOfflineMapInfo.execute(new DisposableMaybeObserver<MapInfo>() {
             @Override
             public void onSuccess(MapInfo mapInfo) {
-                view.displayOfflineMap(mapInfo);
+                view.centerOnOfflineArea(mapInfo);
             }
 
             @Override
             public void onError(Throwable e) {
                 Timber.e(e);
-                view.displayCoordinates(listOfCoordinates);
+                view.centerOnCoordinates(listOfCoordinates);
             }
 
             @Override
             public void onComplete() {
-                view.displayCoordinates(listOfCoordinates);
+                view.centerOnCoordinates(listOfCoordinates);
             }
         });
     }

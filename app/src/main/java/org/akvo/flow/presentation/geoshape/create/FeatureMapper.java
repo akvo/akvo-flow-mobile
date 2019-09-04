@@ -55,8 +55,7 @@ public class FeatureMapper {
     private final GeoUtil geoUtil;
 
     @Inject
-    public FeatureMapper(CoordinatesMapper coordinatesMapper,
-            LengthCounter lengthCounter,
+    public FeatureMapper(CoordinatesMapper coordinatesMapper, LengthCounter lengthCounter,
             AreaCounter areaCounter, GeoUtil geoUtil) {
         this.coordinatesMapper = coordinatesMapper;
         this.lengthCounter = lengthCounter;

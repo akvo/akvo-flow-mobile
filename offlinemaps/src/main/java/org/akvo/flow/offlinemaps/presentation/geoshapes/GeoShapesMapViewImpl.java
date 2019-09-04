@@ -202,7 +202,7 @@ public class GeoShapesMapViewImpl extends MapView implements OnMapReadyCallback,
     }
 
     @Override
-    public void displayCoordinates(List<LatLng> listOfCoordinates) {
+    public void centerOnCoordinates(List<LatLng> listOfCoordinates) {
         if (mapboxMap != null) {
             if (listOfCoordinates.size() == 1) {
                 CameraUpdate cameraUpdate = CameraUpdateFactory
@@ -263,7 +263,7 @@ public class GeoShapesMapViewImpl extends MapView implements OnMapReadyCallback,
 
     @SuppressLint("MissingPermission")
     @Override
-    public void displayOfflineMap(@NonNull MapInfo mapInfo) {
+    public void centerOnOfflineArea(@NonNull MapInfo mapInfo) {
         if (mapboxMap != null) {
             CameraPosition cameraPosition = new CameraPosition.Builder()
                     .target(new LatLng(mapInfo.getLatitude(), mapInfo.getLongitude()))

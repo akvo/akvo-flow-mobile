@@ -340,6 +340,18 @@
     <string name="offline_item_delete_dialog_title">Delete map?</string>
     <string name="offline_item_delete_dialog_message">%1$s will no longer be available for use</string>
 
+    <string name="geoshape_bottom_item_info">Info</string>
+    <string name="geoshape_bottom_item_add_point">Add point</string>
+    <string name="geoshape_bottom_item_delete_point">Delete point</string>
+    <string name="geoshape_bottom_item_delete_feature">Delete feature</string>
+
+    <string name="geoshapes_error_manual_disabled">Manual input is disabled for this question</string>
+    <string name="geoshapes_error_select_shape">Please select at least one shape in the menu</string>
+    <string name="geoshape_properties_point_count">Point Count: %1$s</string>
+    <string name="geoshape_properties_length">Length: %1$s</string>
+    <string name="geoshape_properties_area">Area: %1$s</string>
+    <string name="geoshape_properties_title">Properties</string>
+
     <plurals name="download_forms_error">
         <item quantity="one">Error downloading form</item>
         <item quantity="other">Error downloading forms</item>
@@ -348,5 +360,4 @@
         <item quantity="one">Form downloaded</item>
         <item quantity="other">Forms downloaded</item>
     </plurals>
-
 </resources>

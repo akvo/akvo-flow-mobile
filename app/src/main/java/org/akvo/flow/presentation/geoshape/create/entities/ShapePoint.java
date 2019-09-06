@@ -19,7 +19,10 @@
 
 package org.akvo.flow.presentation.geoshape.create.entities;
 
-public class ShapePoint {
+import android.os.Parcel;
+import android.os.Parcelable;
+
+public class ShapePoint implements Parcelable {
 
     private final String pointId;
     private final String featureId;
@@ -34,6 +37,26 @@ public class ShapePoint {
         this.latitude = latitude;
         this.longitude = longitude;
     }
+
+    protected ShapePoint(Parcel in) {
+        pointId = in.readString();
+        featureId = in.readString();
+        latitude = in.readDouble();
+        longitude = in.readDouble();
+        isSelected = in.readByte() != 0;
+    }
+
+    public static final Creator<ShapePoint> CREATOR = new Creator<ShapePoint>() {
+        @Override
+        public ShapePoint createFromParcel(Parcel in) {
+            return new ShapePoint(in);
+        }
+
+        @Override
+        public ShapePoint[] newArray(int size) {
+            return new ShapePoint[size];
+        }
+    };
 
     public String getPointId() {
         return pointId;
@@ -57,5 +80,19 @@ public class ShapePoint {
 
     public void setSelected(boolean selected) {
         isSelected = selected;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(pointId);
+        dest.writeString(featureId);
+        dest.writeDouble(latitude);
+        dest.writeDouble(longitude);
+        dest.writeByte((byte) (isSelected ? 1 : 0));
     }
 }

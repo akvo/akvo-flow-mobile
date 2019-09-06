@@ -17,31 +17,9 @@
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.akvo.flow.presentation.geoshape.create.entities;
+package org.akvo.flow.presentation.geoshape.properties;
 
-import android.os.Parcel;
+public interface PropertiesView {
 
-import java.util.List;
-
-public class PointShape extends Shape {
-
-    public PointShape(String featureId, List<ShapePoint> points) {
-        super(featureId, points);
-    }
-
-    public PointShape(Parcel in) {
-        super(in);
-    }
-
-    public static final Creator<PointShape> CREATOR = new Creator<PointShape>() {
-        @Override
-        public PointShape createFromParcel(Parcel in) {
-            return new PointShape(in);
-        }
-
-        @Override
-        public PointShape[] newArray(int size) {
-            return new PointShape[size];
-        }
-    };
+    void displayShapeCount(String count, String length, String area);
 }

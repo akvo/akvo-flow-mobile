@@ -21,7 +21,7 @@ package org.akvo.flow.presentation.geoshape;
 
 import android.location.Location;
 
-import com.mapbox.geojson.Point;
+import org.akvo.flow.presentation.geoshape.create.entities.ShapePoint;
 
 import java.util.List;
 
@@ -33,14 +33,14 @@ public class LengthCounter {
     public LengthCounter() {
     }
 
-    public float computeLength(List<Point> points) {
+    public float computeLength(List<ShapePoint> points) {
         float length = 0f;
-        Point previous = null;
-        for (Point point : points) {
+        ShapePoint previous = null;
+        for (ShapePoint point : points) {
             if (previous != null) {
                 float[] distance = new float[1];
-                Location.distanceBetween(previous.latitude(), previous.longitude(),
-                        point.latitude(), point.longitude(), distance);
+                Location.distanceBetween(previous.getLatitude(), previous.getLongitude(),
+                        point.getLatitude(), point.getLongitude(), distance);
                 length += distance[0];
             }
             previous = point;

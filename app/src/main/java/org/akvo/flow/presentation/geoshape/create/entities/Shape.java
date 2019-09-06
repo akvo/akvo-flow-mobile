@@ -19,9 +19,12 @@
 
 package org.akvo.flow.presentation.geoshape.create.entities;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import java.util.List;
 
-public abstract class Shape {
+public abstract class Shape implements Parcelable {
 
     private final String featureId;
     private boolean isSelected;
@@ -31,6 +34,24 @@ public abstract class Shape {
         this.featureId = featureId;
         this.isSelected = false;
         this.points = points;
+    }
+
+    public Shape(Parcel in) {
+        featureId = in.readString();
+        isSelected = in.readByte() != 0;
+        points = in.createTypedArrayList(ShapePoint.CREATOR);
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(featureId);
+        dest.writeByte((byte) (isSelected ? 1 : 0));
+        dest.writeTypedList(points);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
     }
 
     public String getFeatureId() {

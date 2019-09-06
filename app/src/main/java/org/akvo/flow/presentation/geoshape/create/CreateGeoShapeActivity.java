@@ -31,7 +31,6 @@ import android.widget.TextView;
 import com.google.android.material.bottomappbar.BottomAppBar;
 import com.mapbox.geojson.Feature;
 import com.mapbox.geojson.FeatureCollection;
-import com.mapbox.geojson.Point;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.Style;
 
@@ -39,19 +38,27 @@ import org.akvo.flow.R;
 import org.akvo.flow.activity.BackActivity;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
+import org.akvo.flow.offlinemaps.presentation.geoshapes.GeoShapeConstants;
 import org.akvo.flow.offlinemaps.presentation.geoshapes.GeoShapesMapViewImpl;
 import org.akvo.flow.presentation.SnackBarManager;
 import org.akvo.flow.presentation.geoshape.DeletePointDialog;
 import org.akvo.flow.presentation.geoshape.DeleteShapeDialog;
-import org.akvo.flow.presentation.geoshape.PropertiesDialog;
+import org.akvo.flow.presentation.geoshape.create.entities.AreaShape;
+import org.akvo.flow.presentation.geoshape.create.entities.LineShape;
+import org.akvo.flow.presentation.geoshape.create.entities.PointShape;
+import org.akvo.flow.presentation.geoshape.create.entities.Shape;
+import org.akvo.flow.presentation.geoshape.create.entities.ShapePoint;
+import org.akvo.flow.presentation.geoshape.properties.PropertiesDialog;
 import org.akvo.flow.util.ConstantUtil;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import javax.inject.Inject;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 
 import static org.akvo.flow.offlinemaps.presentation.geoshapes.GeoShapeConstants.ACCURACY_THRESHOLD;
@@ -79,6 +86,7 @@ public class CreateGeoShapeActivity extends BackActivity implements
 
     private ViewFeatures viewFeatures = new ViewFeatures(new ArrayList<>(), new ArrayList<>(),
             new ArrayList<>());
+    private final List<Shape> shapes = new ArrayList<>();
 
     @Inject
     FeatureMapper featureMapper;
@@ -128,13 +136,13 @@ public class CreateGeoShapeActivity extends BackActivity implements
                     }
                     break;
                 case R.id.delete_point:
-                    if (viewFeatures.getSelectedFeature() != null) {
+                    if (getSelectedShape() != null) {
                         DeletePointDialog pointDelete = DeletePointDialog.newInstance();
                         pointDelete.show(getSupportFragmentManager(), DeletePointDialog.TAG);
                     }
                     break;
                 case R.id.delete_feature:
-                    if (viewFeatures.getSelectedFeature() != null) {
+                    if (getSelectedShape() != null) {
                         DeleteShapeDialog shapeDelete = DeleteShapeDialog.newInstance();
                         shapeDelete.show(getSupportFragmentManager(), DeleteShapeDialog.TAG);
                     }
@@ -147,17 +155,21 @@ public class CreateGeoShapeActivity extends BackActivity implements
     }
 
     private void displaySelectedShapeInfo() {
-        Feature selectedFeature = viewFeatures.getSelectedFeature();
-        if (selectedFeature != null) {
-            String pointCount = selectedFeature
-                    .getStringProperty(FeatureMapper.POINT_COUNT_PROPERTY_NAME);
-            String length = selectedFeature.hasProperty(FeatureMapper.LENGTH_PROPERTY_NAME) ?
-                    selectedFeature.getStringProperty(FeatureMapper.LENGTH_PROPERTY_NAME) : "";
-            String area = selectedFeature.hasProperty(FeatureMapper.AREA_PROPERTY_NAME) ?
-                    selectedFeature.getStringProperty(FeatureMapper.AREA_PROPERTY_NAME) : "";
-            PropertiesDialog dialog = PropertiesDialog.newInstance(pointCount, length, area);
+        Shape shape = getSelectedShape();
+        if (shape != null) {
+            PropertiesDialog dialog = PropertiesDialog.newInstance(shape);
             dialog.show(getSupportFragmentManager(), PropertiesDialog.TAG);
         }
+    }
+
+    @Nullable
+    private Shape getSelectedShape() {
+        for (Shape shape: shapes) {
+            if (shape.isSelected()) {
+                return shape;
+            }
+        }
+        return null;
     }
 
     private void addLocationPoint() {
@@ -212,7 +224,9 @@ public class CreateGeoShapeActivity extends BackActivity implements
 
     private void setUpFeatures() {
         String geoJSON = getIntent().getStringExtra(ConstantUtil.GEOSHAPE_RESULT);
-        viewFeatures = featureMapper.toViewFeatures(geoJSON);
+        shapes.clear();
+        shapes.addAll(featureMapper.toShapes(geoJSON));
+        viewFeatures = featureMapper.toViewFeatures(shapes);
     }
 
     @SuppressLint("MissingPermission")
@@ -227,17 +241,53 @@ public class CreateGeoShapeActivity extends BackActivity implements
     }
 
     private boolean onMapClick(Feature feature) {
-        viewFeatures.selectFeatureFromPoint(feature);
-        Feature selectedFeature = viewFeatures.getSelectedFeature();
-        if (featureMapper.isMultiPointFeature(selectedFeature)) {
+        Shape selected = selectFeatureFromPoint(feature);
+        if (selected instanceof PointShape) {
             enableShapeDrawMode(R.string.geoshape_points, POINT);
-        } else  if (featureMapper.isLineStringFeature(selectedFeature)) {
+        } else  if (selected instanceof LineShape) {
             enableShapeDrawMode(R.string.geoshape_line, LINE);
-        } else  if (featureMapper.isPolygonFeature(selectedFeature)) {
+        } else  if (selected instanceof AreaShape) {
             enableShapeDrawMode(R.string.geoshape_area, AREA);
         }
         updateSources();
         return true;
+    }
+
+    private Shape selectFeatureFromPoint(Feature feature) {
+        String selectedFeatureId = feature.getStringProperty(GeoShapeConstants.FEATURE_ID);
+        String selectedPointId = feature.getStringProperty(GeoShapeConstants.POINT_ID);
+        Shape selectedShape = null;
+        for (Shape shape : shapes) {
+            if (shape.getFeatureId().equals(selectedFeatureId)) {
+                shape.setSelected(true);
+                selectedShape = shape;
+                List<ShapePoint> points = shape.getPoints();
+                for (ShapePoint point : points) {
+                    if (point.getPointId().equals(selectedPointId)) {
+                        point.setSelected(true);
+                    } else {
+                        point.setSelected(false);
+                    }
+                }
+            } else {
+                shape.setSelected(false);
+                List<ShapePoint> points = shape.getPoints();
+                for (ShapePoint point : points) {
+                    point.setSelected(false);
+                }
+            }
+        }
+        return selectedShape;
+    }
+
+    private void unSelectAllFeatures() {
+        for (Shape shape : shapes) {
+            shape.setSelected(false);
+            List<ShapePoint> points = shape.getPoints();
+            for (ShapePoint point : points) {
+                point.setSelected(false);
+            }
+        }
     }
 
     private boolean onMapLongClick(LatLng point) {
@@ -265,81 +315,96 @@ public class CreateGeoShapeActivity extends BackActivity implements
     }
 
     private void addPoint(LatLng latLng) {
-        Point mapTargetPoint = Point.fromLngLat(latLng.getLongitude(), latLng.getLatitude());
         switch (drawMode) {
             case POINT:
-                addPointToMultiPoint(mapTargetPoint);
+                addPointToMultiPoint(latLng);
                 break;
             case LINE:
-                addPointToLineString(mapTargetPoint);
+                addPointToLineString(latLng);
                 break;
             case AREA:
-                addPointToPolygon(mapTargetPoint);
+                addPointToPolygon(latLng);
                 break;
             default:
                 break;
         }
     }
 
-    private void addPointToMultiPoint(Point mapTargetPoint) {
-        Feature selectedFeature = viewFeatures.getSelectedFeature();
-        if (featureMapper.isMultiPointFeature(selectedFeature)) {
-            featureMapper.updateExistingMultiPoint(mapTargetPoint, selectedFeature);
+    private void addPointToMultiPoint(LatLng latLng) {
+        Shape shape = getSelectedShape();
+        if (shape instanceof PointShape) {
+            List<ShapePoint> points = shape.getPoints();
+            for (ShapePoint point : points) {
+                point.setSelected(false);
+            }
+            ShapePoint shapePoint = createSelectedShapePoint(latLng, shape);
+            points.add(shapePoint);
         } else {
-            selectedFeature = createNewMultiPointFeature(mapTargetPoint);
-        }
-        if (selectedFeature != null) {
-            Feature feature = featureMapper.createPointFeature(mapTargetPoint, selectedFeature);
-            featureMapper.updatePointsList(feature, viewFeatures.getPointFeatures());
+            unSelectAllFeatures();
+            Shape createdShape = new PointShape(UUID.randomUUID().toString(), new ArrayList<>());
+            ShapePoint shapePoint = createSelectedShapePoint(latLng, createdShape);
+            createdShape.getPoints().add(shapePoint);
+            createdShape.setSelected(true);
+            shapes.add(createdShape);
         }
     }
 
-    private void addPointToLineString(Point mapTargetPoint) {
-        Feature selectedFeature = viewFeatures.getSelectedFeature();
-        if (featureMapper.isLineStringFeature(selectedFeature)) {
-            featureMapper.updateExistingLineString(mapTargetPoint, selectedFeature);
+    private void addPointToLineString(LatLng latLng) {
+        Shape shape = getSelectedShape();
+        if (shape instanceof LineShape) {
+            List<ShapePoint> points = shape.getPoints();
+            for (ShapePoint point : points) {
+                point.setSelected(false);
+            }
+            ShapePoint shapePoint = createSelectedShapePoint(latLng, shape);
+            points.add(shapePoint);
         } else {
-            selectedFeature = createNewLineStringFeature(mapTargetPoint);
-        }
-        if (selectedFeature != null) {
-            Feature feature = featureMapper.createPointFeature(mapTargetPoint, selectedFeature);
-            featureMapper.updatePointsList(feature, viewFeatures.getPointFeatures());
+            unSelectAllFeatures();
+            Shape createdShape = new LineShape(UUID.randomUUID().toString(), new ArrayList<>());
+            ShapePoint shapePoint = createSelectedShapePoint(latLng, createdShape);
+            createdShape.getPoints().add(shapePoint);
+            createdShape.setSelected(true);
+            shapes.add(createdShape);
         }
     }
 
-    private void addPointToPolygon(Point mapTargetPoint) {
-        Feature selectedFeature = viewFeatures.getSelectedFeature();
-        if (featureMapper.isPolygonFeature(selectedFeature)) {
-            featureMapper.updateExistingPolygon(mapTargetPoint, selectedFeature);
+    private void addPointToPolygon(LatLng latLng) {
+        Shape shape = getSelectedShape();
+        if (shape instanceof AreaShape) {
+            List<ShapePoint> points = shape.getPoints();
+            for (ShapePoint point : points) {
+                point.setSelected(false);
+            }
+            ShapePoint shapePoint = createSelectedShapePoint(latLng, shape);
+            int size = points.size();
+            if (size < 2) {
+                points.add(shapePoint);
+            } else if (size == 2) {
+                points.add(shapePoint);
+                points.add(points.get(0));
+            } else {
+                points.add(size - 2, shapePoint);
+            }
         } else {
-            selectedFeature = createNewPolygonFeature(mapTargetPoint);
-        }
-        if (selectedFeature != null) {
-            Feature feature = featureMapper.createPointFeature(mapTargetPoint, selectedFeature);
-            featureMapper.updatePointsList(feature, viewFeatures.getPointFeatures());
+            unSelectAllFeatures();
+            Shape createdShape = new AreaShape(UUID.randomUUID().toString(), new ArrayList<>());
+            ShapePoint shapePoint = createSelectedShapePoint(latLng, createdShape);
+            createdShape.getPoints().add(shapePoint);
+            createdShape.setSelected(true);
+            shapes.add(createdShape);
         }
     }
 
     @NonNull
-    private Feature createNewMultiPointFeature(Point mapTargetPoint) {
-        final Feature feature = featureMapper.createNewMultiPointFeature(mapTargetPoint);
-        viewFeatures.addSelectedFeature(feature);
-        return feature;
-    }
-
-    private Feature createNewLineStringFeature(Point mapTargetPoint) {
-        final Feature feature = featureMapper.createNewLineStringFeature(mapTargetPoint);
-        viewFeatures.addSelectedFeature(feature);
-        return feature;
-    }
-
-    private Feature createNewPolygonFeature(Point mapTargetPoint) {
-        final Feature feature = featureMapper.createNewPolygonFeature(mapTargetPoint);
-        viewFeatures.addSelectedFeature(feature);
-        return feature;
+    private ShapePoint createSelectedShapePoint(LatLng latLng, Shape shape) {
+        ShapePoint shapePoint = new ShapePoint(UUID.randomUUID().toString(),
+                shape.getFeatureId(), latLng.getLatitude(), latLng.getLongitude());
+        shapePoint.setSelected(true);
+        return shapePoint;
     }
 
     private void updateSources() {
+        viewFeatures = featureMapper.toViewFeatures(shapes);
         FeatureCollection features = FeatureCollection.fromFeatures(viewFeatures.getFeatures());
         FeatureCollection pointList = FeatureCollection
                 .fromFeatures(viewFeatures.getPointFeatures());
@@ -408,7 +473,7 @@ public class CreateGeoShapeActivity extends BackActivity implements
     private void enableNewShapeType(DrawMode point, @StringRes int stringRes) {
         if (drawMode != point) {
             enableShapeDrawMode(stringRes, point);
-            viewFeatures.unSelectFeature();
+            unSelectAllFeatures();
             updateSources();
         }
     }
@@ -490,26 +555,38 @@ public class CreateGeoShapeActivity extends BackActivity implements
 
     @Override
     public void deletePoint() {
-        Feature feature = viewFeatures.getSelectedFeature();
-        if (feature != null) {
-            List<Point> remainingPoints = featureMapper.removeLastPointFromFeature(feature);
+        Shape shape = getSelectedShape();
+        if (shape != null) {
+            List<ShapePoint> remainingPoints = removeLastPointFromFeature(shape);
             if (remainingPoints.size() == 0) {
-                viewFeatures.setSelectedFeature(null);
-                viewFeatures.removeFeature(feature);
-            } else {
-                viewFeatures.removeSelectedPoint(feature);
+                shapes.remove(shape);
+                unSelectAllFeatures();
             }
             updateSources();
             updateChanged();
         }
     }
 
+    private List<ShapePoint> removeLastPointFromFeature(Shape shape) {
+        List<ShapePoint> points = shape.getPoints();
+        if (shape instanceof AreaShape) {
+            if (points.size() < 3) {
+                points.remove(points.size() - 1);
+            } else {
+                points.remove(points.size() - 2);
+            }
+        } else if (shape instanceof LineShape || shape instanceof PointShape) {
+            points.remove(points.size() - 1);
+        }
+        return points;
+    }
+
     @Override
     public void deleteShape() {
-        Feature feature = viewFeatures.getSelectedFeature();
-        if (feature != null) {
-            viewFeatures.setSelectedFeature(null);
-            viewFeatures.removeFeature(feature);
+        Shape shape = getSelectedShape();
+        if (shape != null) {
+            shapes.remove(shape);
+            unSelectAllFeatures();
             updateSources();
             updateChanged();
         }

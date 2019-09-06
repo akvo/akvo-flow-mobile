@@ -19,6 +19,8 @@
 
 package org.akvo.flow.presentation.geoshape.create.entities;
 
+import android.os.Parcel;
+
 import java.util.List;
 
 public class AreaShape extends Shape {
@@ -26,4 +28,20 @@ public class AreaShape extends Shape {
     public AreaShape(String featureId, List<ShapePoint> points) {
         super(featureId, points);
     }
+
+    public AreaShape(Parcel in) {
+        super(in);
+    }
+
+    public static final Creator<AreaShape> CREATOR = new Creator<AreaShape>() {
+        @Override
+        public AreaShape createFromParcel(Parcel in) {
+            return new AreaShape(in);
+        }
+
+        @Override
+        public AreaShape[] newArray(int size) {
+            return new AreaShape[size];
+        }
+    };
 }

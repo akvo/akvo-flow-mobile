@@ -17,9 +17,8 @@
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.akvo.flow.presentation.geoshape.create;
+package org.akvo.flow.presentation.geoshape.create.entities;
 
-import com.mapbox.geojson.Point;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 
 import java.util.ArrayList;
@@ -29,35 +28,23 @@ import javax.inject.Inject;
 
 import androidx.annotation.NonNull;
 
-public class CoordinatesMapper {
+public class PointsLatLngMapper {
 
     @Inject
-    public CoordinatesMapper() {
+    public PointsLatLngMapper() {
     }
 
-    List<LatLng> toLatLng(List<Point> coordinates) {
+    @NonNull
+    public List<LatLng> transform(@NonNull List<ShapePoint> points) {
         List<LatLng> latLngs = new ArrayList<>();
-        for (Point p : coordinates) {
-            latLngs.add(toLatLng(p));
+        for (ShapePoint p: points) {
+            latLngs.add(transform(p));
         }
         return latLngs;
     }
 
-    List<Point> toPointList(List<LatLng> latLngs) {
-        List<Point> points = new ArrayList<>(latLngs.size());
-        for (LatLng latLng : latLngs) {
-            points.add(toPoint(latLng));
-        }
-        return points;
-    }
-
     @NonNull
-    public Point toPoint(LatLng latLng) {
-        return Point.fromLngLat(latLng.getLongitude(), latLng.getLatitude());
-    }
-
-    @NonNull
-    private LatLng toLatLng(Point p) {
-        return new LatLng(p.latitude(), p.longitude());
+    public LatLng transform(ShapePoint p) {
+        return new LatLng(p.getLatitude(), p.getLongitude());
     }
 }

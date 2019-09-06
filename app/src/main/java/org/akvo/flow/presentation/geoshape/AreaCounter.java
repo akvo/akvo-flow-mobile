@@ -19,7 +19,7 @@
 
 package org.akvo.flow.presentation.geoshape;
 
-import com.mapbox.geojson.Point;
+import org.akvo.flow.presentation.geoshape.create.entities.ShapePoint;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,19 +35,19 @@ public class AreaCounter {
     public AreaCounter() {
     }
 
-    public double area(List<Point> originalPoints) {
+    public double computeArea(List<ShapePoint> originalPoints) {
         if (originalPoints.size() < 3) {
             return 0f;
         }
 
-        // First we compute an equal-area projection of the polygon. We use a sinusoidal
+        // First we compute an equal-computeArea projection of the polygon. We use a sinusoidal
         // projection for now: http://en.wikipedia.org/wiki/Sinusoidal_projection
         List<ProjectedPoint> points = new ArrayList<>();
-        for (Point location : originalPoints) {
+        for (ShapePoint location : originalPoints) {
             points.add(project(location));
         }
 
-        // Now we calculate the area, using regular planar techniques.
+        // Now we calculate the computeArea, using regular planar techniques.
         // http://mathworld.wolfram.com/PolygonArea.html
         double area = 0.0;
         ProjectedPoint prev = points.get(points.size() - 1);// start from the last point
@@ -61,11 +61,11 @@ public class AreaCounter {
         return Math.abs(area) / 2;
     }
 
-    private ProjectedPoint project(Point location) {
-        // Sinusoidal projection (equal-area)
-        double x = location.longitude() * LATITUDE_SIZE * Math
-                .cos(Math.toRadians(location.latitude()));
-        double y = location.latitude() * LATITUDE_SIZE;
+    private ProjectedPoint project(ShapePoint location) {
+        // Sinusoidal projection (equal-computeArea)
+        double x = location.getLongitude() * LATITUDE_SIZE * Math
+                .cos(Math.toRadians(location.getLatitude()));
+        double y = location.getLatitude() * LATITUDE_SIZE;
         return new ProjectedPoint(x, y);
     }
 

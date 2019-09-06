@@ -19,6 +19,8 @@
 
 package org.akvo.flow.presentation.geoshape.create.entities;
 
+import android.os.Parcel;
+
 import java.util.List;
 
 public class LineShape extends Shape {
@@ -26,4 +28,20 @@ public class LineShape extends Shape {
     public LineShape(String featureId, List<ShapePoint> points) {
         super(featureId, points);
     }
+
+    public LineShape(Parcel in) {
+        super(in);
+    }
+
+    public static final Creator<LineShape> CREATOR = new Creator<LineShape>() {
+        @Override
+        public LineShape createFromParcel(Parcel in) {
+            return new LineShape(in);
+        }
+
+        @Override
+        public LineShape[] newArray(int size) {
+            return new LineShape[size];
+        }
+    };
 }

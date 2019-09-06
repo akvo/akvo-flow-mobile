@@ -33,9 +33,11 @@ import org.akvo.flow.injector.component.ViewComponent;
 import org.akvo.flow.offlinemaps.presentation.geoshapes.GeoShapesMapViewImpl;
 import org.akvo.flow.presentation.geoshape.create.FeatureMapper;
 import org.akvo.flow.presentation.geoshape.create.ViewFeatures;
+import org.akvo.flow.presentation.geoshape.create.entities.Shape;
 import org.akvo.flow.util.ConstantUtil;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.inject.Inject;
 
@@ -81,7 +83,8 @@ public class ViewGeoShapeActivity extends BackActivity {
 
     private void setUpFeatures() {
         String geoJSON = getIntent().getStringExtra(ConstantUtil.GEOSHAPE_RESULT);
-        viewFeatures = featureMapper.toViewFeatures(geoJSON);
+        final List<Shape> shapes = featureMapper.toShapes(geoJSON);
+        viewFeatures = featureMapper.toViewFeatures(shapes);
     }
 
     @Override

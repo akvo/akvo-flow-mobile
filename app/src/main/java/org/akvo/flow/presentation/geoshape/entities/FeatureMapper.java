@@ -17,7 +17,7 @@
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.akvo.flow.presentation.geoshape.create.entities;
+package org.akvo.flow.presentation.geoshape.entities;
 
 import com.mapbox.geojson.Feature;
 import com.mapbox.geojson.FeatureCollection;
@@ -29,14 +29,6 @@ import com.mapbox.geojson.Polygon;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 
 import org.akvo.flow.offlinemaps.presentation.geoshapes.GeoShapeConstants;
-import org.akvo.flow.presentation.geoshape.create.entities.AreaShape;
-import org.akvo.flow.presentation.geoshape.create.entities.CoordinatesMapper;
-import org.akvo.flow.presentation.geoshape.create.entities.LineShape;
-import org.akvo.flow.presentation.geoshape.create.entities.PointShape;
-import org.akvo.flow.presentation.geoshape.create.entities.PointsLatLngMapper;
-import org.akvo.flow.presentation.geoshape.create.entities.Shape;
-import org.akvo.flow.presentation.geoshape.create.entities.ShapePoint;
-import org.akvo.flow.presentation.geoshape.create.entities.ViewFeatures;
 
 import java.util.ArrayList;
 import java.util.List;

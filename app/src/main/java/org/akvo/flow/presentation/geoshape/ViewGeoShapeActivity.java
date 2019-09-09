@@ -31,9 +31,9 @@ import org.akvo.flow.activity.BackActivity;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
 import org.akvo.flow.offlinemaps.presentation.geoshapes.GeoShapesMapViewImpl;
-import org.akvo.flow.presentation.geoshape.create.entities.FeatureMapper;
-import org.akvo.flow.presentation.geoshape.create.entities.ViewFeatures;
-import org.akvo.flow.presentation.geoshape.create.entities.Shape;
+import org.akvo.flow.presentation.geoshape.entities.FeatureMapper;
+import org.akvo.flow.presentation.geoshape.entities.ViewFeatures;
+import org.akvo.flow.presentation.geoshape.entities.Shape;
 import org.akvo.flow.util.ConstantUtil;
 
 import java.util.ArrayList;

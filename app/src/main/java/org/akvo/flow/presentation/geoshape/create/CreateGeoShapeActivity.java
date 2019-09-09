@@ -29,7 +29,6 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.google.android.material.bottomappbar.BottomAppBar;
-import com.mapbox.geojson.Feature;
 import com.mapbox.geojson.FeatureCollection;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.Style;
@@ -38,29 +37,19 @@ import org.akvo.flow.R;
 import org.akvo.flow.activity.BackActivity;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
-import org.akvo.flow.offlinemaps.presentation.geoshapes.GeoShapeConstants;
 import org.akvo.flow.offlinemaps.presentation.geoshapes.GeoShapesMapViewImpl;
 import org.akvo.flow.presentation.SnackBarManager;
 import org.akvo.flow.presentation.geoshape.DeletePointDialog;
 import org.akvo.flow.presentation.geoshape.DeleteShapeDialog;
-import org.akvo.flow.presentation.geoshape.create.entities.AreaShape;
-import org.akvo.flow.presentation.geoshape.create.entities.FeatureMapper;
-import org.akvo.flow.presentation.geoshape.create.entities.LineShape;
-import org.akvo.flow.presentation.geoshape.create.entities.PointShape;
-import org.akvo.flow.presentation.geoshape.create.entities.Shape;
-import org.akvo.flow.presentation.geoshape.create.entities.ShapePoint;
-import org.akvo.flow.presentation.geoshape.create.entities.ViewFeatures;
+import org.akvo.flow.presentation.geoshape.entities.Shape;
+import org.akvo.flow.presentation.geoshape.entities.ViewFeatures;
 import org.akvo.flow.presentation.geoshape.properties.PropertiesDialog;
 import org.akvo.flow.util.ConstantUtil;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import javax.inject.Inject;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 
 import static org.akvo.flow.offlinemaps.presentation.geoshapes.GeoShapeConstants.ACCURACY_THRESHOLD;
@@ -72,7 +61,8 @@ import static org.akvo.flow.presentation.geoshape.create.DrawMode.LINE;
 import static org.akvo.flow.presentation.geoshape.create.DrawMode.POINT;
 
 public class CreateGeoShapeActivity extends BackActivity implements
-        DeletePointDialog.PointDeleteListener, DeleteShapeDialog.ShapeDeleteListener {
+        DeletePointDialog.PointDeleteListener, DeleteShapeDialog.ShapeDeleteListener,
+        CreateGeoShapeView {
 
     private GeoShapesMapViewImpl mapView;
     private boolean changed = false;
@@ -86,12 +76,8 @@ public class CreateGeoShapeActivity extends BackActivity implements
     private TextView bottomBarTitle;
     private BottomAppBar bottomAppBar;
 
-    private ViewFeatures viewFeatures = new ViewFeatures(new ArrayList<>(), new ArrayList<>(),
-            new ArrayList<>());
-    private final List<Shape> shapes = new ArrayList<>();
-
     @Inject
-    FeatureMapper featureMapper;
+    CreateGeoShapePresenter presenter;
 
     @Inject
     SnackBarManager snackBarManager;
@@ -103,7 +89,8 @@ public class CreateGeoShapeActivity extends BackActivity implements
         initializeInjector();
         setupToolBar();
         setUpBottomBar();
-        setUpFeatures();
+        presenter.setView(this);
+        presenter.setUpFeatures(getIntent().getStringExtra(ConstantUtil.GEOSHAPE_RESULT));
         setUpMapView(savedInstanceState);
 
         allowPoints = getIntent().getBooleanExtra(ConstantUtil.EXTRA_ALLOW_POINTS, true);
@@ -128,7 +115,7 @@ public class CreateGeoShapeActivity extends BackActivity implements
         bottomAppBar.setOnMenuItemClickListener(item -> {
             switch (item.getItemId()) {
                 case R.id.shape_info:
-                    displaySelectedShapeInfo();
+                    presenter.onShapeInfoPressed();
                     break;
                 case R.id.add_point:
                     if (drawMode != DrawMode.NONE) {
@@ -138,16 +125,10 @@ public class CreateGeoShapeActivity extends BackActivity implements
                     }
                     break;
                 case R.id.delete_point:
-                    if (getSelectedShape() != null) {
-                        DeletePointDialog pointDelete = DeletePointDialog.newInstance();
-                        pointDelete.show(getSupportFragmentManager(), DeletePointDialog.TAG);
-                    }
+                    presenter.onDeletePointPressed();
                     break;
                 case R.id.delete_feature:
-                    if (getSelectedShape() != null) {
-                        DeleteShapeDialog shapeDelete = DeleteShapeDialog.newInstance();
-                        shapeDelete.show(getSupportFragmentManager(), DeleteShapeDialog.TAG);
-                    }
+                    presenter.onDeleteShapePressed();
                     break;
                 default:
                     break;
@@ -156,31 +137,30 @@ public class CreateGeoShapeActivity extends BackActivity implements
         });
     }
 
-    private void displaySelectedShapeInfo() {
-        Shape shape = getSelectedShape();
-        if (shape != null) {
-            PropertiesDialog dialog = PropertiesDialog.newInstance(shape);
-            dialog.show(getSupportFragmentManager(), PropertiesDialog.TAG);
-        }
+    @Override
+    public void displayDeleteShapeDialog() {
+        DeleteShapeDialog shapeDelete = DeleteShapeDialog.newInstance();
+        shapeDelete.show(getSupportFragmentManager(), DeleteShapeDialog.TAG);
     }
 
-    @Nullable
-    private Shape getSelectedShape() {
-        for (Shape shape: shapes) {
-            if (shape.isSelected()) {
-                return shape;
-            }
-        }
-        return null;
+    @Override
+    public void displayDeletePointDialog() {
+        DeletePointDialog pointDelete = DeletePointDialog.newInstance();
+        pointDelete.show(getSupportFragmentManager(), DeletePointDialog.TAG);
+    }
+
+    @Override
+    public void displaySelectedShapeInfo(Shape shape) {
+        PropertiesDialog dialog = PropertiesDialog.newInstance(shape);
+        dialog.show(getSupportFragmentManager(), PropertiesDialog.TAG);
     }
 
     private void addLocationPoint() {
         //TODO: if location permission lacking we should prompt the used to give them
         Location location = isLocationAllowed() ? mapView.getLocation() : null;
         if (location != null && location.getAccuracy() <= ACCURACY_THRESHOLD) {
-            addPoint(new LatLng(location.getLatitude(), location.getLongitude()));
-            updateChanged();
-            updateSources();
+            presenter.onAddPointRequested(
+                    new LatLng(location.getLatitude(), location.getLongitude()), drawMode);
         } else {
             int messageId = location != null ?
                     R.string.location_inaccurate :
@@ -192,16 +172,18 @@ public class CreateGeoShapeActivity extends BackActivity implements
     private void setUpMapView(Bundle savedInstanceState) {
         mapView = findViewById(R.id.mapView);
         mapView.onCreate(savedInstanceState);
-        mapView.getMapAsyncWithCallback(() -> {
-            //TODO: maybe only when a shape type is selected
-            updateAttributionMargin();
-            mapView.initSources(FeatureCollection.fromFeatures(viewFeatures.getFeatures()),
-                    FeatureCollection.fromFeatures(viewFeatures.getPointFeatures()));
-            mapView.initCircleSelectionSources();
-            displayUserLocation();
-            mapView.centerMap(viewFeatures.getListOfCoordinates());
-            setMapClicks();
-        });
+        mapView.getMapAsyncWithCallback(presenter::onMapReady);
+    }
+
+    @Override
+    public void displayMapItems(ViewFeatures viewFeatures) {
+        updateAttributionMargin();
+        mapView.initSources(FeatureCollection.fromFeatures(viewFeatures.getFeatures()),
+                FeatureCollection.fromFeatures(viewFeatures.getPointFeatures()));
+        mapView.initCircleSelectionSources();
+        displayUserLocation();
+        mapView.centerMap(viewFeatures.getListOfCoordinates());
+        setMapClicks();
     }
 
     private void updateAttributionMargin() {
@@ -224,13 +206,6 @@ public class CreateGeoShapeActivity extends BackActivity implements
         }
     }
 
-    private void setUpFeatures() {
-        String geoJSON = getIntent().getStringExtra(ConstantUtil.GEOSHAPE_RESULT);
-        shapes.clear();
-        shapes.addAll(featureMapper.toShapes(geoJSON));
-        viewFeatures = featureMapper.toViewFeatures(shapes);
-    }
-
     @SuppressLint("MissingPermission")
     public void displayUserLocation() {
         if (isLocationAllowed()) {
@@ -239,57 +214,22 @@ public class CreateGeoShapeActivity extends BackActivity implements
     }
 
     private void setMapClicks() {
-        mapView.setMapClicks(this::onMapLongClick, this::onMapClick);
+        mapView.setMapClicks(this::onMapLongClick, presenter::onMapClick);
     }
 
-    private boolean onMapClick(Feature feature) {
-        Shape selected = selectFeatureFromPoint(feature);
-        if (selected instanceof PointShape) {
-            enableShapeDrawMode(R.string.geoshape_points, POINT);
-        } else  if (selected instanceof LineShape) {
-            enableShapeDrawMode(R.string.geoshape_line, LINE);
-        } else  if (selected instanceof AreaShape) {
-            enableShapeDrawMode(R.string.geoshape_area, AREA);
-        }
-        updateSources();
-        return true;
+    @Override
+    public void enableAreaDrawMode() {
+        enableShapeDrawMode(R.string.geoshape_area, AREA);
     }
 
-    private Shape selectFeatureFromPoint(Feature feature) {
-        String selectedFeatureId = feature.getStringProperty(GeoShapeConstants.FEATURE_ID);
-        String selectedPointId = feature.getStringProperty(GeoShapeConstants.POINT_ID);
-        Shape selectedShape = null;
-        for (Shape shape : shapes) {
-            if (shape.getFeatureId().equals(selectedFeatureId)) {
-                shape.setSelected(true);
-                selectedShape = shape;
-                List<ShapePoint> points = shape.getPoints();
-                for (ShapePoint point : points) {
-                    if (point.getPointId().equals(selectedPointId)) {
-                        point.setSelected(true);
-                    } else {
-                        point.setSelected(false);
-                    }
-                }
-            } else {
-                shape.setSelected(false);
-                List<ShapePoint> points = shape.getPoints();
-                for (ShapePoint point : points) {
-                    point.setSelected(false);
-                }
-            }
-        }
-        return selectedShape;
+    @Override
+    public void enableLineDrawMode() {
+        enableShapeDrawMode(R.string.geoshape_line, LINE);
     }
 
-    private void unSelectAllFeatures() {
-        for (Shape shape : shapes) {
-            shape.setSelected(false);
-            List<ShapePoint> points = shape.getPoints();
-            for (ShapePoint point : points) {
-                point.setSelected(false);
-            }
-        }
+    @Override
+    public void enablePointDrawMode() {
+        enableShapeDrawMode(R.string.geoshape_points, POINT);
     }
 
     private boolean onMapLongClick(LatLng point) {
@@ -298,9 +238,7 @@ public class CreateGeoShapeActivity extends BackActivity implements
             return false;
         }
         if (drawMode != DrawMode.NONE) {
-            addPoint(point);
-            updateChanged();
-            updateSources();
+            presenter.onAddPointRequested(point, drawMode);
         } else {
             showMessage(R.string.geoshapes_error_select_shape);
         }
@@ -311,105 +249,14 @@ public class CreateGeoShapeActivity extends BackActivity implements
         snackBarManager.displaySnackBar(bottomAppBar, messageResId, this);
     }
 
-    private void updateChanged() {
+    @Override
+    public void updateMenu() {
         changed = true;
         invalidateOptionsMenu();
     }
 
-    private void addPoint(LatLng latLng) {
-        switch (drawMode) {
-            case POINT:
-                addPointToMultiPoint(latLng);
-                break;
-            case LINE:
-                addPointToLineString(latLng);
-                break;
-            case AREA:
-                addPointToPolygon(latLng);
-                break;
-            default:
-                break;
-        }
-    }
-
-    private void addPointToMultiPoint(LatLng latLng) {
-        Shape shape = getSelectedShape();
-        if (shape instanceof PointShape) {
-            List<ShapePoint> points = shape.getPoints();
-            for (ShapePoint point : points) {
-                point.setSelected(false);
-            }
-            ShapePoint shapePoint = createSelectedShapePoint(latLng, shape);
-            points.add(shapePoint);
-        } else {
-            unSelectAllFeatures();
-            Shape createdShape = new PointShape(UUID.randomUUID().toString(), new ArrayList<>());
-            ShapePoint shapePoint = createSelectedShapePoint(latLng, createdShape);
-            createdShape.getPoints().add(shapePoint);
-            createdShape.setSelected(true);
-            shapes.add(createdShape);
-        }
-    }
-
-    private void addPointToLineString(LatLng latLng) {
-        Shape shape = getSelectedShape();
-        if (shape instanceof LineShape) {
-            List<ShapePoint> points = shape.getPoints();
-            for (ShapePoint point : points) {
-                point.setSelected(false);
-            }
-            ShapePoint shapePoint = createSelectedShapePoint(latLng, shape);
-            points.add(shapePoint);
-        } else {
-            unSelectAllFeatures();
-            Shape createdShape = new LineShape(UUID.randomUUID().toString(), new ArrayList<>());
-            ShapePoint shapePoint = createSelectedShapePoint(latLng, createdShape);
-            createdShape.getPoints().add(shapePoint);
-            createdShape.setSelected(true);
-            shapes.add(createdShape);
-        }
-    }
-
-    private void addPointToPolygon(LatLng latLng) {
-        Shape shape = getSelectedShape();
-        if (shape instanceof AreaShape) {
-            List<ShapePoint> points = shape.getPoints();
-            for (ShapePoint point : points) {
-                point.setSelected(false);
-            }
-            ShapePoint shapePoint = createSelectedShapePoint(latLng, shape);
-            int size = points.size();
-            if (size < 2) {
-                points.add(shapePoint);
-            } else if (size == 2) {
-                points.add(shapePoint);
-                points.add(points.get(0));
-            } else {
-                points.add(size - 2, shapePoint);
-            }
-        } else {
-            unSelectAllFeatures();
-            Shape createdShape = new AreaShape(UUID.randomUUID().toString(), new ArrayList<>());
-            ShapePoint shapePoint = createSelectedShapePoint(latLng, createdShape);
-            createdShape.getPoints().add(shapePoint);
-            createdShape.setSelected(true);
-            shapes.add(createdShape);
-        }
-    }
-
-    @NonNull
-    private ShapePoint createSelectedShapePoint(LatLng latLng, Shape shape) {
-        ShapePoint shapePoint = new ShapePoint(UUID.randomUUID().toString(),
-                shape.getFeatureId(), latLng.getLatitude(), latLng.getLongitude());
-        shapePoint.setSelected(true);
-        return shapePoint;
-    }
-
-    private void updateSources() {
-        viewFeatures = featureMapper.toViewFeatures(shapes);
-        FeatureCollection features = FeatureCollection.fromFeatures(viewFeatures.getFeatures());
-        FeatureCollection pointList = FeatureCollection
-                .fromFeatures(viewFeatures.getPointFeatures());
+    @Override
+    public void updateSources(FeatureCollection features, FeatureCollection pointList) {
         mapView.setSource(features, FILL_SOURCE_ID);
         mapView.setSource(features, LINE_SOURCE_ID);
         mapView.setSource(pointList, CIRCLE_SOURCE_ID);
@@ -429,7 +276,7 @@ public class CreateGeoShapeActivity extends BackActivity implements
         }
         MenuItem item = menu.findItem(R.id.save);
         if (item != null) {
-            item.setVisible(isValidShape() && changed);
+            item.setVisible(presenter.isValidShape() && changed);
         }
         return super.onCreateOptionsMenu(menu);
     }
@@ -463,8 +310,7 @@ public class CreateGeoShapeActivity extends BackActivity implements
                 enableNewShapeType(AREA, R.string.geoshape_area);
                 break;
             case R.id.save:
-                setShapeResult();
-                finish();
+                presenter.onSavePressed(changed);
                 break;
             default:
                 break;
@@ -472,11 +318,9 @@ public class CreateGeoShapeActivity extends BackActivity implements
         return super.onOptionsItemSelected(item);
     }
 
-    private void enableNewShapeType(DrawMode point, @StringRes int stringRes) {
-        if (drawMode != point) {
-            enableShapeDrawMode(stringRes, point);
-            unSelectAllFeatures();
-            updateSources();
+    private void enableNewShapeType(DrawMode drawMode, @StringRes int stringRes) {
+        if (this.drawMode != drawMode) {
+            presenter.onNewDrawModePresssed(drawMode);
         }
     }
 
@@ -488,29 +332,31 @@ public class CreateGeoShapeActivity extends BackActivity implements
 
     private void updateMapStyle(String style) {
         mapView.updateMapStyle(style, callback -> {
-            mapView.initSources(FeatureCollection.fromFeatures(viewFeatures.getFeatures()),
-                    FeatureCollection.fromFeatures(viewFeatures.getPointFeatures()));
-            mapView.initCircleSelectionSources();
-            mapView.centerMap(viewFeatures.getListOfCoordinates());
+            presenter.onMapStyleUpdated();
         });
     }
 
-    private void setShapeResult() {
-        Intent intent = new Intent();
-        if (isValidShape() && changed) {
-            FeatureCollection features = FeatureCollection.fromFeatures(viewFeatures.getFeatures());
-            //TODO: shall we remove the id property?
-            intent.putExtra(ConstantUtil.GEOSHAPE_RESULT, features.toJson());
-            setResult(RESULT_OK, intent);
-        } else {
-            setResult(RESULT_CANCELED, intent);
-        }
+    @Override
+    public void displayNewMapStyle(FeatureCollection features, FeatureCollection pointFeatures,
+            List<LatLng> listOfCoordinates) {
+        mapView.initSources(features, pointFeatures);
+        mapView.initCircleSelectionSources();
+        mapView.centerMap(listOfCoordinates);
     }
 
-    //TODO: validate shapes
-    private boolean isValidShape() {
-        List<Feature> features = viewFeatures.getFeatures();
-        return features.size() > 0;
+    @Override
+    public void setShapeResult(String shapesAsString) {
+        Intent intent = new Intent();
+        intent.putExtra(ConstantUtil.GEOSHAPE_RESULT, shapesAsString);
+        setResult(RESULT_OK, intent);
+        finish();
+    }
+
+    @Override
+    public void setCanceledResult() {
+        Intent intent = new Intent();
+        setResult(RESULT_CANCELED, intent);
+        finish();
     }
 
     @Override
@@ -557,40 +403,11 @@ public class CreateGeoShapeActivity extends BackActivity implements
 
     @Override
     public void deletePoint() {
-        Shape shape = getSelectedShape();
-        if (shape != null) {
-            List<ShapePoint> remainingPoints = removeLastPointFromFeature(shape);
-            if (remainingPoints.size() == 0) {
-                shapes.remove(shape);
-                unSelectAllFeatures();
-            }
-            updateSources();
-            updateChanged();
-        }
-    }
-
-    private List<ShapePoint> removeLastPointFromFeature(Shape shape) {
-        List<ShapePoint> points = shape.getPoints();
-        if (shape instanceof AreaShape) {
-            if (points.size() < 3) {
-                points.remove(points.size() - 1);
-            } else {
-                points.remove(points.size() - 2);
-            }
-        } else if (shape instanceof LineShape || shape instanceof PointShape) {
-            points.remove(points.size() - 1);
-        }
-        return points;
+        presenter.onDeletePointConfirmed();
     }
 
     @Override
     public void deleteShape() {
-        Shape shape = getSelectedShape();
-        if (shape != null) {
-            shapes.remove(shape);
-            unSelectAllFeatures();
-            updateSources();
-            updateChanged();
-        }
+        presenter.onDeleteShapeConfirmed();
     }
 }

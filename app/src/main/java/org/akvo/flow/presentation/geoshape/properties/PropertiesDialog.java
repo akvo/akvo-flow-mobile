@@ -30,7 +30,7 @@ import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.injector.component.ApplicationComponent;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
-import org.akvo.flow.presentation.geoshape.create.entities.Shape;
+import org.akvo.flow.presentation.geoshape.entities.Shape;
 
 import javax.inject.Inject;
 

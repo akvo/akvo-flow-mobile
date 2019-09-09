@@ -17,31 +17,31 @@
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.akvo.flow.presentation.geoshape.create.entities;
+package org.akvo.flow.presentation.geoshape.entities;
 
 import android.os.Parcel;
 
 import java.util.List;
 
-public class LineShape extends Shape {
+public class PointShape extends Shape {
 
-    public LineShape(String featureId, List<ShapePoint> points) {
+    public PointShape(String featureId, List<ShapePoint> points) {
         super(featureId, points);
     }
 
-    public LineShape(Parcel in) {
+    public PointShape(Parcel in) {
         super(in);
     }
 
-    public static final Creator<LineShape> CREATOR = new Creator<LineShape>() {
+    public static final Creator<PointShape> CREATOR = new Creator<PointShape>() {
         @Override
-        public LineShape createFromParcel(Parcel in) {
-            return new LineShape(in);
+        public PointShape createFromParcel(Parcel in) {
+            return new PointShape(in);
         }
 
         @Override
-        public LineShape[] newArray(int size) {
-            return new LineShape[size];
+        public PointShape[] newArray(int size) {
+            return new PointShape[size];
         }
     };
 }

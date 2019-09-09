@@ -17,7 +17,7 @@
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.akvo.flow.presentation.geoshape.create.entities;
+package org.akvo.flow.presentation.geoshape.entities;
 
 import android.os.Parcel;
 import android.os.Parcelable;

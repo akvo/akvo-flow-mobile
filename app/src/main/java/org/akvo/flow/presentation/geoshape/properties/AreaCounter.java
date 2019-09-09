@@ -19,7 +19,7 @@
 
 package org.akvo.flow.presentation.geoshape.properties;
 
-import org.akvo.flow.presentation.geoshape.create.entities.ShapePoint;
+import org.akvo.flow.presentation.geoshape.entities.ShapePoint;
 
 import java.util.ArrayList;
 import java.util.List;

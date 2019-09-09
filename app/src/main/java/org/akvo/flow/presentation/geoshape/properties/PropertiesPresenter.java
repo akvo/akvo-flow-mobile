@@ -20,9 +20,9 @@
 package org.akvo.flow.presentation.geoshape.properties;
 
 import org.akvo.flow.presentation.Presenter;
-import org.akvo.flow.presentation.geoshape.create.entities.AreaShape;
-import org.akvo.flow.presentation.geoshape.create.entities.LineShape;
-import org.akvo.flow.presentation.geoshape.create.entities.Shape;
+import org.akvo.flow.presentation.geoshape.entities.AreaShape;
+import org.akvo.flow.presentation.geoshape.entities.LineShape;
+import org.akvo.flow.presentation.geoshape.entities.Shape;
 
 import javax.inject.Inject;
 

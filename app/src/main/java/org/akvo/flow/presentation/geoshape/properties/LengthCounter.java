@@ -21,7 +21,7 @@ package org.akvo.flow.presentation.geoshape.properties;
 
 import android.location.Location;
 
-import org.akvo.flow.presentation.geoshape.create.entities.ShapePoint;
+import org.akvo.flow.presentation.geoshape.entities.ShapePoint;
 
 import java.util.List;
 

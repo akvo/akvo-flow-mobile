@@ -44,10 +44,12 @@ import org.akvo.flow.presentation.SnackBarManager;
 import org.akvo.flow.presentation.geoshape.DeletePointDialog;
 import org.akvo.flow.presentation.geoshape.DeleteShapeDialog;
 import org.akvo.flow.presentation.geoshape.create.entities.AreaShape;
+import org.akvo.flow.presentation.geoshape.create.entities.FeatureMapper;
 import org.akvo.flow.presentation.geoshape.create.entities.LineShape;
 import org.akvo.flow.presentation.geoshape.create.entities.PointShape;
 import org.akvo.flow.presentation.geoshape.create.entities.Shape;
 import org.akvo.flow.presentation.geoshape.create.entities.ShapePoint;
+import org.akvo.flow.presentation.geoshape.create.entities.ViewFeatures;
 import org.akvo.flow.presentation.geoshape.properties.PropertiesDialog;
 import org.akvo.flow.util.ConstantUtil;
 

@@ -17,7 +17,7 @@
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.akvo.flow.presentation.geoshape;
+package org.akvo.flow.presentation.geoshape.properties;
 
 import android.location.Location;
 

@@ -301,13 +301,13 @@ public class CreateGeoShapeActivity extends BackActivity implements
                 onBackPressed();
                 break;
             case R.id.add_points:
-                enableNewShapeType(POINT, R.string.geoshape_points);
+                enableNewShapeType(POINT);
                 break;
             case R.id.add_line:
-                enableNewShapeType(LINE, R.string.geoshape_line);
+                enableNewShapeType(LINE);
                 break;
             case R.id.add_polygon:
-                enableNewShapeType(AREA, R.string.geoshape_area);
+                enableNewShapeType(AREA);
                 break;
             case R.id.save:
                 presenter.onSavePressed(changed);
@@ -318,7 +318,7 @@ public class CreateGeoShapeActivity extends BackActivity implements
         return super.onOptionsItemSelected(item);
     }
 
-    private void enableNewShapeType(DrawMode drawMode, @StringRes int stringRes) {
+    private void enableNewShapeType(DrawMode drawMode) {
         if (this.drawMode != drawMode) {
             presenter.onNewDrawModePresssed(drawMode);
         }

@@ -143,7 +143,26 @@ public class OfflineAreasListPresenter {
                 .subscribeWith(new DisposableCompletableObserver() {
                     @Override
                     public void onComplete() {
-                        loadAreas();
+                        getSelectedOfflineRegion.execute(new DisposableMaybeObserver<Long>() {
+                            @Override
+                            public void onSuccess(Long aLong) {
+                                if (areaId == aLong) {
+                                    resetSelectedArea();
+                                } else {
+                                    loadAreas();
+                                }
+                            }
+
+                            @Override
+                            public void onError(Throwable e) {
+                                loadAreas();
+                            }
+
+                            @Override
+                            public void onComplete() {
+                                loadAreas();
+                            }
+                        });
                     }
 
                     @Override
@@ -153,6 +172,23 @@ public class OfflineAreasListPresenter {
                     }
                 });
         disposables.add(subscribeWith);
+    }
+
+    private void resetSelectedArea() {
+        Map<String, Object> params = new HashMap<>(2);
+        params.put(SaveSelectedOfflineArea.AREA_ID_PARAM, OfflineAreasListAdapter.NONE_SELECTED);
+        saveSelectedOfflineArea.execute(new DisposableCompletableObserver() {
+            @Override
+            public void onComplete() {
+                loadAreas();
+            }
+
+            @Override
+            public void onError(Throwable e) {
+                Timber.e(e);
+                loadAreas();
+            }
+        }, params);
     }
 
     public void selectRegion(long regionId) {

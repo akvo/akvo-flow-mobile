@@ -337,9 +337,9 @@ public class CreateGeoShapeActivity extends BackActivity implements
     }
 
     @Override
-    public void displayNewMapStyle(FeatureCollection features, FeatureCollection pointFeatures,
+    public void displayNewMapStyle(FeatureCollection shapeFeatures, FeatureCollection pointFeatures,
             List<LatLng> listOfCoordinates) {
-        mapView.initSources(features, pointFeatures);
+        mapView.initSources(shapeFeatures, pointFeatures);
         mapView.initCircleSelectionSources();
         mapView.centerMap(listOfCoordinates);
     }

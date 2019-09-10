@@ -47,7 +47,7 @@ public interface CreateGeoShapeView {
 
     void updateMenu();
 
-    void displayNewMapStyle(FeatureCollection fromFeatures, FeatureCollection fromFeatures1,
+    void displayNewMapStyle(FeatureCollection shapeFeatures, FeatureCollection pointFeatures,
             List<LatLng> listOfCoordinates);
 
     void setShapeResult(String toJson);

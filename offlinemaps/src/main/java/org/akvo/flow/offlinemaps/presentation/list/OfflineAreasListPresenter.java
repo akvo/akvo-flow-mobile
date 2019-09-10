@@ -143,10 +143,11 @@ public class OfflineAreasListPresenter {
                 .subscribeWith(new DisposableCompletableObserver() {
                     @Override
                     public void onComplete() {
+                        getSelectedOfflineRegion.dispose();
                         getSelectedOfflineRegion.execute(new DisposableMaybeObserver<Long>() {
                             @Override
-                            public void onSuccess(Long aLong) {
-                                if (areaId == aLong) {
+                            public void onSuccess(Long selectedAreaId) {
+                                if (areaId == selectedAreaId) {
                                     resetSelectedArea();
                                 } else {
                                     loadAreas();

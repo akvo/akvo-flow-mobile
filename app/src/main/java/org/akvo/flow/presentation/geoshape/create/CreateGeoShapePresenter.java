@@ -39,7 +39,6 @@ import java.util.UUID;
 
 import javax.inject.Inject;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 public class CreateGeoShapePresenter implements Presenter {
@@ -58,7 +57,7 @@ public class CreateGeoShapePresenter implements Presenter {
 
     @Override
     public void destroy() {
-        //TODO:
+        //EMPTY
     }
 
     public void setView(CreateGeoShapeView view) {
@@ -76,16 +75,6 @@ public class CreateGeoShapePresenter implements Presenter {
         if (shape != null) {
             view.displaySelectedShapeInfo(shape);
         }
-    }
-
-    @Nullable
-    private Shape getSelectedShape() {
-        for (Shape shape : shapes) {
-            if (shape.isSelected()) {
-                return shape;
-            }
-        }
-        return null;
     }
 
     public void onDeletePointPressed() {
@@ -118,134 +107,44 @@ public class CreateGeoShapePresenter implements Presenter {
     }
 
     public void onAddPointRequested(LatLng latLng, DrawMode drawMode) {
-        switch (drawMode) {
-            case POINT:
-                addPointToMultiPoint(latLng);
-                break;
-            case LINE:
-                addPointToLineString(latLng);
-                break;
-            case AREA:
-                addPointToPolygon(latLng);
-                break;
-            default:
-                break;
+        Shape shape = getSelectedShape();
+        if (shape != null) {
+            shape.addPoint(latLng);
+        } else {
+            unSelectAllFeatures();
+            Shape createdShape = createShape(drawMode);
+            if (createdShape != null) {
+                createdShape.setSelected(true);
+                createdShape.addPoint(latLng);
+                shapes.add(createdShape);
+            }
         }
         view.updateMenu();
         updateSources();
     }
 
-    public void addPointToMultiPoint(LatLng latLng) {
-        Shape shape = getSelectedShape();
-        if (shape instanceof PointShape) {
-            List<ShapePoint> points = shape.getPoints();
-            for (ShapePoint point : points) {
-                point.setSelected(false);
-            }
-            ShapePoint shapePoint = createSelectedShapePoint(latLng, shape);
-            points.add(shapePoint);
-        } else {
-            unSelectAllFeatures();
-            Shape createdShape = new PointShape(UUID.randomUUID().toString(), new ArrayList<>());
-            ShapePoint shapePoint = createSelectedShapePoint(latLng, createdShape);
-            createdShape.getPoints().add(shapePoint);
-            createdShape.setSelected(true);
-            shapes.add(createdShape);
+    @Nullable
+    private Shape createShape(DrawMode drawMode) {
+        String featureId = UUID.randomUUID().toString();
+        ArrayList<ShapePoint> points = new ArrayList<>();
+        Shape createdShape = null;
+        switch (drawMode) {
+            case POINT:
+               createdShape = new PointShape(featureId, points);
+                break;
+            case LINE:
+                createdShape = new LineShape(featureId, points);
+                break;
+            case AREA:
+                createdShape = new AreaShape(featureId, points);
+                break;
+            default:
+                break;
         }
+        return createdShape;
     }
 
-    public void addPointToLineString(LatLng latLng) {
-        Shape shape = getSelectedShape();
-        if (shape instanceof LineShape) {
-            List<ShapePoint> points = shape.getPoints();
-            for (ShapePoint point : points) {
-                point.setSelected(false);
-            }
-            ShapePoint shapePoint = createSelectedShapePoint(latLng, shape);
-            points.add(shapePoint);
-        } else {
-            unSelectAllFeatures();
-            Shape createdShape = new LineShape(UUID.randomUUID().toString(), new ArrayList<>());
-            ShapePoint shapePoint = createSelectedShapePoint(latLng, createdShape);
-            createdShape.getPoints().add(shapePoint);
-            createdShape.setSelected(true);
-            shapes.add(createdShape);
-        }
-    }
-
-    public void addPointToPolygon(LatLng latLng) {
-        Shape shape = getSelectedShape();
-        if (shape instanceof AreaShape) {
-            List<ShapePoint> points = shape.getPoints();
-            for (ShapePoint point : points) {
-                point.setSelected(false);
-            }
-            ShapePoint shapePoint = createSelectedShapePoint(latLng, shape);
-            int size = points.size();
-            if (size < 2) {
-                points.add(shapePoint);
-            } else if (size == 2) {
-                points.add(shapePoint);
-                points.add(points.get(0));
-            } else {
-                points.add(size - 2, shapePoint);
-            }
-        } else {
-            unSelectAllFeatures();
-            Shape createdShape = new AreaShape(UUID.randomUUID().toString(), new ArrayList<>());
-            ShapePoint shapePoint = createSelectedShapePoint(latLng, createdShape);
-            createdShape.getPoints().add(shapePoint);
-            createdShape.setSelected(true);
-            shapes.add(createdShape);
-        }
-    }
-
-    @NonNull
-    private ShapePoint createSelectedShapePoint(LatLng latLng, Shape shape) {
-        ShapePoint shapePoint = new ShapePoint(UUID.randomUUID().toString(),
-                shape.getFeatureId(), latLng.getLatitude(), latLng.getLongitude());
-        shapePoint.setSelected(true);
-        return shapePoint;
-    }
-
-    private Shape selectFeatureFromPoint(Feature feature) {
-        String selectedFeatureId = feature.getStringProperty(GeoShapeConstants.FEATURE_ID);
-        String selectedPointId = feature.getStringProperty(GeoShapeConstants.POINT_ID);
-        Shape selectedShape = null;
-        for (Shape shape : shapes) {
-            if (shape.getFeatureId().equals(selectedFeatureId)) {
-                shape.setSelected(true);
-                selectedShape = shape;
-                List<ShapePoint> points = shape.getPoints();
-                for (ShapePoint point : points) {
-                    if (point.getPointId().equals(selectedPointId)) {
-                        point.setSelected(true);
-                    } else {
-                        point.setSelected(false);
-                    }
-                }
-            } else {
-                shape.setSelected(false);
-                List<ShapePoint> points = shape.getPoints();
-                for (ShapePoint point : points) {
-                    point.setSelected(false);
-                }
-            }
-        }
-        return selectedShape;
-    }
-
-    private void unSelectAllFeatures() {
-        for (Shape shape : shapes) {
-            shape.setSelected(false);
-            List<ShapePoint> points = shape.getPoints();
-            for (ShapePoint point : points) {
-                point.setSelected(false);
-            }
-        }
-    }
-
-    public void onNewDrawModePresssed(DrawMode drawMode) {
+    public void onNewDrawModePressed(DrawMode drawMode) {
         switch (drawMode) {
             case POINT:
                 view.enablePointDrawMode();
@@ -274,24 +173,19 @@ public class CreateGeoShapePresenter implements Presenter {
             //TODO: shall we remove the id property?
             FeatureCollection features = FeatureCollection.fromFeatures(viewFeatures.getFeatures());
             view.setShapeResult(features.toJson());
-
         } else {
             view.setCanceledResult();
         }
     }
 
-    private List<ShapePoint> removeLastPointFromFeature(Shape shape) {
-        List<ShapePoint> points = shape.getPoints();
-        if (shape instanceof AreaShape) {
-            if (points.size() < 3) {
-                points.remove(points.size() - 1);
-            } else {
-                points.remove(points.size() - 2);
+    @Nullable
+    private Shape getSelectedShape() {
+        for (Shape shape : shapes) {
+            if (shape.isSelected()) {
+                return shape;
             }
-        } else if (shape instanceof LineShape || shape instanceof PointShape) {
-            points.remove(points.size() - 1);
         }
-        return points;
+        return null;
     }
 
     //TODO: validate shapes
@@ -303,10 +197,9 @@ public class CreateGeoShapePresenter implements Presenter {
     public void onDeletePointConfirmed() {
         Shape shape = getSelectedShape();
         if (shape != null) {
-            List<ShapePoint> remainingPoints = removeLastPointFromFeature(shape);
-            if (remainingPoints.size() == 0) {
+            shape.removeSelectedPoint();
+            if (shape.getPoints().size() == 0) {
                 shapes.remove(shape);
-                unSelectAllFeatures();
             }
             updateSources();
             view.updateMenu();
@@ -317,7 +210,6 @@ public class CreateGeoShapePresenter implements Presenter {
         Shape shape = getSelectedShape();
         if (shape != null) {
             shapes.remove(shape);
-            unSelectAllFeatures();
             updateSources();
             view.updateMenu();
         }
@@ -327,5 +219,26 @@ public class CreateGeoShapePresenter implements Presenter {
         viewFeatures = featureMapper.toViewFeatures(shapes);
         view.updateSources(FeatureCollection.fromFeatures(viewFeatures.getFeatures()),
                 FeatureCollection.fromFeatures(viewFeatures.getPointFeatures()));
+    }
+
+    private Shape selectFeatureFromPoint(Feature feature) {
+        String selectedFeatureId = feature.getStringProperty(GeoShapeConstants.FEATURE_ID);
+        String selectedPointId = feature.getStringProperty(GeoShapeConstants.POINT_ID);
+        Shape selectedShape = null;
+        for (Shape shape : shapes) {
+            if (shape.getFeatureId().equals(selectedFeatureId)) {
+                shape.select(selectedPointId);
+                selectedShape = shape;
+            } else {
+                shape.unSelect();
+            }
+        }
+        return selectedShape;
+    }
+
+    private void unSelectAllFeatures() {
+        for (Shape shape : shapes) {
+            shape.unSelect();
+        }
     }
 }

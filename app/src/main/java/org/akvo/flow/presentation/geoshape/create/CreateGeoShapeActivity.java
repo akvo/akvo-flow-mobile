@@ -320,7 +320,7 @@ public class CreateGeoShapeActivity extends BackActivity implements
 
     private void enableNewShapeType(DrawMode drawMode) {
         if (this.drawMode != drawMode) {
-            presenter.onNewDrawModePresssed(drawMode);
+            presenter.onNewDrawModePressed(drawMode);
         }
     }
 

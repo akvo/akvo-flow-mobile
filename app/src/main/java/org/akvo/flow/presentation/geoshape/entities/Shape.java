@@ -22,7 +22,12 @@ package org.akvo.flow.presentation.geoshape.entities;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.mapbox.mapboxsdk.geometry.LatLng;
+
 import java.util.List;
+import java.util.UUID;
+
+import androidx.annotation.NonNull;
 
 public abstract class Shape implements Parcelable {
 
@@ -68,5 +73,57 @@ public abstract class Shape implements Parcelable {
 
     public List<ShapePoint> getPoints() {
         return points;
+    }
+
+    public void removeSelectedPoint() {
+        List<ShapePoint> points = getPoints();
+        ShapePoint pointToDelete = null;
+        for (ShapePoint point : points) {
+            if (point.isSelected()) {
+                pointToDelete = point;
+                break;
+            }
+        }
+        if (pointToDelete != null) {
+            points.remove(pointToDelete);
+        }
+    }
+
+    public void unSelect() {
+        setSelected(false);
+        unSelectAllPoints();
+    }
+
+    public void select(String selectedPointId) {
+        setSelected(true);
+        List<ShapePoint> points = getPoints();
+        for (ShapePoint point : points) {
+            if (point.getPointId().equals(selectedPointId)) {
+                point.setSelected(true);
+            } else {
+                point.setSelected(false);
+            }
+        }
+    }
+
+    public void addPoint(LatLng latLng) {
+        unSelectAllPoints();
+        ShapePoint shapePoint = createSelectedShapePoint(latLng, getFeatureId());
+        points.add(shapePoint);
+    }
+
+    @NonNull
+    ShapePoint createSelectedShapePoint(LatLng latLng, String featureId) {
+        ShapePoint shapePoint = new ShapePoint(UUID.randomUUID().toString(),
+                featureId, latLng.getLatitude(), latLng.getLongitude());
+        shapePoint.setSelected(true);
+        return shapePoint;
+    }
+
+    void unSelectAllPoints() {
+        List<ShapePoint> points = getPoints();
+        for (ShapePoint point : points) {
+            point.setSelected(false);
+        }
     }
 }

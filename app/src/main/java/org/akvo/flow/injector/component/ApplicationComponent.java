@@ -39,7 +39,7 @@ import org.akvo.flow.domain.repository.UserRepository;
 import org.akvo.flow.injector.module.ApplicationModule;
 import org.akvo.flow.injector.module.ViewModule;
 import org.akvo.flow.presentation.BaseActivity;
-import org.akvo.flow.service.ApkUpdateService;
+import org.akvo.flow.service.ApkUpdateWorker;
 import org.akvo.flow.service.BootstrapService;
 import org.akvo.flow.service.DataFixService;
 import org.akvo.flow.service.DataPointUploadService;
@@ -98,7 +98,7 @@ public interface ApplicationComponent {
 
     void inject(DataPointUploadService uploadService);
 
-    void inject(ApkUpdateService apkUpdateService);
+    void inject(ApkUpdateWorker apkUpdateWorker);
 
     void inject(FlowApp app);
 

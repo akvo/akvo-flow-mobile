@@ -38,19 +38,24 @@ import org.akvo.flow.domain.interactor.setup.SetUpParams;
 import org.akvo.flow.injector.component.ApplicationComponent;
 import org.akvo.flow.injector.component.DaggerApplicationComponent;
 import org.akvo.flow.injector.module.ApplicationModule;
-import org.akvo.flow.service.ApkUpdateService;
+import org.akvo.flow.service.ApkUpdateWorker;
 import org.akvo.flow.service.FileChangeTrackingService;
 import org.akvo.flow.util.logging.LoggingHelper;
 
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 
 import androidx.annotation.Nullable;
 import androidx.multidex.MultiDexApplication;
+import androidx.work.Constraints;
+import androidx.work.NetworkType;
+import androidx.work.PeriodicWorkRequest;
+import androidx.work.WorkManager;
 import io.fabric.sdk.android.Fabric;
 import timber.log.Timber;
 
@@ -66,11 +71,12 @@ public class FlowApp extends MultiDexApplication {
     @Named("getSelectedUser")
     UseCase getSelectedUser;
 
-    private ApplicationComponent applicationComponent;
-
     @Inject
     @Named("saveSetup")
     UseCase saveSetup;
+
+    private ApplicationComponent applicationComponent;
+    private WorkManager workManager;
 
     @Override
     public void onCreate() {
@@ -88,6 +94,7 @@ public class FlowApp extends MultiDexApplication {
         initFabric();
         initLogging();
         updateLocale();
+        workManager = WorkManager.getInstance(this);
         startUpdateService();
         startBootstrapFolderTracker();
         updateLoggingInfo();
@@ -126,7 +133,17 @@ public class FlowApp extends MultiDexApplication {
     }
 
     private void startUpdateService() {
-        ApkUpdateService.scheduleFirstTask(this);
+        Constraints constraints = new Constraints.Builder()
+                .setRequiredNetworkType(NetworkType.CONNECTED)
+                .setRequiresBatteryNotLow(true)
+                .build();
+        PeriodicWorkRequest workRequest = new PeriodicWorkRequest
+                .Builder(ApkUpdateWorker.class, 1, TimeUnit.DAYS)
+                .setInitialDelay(0, TimeUnit.SECONDS)
+                .setConstraints(constraints)
+                .addTag(ApkUpdateWorker.TAG)
+                .build();
+        workManager.enqueue(workRequest);
     }
 
     private void initializeInjector() {

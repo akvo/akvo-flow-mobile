@@ -22,13 +22,6 @@ package org.akvo.flow.service;
 
 import android.content.Context;
 import android.content.Intent;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
-
-import com.google.android.gms.gcm.GcmNetworkManager;
-import com.google.android.gms.gcm.GcmTaskService;
-import com.google.android.gms.gcm.OneoffTask;
-import com.google.android.gms.gcm.Task;
-import com.google.android.gms.gcm.TaskParams;
 
 import org.akvo.flow.R;
 import org.akvo.flow.app.FlowApp;
@@ -39,17 +32,27 @@ import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.NotificationHelper;
 
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.StringRes;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.work.Constraints;
+import androidx.work.NetworkType;
+import androidx.work.OneTimeWorkRequest;
+import androidx.work.WorkManager;
+import androidx.work.Worker;
+import androidx.work.WorkerParameters;
 import timber.log.Timber;
 
 /**
  * Task service which will only run if there is a connection
  */
-public class DataPointUploadService extends GcmTaskService {
+public class DataPointUploadWorker extends Worker {
 
-    private static final String TAG = "DataPointUploadService";
+    private static final String TAG = "DataPointUploadWorker";
 
     @Inject
     AllDeviceNotifications checkDeviceNotification;
@@ -57,60 +60,44 @@ public class DataPointUploadService extends GcmTaskService {
     @Inject
     UploadAllDataPoints upload;
 
-    public static void scheduleUpload(Context context, boolean isMobileSyncAllowed) {
-        final int requiredNetwork = isMobileSyncAllowed ?
-                Task.NETWORK_STATE_CONNECTED : //require a connection to a network
-                Task.NETWORK_STATE_UNMETERED; //require a connection to a wifi network
-        GcmNetworkManager gcmNetworkManager = GcmNetworkManager.getInstance(context);
-        Task periodicTask = new OneoffTask.Builder()
-                .setRequiredNetwork(requiredNetwork)
-                .setTag(TAG)
-                .setExecutionWindow(0, 30)
-                .setService(DataPointUploadService.class)
-                .setPersisted(true)
-                .setUpdateCurrent(true)
-                .setRequiresCharging(false)
-                .build();
-        gcmNetworkManager.schedule(periodicTask);
-    }
-
-    @Override
-    public void onCreate() {
-        super.onCreate();
+    public DataPointUploadWorker(@NonNull Context context,
+            @NonNull WorkerParameters workerParams) {
+        super(context, workerParams);
         FlowApp application = (FlowApp) getApplicationContext();
         application.getApplicationComponent().inject(this);
     }
 
+    public static void scheduleUpload(Context context, boolean isMobileSyncAllowed) {
+        final NetworkType requiredNetwork = isMobileSyncAllowed ?
+                NetworkType.CONNECTED : //require a connection to a network
+                NetworkType.UNMETERED; //require a connection to a wifi network
+        Constraints constraints = new Constraints.Builder()
+                .setRequiredNetworkType(requiredNetwork)
+                .setRequiresBatteryNotLow(true)
+                .build();
+        OneTimeWorkRequest uploadWorkRequest = new OneTimeWorkRequest.Builder(
+                DataPointUploadWorker.class)
+                .setInitialDelay(0, TimeUnit.SECONDS)
+                .setConstraints(constraints)
+                .addTag(TAG)
+                .build();
+        WorkManager.getInstance(context.getApplicationContext()).enqueue(uploadWorkRequest);
+    }
+
     @Override
-    public void onDestroy() {
-        super.onDestroy();
+    public void onStopped() {
+        super.onStopped();
         checkDeviceNotification.dispose();
         upload.dispose();
     }
 
+    @NonNull
     @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        if (intent == null) {
-            // GcmTaskService doesn't check for null intent
-            Timber.w("Invalid GcmTask null intent.");
-            stopSelf();
-            return START_NOT_STICKY;
-        }
-        return super.onStartCommand(intent, flags, startId);
-    }
-
-    @Override
-    public void onInitializeTasks() {
-        super.onInitializeTasks();
-        scheduleUpload(getApplicationContext(), false);
-    }
-
-    @Override
-    public int onRunTask(TaskParams taskParams) {
+    public Result doWork() {
         NotificationHelper.showSyncingNotification(getApplicationContext());
         checkDeviceNotification();
         NotificationHelper.hideSyncingNotification(getApplicationContext());
-        return GcmNetworkManager.RESULT_SUCCESS;
+        return Result.success();
     }
 
     private void checkDeviceNotification() {
@@ -156,13 +143,20 @@ public class DataPointUploadService extends GcmTaskService {
                     .format(getString(R.string.data_sync_error_form_deleted_text), formId);
             String title = getString(R.string.data_sync_error_form_deleted_title);
             NotificationHelper
-                    .displayNonOnGoingErrorNotification(this, notificationId, text, title);
+                    .displayNonOnGoingErrorNotification(getApplicationContext(), notificationId,
+                            text, title);
         }
     }
 
+    private String getString(@StringRes int resId) {
+        return getApplicationContext().getString(resId);
+    }
+
     private void displayErrorNotification(String formId) {
-        NotificationHelper.displayErrorNotification(getString(R.string.sync_error_title, formId),
-                getString(R.string.sync_error_message), this, formId(formId));
+        Context applicationContext = getApplicationContext();
+        NotificationHelper.displayErrorNotification(
+                applicationContext.getString(R.string.sync_error_title, formId),
+                getString(R.string.sync_error_message), applicationContext, formId(formId));
     }
 
     /**
@@ -172,13 +166,13 @@ public class DataPointUploadService extends GcmTaskService {
         try {
             return Integer.valueOf(id);
         } catch (NumberFormatException e) {
-            Timber.e(id + " is not a valid form id");
+            Timber.e("%s is not a valid form id", id);
             return 0;
         }
     }
 
     private void broadcastDataPointStatusChange() {
         Intent intentBroadcast = new Intent(ConstantUtil.ACTION_DATA_SYNC);
-        LocalBroadcastManager.getInstance(this).sendBroadcast(intentBroadcast);
+        LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intentBroadcast);
     }
 }

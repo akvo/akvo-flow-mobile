@@ -61,6 +61,7 @@ import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
 import org.akvo.flow.presentation.datapoints.DataPointSyncSnackBarManager;
 import org.akvo.flow.presentation.datapoints.list.entity.ListDataPoint;
+import org.akvo.flow.service.DataPointUploadWorker;
 import org.akvo.flow.tracking.TrackingListener;
 import org.akvo.flow.ui.Navigator;
 import org.akvo.flow.ui.fragment.OrderByDialogFragment;
@@ -108,7 +109,7 @@ public class DataPointsListFragment extends Fragment implements LocationListener
 
     /**
      * BroadcastReceiver to notify of data synchronisation. This should be
-     * fired from {@link org.akvo.flow.service.DataPointUploadService}
+     * fired from {@link DataPointUploadWorker}
      */
     private final BroadcastReceiver dataSyncReceiver = new DataSyncBroadcastReceiver(this);
 

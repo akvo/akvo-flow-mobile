@@ -42,7 +42,7 @@ import org.akvo.flow.presentation.BaseActivity;
 import org.akvo.flow.service.ApkUpdateWorker;
 import org.akvo.flow.service.BootstrapService;
 import org.akvo.flow.service.DataFixService;
-import org.akvo.flow.service.DataPointUploadService;
+import org.akvo.flow.service.DataPointUploadWorker;
 import org.akvo.flow.service.FileChangeTrackingService;
 import org.akvo.flow.service.SurveyDownloadService;
 import org.akvo.flow.service.UnPublishDataService;
@@ -96,7 +96,7 @@ public interface ApplicationComponent {
 
     void inject(UnPublishDataService unPublishDataService);
 
-    void inject(DataPointUploadService uploadService);
+    void inject(DataPointUploadWorker uploadService);
 
     void inject(ApkUpdateWorker apkUpdateWorker);
 

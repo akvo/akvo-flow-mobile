@@ -73,4 +73,10 @@ public class ApkUpdateWorker extends Worker {
         }, params);
         return Result.success();
     }
+
+    @Override
+    public void onStopped() {
+        super.onStopped();
+        refreshApkData.dispose();
+    }
 }

@@ -76,7 +76,6 @@ public class FlowApp extends MultiDexApplication {
     UseCase saveSetup;
 
     private ApplicationComponent applicationComponent;
-    private WorkManager workManager;
 
     @Override
     public void onCreate() {
@@ -94,7 +93,6 @@ public class FlowApp extends MultiDexApplication {
         initFabric();
         initLogging();
         updateLocale();
-        workManager = WorkManager.getInstance(this);
         startUpdateService();
         startBootstrapFolderTracker();
         updateLoggingInfo();
@@ -143,7 +141,7 @@ public class FlowApp extends MultiDexApplication {
                 .setConstraints(constraints)
                 .addTag(ApkUpdateWorker.TAG)
                 .build();
-        workManager.enqueue(workRequest);
+        WorkManager.getInstance(this).enqueue(workRequest);
     }
 
     private void initializeInjector() {

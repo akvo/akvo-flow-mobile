@@ -45,17 +45,12 @@ import org.akvo.flow.util.logging.LoggingHelper;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 
 import androidx.annotation.Nullable;
 import androidx.multidex.MultiDexApplication;
-import androidx.work.Constraints;
-import androidx.work.NetworkType;
-import androidx.work.PeriodicWorkRequest;
-import androidx.work.WorkManager;
 import io.fabric.sdk.android.Fabric;
 import timber.log.Timber;
 
@@ -131,17 +126,7 @@ public class FlowApp extends MultiDexApplication {
     }
 
     private void startUpdateService() {
-        Constraints constraints = new Constraints.Builder()
-                .setRequiredNetworkType(NetworkType.CONNECTED)
-                .setRequiresBatteryNotLow(true)
-                .build();
-        PeriodicWorkRequest workRequest = new PeriodicWorkRequest
-                .Builder(ApkUpdateWorker.class, 1, TimeUnit.DAYS)
-                .setInitialDelay(0, TimeUnit.SECONDS)
-                .setConstraints(constraints)
-                .addTag(ApkUpdateWorker.TAG)
-                .build();
-        WorkManager.getInstance(this).enqueue(workRequest);
+        ApkUpdateWorker.enqueueWork(getApplicationContext());
     }
 
     private void initializeInjector() {

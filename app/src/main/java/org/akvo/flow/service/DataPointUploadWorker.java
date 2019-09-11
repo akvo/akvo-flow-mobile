@@ -40,6 +40,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.StringRes;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.work.Constraints;
+import androidx.work.ExistingWorkPolicy;
 import androidx.work.NetworkType;
 import androidx.work.OneTimeWorkRequest;
 import androidx.work.WorkManager;
@@ -81,7 +82,8 @@ public class DataPointUploadWorker extends Worker {
                 .setConstraints(constraints)
                 .addTag(TAG)
                 .build();
-        WorkManager.getInstance(context.getApplicationContext()).enqueue(uploadWorkRequest);
+        WorkManager.getInstance(context.getApplicationContext())
+                .enqueueUniqueWork(TAG, ExistingWorkPolicy.REPLACE, uploadWorkRequest);
     }
 
     @Override

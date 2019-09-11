@@ -29,10 +29,16 @@ import org.akvo.flow.domain.interactor.apk.RefreshApkData;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 
 import androidx.annotation.NonNull;
+import androidx.work.Constraints;
+import androidx.work.ExistingPeriodicWorkPolicy;
+import androidx.work.NetworkType;
+import androidx.work.PeriodicWorkRequest;
+import androidx.work.WorkManager;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 import timber.log.Timber;
@@ -58,6 +64,20 @@ public class ApkUpdateWorker extends Worker {
         super(context, workerParams);
         FlowApp application = (FlowApp) getApplicationContext();
         application.getApplicationComponent().inject(this);
+    }
+
+    public static void enqueueWork(Context applicationContext) {
+        Constraints constraints = new Constraints.Builder()
+                .setRequiredNetworkType(NetworkType.CONNECTED)
+                .build();
+        PeriodicWorkRequest workRequest = new PeriodicWorkRequest
+                .Builder(ApkUpdateWorker.class, 1, TimeUnit.DAYS)
+                .setInitialDelay(0, TimeUnit.SECONDS)
+                .setConstraints(constraints)
+                .addTag(ApkUpdateWorker.TAG)
+                .build();
+        WorkManager.getInstance(applicationContext)
+                .enqueueUniquePeriodicWork(TAG, ExistingPeriodicWorkPolicy.REPLACE, workRequest);
     }
 
     @NonNull

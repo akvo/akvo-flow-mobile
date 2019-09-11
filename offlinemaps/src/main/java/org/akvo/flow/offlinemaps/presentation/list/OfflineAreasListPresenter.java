@@ -143,7 +143,6 @@ public class OfflineAreasListPresenter {
                 .subscribeWith(new DisposableCompletableObserver() {
                     @Override
                     public void onComplete() {
-                        getSelectedOfflineRegion.dispose();
                         getSelectedOfflineRegion.execute(new DisposableMaybeObserver<Long>() {
                             @Override
                             public void onSuccess(Long selectedAreaId) {
@@ -177,7 +176,7 @@ public class OfflineAreasListPresenter {
 
     private void resetSelectedArea() {
         Map<String, Object> params = new HashMap<>(2);
-        params.put(SaveSelectedOfflineArea.AREA_ID_PARAM, OfflineAreasListAdapter.NONE_SELECTED);
+        params.put(SaveSelectedOfflineArea.AREA_ID_PARAM, -1L);
         saveSelectedOfflineArea.execute(new DisposableCompletableObserver() {
             @Override
             public void onComplete() {

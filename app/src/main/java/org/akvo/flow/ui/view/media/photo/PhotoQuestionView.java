@@ -24,8 +24,6 @@ import android.Manifest;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.ImageView;
@@ -56,6 +54,8 @@ import java.io.File;
 
 import javax.inject.Inject;
 
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -338,7 +338,7 @@ public class PhotoQuestionView extends QuestionView
             mLocationInfo.setVisibility(VISIBLE);
             double[] location = ImageUtil.getLocation(file.getAbsolutePath());
             if (location != null) {
-                mLocationInfo.setText(R.string.image_location_saved);
+                mLocationInfo.setText("lat: " + location[0] + ", \nlon:" + location[1]);
             } else {
                 mLocationInfo.setText(R.string.image_location_unknown);
             }

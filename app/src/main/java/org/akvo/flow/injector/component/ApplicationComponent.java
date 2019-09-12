@@ -82,7 +82,7 @@ public interface ApplicationComponent {
 
     Gson gson();
 
-    void inject(FileChangeTrackingWorker fileChangeTrackingService);
+    void inject(FileChangeTrackingWorker fileChangeTrackingWorker);
 
     void inject(SurveyDownloadService surveyDownloadService);
 
@@ -96,7 +96,7 @@ public interface ApplicationComponent {
 
     void inject(UnPublishDataService unPublishDataService);
 
-    void inject(DataPointUploadWorker uploadService);
+    void inject(DataPointUploadWorker dataPointUploadWorker);
 
     void inject(ApkUpdateWorker apkUpdateWorker);
 

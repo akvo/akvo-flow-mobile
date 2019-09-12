@@ -21,9 +21,6 @@ package org.akvo.flow.service;
 
 import android.content.Context;
 import android.content.Intent;
-import androidx.annotation.NonNull;
-import androidx.core.app.JobIntentService;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.domain.interactor.CheckSubmittedFiles;
@@ -33,15 +30,16 @@ import org.akvo.flow.util.ConstantUtil;
 
 import javax.inject.Inject;
 
+import androidx.annotation.NonNull;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.work.Worker;
+import androidx.work.WorkerParameters;
 import io.reactivex.observers.DisposableCompletableObserver;
 import timber.log.Timber;
 
-public class DataFixService extends JobIntentService {
+public class DataFixWorker extends Worker {
 
-    /**
-     * Unique job ID for this service.
-     */
-    private static final int JOB_ID = 1000;
+    public static final String TAG = "DataFixWorker";
 
     @Inject
     MakeDataPrivate makeDataPrivate;
@@ -52,31 +50,17 @@ public class DataFixService extends JobIntentService {
     @Inject
     ExportSurveyInstances exportSurveyInstances;
 
-    /**
-     * Convenience method for enqueuing work in to this service.
-     */
-    public static void enqueueWork(Context context, Intent work) {
-        enqueueWork(context, DataFixService.class, JOB_ID, work);
-    }
-
-    @Override
-    public void onCreate() {
-        super.onCreate();
+    public DataFixWorker(@NonNull Context context,
+            @NonNull WorkerParameters workerParams) {
+        super(context, workerParams);
         FlowApp application = (FlowApp) getApplicationContext();
         application.getApplicationComponent().inject(this);
     }
 
+    @NonNull
     @Override
-    public void onDestroy() {
-        super.onDestroy();
-        makeDataPrivate.dispose();
-        checkSubmittedFiles.dispose();
-        exportSurveyInstances.dispose();
-    }
-
-    @Override
-    protected void onHandleWork(@NonNull Intent intent) {
-        makeDataPrivate.execute(new DisposableCompletableObserver()  {
+    public Result doWork() {
+        makeDataPrivate.execute(new DisposableCompletableObserver() {
             @Override
             public void onComplete() {
                 verify();
@@ -88,6 +72,15 @@ public class DataFixService extends JobIntentService {
                 verify();
             }
         });
+        return Result.success();
+    }
+
+    @Override
+    public void onStopped() {
+        super.onStopped();
+        makeDataPrivate.dispose();
+        checkSubmittedFiles.dispose();
+        exportSurveyInstances.dispose();
     }
 
     private void verify() {
@@ -121,6 +114,6 @@ public class DataFixService extends JobIntentService {
 
     private void broadcastDataPointStatusChange() {
         Intent intentBroadcast = new Intent(ConstantUtil.ACTION_DATA_SYNC);
-        LocalBroadcastManager.getInstance(this).sendBroadcast(intentBroadcast);
+        LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intentBroadcast);
     }
 }

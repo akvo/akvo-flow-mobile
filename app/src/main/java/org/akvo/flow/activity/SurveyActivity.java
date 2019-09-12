@@ -63,7 +63,7 @@ import org.akvo.flow.presentation.survey.FABListener;
 import org.akvo.flow.presentation.survey.SurveyPresenter;
 import org.akvo.flow.presentation.survey.SurveyView;
 import org.akvo.flow.service.BootstrapService;
-import org.akvo.flow.service.DataFixService;
+import org.akvo.flow.service.DataFixWorker;
 import org.akvo.flow.service.SurveyDownloadService;
 import org.akvo.flow.service.TimeCheckService;
 import org.akvo.flow.tracking.TrackingHelper;
@@ -154,7 +154,6 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     private boolean activityJustCreated;
     private boolean permissionsResults;
     private TrackingHelper trackingHelper;
-    private boolean dataFixServiceStarted = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -385,10 +384,6 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     private void startServices() {
         startService(new Intent(this, BootstrapService.class));
         startService(new Intent(this, TimeCheckService.class));
-        if (!dataFixServiceStarted) {
-            DataFixService.enqueueWork(getApplicationContext(), new Intent());
-            dataFixServiceStarted = true;
-        }
     }
 
     private void displayExternalStorageMissing() {
@@ -400,6 +395,7 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
 
     @Override
     protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
         setIntent(intent);
         if (Intent.ACTION_VIEW.equals(intent.getAction())) {
             String surveyedLocaleId = intent.getDataString();

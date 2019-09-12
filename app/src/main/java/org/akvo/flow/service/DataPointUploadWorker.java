@@ -53,7 +53,7 @@ import timber.log.Timber;
  */
 public class DataPointUploadWorker extends Worker {
 
-    private static final String TAG = "DataPointUploadWorker";
+    public static final String TAG = "DataPointUploadWorker";
 
     @Inject
     AllDeviceNotifications checkDeviceNotification;
@@ -61,8 +61,7 @@ public class DataPointUploadWorker extends Worker {
     @Inject
     UploadAllDataPoints upload;
 
-    public DataPointUploadWorker(@NonNull Context context,
-            @NonNull WorkerParameters workerParams) {
+    public DataPointUploadWorker(@NonNull Context context, @NonNull WorkerParameters workerParams) {
         super(context, workerParams);
         FlowApp application = (FlowApp) getApplicationContext();
         application.getApplicationComponent().inject(this);
@@ -74,7 +73,6 @@ public class DataPointUploadWorker extends Worker {
                 NetworkType.UNMETERED; //require a connection to a wifi network
         Constraints constraints = new Constraints.Builder()
                 .setRequiredNetworkType(requiredNetwork)
-                .setRequiresBatteryNotLow(true)
                 .build();
         OneTimeWorkRequest uploadWorkRequest = new OneTimeWorkRequest.Builder(
                 DataPointUploadWorker.class)
@@ -86,13 +84,6 @@ public class DataPointUploadWorker extends Worker {
                 .enqueueUniqueWork(TAG, ExistingWorkPolicy.REPLACE, uploadWorkRequest);
     }
 
-    @Override
-    public void onStopped() {
-        super.onStopped();
-        checkDeviceNotification.dispose();
-        upload.dispose();
-    }
-
     @NonNull
     @Override
     public Result doWork() {
@@ -100,6 +91,13 @@ public class DataPointUploadWorker extends Worker {
         checkDeviceNotification();
         NotificationHelper.hideSyncingNotification(getApplicationContext());
         return Result.success();
+    }
+
+    @Override
+    public void onStopped() {
+        super.onStopped();
+        checkDeviceNotification.dispose();
+        upload.dispose();
     }
 
     private void checkDeviceNotification() {

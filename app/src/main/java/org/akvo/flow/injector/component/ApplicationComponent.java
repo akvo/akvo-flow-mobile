@@ -41,7 +41,7 @@ import org.akvo.flow.injector.module.ViewModule;
 import org.akvo.flow.presentation.BaseActivity;
 import org.akvo.flow.service.ApkUpdateWorker;
 import org.akvo.flow.service.BootstrapService;
-import org.akvo.flow.service.DataFixService;
+import org.akvo.flow.service.DataFixWorker;
 import org.akvo.flow.service.DataPointUploadWorker;
 import org.akvo.flow.service.FileChangeTrackingService;
 import org.akvo.flow.service.SurveyDownloadService;
@@ -88,7 +88,7 @@ public interface ApplicationComponent {
 
     void inject(BootstrapService bootstrapService);
 
-    void inject(DataFixService dataFixService);
+    void inject(DataFixWorker dataFixWorker);
 
     void inject(DataTimeoutReceiver dataTimeoutReceiver);
 

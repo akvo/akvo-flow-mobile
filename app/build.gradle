@@ -214,7 +214,6 @@ dependencies {
     implementation "androidx.constraintlayout:constraintlayout:${rootProject.ext.constraintLayoutVersion}"
     implementation "androidx.multidex:multidex:${rootProject.ext.multidexVersion}"
     implementation "com.google.android.gms:play-services-maps:${rootProject.ext.gmsVersion}"
-    implementation "com.google.android.gms:play-services-gcm:${rootProject.ext.gmsVersion}"
     implementation "com.google.maps.android:android-maps-utils:${rootProject.ext.mapUtilsVersion}"
     implementation "org.ocpsoft.prettytime:prettytime:${rootProject.ext.prettyTimeVersion}"
     implementation "com.jakewharton.timber:timber:${rootProject.ext.timberVersion}"

@@ -36,8 +36,8 @@ import org.akvo.flow.domain.interactor.setup.SetUpParams;
 import org.akvo.flow.injector.component.ApplicationComponent;
 import org.akvo.flow.injector.component.DaggerApplicationComponent;
 import org.akvo.flow.injector.module.ApplicationModule;
-import org.akvo.flow.service.ApkUpdateService;
-import org.akvo.flow.service.FileChangeTrackingService;
+import org.akvo.flow.service.ApkUpdateWorker;
+import org.akvo.flow.service.FileChangeTrackingWorker;
 import org.akvo.flow.util.logging.LoggingHelper;
 
 import java.util.HashMap;
@@ -63,11 +63,11 @@ public class FlowApp extends MultiDexApplication {
     @Named("getSelectedUser")
     UseCase getSelectedUser;
 
-    private ApplicationComponent applicationComponent;
-
     @Inject
     @Named("saveSetup")
     UseCase saveSetup;
+
+    private ApplicationComponent applicationComponent;
 
     @Override
     public void onCreate() {
@@ -111,11 +111,11 @@ public class FlowApp extends MultiDexApplication {
     }
 
     private void startBootstrapFolderTracker() {
-        FileChangeTrackingService.scheduleVerifier(this);
+        FileChangeTrackingWorker.scheduleVerifier(this);
     }
 
     private void startUpdateService() {
-        ApkUpdateService.scheduleFirstTask(this);
+        ApkUpdateWorker.enqueueWork(getApplicationContext());
     }
 
     private void initializeInjector() {

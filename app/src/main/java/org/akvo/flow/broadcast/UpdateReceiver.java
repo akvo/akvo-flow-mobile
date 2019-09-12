@@ -33,13 +33,11 @@ import androidx.work.ExistingWorkPolicy;
 import androidx.work.NetworkType;
 import androidx.work.OneTimeWorkRequest;
 import androidx.work.WorkManager;
-import timber.log.Timber;
 
 public class UpdateReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        Timber.d("App got updated");
         if (Intent.ACTION_MY_PACKAGE_REPLACED.equals(intent.getAction())) {
             Constraints constraints = new Constraints.Builder()
                     .setRequiresStorageNotLow(true)

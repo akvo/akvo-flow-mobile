@@ -50,8 +50,7 @@ public class DataFixWorker extends Worker {
     @Inject
     ExportSurveyInstances exportSurveyInstances;
 
-    public DataFixWorker(@NonNull Context context,
-            @NonNull WorkerParameters workerParams) {
+    public DataFixWorker(@NonNull Context context, @NonNull WorkerParameters workerParams) {
         super(context, workerParams);
         FlowApp application = (FlowApp) getApplicationContext();
         application.getApplicationComponent().inject(this);

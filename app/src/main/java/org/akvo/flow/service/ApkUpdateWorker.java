@@ -48,7 +48,6 @@ import timber.log.Timber;
  * If found, it will display a {@link org.akvo.flow.activity.AppUpdateActivity}, requesting
  * permission to download and installAppUpdate it.
  *
- * @author Christopher Fagiani
  */
 public class ApkUpdateWorker extends Worker {
 

@@ -48,9 +48,6 @@ import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 import timber.log.Timber;
 
-/**
- * Task service which will only run if there is a connection
- */
 public class DataPointUploadWorker extends Worker {
 
     public static final String TAG = "DataPointUploadWorker";

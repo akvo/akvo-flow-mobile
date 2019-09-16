@@ -212,7 +212,6 @@ dependencies {
     implementation "com.google.android.material:material:${rootProject.ext.materialVersion}"
     implementation "androidx.constraintlayout:constraintlayout:${rootProject.ext.constraintLayoutVersion}"
     implementation "androidx.multidex:multidex:${rootProject.ext.multidexVersion}"
-    implementation "com.google.android.gms:play-services-gcm:${rootProject.ext.gmsVersion}"
     implementation "org.ocpsoft.prettytime:prettytime:${rootProject.ext.prettyTimeVersion}"
     implementation "com.jakewharton.timber:timber:${rootProject.ext.timberVersion}"
     implementation "com.google.dagger:dagger:${rootProject.ext.daggerVersion}"
@@ -242,6 +241,7 @@ dependencies {
     implementation "androidx.core:core-ktx:${rootProject.ext.coreKtxVersion}"
     implementation "com.mapbox.mapboxsdk:mapbox-android-sdk:${rootProject.ext.mapboxVersion}"
     implementation "com.mapbox.mapboxsdk:mapbox-android-plugin-markerview-v7:${rootProject.ext.mapboxMarkerVersion}"
+    implementation "androidx.work:work-runtime:${rootProject.ext.workVersion}"
 
     testImplementation "junit:junit:${rootProject.ext.jUnitVersion}"
     testImplementation "org.mockito:mockito-core:${rootProject.ext.mockitoCoreVersion}"

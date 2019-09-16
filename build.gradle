@@ -30,6 +30,7 @@ ext {
     materialVersion = "1.0.0"
     multidexVersion = '2.0.1'
     recyclerVersion = "1.0.0"
+    workVersion = "2.2.0"
 
     adapterRxJava2Version = "2.3.0"
     butterKnifeVersion = "10.1.0"

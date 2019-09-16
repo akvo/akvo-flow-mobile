@@ -12,8 +12,6 @@
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
-    <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
-    <!-- For GcmTaskService -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <uses-feature
@@ -90,39 +88,18 @@
             android:screenOrientation="landscape" />
         <activity android:name=".presentation.datapoints.map.one.DataPointMapActivity" />
 
-        <service
-            android:name=".service.DataFixService"
-            android:exported="false"
-            android:permission="android.permission.BIND_JOB_SERVICE" />
         <service android:name=".service.SurveyDownloadService" />
         <service android:name=".service.BootstrapService" />
         <service android:name=".service.TimeCheckService" />
-        <service
-            android:name=".service.ApkUpdateService"
-            android:exported="true"
-            android:permission="com.google.android.gms.permission.BIND_NETWORK_TASK_SERVICE">
-            <intent-filter>
-                <action android:name="com.google.android.gms.gcm.ACTION_TASK_READY" />
-            </intent-filter>
-        </service>
-        <service
-            android:name=".service.FileChangeTrackingService"
-            android:exported="true"
-            android:permission="com.google.android.gms.permission.BIND_NETWORK_TASK_SERVICE">
-            <intent-filter>
-                <action android:name="com.google.android.gms.gcm.ACTION_TASK_READY" />
-            </intent-filter>
-        </service>
-        <service
-            android:name=".service.DataPointUploadService"
-            android:exported="true"
-            android:permission="com.google.android.gms.permission.BIND_NETWORK_TASK_SERVICE">
-            <intent-filter>
-                <action android:name="com.google.android.gms.gcm.ACTION_TASK_READY" />
-            </intent-filter>
-        </service>
         <service android:name=".service.UnPublishDataService" />
 
+        <receiver android:name=".broadcast.UpdateReceiver">
+            <intent-filter
+                android:enabled="true"
+                android:exported="true">
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+            </intent-filter>
+        </receiver>
         <receiver
             android:name=".broadcast.BootStrapReceiver"
             android:exported="false">
@@ -144,9 +121,6 @@
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
-        <meta-data
-            android:name="com.google.android.gms.version"
-            android:value="@integer/google_play_services_version" />
 
         <activity
             android:name=".presentation.about.AboutActivity"

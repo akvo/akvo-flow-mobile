@@ -51,7 +51,7 @@ public class AreaShape extends Shape {
     public void removeSelectedPoint() {
         super.removeSelectedPoint();
         List<ShapePoint> points = getPoints();
-        //There can never be 3, as soon as there are 3 we add the first item to close the area
+        //Remove the extra point we added to create a valid shape since at this point the shape ceases to be valid
         if (points.size() == 3) {
             points.remove(points.size() - 1);
         }

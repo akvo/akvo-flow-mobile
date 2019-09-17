@@ -29,7 +29,8 @@ import java.util.UUID;
 
 import androidx.annotation.NonNull;
 
-public abstract class Shape implements Parcelable {
+public abstract class
+Shape implements Parcelable {
 
     private final String featureId;
     private boolean isSelected;

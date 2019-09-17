@@ -43,12 +43,16 @@ public class FeatureMapper {
 
     private final CoordinatesMapper coordinatesMapper;
     private final PointsLatLngMapper pointsLatLngMapper;
+    private final LengthCounter lengthCounter;
+    private final AreaCounter areaCounter;
 
     @Inject
-    public FeatureMapper(CoordinatesMapper coordinatesMapper,
-            PointsLatLngMapper pointsLatLngMapper) {
+    public FeatureMapper(CoordinatesMapper coordinatesMapper, PointsLatLngMapper pointsLatLngMapper,
+            LengthCounter lengthCounter, AreaCounter areaCounter) {
         this.coordinatesMapper = coordinatesMapper;
         this.pointsLatLngMapper = pointsLatLngMapper;
+        this.lengthCounter = lengthCounter;
+        this.areaCounter = areaCounter;
     }
 
     public List<Shape> toShapes(@Nullable String gson) {
@@ -176,5 +180,44 @@ public class FeatureMapper {
             features = new ArrayList<>();
         }
         return features;
+    }
+
+    public String createFeaturesToSave(List<Shape> shapes) {
+        final List<Feature> features = new ArrayList<>(shapes.size());
+        for (Shape shape : shapes) {
+            List<LatLng> shapeCoordinates = pointsLatLngMapper.transform(shape.getPoints());
+            List<Point> points = coordinatesMapper.toPointList(shapeCoordinates);
+            if (shape instanceof AreaShape) {
+                List<List<Point>> es = new ArrayList<>();
+                es.add(points);
+                Feature feature = Feature.fromGeometry(Polygon.fromLngLats(es));
+                int count = points.size();
+                if (count > 3) {
+                    //remove last point which does not count as point, is just there to
+                    //close the shape
+                    count = count - 1;
+                }
+                feature.addStringProperty(GeoShapeConstants.PROPERTY_POINT_COUNT,
+                        count + "");
+                feature.addStringProperty(GeoShapeConstants.PROPERTY_LENGTH,
+                        lengthCounter.computeLength(shape.getPoints()) + "");
+                feature.addStringProperty(GeoShapeConstants.PROPERTY_AREA,
+                        areaCounter.computeArea(shape.getPoints()) + "");
+                features.add(feature);
+            } else if (shape instanceof LineShape) {
+                Feature feature = Feature.fromGeometry(LineString.fromLngLats(points));
+                feature.addStringProperty(GeoShapeConstants.PROPERTY_POINT_COUNT,
+                        points.size() + "");
+                feature.addStringProperty(GeoShapeConstants.PROPERTY_LENGTH,
+                        lengthCounter.computeLength(shape.getPoints()) + "");
+                features.add(feature);
+            } else if (shape instanceof PointShape) {
+                Feature feature = Feature.fromGeometry(MultiPoint.fromLngLats(points));
+                feature.addStringProperty(GeoShapeConstants.PROPERTY_POINT_COUNT,
+                        points.size() + "");
+                features.add(feature);
+            }
+        }
+        return FeatureCollection.fromFeatures(features).toJson();
     }
 }

@@ -170,9 +170,8 @@ public class CreateGeoShapePresenter implements Presenter {
 
     public void onSavePressed(boolean changed) {
         if (isValidShape() && changed) {
-            //TODO: shall we remove the id property?
-            FeatureCollection features = FeatureCollection.fromFeatures(viewFeatures.getFeatures());
-            view.setShapeResult(features.toJson());
+            String featureString = featureMapper.createFeaturesToSave(shapes);
+            view.setShapeResult(featureString);
         } else {
             view.setCanceledResult();
         }

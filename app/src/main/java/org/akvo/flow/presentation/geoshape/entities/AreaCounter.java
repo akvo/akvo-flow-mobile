@@ -17,9 +17,7 @@
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.akvo.flow.presentation.geoshape.properties;
-
-import org.akvo.flow.presentation.geoshape.entities.ShapePoint;
+package org.akvo.flow.presentation.geoshape.entities;
 
 import java.util.ArrayList;
 import java.util.List;

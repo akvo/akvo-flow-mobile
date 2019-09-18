@@ -13,6 +13,7 @@
 # Testing
 .calabash_settings
 .kotlintest
+data/abc
 
 app/bin
 app/gen
@@ -56,6 +57,7 @@ build_config
 .env.default
 akvo-flow-server-config/
 app/fabric.properties
+akvoflowapp-firebase-adminsdk*
 
 #errors
 hs_err_*

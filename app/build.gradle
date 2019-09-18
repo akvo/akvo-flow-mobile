@@ -7,6 +7,8 @@ if (!project.hasProperty("nodexcount")) {
 }
 apply plugin: 'io.fabric'
 
+apply plugin: 'com.google.firebase.appdistribution'
+
 repositories {
     mavenCentral()
     jcenter()
@@ -111,6 +113,10 @@ android {
             proguardFile 'proguard-files/crashlytics.pro'
             proguardFile getDefaultProguardFile('proguard-android.txt')
             signingConfig signingConfigs.flowRelease
+
+            firebaseAppDistribution {
+                groups = "testers"
+            }
         }
         debug {
             ext.enableCrashlytics = false
@@ -134,6 +140,7 @@ android {
             proguardFile getDefaultProguardFile('proguard-android.txt')
             multiDexKeepProguard file('proguard-files/proguard-multidex-rules.pro')
         }
+
     }
 
     packagingOptions {

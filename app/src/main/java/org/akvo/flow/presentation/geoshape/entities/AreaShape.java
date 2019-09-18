@@ -73,7 +73,7 @@ public class AreaShape extends Shape {
             points.add(shapePoint);
             points.add(points.get(0));
         } else {
-            points.add(size - 2, shapePoint);
+            points.add(size - 1, shapePoint);
         }
     }
 }

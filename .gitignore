@@ -57,6 +57,12 @@ build_config
 akvo-flow-server-config/
 app/fabric.properties
 
+#bitrise
+.bitrise.secrets.yml
+bitrise.yml
+fieldsurvey-release.keystore
+gradle.deps
+
 #errors
 hs_err_*
 .attach_pid*

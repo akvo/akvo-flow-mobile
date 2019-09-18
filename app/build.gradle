@@ -5,21 +5,13 @@ apply plugin: 'io.sentry.android.gradle'
 if (!project.hasProperty("nodexcount")) {
     apply plugin: 'com.getkeepsafe.dexcount'
 }
-apply plugin: 'io.fabric'
-
-repositories {
-    mavenCentral()
-    jcenter()
-    maven { url 'https://maven.fabric.io/public' }
-    google()
-}
 
 sentry {
     autoProguardConfig true
     autoUpload true
 }
 
-def isCi = "true" == "true"
+def isCi = "true" == System.getenv("TRAVIS")
 
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
@@ -241,7 +233,6 @@ dependencies {
         debugImplementation "com.squareup.leakcanary:leakcanary-support-fragment:${rootProject.ext.leakCanaryVersion}"
     }
 
-    implementation "com.android.support:multidex:${rootProject.ext.multidexVersion}"
     implementation "com.google.firebase:firebase-analytics:${rootProject.ext.firebaseVersion}"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
     implementation "androidx.core:core-ktx:${rootProject.ext.coreKtxVersion}"

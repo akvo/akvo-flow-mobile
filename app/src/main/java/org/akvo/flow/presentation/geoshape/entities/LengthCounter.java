@@ -17,11 +17,9 @@
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.akvo.flow.presentation.geoshape.properties;
+package org.akvo.flow.presentation.geoshape.entities;
 
 import android.location.Location;
-
-import org.akvo.flow.presentation.geoshape.entities.ShapePoint;
 
 import java.util.List;
 

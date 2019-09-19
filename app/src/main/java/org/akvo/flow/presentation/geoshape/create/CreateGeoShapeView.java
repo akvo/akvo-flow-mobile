@@ -19,26 +19,38 @@
 
 package org.akvo.flow.presentation.geoshape.create;
 
-import com.mapbox.geojson.Point;
+import com.mapbox.geojson.FeatureCollection;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 
-import java.util.ArrayList;
+import org.akvo.flow.presentation.geoshape.entities.Shape;
+import org.akvo.flow.presentation.geoshape.entities.ViewFeatures;
+
 import java.util.List;
 
-import javax.inject.Inject;
+public interface CreateGeoShapeView {
 
-public class CoordinatesMapper {
+    void displayDeleteShapeDialog();
 
-    @Inject
-    public CoordinatesMapper() {
-    }
+    void displayDeletePointDialog();
 
-    List<LatLng> toLatLng(List<Point> coordinates) {
-        List<LatLng> latLngs = new ArrayList<>();
-        for (Point p : coordinates) {
-            LatLng latLng = new LatLng(p.latitude(), p.longitude());
-            latLngs.add(latLng);
-        }
-        return latLngs;
-    }
+    void displaySelectedShapeInfo(Shape shape);
+
+    void displayMapItems(ViewFeatures viewFeatures);
+
+    void enablePointDrawMode();
+
+    void enableLineDrawMode();
+
+    void enableAreaDrawMode();
+
+    void updateSources(FeatureCollection features, FeatureCollection pointList);
+
+    void updateMenu();
+
+    void displayNewMapStyle(FeatureCollection shapeFeatures, FeatureCollection pointFeatures,
+            List<LatLng> listOfCoordinates);
+
+    void setShapeResult(String toJson);
+
+    void setCanceledResult();
 }

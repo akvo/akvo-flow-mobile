@@ -46,4 +46,9 @@ public class GeoShapeConstants {
     public static final String POINT_SELECTED_PROPERTY = "is-point-selected";
     public static final String SHAPE_SELECTED_PROPERTY = "is-shape-selected";
     public static final String LAT_LNG_PROPERTY = "lat-lng";
+    public static final String POINT_ID = "point-id";
+    public static final String FEATURE_ID = "shape-id";
+    public static final String PROPERTY_POINT_COUNT = "pointCount";
+    public static final String PROPERTY_LENGTH = "length";
+    public static final String PROPERTY_AREA = "area";
 }

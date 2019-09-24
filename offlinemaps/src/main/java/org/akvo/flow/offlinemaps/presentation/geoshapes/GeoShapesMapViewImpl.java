@@ -240,7 +240,7 @@ public class GeoShapesMapViewImpl extends MapView implements OnMapReadyCallback,
 
     @SuppressLint("MissingPermission")
     public void displayUserLocation() {
-        if (mapboxMap != null && mapboxMap.getStyle() != null) {
+        if (mapboxMap != null && mapboxMap.getStyle() != null && isLocationAllowed()) {
             LocationComponent locationComponent = mapboxMap.getLocationComponent();
             LocationComponentOptions componentOptions = LocationComponentOptions
                     .builder(getContext())
@@ -288,7 +288,8 @@ public class GeoShapesMapViewImpl extends MapView implements OnMapReadyCallback,
                 if (mapboxMap != null) {
                     Projection projection = mapboxMap.getProjection();
                     List<Feature> features = mapboxMap
-                            .queryRenderedFeatures(projection.toScreenLocation(point), CIRCLE_LAYER_ID);
+                            .queryRenderedFeatures(projection.toScreenLocation(point),
+                                    CIRCLE_LAYER_ID);
                     Feature selected = features.isEmpty() ? null : features.get(0);
                     return selected != null && clickListener.onGeoShapeSelected(selected);
                 } else {

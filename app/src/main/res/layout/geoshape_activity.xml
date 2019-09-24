@@ -34,7 +34,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
                 android:layout_alignParentBottom="true"
-                android:background="@color/feature_menu_background"
                 android:visibility="gone"
                 tools:visibility="visible">
 

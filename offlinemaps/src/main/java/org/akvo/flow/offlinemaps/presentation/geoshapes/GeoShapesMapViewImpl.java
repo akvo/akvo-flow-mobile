@@ -176,16 +176,17 @@ public class GeoShapesMapViewImpl extends MapView implements OnMapReadyCallback,
         }
     }
 
-    public void initSources(FeatureCollection features, FeatureCollection pointFeatures) {
+    public void initSources(List<Feature> features, List<Feature> pointFeatures) {
         Style style = mapboxMap.getStyle();
         if (style != null) {
-            initFillSource(style, features);
-            initLineSource(style, features);
             initCircleSource(style, pointFeatures);
+            initCircleTextSource(style, pointFeatures);
+            initLineSource(style, features);
+            initFillSource(style, features);
 
-            initFillLayer(style);
-            initLineLayer(style);
             initCircleLayer(style);
+            initLineLayer(style);
+            initFillLayer(style);
         }
     }
 
@@ -219,11 +220,12 @@ public class GeoShapesMapViewImpl extends MapView implements OnMapReadyCallback,
         }
     }
 
-    public void setSource(FeatureCollection features, String sourceId) {
+    public void setSource(List<Feature> features, String sourceId) {
         if (mapboxMap != null && mapboxMap.getStyle() != null) {
             GeoJsonSource source = (GeoJsonSource) mapboxMap.getStyle().getSource(sourceId);
             if (source != null) {
-                source.setGeoJson(features);
+                FeatureCollection featureCollection = FeatureCollection.fromFeatures(features);
+                source.setGeoJson(featureCollection);
             }
         }
     }
@@ -312,7 +314,7 @@ public class GeoShapesMapViewImpl extends MapView implements OnMapReadyCallback,
                 fillColor(FILL_COLOR)
         );
         fillLayer.setFilter(has(FEATURE_POLYGON));
-        style.addLayer(fillLayer);
+        style.addLayerBelow(fillLayer, LINE_LAYER_ID);
     }
 
     private void initLineLayer(@NonNull Style style) {
@@ -322,7 +324,7 @@ public class GeoShapesMapViewImpl extends MapView implements OnMapReadyCallback,
                 lineWidth(4f)
         );
         lineLayer.setFilter(any(has(FEATURE_POLYGON), has(FEATURE_LINE)));
-        style.addLayer(lineLayer);
+        style.addLayerBelow(lineLayer, CIRCLE_LAYER_ID);
     }
 
     private void initCircleLayer(@NonNull Style style) {
@@ -339,25 +341,26 @@ public class GeoShapesMapViewImpl extends MapView implements OnMapReadyCallback,
         style.addLayer(circleLayer);
     }
 
-    private void initLineSource(@NonNull Style style, FeatureCollection featureCollection) {
-        addJsonSourceToStyle(style, featureCollection, LINE_SOURCE_ID);
+    private void initLineSource(@NonNull Style style, @NonNull List<Feature> features) {
+        addJsonSourceToStyle(style, features, LINE_SOURCE_ID);
     }
 
-    private void initFillSource(@NonNull Style style, FeatureCollection featureCollection) {
-        addJsonSourceToStyle(style, featureCollection, FILL_SOURCE_ID);
+    private void initFillSource(@NonNull Style style, @NonNull List<Feature> features) {
+        addJsonSourceToStyle(style, features, FILL_SOURCE_ID);
     }
 
-    private void initCircleSource(@NonNull Style style, FeatureCollection featureCollection) {
-        addJsonSourceToStyle(style, featureCollection, CIRCLE_SOURCE_ID);
+    private void initCircleSource(@NonNull Style style, @NonNull List<Feature> features) {
+        addJsonSourceToStyle(style, features, CIRCLE_SOURCE_ID);
     }
 
-    private void initCircleTextSource(@NonNull Style style, FeatureCollection featureCollection) {
-        addJsonSourceToStyle(style, featureCollection, CIRCLE_SOURCE_ID_LABEL);
+    private void initCircleTextSource(@NonNull Style style, @NonNull List<Feature> features) {
+        addJsonSourceToStyle(style, features, CIRCLE_SOURCE_ID_LABEL);
     }
 
-    private void addJsonSourceToStyle(@NonNull Style style, @NonNull FeatureCollection collection,
+    private void addJsonSourceToStyle(@NonNull Style style, @NonNull List<Feature> features,
             @NonNull String sourceId) {
-        GeoJsonSource geoJsonSource = new GeoJsonSource(sourceId, collection);
+        FeatureCollection featureCollection = FeatureCollection.fromFeatures(features);
+        GeoJsonSource geoJsonSource = new GeoJsonSource(sourceId, featureCollection);
         style.addSource(geoJsonSource);
     }
 
@@ -376,7 +379,7 @@ public class GeoShapesMapViewImpl extends MapView implements OnMapReadyCallback,
         );
         circleLayer.setFilter(all(has(GeoShapeConstants.SHAPE_SELECTED_PROPERTY),
                 not(has(GeoShapeConstants.POINT_SELECTED_PROPERTY))));
-        style.addLayer(circleLayer);
+        style.addLayerAbove(circleLayer, CIRCLE_LAYER_ID);
     }
 
     /**
@@ -392,7 +395,7 @@ public class GeoShapesMapViewImpl extends MapView implements OnMapReadyCallback,
         );
         circleLayer.setFilter(all(has(GeoShapeConstants.POINT_SELECTED_PROPERTY),
                 not(has(GeoShapeConstants.SHAPE_SELECTED_PROPERTY))));
-        style.addLayer(circleLayer);
+        style.addLayerAbove(circleLayer, SELECTED_FEATURE_POINT_LAYER_ID);
     }
 
     /**
@@ -411,6 +414,6 @@ public class GeoShapesMapViewImpl extends MapView implements OnMapReadyCallback,
         );
         symbolLayer.setFilter(all(has(GeoShapeConstants.POINT_SELECTED_PROPERTY),
                 not(has(GeoShapeConstants.SHAPE_SELECTED_PROPERTY))));
-        style.addLayer(symbolLayer);
+        style.addLayerAbove(symbolLayer, SELECTED_POINT_LAYER_ID);
     }
 }

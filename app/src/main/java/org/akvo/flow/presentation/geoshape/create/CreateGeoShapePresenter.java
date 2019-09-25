@@ -20,7 +20,6 @@
 package org.akvo.flow.presentation.geoshape.create;
 
 import com.mapbox.geojson.Feature;
-import com.mapbox.geojson.FeatureCollection;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 
 import org.akvo.flow.offlinemaps.presentation.geoshapes.GeoShapeConstants;
@@ -163,9 +162,7 @@ public class CreateGeoShapePresenter implements Presenter {
     }
 
     public void onMapStyleUpdated() {
-        view.displayNewMapStyle(FeatureCollection.fromFeatures(viewFeatures.getFeatures()),
-                FeatureCollection.fromFeatures(viewFeatures.getPointFeatures()),
-                viewFeatures.getListOfCoordinates());
+        view.displayNewMapStyle(viewFeatures);
     }
 
     public void onSavePressed(boolean changed) {
@@ -216,8 +213,7 @@ public class CreateGeoShapePresenter implements Presenter {
 
     private void updateSources() {
         viewFeatures = featureMapper.toViewFeatures(shapes);
-        view.updateSources(FeatureCollection.fromFeatures(viewFeatures.getFeatures()),
-                FeatureCollection.fromFeatures(viewFeatures.getPointFeatures()));
+        view.updateSources(viewFeatures);
     }
 
     private Shape selectFeatureFromPoint(Feature feature) {

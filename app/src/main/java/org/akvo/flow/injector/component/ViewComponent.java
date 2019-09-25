@@ -35,8 +35,9 @@ import org.akvo.flow.presentation.datapoints.list.DataPointsListFragment;
 import org.akvo.flow.presentation.datapoints.map.DataPointsMapFragment;
 import org.akvo.flow.presentation.datapoints.map.one.DataPointMapActivity;
 import org.akvo.flow.presentation.form.mobiledata.MobileDataSettingDialog;
-import org.akvo.flow.presentation.geoshape.properties.PropertiesDialog;
 import org.akvo.flow.presentation.geoshape.ViewGeoShapeActivity;
+import org.akvo.flow.presentation.geoshape.create.CreateGeoShapeActivity;
+import org.akvo.flow.presentation.geoshape.properties.PropertiesDialog;
 import org.akvo.flow.presentation.help.HelpActivity;
 import org.akvo.flow.presentation.legal.LegalNoticesActivity;
 import org.akvo.flow.presentation.main.MainActivity;
@@ -117,6 +118,8 @@ public interface ViewComponent {
     void inject(MobileDataSettingDialog mobileDataSettingDialog);
 
     void inject(DataPointMapActivity dataPointMapActivity);
+
+    void inject(CreateGeoShapeActivity createGeoShapeActivity);
 
     void inject(ViewGeoShapeActivity viewGeoShapeActivity);
 

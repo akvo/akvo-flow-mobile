@@ -91,6 +91,7 @@ import static org.akvo.flow.offlinemaps.presentation.geoshapes.GeoShapeConstants
 import static org.akvo.flow.offlinemaps.presentation.geoshapes.GeoShapeConstants.CIRCLE_LAYER_ID;
 import static org.akvo.flow.offlinemaps.presentation.geoshapes.GeoShapeConstants.CIRCLE_LINE_COLOR;
 import static org.akvo.flow.offlinemaps.presentation.geoshapes.GeoShapeConstants.CIRCLE_SOURCE_ID;
+import static org.akvo.flow.offlinemaps.presentation.geoshapes.GeoShapeConstants.CIRCLE_SOURCE_ID_LABEL;
 import static org.akvo.flow.offlinemaps.presentation.geoshapes.GeoShapeConstants.FEATURE_LINE;
 import static org.akvo.flow.offlinemaps.presentation.geoshapes.GeoShapeConstants.FEATURE_POLYGON;
 import static org.akvo.flow.offlinemaps.presentation.geoshapes.GeoShapeConstants.FILL_COLOR;
@@ -350,6 +351,10 @@ public class GeoShapesMapViewImpl extends MapView implements OnMapReadyCallback,
         addJsonSourceToStyle(style, featureCollection, CIRCLE_SOURCE_ID);
     }
 
+    private void initCircleTextSource(@NonNull Style style, FeatureCollection featureCollection) {
+        addJsonSourceToStyle(style, featureCollection, CIRCLE_SOURCE_ID_LABEL);
+    }
+
     private void addJsonSourceToStyle(@NonNull Style style, @NonNull FeatureCollection collection,
             @NonNull String sourceId) {
         GeoJsonSource geoJsonSource = new GeoJsonSource(sourceId, collection);
@@ -394,7 +399,8 @@ public class GeoShapesMapViewImpl extends MapView implements OnMapReadyCallback,
      * A selected point location will be drawn in a greenish color
      */
     private void initPointSelectedTextLayer(@NonNull Style style) {
-        SymbolLayer symbolLayer = new SymbolLayer(SELECTED_POINT_TEXT_LAYER_ID, CIRCLE_SOURCE_ID);
+        SymbolLayer symbolLayer = new SymbolLayer(SELECTED_POINT_TEXT_LAYER_ID,
+                CIRCLE_SOURCE_ID_LABEL);
         symbolLayer.setProperties(
                 textField(Expression.toString(get(GeoShapeConstants.LAT_LNG_PROPERTY))),
                 textSize(12f),

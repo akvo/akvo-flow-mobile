@@ -21,6 +21,7 @@ package org.akvo.flow.offlinemaps.presentation.geoshapes;
 
 public class GeoShapeConstants {
     public static final String CIRCLE_SOURCE_ID = "circle-source-id";
+    public static final String CIRCLE_SOURCE_ID_LABEL = "circle-source-id";
     public static final String FILL_SOURCE_ID = "fill-source-id";
     public static final String LINE_SOURCE_ID = "line-source-id";
     public static final String CIRCLE_LAYER_ID = "unselected-point-layer-id";

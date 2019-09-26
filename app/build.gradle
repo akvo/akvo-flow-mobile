@@ -11,7 +11,7 @@ sentry {
     autoUpload true
 }
 
-def isCi = "true" == System.getenv("TRAVIS")
+def isCi = "true" == System.getenv("TRAVIS") || "true" == System.getenv("CI")
 
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion

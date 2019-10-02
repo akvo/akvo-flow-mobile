@@ -22,8 +22,6 @@ package org.akvo.flow.app;
 import android.content.res.Configuration;
 import android.text.TextUtils;
 
-import com.crashlytics.android.Crashlytics;
-import com.crashlytics.android.core.CrashlyticsCore;
 import com.mapbox.mapboxsdk.Mapbox;
 import com.squareup.leakcanary.LeakCanary;
 
@@ -38,8 +36,8 @@ import org.akvo.flow.domain.interactor.setup.SetUpParams;
 import org.akvo.flow.injector.component.ApplicationComponent;
 import org.akvo.flow.injector.component.DaggerApplicationComponent;
 import org.akvo.flow.injector.module.ApplicationModule;
-import org.akvo.flow.service.ApkUpdateService;
-import org.akvo.flow.service.FileChangeTrackingService;
+import org.akvo.flow.service.ApkUpdateWorker;
+import org.akvo.flow.service.FileChangeTrackingWorker;
 import org.akvo.flow.util.logging.LoggingHelper;
 
 import java.util.HashMap;
@@ -51,7 +49,6 @@ import javax.inject.Named;
 
 import androidx.annotation.Nullable;
 import androidx.multidex.MultiDexApplication;
-import io.fabric.sdk.android.Fabric;
 import timber.log.Timber;
 
 public class FlowApp extends MultiDexApplication {
@@ -66,11 +63,11 @@ public class FlowApp extends MultiDexApplication {
     @Named("getSelectedUser")
     UseCase getSelectedUser;
 
-    private ApplicationComponent applicationComponent;
-
     @Inject
     @Named("saveSetup")
     UseCase saveSetup;
+
+    private ApplicationComponent applicationComponent;
 
     @Override
     public void onCreate() {
@@ -85,7 +82,6 @@ public class FlowApp extends MultiDexApplication {
 
         installLeakCanary();
         initializeInjector();
-        initFabric();
         initLogging();
         updateLocale();
         startUpdateService();
@@ -96,13 +92,6 @@ public class FlowApp extends MultiDexApplication {
 
     private void installLeakCanary() {
         LeakCanary.install(this);
-    }
-
-    private void initFabric() {
-        CrashlyticsCore crashlyticsCore = new CrashlyticsCore.Builder()
-                .disabled(true)
-                .build();
-        Fabric.with(this, new Crashlytics.Builder().core(crashlyticsCore).build());
     }
 
     private void saveConfig() {
@@ -122,11 +111,11 @@ public class FlowApp extends MultiDexApplication {
     }
 
     private void startBootstrapFolderTracker() {
-        FileChangeTrackingService.scheduleVerifier(this);
+        FileChangeTrackingWorker.scheduleVerifier(this);
     }
 
     private void startUpdateService() {
-        ApkUpdateService.scheduleFirstTask(this);
+        ApkUpdateWorker.enqueueWork(getApplicationContext());
     }
 
     private void initializeInjector() {

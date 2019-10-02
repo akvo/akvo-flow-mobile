@@ -35,6 +35,9 @@ import org.akvo.flow.presentation.datapoints.list.DataPointsListFragment;
 import org.akvo.flow.presentation.datapoints.map.DataPointsMapFragment;
 import org.akvo.flow.presentation.datapoints.map.one.DataPointMapActivity;
 import org.akvo.flow.presentation.form.mobiledata.MobileDataSettingDialog;
+import org.akvo.flow.presentation.geoshape.ViewGeoShapeActivity;
+import org.akvo.flow.presentation.geoshape.create.CreateGeoShapeActivity;
+import org.akvo.flow.presentation.geoshape.properties.PropertiesDialog;
 import org.akvo.flow.presentation.help.HelpActivity;
 import org.akvo.flow.presentation.legal.LegalNoticesActivity;
 import org.akvo.flow.presentation.main.MainActivity;
@@ -46,6 +49,7 @@ import org.akvo.flow.ui.fragment.DatapointsFragment;
 import org.akvo.flow.ui.fragment.ResponseListFragment;
 import org.akvo.flow.ui.view.CaddisflyQuestionView;
 import org.akvo.flow.ui.view.CascadeQuestionView;
+import org.akvo.flow.ui.view.GeoshapeQuestionView;
 import org.akvo.flow.ui.view.geolocation.GeoQuestionView;
 import org.akvo.flow.ui.view.media.photo.PhotoQuestionView;
 import org.akvo.flow.ui.view.media.video.VideoQuestionView;
@@ -99,6 +103,8 @@ public interface ViewComponent {
 
     void inject(GeoQuestionView geoQuestionView);
 
+    void inject(GeoshapeQuestionView geoshapeQuestionView);
+
     void inject(AddUserActivity addUserActivity);
 
     void inject(SurveyActivity surveyActivity);
@@ -112,4 +118,10 @@ public interface ViewComponent {
     void inject(MobileDataSettingDialog mobileDataSettingDialog);
 
     void inject(DataPointMapActivity dataPointMapActivity);
+
+    void inject(CreateGeoShapeActivity createGeoShapeActivity);
+
+    void inject(ViewGeoShapeActivity viewGeoShapeActivity);
+
+    void inject(PropertiesDialog propertiesDialog);
 }

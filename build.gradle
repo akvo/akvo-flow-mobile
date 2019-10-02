@@ -11,7 +11,6 @@ buildscript {
         classpath 'com.android.tools.build:gradle:3.3.2'
         classpath 'io.sentry:sentry-android-gradle-plugin:1.7.22'
         classpath 'com.getkeepsafe.dexcount:dexcount-gradle-plugin:0.8.6'
-        classpath 'io.fabric.tools:gradle:1.28.0'
         classpath 'com.google.gms:google-services:3.2.1'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
@@ -31,10 +30,10 @@ ext {
     materialVersion = "1.0.0"
     multidexVersion = '2.0.1'
     recyclerVersion = "1.0.0"
+    workVersion = "2.2.0"
 
     adapterRxJava2Version = "2.3.0"
     butterKnifeVersion = "10.1.0"
-    crashlyticsVersion = "2.9.9@aar"
     converterGsonVersion = "2.3.0"
     converterScalarsVersion = "2.3.0"
     daggerVersion = "2.21"
@@ -44,7 +43,7 @@ ext {
     leakCanaryVersion = "1.6.1"
     loggingInterceptorVersion = "3.12.1"
     mapboxMarkerVersion = "0.2.0"
-    mapboxOfflineRxVersion = "1.2.0-alpha03"
+    mapboxOfflineRxVersion = "1.2.0-alpha04"
     mapboxVersion = "7.4.0"
     mapUtilsVersion = "0.5"
     prettyTimeVersion = "4.0.1.Final"

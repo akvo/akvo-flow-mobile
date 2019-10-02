@@ -62,7 +62,7 @@ import org.akvo.flow.presentation.SnackBarManager;
 import org.akvo.flow.presentation.form.FormPresenter;
 import org.akvo.flow.presentation.form.FormView;
 import org.akvo.flow.presentation.form.mobiledata.MobileDataSettingDialog;
-import org.akvo.flow.service.DataPointUploadService;
+import org.akvo.flow.service.DataPointUploadWorker;
 import org.akvo.flow.ui.Navigator;
 import org.akvo.flow.ui.adapter.LanguageAdapter;
 import org.akvo.flow.ui.adapter.SurveyTabAdapter;
@@ -713,7 +713,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
 
     @Override
     public void startSync(boolean isMobileSyncAllowed) {
-        DataPointUploadService.scheduleUpload(getApplicationContext(), isMobileSyncAllowed);
+        DataPointUploadWorker.scheduleUpload(getApplicationContext(), isMobileSyncAllowed);
     }
 
     @Override
@@ -838,7 +838,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
 
     private void navigateToGeoShapeActivity(QuestionInteractionEvent event) {
         mRequestQuestionId = event.getSource().getQuestion().getId();
-        navigator.navigateToGeoShapeActivity(this, event.getData());
+        navigator.navigateToCreateGeoShapeActivity(this, event.getData());
     }
 
     private void navigateToCaddisfly(QuestionInteractionEvent event) {

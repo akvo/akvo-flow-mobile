@@ -46,7 +46,7 @@ import org.akvo.flow.presentation.settings.passcode.PassCodeDeleteAllDialog;
 import org.akvo.flow.presentation.settings.passcode.PassCodeDeleteCollectedDialog;
 import org.akvo.flow.presentation.settings.passcode.PassCodeDownloadFormDialog;
 import org.akvo.flow.presentation.settings.passcode.PassCodeReloadFormsDialog;
-import org.akvo.flow.service.DataPointUploadService;
+import org.akvo.flow.service.DataPointUploadWorker;
 import org.akvo.flow.tracking.TrackingHelper;
 import org.akvo.flow.ui.Navigator;
 
@@ -181,7 +181,7 @@ public class PreferenceActivity extends BackActivity implements PreferenceView,
         if (trackingHelper != null) {
             trackingHelper.logUploadDataEvent();
         }
-        DataPointUploadService.scheduleUpload(getApplicationContext(), enableDataSc.isChecked());
+        DataPointUploadWorker.scheduleUpload(getApplicationContext(), enableDataSc.isChecked());
         finish();
     }
 

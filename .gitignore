@@ -13,6 +13,7 @@
 # Testing
 .calabash_settings
 .kotlintest
+data/abc
 
 app/bin
 app/gen
@@ -47,8 +48,6 @@ captures/
 #sentry config files
 sentry.properties
 
-!/util/upload-apk/build/libs/deploy-1.0.jar
-
 #CI config
 fastlane/report.xml
 fastlane/README.md
@@ -56,11 +55,12 @@ build_config
 .env.default
 akvo-flow-server-config/
 app/fabric.properties
+akvoflowapp-firebase-adminsdk*
 
 #bitrise
 .bitrise.secrets.yml
 bitrise.yml
-fieldsurvey-release.keystore
+*.keystore
 gradle.deps
 
 #errors

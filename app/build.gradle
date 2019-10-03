@@ -105,7 +105,6 @@ android {
             signingConfig signingConfigs.flowRelease
         }
         debug {
-            ext.enableCrashlytics = false
             minifyEnabled true
             multiDexEnabled true
             useProguard false

@@ -20,7 +20,9 @@
 package org.akvo.flow.presentation.geoshape.properties;
 
 import org.akvo.flow.presentation.Presenter;
+import org.akvo.flow.presentation.geoshape.entities.AreaCounter;
 import org.akvo.flow.presentation.geoshape.entities.AreaShape;
+import org.akvo.flow.presentation.geoshape.entities.LengthCounter;
 import org.akvo.flow.presentation.geoshape.entities.LineShape;
 import org.akvo.flow.presentation.geoshape.entities.Shape;
 

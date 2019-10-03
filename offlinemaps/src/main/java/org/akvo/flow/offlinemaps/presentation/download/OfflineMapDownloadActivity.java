@@ -45,6 +45,8 @@ import org.akvo.flow.offlinemaps.tracking.TrackingHelper;
 
 import javax.inject.Inject;
 
+import androidx.annotation.NonNull;
+
 public class OfflineMapDownloadActivity extends ToolBarBackActivity
         implements OfflineMapDownloadView {
 
@@ -99,7 +101,7 @@ public class OfflineMapDownloadActivity extends ToolBarBackActivity
         saveBt.setOnClickListener(v -> {
             if (mapboxMap != null && mapboxMap.getStyle() != null) {
                 float pixelRatio = getResources().getDisplayMetrics().density;
-                String styleUrl = mapboxMap.getStyle().getUrl();
+                String styleUrl = mapboxMap.getStyle().getUri();
                 LatLngBounds bounds = mapboxMap.getProjection().getVisibleRegion().latLngBounds;
                 double zoom = mapboxMap.getCameraPosition().zoom;
                 presenter.downloadArea(styleUrl, bounds, pixelRatio, zoom,
@@ -166,7 +168,7 @@ public class OfflineMapDownloadActivity extends ToolBarBackActivity
     }
 
     @Override
-    protected void onSaveInstanceState(Bundle outState) {
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         mapView.onSaveInstanceState(outState);
     }

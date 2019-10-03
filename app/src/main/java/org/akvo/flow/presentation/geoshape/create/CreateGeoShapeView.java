@@ -19,13 +19,8 @@
 
 package org.akvo.flow.presentation.geoshape.create;
 
-import com.mapbox.geojson.FeatureCollection;
-import com.mapbox.mapboxsdk.geometry.LatLng;
-
 import org.akvo.flow.presentation.geoshape.entities.Shape;
 import org.akvo.flow.presentation.geoshape.entities.ViewFeatures;
-
-import java.util.List;
 
 public interface CreateGeoShapeView {
 
@@ -43,12 +38,11 @@ public interface CreateGeoShapeView {
 
     void enableAreaDrawMode();
 
-    void updateSources(FeatureCollection features, FeatureCollection pointList);
+    void updateSources(ViewFeatures viewFeatures);
 
     void updateMenu();
 
-    void displayNewMapStyle(FeatureCollection shapeFeatures, FeatureCollection pointFeatures,
-            List<LatLng> listOfCoordinates);
+    void displayNewMapStyle(ViewFeatures viewFeatures);
 
     void setShapeResult(String toJson);
 

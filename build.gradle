@@ -34,7 +34,6 @@ ext {
 
     adapterRxJava2Version = "2.3.0"
     butterKnifeVersion = "10.1.0"
-    crashlyticsVersion = "2.9.9@aar"
     converterGsonVersion = "2.3.0"
     converterScalarsVersion = "2.3.0"
     daggerVersion = "2.21"

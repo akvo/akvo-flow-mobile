@@ -23,12 +23,12 @@ package org.akvo.flow.presentation.geoshape;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.os.Bundle;
-import androidx.fragment.app.DialogFragment;
-import androidx.appcompat.app.AlertDialog;
 
 import org.akvo.flow.R;
+
+import androidx.appcompat.app.AlertDialog;
+import androidx.fragment.app.DialogFragment;
 
 public class DeleteShapeDialog extends DialogFragment {
 
@@ -65,19 +65,13 @@ public class DeleteShapeDialog extends DialogFragment {
         return new AlertDialog.Builder(getActivity()).setTitle(R.string.delete_shape_title)
                 .setCancelable(true)
                 .setPositiveButton(R.string.delete,
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                if (listener != null) {
-                                    listener.deleteShape();
-                                }
+                        (dialog, id) -> {
+                            if (listener != null) {
+                                listener.deleteShape();
                             }
                         })
                 .setNegativeButton(R.string.cancelbutton,
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                dialog.cancel();
-                            }
-                        }).create();
+                        (dialog, id) -> dialog.cancel()).create();
     }
 
     public interface ShapeDeleteListener {

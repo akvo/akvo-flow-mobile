@@ -13,6 +13,7 @@
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
     <uses-feature
         android:name="android.hardware.camera"
@@ -27,8 +28,6 @@
         android:theme="@style/FlowAppTheme"
         android:usesCleartextTraffic="true"
         tools:ignore="GoogleAppIndexingWarning">
-        <activity
-            android:name=".presentation.geoshape.ViewGeoShapeActivity"/>
 
         <uses-library
             android:name="org.apache.http.legacy"
@@ -67,9 +66,6 @@
             android:name=".activity.TransmissionHistoryActivity"
             android:configChanges="locale|layoutDirection"
             android:label="@string/transmissionhist" />
-        <activity
-            android:name=".activity.GeoshapeActivity"
-            android:configChanges="locale|layoutDirection|orientation|screenSize" />
         <activity
             android:name=".activity.AppUpdateActivity"
             android:configChanges="locale|layoutDirection"
@@ -118,10 +114,6 @@
             </intent-filter>
         </receiver>
 
-        <meta-data
-            android:name="com.google.android.geo.API_KEY"
-            android:value="@string/google_maps_key" />
-
         <activity
             android:name=".presentation.about.AboutActivity"
             android:configChanges="locale|layoutDirection"
@@ -148,6 +140,10 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".activity.SurveyActivity" />
         </activity>
+        <activity android:name=".presentation.geoshape.ViewGeoShapeActivity"
+            android:configChanges="locale|layoutDirection|orientation|screenSize"/>
+        <activity android:name=".presentation.geoshape.create.CreateGeoShapeActivity"
+            android:configChanges="locale|layoutDirection|orientation|screenSize"/>
 
         <provider
             android:name="androidx.core.content.FileProvider"

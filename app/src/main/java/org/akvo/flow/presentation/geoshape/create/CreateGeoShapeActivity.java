@@ -29,7 +29,6 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.google.android.material.bottomappbar.BottomAppBar;
-import com.mapbox.geojson.FeatureCollection;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.Style;
 
@@ -46,14 +45,13 @@ import org.akvo.flow.presentation.geoshape.entities.ViewFeatures;
 import org.akvo.flow.presentation.geoshape.properties.PropertiesDialog;
 import org.akvo.flow.util.ConstantUtil;
 
-import java.util.List;
-
 import javax.inject.Inject;
 
 import androidx.annotation.StringRes;
 
 import static org.akvo.flow.offlinemaps.presentation.geoshapes.GeoShapeConstants.ACCURACY_THRESHOLD;
 import static org.akvo.flow.offlinemaps.presentation.geoshapes.GeoShapeConstants.CIRCLE_SOURCE_ID;
+import static org.akvo.flow.offlinemaps.presentation.geoshapes.GeoShapeConstants.CIRCLE_SOURCE_ID_LABEL;
 import static org.akvo.flow.offlinemaps.presentation.geoshapes.GeoShapeConstants.FILL_SOURCE_ID;
 import static org.akvo.flow.offlinemaps.presentation.geoshapes.GeoShapeConstants.LINE_SOURCE_ID;
 import static org.akvo.flow.presentation.geoshape.create.DrawMode.AREA;
@@ -178,11 +176,11 @@ public class CreateGeoShapeActivity extends BackActivity implements
     @Override
     public void displayMapItems(ViewFeatures viewFeatures) {
         updateAttributionMargin();
-        mapView.initSources(FeatureCollection.fromFeatures(viewFeatures.getFeatures()),
-                FeatureCollection.fromFeatures(viewFeatures.getPointFeatures()));
+        mapView.centerMap(viewFeatures.getListOfCoordinates());
+        mapView.initSources(viewFeatures.getFeatures(),
+                viewFeatures.getPointFeatures());
         mapView.initCircleSelectionSources();
         displayUserLocation();
-        mapView.centerMap(viewFeatures.getListOfCoordinates());
         setMapClicks();
     }
 
@@ -256,10 +254,11 @@ public class CreateGeoShapeActivity extends BackActivity implements
     }
 
     @Override
-    public void updateSources(FeatureCollection features, FeatureCollection pointList) {
-        mapView.setSource(features, FILL_SOURCE_ID);
-        mapView.setSource(features, LINE_SOURCE_ID);
-        mapView.setSource(pointList, CIRCLE_SOURCE_ID);
+    public void updateSources(ViewFeatures viewFeatures) {
+        mapView.setSource(viewFeatures.getPointFeatures(), CIRCLE_SOURCE_ID);
+        mapView.setSource(viewFeatures.getPointFeatures(), CIRCLE_SOURCE_ID_LABEL);
+        mapView.setSource(viewFeatures.getFeatures(), LINE_SOURCE_ID);
+        mapView.setSource(viewFeatures.getFeatures(), FILL_SOURCE_ID);
     }
 
     @Override
@@ -337,11 +336,10 @@ public class CreateGeoShapeActivity extends BackActivity implements
     }
 
     @Override
-    public void displayNewMapStyle(FeatureCollection shapeFeatures, FeatureCollection pointFeatures,
-            List<LatLng> listOfCoordinates) {
-        mapView.initSources(shapeFeatures, pointFeatures);
+    public void displayNewMapStyle(ViewFeatures viewFeatures) {
+        mapView.initSources(viewFeatures.getFeatures(), viewFeatures.getPointFeatures());
         mapView.initCircleSelectionSources();
-        mapView.centerMap(listOfCoordinates);
+        mapView.centerMap(viewFeatures.getListOfCoordinates());
     }
 
     @Override

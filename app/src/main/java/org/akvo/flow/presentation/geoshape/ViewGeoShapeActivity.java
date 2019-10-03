@@ -23,7 +23,6 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.mapbox.geojson.FeatureCollection;
 import com.mapbox.mapboxsdk.maps.Style;
 
 import org.akvo.flow.R;
@@ -32,8 +31,8 @@ import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
 import org.akvo.flow.offlinemaps.presentation.geoshapes.GeoShapesMapViewImpl;
 import org.akvo.flow.presentation.geoshape.entities.FeatureMapper;
-import org.akvo.flow.presentation.geoshape.entities.ViewFeatures;
 import org.akvo.flow.presentation.geoshape.entities.Shape;
+import org.akvo.flow.presentation.geoshape.entities.ViewFeatures;
 import org.akvo.flow.util.ConstantUtil;
 
 import java.util.ArrayList;
@@ -73,10 +72,7 @@ public class ViewGeoShapeActivity extends BackActivity {
         mapView = findViewById(R.id.mapView);
         mapView.onCreate(savedInstanceState);
         mapView.getMapAsyncWithCallback(() -> {
-            FeatureCollection features = FeatureCollection.fromFeatures(viewFeatures.getFeatures());
-            FeatureCollection pointFeatures = FeatureCollection
-                    .fromFeatures(viewFeatures.getPointFeatures());
-            mapView.initSources(features, pointFeatures);
+            mapView.initSources(viewFeatures.getFeatures(), viewFeatures.getPointFeatures());
             mapView.centerMap(viewFeatures.getListOfCoordinates());
         });
     }
@@ -116,8 +112,7 @@ public class ViewGeoShapeActivity extends BackActivity {
 
     private void updateMapStyle(String style) {
         mapView.updateMapStyle(style, callback -> {
-            FeatureCollection features = FeatureCollection.fromFeatures(viewFeatures.getFeatures());
-            mapView.initSources(features, features);
+            mapView.initSources(viewFeatures.getFeatures(), viewFeatures.getFeatures());
             mapView.centerMap(viewFeatures.getListOfCoordinates());
         });
     }

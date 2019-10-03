@@ -58,6 +58,7 @@ build_config
 akvo-flow-server-config/
 app/fabric.properties
 akvoflowapp-firebase-adminsdk*
+app/*.keystore
 
 #errors
 hs_err_*

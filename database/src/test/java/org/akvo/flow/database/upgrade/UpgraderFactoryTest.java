@@ -39,15 +39,24 @@ public class UpgraderFactoryTest {
         UpgraderVisitor upgrader = (UpgraderVisitor) upgraderFactory
                 .createUpgrader(DatabaseHelper.VER_RESPONSE_ITERATION, null, null);
 
-        assertEquals(1, upgrader.getUpgraders().size());
+        assertEquals(2, upgrader.getUpgraders().size());
         assertTrue(containsResponsesUpgrader(upgrader.getUpgraders()));
     }
 
     @Test
-    public void createUpgraderShouldCreateNoUpgraderWhenTransmissionIteration() {
+    public void createUpgraderShouldCreateNoUpgraderWheTransmissionsIteration() {
         UpgraderFactory upgraderFactory = new UpgraderFactory();
         UpgraderVisitor upgrader = (UpgraderVisitor) upgraderFactory
                 .createUpgrader(DatabaseHelper.VER_TRANSMISSION_ITERATION, null, null);
+
+        assertEquals(1, upgrader.getUpgraders().size());
+    }
+
+    @Test
+    public void createUpgraderShouldCreateNoUpgraderWhenAssingmentIteration() {
+        UpgraderFactory upgraderFactory = new UpgraderFactory();
+        UpgraderVisitor upgrader = (UpgraderVisitor) upgraderFactory
+                .createUpgrader(DatabaseHelper.VER_DATA_POINT_ASSIGNMENTS_ITERATION, null, null);
 
         assertEquals(0, upgrader.getUpgraders().size());
     }

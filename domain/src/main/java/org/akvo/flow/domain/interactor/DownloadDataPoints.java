@@ -31,14 +31,16 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
-import io.reactivex.Flowable;
+import io.reactivex.Single;
 import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Function;
+import io.reactivex.observers.DisposableSingleObserver;
 import io.reactivex.schedulers.Schedulers;
 
 public class DownloadDataPoints {
 
-    public static final String KEY_SURVEY_GROUP_ID = "survey_group_id";
+    public static final String KEY_SURVEY_ID = "survey_id";
 
     private final ThreadExecutor threadExecutor;
     private final PostExecutionThread postExecutionThread;
@@ -58,48 +60,51 @@ public class DownloadDataPoints {
         this.connectivityStateManager = connectivityStateManager;
     }
 
-    public <T> void execute(DefaultFlowableObserver<T> defaultFlowableObserver,
-            ErrorComposable errorComposable, Map<String, Object> parameters) {
-        Flowable flowable = this.buildUseCaseObservable(parameters)
+    public void execute(DisposableSingleObserver<DownloadResult> singleObserver,
+            Map<String, Object> parameters) {
+        addDisposable(buildUseCaseObservable(parameters)
                 .subscribeOn(Schedulers.from(threadExecutor))
-                .observeOn(postExecutionThread.getScheduler());
-        this.disposables.add(flowable
-                .subscribe(defaultFlowableObserver, errorComposable, defaultFlowableObserver));
-    }
-
-    protected <T> Flowable buildUseCaseObservable(final Map<String, T> parameters) {
-        if (parameters == null || parameters.get(KEY_SURVEY_GROUP_ID) == null) {
-            return Flowable.error(new IllegalArgumentException("Missing survey group id"));
-        }
-        if (!connectivityStateManager.isConnectionAvailable()) {
-            return Flowable.just(new DownloadResult(DownloadResult.ResultCode.ERROR_NO_NETWORK, 0));
-        }
-        return syncDataPoints(parameters);
-    }
-
-    private <T> Flowable<DownloadResult> syncDataPoints(Map<String, T> parameters) {
-        return surveyRepository.downloadDataPoints((Long) parameters.get(KEY_SURVEY_GROUP_ID))
-                .map(new Function<Integer, DownloadResult>() {
-                    @Override
-                    public DownloadResult apply(Integer integer) {
-                        return new DownloadResult(DownloadResult.ResultCode.SUCCESS, integer);
-                    }
-                })
-                .onErrorResumeNext(new Function<Throwable, Flowable<DownloadResult>>() {
-                    @Override
-                    public Flowable<DownloadResult> apply(Throwable throwable) {
-                        if (throwable instanceof AssignmentRequiredException) {
-                            return Flowable.just(new DownloadResult(
-                                    DownloadResult.ResultCode.ERROR_ASSIGNMENT_MISSING, 0));
-                        }
-                        return Flowable.error(throwable);
-                    }
-                });
+                .observeOn(postExecutionThread.getScheduler())
+                .subscribeWith(singleObserver));
     }
 
     public void dispose() {
         if (!disposables.isDisposed()) {
             disposables.clear();
         }
+    }
+
+    protected Single<DownloadResult> buildUseCaseObservable(final Map<String, Object> parameters) {
+        if (parameters == null || parameters.get(KEY_SURVEY_ID) == null) {
+            return Single.error(new IllegalArgumentException("Missing survey group id"));
+        }
+        if (!connectivityStateManager.isConnectionAvailable()) {
+            return Single.just(new DownloadResult(DownloadResult.ResultCode.ERROR_NO_NETWORK, 0));
+        }
+        return syncDataPoints(parameters);
+    }
+
+    private Single<DownloadResult> syncDataPoints(Map<String, Object> parameters) {
+        return surveyRepository.downloadDataPoints((Long) parameters.get(KEY_SURVEY_ID))
+                .map(new Function<Integer, DownloadResult>() {
+                    @Override
+                    public DownloadResult apply(Integer integer) {
+                        return new DownloadResult(DownloadResult.ResultCode.SUCCESS, integer);
+                    }
+                })
+                .onErrorResumeNext(new Function<Throwable, Single<DownloadResult>>() {
+                    @Override
+                    public Single<DownloadResult> apply(Throwable throwable) {
+                        if (throwable instanceof AssignmentRequiredException) {
+                            return Single.just(new DownloadResult(
+                                    DownloadResult.ResultCode.ERROR_ASSIGNMENT_MISSING, 0));
+                        }
+                        return Single.error(throwable);
+                    }
+                });
+    }
+
+    private void addDisposable(Disposable disposable) {
+        disposables.add(disposable);
     }
 }

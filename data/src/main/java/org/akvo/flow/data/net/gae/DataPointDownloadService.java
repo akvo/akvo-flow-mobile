@@ -22,23 +22,17 @@ package org.akvo.flow.data.net.gae;
 
 import org.akvo.flow.data.entity.ApiLocaleResult;
 
-import io.reactivex.Flowable;
+import io.reactivex.Single;
 import retrofit2.http.GET;
-import retrofit2.http.Headers;
 import retrofit2.http.Query;
 
 import static org.akvo.flow.data.util.ApiUrls.ANDROID_ID;
-import static org.akvo.flow.data.util.ApiUrls.IMEI;
-import static org.akvo.flow.data.util.ApiUrls.LAST_UPDATED;
-import static org.akvo.flow.data.util.ApiUrls.PHONE_NUMBER;
-import static org.akvo.flow.data.util.ApiUrls.SURVEYED_LOCALE;
-import static org.akvo.flow.data.util.ApiUrls.SURVEY_GROUP;
+import static org.akvo.flow.data.util.ApiUrls.DATA_POINTS;
+import static org.akvo.flow.data.util.ApiUrls.SURVEY_ID;
 
 public interface DataPointDownloadService {
 
-    @GET(SURVEYED_LOCALE)
-    @Headers("Cache-Control: no-cache")
-    Flowable<ApiLocaleResult> loadNewDataPoints(@Query(ANDROID_ID) String androidId,
-            @Query(IMEI) String imei, @Query(LAST_UPDATED) String lastUpdated,
-            @Query(PHONE_NUMBER) String phoneNumber, @Query(SURVEY_GROUP) String surveyGroup);
+    @GET(DATA_POINTS)
+    Single<ApiLocaleResult> getAssignedDataPoints(@Query(ANDROID_ID) String androidId,
+            @Query(SURVEY_ID) String surveyId);
 }

@@ -267,7 +267,6 @@ public class SurveyDbAdapter {
      * any response saved in the database, as well as the transmission history.
      */
     public void clearCollectedData() {
-        executeSql("DELETE FROM " + Tables.SYNC_TIME);
         deleteAllResponses();
         executeSql("DELETE FROM " + Tables.SURVEY_INSTANCE);
         executeSql("DELETE FROM " + Tables.RECORD);

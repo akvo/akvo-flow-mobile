@@ -232,11 +232,10 @@ public class ApplicationModule {
     @Provides
     @Singleton
     RestApi provideRestApi(DeviceHelper deviceHelper, RestServiceFactory serviceFactory,
-            Encoder encoder, ApiUrls apiUrls, AmazonAuthHelper amazonAuthHelper,
-            BodyCreator bodyCreator) {
+            ApiUrls apiUrls, AmazonAuthHelper amazonAuthHelper, BodyCreator bodyCreator) {
         final DateFormat df = new SimpleDateFormat(REST_API_DATE_PATTERN, Locale.US);
         df.setTimeZone(TimeZone.getTimeZone(TIMEZONE));
-        return new RestApi(deviceHelper, serviceFactory, encoder, BuildConfig.VERSION_NAME,
+        return new RestApi(deviceHelper, serviceFactory, BuildConfig.VERSION_NAME,
                 apiUrls, amazonAuthHelper, df, bodyCreator);
     }
 

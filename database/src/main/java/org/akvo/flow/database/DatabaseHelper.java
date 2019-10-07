@@ -40,7 +40,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "surveydata";
     public static final int VER_RESPONSE_ITERATION = 85;
     public static final int VER_TRANSMISSION_ITERATION = 86;
-    static final int DATABASE_VERSION = VER_TRANSMISSION_ITERATION;
+    public static final int VER_DATA_POINT_ASSIGNMENTS_ITERATION = 87;
+    static final int DATABASE_VERSION = VER_DATA_POINT_ASSIGNMENTS_ITERATION;
 
     private static SQLiteDatabase database;
     private static final Object LOCK_OBJ = new Object();
@@ -129,11 +130,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 + TransmissionColumns.END_DATE + " INTEGER,"
                 + "UNIQUE (" + TransmissionColumns.FILENAME + ") ON CONFLICT REPLACE)");
 
-        db.execSQL("CREATE TABLE " + Tables.SYNC_TIME + " ("
-                + SyncTimeColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
-                + SyncTimeColumns.SURVEY_GROUP_ID + " INTEGER,"
-                + SyncTimeColumns.TIME + " TEXT,"
-                + "UNIQUE (" + SyncTimeColumns.SURVEY_GROUP_ID + ") ON CONFLICT REPLACE)");
         languageTable.onCreate(db);
         createIndexes(db);
     }
@@ -147,6 +143,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void upgradeFromResponses(SQLiteDatabase db) {
         TransmissionMigrationHelper helper = new TransmissionMigrationHelper();
         helper.migrateTransmissions(db);
+    }
+
+    public void upgradeFromAssignments(SQLiteDatabase db) {
+        db.execSQL("DROP TABLE IF EXISTS sync_time");
     }
 
     /**

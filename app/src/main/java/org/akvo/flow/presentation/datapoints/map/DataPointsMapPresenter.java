@@ -23,12 +23,10 @@ package org.akvo.flow.presentation.datapoints.map;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.entity.DataPoint;
 import org.akvo.flow.domain.entity.DownloadResult;
-import org.akvo.flow.domain.interactor.DefaultFlowableObserver;
 import org.akvo.flow.domain.interactor.DefaultObserver;
 import org.akvo.flow.domain.interactor.DownloadDataPoints;
-import org.akvo.flow.domain.interactor.ErrorComposable;
-import org.akvo.flow.domain.interactor.datapoints.GetSavedDataPoints;
 import org.akvo.flow.domain.interactor.UseCase;
+import org.akvo.flow.domain.interactor.datapoints.GetSavedDataPoints;
 import org.akvo.flow.domain.util.Constants;
 import org.akvo.flow.presentation.Presenter;
 
@@ -42,6 +40,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import androidx.annotation.NonNull;
+import io.reactivex.observers.DisposableSingleObserver;
 import timber.log.Timber;
 
 import static org.akvo.flow.domain.entity.DownloadResult.ResultCode.SUCCESS;
@@ -131,17 +130,11 @@ public class DataPointsMapPresenter implements Presenter {
 
     private void syncRecords(final long surveyGroupId) {
         Map<String, Object> params = new HashMap<>(2);
-        params.put(DownloadDataPoints.KEY_SURVEY_GROUP_ID, surveyGroupId);
-        downloadDataPoints.execute(new DefaultFlowableObserver<DownloadResult>() {
+        params.put(DownloadDataPoints.KEY_SURVEY_ID, surveyGroupId);
+        downloadDataPoints.execute(new DisposableSingleObserver<DownloadResult>() {
             @Override
-            public void onComplete() {
+            public void onSuccess(DownloadResult result) {
                 view.hideProgress();
-            }
-
-            @Override
-            public void onNext(DownloadResult result) {
-                Timber.d("onNext datapoint sync: synced : %d", result.getNumberOfSyncedItems());
-
                 if (result.getResultCode() == SUCCESS) {
                     if (result.getNumberOfSyncedItems() > 0) {
                         view.showSyncedResults(result.getNumberOfSyncedItems());
@@ -162,7 +155,7 @@ public class DataPointsMapPresenter implements Presenter {
                     }
                 }
             }
-        }, new ErrorComposable() {
+
             @Override
             public void onError(Throwable e) {
                 Timber.e(e, "Error syncing %s", surveyGroupId);

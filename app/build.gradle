@@ -11,8 +11,6 @@ sentry {
     autoUpload true
 }
 
-def isCi = "true" == System.getenv("TRAVIS") || "true" == System.getenv("CI")
-
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
 
@@ -219,13 +217,8 @@ dependencies {
     implementation "io.reactivex.rxjava2:rxjava:${rootProject.ext.rxJavaVersion}"
     implementation "com.squareup.okhttp3:logging-interceptor:${rootProject.ext.loggingInterceptorVersion}"
     implementation "com.google.code.gson:gson:${rootProject.ext.gsonVersion}"
-    if (isCi) {
-        implementation "com.squareup.leakcanary:leakcanary-android-no-op:${rootProject.ext.leakCanaryVersion}"
-    } else {
-        debugImplementation "com.squareup.leakcanary:leakcanary-android:${rootProject.ext.leakCanaryVersion}"
-        releaseImplementation "com.squareup.leakcanary:leakcanary-android-no-op:${rootProject.ext.leakCanaryVersion}"
-        debugImplementation "com.squareup.leakcanary:leakcanary-support-fragment:${rootProject.ext.leakCanaryVersion}"
-    }
+
+    debugImplementation "com.squareup.leakcanary:leakcanary-android:${rootProject.ext.leakCanaryVersion}"
 
     implementation "com.google.firebase:firebase-analytics:${rootProject.ext.firebaseVersion}"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"

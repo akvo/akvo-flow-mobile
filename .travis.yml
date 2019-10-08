@@ -43,7 +43,6 @@ before_install:
   - echo "android.enableJetifier=true" >> gradle.properties
   - echo "android.enableR8=false" >> gradle.properties
   - echo "android.enableR8=false" >> app/gradle.properties
-  - chmod +x fastlane/deploy_beta.sh
   - PWD=echo pwd
   - echo "RELEASE_STORE_FILE="$PWD"/app/fieldsurvey-release.keystore" >> app/gradle.properties
   - chmod +x travis/deploy_release.sh

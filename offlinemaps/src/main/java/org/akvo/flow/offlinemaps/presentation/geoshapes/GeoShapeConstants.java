@@ -21,6 +21,7 @@ package org.akvo.flow.offlinemaps.presentation.geoshapes;
 
 public class GeoShapeConstants {
     public static final String CIRCLE_SOURCE_ID = "circle-source-id";
+    public static final String CIRCLE_SOURCE_ID_LABEL = "circle-source-id-label";
     public static final String FILL_SOURCE_ID = "fill-source-id";
     public static final String LINE_SOURCE_ID = "line-source-id";
     public static final String CIRCLE_LAYER_ID = "unselected-point-layer-id";
@@ -46,4 +47,9 @@ public class GeoShapeConstants {
     public static final String POINT_SELECTED_PROPERTY = "is-point-selected";
     public static final String SHAPE_SELECTED_PROPERTY = "is-shape-selected";
     public static final String LAT_LNG_PROPERTY = "lat-lng";
+    public static final String POINT_ID = "point-id";
+    public static final String FEATURE_ID = "shape-id";
+    public static final String PROPERTY_POINT_COUNT = "pointCount";
+    public static final String PROPERTY_LENGTH = "length";
+    public static final String PROPERTY_AREA = "area";
 }

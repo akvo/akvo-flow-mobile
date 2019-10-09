@@ -1,5 +1,19 @@
 Akvo FLOW app release notes
 ===========================
+# ver 2.8.1
+Date: 02 October 2019
+
+* **Review background work tasks and services** - [#1414](https://github.com/akvo/akvo-flow-mobile/issues/1414)
+* **Use offline maps when capturing geoshapes** - [#1447](https://github.com/akvo/akvo-flow-mobile/issues/1447)
+* **View geoshape using Mapbox** - [#1462](https://github.com/akvo/akvo-flow-mobile/issues/1462)
+* **Deleting offline region should also delete it's id if it was selected** - [#1468](https://github.com/akvo/akvo-flow-mobile/issues/1468)
+* **Creating a geoshape area with more than 3 points does not follow point order** - [#1483](https://github.com/akvo/akvo-flow-mobile/issues/1483)
+* **Deleting geoshape points** - [#1484](https://github.com/akvo/akvo-flow-mobile/issues/1484)
+* **Issues with geoshape metadata** - [#1485](https://github.com/akvo/akvo-flow-mobile/issues/1485)
+* **Starting foreground services now requires a permission** - [#1489](https://github.com/akvo/akvo-flow-mobile/issues/1489)
+
+---------------
+
 # ver 2.8.0.1
 Date: 06 August 2019
 

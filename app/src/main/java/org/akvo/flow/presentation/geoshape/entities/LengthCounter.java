@@ -17,28 +17,32 @@
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.akvo.flow.presentation.geoshape.create;
+package org.akvo.flow.presentation.geoshape.entities;
 
-import com.mapbox.geojson.Point;
-import com.mapbox.mapboxsdk.geometry.LatLng;
+import android.location.Location;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
 
-public class CoordinatesMapper {
+public class LengthCounter {
 
     @Inject
-    public CoordinatesMapper() {
+    public LengthCounter() {
     }
 
-    List<LatLng> toLatLng(List<Point> coordinates) {
-        List<LatLng> latLngs = new ArrayList<>();
-        for (Point p : coordinates) {
-            LatLng latLng = new LatLng(p.latitude(), p.longitude());
-            latLngs.add(latLng);
+    public float computeLength(List<ShapePoint> points) {
+        float length = 0f;
+        ShapePoint previous = null;
+        for (ShapePoint point : points) {
+            if (previous != null) {
+                float[] distance = new float[1];
+                Location.distanceBetween(previous.getLatitude(), previous.getLongitude(),
+                        point.getLatitude(), point.getLongitude(), distance);
+                length += distance[0];
+            }
+            previous = point;
         }
-        return latLngs;
+        return length;
     }
 }

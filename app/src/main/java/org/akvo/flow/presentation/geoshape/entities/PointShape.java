@@ -17,34 +17,31 @@
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.akvo.flow.presentation.geoshape;
+package org.akvo.flow.presentation.geoshape.entities;
 
-import android.location.Location;
-
-import com.mapbox.geojson.Point;
+import android.os.Parcel;
 
 import java.util.List;
 
-import javax.inject.Inject;
+public class PointShape extends Shape {
 
-public class LengthCounter {
-
-    @Inject
-    public LengthCounter() {
+    public PointShape(String featureId, List<ShapePoint> points) {
+        super(featureId, points);
     }
 
-    public float computeLength(List<Point> points) {
-        float length = 0f;
-        Point previous = null;
-        for (Point point : points) {
-            if (previous != null) {
-                float[] distance = new float[1];
-                Location.distanceBetween(previous.latitude(), previous.longitude(),
-                        point.latitude(), point.longitude(), distance);
-                length += distance[0];
-            }
-            previous = point;
+    public PointShape(Parcel in) {
+        super(in);
+    }
+
+    public static final Creator<PointShape> CREATOR = new Creator<PointShape>() {
+        @Override
+        public PointShape createFromParcel(Parcel in) {
+            return new PointShape(in);
         }
-        return length;
-    }
+
+        @Override
+        public PointShape[] newArray(int size) {
+            return new PointShape[size];
+        }
+    };
 }

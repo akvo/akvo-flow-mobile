@@ -26,6 +26,8 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.util.AttributeSet;
 
+import com.mapbox.android.gestures.MoveGestureDetector;
+import com.mapbox.android.gestures.StandardScaleGestureDetector;
 import com.mapbox.geojson.Feature;
 import com.mapbox.geojson.FeatureCollection;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
@@ -152,6 +154,7 @@ public class MapBoxMapItemListViewImpl extends MapView implements OnMapReadyCall
         selectionManager = new SelectionManager(this, mapboxMap,
                 getSelectionListener(getContext()));
         this.mapboxMap.addOnMapClickListener(this);
+        addScaleAndMoveListeners();
 
         this.mapboxMap.setStyle(Style.MAPBOX_STREETS, style -> {
             style.addImage(MARKER_IMAGE, BitmapFactory.decodeResource(
@@ -163,6 +166,53 @@ public class MapBoxMapItemListViewImpl extends MapView implements OnMapReadyCall
             }
             presenter.loadOfflineSettings();
         });
+    }
+
+    /**
+     * When the map is zoomed or moved the displayed window popup may get displaced compared to the
+     * marker itself or the marker may get clustered and the popup becomes orphaned
+     * Better dismiss it and if user wants to select it, let him do it again.
+     */
+    private void addScaleAndMoveListeners() {
+        if (mapboxMap != null) {
+            mapboxMap.addOnScaleListener(new MapboxMap.OnScaleListener() {
+                @Override
+                public void onScaleBegin(@NonNull StandardScaleGestureDetector detector) {
+                    if (selectionManager != null) {
+                        selectionManager.unSelectFeature();
+                    }
+                }
+
+                @Override
+                public void onScale(@NonNull StandardScaleGestureDetector detector) {
+                    //EMPTY
+                }
+
+                @Override
+                public void onScaleEnd(@NonNull StandardScaleGestureDetector detector) {
+                    //EMPTY
+                }
+            });
+
+            mapboxMap.addOnMoveListener(new MapboxMap.OnMoveListener() {
+                @Override
+                public void onMoveBegin(@NonNull MoveGestureDetector detector) {
+                    if (selectionManager != null) {
+                        selectionManager.unSelectFeature();
+                    }
+                }
+
+                @Override
+                public void onMove(@NonNull MoveGestureDetector detector) {
+                    //EMPTY
+                }
+
+                @Override
+                public void onMoveEnd(@NonNull MoveGestureDetector detector) {
+                    //EMPTY
+                }
+            });
+        }
     }
 
     private InfoWindowLayout.InfoWindowSelectionListener getSelectionListener(Context context) {

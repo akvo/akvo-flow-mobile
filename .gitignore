@@ -48,8 +48,6 @@ captures/
 #sentry config files
 sentry.properties
 
-!/util/upload-apk/build/libs/deploy-1.0.jar
-
 #CI config
 fastlane/report.xml
 fastlane/README.md

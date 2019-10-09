@@ -177,7 +177,10 @@ public class MapBoxMapItemListViewImpl extends MapView implements OnMapReadyCall
     private void addClusteredGeoJsonSource(@NonNull Style loadedMapStyle, List<Feature> features) {
         addGeoJsonSource(loadedMapStyle, FeatureCollection.fromFeatures(features));
         addUnClusteredLayer(loadedMapStyle);
+        addClusteredLayers(loadedMapStyle);
+    }
 
+    private void addClusteredLayers(@NonNull Style loadedMapStyle) {
         int[][] layers = new int[][] {
                 new int[] { 50, Color.parseColor("#009954") },
                 new int[] { 20, Color.parseColor("#007B99") },
@@ -190,9 +193,9 @@ public class MapBoxMapItemListViewImpl extends MapView implements OnMapReadyCall
         addCountLabels(loadedMapStyle);
     }
 
-    private void addClusterLayer(@NonNull Style loadedMapStyle, int[][] layers, int position) {
-        int layerColor = layers[position][1];
-        CircleLayer circles = new CircleLayer("cluster-" + position, SOURCE_ID);
+    private void addClusterLayer(@NonNull Style loadedMapStyle, int[][] layers, int layer) {
+        int layerColor = layers[layer][1];
+        CircleLayer circles = new CircleLayer("cluster-" + layer, SOURCE_ID);
         circles.setProperties(
                 circleColor(layerColor),
                 circleRadius(18f)
@@ -201,14 +204,12 @@ public class MapBoxMapItemListViewImpl extends MapView implements OnMapReadyCall
         Expression pointCount = toNumber(get(POINT_COUNT));
 
         // Add a filter to the cluster layer that hides the circles based on "point_count"
-        int minPointsNumber = layers[position][0];
-        circles.setFilter(
-                position == 0
-                        ? all(has(POINT_COUNT),
-                        gte(pointCount, literal(minPointsNumber))
-                ) : all(has(POINT_COUNT),
-                        gt(pointCount, literal(minPointsNumber)),
-                        lt(pointCount, literal(layers[position - 1][0]))
+        int minPointsNumber = layers[layer][0];
+        circles.setFilter(layer == 0 ?
+                all(has(POINT_COUNT), gte(pointCount, literal(minPointsNumber - 1))) :
+                all(has(POINT_COUNT),
+                        gt(pointCount, literal(minPointsNumber - 1)),
+                        lt(pointCount, literal(layers[layer - 1][0]))
                 )
         );
         loadedMapStyle.addLayer(circles);
@@ -228,24 +229,13 @@ public class MapBoxMapItemListViewImpl extends MapView implements OnMapReadyCall
 
     private void addUnClusteredLayer(@NonNull Style loadedMapStyle) {
         SymbolLayer unClustered = new SymbolLayer(UN_CLUSTERED_POINTS, SOURCE_ID);
-
-        unClustered.setProperties(
-                iconImage(MARKER_IMAGE),
-                iconColor(
-                        rgb(255, 119, 77)
-                )
-        );
+        unClustered.setProperties(iconImage(MARKER_IMAGE), iconColor(rgb(255, 119, 77)));
         loadedMapStyle.addLayer(unClustered);
     }
 
-    private void addGeoJsonSource(@NonNull Style loadedMapStyle,
-            FeatureCollection featureCollection) {
-        source = new GeoJsonSource(SOURCE_ID,
-                featureCollection,
-                new GeoJsonOptions()
-                        .withCluster(true)
-                        .withClusterRadius(50)
-        );
+    private void addGeoJsonSource(@NonNull Style loadedMapStyle, FeatureCollection collection) {
+        GeoJsonOptions options = new GeoJsonOptions().withCluster(true).withClusterRadius(50);
+        source = new GeoJsonSource(SOURCE_ID, collection, options);
         loadedMapStyle.addSource(source);
     }
 
@@ -317,5 +307,8 @@ public class MapBoxMapItemListViewImpl extends MapView implements OnMapReadyCall
     public void onDestroy() {
         super.onDestroy();
         presenter.destroy();
+        if (selectionManager != null) {
+            selectionManager.destroy();
+        }
     }
 }

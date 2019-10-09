@@ -102,4 +102,8 @@ public class SelectionManager {
         LatLng latLng = new LatLng(latitude, longitude);
         markerView.setLatLng(latLng);
     }
+
+    public void destroy() {
+        markerViewManager.onDestroy();
+    }
 }

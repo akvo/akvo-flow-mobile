@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -15,24 +15,28 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 
 package org.akvo.flow.ui.view.media.photo;
 
+import org.akvo.flow.domain.entity.DomainImageMetadata;
 import org.akvo.flow.domain.response.value.Media;
 
-public interface IPhotoQuestionView {
+import javax.inject.Inject;
 
-    void showLoading();
+public class MediaMapper {
 
-    void displayImage(Media media);
+    private final LocationMapper locationMapper;
 
-    void hideLoading();
+    @Inject
+    public MediaMapper(LocationMapper locationMapper) {
+        this.locationMapper = locationMapper;
+    }
 
-    void showErrorGettingMedia();
-
-    void updateResponse(String localFilePath);
-
-    void displayLocationInfo();
+    public Media transform(DomainImageMetadata imageMetadata) {
+        Media media = new Media();
+        media.setFilename(imageMetadata.getFilename());
+        media.setLocation(locationMapper.transform(imageMetadata.getDomainImageLocation()));
+        return media;
+    }
 }

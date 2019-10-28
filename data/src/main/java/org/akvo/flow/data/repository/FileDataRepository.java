@@ -22,18 +22,22 @@ package org.akvo.flow.data.repository;
 
 import android.graphics.Bitmap;
 import android.net.Uri;
+
+import org.akvo.flow.data.datasource.DataSourceFactory;
+import org.akvo.flow.domain.entity.DomainImageMetadata;
+import org.akvo.flow.domain.entity.InstanceIdUuid;
+import org.akvo.flow.domain.repository.FileRepository;
+
+import java.io.File;
+import java.util.List;
+
+import javax.inject.Inject;
+
 import io.reactivex.Completable;
 import io.reactivex.Maybe;
 import io.reactivex.Observable;
 import io.reactivex.annotations.NonNull;
 import io.reactivex.functions.Function;
-import org.akvo.flow.data.datasource.DataSourceFactory;
-import org.akvo.flow.domain.entity.InstanceIdUuid;
-import org.akvo.flow.domain.repository.FileRepository;
-
-import javax.inject.Inject;
-import java.io.File;
-import java.util.List;
 
 public class FileDataRepository implements FileRepository {
 
@@ -52,7 +56,7 @@ public class FileDataRepository implements FileRepository {
     }
 
     @Override
-    public Observable<Boolean> copyResizedImage(final Uri uri, final String resizedImagePath,
+    public Observable<DomainImageMetadata> copyResizedImage(final Uri uri, final String resizedImagePath,
             final int imageSize, final boolean removeDuplicate) {
         return dataSourceFactory.getImageDataSource()
                 .copyResizedImage(uri, resizedImagePath, imageSize, removeDuplicate);

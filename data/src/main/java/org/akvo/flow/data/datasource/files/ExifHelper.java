@@ -22,6 +22,8 @@ package org.akvo.flow.data.datasource.files;
 
 import android.text.TextUtils;
 
+import org.akvo.flow.data.entity.images.DataImageLocation;
+
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -38,7 +40,7 @@ public class ExifHelper {
     public ExifHelper() {
     }
 
-    boolean updateExifData(@Nullable InputStream originalImageInputStream,
+    DataImageLocation updateExifData(@Nullable InputStream originalImageInputStream,
             @NonNull String resizedImagePath) {
         if (originalImageInputStream != null) {
             try {
@@ -62,12 +64,15 @@ public class ExifHelper {
                 copyAttribute(originalImageExif, newImageExif, ExifInterface.TAG_GPS_ALTITUDE);
                 copyAttribute(originalImageExif, newImageExif, ExifInterface.TAG_GPS_ALTITUDE_REF);
                 newImageExif.saveAttributes();
-                return true;
+                double[] latLng = newImageExif.getLatLong();
+                Double latitude = latLng == null? null: latLng[0];
+                Double longitude = latLng == null? null: latLng[1];
+                return new DataImageLocation(latitude, longitude, newImageExif.getAltitude(0.0));
             } catch (IOException e) {
                 Timber.e(e);
             }
         }
-        return false;
+        return new DataImageLocation(null, null, 0);
     }
 
     private String getOrientation(ExifInterface exifInterface) {

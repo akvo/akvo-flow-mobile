@@ -59,6 +59,8 @@ public class ExifHelper {
                 copyAttribute(originalImageExif, newImageExif, ExifInterface.TAG_GPS_LATITUDE_REF);
                 copyAttribute(originalImageExif, newImageExif, ExifInterface.TAG_GPS_LONGITUDE);
                 copyAttribute(originalImageExif, newImageExif, ExifInterface.TAG_GPS_LONGITUDE_REF);
+                copyAttribute(originalImageExif, newImageExif, ExifInterface.TAG_GPS_ALTITUDE);
+                copyAttribute(originalImageExif, newImageExif, ExifInterface.TAG_GPS_ALTITUDE_REF);
                 newImageExif.saveAttributes();
                 return true;
             } catch (IOException e) {

@@ -23,13 +23,17 @@ import org.akvo.flow.domain.entity.DomainImageLocation;
 
 import javax.inject.Inject;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 public class DomainImageLocationMapper {
 
     @Inject
     public DomainImageLocationMapper() {
     }
 
-    public DomainImageLocation transform(DataImageLocation location) {
+    @Nullable
+    public DomainImageLocation transform(@NonNull DataImageLocation location) {
         boolean isValidLocation = location.getLatitude() != null && location.getLongitude() != null;
         return isValidLocation ?
                 new DomainImageLocation(location.getLatitude(), location.getLongitude(),

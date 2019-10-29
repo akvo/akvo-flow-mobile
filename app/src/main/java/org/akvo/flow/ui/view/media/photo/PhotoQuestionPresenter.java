@@ -49,8 +49,7 @@ public class PhotoQuestionPresenter implements Presenter {
 
     @Inject
     public PhotoQuestionPresenter(@Named("copyResizedImage") UseCase saveResizedImage,
-            MediaFileHelper mediaFileHelper,
-            MediaMapper mediaMapper) {
+            MediaFileHelper mediaFileHelper, MediaMapper mediaMapper) {
         this.saveResizedImage = saveResizedImage;
         this.mediaFileHelper = mediaFileHelper;
         this.mediaMapper = mediaMapper;

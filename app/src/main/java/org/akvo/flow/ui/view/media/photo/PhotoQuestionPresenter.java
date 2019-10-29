@@ -21,9 +21,9 @@
 package org.akvo.flow.ui.view.media.photo;
 
 import android.net.Uri;
-import androidx.annotation.Nullable;
 import android.text.TextUtils;
 
+import org.akvo.flow.domain.entity.DomainImageMetadata;
 import org.akvo.flow.domain.interactor.DefaultObserver;
 import org.akvo.flow.domain.interactor.SaveResizedImage;
 import org.akvo.flow.domain.interactor.UseCase;
@@ -37,6 +37,7 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import androidx.annotation.Nullable;
 import timber.log.Timber;
 
 public class PhotoQuestionPresenter implements Presenter {
@@ -44,12 +45,14 @@ public class PhotoQuestionPresenter implements Presenter {
     private final UseCase saveResizedImage;
     private final MediaFileHelper mediaFileHelper;
     private IPhotoQuestionView view;
+    private final MediaMapper mediaMapper;
 
     @Inject
     public PhotoQuestionPresenter(@Named("copyResizedImage") UseCase saveResizedImage,
-            MediaFileHelper mediaFileHelper) {
+            MediaFileHelper mediaFileHelper, MediaMapper mediaMapper) {
         this.saveResizedImage = saveResizedImage;
         this.mediaFileHelper = mediaFileHelper;
+        this.mediaMapper = mediaMapper;
     }
 
     public void setView(IPhotoQuestionView view) {
@@ -84,10 +87,10 @@ public class PhotoQuestionPresenter implements Presenter {
             params.put(SaveResizedImage.ORIGINAL_FILE_NAME_PARAM, originalFilePath);
             params.put(SaveResizedImage.RESIZED_FILE_NAME_PARAM, resizedImageFilePath);
             params.put(SaveResizedImage.REMOVE_ORIGINAL_IMAGE_PARAM, deleteOriginal);
-            saveResizedImage.execute(new DefaultObserver<Boolean>() {
+            saveResizedImage.execute(new DefaultObserver<DomainImageMetadata>() {
                 @Override
-                public void onNext(Boolean ignored) {
-                    view.displayImage(resizedImageFilePath);
+                public void onNext(DomainImageMetadata imageMetadata) {
+                    view.displayImage(mediaMapper.transform(imageMetadata));
                 }
 
                 @Override

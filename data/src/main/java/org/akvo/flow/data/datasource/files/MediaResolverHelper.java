@@ -25,10 +25,9 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import android.text.TextUtils;
 
+import org.akvo.flow.data.entity.images.DataImageLocation;
 import org.akvo.flow.data.util.FileHelper;
 
 import java.io.FileInputStream;
@@ -37,6 +36,8 @@ import java.io.InputStream;
 
 import javax.inject.Inject;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import timber.log.Timber;
 
 public class MediaResolverHelper {
@@ -80,11 +81,11 @@ public class MediaResolverHelper {
         return deleteMedia(uri);
     }
 
-    boolean updateExifData(@NonNull Uri uri, @NonNull String resizedImagePath) {
+    DataImageLocation updateExifData(@NonNull Uri uri, @NonNull String resizedImagePath) {
         final InputStream inputStream = getInputStreamFromUri(uri);
-        final boolean dataUpdated = exifHelper.updateExifData(inputStream, resizedImagePath);
+        final DataImageLocation location = exifHelper.updateExifData(inputStream, resizedImagePath);
         fileHelper.close(inputStream);
-        return dataUpdated;
+        return location;
     }
 
     void removeDuplicatedExtraFile(@NonNull Uri uri, @NonNull String imagePath) {

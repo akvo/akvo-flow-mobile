@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -15,24 +15,30 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 
 package org.akvo.flow.ui.view.media.photo;
 
-import org.akvo.flow.domain.response.value.Media;
+import org.akvo.flow.domain.entity.DomainImageLocation;
+import org.akvo.flow.domain.response.value.Location;
 
-public interface IPhotoQuestionView {
+import javax.inject.Inject;
 
-    void showLoading();
+import androidx.annotation.Nullable;
 
-    void displayImage(Media media);
+public class LocationMapper {
 
-    void hideLoading();
+    @Inject
+    public LocationMapper() {
+    }
 
-    void showErrorGettingMedia();
-
-    void updateResponse(String localFilePath);
-
-    void displayLocationInfo();
+    @Nullable
+    public Location transform(@Nullable DomainImageLocation domainImageLocation) {
+        if (domainImageLocation == null) {
+            return null;
+        }
+        //precision is not available in exif tags so we just set it to 0
+        return new Location(domainImageLocation.getLatitude(), domainImageLocation.getLongitude(),
+                domainImageLocation.getAltitude(), 0.0f);
+    }
 }

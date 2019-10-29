@@ -340,6 +340,7 @@ public class PhotoQuestionView extends QuestionView
                 if (location != null) {
                     displayLocation(location[0], location[1]);
                 } else {
+                    mLocationInfo.setVisibility(VISIBLE);
                     mLocationInfo.setText(R.string.image_location_unknown);
                 }
             } else {

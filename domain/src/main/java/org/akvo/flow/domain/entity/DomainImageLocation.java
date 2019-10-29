@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -15,24 +15,31 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 
-package org.akvo.flow.ui.view.media.photo;
+package org.akvo.flow.domain.entity;
 
-import org.akvo.flow.domain.response.value.Media;
+public class DomainImageLocation {
 
-public interface IPhotoQuestionView {
+    private final double latitude;
+    private final double longitude;
+    private final double altitude;
 
-    void showLoading();
+    public DomainImageLocation(double latitude, double longitude, double altitude) {
+        this.latitude = latitude;
+        this.longitude = longitude;
+        this.altitude = altitude;
+    }
 
-    void displayImage(Media media);
+    public double getLatitude() {
+        return latitude;
+    }
 
-    void hideLoading();
+    public double getLongitude() {
+        return longitude;
+    }
 
-    void showErrorGettingMedia();
-
-    void updateResponse(String localFilePath);
-
-    void displayLocationInfo();
+    public double getAltitude() {
+        return altitude;
+    }
 }

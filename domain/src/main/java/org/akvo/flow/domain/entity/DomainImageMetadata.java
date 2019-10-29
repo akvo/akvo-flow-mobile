@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -15,24 +15,30 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 
-package org.akvo.flow.ui.view.media.photo;
+package org.akvo.flow.domain.entity;
 
-import org.akvo.flow.domain.response.value.Media;
+import androidx.annotation.Nullable;
 
-public interface IPhotoQuestionView {
+public class DomainImageMetadata {
 
-    void showLoading();
+    private final String filename;
 
-    void displayImage(Media media);
+    @Nullable
+    private final DomainImageLocation domainImageLocation;
 
-    void hideLoading();
+    public DomainImageMetadata(String filename, @Nullable DomainImageLocation domainImageLocation) {
+        this.filename = filename;
+        this.domainImageLocation = domainImageLocation;
+    }
 
-    void showErrorGettingMedia();
+    public String getFilename() {
+        return filename;
+    }
 
-    void updateResponse(String localFilePath);
-
-    void displayLocationInfo();
+    @Nullable
+    public DomainImageLocation getDomainImageLocation() {
+        return domainImageLocation;
+    }
 }

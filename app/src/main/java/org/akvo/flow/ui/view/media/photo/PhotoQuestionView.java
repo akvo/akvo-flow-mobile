@@ -35,6 +35,7 @@ import org.akvo.flow.activity.FormActivity;
 import org.akvo.flow.async.MediaSyncTask;
 import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionResponse;
+import org.akvo.flow.domain.response.value.Location;
 import org.akvo.flow.domain.response.value.Media;
 import org.akvo.flow.event.QuestionInteractionEvent;
 import org.akvo.flow.event.SurveyListener;
@@ -329,23 +330,30 @@ public class PhotoQuestionView extends QuestionView
 
     @Override
     public void displayLocationInfo() {
-        if (mMedia.getLocation() != null) {
-            mLocationInfo.setVisibility(VISIBLE);
-            mLocationInfo.setText(R.string.image_location_saved);
+        Location mediaLocation = mMedia.getLocation();
+        if (mediaLocation != null) {
+            displayLocation(mediaLocation.getLatitude(), mediaLocation.getLongitude());
         } else {
             File file = rebuildFilePath();
             if (file != null && file.exists()) {
-                mLocationInfo.setVisibility(VISIBLE);
                 double[] location = ImageUtil.getLocation(file.getAbsolutePath());
                 if (location != null) {
-                    mLocationInfo.setText(R.string.image_location_saved);
+                    displayLocation(location[0], location[1]);
                 } else {
+                    mLocationInfo.setVisibility(VISIBLE);
                     mLocationInfo.setText(R.string.image_location_unknown);
                 }
             } else {
                 mLocationInfo.setVisibility(GONE);
             }
         }
+    }
+
+    private void displayLocation(double latitude, double longitude) {
+        String locationText = getContext()
+                .getString(R.string.image_location_coordinates, latitude + "", longitude + "");
+        mLocationInfo.setText(locationText);
+        mLocationInfo.setVisibility(VISIBLE);
     }
 
     private void showImageError() {

@@ -224,7 +224,6 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
     implementation "androidx.core:core-ktx:${rootProject.ext.coreKtxVersion}"
     implementation "com.mapbox.mapboxsdk:mapbox-android-sdk:${rootProject.ext.mapboxVersion}"
-    implementation "com.mapbox.mapboxsdk:mapbox-android-plugin-markerview-v7:${rootProject.ext.mapboxMarkerVersion}"
     implementation "androidx.work:work-runtime:${rootProject.ext.workVersion}"
 
     testImplementation "junit:junit:${rootProject.ext.jUnitVersion}"

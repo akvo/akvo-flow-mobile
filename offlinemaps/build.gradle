@@ -32,7 +32,7 @@ dependencies {
     implementation "com.google.android.material:material:${rootProject.ext.materialVersion}"
     implementation "androidx.constraintlayout:constraintlayout:${rootProject.ext.constraintLayoutVersion}"
     implementation "com.mapbox.mapboxsdk:mapbox-android-sdk:${rootProject.ext.mapboxVersion}"
-    implementation "com.mapbox.mapboxsdk:mapbox-android-plugin-markerview-v7:${rootProject.ext.mapboxMarkerVersion}"
+    implementation "com.mapbox.mapboxsdk:mapbox-android-plugin-markerview-v8:${rootProject.ext.mapboxMarkerVersion}"
     implementation "com.github.akvo:mapbox-offline-reactive:${rootProject.ext.mapboxOfflineRxVersion}"
     implementation "com.jakewharton.timber:timber:${rootProject.ext.timberVersion}"
     implementation "io.reactivex.rxjava2:rxandroid:${rootProject.ext.rxAndroidVersion}"

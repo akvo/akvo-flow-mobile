@@ -350,7 +350,7 @@ public class PhotoQuestionView extends QuestionView
 
     private void displayLocation(double latitude, double longitude) {
         String locationText = getContext()
-                .getString(R.string.image_location_coordinates, latitude, longitude);
+                .getString(R.string.image_location_coordinates, latitude + "", longitude + "");
         mLocationInfo.setText(locationText);
         mLocationInfo.setVisibility(VISIBLE);
     }

@@ -33,9 +33,6 @@ local.properties
 build/
 gradle.properties
 
-# Local debug settings
-app/src/debug/raw/survey.properties
-
 #Builds
 builds/
 tmp/
@@ -49,16 +46,18 @@ captures/
 sentry.properties
 
 #CI config
-fastlane/report.xml
-fastlane/README.md
 build_config
 .env.default
 akvo-flow-server-config/
 app/fabric.properties
 akvoflowapp-firebase-adminsdk*
-app/*.keystore
+
+#bitrise
+.bitrise.secrets.yml
+bitrise.yml
+*.keystore
+gradle.deps
 
 #errors
 hs_err_*
 .attach_pid*
-

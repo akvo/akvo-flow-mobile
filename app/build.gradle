@@ -6,19 +6,10 @@ if (!project.hasProperty("nodexcount")) {
     apply plugin: 'com.getkeepsafe.dexcount'
 }
 
-repositories {
-    mavenCentral()
-    jcenter()
-    maven { url 'https://maven.fabric.io/public' }
-    google()
-}
-
 sentry {
     autoProguardConfig true
     autoUpload true
 }
-
-def isCi = "true" == "true"
 
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
@@ -112,7 +103,6 @@ android {
             signingConfig signingConfigs.flowRelease
         }
         debug {
-            ext.enableCrashlytics = false
             minifyEnabled true
             multiDexEnabled true
             useProguard false
@@ -227,20 +217,13 @@ dependencies {
     implementation "io.reactivex.rxjava2:rxjava:${rootProject.ext.rxJavaVersion}"
     implementation "com.squareup.okhttp3:logging-interceptor:${rootProject.ext.loggingInterceptorVersion}"
     implementation "com.google.code.gson:gson:${rootProject.ext.gsonVersion}"
-    if (isCi) {
-        implementation "com.squareup.leakcanary:leakcanary-android-no-op:${rootProject.ext.leakCanaryVersion}"
-    } else {
-        debugImplementation "com.squareup.leakcanary:leakcanary-android:${rootProject.ext.leakCanaryVersion}"
-        releaseImplementation "com.squareup.leakcanary:leakcanary-android-no-op:${rootProject.ext.leakCanaryVersion}"
-        debugImplementation "com.squareup.leakcanary:leakcanary-support-fragment:${rootProject.ext.leakCanaryVersion}"
-    }
 
-    implementation "com.android.support:multidex:${rootProject.ext.multidexVersion}"
+    debugImplementation "com.squareup.leakcanary:leakcanary-android:${rootProject.ext.leakCanaryVersion}"
+
     implementation "com.google.firebase:firebase-analytics:${rootProject.ext.firebaseVersion}"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
     implementation "androidx.core:core-ktx:${rootProject.ext.coreKtxVersion}"
     implementation "com.mapbox.mapboxsdk:mapbox-android-sdk:${rootProject.ext.mapboxVersion}"
-    implementation "com.mapbox.mapboxsdk:mapbox-android-plugin-markerview-v7:${rootProject.ext.mapboxMarkerVersion}"
     implementation "androidx.work:work-runtime:${rootProject.ext.workVersion}"
 
     testImplementation "junit:junit:${rootProject.ext.jUnitVersion}"

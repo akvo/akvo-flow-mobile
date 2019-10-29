@@ -22,6 +22,8 @@ package org.akvo.flow.data.datasource.files;
 
 import android.text.TextUtils;
 
+import org.akvo.flow.data.entity.images.DataImageLocation;
+
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -38,34 +40,54 @@ public class ExifHelper {
     public ExifHelper() {
     }
 
-    boolean updateExifData(@Nullable InputStream originalImageInputStream,
+    DataImageLocation updateExifData(@Nullable InputStream originalImageInputStream,
             @NonNull String resizedImagePath) {
         if (originalImageInputStream != null) {
             try {
                 ExifInterface originalImageExif = new ExifInterface(originalImageInputStream);
                 ExifInterface newImageExif = new ExifInterface(resizedImagePath);
-                final String originalImageOrientation = getOrientation(originalImageExif);
-                final String newImageOrientation = getOrientation(newImageExif);
-
-                boolean orientationNeedsUpdate =
-                        !TextUtils.isEmpty(originalImageOrientation) && !originalImageOrientation
-                                .equals(newImageOrientation);
-                if (orientationNeedsUpdate) {
-                    newImageExif
-                            .setAttribute(ExifInterface.TAG_ORIENTATION, originalImageOrientation);
-                }
-
-                copyAttribute(originalImageExif, newImageExif, ExifInterface.TAG_GPS_LATITUDE);
-                copyAttribute(originalImageExif, newImageExif, ExifInterface.TAG_GPS_LATITUDE_REF);
-                copyAttribute(originalImageExif, newImageExif, ExifInterface.TAG_GPS_LONGITUDE);
-                copyAttribute(originalImageExif, newImageExif, ExifInterface.TAG_GPS_LONGITUDE_REF);
-                newImageExif.saveAttributes();
-                return true;
+                copyOrientationInformation(originalImageExif, newImageExif);
+                copyGpsInformation(originalImageExif, newImageExif);
+                return extractGpsData(newImageExif);
             } catch (IOException e) {
                 Timber.e(e);
             }
         }
-        return false;
+        return new DataImageLocation(null, null, 0);
+    }
+
+    @NonNull
+    private DataImageLocation extractGpsData(ExifInterface newImageExif) {
+        double[] latLong = newImageExif.getLatLong();
+        Double latitude = latLong == null? null: latLong[0];
+        Double longitude = latLong == null? null: latLong[1];
+        return new DataImageLocation(latitude, longitude, newImageExif.getAltitude(0.0));
+    }
+
+    private void copyGpsInformation(ExifInterface originalImageExif, ExifInterface newImageExif)
+            throws IOException {
+        copyAttribute(originalImageExif, newImageExif, ExifInterface.TAG_GPS_LATITUDE);
+        copyAttribute(originalImageExif, newImageExif, ExifInterface.TAG_GPS_LATITUDE_REF);
+        copyAttribute(originalImageExif, newImageExif, ExifInterface.TAG_GPS_LONGITUDE);
+        copyAttribute(originalImageExif, newImageExif, ExifInterface.TAG_GPS_LONGITUDE_REF);
+        copyAttribute(originalImageExif, newImageExif, ExifInterface.TAG_GPS_ALTITUDE);
+        copyAttribute(originalImageExif, newImageExif, ExifInterface.TAG_GPS_ALTITUDE_REF);
+        newImageExif.saveAttributes();
+    }
+
+    private void copyOrientationInformation(ExifInterface originalImageExif,
+            ExifInterface newImageExif) throws IOException {
+        final String originalImageOrientation = getOrientation(originalImageExif);
+        final String newImageOrientation = getOrientation(newImageExif);
+
+        boolean orientationNeedsUpdate =
+                !TextUtils.isEmpty(originalImageOrientation) && !originalImageOrientation
+                        .equals(newImageOrientation);
+        if (orientationNeedsUpdate) {
+            newImageExif
+                    .setAttribute(ExifInterface.TAG_ORIENTATION, originalImageOrientation);
+        }
+        newImageExif.saveAttributes();
     }
 
     private String getOrientation(ExifInterface exifInterface) {

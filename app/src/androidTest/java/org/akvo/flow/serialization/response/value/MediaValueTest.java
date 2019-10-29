@@ -33,15 +33,11 @@ public class MediaValueTest extends TestCase {
 
     public void testSerialization() {
         Media media = new Media();
-        Location location = new Location();
-        location.setAccuracy(5f);
-        location.setAltitude(1f);
-        location.setLatitude(40.0);
-        location.setLongitude(2.0);
+        Location location = new Location(40.0, 2.0, 1.0, 5f);
         media.setFilename("file1");
         media.setLocation(location);
 
-        String value = MediaValue.serialize(media);
+        String value = MediaValue.serialize(media, false);
 
         Media deserialized = MediaValue.deserialize(value);
 

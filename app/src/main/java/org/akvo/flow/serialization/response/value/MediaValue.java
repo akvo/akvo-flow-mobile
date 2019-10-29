@@ -19,8 +19,6 @@
 
 package org.akvo.flow.serialization.response.value;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import android.text.TextUtils;
 
 import com.google.gson.GsonBuilder;
@@ -30,13 +28,19 @@ import com.google.gson.JsonSyntaxException;
 import org.akvo.flow.domain.response.value.Media;
 import org.akvo.flow.domain.util.GsonMapper;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import timber.log.Timber;
 
 public class MediaValue {
 
     @NonNull
-    public static String serialize(Media media) {
-        GsonMapper mapper = new GsonMapper(new GsonBuilder().create());
+    public static String serialize(Media media, boolean serializeNulls) {
+        GsonBuilder gsonBuilder = new GsonBuilder();
+        if (serializeNulls) {
+            gsonBuilder.serializeNulls();
+        }
+        GsonMapper mapper = new GsonMapper(gsonBuilder.create());
         try {
             return mapper.write(media, Media.class);
         } catch (JsonIOException | JsonSyntaxException e) {

@@ -24,8 +24,6 @@ import android.Manifest;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.ImageView;
@@ -37,6 +35,7 @@ import org.akvo.flow.activity.FormActivity;
 import org.akvo.flow.async.MediaSyncTask;
 import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionResponse;
+import org.akvo.flow.domain.response.value.Location;
 import org.akvo.flow.domain.response.value.Media;
 import org.akvo.flow.event.QuestionInteractionEvent;
 import org.akvo.flow.event.SurveyListener;
@@ -56,6 +55,8 @@ import java.io.File;
 
 import javax.inject.Inject;
 
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -164,14 +165,11 @@ public class PhotoQuestionView extends QuestionView
     }
 
     private void storagePermissionNotGranted() {
-        final View.OnClickListener retryListener = new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (storagePermissionsHelper.userPressedDoNotShowAgain((FormActivity) getContext())) {
-                    navigator.navigateToAppSystemSettings(getContext());
-                } else {
-                    requestStoragePermissions();
-                }
+        final View.OnClickListener retryListener = v -> {
+            if (storagePermissionsHelper.userPressedDoNotShowAgain((FormActivity) getContext())) {
+                navigator.navigateToAppSystemSettings(getContext());
+            } else {
+                requestStoragePermissions();
             }
         };
         snackBarManager
@@ -215,9 +213,8 @@ public class PhotoQuestionView extends QuestionView
     }
 
     @Override
-    public void displayImage(String mediaFilePath) {
-        mMedia = new Media();
-        mMedia.setFilename(mediaFilePath);
+    public void displayImage(Media media) {
+        mMedia = media;
 
         captureResponse();
         displayThumbnail();
@@ -273,7 +270,7 @@ public class PhotoQuestionView extends QuestionView
         QuestionResponse response = null;
         if (mMedia != null && !TextUtils.isEmpty(mMedia.getFilename())) {
             Question question = getQuestion();
-            String value = MediaValue.serialize(mMedia);
+            String value = MediaValue.serialize(mMedia, true);
             response = new QuestionResponse.QuestionResponseBuilder()
                     .setValue(value)
                     .setType(ConstantUtil.IMAGE_RESPONSE_TYPE)
@@ -333,18 +330,30 @@ public class PhotoQuestionView extends QuestionView
 
     @Override
     public void displayLocationInfo() {
-        File file = rebuildFilePath();
-        if (file != null && file.exists()) {
-            mLocationInfo.setVisibility(VISIBLE);
-            double[] location = ImageUtil.getLocation(file.getAbsolutePath());
-            if (location != null) {
-                mLocationInfo.setText(R.string.image_location_saved);
-            } else {
-                mLocationInfo.setText(R.string.image_location_unknown);
-            }
+        Location mediaLocation = mMedia.getLocation();
+        if (mediaLocation != null) {
+            displayLocation(mediaLocation.getLatitude(), mediaLocation.getLongitude());
         } else {
-            mLocationInfo.setVisibility(GONE);
+            File file = rebuildFilePath();
+            if (file != null && file.exists()) {
+                double[] location = ImageUtil.getLocation(file.getAbsolutePath());
+                if (location != null) {
+                    displayLocation(location[0], location[1]);
+                } else {
+                    mLocationInfo.setVisibility(VISIBLE);
+                    mLocationInfo.setText(R.string.image_location_unknown);
+                }
+            } else {
+                mLocationInfo.setVisibility(GONE);
+            }
         }
+    }
+
+    private void displayLocation(double latitude, double longitude) {
+        String locationText = getContext()
+                .getString(R.string.image_location_coordinates, latitude + "", longitude + "");
+        mLocationInfo.setText(locationText);
+        mLocationInfo.setVisibility(VISIBLE);
     }
 
     private void showImageError() {

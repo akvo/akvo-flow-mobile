@@ -23,7 +23,6 @@ import android.content.res.Configuration;
 import android.text.TextUtils;
 
 import com.mapbox.mapboxsdk.Mapbox;
-import com.squareup.leakcanary.LeakCanary;
 
 import org.akvo.flow.BuildConfig;
 import org.akvo.flow.R;
@@ -72,15 +71,9 @@ public class FlowApp extends MultiDexApplication {
     @Override
     public void onCreate() {
         super.onCreate();
-        if (LeakCanary.isInAnalyzerProcess(this)) {
-            // This process is dedicated to LeakCanary for heap analysis.
-            // You should not init your app in this process.
-            return;
-        }
 
         Mapbox.getInstance(this, getString(R.string.mapbox_token));
 
-        installLeakCanary();
         initializeInjector();
         initLogging();
         updateLocale();
@@ -88,10 +81,6 @@ public class FlowApp extends MultiDexApplication {
         startBootstrapFolderTracker();
         updateLoggingInfo();
         saveConfig();
-    }
-
-    private void installLeakCanary() {
-        LeakCanary.install(this);
     }
 
     private void saveConfig() {

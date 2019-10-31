@@ -115,6 +115,20 @@ public class BriteSurveyDbAdapter {
                         });
     }
 
+    public Cursor getSubmittedDataPoints(long surveyGroupId) {
+        String queryString = "SELECT " + RecordColumns.RECORD_ID + " FROM"
+                + " (SELECT " + RecordColumns.RECORD_ID
+                + ", MIN(r." + SurveyInstanceColumns.STATUS + ") as " + SurveyInstanceColumns.STATUS
+                + " FROM " + Tables.RECORD
+                + " AS sl LEFT JOIN " + Tables.SURVEY_INSTANCE + " AS r ON "
+                + "sl." + RecordColumns.RECORD_ID + "=" + "r." + SurveyInstanceColumns.RECORD_ID
+                + " WHERE sl." + RecordColumns.SURVEY_GROUP_ID + " = " + surveyGroupId
+                + " GROUP BY sl." + RecordColumns.RECORD_ID + ")"
+                + " WHERE " + SurveyInstanceColumns.STATUS + " != " + SurveyInstanceStatus.SAVED;
+
+        return briteDatabase.query(queryString);
+    }
+
     /**
      * Uses a simple planar approximation of distance
      */
@@ -192,8 +206,21 @@ public class BriteSurveyDbAdapter {
         updateRecordModifiedDate(id, lastModified);
     }
 
-    public void deleteRecordsForSurvey(long surveyId) {
-        briteDatabase.delete(Tables.RECORD, RecordColumns.SURVEY_GROUP_ID + " = ?", surveyId + "");
+    public void deleteSubmittedRecordsForSurvey(long surveyId) {
+        Cursor cursor = getSubmittedDataPoints(surveyId);
+        List<String> records = new ArrayList<>();
+        if (cursor != null) {
+            if (cursor.moveToFirst()) {
+                int columnIdx = cursor.getColumnIndexOrThrow(RecordColumns.RECORD_ID);
+                do {
+                    records.add(cursor.getString(columnIdx));
+                } while (cursor.moveToNext());
+                cursor.close();
+            }
+        }
+        for (String recordId : records) {
+            briteDatabase.delete(Tables.RECORD, RecordColumns.RECORD_ID + " = ?", recordId);
+        }
     }
 
     /**

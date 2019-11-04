@@ -141,7 +141,8 @@ public class LockedGeoQuestionViewTest {
         onView(withId(R.id.lon_et)).perform(replaceText(""));
         onView(withId(R.id.height_et)).perform(replaceText(""));
         onView(withId(R.id.acc_tv))
-                .perform(replaceText(getString(R.string.geo_location_accuracy_default, rule)));
+                .perform(replaceTextInTextView(
+                        getString(R.string.geo_location_accuracy_default, rule)));
 
         closeSoftKeyboard();
         clickGeoButton();

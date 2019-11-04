@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2016-2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -22,7 +22,6 @@ package org.akvo.flow.injector.module;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.support.annotation.NonNull;
 
 import com.google.gson.Gson;
 import com.squareup.sqlbrite2.BriteDatabase;
@@ -32,14 +31,18 @@ import org.akvo.flow.BuildConfig;
 import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.data.datasource.preferences.SharedPreferencesDataSource;
 import org.akvo.flow.data.executor.JobExecutor;
-import org.akvo.flow.data.net.DeviceHelper;
 import org.akvo.flow.data.net.Encoder;
 import org.akvo.flow.data.net.HMACInterceptor;
 import org.akvo.flow.data.net.RestApi;
 import org.akvo.flow.data.net.RestServiceFactory;
 import org.akvo.flow.data.net.S3User;
 import org.akvo.flow.data.net.SignatureHelper;
+import org.akvo.flow.data.net.s3.AmazonAuthHelper;
+import org.akvo.flow.data.net.s3.BodyCreator;
+import org.akvo.flow.data.repository.ApkDataRepository;
 import org.akvo.flow.data.repository.FileDataRepository;
+import org.akvo.flow.data.repository.FormDataRepository;
+import org.akvo.flow.data.repository.MissingAndDeletedDataRepository;
 import org.akvo.flow.data.repository.SetupDataRepository;
 import org.akvo.flow.data.repository.SurveyDataRepository;
 import org.akvo.flow.data.repository.UserDataRepository;
@@ -48,10 +51,15 @@ import org.akvo.flow.database.DatabaseHelper;
 import org.akvo.flow.database.LanguageTable;
 import org.akvo.flow.domain.executor.PostExecutionThread;
 import org.akvo.flow.domain.executor.ThreadExecutor;
+import org.akvo.flow.domain.repository.ApkRepository;
 import org.akvo.flow.domain.repository.FileRepository;
+import org.akvo.flow.domain.repository.FormRepository;
+import org.akvo.flow.domain.repository.MissingAndDeletedRepository;
 import org.akvo.flow.domain.repository.SetupRepository;
 import org.akvo.flow.domain.repository.SurveyRepository;
 import org.akvo.flow.domain.repository.UserRepository;
+import org.akvo.flow.domain.util.DeviceHelper;
+import org.akvo.flow.domain.util.GsonMapper;
 import org.akvo.flow.thread.UIThread;
 import org.akvo.flow.util.logging.DebugLoggingHelper;
 import org.akvo.flow.util.logging.LoggingHelper;
@@ -65,6 +73,7 @@ import java.util.concurrent.TimeUnit;
 
 import javax.inject.Singleton;
 
+import androidx.annotation.NonNull;
 import dagger.Module;
 import dagger.Provides;
 import io.reactivex.schedulers.Schedulers;
@@ -99,6 +108,12 @@ public class ApplicationModule {
 
     @Provides
     @Singleton
+    ApkRepository provideApkRepository(ApkDataRepository apkDataRepository) {
+        return apkDataRepository;
+    }
+
+    @Provides
+    @Singleton
     FileRepository provideFileRepository(FileDataRepository fileDataRepository) {
         return fileDataRepository;
     }
@@ -121,6 +136,13 @@ public class ApplicationModule {
 
     @Provides
     @Singleton
+    MissingAndDeletedRepository provideMissingAndDeletedRepository(
+            MissingAndDeletedDataRepository repository) {
+        return repository;
+    }
+
+    @Provides
+    @Singleton
     UserRepository provideUserRepository(UserDataRepository userDataRepository) {
         return userDataRepository;
     }
@@ -129,6 +151,12 @@ public class ApplicationModule {
     @Singleton
     SetupRepository provideSetupRepository(SetupDataRepository setupDataRepository) {
         return setupDataRepository;
+    }
+
+    @Provides
+    @Singleton
+    FormRepository provideFormRepository(FormDataRepository formDataRepository) {
+        return formDataRepository;
     }
 
     @Provides
@@ -176,9 +204,9 @@ public class ApplicationModule {
 
     @Provides
     @Singleton
-    SharedPreferencesDataSource provideSharedPreferences() {
+    SharedPreferencesDataSource provideSharedPreferences(GsonMapper mapper) {
         return new SharedPreferencesDataSource(
-                application.getSharedPreferences(PREFS_NAME, PREFS_MODE));
+                application.getSharedPreferences(PREFS_NAME, PREFS_MODE), mapper);
     }
 
     @Provides
@@ -195,14 +223,21 @@ public class ApplicationModule {
 
     @Provides
     @Singleton
-    RestApi provideRestApi(DeviceHelper deviceHelper, RestServiceFactory serviceFactory,
-            Encoder encoder, ApiUrls apiUrls, SignatureHelper signatureHelper) {
+    AmazonAuthHelper provideAmazonAuthHelper(SignatureHelper signatureHelper) {
         S3User s3User = new S3User(BuildConfig.AWS_BUCKET, BuildConfig.AWS_ACCESS_KEY_ID,
                 BuildConfig.AWS_SECRET_KEY);
+        return new AmazonAuthHelper(signatureHelper, s3User);
+    }
+
+    @Provides
+    @Singleton
+    RestApi provideRestApi(DeviceHelper deviceHelper, RestServiceFactory serviceFactory,
+            Encoder encoder, ApiUrls apiUrls, AmazonAuthHelper amazonAuthHelper,
+            BodyCreator bodyCreator) {
         final DateFormat df = new SimpleDateFormat(REST_API_DATE_PATTERN, Locale.US);
         df.setTimeZone(TimeZone.getTimeZone(TIMEZONE));
         return new RestApi(deviceHelper, serviceFactory, encoder, BuildConfig.VERSION_NAME,
-                apiUrls, signatureHelper, s3User, df);
+                apiUrls, amazonAuthHelper, df, bodyCreator);
     }
 
     @Provides

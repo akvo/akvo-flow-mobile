@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2018-2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -20,11 +20,11 @@
 
 package org.akvo.flow.data.entity;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import android.text.TextUtils;
 
-import org.akvo.flow.data.datasource.FlowFileBrowser;
+import org.akvo.flow.data.util.FlowFileBrowser;
 import org.akvo.flow.data.util.Constants;
 import org.akvo.flow.data.util.FileHelper;
 
@@ -34,12 +34,12 @@ import javax.inject.Inject;
 
 public class S3FileMapper {
 
-    private final FlowFileBrowser folderBrowser;
+    private final FlowFileBrowser fileBrowser;
     private final FileHelper fileHelper;
 
     @Inject
-    public S3FileMapper(FlowFileBrowser folderBrowser, FileHelper fileHelper) {
-        this.folderBrowser = folderBrowser;
+    public S3FileMapper(FlowFileBrowser fileBrowser, FileHelper fileHelper) {
+        this.fileBrowser = fileBrowser;
         this.fileHelper = fileHelper;
     }
 
@@ -49,8 +49,9 @@ public class S3FileMapper {
         File transmissionFile = getFile(filename);
         if (transmissionFile != null && transmissionFile.exists()) {
             String md5Checksum = fileHelper.getMd5Base64(transmissionFile);
+            String md5Hex = fileHelper.hexMd5(transmissionFile);
             trans = new S3File(transmissionFile, isFilePublic(filename), getDir(filename),
-                    getAction(filename), md5Checksum);
+                    getAction(filename), md5Checksum, md5Hex);
         }
         return trans;
     }
@@ -82,7 +83,10 @@ public class S3FileMapper {
     }
 
     @Nullable
-    private File getFile(String filename) {
+    private File getFile(@Nullable String filename) {
+        if (TextUtils.isEmpty(filename)) {
+            return null;
+        }
         String ext = getFileExtension(filename);
         String folderName;
         if (isMedia(ext)) {
@@ -93,13 +97,7 @@ public class S3FileMapper {
             //unsupported file format found
             folderName = null;
         }
-        File folder = folderBrowser.getInternalFolder(folderName);
-        File file = new File(folder, filename);
-        if (file.exists()) {
-            return file;
-        } else {
-            return null;
-        }
+        return fileBrowser.getInternalFile(filename, folderName);
     }
 
     private boolean isMedia(@Nullable String ext) {

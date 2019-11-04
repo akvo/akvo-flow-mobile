@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2016-2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -28,20 +28,22 @@ import com.squareup.sqlbrite2.BriteDatabase;
 import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.broadcast.BootReceiver;
 import org.akvo.flow.broadcast.DataTimeoutReceiver;
-import org.akvo.flow.data.net.RestApi;
 import org.akvo.flow.domain.executor.PostExecutionThread;
 import org.akvo.flow.domain.executor.ThreadExecutor;
+import org.akvo.flow.domain.repository.ApkRepository;
 import org.akvo.flow.domain.repository.FileRepository;
-import org.akvo.flow.domain.repository.SetupRepository;
+import org.akvo.flow.domain.repository.FormRepository;
+import org.akvo.flow.domain.repository.MissingAndDeletedRepository;
 import org.akvo.flow.domain.repository.SurveyRepository;
 import org.akvo.flow.domain.repository.UserRepository;
 import org.akvo.flow.injector.module.ApplicationModule;
 import org.akvo.flow.injector.module.ViewModule;
 import org.akvo.flow.presentation.BaseActivity;
+import org.akvo.flow.service.ApkUpdateWorker;
 import org.akvo.flow.service.BootstrapService;
-import org.akvo.flow.service.DataFixService;
-import org.akvo.flow.service.DataPointUploadService;
-import org.akvo.flow.service.FileChangeTrackingService;
+import org.akvo.flow.service.DataFixWorker;
+import org.akvo.flow.service.DataPointUploadWorker;
+import org.akvo.flow.service.FileChangeTrackingWorker;
 import org.akvo.flow.service.SurveyDownloadService;
 import org.akvo.flow.service.UnPublishDataService;
 import org.akvo.flow.util.logging.LoggingHelper;
@@ -60,9 +62,7 @@ public interface ApplicationComponent {
 
     BriteDatabase provideDatabase();
 
-    void inject(FlowApp app);
-
-    void inject(BaseActivity baseActivity);
+    ApkRepository apkRepository();
 
     Context context();
 
@@ -76,19 +76,19 @@ public interface ApplicationComponent {
 
     UserRepository userRepository();
 
-    SetupRepository setupRepository();
+    FormRepository formRepository();
+
+    MissingAndDeletedRepository missingAndDeletedRepository();
 
     Gson gson();
 
-    RestApi restApi();
-
-    void inject(FileChangeTrackingService fileChangeTrackingService);
+    void inject(FileChangeTrackingWorker fileChangeTrackingWorker);
 
     void inject(SurveyDownloadService surveyDownloadService);
 
     void inject(BootstrapService bootstrapService);
 
-    void inject(DataFixService dataFixService);
+    void inject(DataFixWorker dataFixWorker);
 
     void inject(DataTimeoutReceiver dataTimeoutReceiver);
 
@@ -96,5 +96,11 @@ public interface ApplicationComponent {
 
     void inject(UnPublishDataService unPublishDataService);
 
-    void inject(DataPointUploadService uploadService);
+    void inject(DataPointUploadWorker dataPointUploadWorker);
+
+    void inject(ApkUpdateWorker apkUpdateWorker);
+
+    void inject(FlowApp app);
+
+    void inject(BaseActivity baseActivity);
 }

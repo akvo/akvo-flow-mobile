@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017,2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -23,7 +23,7 @@ package org.akvo.flow.ui.view.option;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 import android.text.Html;
 import android.text.Spanned;
 import android.text.TextUtils;
@@ -276,11 +276,6 @@ public abstract class OptionQuestionView extends QuestionView {
         if (!values.isEmpty()) {
             response = OptionValue.serialize(values);
         }
-        QuestionResponse questionResponse = new QuestionResponse.QuestionResponseBuilder()
-                .setValue(response)
-                .setType(ConstantUtil.OPTION_RESPONSE_TYPE)
-                .setQuestionId(getQuestion().getId())
-                .createQuestionResponse();
-        setResponse(questionResponse, suppressListeners);
+        setResponse(suppressListeners, getQuestion(), response, ConstantUtil.OPTION_RESPONSE_TYPE);
     }
 }

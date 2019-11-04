@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -15,19 +15,12 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 
 package org.akvo.flow.presentation.datapoints.map;
 
-import android.app.Activity;
 import android.content.Context;
-import android.location.Criteria;
-import android.location.Location;
-import android.location.LocationManager;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v4.app.FragmentActivity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -36,17 +29,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.GoogleMap.OnInfoWindowClickListener;
-import com.google.android.gms.maps.GoogleMapOptions;
-import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.CameraPosition;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.LatLngBounds;
-import com.google.android.gms.maps.model.Marker;
-import com.google.maps.android.clustering.ClusterManager;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.mapbox.geojson.FeatureCollection;
 
 import org.akvo.flow.R;
 import org.akvo.flow.app.FlowApp;
@@ -54,22 +38,24 @@ import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.injector.component.ApplicationComponent;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
+import org.akvo.flow.offlinemaps.presentation.MapBoxMapItemListViewImpl;
+import org.akvo.flow.offlinemaps.presentation.MapReadyCallback;
 import org.akvo.flow.presentation.datapoints.DataPointSyncSnackBarManager;
-import org.akvo.flow.presentation.datapoints.map.entity.MapDataPoint;
+import org.akvo.flow.tracking.TrackingListener;
 import org.akvo.flow.ui.Navigator;
-import org.akvo.flow.ui.fragment.RecordListListener;
 import org.akvo.flow.util.ConstantUtil;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.inject.Inject;
 
-public class DataPointsMapFragment extends SupportMapFragment implements OnInfoWindowClickListener,
-        OnMapReadyCallback, DataPointsMapView {
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 
-    private static final int MAP_ZOOM_LEVEL = 10;
-    private static final String MAP_OPTIONS = "MapOptions";
+public class DataPointsMapFragment extends Fragment implements DataPointsMapView,
+        MapReadyCallback {
+
+    private static final int MAP_TAB = 1;
 
     @Inject
     DataPointSyncSnackBarManager dataPointSyncSnackBarManager;
@@ -81,27 +67,20 @@ public class DataPointsMapFragment extends SupportMapFragment implements OnInfoW
     Navigator navigator;
 
     @Nullable
-    private RecordListListener mListener;
-
-    private List<MapDataPoint> mItems;
-
-    @Nullable
     private ProgressBar progressBar;
 
-    @Nullable
-    private GoogleMap mMap;
-
-    private ClusterManager<MapDataPoint> mClusterManager;
     private boolean activityJustCreated;
     private Integer menuRes = null;
+
+    private FloatingActionButton offlineMapsFab;
+    private MapBoxMapItemListViewImpl mapView;
+
+    private TrackingListener trackingListener;
 
     public static DataPointsMapFragment newInstance(SurveyGroup surveyGroup) {
         DataPointsMapFragment fragment = new DataPointsMapFragment();
         Bundle args = new Bundle();
         args.putSerializable(ConstantUtil.SURVEY_GROUP_EXTRA, surveyGroup);
-        GoogleMapOptions options = new GoogleMapOptions();
-        options.zOrderOnTop(true);
-        args.putParcelable(MAP_OPTIONS, options);
         fragment.setArguments(args);
         return fragment;
     }
@@ -109,33 +88,36 @@ public class DataPointsMapFragment extends SupportMapFragment implements OnInfoW
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mItems = new ArrayList<>();
         setHasOptionsMenu(true);
     }
 
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        // This makes sure that the container activity has implemented
-        // the callback interface. If not, it throws an exception
-        try {
-            mListener = (RecordListListener) activity;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(
-                    activity.toString() + " must implement RecordListListener");
+    public void onAttach(Context context) {
+        super.onAttach(context);
+
+        FragmentActivity activity = getActivity();
+        if (! (activity instanceof TrackingListener)) {
+            throw new IllegalArgumentException("Activity must implement TrackingListener");
+        } else {
+            trackingListener = (TrackingListener) activity;
         }
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
-        View view = super.onCreateView(inflater, container, savedInstanceState);
-        if (view instanceof ViewGroup) {
-            ViewGroup viewGroup = (ViewGroup) view;
-            View.inflate(getActivity(), R.layout.map_progress_bar, viewGroup);
-            progressBar = (ProgressBar) view.findViewById(R.id.progressBar);
-        }
+        View view = inflater.inflate(R.layout.fragment_map_box_map, container, false);
+        progressBar = view.findViewById(R.id.progressBar);
+        offlineMapsFab = view.findViewById(R.id.offline_maps_fab);
         return view;
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        mapView = view.findViewById(R.id.mapView);
+        mapView.onCreate(savedInstanceState);
+        mapView.getMapAsyncWithCallback(this);
     }
 
     @Override
@@ -145,8 +127,7 @@ public class DataPointsMapFragment extends SupportMapFragment implements OnInfoW
         presenter.setView(this);
         SurveyGroup surveyGroup = (SurveyGroup) getArguments()
                 .getSerializable(ConstantUtil.SURVEY_GROUP_EXTRA);
-        presenter.onDataReady(surveyGroup);
-        getMapAsync(this);
+        presenter.onSurveyGroupReady(surveyGroup);
         activityJustCreated = true;
     }
 
@@ -162,101 +143,59 @@ public class DataPointsMapFragment extends SupportMapFragment implements OnInfoW
      *
      * @return {@link ApplicationComponent}
      */
+    @SuppressWarnings("ConstantConditions")
     private ApplicationComponent getApplicationComponent() {
         return ((FlowApp) getActivity().getApplication()).getApplicationComponent();
     }
 
     @Override
-    public void onMapReady(GoogleMap googleMap) {
-        mMap = googleMap;
-        configMap();
-        presenter.onViewReady();
-    }
-
-    private void configMap() {
-        if (mMap != null) {
-            mMap.setMyLocationEnabled(true);
-            mMap.setOnInfoWindowClickListener(this);
-            mClusterManager = new ClusterManager<>(getActivity(), mMap);
-            mClusterManager.setRenderer(new PointRenderer(mMap, getActivity(), mClusterManager));
-            mMap.setOnMarkerClickListener(mClusterManager);
-            mMap.setOnCameraChangeListener(new GoogleMap.OnCameraChangeListener() {
-                @Override
-                public void onCameraChange(CameraPosition cameraPosition) {
-                    cluster();
-                }
-            });
-            centerMapOnUserLocation();
-        }
-    }
-
-    private void cluster() {
-        if (mMap == null) {
-            return;
-        }
-
-        final LatLngBounds bounds = mMap.getProjection().getVisibleRegion().latLngBounds;
-        LatLng ne = bounds.northeast;
-        LatLng sw = bounds.southwest;
-        double latDst = Math.abs(ne.latitude - sw.latitude);
-        double lonDst = Math.abs(ne.longitude - sw.longitude);
-
-        final double scale = 1d;
-        LatLngBounds newBounds =
-                bounds.including(
-                        new LatLng(ne.latitude + latDst / scale, ne.longitude + lonDst / scale))
-                        .including(new LatLng(sw.latitude - latDst / scale,
-                                ne.longitude + lonDst / scale))
-                        .including(new LatLng(sw.latitude - latDst / scale,
-                                sw.longitude - lonDst / scale))
-                        .including(new LatLng(ne.latitude + latDst / scale,
-                                sw.longitude - lonDst / scale));
-
-        mClusterManager.clearItems();
-        for (MapDataPoint item : mItems) {
-            if (item.getPosition() != null && newBounds.contains(item.getPosition())) {
-                mClusterManager.addItem(item);
-            }
-        }
-        mClusterManager.cluster();
-    }
-
-    private void centerMapOnUserLocation() {
-        if (mMap == null) {
-            return;
-        }
-
-        LatLng position = null;
-        LocationManager manager = (LocationManager) getActivity().getApplicationContext()
-                .getSystemService(Context.LOCATION_SERVICE);
-        Criteria criteria = new Criteria();
-        criteria.setAccuracy(Criteria.ACCURACY_FINE);
-        String provider = manager == null ? null : manager.getBestProvider(criteria, true);
-        if (provider != null) {
-            Location location = manager.getLastKnownLocation(provider);
-            if (location != null) {
-                position = new LatLng(location.getLatitude(), location.getLongitude());
-            }
-        }
-
-        if (position != null) {
-            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(position, MAP_ZOOM_LEVEL));
-        }
-    }
-
-    @Override
     public void onResume() {
         super.onResume();
+        mapView.onResume();
         if (!activityJustCreated) {
-            presenter.loadDataPoints();
+            mapView.getMapAsyncWithCallback(this);
         }
         activityJustCreated = false;
     }
 
     @Override
-    public void onDetach() {
-        super.onDetach();
-        mListener = null;
+    public void onStart() {
+        super.onStart();
+        mapView.onStart();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        mapView.onStop();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        mapView.onPause();
+    }
+
+    @Override
+    public void onLowMemory() {
+        super.onLowMemory();
+        if (mapView != null) {
+            mapView.onLowMemory();
+        }
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        mapView.onDestroy();
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if (mapView != null) {
+            mapView.onSaveInstanceState(outState);
+        }
     }
 
     @Override
@@ -266,7 +205,12 @@ public class DataPointsMapFragment extends SupportMapFragment implements OnInfoW
     }
 
     public void onNewSurveySelected(SurveyGroup surveyGroup) {
-        getArguments().putSerializable(ConstantUtil.SURVEY_GROUP_EXTRA, surveyGroup);
+        Bundle arguments = getArguments();
+        if (arguments == null) {
+            arguments = new Bundle();
+        }
+        arguments.putSerializable(ConstantUtil.SURVEY_GROUP_EXTRA, surveyGroup);
+        setArguments(arguments);
         presenter.onNewSurveySelected(surveyGroup);
     }
 
@@ -283,9 +227,15 @@ public class DataPointsMapFragment extends SupportMapFragment implements OnInfoW
         switch (item.getItemId()) {
             case R.id.download:
                 presenter.onSyncRecordsPressed();
+                if (trackingListener != null) {
+                    trackingListener.logDownloadEvent(MAP_TAB);
+                }
                 return true;
             case R.id.upload:
                 presenter.onUploadPressed();
+                if (trackingListener != null) {
+                    trackingListener.logUploadEvent(MAP_TAB);
+                }
                 return true;
             default:
                 return false;
@@ -307,18 +257,8 @@ public class DataPointsMapFragment extends SupportMapFragment implements OnInfoW
     }
 
     @Override
-    public void onInfoWindowClick(Marker marker) {
-        final String surveyedLocaleId = marker.getSnippet();
-        if (mListener != null) {
-            mListener.onRecordSelected(surveyedLocaleId);
-        }
-    }
-
-    @Override
-    public void displayData(List<MapDataPoint> surveyedLocales) {
-        mItems.clear();
-        mItems.addAll(surveyedLocales);
-        cluster();
+    public void displayDataPoints(FeatureCollection dataPoints) {
+        mapView.displayDataPoints(dataPoints);
     }
 
     @Override
@@ -342,7 +282,7 @@ public class DataPointsMapFragment extends SupportMapFragment implements OnInfoW
     private void reloadMenu() {
         FragmentActivity activity = getActivity();
         if (activity != null) {
-            activity.supportInvalidateOptionsMenu();
+            activity.invalidateOptionsMenu();
         }
     }
 
@@ -358,26 +298,35 @@ public class DataPointsMapFragment extends SupportMapFragment implements OnInfoW
 
     @Override
     public void showErrorNoNetwork() {
-        dataPointSyncSnackBarManager.showErrorNoNetwork(getView(), new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                presenter.onSyncRecordsPressed();
-            }
-        });
+        dataPointSyncSnackBarManager.showErrorNoNetwork(getView(),
+                v -> presenter.onSyncRecordsPressed());
     }
 
     @Override
     public void showErrorSync() {
-        dataPointSyncSnackBarManager.showErrorSync(getView(), new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                presenter.onSyncRecordsPressed();
-            }
-        });
+        dataPointSyncSnackBarManager
+                .showErrorSync(getView(), v -> presenter.onSyncRecordsPressed());
     }
 
     @Override
     public void showNoDataPointsToSync() {
         dataPointSyncSnackBarManager.showNoDataPointsToSync(getView());
+    }
+
+    public void showFab() {
+        offlineMapsFab.show();
+    }
+
+    public void hideFab() {
+        offlineMapsFab.hide();
+    }
+
+    public void refreshView() {
+        mapView.refreshSelectedArea();
+    }
+
+    @Override
+    public void onMapReady() {
+        presenter.loadDataPoints();
     }
 }

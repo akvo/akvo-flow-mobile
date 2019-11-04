@@ -1,0 +1,230 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<resources>
+  <string name="geo_location_accuracy_default">Độ chính xác: chưa xác định</string>
+  <string name="geo_location_accuracy">Độ chính xác: %1$s mét </string>
+  <string name="nocardspacetitle">Bộ nhớ trong đầy dữ liệu</string>
+  <string name="lowcardspacetitle">Bộ nhớ trong sắp đầy dữ liệu</string>
+  <string name="nocardspacedialog">Thẻ nhớ của thiết bị này đã đầy dữ liệu và bạn không thể thu thập thêm dữ liệu. Bạn phải xóa bớt dữ liệu trên thẻ nhớ để có thể tiếp tục lưu trữ dữ liệu khác</string>
+  <string name="lowcardspacedialog">Bạn còn %%% MB không gian lưu trữ dữ liệu trên thẻ nhớ của thiết bị này. Ngay khi thẻ nhớ đầy dữ liệu, bạn sẽ không thể thu thập thêm dữ liệu</string>
+  <string name="getgeo">Kiểm tra tọa độ địa lý</string>
+  <string name="lat">Vĩ độ</string>
+  <string name="lon">Kinh độ</string>
+  <string name="elevation">Độ cao</string>
+  <string name="submitbutton">Đệ trình</string>
+  <string name="geodialog">Vui lòng kích hoạt chức năng định vị </string>
+  <string name="settings">Cài đặt</string>
+  <string name="aboutlabel">Phiên bản</string>
+  <string name="otherinstructions">Vui lòng nhập một mô tả</string>
+  <string name="deleteresponse">Xóa câu trả lời</string>
+  <string name="othertext">Khác…</string>
+  <string name="surveylanglabel">Những ngôn ngữ của đợt khảo sát</string>
+  <string name="scanbarcode">Quét mã vạch</string>
+  <string name="toosmallerr">Giá trị quá nhỏ. Giá trị nhỏ nhất là: </string>
+  <string name="toolargeerr">Giá trị quá lớn. Giá trị lớn nhất là: </string>
+  <string name="baddatatypeerr">Câu trả lời phải là dạng số học</string>
+  <string name="conftitle">Vui lòng xác minh</string>
+  <string name="reloadconftext">Bạn có chắc chắn rằng bạn muốn làm sạch và tải lại những đợt khảo sát không?</string>
+  <string name="langoption">Ngôn ngữ</string>
+  <string name="langmandatorytitle">Lựa chọn sai</string>
+  <string name="langmandatorytext">Bạn phải lựa chọn tối thiểu 1 ngôn ngữ</string>
+  <string name="preference_download_form_title">Tải các mẫu biểu thông qua số ID của mẫu biểu</string>
+  <string name="preference_download_form_subtitle">Chỉ hoạt động khi nhận được chỉ thị</string>
+  <string name="downloadsurveylabel">Tải biểu mẫu</string>
+  <string name="downloadsurveyinstr">Nhập ID của form mà bạn muốn tải</string>
+  <string name="deletealldatawarning">Điều này sẽ xóa vĩnh viễn tất cả dữ liệu (những câu hỏi, câu trả lời, hình ảnh và người sử dụng) trên thiết bị. Đây là hoạt động không thể đảo ngược. Nhấn OK để tiếp tục hoặc hủy bỏ để thoát</string>
+  <string name="delete_responses_warning">Điều này sẽ xóa vĩnh viễn tất cả dữ liệu những câu trả lời, hình ảnh và file nén trên thiết bị. Đây là hoạt động không thể đảo ngược. Nhấn OK để tiếp tục hoặc hủy bỏ để thoát</string>
+  <string name="unsentdatawarning">Những câu trả lời chưa được đệ trình. Chắc chắc rằng bạn chuyển chúng sang một nơi khác trước khi xóa. Đây là hoạt động không thể đảo ngược. Nhấn OK để tiếp tục hoặc hủy bỏ để thoát</string>
+  <string name="deleteonewarning">Điều này sẽ xóa vĩnh viễn câu trả lời này. Nhấn Ok để tiếp tục hoặc hủy bỏ để thoát</string>
+  <string name="nextbutton">Kế tiếp</string>
+  <string name="cleartitle">Xóa những câu trả lời khảo sát</string>
+  <string name="cleardesc">Bạn có chắc rằng bạn muốn xóa những câu trả lời của mình?</string>
+  <string name="authtitle">Yêu cầu có sự cho phép</string>
+  <string name="authtext">Vui lòng nhập mã quản trị: </string>
+  <string name="authfailed">Chưa được cấp phép</string>
+  <string name="invalidpassword">Sai mật khẩu</string>
+  <string name="clearquestion">Xóa dữ liệu</string>
+  <string name="clearquestiondesc">Bạn có muốn xóa câu trả lời của câu hỏi này?</string>
+  <string name="identlabel">Nhận dạng thiết bị</string>
+  <string name="bootstrapstart">Tải dữ liệu điều tra từ thẻ nhớ SD</string>
+  <string name="bootstrapcomplete">Hoàn thành tải dữ liệu khảo sát từ thẻ nhớ SD</string>
+  <string name="bootstraperror">Lỗi khi xử lý tập tin zip bootstrap</string>
+  <string name="bootstrap_invalid_app">Lỗi: Mẫu không thuộc trường Flow này</string>
+  <string name="transmissionhist">Lịch sử truyền dữ liệu</string>
+  <string name="transstartdate">Quá trình truyền dữ liệu đã bắt đầu</string>
+  <string name="transenddate">Quá trình truyền dữ liệu đã kết thúc</string>
+  <string name="resetalldesc">Xóa vĩnh viễn toàn bộ những câu hỏi, trả lời (bao gồm những hình ảnh và file nén được xuất) và những người sử dụng</string>
+  <string name="reset_responses_desc">Xóa vĩnh viễn toàn bộ những câu trả lời khảo sát (bao gồm những hình ảnh và file nén được xuất)</string>
+  <string name="checksd">Bộ nhớ khả dụng</string>
+  <string name="sdmissing">Thẻ nhớ SD thiếu hoặc không được lắp. Chắc chắn rằng bạn đã tắt chế độ \"Sao chép tập tin qua cổng USB\"</string>
+  <string name="pickdate">Chọn ngày</string>
+  <string name="pleasewaitforbootstrap">Vui lòng đợi đến khi file hoàn tất quá trình xử lý</string>
+  <string name="clear_data_success">Dữ liệu đã được xóa khỏi thiết bị</string>
+  <string name="clear_data_error">Lỗi xảy ra trong quá trình xóa dữ liệu khỏi thiết bị</string>
+  <string name="search">Search</string>
+  <string name="sort">Sắp xếp theo</string>
+  <string name="stats">Thống kê điều tra</string>
+  <string name="prefill_title">Những câu trả lời trước đây</string>
+  <string name="prefill_text">Biểu mẫu với những câu trả lời trước đây?</string>
+  <!--Data sync-->
+  <string name="data_sync_all">Dữ liệu đã được đồng bộ hóa %1$d - Bị lỗi %2$d</string>
+  <string name="data_sync_synced">Dữ liệu đã được đồng bộ hóa: %1$d</string>
+  <string name="data_sync_error_form_deleted_title">Đã xóa mẫu biểu</string>
+  <string name="data_sync_error_form_deleted_text">Mẫu biểu đã bị xóa %1$s</string>
+  <!--Localization-->
+  <string name="please_restart">Vui lòng, khởi động lại ứng dụng</string>
+  <!--Empty Views-->
+  <string name="no_datapoints_error_text">Bạn chưa có điễm dữ liệu nào.</string>
+  <string name="no_survey_selected_text">You have no Survey selected. Open the side menu to select one.</string>
+  <!--ToolBar-->
+  <string name="more">Thêm điểm</string>
+  <!--Search-->
+  <string name="search_hint">Tìm kiếm điểm dữ liệu</string>
+  <!--Project List (Survey Group) Activity-->
+  <!--Survey Activity-->
+  <string name="error_responses">Một vài cầu trả lời chứa lỗi. Bạn phải xem lại những câu hỏi bên dưới trước khi bạn có thể đệ trình:</string>
+  <string name="error_question_mandatory">Yêu cầu trả lời câu hỏi này</string>
+  <string name="repeat_answer">Vui lòng, nhắc lại câu trả lời</string>
+  <string name="error_answer_match">Câu trả lời không phù hợp</string>
+  <string name="error_img_preview">Không thể xem trước hình ảnh</string>
+  <string name="caddisfly_test">Đi đến thử nghiệm</string>
+  <string name="error_empty_form">Những biểu mẫu trống dữ liệu không thể đệ trình. Trước tiên, vui lòng, điền thêm những câu trả lời tương ứng.</string>
+  <string name="select">Vui lòng chọn</string>
+  <string name="clear_value_msg">Bạn có muốn xóa dữ liệu này?</string>
+  <string name="type_code">Loại mã</string>
+  <string name="or">Hoặc</string>
+  <string name="capture_shape">Chụp hình</string>
+  <string name="view_shape">Xem hình dạng</string>
+  <string name="repeat_group">Lặp lại nhóm câu hỏi này</string>
+  <string name="repetitions">Sự lặp lại:</string>
+  <string name="view_map">View map</string>
+  <string name="delete_group_title">Xóa nhóm câu hỏi</string>
+  <string name="delete_group_text">Bạn có muốn xóa nhóm câu hỏi này?</string>
+  <string name="add_signature">Ký tên</string>
+  <string name="modify_signature">Chỉnh sửa chữ ký</string>
+  <string name="signed_by">Được ký bởi</string>
+  <string name="signature_terms">Tôi hiểu rằng đây là chữ ký điện tử của tôi</string>
+  <string name="image_location_unknown">Không rõ vị trí địa lý</string>
+  <string name="image_location_reading">Đang đọc vị trí địa lý</string>
+  <string name="image_location_saved">Đã lưu vị trí địa lý</string>
+  <!--RecordList Activity-->
+  <string name="stats_total">Tổng số những điểm dữ liệu:</string>
+  <string name="stats_week">7 ngày trước:</string>
+  <string name="stats_today">Hôm nay:</string>
+  <string name="distance_label">Khoảng cách:</string>
+  <string name="tab_datapoints">Những điểm dữ liệu</string>
+  <string name="tab_map">Bản đồ</string>
+  <string name="order_date">Ngày tháng</string>
+  <string name="order_distance">Khoảng cách</string>
+  <string name="order_status">Trạng thái</string>
+  <string name="order_name">Tên</string>
+  <!--Record Activity-->
+  <string name="unknown">Điểm dữ liệu chưa có tên</string>
+  <string name="last_modified_monitored">Lần thay đổi trước:</string>
+  <string name="last_modified_regular">Đã đệ trình:</string>
+  <string name="last_response">Câu trả lời cuối cùng:</string>
+  <string name="error_missing_cascade">Những file danh sách chưa được tải xuống</string>
+  <string name="error_missing_form">Không tìm thấy mẫu biểu. Xin vui lòng tải lại tất cả các mẫu biểu</string>
+  <string name="tab_forms">Những biểu mẫu</string>
+  <string name="tab_history">Lịch sử </string>
+  <!--Form & transmission status-->
+  <string name="status_queued">Sắp xếp</string>
+  <string name="status_in_progress">Đang được tiến hành</string>
+  <string name="status_failed">Bị lỗi</string>
+  <string name="status_saved">Đã lưu</string>
+  <string name="status_submitted">Đã đệ trình</string>
+  <!--APK update-->
+  <string name="update">Cập nhật</string>
+  <string name="not_now">Không phải bây giờ</string>
+  <string name="clicktoinstall">Phiên bản ứng dụng Flow đã được tải xuống. Bạn có muốn cài đặt nó không?</string>
+  <string name="apk_upgrade_error">Lỗi tải xuống phiên bản cập nhật Flow</string>
+  <!--Time check-->
+  <string name="time_check_activity">Ngày tháng và thời gian</string>
+  <string name="time_warning">Thời gian trên máy điện thoại của bạn không chính xác! Thay đổi đồng hồ của bạn và thử lại. Ngày tháng và thời gian trên điện thoại của bạn là:</string>
+  <string name="adjust_date">Thay đổi thời gian</string>
+  <!--Form sync-->
+  <string name="downloading_forms">Đang tải các biểu mẫu</string>
+  <string name="error_form_sync_title">Lỗi khi đồng bộ hóa biểu mẫu</string>
+  <string name="error_assignment_read">Việc chỉ định mẫu biểu không được thực hiện từ bảng điều khiển Flow</string>
+  <string name="error_form_header">Mẫu biểu %1$s không thể tải được từ bảng điều kiển Flow</string>
+  <string name="error_form_download">Chắc chắn rằng biểu mẫu này đã được công bố, và ngày tháng/thời gian của khu vực của bạn là ok</string>
+  <string name="form_deleted">Biểu mẫu này đã bị xóa</string>
+  <!--File sync-->
+  <string name="sync_error_message">Có thể đã bị xóa</string>
+  <string name="sync_error_title">Mẫu biểu %1$s không tồn tại</string>
+  <!--Plotting-->
+  <string name="geoshape_area">Vùng</string>
+  <string name="geoshape_line">Dòng</string>
+  <string name="geoshape_points">Điểm</string>
+  <string name="location_unknown">Khu vực này không được biết đến</string>
+  <string name="location_inaccurate">Việc nhận dạng khu vực này là chưa đủ chính xác</string>
+  <string name="geoshape_response">Hình được chụp thành công</string>
+  <string name="add_point_title">Thêm điểm</string>
+  <string name="add_point_text">Bạn có muốn thêm một điểm mới vào khu vực này không?</string>
+  <!--Navigation Drawer-->
+  <string name="add_user">Thêm người sử dụng</string>
+  <string name="new_user">+ người sử dụng</string>
+  <string name="delete_user">Xóa tên người sử dụng</string>
+  <string name="username">Tên người sử dụng</string>
+  <string name="mustselectuser">Xin vui lòng chọn tên người sử dụng trước khi tiếp tục</string>
+  <string name="surveys">Khảo sát</string>
+  <string name="logged_in_as">Đăng nhập bởi</string>
+  <!--Misc-->
+  <string name="okbutton">OK</string>
+  <string name="cancelbutton">Hủy bỏ</string>
+  <string name="savebutton">Lưu dữ liệu</string>
+  <string name="clearbutton">Xóa dữ liệu</string>
+  <string name="yes">Có</string>
+  <string name="no">Không</string>
+  <string name="action_retry">Làm lại</string>
+  <string name="delete">Xóa</string>
+  <string name="drawer_open">Drawer open</string>
+  <string name="drawer_close">Drawer close</string>
+  <!--app update service-->
+  <string name="apk_update_service_no_update">Bạn đang sử dụng phiên bản mới nhất của ứng dụng này</string>
+  <string name="apk_update_service_error_update">Lỗi khi cập nhật ứng dụng. Vui lòng thử lại</string>
+  <string name="apk_update_service_error_no_internet">Lỗi khi cập nhật ứng dụng. Bạn không có kết nối Internet</string>
+  <string name="locale_list_error_unknown_location">Vị trí không xác định</string>
+  <string name="location_timeout">Không thể xác định vị trí</string>
+  <string name="auto_geo_location_pending">Vui lòng đợi quá trình định vị</string>
+  <string name="invalid_latitude">Vĩ độ sai</string>
+  <string name="invalid_longitude">Kinh độ sai</string>
+  <string name="invalid_elevation">Độ cao sai</string>
+  <string name="about_activity_title">Thông tin liên quan</string>
+  <string name="about_view_title">Ứng dụng Akvo Flow</string>
+  <string name="app_icon_description">Biểu tượng ứng dụng</string>
+  <string name="about_view_subtitle">Thu thập dữ liệu chất lượng cao hơn, nhanh hơn</string>
+  <string name="about_view_version">Phiên bản %1$s</string>
+  <string name="about_view_copyright">Bản sao © 2010-%1$s Stichting Akvo</string>
+  <string name="about_view_update">Kiểm tra cập nhật phiên bản</string>
+  <string name="about_view_legal">Thông tin hợp pháp</string>
+  <string name="about_view_release_notes">Những ghi chú của phiên bản mới</string>
+  <string name="about_view_terms">Những điều khoản sử dụng</string>
+  <string name="licences_title">Giấy phép cho bên thứ ba</string>
+  <string name="licences_description">Phần mềm này lấy thông tin từ các dự án được liệt kê bên dưới</string>
+  <string name="apache_licence_title">Apache License 2.0</string>
+  <string name="eclipse_licence_title">Eclipse Public License 1.0</string>
+  <string name="mit_licence_title">MIT License</string>
+  <string name="barcode_scanner_missing_error">Thiết bị này chưa cài đặt ứng dụng scanner. Bạn có muốn cài đặt ứng dụng bây giờ không?</string>
+  <string name="install">Cài đặt</string>
+  <string name="signature_name_hint">Vui lòng gõ tên của bạn</string>
+  <string name="saving">Đang lưu…</string>
+  <string name="error_saving_signature">Lỗi lưu chữ ký, vui lòng ký lại</string>
+  <string name="help">Hỗ trợ</string>
+  <string name="error_loading_help">Lỗi tải </string>
+  <string name="error_mobile_data_sync">Vô hiệu hóa đồng bộ dữ liệu qua mạng di động</string>
+  <string name="preference_screen_on">Giữ màn hình bật sáng trong quá trình nhập dữ liệu</string>
+  <string name="preference_app_language">Ngôn ngữ ứng dụng</string>
+  <string name="preference_image_size">Kích thước ảnh</string>
+  <string name="preferences_data_section">Dữ liệu</string>
+  <string name="preference_delete_collected_data">Xóa những hình ảnh và dữ liệu đã thu thập</string>
+  <string name="preference_delete_everything">Xóa tất cả mọi thứ. Hình ảnh, dữ liệu và bộ câu hỏi.</string>
+  <string name="preferences_configuration_section">Cấu hình</string>
+  <string name="preference_gps">Định vị vị trí</string>
+  <string name="preference_storage">Bộ nhớ khả dụng</string>
+  <string name="preferences_section_information">Thông tin</string>
+  <string name="preference_identifier">Nhận dạng thiết bị</string>
+  <string name="preference_instance_name">Tên trường Flow</string>
+  <string name="action_settings">Cài đặt</string>
+  <string name="no_records_subtitle_non_monitored">Nhấn dấu \'+\' để tạo một điểm dữ liệu mới</string>
+  <!--Verify if this works for transifex-->
+</resources>

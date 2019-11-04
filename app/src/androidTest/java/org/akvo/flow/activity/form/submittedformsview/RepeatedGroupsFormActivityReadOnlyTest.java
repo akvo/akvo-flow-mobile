@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017,2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -20,13 +20,9 @@
 
 package org.akvo.flow.activity.form.submittedformsview;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
-import android.support.annotation.NonNull;
-import android.support.test.InstrumentationRegistry;
-import android.support.test.filters.MediumTest;
-import android.support.test.rule.ActivityTestRule;
-import android.support.test.runner.AndroidJUnit4;
 
 import org.akvo.flow.R;
 import org.akvo.flow.activity.FormActivity;
@@ -40,12 +36,19 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import static android.support.test.espresso.Espresso.onView;
-import static android.support.test.espresso.action.ViewActions.click;
-import static android.support.test.espresso.assertion.ViewAssertions.matches;
-import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
-import static android.support.test.espresso.matcher.ViewMatchers.withId;
-import static android.support.test.espresso.matcher.ViewMatchers.withText;
+import androidx.annotation.NonNull;
+import androidx.test.platform.app.InstrumentationRegistry;
+import androidx.test.filters.MediumTest;
+import androidx.test.rule.ActivityTestRule;
+import androidx.test.rule.GrantPermissionRule;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
+
+import static androidx.test.espresso.Espresso.onView;
+import static androidx.test.espresso.action.ViewActions.click;
+import static androidx.test.espresso.assertion.ViewAssertions.matches;
+import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
+import static androidx.test.espresso.matcher.ViewMatchers.withId;
+import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static org.akvo.flow.activity.MultiItemByPositionMatcher.getElementFromMatchAtPosition;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.addExecutionDelay;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.getFormActivityIntent;
@@ -56,17 +59,30 @@ import static org.hamcrest.core.AllOf.allOf;
 @RunWith(AndroidJUnit4.class)
 public class RepeatedGroupsFormActivityReadOnlyTest {
 
-    public static final String SURVEY_TITLE = "RepeatedBarcodeGroup";
+    private static final String SURVEY_TITLE = "RepeatedBarcodeGroup";
+
+    @Rule
+    public GrantPermissionRule permissionRule = GrantPermissionRule
+            .grant(android.Manifest.permission.ACCESS_FINE_LOCATION);
+
+    @Rule
+    public GrantPermissionRule permissionRule2 = GrantPermissionRule
+            .grant(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+
+    @Rule
+    public GrantPermissionRule permissionRule3 = GrantPermissionRule
+            .grant(Manifest.permission.READ_PHONE_STATE);
+
     @Rule
     public ActivityTestRule<FormActivity> rule = new ActivityTestRule<FormActivity>(
             FormActivity.class) {
         @Override
         protected Intent getActivityIntent() {
-            Context targetContext = InstrumentationRegistry.getTargetContext();
+            Context targetContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
             SurveyRequisite.setRequisites(targetContext);
             SurveyInstaller installer = new SurveyInstaller(targetContext);
             Survey survey = installer
-                    .installSurvey(repeated_groups_form, InstrumentationRegistry.getContext());
+                    .installSurvey(repeated_groups_form, InstrumentationRegistry.getInstrumentation().getContext());
             long id = installer
                     .createDataPoint(survey.getSurveyGroup(), generateTestResponseData()).first;
             return getFormActivityIntent(207569117L, "200389118", SURVEY_TITLE, id, true);
@@ -75,14 +91,14 @@ public class RepeatedGroupsFormActivityReadOnlyTest {
 
     @AfterClass
     public static void afterClass() {
-        Context targetContext = InstrumentationRegistry.getTargetContext();
+        Context targetContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
         SurveyRequisite.resetRequisites(targetContext);
         SurveyInstaller installer = new SurveyInstaller(targetContext);
         installer.clearSurveys();
     }
 
     @Test
-    public void verifyOneRepetition() throws Exception {
+    public void verifyOneRepetition() {
         clickOnTabNamed("RepeatedBarcodeGroup");
         onView(allOf(withId(R.id.barcode_input), isDisplayed())).check(matches(withText("123456")));
         verifyRepeatHeaderText("Repetitions:1");
@@ -94,7 +110,7 @@ public class RepeatedGroupsFormActivityReadOnlyTest {
     }
 
     @Test
-    public void verifyThreeRepetitions() throws Exception {
+    public void verifyThreeRepetitions() {
         clickOnTabNamed("RepeatedTextGroup");
         verifyRepeatHeaderText("Repetitions:3");
 

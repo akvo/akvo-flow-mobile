@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2018-2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -21,8 +21,8 @@
 package org.akvo.flow.data.entity;
 
 import android.database.Cursor;
-import android.support.annotation.NonNull;
-import android.support.v4.util.Pair;
+import androidx.annotation.NonNull;
+import androidx.core.util.Pair;
 import android.text.TextUtils;
 
 import org.akvo.flow.data.util.FileHelper;
@@ -100,22 +100,20 @@ public class FormInstanceMapper {
             formInstance = getFormInstance(deviceId, data);
 
             do {
-                // Sanitize answer value. No newlines or tabs!
                 String value = textValueCleaner.sanitizeValue(data.getString(answer_col));
-                // never send empty answers
-                if (TextUtils.isEmpty(value)) {
-                    continue;
+
+                // empty answers will be ignored
+                if (!TextUtils.isEmpty(value)) {
+                    // If the response has any file attached, enqueue it to the image list
+                    String filename = getFilename(data);
+
+                    if (!TextUtils.isEmpty(filename)) {
+                        imagePaths.add(filename);
+                    }
+
+                    Response response = responseMapper.extractResponse(data, value);
+                    responses.add(response);
                 }
-
-                // If the response has any file attached, enqueue it to the image list
-                String filename = getFilename(data);
-
-                if (!TextUtils.isEmpty(filename)) {
-                    imagePaths.add(filename);
-                }
-
-                Response response = responseMapper.extractResponse(data, value);
-                responses.add(response);
             } while (data.moveToNext());
 
             formInstance.getResponses().addAll(responses);

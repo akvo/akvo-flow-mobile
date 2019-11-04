@@ -21,18 +21,13 @@
 package org.akvo.flow.data.repository;
 
 import android.database.Cursor;
-import android.support.annotation.NonNull;
 
 import org.akvo.flow.data.datasource.DataSourceFactory;
 import org.akvo.flow.data.datasource.DatabaseDataSource;
 import org.akvo.flow.data.entity.ApiDataPoint;
-import org.akvo.flow.data.entity.ApiFilesResult;
 import org.akvo.flow.data.entity.ApiLocaleResult;
 import org.akvo.flow.data.entity.ApiSurveyInstance;
 import org.akvo.flow.data.entity.DataPointMapper;
-import org.akvo.flow.data.entity.FilesResultMapper;
-import org.akvo.flow.data.entity.FilteredFilesResult;
-import org.akvo.flow.data.entity.FormIdMapper;
 import org.akvo.flow.data.entity.FormInstanceMapper;
 import org.akvo.flow.data.entity.FormInstanceMetadataMapper;
 import org.akvo.flow.data.entity.S3File;
@@ -46,6 +41,7 @@ import org.akvo.flow.data.entity.UploadFormDeletedError;
 import org.akvo.flow.data.entity.UploadResult;
 import org.akvo.flow.data.entity.UploadSuccess;
 import org.akvo.flow.data.entity.UserMapper;
+import org.akvo.flow.data.entity.form.FormIdMapper;
 import org.akvo.flow.data.net.RestApi;
 import org.akvo.flow.domain.entity.DataPoint;
 import org.akvo.flow.domain.entity.FormInstanceMetadata;
@@ -67,6 +63,9 @@ import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.VisibleForTesting;
+import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.reactivex.Single;
@@ -77,6 +76,7 @@ import io.reactivex.functions.Function;
 import io.reactivex.functions.Predicate;
 import okhttp3.ResponseBody;
 import retrofit2.HttpException;
+import retrofit2.Response;
 import timber.log.Timber;
 
 public class SurveyDataRepository implements SurveyRepository {
@@ -88,8 +88,7 @@ public class SurveyDataRepository implements SurveyRepository {
     private final SurveyMapper surveyMapper;
     private final UserMapper userMapper;
     private final TransmissionFilenameMapper transmissionFileMapper;
-    private final FormIdMapper surveyIdMapper;
-    private final FilesResultMapper filesResultMapper;
+    private final FormIdMapper formIdMapper;
     private final TransmissionMapper transmissionMapper;
     private final FormInstanceMapper formInstanceMapper;
     private final FormInstanceMetadataMapper formInstanceMetadataMapper;
@@ -99,10 +98,9 @@ public class SurveyDataRepository implements SurveyRepository {
     public SurveyDataRepository(DataSourceFactory dataSourceFactory,
             DataPointMapper dataPointMapper, SyncedTimeMapper syncedTimeMapper, RestApi restApi,
             SurveyMapper surveyMapper, UserMapper userMapper,
-            TransmissionFilenameMapper transmissionFilenameMapper, FormIdMapper surveyIdMapper,
-            FilesResultMapper filesResultMapper, TransmissionMapper transmissionMapper,
-            FormInstanceMapper formInstanceMapper,
-            FormInstanceMetadataMapper formInstanceMetadataMapper) {
+            TransmissionFilenameMapper transmissionFilenameMapper,
+            TransmissionMapper transmissionMapper, FormInstanceMapper formInstanceMapper,
+            FormIdMapper formIdMapper, FormInstanceMetadataMapper formInstanceMetadataMapper) {
         this.dataSourceFactory = dataSourceFactory;
         this.dataPointMapper = dataPointMapper;
         this.syncedTimeMapper = syncedTimeMapper;
@@ -110,8 +108,7 @@ public class SurveyDataRepository implements SurveyRepository {
         this.surveyMapper = surveyMapper;
         this.userMapper = userMapper;
         this.transmissionFileMapper = transmissionFilenameMapper;
-        this.surveyIdMapper = surveyIdMapper;
-        this.filesResultMapper = filesResultMapper;
+        this.formIdMapper = formIdMapper;
         this.transmissionMapper = transmissionMapper;
         this.formInstanceMapper = formInstanceMapper;
         this.formInstanceMetadataMapper = formInstanceMetadataMapper;
@@ -139,6 +136,23 @@ public class SurveyDataRepository implements SurveyRepository {
                                 return Observable.just(dataPointMapper.getDataPoints(cursor));
                             }
                         });
+    }
+
+    @Override
+    public Single<DataPoint> getDataPoint(final String datapointId) {
+        return dataSourceFactory.getDataBaseDataSource()
+                .getDataPoint(datapointId)
+                .flatMap(new Function<Cursor, Single<DataPoint>>() {
+                    @Override
+                    public Single<DataPoint> apply(Cursor cursor) {
+                        DataPoint dataPoint = dataPointMapper.mapOneDataPoint(cursor);
+                        if (dataPoint == null) {
+                            return Single.error(new Exception(
+                                    "Datapoint with id: " + datapointId + " not found"));
+                        }
+                        return Single.just(dataPoint);
+                    }
+                });
     }
 
     @Override
@@ -172,26 +186,26 @@ public class SurveyDataRepository implements SurveyRepository {
         return downloadDataPoints(surveyGroupId, state)
                 .doOnNext(new Consumer<State>() {
                     @Override
-                    public void accept(@NonNull State state) throws Exception {
+                    public void accept(@NonNull State state) {
                         List<ApiDataPoint> lastBatch = state.getLastBatch();
                         dataSourceFactory.getDataBaseDataSource().syncDataPoints(lastBatch);
                     }
                 })
                 .repeatWhen(new Function<Flowable<Object>, Publisher<?>>() {
                     @Override
-                    public Publisher<?> apply(@NonNull Flowable<Object> flowable) throws Exception {
+                    public Publisher<?> apply(@NonNull Flowable<Object> flowable) {
                         return flowable.delay(15, TimeUnit.SECONDS);
                     }
                 })
                 .takeUntil(new Predicate<State>() {
                     @Override
-                    public boolean test(State state) throws Exception {
+                    public boolean test(State state) {
                         return state.getLastBatch().isEmpty();
                     }
                 })
                 .filter(new Predicate<State>() {
                     @Override
-                    public boolean test(State state) throws Exception {
+                    public boolean test(State state) {
                         return state.getLastBatch().isEmpty();
                     }
                 })
@@ -207,14 +221,13 @@ public class SurveyDataRepository implements SurveyRepository {
             final State state) {
         return Flowable.defer(new Callable<Flowable<ApiLocaleResult>>() {
             @Override
-            public Flowable<ApiLocaleResult> call() throws Exception {
+            public Flowable<ApiLocaleResult> call() {
                 return restApi.downloadDataPoints(surveyGroupId,
                         state.getTimestamp());
             }
         }).map(new Function<ApiLocaleResult, List<ApiDataPoint>>() {
             @Override
-            public List<ApiDataPoint> apply(@NonNull ApiLocaleResult apiLocaleResult)
-                    throws Exception {
+            public List<ApiDataPoint> apply(@NonNull ApiLocaleResult apiLocaleResult) {
                 if (apiLocaleResult == null || apiLocaleResult.getDataPoints() == null) {
                     return Collections.emptyList();
                 }
@@ -224,8 +237,7 @@ public class SurveyDataRepository implements SurveyRepository {
             }
         }).concatMap(new Function<List<ApiDataPoint>, Flowable<State>>() {
             @Override
-            public Flowable<State> apply(@NonNull List<ApiDataPoint> dataPoints)
-                    throws Exception {
+            public Flowable<State> apply(@NonNull List<ApiDataPoint> dataPoints) {
                 return filterDataPoints(dataPoints, state);
             }
         });
@@ -236,7 +248,7 @@ public class SurveyDataRepository implements SurveyRepository {
         return Flowable.fromIterable(dataPoints)
                 .filter(new Predicate<ApiDataPoint>() {
                     @Override
-                    public boolean test(@NonNull ApiDataPoint apiDataPoint) throws Exception {
+                    public boolean test(@NonNull ApiDataPoint apiDataPoint) {
                         List<ApiSurveyInstance> instances = apiDataPoint.getSurveyInstances();
                         return instances != null && !instances.isEmpty();
                     }
@@ -244,8 +256,7 @@ public class SurveyDataRepository implements SurveyRepository {
                 .toList()
                 .flatMap(new Function<List<ApiDataPoint>, SingleSource<State>>() {
                     @Override
-                    public SingleSource<State> apply(@NonNull List<ApiDataPoint> points)
-                            throws Exception {
+                    public SingleSource<State> apply(@NonNull List<ApiDataPoint> points) {
                         state.update(points);
                         return Single.just(state);
                     }
@@ -357,80 +368,24 @@ public class SurveyDataRepository implements SurveyRepository {
                 });
     }
 
-    private Observable<List<String>> getFormIds(String surveyId) {
+    @Override
+    public Observable<List<String>> getFormIds(String surveyId) {
         return dataSourceFactory.getDataBaseDataSource().getFormIds(surveyId)
                 .map(new Function<Cursor, List<String>>() {
                     @Override
                     public List<String> apply(Cursor cursor) {
-                        return surveyIdMapper.mapToFormId(cursor);
+                        return formIdMapper.mapToFormId(cursor);
                     }
                 });
     }
 
-    private Observable<List<String>> getFormIds() {
+    @Override
+    public Observable<List<String>> getFormIds() {
         return dataSourceFactory.getDataBaseDataSource().getFormIds()
                 .map(new Function<Cursor, List<String>>() {
                     @Override
                     public List<String> apply(Cursor cursor) {
-                        return surveyIdMapper.mapToFormId(cursor);
-                    }
-                });
-    }
-
-    @Override
-    public Observable<List<String>> checkDeviceNotification(String surveyId,
-            final String deviceId) {
-        return getFormIds(surveyId)
-                .concatMap(new Function<List<String>, Observable<List<String>>>() {
-                    @Override
-                    public Observable<List<String>> apply(List<String> formIds) {
-                        return downloadMissingAndDeleted(formIds, deviceId);
-                    }
-                });
-    }
-
-    @Override
-    public Observable<List<String>> checkDeviceNotification(final String deviceId) {
-        return getFormIds()
-                .concatMap(new Function<List<String>, Observable<List<String>>>() {
-                    @Override
-                    public Observable<List<String>> apply(List<String> formIds) {
-                        return downloadMissingAndDeleted(formIds, deviceId);
-                    }
-                });
-    }
-
-    private Observable<List<String>> downloadMissingAndDeleted(List<String> formIds,
-            String deviceId) {
-        return restApi.getPendingFiles(formIds, deviceId)
-                .map(new Function<ApiFilesResult, FilteredFilesResult>() {
-                    @Override
-                    public FilteredFilesResult apply(ApiFilesResult apiFilesResult) {
-                        return filesResultMapper.transform(apiFilesResult);
-                    }
-                })
-                .concatMap(new Function<FilteredFilesResult, Observable<List<String>>>() {
-                    @Override
-                    public Observable<List<String>> apply(final FilteredFilesResult filtered) {
-                        final DatabaseDataSource dataSource = dataSourceFactory
-                                .getDataBaseDataSource();
-                        return Observable.zip(dataSource
-                                        .setFileTransmissionsFailed(filtered.getMissingFiles()),
-                                dataSource.setDeletedForms(filtered.getDeletedForms()),
-                                new BiFunction<Boolean, Boolean, Boolean>() {
-                                    @Override
-                                    public Boolean apply(Boolean result1, Boolean result2) {
-                                        return result1 && result2;
-                                    }
-                                })
-                                .concatMap(new Function<Boolean, Observable<List<String>>>() {
-                                    @Override
-                                    public Observable<List<String>> apply(Boolean ignored) {
-                                        dataSource.updateFailedTransmissionsSurveyInstances(
-                                                filtered.getMissingFiles());
-                                        return Observable.just(filtered.getDeletedForms());
-                                    }
-                                });
+                        return formIdMapper.mapToFormId(cursor);
                     }
                 });
     }
@@ -458,7 +413,8 @@ public class SurveyDataRepository implements SurveyRepository {
                 });
     }
 
-    private Observable<List<Transmission>> getSurveyTransmissions(@NonNull String surveyId) {
+    @VisibleForTesting
+    Observable<List<Transmission>> getSurveyTransmissions(@NonNull String surveyId) {
         return getFormIds(surveyId)
                 .flatMap(new Function<List<String>, Observable<List<Transmission>>>() {
                     @Override
@@ -470,20 +426,16 @@ public class SurveyDataRepository implements SurveyRepository {
                                         return getFormTransmissions(formId);
                                     }
                                 })
-                                .toList()
-                                .toObservable()
-                                .map(new Function<List<List<Transmission>>, List<Transmission>>() {
-                                    @Override
-                                    public List<Transmission> apply(List<List<Transmission>> lists) {
-                                        List<Transmission> transmissions = new ArrayList<>();
-                                        for (List<Transmission> transmissionList : lists) {
-                                            if (transmissionList != null) {
-                                                transmissions.addAll(transmissionList);
+                                .flatMapIterable(
+                                        new Function<List<Transmission>, List<Transmission>>() {
+                                            @Override
+                                            public List<Transmission> apply(
+                                                    List<Transmission> transmissions) {
+                                                return transmissions;
                                             }
-                                        }
-                                        return transmissions;
-                                    }
-                                });
+                                        })
+                                .toList()
+                                .toObservable();
                     }
                 });
     }
@@ -510,7 +462,7 @@ public class SurveyDataRepository implements SurveyRepository {
     }
 
     @Override
-    public Observable<List<InstanceIdUuid>> getSubmittedInstances() {
+    public Single<List<InstanceIdUuid>> getSubmittedInstances() {
         return dataSourceFactory.getDataBaseDataSource().getSubmittedInstances()
                 .map(new Function<Cursor, List<InstanceIdUuid>>() {
                     @Override
@@ -521,12 +473,12 @@ public class SurveyDataRepository implements SurveyRepository {
     }
 
     @Override
-    public Observable<Boolean> setInstanceStatusToRequested(long id) {
+    public Completable setInstanceStatusToRequested(long id) {
         return dataSourceFactory.getDataBaseDataSource().setInstanceStatusToRequested(id);
     }
 
     @Override
-    public Observable<List<Long>> getPendingSurveyInstances() {
+    public Single<List<Long>> getPendingSurveyInstances() {
         return dataSourceFactory.getDataBaseDataSource().getPendingSurveyInstances()
                 .map(new Function<Cursor, List<Long>>() {
                     @Override
@@ -537,7 +489,7 @@ public class SurveyDataRepository implements SurveyRepository {
     }
 
     @Override
-    public Observable<FormInstanceMetadata> getFormInstanceData(Long instanceId,
+    public Single<FormInstanceMetadata> getFormInstanceData(final Long instanceId,
             final String deviceId) {
         return dataSourceFactory.getDataBaseDataSource().getResponses(instanceId)
                 .map(new Function<Cursor, FormInstanceMetadata>() {
@@ -545,21 +497,28 @@ public class SurveyDataRepository implements SurveyRepository {
                     public FormInstanceMetadata apply(Cursor cursor) {
                         return formInstanceMetadataMapper.transform(cursor, deviceId);
                     }
+                })
+                .flatMap(new Function<FormInstanceMetadata, Single<FormInstanceMetadata>>() {
+                    @Override
+                    public Single<FormInstanceMetadata> apply(
+                            FormInstanceMetadata formInstanceMetadata) {
+                        if (!formInstanceMetadata.isValid()) {
+                            return Single
+                                    .error(new Exception("Invalid form instance: " + instanceId));
+                        } else {
+                            return Single.just(formInstanceMetadata);
+                        }
+                    }
                 });
     }
 
     @Override
-    public Observable<Boolean> createTransmissions(final Long instanceId, final String formId,
+    public Completable createTransmissions(final Long instanceId, final String formId,
             Set<String> fileNames) {
         final DatabaseDataSource dataBaseDataSource = dataSourceFactory.getDataBaseDataSource();
         return dataBaseDataSource
                 .createTransmissions(instanceId, formId, fileNames)
-                .flatMap(new Function<Boolean, Observable<Boolean>>() {
-                    @Override
-                    public Observable<Boolean> apply(Boolean ignored) {
-                        return dataBaseDataSource.setInstanceStatusToSubmitted(instanceId);
-                    }
-                });
+                .andThen(dataBaseDataSource.setInstanceStatusToSubmitted(instanceId));
     }
 
     private Observable<Set<String>> updateSurveyInstance(List<UploadResult> list) {
@@ -606,16 +565,17 @@ public class SurveyDataRepository implements SurveyRepository {
                 });
     }
 
-    private Observable<UploadResult> syncTransmission(final Transmission transmission,
+    @VisibleForTesting
+    Observable<UploadResult> syncTransmission(final Transmission transmission,
             final String deviceId) {
         final DatabaseDataSource dataBaseDataSource = dataSourceFactory.getDataBaseDataSource();
         final long transmissionId = transmission.getId();
         final long surveyInstanceId = transmission.getRespondentId();
         final String formId = transmission.getFormId();
         return restApi.uploadFile(transmission)
-                .concatMap(new Function<ResponseBody, Observable<?>>() {
+                .concatMap(new Function<Response<ResponseBody>, Observable<?>>() {
                     @Override
-                    public Observable<?> apply(ResponseBody ignored) {
+                    public Observable<?> apply(Response ignored) {
                         S3File s3File = transmission.getS3File();
                         return restApi.notifyFileAvailable(s3File.getAction(),
                                 transmission.getFormId(), s3File.getFile().getName(), deviceId);

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2018-2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -20,7 +20,7 @@
 
 package org.akvo.flow.data.entity;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import org.akvo.flow.data.util.Constants;
 
@@ -38,16 +38,18 @@ public class S3File {
     private final String dir;
     private final String action;
     private final String md5Base64;
-
+    private final String md5Hex;
     private final String filename;
 
-    public S3File(File file, boolean isPublic, String dir, String action, String md5Base64) {
+    public S3File(File file, boolean isPublic, String dir, String action, String md5Base64,
+            String md5Hex) {
         this.file = file;
         this.isPublic = isPublic;
         this.dir = dir;
         this.action = action;
         this.md5Base64 = md5Base64;
         this.filename = file.getName();
+        this.md5Hex = md5Hex;
     }
 
     public File getFile() {
@@ -93,5 +95,9 @@ public class S3File {
     @NonNull
     public String getObjectKey() {
         return dir + "/" + filename;
+    }
+
+    public String getMd5Hex() {
+        return md5Hex;
     }
 }

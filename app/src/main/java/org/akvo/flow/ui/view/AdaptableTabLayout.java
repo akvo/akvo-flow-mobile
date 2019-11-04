@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017,2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -21,17 +21,18 @@
 package org.akvo.flow.ui.view;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.design.widget.TabLayout;
-import android.support.v4.view.PagerAdapter;
-import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
+
+import com.google.android.material.tabs.TabLayout;
 
 import org.akvo.flow.util.ViewUtil;
 
 import java.lang.reflect.Field;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.viewpager.widget.PagerAdapter;
+import androidx.viewpager.widget.ViewPager;
 import timber.log.Timber;
 
 /**
@@ -43,8 +44,8 @@ import timber.log.Timber;
  */
 public class AdaptableTabLayout extends TabLayout {
 
-    private static final String REQUESTED_TAB_MIN_WIDTH = "mRequestedTabMinWidth";
-    private static final String REQUESTED_TAB_MAX_WIDTH = "mRequestedTabMaxWidth";
+    private static final String REQUESTED_TAB_MIN_WIDTH = "requestedTabMinWidth";
+    private static final String REQUESTED_TAB_MAX_WIDTH = "requestedTabMaxWidth";
     private static final int DIVIDER_MINIMUM = 1;
     private static final int DIVIDER_MAXIMUM = 3;
     public static final int UNSET = -1;

@@ -41,6 +41,13 @@ public class ApiUrls {
     public static final String ACTION = "action";
     public static final String FORM_ID = "formID";
     public static final String FILENAME = "fileName";
+    public static final String APK_VERSION_SERVICE_PATH =
+            "/deviceapprest?action=getLatestVersion&deviceType=androidPhone&appCode=flowapp";
+    public static final String SURVEY_ID = "surveyId";
+    public static final String ANDROID_BUILD_VERSION = "androidBuildVersion";
+
+    public static final String FORM_HEADER_PATH = "/surveymanager?action=getSurveyHeader";
+    public static final String FORMS_HEADER_PATH = "/surveymanager?action=getAvailableSurveysDevice";
 
     private final String gaeUrl;
     private final String s3Url;

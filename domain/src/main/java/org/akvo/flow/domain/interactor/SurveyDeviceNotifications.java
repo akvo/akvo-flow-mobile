@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2018-2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -22,12 +22,14 @@ package org.akvo.flow.domain.interactor;
 
 import org.akvo.flow.domain.executor.PostExecutionThread;
 import org.akvo.flow.domain.executor.ThreadExecutor;
+import org.akvo.flow.domain.repository.MissingAndDeletedRepository;
 import org.akvo.flow.domain.repository.SurveyRepository;
 import org.akvo.flow.domain.repository.UserRepository;
 import org.akvo.flow.domain.util.Constants;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.inject.Inject;
 
@@ -38,14 +40,17 @@ public class SurveyDeviceNotifications extends UseCase {
 
     private final SurveyRepository surveyRepository;
     private final UserRepository userRepository;
+    private final MissingAndDeletedRepository missingAndDeletedRepository;
 
     @Inject
     protected SurveyDeviceNotifications(ThreadExecutor threadExecutor,
             PostExecutionThread postExecutionThread, SurveyRepository surveyRepository,
-            UserRepository userRepository) {
+            UserRepository userRepository,
+            MissingAndDeletedRepository missingAndDeletedRepository) {
         super(threadExecutor, postExecutionThread);
         this.surveyRepository = surveyRepository;
         this.userRepository = userRepository;
+        this.missingAndDeletedRepository = missingAndDeletedRepository;
     }
 
     @Override
@@ -55,10 +60,17 @@ public class SurveyDeviceNotifications extends UseCase {
         }
         final String surveyId = (String) parameters.get(Constants.KEY_SURVEY_ID);
         return userRepository.getDeviceId()
-                .concatMap(new Function<String, Observable<List<String>>>() {
+                .concatMap(new Function<String, Observable<Set<String>>>() {
                     @Override
-                    public Observable<List<String>> apply(String deviceId) {
-                        return surveyRepository.checkDeviceNotification(surveyId, deviceId);
+                    public Observable<Set<String>> apply(final String deviceId) {
+                        return surveyRepository.getFormIds(surveyId)
+                                .concatMap(new Function<List<String>, Observable<Set<String>>>() {
+                                    @Override
+                                    public Observable<Set<String>> apply(List<String> strings) {
+                                        return missingAndDeletedRepository
+                                                .downloadMissingAndDeleted(strings, deviceId);
+                                    }
+                                });
                     }
                 });
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -20,8 +20,6 @@
 
 package org.akvo.flow.presentation.datapoints.map;
 
-import android.support.annotation.NonNull;
-
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.entity.DataPoint;
 import org.akvo.flow.domain.entity.DownloadResult;
@@ -29,13 +27,12 @@ import org.akvo.flow.domain.interactor.DefaultFlowableObserver;
 import org.akvo.flow.domain.interactor.DefaultObserver;
 import org.akvo.flow.domain.interactor.DownloadDataPoints;
 import org.akvo.flow.domain.interactor.ErrorComposable;
-import org.akvo.flow.domain.interactor.GetSavedDataPoints;
+import org.akvo.flow.domain.interactor.datapoints.GetSavedDataPoints;
 import org.akvo.flow.domain.interactor.UseCase;
 import org.akvo.flow.domain.util.Constants;
 import org.akvo.flow.presentation.Presenter;
-import org.akvo.flow.presentation.datapoints.map.entity.MapDataPoint;
-import org.akvo.flow.presentation.datapoints.map.entity.MapDataPointMapper;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -44,37 +41,38 @@ import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import androidx.annotation.NonNull;
 import timber.log.Timber;
 
 import static org.akvo.flow.domain.entity.DownloadResult.ResultCode.SUCCESS;
 
 public class DataPointsMapPresenter implements Presenter {
 
-    private final MapDataPointMapper mapper;
     private final DownloadDataPoints downloadDataPoints;
     private final UseCase getSavedDataPoints;
     private final UseCase checkDeviceNotification;
     private final UseCase upload;
+    private final FeatureMapper featureMapper;
 
     private DataPointsMapView view;
     private SurveyGroup surveyGroup;
 
     @Inject DataPointsMapPresenter(@Named("getSavedDataPoints") UseCase getSavedDataPoints,
-            MapDataPointMapper mapper, DownloadDataPoints downloadDataPoints,
+            DownloadDataPoints downloadDataPoints,
             @Named("checkDeviceNotification") UseCase checkDeviceNotification,
-            @Named("uploadSync") UseCase upload) {
+            @Named("uploadSync") UseCase upload, FeatureMapper featureMapper) {
         this.getSavedDataPoints = getSavedDataPoints;
-        this.mapper = mapper;
         this.downloadDataPoints = downloadDataPoints;
         this.checkDeviceNotification = checkDeviceNotification;
         this.upload = upload;
+        this.featureMapper = featureMapper;
     }
 
     void setView(@NonNull DataPointsMapView view) {
         this.view = view;
     }
 
-    void onDataReady(SurveyGroup surveyGroup) {
+    void onSurveyGroupReady(SurveyGroup surveyGroup) {
         this.surveyGroup = surveyGroup;
         if (surveyGroup == null) {
             view.hideMenu();
@@ -84,11 +82,8 @@ public class DataPointsMapPresenter implements Presenter {
             } else {
                 view.showNonMonitoredMenu();
             }
+            view.showFab();
         }
-    }
-
-    void onViewReady() {
-        loadDataPoints();
     }
 
     void loadDataPoints() {
@@ -100,12 +95,12 @@ public class DataPointsMapPresenter implements Presenter {
                 @Override
                 public void onError(Throwable e) {
                     Timber.e(e, "Error loading saved datapoints");
+                    view.displayDataPoints(featureMapper.getFeatureCollection(new ArrayList<>()));
                 }
 
                 @Override
                 public void onNext(List<DataPoint> dataPoints) {
-                    List<MapDataPoint> mapDataPoints = mapper.transform(dataPoints);
-                    view.displayData(mapDataPoints);
+                    view.displayDataPoints(featureMapper.getFeatureCollection(dataPoints));
                 }
             }, params);
         }
@@ -123,7 +118,7 @@ public class DataPointsMapPresenter implements Presenter {
         getSavedDataPoints.dispose();
         downloadDataPoints.dispose();
         view.hideProgress();
-        onDataReady(surveyGroup);
+        onSurveyGroupReady(surveyGroup);
         loadDataPoints();
     }
 
@@ -182,7 +177,7 @@ public class DataPointsMapPresenter implements Presenter {
             view.showProgress();
             final Map<String, Object> params = new HashMap<>(2);
             params.put(Constants.KEY_SURVEY_ID, surveyGroup.getId() + "");
-            checkDeviceNotification.execute(new DefaultObserver<List<String>>() {
+            checkDeviceNotification.execute(new DefaultObserver<Set<String>>() {
                 @Override
                 public void onError(Throwable e) {
                     Timber.e(e);
@@ -190,7 +185,7 @@ public class DataPointsMapPresenter implements Presenter {
                 }
 
                 @Override
-                public void onNext(List<String> strings) {
+                public void onNext(Set<String> ignored) {
                     uploadDataPoints(params);
                 }
             }, params);

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017,2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -21,11 +21,12 @@
 package org.akvo.flow.data.loader.models;
 
 import android.database.Cursor;
-import android.support.annotation.NonNull;
 
 import org.akvo.flow.database.SurveyDbAdapter;
 import org.akvo.flow.database.SurveyInstanceColumns;
 import org.akvo.flow.domain.SurveyedLocale;
+
+import androidx.annotation.NonNull;
 
 public class SurveyedLocaleMapper {
 
@@ -33,7 +34,6 @@ public class SurveyedLocaleMapper {
     public SurveyedLocale getSurveyedLocale(@NonNull Cursor cursor) {
         String id = cursor.getString(SurveyDbAdapter.RecordQuery.RECORD_ID);
         long surveyGroupId = cursor.getLong(SurveyDbAdapter.RecordQuery.SURVEY_GROUP_ID);
-        long lastModified = cursor.getLong(SurveyDbAdapter.RecordQuery.LAST_MODIFIED);
         String name = cursor.getString(SurveyDbAdapter.RecordQuery.NAME);
 
         // Location. Check for null values first
@@ -49,7 +49,6 @@ public class SurveyedLocaleMapper {
         if (columnIndex != -1) {
             status = cursor.getInt(columnIndex);
         }
-        return new SurveyedLocale(id, name, lastModified, surveyGroupId, latitude, longitude,
-                status);
+        return new SurveyedLocale(id, name, surveyGroupId, latitude, longitude, status);
     }
 }

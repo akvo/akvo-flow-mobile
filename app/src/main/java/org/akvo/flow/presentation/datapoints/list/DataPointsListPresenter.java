@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -20,7 +20,7 @@
 
 package org.akvo.flow.presentation.datapoints.list;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.entity.DataPoint;
@@ -29,7 +29,7 @@ import org.akvo.flow.domain.interactor.DefaultFlowableObserver;
 import org.akvo.flow.domain.interactor.DefaultObserver;
 import org.akvo.flow.domain.interactor.DownloadDataPoints;
 import org.akvo.flow.domain.interactor.ErrorComposable;
-import org.akvo.flow.domain.interactor.GetSavedDataPoints;
+import org.akvo.flow.domain.interactor.datapoints.GetSavedDataPoints;
 import org.akvo.flow.domain.interactor.UseCase;
 import org.akvo.flow.domain.util.Constants;
 import org.akvo.flow.presentation.Presenter;
@@ -253,7 +253,7 @@ public class DataPointsListPresenter implements Presenter {
             view.showLoading();
             final Map<String, Object> params = new HashMap<>(2);
             params.put(Constants.KEY_SURVEY_ID, surveyGroup.getId() + "");
-            checkDeviceNotification.execute(new DefaultObserver<List<String>>() {
+            checkDeviceNotification.execute(new DefaultObserver<Set<String>>() {
                 @Override
                 public void onError(Throwable e) {
                     Timber.e(e);
@@ -261,7 +261,7 @@ public class DataPointsListPresenter implements Presenter {
                 }
 
                 @Override
-                public void onNext(List<String> strings) {
+                public void onNext(Set<String> ignored) {
                     uploadDataPoints(params);
                 }
             }, params);

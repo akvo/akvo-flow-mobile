@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -27,6 +27,7 @@ import org.akvo.flow.domain.interactor.SaveEnableMobileData;
 import org.akvo.flow.domain.interactor.SaveImageSize;
 import org.akvo.flow.domain.interactor.SaveKeepScreenOn;
 import org.akvo.flow.domain.interactor.UseCase;
+import org.akvo.flow.domain.interactor.forms.DownloadForm;
 import org.akvo.flow.presentation.Presenter;
 import org.akvo.flow.util.logging.LoggingHelper;
 
@@ -49,6 +50,8 @@ public class PreferencePresenter implements Presenter {
     private final UseCase unSyncedTransmissionsExist;
     private final UseCase clearResponses;
     private final UseCase clearAllData;
+    private final UseCase downloadForm;
+    private final UseCase reloadForms;
     private final ViewUserSettingsMapper mapper;
     private final LoggingHelper helper;
 
@@ -63,6 +66,8 @@ public class PreferencePresenter implements Presenter {
             @Named("unSyncedTransmissionsExist") UseCase unSyncedTransmissionsExist,
             @Named("clearResponses") UseCase clearResponses,
             @Named("clearAllData") UseCase clearAllData,
+            @Named("downloadForm") UseCase downloadForm,
+            @Named("reloadForms") UseCase reloadForms,
             ViewUserSettingsMapper mapper, LoggingHelper helper) {
         this.getUserSettings = getUserSettings;
         this.saveAppLanguage = saveAppLanguage;
@@ -72,6 +77,8 @@ public class PreferencePresenter implements Presenter {
         this.unSyncedTransmissionsExist = unSyncedTransmissionsExist;
         this.clearResponses = clearResponses;
         this.clearAllData = clearAllData;
+        this.downloadForm = downloadForm;
+        this.reloadForms = reloadForms;
         this.mapper = mapper;
         this.helper = helper;
     }
@@ -152,6 +159,8 @@ public class PreferencePresenter implements Presenter {
         unSyncedTransmissionsExist.dispose();
         clearAllData.dispose();
         clearResponses.dispose();
+        downloadForm.dispose();
+        reloadForms.dispose();
     }
 
     public void deleteCollectedData() {
@@ -201,6 +210,44 @@ public class PreferencePresenter implements Presenter {
         clearAllData.execute(new ClearDataObserver(), null);
     }
 
+    public void downloadForm(String formId) {
+        view.showLoading();
+        Map<String, Object> params = new HashMap<>(2);
+        params.put(DownloadForm.FORM_ID_PARAM, formId);
+        downloadForm.execute(new DefaultObserver<Boolean>() {
+            @Override
+            public void onError(Throwable e) {
+                Timber.e(e);
+                view.hideLoading();
+                view.showDownloadFormsError(1);
+            }
+
+            @Override
+            public void onNext(Boolean aBoolean) {
+                view.hideLoading();
+                view.showDownloadFormsSuccess(1);
+            }
+        }, params);
+    }
+
+    public void reloadForms() {
+        view.showLoading();
+        reloadForms.execute(new DefaultObserver<Integer>() {
+            @Override
+            public void onError(Throwable e) {
+                Timber.e(e);
+                view.hideLoading();
+                view.showDownloadFormsError(5); //random number for now
+            }
+
+            @Override
+            public void onNext(Integer numberOfForms) {
+                view.hideLoading();
+                view.showDownloadFormsSuccess(numberOfForms);
+            }
+        }, null);
+    }
+
     private class ClearDataObserver extends DefaultObserver<Boolean> {
         @Override
         public void onError(Throwable e) {
@@ -215,7 +262,6 @@ public class PreferencePresenter implements Presenter {
             } else {
                 view.showClearDataError();
             }
-
         }
     }
 }

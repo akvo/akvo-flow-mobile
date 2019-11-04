@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2018-2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -20,24 +20,25 @@
 
 package org.akvo.flow.domain.interactor;
 
+import androidx.annotation.VisibleForTesting;
+import io.reactivex.Completable;
+import io.reactivex.CompletableSource;
+import io.reactivex.Observable;
+import io.reactivex.annotations.NonNull;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Function;
+import io.reactivex.observers.DisposableCompletableObserver;
 import org.akvo.flow.domain.entity.FormInstanceMetadata;
 import org.akvo.flow.domain.repository.FileRepository;
 import org.akvo.flow.domain.repository.SurveyRepository;
 import org.akvo.flow.domain.repository.UserRepository;
 import org.akvo.flow.domain.util.TextValueCleaner;
 
+import javax.inject.Inject;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import javax.inject.Inject;
-
-import io.reactivex.Observable;
-import io.reactivex.annotations.NonNull;
-import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Function;
-import io.reactivex.observers.DisposableObserver;
 
 public class ExportSurveyInstances {
 
@@ -58,9 +59,8 @@ public class ExportSurveyInstances {
         this.disposables = new CompositeDisposable();
     }
 
-    @SuppressWarnings("unchecked")
-    public <T> void execute(DisposableObserver<T> observer) {
-        final Observable<T> observable = buildUseCaseObservable();
+    public void execute(DisposableCompletableObserver observer) {
+        final Completable observable = buildUseCaseObservable();
         addDisposable(observable.subscribeWith(observer));
     }
 
@@ -70,11 +70,8 @@ public class ExportSurveyInstances {
         }
     }
 
-    private void addDisposable(Disposable disposable) {
-        disposables.add(disposable);
-    }
-
-    private Observable buildUseCaseObservable() {
+    @VisibleForTesting
+    Completable buildUseCaseObservable() {
         return userRepository.getDeviceId()
                 .map(new Function<String, String>() {
                     @Override
@@ -82,69 +79,59 @@ public class ExportSurveyInstances {
                         return valueCleaner.cleanVal(deviceId);
                     }
                 })
-                .flatMap(new Function<String, Observable<Boolean>>() {
+                .flatMapCompletable(new Function<String, Completable>() {
                     @Override
-                    public Observable<Boolean> apply(final String deviceId) {
+                    public Completable apply(final String deviceId) {
                         return createInstancesZipFiles(deviceId);
                     }
                 });
     }
 
-    private Observable<Boolean> createInstancesZipFiles(final String deviceId) {
+    private void addDisposable(Disposable disposable) {
+        disposables.add(disposable);
+    }
+
+    private Completable createInstancesZipFiles(final String deviceId) {
         return surveyRepository.getPendingSurveyInstances()
-                .concatMap(new Function<List<Long>, Observable<Boolean>>() {
+                .flatMapCompletable(new Function<List<Long>, CompletableSource>() {
                     @Override
-                    public Observable<Boolean> apply(List<Long> instanceIds) {
+                    public CompletableSource apply(List<Long> instanceIds) {
                         return Observable.fromIterable(instanceIds)
-                                .concatMap(new Function<Long, Observable<Boolean>>() {
+                                .flatMapCompletable(new Function<Long, CompletableSource>() {
                                     @Override
-                                    public Observable<Boolean> apply(Long instanceId) {
-                                        return getFormInstanceData(instanceId, deviceId);
-                                    }
-                                })
-                                .toList()
-                                .toObservable()
-                                .map(new Function<List<Boolean>, Boolean>() {
-                                    @Override
-                                    public Boolean apply(List<Boolean> ignored) {
-                                        return true;
+                                    public CompletableSource apply(Long instanceId) {
+                                        return createTransmissions(instanceId, deviceId);
                                     }
                                 });
                     }
                 });
     }
 
-    private Observable<Boolean> getFormInstanceData(@NonNull final Long instanceId,
+    private Completable createTransmissions(@NonNull final Long instanceId,
             final String deviceId) {
         return surveyRepository.setInstanceStatusToRequested(instanceId)
-                .concatMap(new Function<Boolean, Observable<Boolean>>() {
-                    @Override
-                    public Observable<Boolean> apply(Boolean aBoolean) {
-                        return surveyRepository.getFormInstanceData(instanceId, deviceId)
-                                .concatMap(
-                                        new Function<FormInstanceMetadata, Observable<Boolean>>() {
-                                            @Override
-                                            public Observable<Boolean> apply(
-                                                    final FormInstanceMetadata metadata) {
-                                                return createTransmissions(metadata, instanceId);
-                                            }
-                                        });
-                    }
-                });
+                .andThen(surveyRepository.getFormInstanceData(instanceId, deviceId)
+                        .flatMapCompletable(
+                                new Function<FormInstanceMetadata, CompletableSource>() {
+                                    @Override
+                                    public CompletableSource apply(FormInstanceMetadata metadata) {
+                                        return createTransmissions(metadata, instanceId);
+                                    }
+                                }));
     }
 
-    private Observable<Boolean> createTransmissions(final FormInstanceMetadata metadata,
+    private Completable createTransmissions(final FormInstanceMetadata metadata,
             @NonNull final Long instanceId) {
         return fileRepository
                 .createDataZip(metadata.getZipFileName(), metadata.getFormInstanceData())
-                .concatMap(new Function<Boolean, Observable<Boolean>>() {
-                    @Override
-                    public Observable<Boolean> apply(Boolean ignored) {
-                        Set<String> filenames = new HashSet<>(metadata.getMediaFileNames());
-                        filenames.add(metadata.getZipFileName());
-                        return surveyRepository
-                                .createTransmissions(instanceId, metadata.getFormId(), filenames);
-                    }
-                });
+                .andThen(insertToDatabase(metadata, instanceId));
+    }
+
+    private Completable insertToDatabase(FormInstanceMetadata metadata,
+            @NonNull Long instanceId) {
+        Set<String> filenames = new HashSet<>(metadata.getMediaFileNames());
+        filenames.add(metadata.getZipFileName());
+        return surveyRepository
+                .createTransmissions(instanceId, metadata.getFormId(), filenames);
     }
 }

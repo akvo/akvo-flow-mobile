@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2010-2017,2019 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -19,16 +19,14 @@
 
 package org.akvo.flow.ui.fragment;
 
+import android.content.Context;
 import android.os.Bundle;
-import android.support.design.widget.TabLayout;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+
+import com.google.android.material.tabs.TabLayout;
 
 import org.akvo.flow.R;
 import org.akvo.flow.app.FlowApp;
@@ -39,12 +37,20 @@ import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
 import org.akvo.flow.presentation.datapoints.list.DataPointsListFragment;
 import org.akvo.flow.presentation.datapoints.map.DataPointsMapFragment;
+import org.akvo.flow.presentation.survey.FABListener;
+import org.akvo.flow.tracking.TrackingListener;
 import org.akvo.flow.util.ConstantUtil;
 
 import java.util.Map;
 import java.util.WeakHashMap;
 
 import javax.inject.Inject;
+
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentPagerAdapter;
+import androidx.viewpager.widget.ViewPager;
 
 public class DatapointsFragment extends Fragment {
 
@@ -60,6 +66,11 @@ public class DatapointsFragment extends Fragment {
 
     private String[] tabNames;
 
+    private ViewPager mPager;
+
+    private TrackingListener trackingListener;
+    private FABListener fabListener;
+
     public DatapointsFragment() {
     }
 
@@ -69,6 +80,28 @@ public class DatapointsFragment extends Fragment {
         args.putSerializable(ConstantUtil.SURVEY_GROUP_EXTRA, surveyGroup);
         fragment.setArguments(args);
         return fragment;
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (! (context instanceof TrackingListener)) {
+            throw new IllegalArgumentException("Activity must implement TrackingListener");
+        } else {
+            trackingListener = (TrackingListener) context;
+        }
+        if (! (context instanceof FABListener)) {
+            throw new IllegalArgumentException("Activity must implement FABListener");
+        } else {
+            fabListener = (FABListener) context;
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        trackingListener = null;
+        fabListener = null;
     }
 
     @Override
@@ -120,17 +153,72 @@ public class DatapointsFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.datapoints_fragment, container, false);
-        ViewPager mPager = (ViewPager) v.findViewById(R.id.pager);
-        TabLayout tabs = (TabLayout) v.findViewById(R.id.tabs);
+        mPager = v.findViewById(R.id.pager);
+        TabLayout tabs = v.findViewById(R.id.tabs);
 
         mTabsAdapter = new TabsAdapter(getChildFragmentManager(), tabNames, mSurveyGroup);
         mPager.setAdapter(mTabsAdapter);
         tabs.setupWithViewPager(mPager);
+        mPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset,
+                    int positionOffsetPixels) {
+                //EMPTY
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                if (position == POSITION_MAP && mSurveyGroup != null) {
+                    DataPointsMapFragment mapFragment = mTabsAdapter.getMapFragment();
+                    if (mapFragment != null) {
+                        mapFragment.showFab();
+                    }
+                }
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+                switch (state) {
+                    case ViewPager.SCROLL_STATE_SETTLING:
+                    case ViewPager.SCROLL_STATE_IDLE:
+                        showFabs();
+                        break;
+                    default:
+                        hideFabs();
+                        break;
+                }
+            }
+        });
 
         return v;
+    }
+
+    private void hideFabs() {
+        if (fabListener != null) {
+            fabListener.hideFab();
+        }
+        if (mSurveyGroup != null) {
+            DataPointsMapFragment mapFragment = mTabsAdapter.getMapFragment();
+            if (mapFragment != null) {
+                mapFragment.hideFab();
+            }
+        }
+    }
+
+    private void showFabs() {
+        if (fabListener != null) {
+            fabListener.showFab();
+        }
+
+        if (mPager.getCurrentItem() == POSITION_MAP && mSurveyGroup != null) {
+            DataPointsMapFragment mapFragment = mTabsAdapter.getMapFragment();
+            if (mapFragment != null) {
+                mapFragment.showFab();
+            }
+        }
     }
 
     @Override
@@ -139,9 +227,18 @@ public class DatapointsFragment extends Fragment {
             StatsDialogFragment dialogFragment = StatsDialogFragment
                     .newInstance(mSurveyGroup.getId());
             dialogFragment.show(getFragmentManager(), STATS_DIALOG_FRAGMENT_TAG);
+            int selectedTab = mPager.getCurrentItem();
+
+            if (trackingListener != null) {
+                trackingListener.logStatsEvent(selectedTab);
+            }
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    public void refreshMap() {
+        mTabsAdapter.refreshMap();
     }
 
     static class TabsAdapter extends FragmentPagerAdapter {
@@ -165,8 +262,7 @@ public class DatapointsFragment extends Fragment {
             this.surveyGroup = newSurveyGroup;
             DataPointsListFragment listFragment = (DataPointsListFragment) fragmentsRef
                     .get(POSITION_LIST);
-            DataPointsMapFragment mapFragment = (DataPointsMapFragment) fragmentsRef
-                    .get(POSITION_MAP);
+            DataPointsMapFragment mapFragment = getMapFragment();
 
             if (listFragment != null) {
                 listFragment.onNewSurveySelected(surveyGroup);
@@ -176,8 +272,13 @@ public class DatapointsFragment extends Fragment {
             }
         }
 
+        DataPointsMapFragment getMapFragment() {
+            return (DataPointsMapFragment) fragmentsRef.get(POSITION_MAP);
+        }
+
+        @NonNull
         @Override
-        public Object instantiateItem(ViewGroup container, int position) {
+        public Object instantiateItem(@NonNull ViewGroup container, int position) {
             if (position == POSITION_LIST) {
                 DataPointsListFragment dataPointsListFragment = (DataPointsListFragment) super
                         .instantiateItem(container, position);
@@ -204,6 +305,9 @@ public class DatapointsFragment extends Fragment {
             return tabs[position];
         }
 
+        public void refreshMap() {
+            getMapFragment().refreshView();
+        }
     }
 
     public void refresh(SurveyGroup surveyGroup) {

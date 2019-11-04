@@ -5,7 +5,6 @@
 #### Screenshots (if appropriate)
 
 #### Reviewer Checklist
-* [ ] Connect the issue
 * [ ] Test plan
 * [ ] Copyright header
 * [ ] Code formatting

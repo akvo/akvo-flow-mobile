@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2018-2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -21,8 +21,8 @@
 package org.akvo.flow.presentation.settings.publish;
 
 import android.content.Context;
-import android.support.annotation.Nullable;
-import android.support.v4.content.ContextCompat;
+import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -36,6 +36,7 @@ import org.akvo.flow.injector.component.ApplicationComponent;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
 import org.akvo.flow.presentation.SnackBarManager;
+import org.akvo.flow.tracking.TrackingHelper;
 import org.akvo.flow.util.AlarmHelper;
 import org.akvo.flow.util.BootReceiverHelper;
 
@@ -75,6 +76,8 @@ public class PublishFilesPreferenceView extends LinearLayout
     @Inject
     SnackBarManager snackBarManager;
 
+    private TrackingHelper trackingHelper;
+
     public PublishFilesPreferenceView(Context context) {
         this(context, null);
     }
@@ -90,6 +93,7 @@ public class PublishFilesPreferenceView extends LinearLayout
         initialiseInjector();
         ButterKnife.bind(this);
         presenter.setView(this);
+        trackingHelper = new TrackingHelper(getContext());
     }
 
     private void initialiseInjector() {
@@ -106,6 +110,7 @@ public class PublishFilesPreferenceView extends LinearLayout
     @OnClick(R.id.publish_files_preference)
     void onPublishClick() {
         presenter.onPublishClick();
+        trackingHelper.logPublishPressed();
     }
 
     @Override

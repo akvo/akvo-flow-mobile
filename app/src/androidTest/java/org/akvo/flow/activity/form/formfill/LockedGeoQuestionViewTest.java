@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -20,21 +20,15 @@
 
 package org.akvo.flow.activity.form.formfill;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
-import android.support.test.InstrumentationRegistry;
-import android.support.test.espresso.UiController;
-import android.support.test.espresso.ViewAction;
-import android.support.test.espresso.ViewInteraction;
-import android.support.test.espresso.matcher.BoundedMatcher;
-import android.support.test.espresso.matcher.ViewMatchers;
-import android.support.test.filters.MediumTest;
-import android.support.test.rule.ActivityTestRule;
-import android.support.test.runner.AndroidJUnit4;
+import android.os.Build;
+import android.os.SystemClock;
 import android.view.View;
 import android.widget.TextView;
 
@@ -54,20 +48,31 @@ import org.junit.runner.RunWith;
 
 import java.text.DecimalFormat;
 
-import static android.support.test.espresso.Espresso.closeSoftKeyboard;
-import static android.support.test.espresso.Espresso.onView;
-import static android.support.test.espresso.action.ViewActions.click;
-import static android.support.test.espresso.action.ViewActions.replaceText;
-import static android.support.test.espresso.assertion.ViewAssertions.matches;
-import static android.support.test.espresso.matcher.ViewMatchers.isAssignableFrom;
-import static android.support.test.espresso.matcher.ViewMatchers.isClickable;
-import static android.support.test.espresso.matcher.ViewMatchers.isCompletelyDisplayed;
-import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
-import static android.support.test.espresso.matcher.ViewMatchers.isEnabled;
-import static android.support.test.espresso.matcher.ViewMatchers.isFocusable;
-import static android.support.test.espresso.matcher.ViewMatchers.withEffectiveVisibility;
-import static android.support.test.espresso.matcher.ViewMatchers.withId;
-import static android.support.test.espresso.matcher.ViewMatchers.withText;
+import androidx.test.platform.app.InstrumentationRegistry;
+import androidx.test.espresso.UiController;
+import androidx.test.espresso.ViewAction;
+import androidx.test.espresso.ViewInteraction;
+import androidx.test.espresso.matcher.BoundedMatcher;
+import androidx.test.espresso.matcher.ViewMatchers;
+import androidx.test.filters.MediumTest;
+import androidx.test.rule.ActivityTestRule;
+import androidx.test.rule.GrantPermissionRule;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
+
+import static androidx.test.espresso.Espresso.closeSoftKeyboard;
+import static androidx.test.espresso.Espresso.onView;
+import static androidx.test.espresso.action.ViewActions.click;
+import static androidx.test.espresso.action.ViewActions.replaceText;
+import static androidx.test.espresso.assertion.ViewAssertions.matches;
+import static androidx.test.espresso.matcher.ViewMatchers.isAssignableFrom;
+import static androidx.test.espresso.matcher.ViewMatchers.isClickable;
+import static androidx.test.espresso.matcher.ViewMatchers.isCompletelyDisplayed;
+import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
+import static androidx.test.espresso.matcher.ViewMatchers.isEnabled;
+import static androidx.test.espresso.matcher.ViewMatchers.isFocusable;
+import static androidx.test.espresso.matcher.ViewMatchers.withEffectiveVisibility;
+import static androidx.test.espresso.matcher.ViewMatchers.withId;
+import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.addExecutionDelay;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.getFormActivityIntent;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.getString;
@@ -90,6 +95,18 @@ public class LockedGeoQuestionViewTest {
     private final DecimalFormat accuracyFormat = new DecimalFormat("#");
 
     @Rule
+    public GrantPermissionRule permissionRule = GrantPermissionRule
+            .grant(android.Manifest.permission.ACCESS_FINE_LOCATION);
+
+    @Rule
+    public GrantPermissionRule permissionRule2 = GrantPermissionRule
+            .grant(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+
+    @Rule
+    public GrantPermissionRule permissionRule3 = GrantPermissionRule
+            .grant(Manifest.permission.READ_PHONE_STATE);
+
+    @Rule
     public ActivityTestRule<FormActivity> rule = new ActivityTestRule<FormActivity>(
             FormActivity.class) {
         @Override
@@ -100,10 +117,10 @@ public class LockedGeoQuestionViewTest {
 
     @BeforeClass
     public static void beforeClass() {
-        Context targetContext = InstrumentationRegistry.getTargetContext();
+        Context targetContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
         SurveyRequisite.setRequisites(targetContext);
         installer = new SurveyInstaller(targetContext);
-        installer.installSurvey(locked_geo_form, InstrumentationRegistry.getContext());
+        installer.installSurvey(locked_geo_form, InstrumentationRegistry.getInstrumentation().getContext());
     }
 
     @After
@@ -113,7 +130,7 @@ public class LockedGeoQuestionViewTest {
 
     @AfterClass
     public static void afterClass() {
-        SurveyRequisite.resetRequisites(InstrumentationRegistry.getTargetContext());
+        SurveyRequisite.resetRequisites(InstrumentationRegistry.getInstrumentation().getTargetContext());
         installer.clearSurveys();
     }
 
@@ -193,7 +210,7 @@ public class LockedGeoQuestionViewTest {
     }
 
     @Test
-    public void ensureLocationValuesDisplayedCorrectlyWhenCancelled() throws Exception {
+    public void ensureLocationValuesDisplayedCorrectlyWhenCancelled() {
         onView(withId(R.id.lat_et)).perform(replaceText(""));
         onView(withId(R.id.lon_et)).perform(replaceText(""));
         onView(withId(R.id.height_et)).perform(replaceText(""));
@@ -221,7 +238,7 @@ public class LockedGeoQuestionViewTest {
     }
 
     private void provideMockLocation(float accuracy) {
-        LocationManager locationManager = (LocationManager) InstrumentationRegistry.getContext()
+        LocationManager locationManager = (LocationManager) InstrumentationRegistry.getInstrumentation().getContext()
                 .getSystemService(Context.LOCATION_SERVICE);
         assert locationManager != null;
         locationManager
@@ -234,6 +251,11 @@ public class LockedGeoQuestionViewTest {
         location.setLongitude(MOCK_LONGITUDE);
         location.setAltitude(MOCK_ALTITUDE);
         location.setAccuracy(accuracy);
+        location.setTime(System.currentTimeMillis());
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            location.setElapsedRealtimeNanos(SystemClock.elapsedRealtimeNanos());
+        }
+
         locationManager.setTestProviderLocation(LocationManager.GPS_PROVIDER, location);
     }
 
@@ -259,24 +281,18 @@ public class LockedGeoQuestionViewTest {
     }
 
     private void verifyErrorSnackBarDisplayed() {
-        onView(allOf(withId(android.support.design.R.id.snackbar_text),
+        onView(allOf(withId(com.google.android.material.R.id.snackbar_text),
                 withText(R.string.location_timeout)))
                 .check(matches(withEffectiveVisibility(ViewMatchers.Visibility.VISIBLE)));
     }
 
     private void simulateLocationTimeout() {
         final View geoQuestion = rule.getActivity().findViewById(R.id.geo_question_view);
-        geoQuestion.post(new Runnable() {
-            @Override
-            public void run() {
-                ((TimedLocationListener.Listener) geoQuestion)
-                        .onTimeout();
-            }
-        });
+        geoQuestion.post(((TimedLocationListener.Listener) geoQuestion)::onTimeout);
     }
 
     private void clickSnackBarRetry() {
-        onView(withId(android.support.design.R.id.snackbar_action))
+        onView(withId(com.google.android.material.R.id.snackbar_action))
                 .check(matches(allOf(isEnabled(), isClickable())))
                 .perform(new ViewAction() {
                              @Override
@@ -313,7 +329,6 @@ public class LockedGeoQuestionViewTest {
 
     private static ViewAction replaceTextInTextView(final String value) {
         return new ViewAction() {
-            @SuppressWarnings("unchecked")
             @Override
             public Matcher<View> getConstraints() {
                 return allOf(isDisplayed(), isAssignableFrom(TextView.class));

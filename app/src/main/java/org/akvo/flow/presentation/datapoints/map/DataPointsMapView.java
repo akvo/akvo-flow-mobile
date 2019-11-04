@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -20,9 +20,7 @@
 
 package org.akvo.flow.presentation.datapoints.map;
 
-import org.akvo.flow.presentation.datapoints.map.entity.MapDataPoint;
-
-import java.util.List;
+import com.mapbox.geojson.FeatureCollection;
 
 interface DataPointsMapView {
 
@@ -30,7 +28,7 @@ interface DataPointsMapView {
 
     void hideProgress();
 
-    void displayData(List<MapDataPoint> surveyedLocales);
+    void displayDataPoints(FeatureCollection dataPoints);
 
     void showSyncedResults(int numberOfSyncedItems);
 
@@ -47,4 +45,6 @@ interface DataPointsMapView {
     void showMonitoredMenu();
 
     void showNonMonitoredMenu();
+
+    void showFab();
 }

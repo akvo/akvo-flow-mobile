@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -24,19 +24,20 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 
 import org.akvo.flow.data.datasource.DataSourceFactory;
-import org.akvo.flow.data.datasource.MediaDataSource;
+import org.akvo.flow.domain.entity.DomainImageMetadata;
+import org.akvo.flow.domain.entity.InstanceIdUuid;
 import org.akvo.flow.domain.repository.FileRepository;
 
 import java.io.File;
-import java.io.InputStream;
 import java.util.List;
 
 import javax.inject.Inject;
 
+import io.reactivex.Completable;
+import io.reactivex.Maybe;
 import io.reactivex.Observable;
 import io.reactivex.annotations.NonNull;
 import io.reactivex.functions.Function;
-import timber.log.Timber;
 
 public class FileDataRepository implements FileRepository {
 
@@ -55,58 +56,16 @@ public class FileDataRepository implements FileRepository {
     }
 
     @Override
-    public Observable<Boolean> copyResizedImage(final Uri uri, final String resizedImagePath,
+    public Observable<DomainImageMetadata> copyResizedImage(final Uri uri, final String resizedImagePath,
             final int imageSize, final boolean removeDuplicate) {
-        return dataSourceFactory.getMediaDataSource().getInputStreamFromUri(uri)
-                .concatMap(new Function<InputStream, Observable<Boolean>>() {
-                    @Override
-                    public Observable<Boolean> apply(final InputStream inputStream) {
-                        return saveResizedImage(uri, resizedImagePath, imageSize)
-                                .concatMap(new Function<Boolean, Observable<Boolean>>() {
-                                    @Override
-                                    public Observable<Boolean> apply(Boolean result) {
-                                        if (removeDuplicate) {
-                                            return removeDuplicateImage(uri);
-                                        } else {
-                                            return Observable.just(result);
-                                        }
-                                    }
-                                });
-                    }
-                });
-    }
-
-    private Observable<Boolean> removeDuplicateImage(final Uri uri) {
-        try {
-            new File(uri.getPath()).delete();
-        } catch (Exception e) {
-            Timber.e(e);
-        }
-        return Observable.just(true);
-    }
-
-    private Observable<Boolean> saveResizedImage(final Uri uri, final String resizedImagePath,
-            final int imageSize) {
-        return dataSourceFactory.getMediaDataSource().getInputStreamFromUri(uri)
-                .concatMap(new Function<InputStream, Observable<Boolean>>() {
-                    @Override
-                    public Observable<Boolean> apply(InputStream inputStream) {
-                        return dataSourceFactory.getImageDataSource()
-                                .saveResizedImage(uri, resizedImagePath, imageSize, inputStream);
-                    }
-                });
+        return dataSourceFactory.getImageDataSource()
+                .copyResizedImage(uri, resizedImagePath, imageSize, removeDuplicate);
     }
 
     @Override
-    public Observable<Boolean> moveFiles() {
-        return Observable.merge(dataSourceFactory.getFileDataSource().moveZipFiles(),
-                dataSourceFactory.getFileDataSource().moveMediaFiles())
-                .concatMap(new Function<List<String>, Observable<Boolean>>() {
-                    @Override
-                    public Observable<Boolean> apply(List<String> movedFiles) {
-                        return Observable.just(true);
-                    }
-                });
+    public Completable moveFiles() {
+        return Completable.mergeArray(dataSourceFactory.getFileDataSource().moveZipFiles(),
+                dataSourceFactory.getFileDataSource().moveMediaFiles());
     }
 
     @Override
@@ -146,34 +105,18 @@ public class FileDataRepository implements FileRepository {
     }
 
     @Override
-    public Observable<File> getZipFile(String uuid) {
-        return dataSourceFactory.getFileDataSource().getZipFile(uuid);
+    public Maybe<File> getInstancesWithIncorrectZip(InstanceIdUuid instanceIdUuid) {
+        return dataSourceFactory.getFileDataSource().getIncorrectZipFile(instanceIdUuid.getUuid());
     }
 
     @Override
-    public Observable<Boolean> createDataZip(String zipFileName,
-            String formInstanceData) {
-        return dataSourceFactory.getFileDataSource().writeDataToZipFile(zipFileName, formInstanceData);
+    public Completable createDataZip(String zipFileName, String formInstanceData) {
+        return dataSourceFactory.getFileDataSource()
+                .writeDataToZipFile(zipFileName, formInstanceData);
     }
 
     @Override
     public Observable<String> copyVideo(final Uri uri, final boolean removeOriginal) {
-        final MediaDataSource mediaDataSource = dataSourceFactory.getMediaDataSource();
-        return mediaDataSource.getInputStreamFromUri(uri)
-                .concatMap(new Function<InputStream, Observable<String>>() {
-                    @Override
-                    public Observable<String> apply(InputStream inputStream) {
-                        return dataSourceFactory.getFileDataSource().copyVideo(inputStream)
-                                .flatMap(new Function<String, Observable<String>>() {
-                                    @Override
-                                    public Observable<String> apply(String videoPath) {
-                                        if (removeOriginal) {
-                                            mediaDataSource.deleteMedia(uri);
-                                        }
-                                        return Observable.just(videoPath);
-                                    }
-                                });
-                    }
-                });
+        return dataSourceFactory.getVideoDataSource().copyVideo(uri, removeOriginal);
     }
 }

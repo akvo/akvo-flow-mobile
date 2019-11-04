@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2018 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2019 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -23,7 +23,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 import android.text.Html;
 import android.text.Spanned;
 import android.text.TextUtils;
@@ -299,11 +299,15 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
     }
 
     /**
-     * method that can be overridden by sub classes if they want to have some
-     * sort of visual response to a question interaction.
+     * Receiving question input from other apps or activities such as image, video, barcode
+     * By default this does nothing
      */
-    public void questionComplete(Bundle data) {
-        // do nothing
+    public void onQuestionResultReceived(Bundle data) {
+        // EMPTY
+    }
+
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        // EMTPY
     }
 
     /**
@@ -409,6 +413,15 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
      * in a QuestionResponse object
      */
     public abstract void captureResponse(boolean suppressListeners);
+
+    public void setResponse(boolean suppressListeners, Question question, String value,
+            String type) {
+        setResponse(createResponse(question, value, type), suppressListeners);
+    }
+
+    public void setResponse(Question question, String value, String type) {
+        setResponse(createResponse(question, value, type));
+    }
 
     /**
      * this method should be overridden by subclasses so they can manage the UI
@@ -545,5 +558,12 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
         return true;
     }
 
+    private QuestionResponse createResponse(Question question, String value, String type) {
+        return new QuestionResponse.QuestionResponseBuilder()
+                .setValue(value)
+                .setType(type)
+                .setQuestionId(question.getQuestionId())
+                .setIteration(question.getIteration())
+                .createQuestionResponse();
+    }
 }
-

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2018-2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -24,23 +24,41 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v4.app.DialogFragment;
+import androidx.annotation.NonNull;
+import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.FragmentActivity;
 
 import org.akvo.flow.R;
-import org.akvo.flow.service.SurveyDownloadService;
 
 public class ReloadFormsConfirmationDialog extends DialogFragment {
 
     public static final String TAG = "ReloadFormsConfirmationDialog";
+
+    private ReloadFormsListener listener;
 
     public ReloadFormsConfirmationDialog() {
     }
 
     public static ReloadFormsConfirmationDialog newInstance() {
         return new ReloadFormsConfirmationDialog();
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        FragmentActivity activity = getActivity();
+        if (activity instanceof ReloadFormsListener) {
+            listener = (ReloadFormsListener) activity;
+        } else {
+            throw new IllegalArgumentException("Activity must implement ReloadFormsListener");
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        listener = null;
     }
 
     @NonNull
@@ -51,10 +69,9 @@ public class ReloadFormsConfirmationDialog extends DialogFragment {
         builder.setMessage(R.string.reloadconftext);
         builder.setPositiveButton(R.string.okbutton, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
-                Context activity = getActivity();
-                Intent i = new Intent(activity, SurveyDownloadService.class);
-                i.putExtra(SurveyDownloadService.EXTRA_DELETE_SURVEYS, true);
-                activity.startService(i);
+                if (listener != null) {
+                    listener.reloadFormsConfirmed();
+                }
             }
         });
         builder.setNegativeButton(R.string.cancelbutton,
@@ -64,5 +81,10 @@ public class ReloadFormsConfirmationDialog extends DialogFragment {
                     }
                 });
         return builder.create();
+    }
+
+    public interface ReloadFormsListener {
+
+        void reloadFormsConfirmed();
     }
 }

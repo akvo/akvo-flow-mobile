@@ -30,6 +30,7 @@ public class Constants {
     public static final String JPEG_CONTENT_TYPE = "image/jpeg";
     public static final String PNG_CONTENT_TYPE = "image/png";
     public static final String VIDEO_CONTENT_TYPE = "video/mp4";
-    public static final String SURVEY_DATA_FILE_JSON = "data.json";
-    public static final String UTF_8_CHARSET = "UTF-8";
+    public static final String VERSION = "ver";
+    static final String SURVEY_DATA_FILE_JSON = "data.json";
+    static final String UTF_8_CHARSET = "UTF-8";
 }

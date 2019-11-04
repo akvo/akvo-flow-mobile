@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2018-2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -20,17 +20,17 @@
 
 package org.akvo.flow.ui.view.media.video;
 
+import android.Manifest;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v4.content.FileProvider;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 
 import org.akvo.flow.R;
+import org.akvo.flow.activity.FormActivity;
 import org.akvo.flow.async.MediaSyncTask;
 import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionResponse;
@@ -45,6 +45,7 @@ import org.akvo.flow.ui.Navigator;
 import org.akvo.flow.ui.view.QuestionView;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.MediaFileHelper;
+import org.akvo.flow.util.StoragePermissionsHelper;
 import org.akvo.flow.util.image.GlideImageLoader;
 import org.akvo.flow.util.image.ImageLoader;
 
@@ -52,6 +53,8 @@ import java.io.File;
 
 import javax.inject.Inject;
 
+import androidx.annotation.Nullable;
+import androidx.core.content.FileProvider;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -75,6 +78,9 @@ public class VideoQuestionView extends QuestionView
 
     @Inject
     VideoQuestionPresenter presenter;
+
+    @Inject
+    StoragePermissionsHelper storagePermissionsHelper;
 
     @BindView(R.id.acquire_media_ll)
     View mediaLayout;
@@ -134,7 +140,45 @@ public class VideoQuestionView extends QuestionView
 
     @OnClick(R.id.camera_btn)
     void onTakeVideoClicked() {
-        notifyQuestionListeners(QuestionInteractionEvent.TAKE_VIDEO_EVENT);
+        if (storagePermissionsHelper.isStorageAllowed()) {
+            notifyQuestionListeners(QuestionInteractionEvent.TAKE_VIDEO_EVENT);
+        } else {
+           requestStoragePermissions();
+        }
+    }
+
+    private void requestStoragePermissions() {
+        final FormActivity activity = (FormActivity) getContext();
+        activity.requestPermissions(new String[] { Manifest.permission.WRITE_EXTERNAL_STORAGE },
+                ConstantUtil.STORAGE_PERMISSION_CODE, getQuestion().getQuestionId());
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        if (requestCode == ConstantUtil.STORAGE_PERMISSION_CODE) {
+            if (storagePermissionsHelper.storagePermissionsGranted(permissions[0], grantResults)) {
+                notifyQuestionListeners(QuestionInteractionEvent.TAKE_VIDEO_EVENT);
+            } else {
+                storagePermissionNotGranted();
+            }
+        }
+    }
+
+    private void storagePermissionNotGranted() {
+        final View.OnClickListener retryListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (storagePermissionsHelper.userPressedDoNotShowAgain((FormActivity) getContext())) {
+                    navigator.navigateToAppSystemSettings(getContext());
+                } else {
+                    requestStoragePermissions();
+                }
+            }
+        };
+        snackBarManager
+                .displaySnackBarWithAction(this,
+                        R.string.storage_permission_missing,
+                        R.string.action_retry, retryListener, getContext());
     }
 
     @OnClick(R.id.gallery_btn)
@@ -161,7 +205,7 @@ public class VideoQuestionView extends QuestionView
      * object
      */
     @Override
-    public void questionComplete(Bundle mediaData) {
+    public void onQuestionResultReceived(Bundle mediaData) {
         Uri uri = mediaData != null ?
                 (Uri) mediaData.getParcelable(ConstantUtil.VIDEO_FILE_KEY) :
                 null;
@@ -243,7 +287,7 @@ public class VideoQuestionView extends QuestionView
             Question question = getQuestion();
             Media media = new Media();
             media.setFilename(filePath);
-            String value = MediaValue.serialize(media);
+            String value = MediaValue.serialize(media, false);
             response = new QuestionResponse.QuestionResponseBuilder()
                     .setValue(value)
                     .setType(ConstantUtil.VIDEO_RESPONSE_TYPE)

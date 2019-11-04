@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.design.widget.CoordinatorLayout
+<androidx.coordinatorlayout.widget.CoordinatorLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context="org.akvo.flow.presentation.AboutActivity">
+        android:id="@+id/root_layout"
+        tools:context="org.akvo.flow.presentation.about.AboutActivity">
 
     <include layout="@layout/app_bar_layout"/>
 
@@ -80,4 +81,4 @@
                 android:text="@string/about_view_terms"
                 style="@style/LinkTextViewStyle"/>
     </LinearLayout>
-</android.support.design.widget.CoordinatorLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

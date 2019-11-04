@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017,2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -20,9 +20,13 @@
 
 package org.akvo.flow.util.image;
 
-import android.widget.ImageView;
+        import android.widget.ImageView;
 
-import java.io.File;
+        import org.akvo.flow.domain.util.ImageSize;
+
+        import java.io.File;
+
+        import androidx.annotation.NonNull;
 
 public interface ImageLoader {
 
@@ -31,4 +35,7 @@ public interface ImageLoader {
     void loadFromFile(File file, ImageLoaderListener listener);
 
     void loadFromBase64String(String image, ImageView imageView, ImageLoaderListener listener);
+
+    void loadFromFile(ImageView imageView, File file, ImageLoaderListener listener,
+            @NonNull ImageSize size);
 }

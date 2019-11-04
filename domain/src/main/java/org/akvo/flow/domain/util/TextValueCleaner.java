@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2018-2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -20,12 +20,14 @@
 
 package org.akvo.flow.domain.util;
 
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 
 import javax.inject.Inject;
 
 public class TextValueCleaner {
-    private static final String DELIMITER = "\t";
+    static final String TAB = "\t";
+    static final String COMA = ",";
+    static final String NEWLINE = "\n";
     private static final String SPACE = "\u0020"; // safe from source whitespace reformatting
 
     @Inject
@@ -35,14 +37,14 @@ public class TextValueCleaner {
     public String cleanVal(@Nullable String value) {
         String cleanValue = value;
         if (cleanValue != null) {
-            if (cleanValue.contains(DELIMITER)) {
-                cleanValue = cleanValue.replace(DELIMITER, SPACE);
+            if (cleanValue.contains(TAB)) {
+                cleanValue = cleanValue.replace(TAB, SPACE);
             }
-            if (cleanValue.contains(",")) {
-                cleanValue = cleanValue.replace(",", SPACE);
+            if (cleanValue.contains(COMA)) {
+                cleanValue = cleanValue.replace(COMA, SPACE);
             }
-            if (cleanValue.contains("\n")) {
-                cleanValue = cleanValue.replace("\n", SPACE);
+            if (cleanValue.contains(NEWLINE)) {
+                cleanValue = cleanValue.replace(NEWLINE, SPACE);
             }
         }
         return cleanValue;
@@ -52,8 +54,8 @@ public class TextValueCleaner {
         String cleanValue = value;
         if (cleanValue != null) {
             cleanValue = cleanValue.trim();
-            cleanValue = cleanValue.replace("\n", SPACE);
-            cleanValue = cleanValue.replace(DELIMITER, SPACE);
+            cleanValue = cleanValue.replace(NEWLINE, SPACE);
+            cleanValue = cleanValue.replace(TAB, SPACE);
         }
         return cleanValue;
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2018-2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -23,6 +23,7 @@ package org.akvo.flow.broadcast;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import androidx.core.content.ContextCompat;
 
 import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.domain.interactor.DefaultObserver;
@@ -63,8 +64,7 @@ public class BootReceiver extends BroadcastReceiver {
                 @Override
                 public void onError(Throwable e) {
                     getPublishDataTime.dispose();
-                    bootReceiverHelper.disableBootReceiver();
-                    appContext.startService(new Intent(appContext, UnPublishDataService.class));
+                    disableReceiverAndStartService(context);
                     Timber.e(e);
                 }
 
@@ -78,9 +78,15 @@ public class BootReceiver extends BroadcastReceiver {
                                 .getRemainingPublishedTime(timeSincePublished);
                         alarmHelper.scheduleAlarm(timeLeft * 60 * 1000);
                     } else {
-                        bootReceiverHelper.disableBootReceiver();
-                        appContext.startService(new Intent(appContext, UnPublishDataService.class));
+                        disableReceiverAndStartService(context);
                     }
+                }
+
+                private void disableReceiverAndStartService(Context context) {
+                    bootReceiverHelper.disableBootReceiver();
+                    ContextCompat
+                            .startForegroundService(context,
+                                    new Intent(context, UnPublishDataService.class));
                 }
             }, null);
         }

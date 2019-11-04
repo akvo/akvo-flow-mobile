@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2012-2016,2018 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2012-2016,2018-2019 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -19,7 +19,7 @@
 package org.akvo.flow.util;
 
 import android.graphics.Bitmap;
-import android.support.media.ExifInterface;
+import androidx.exifinterface.media.ExifInterface;
 import android.util.Base64;
 
 import java.io.ByteArrayOutputStream;
@@ -44,54 +44,5 @@ public class ImageUtil {
             Timber.e(e);
         }
         return null;
-    }
-
-    public static void setLocation(String image, double latitude, double longitude) {
-        try {
-            ExifInterface exif = new ExifInterface(image);
-
-            String latDMS = convertDMS(latitude);
-            String lonDMS = convertDMS(longitude);
-            String latRef = latitude >= 0d ? "N" : "S";
-            String lonRef = longitude >= 0d ? "E" : "W";
-
-            exif.setAttribute(ExifInterface.TAG_GPS_LATITUDE, latDMS);
-            exif.setAttribute(ExifInterface.TAG_GPS_LATITUDE_REF, latRef);
-            exif.setAttribute(ExifInterface.TAG_GPS_LONGITUDE, lonDMS);
-            exif.setAttribute(ExifInterface.TAG_GPS_LONGITUDE_REF, lonRef);
-            exif.saveAttributes();
-        } catch (IOException e) {
-            Timber.e(e.getMessage());
-        }
-
-    }
-
-    private static String convertDMS(double coordinate) {
-        if (coordinate < -180.0 || coordinate > 180.0 || Double.isNaN(coordinate)) {
-            throw new IllegalArgumentException("coordinate=" + coordinate);
-        }
-
-        // Fixed denominator for seconds
-        final int secondsDenom = 1000;
-
-        StringBuilder sb = new StringBuilder();
-
-        coordinate = Math.abs(coordinate);
-
-        int degrees = (int) Math.floor(coordinate);
-        sb.append(degrees);
-        sb.append("/1,");
-        coordinate -= degrees;
-        coordinate *= 60.0;
-        int minutes = (int) Math.floor(coordinate);
-        sb.append(minutes);
-        sb.append("/1,");
-        coordinate -= minutes;
-        coordinate *= 60.0;
-        coordinate *= secondsDenom;
-        int secondsNum = (int) Math.floor(coordinate);
-        sb.append(secondsNum);
-        sb.append("/").append(secondsDenom);
-        return sb.toString();
     }
 }

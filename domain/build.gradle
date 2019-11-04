@@ -1,4 +1,6 @@
 apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
 
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
@@ -8,7 +10,7 @@ android {
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
         versionName "1.0"
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
     packagingOptions {
@@ -33,6 +35,16 @@ android {
         abortOnError false
         ignore 'InvalidPackage'
     }
+
+    testOptions {
+        unitTests.returnDefaultValues = true
+    }
+
+    testOptions.unitTests.all {
+        testLogging {
+            events 'passed', 'skipped', 'failed', 'standardOut', 'standardError'
+        }
+    }
 }
 
 dependencies {
@@ -40,8 +52,19 @@ dependencies {
     annotationProcessor "com.google.dagger:dagger-compiler:${rootProject.ext.daggerVersion}"
     implementation "io.reactivex.rxjava2:rxandroid:${rootProject.ext.rxAndroidVersion}"
     implementation "io.reactivex.rxjava2:rxjava:${rootProject.ext.rxJavaVersion}"
-    implementation "com.android.support:support-annotations:${rootProject.ext.supportVersion}"
-    implementation "com.android.support:appcompat-v7:${rootProject.ext.supportVersion}"
+    implementation "androidx.annotation:annotation:${rootProject.ext.annotationVersion}"
+    implementation "androidx.appcompat:appcompat:${rootProject.ext.appCompatVersion}"
     implementation "com.jakewharton.timber:timber:${rootProject.ext.timberVersion}"
     implementation "com.google.code.gson:gson:${rootProject.ext.gsonVersion}"
+    testImplementation "junit:junit:${rootProject.ext.jUnitVersion}"
+    testImplementation "org.mockito:mockito-core:${rootProject.ext.mockitoCoreVersion}"
+    testImplementation "org.powermock:powermock-module-junit4:${rootProject.ext.powerMockVersion}"
+    testImplementation "org.powermock:powermock-module-junit4-rule:${rootProject.ext.powerMockVersion}"
+    testImplementation "org.powermock:powermock-api-mockito:${rootProject.ext.powerMockVersion}"
+    testImplementation "org.powermock:powermock-classloading-xstream:${rootProject.ext.powerMockVersion}"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+    implementation "androidx.core:core-ktx:${rootProject.ext.coreKtxVersion}"
+}
+repositories {
+    mavenCentral()
 }

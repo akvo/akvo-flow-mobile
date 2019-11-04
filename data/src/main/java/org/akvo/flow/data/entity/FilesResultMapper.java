@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2018-2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -20,15 +20,16 @@
 
 package org.akvo.flow.data.entity;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.annotation.VisibleForTesting;
-import android.text.TextUtils;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.VisibleForTesting;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.inject.Inject;
 
@@ -41,8 +42,8 @@ public class FilesResultMapper {
     @NonNull
     public FilteredFilesResult transform(@Nullable ApiFilesResult apiFilesResult) {
         if (apiFilesResult == null) {
-            return new FilteredFilesResult(Collections.<String>emptyList(),
-                    Collections.<String>emptyList());
+            return new FilteredFilesResult(Collections.<String>emptySet(),
+                    Collections.<String>emptySet());
         }
         List<String> missingFilesRaw = new ArrayList<>();
         if (apiFilesResult.getMissingFiles() != null ) {
@@ -51,16 +52,16 @@ public class FilesResultMapper {
         if (apiFilesResult.getMissingUnknown() != null) {
             missingFilesRaw.addAll(apiFilesResult.getMissingUnknown());
         }
-        List<String> missingFilenames = new ArrayList<>();
+        Set<String> missingFilenames = new HashSet<>();
         for (String f: missingFilesRaw) {
             String filename = getFilenameFromPath(f);
-            if (!TextUtils.isEmpty(filename)) {
+            if (!isEmpty(filename)) {
                  missingFilenames.add(filename);
             }
         }
-        List<String> deletedForms = apiFilesResult.getDeletedForms();
-        if (deletedForms == null) {
-            deletedForms = new ArrayList<>();
+        Set<String> deletedForms = new HashSet<>();
+        if (apiFilesResult.getDeletedForms() != null) {
+            deletedForms.addAll(apiFilesResult.getDeletedForms());
         }
         return new FilteredFilesResult(missingFilenames, deletedForms);
     }
@@ -69,12 +70,15 @@ public class FilesResultMapper {
     @Nullable
     String getFilenameFromPath(@Nullable String filePath) {
         String filename;
-        if (!TextUtils.isEmpty(filePath) && filePath.contains(File.separator)
-                && filePath.contains(".")) {
+        if (!isEmpty(filePath) && filePath.contains(File.separator) && filePath.contains(".")) {
             filename = filePath.substring(filePath.lastIndexOf(File.separator) + 1);
         } else {
             filename = filePath;
         }
         return filename;
+    }
+
+    private boolean isEmpty(@Nullable String string) {
+        return string == null || string.isEmpty();
     }
 }

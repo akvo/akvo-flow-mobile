@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2018-2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -21,7 +21,7 @@
 package org.akvo.flow.data.entity;
 
 import android.database.Cursor;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 
 import org.akvo.flow.database.TransmissionColumns;
 
@@ -29,6 +29,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
+
+import timber.log.Timber;
 
 public class TransmissionMapper {
 
@@ -57,6 +59,8 @@ public class TransmissionMapper {
                                 cursor.getLong(surveyInstanceCol), cursor.getString(formIdCol),
                                 s3File);
                         transmissions.add(trans);
+                    } else {
+                        Timber.e("Transmission error: file " + filename + " could not be processed");
                     }
                 } while (cursor.moveToNext());
             }

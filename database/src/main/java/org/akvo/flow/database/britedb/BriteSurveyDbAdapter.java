@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -22,8 +22,6 @@ package org.akvo.flow.database.britedb;
 
 import android.content.ContentValues;
 import android.database.Cursor;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import com.squareup.sqlbrite2.BriteDatabase;
@@ -45,6 +43,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
 import io.reactivex.functions.Function;
@@ -140,6 +140,21 @@ public class BriteSurveyDbAdapter {
      */
     private double correctDistanceForShortening(Double latitude) {
         return Math.pow(Math.cos(Math.toRadians(latitude)), 2);
+    }
+
+    public Cursor getDataPoint(String dataPointId) {
+        String sqlQuery =
+                "SELECT  "
+                        + RecordColumns._ID + ","
+                        + RecordColumns.RECORD_ID + ","
+                        + RecordColumns.SURVEY_GROUP_ID + ","
+                        + RecordColumns.NAME + ","
+                        + RecordColumns.LATITUDE + ","
+                        + RecordColumns.LONGITUDE + ","
+                        + RecordColumns.LAST_MODIFIED
+                        + " FROM " + Tables.RECORD
+                        + " WHERE " + RecordColumns.RECORD_ID + " = ?";
+        return briteDatabase.query(sqlQuery, dataPointId);
     }
 
     public Observable<Cursor> getDataPoints(long surveyGroupId) {
@@ -369,7 +384,7 @@ public class BriteSurveyDbAdapter {
         briteDatabase.insert(Tables.TRANSMISSION, values);
     }
 
-    public void updateFailedTransmissions(@NonNull List<String> filenames) {
+    public void updateFailedTransmissions(@NonNull Set<String> filenames) {
         BriteDatabase.Transaction transaction = beginTransaction();
         try {
             for (String filename : filenames) {
@@ -543,7 +558,7 @@ public class BriteSurveyDbAdapter {
      * reinserts the test survey into the database. For debugging purposes only.
      * The survey xml must exist in the APK
      */
-    public void reinstallTestSurvey() {
+    public void installTestForm() {
         ContentValues values = new ContentValues();
         values.put(SurveyColumns.SURVEY_ID, "999991");
         values.put(SurveyColumns.NAME, "Sample Survey");
@@ -583,6 +598,19 @@ public class BriteSurveyDbAdapter {
         return briteDatabase.query(sql, selectionArgs);
     }
 
+    public boolean isSurveyUpToDate(String surveyId, String surveyVersion) {
+        boolean isUpToDate = true;
+        Cursor cursor = getSurveys(surveyId, surveyVersion);
+
+        if (cursor == null || cursor.getCount() <= 0) {
+            isUpToDate = false;
+        }
+        if (cursor != null) {
+            cursor.close();
+        }
+        return isUpToDate;
+    }
+
     /**
      * updates the survey table by recording the help download flag
      */
@@ -601,7 +629,7 @@ public class BriteSurveyDbAdapter {
      * marks a survey record identified by the ID passed in as deleted.
      *
      */
-    public void setFormsDeleted(List<String> formIds) {
+    public void setFormsDeleted(Set<String> formIds) {
         BriteDatabase.Transaction transaction = beginTransaction();
         try {
             for (String formId : formIds) {

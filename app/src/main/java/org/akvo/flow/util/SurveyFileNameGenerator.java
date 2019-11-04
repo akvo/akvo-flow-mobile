@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017,2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -20,7 +20,7 @@
 
 package org.akvo.flow.util;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 public class SurveyFileNameGenerator {
 

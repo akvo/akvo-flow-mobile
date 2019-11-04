@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2016-2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -28,11 +28,16 @@ import org.akvo.flow.activity.SurveyActivity;
 import org.akvo.flow.activity.TransmissionHistoryActivity;
 import org.akvo.flow.injector.PerActivity;
 import org.akvo.flow.injector.module.ViewModule;
-import org.akvo.flow.presentation.AboutActivity;
+import org.akvo.flow.injector.module.WalkThroughModule;
 import org.akvo.flow.presentation.AppDownloadDialogFragment;
+import org.akvo.flow.presentation.about.AboutActivity;
 import org.akvo.flow.presentation.datapoints.list.DataPointsListFragment;
 import org.akvo.flow.presentation.datapoints.map.DataPointsMapFragment;
+import org.akvo.flow.presentation.datapoints.map.one.DataPointMapActivity;
 import org.akvo.flow.presentation.form.mobiledata.MobileDataSettingDialog;
+import org.akvo.flow.presentation.geoshape.ViewGeoShapeActivity;
+import org.akvo.flow.presentation.geoshape.create.CreateGeoShapeActivity;
+import org.akvo.flow.presentation.geoshape.properties.PropertiesDialog;
 import org.akvo.flow.presentation.help.HelpActivity;
 import org.akvo.flow.presentation.legal.LegalNoticesActivity;
 import org.akvo.flow.presentation.main.MainActivity;
@@ -40,11 +45,12 @@ import org.akvo.flow.presentation.navigation.FlowNavigationView;
 import org.akvo.flow.presentation.settings.PreferenceActivity;
 import org.akvo.flow.presentation.settings.publish.PublishFilesPreferenceView;
 import org.akvo.flow.presentation.signature.SignatureActivity;
-import org.akvo.flow.presentation.walkthrough.WalkThroughActivity;
 import org.akvo.flow.ui.fragment.DatapointsFragment;
 import org.akvo.flow.ui.fragment.ResponseListFragment;
 import org.akvo.flow.ui.view.CaddisflyQuestionView;
 import org.akvo.flow.ui.view.CascadeQuestionView;
+import org.akvo.flow.ui.view.GeoshapeQuestionView;
+import org.akvo.flow.ui.view.geolocation.GeoQuestionView;
 import org.akvo.flow.ui.view.media.photo.PhotoQuestionView;
 import org.akvo.flow.ui.view.media.video.VideoQuestionView;
 import org.akvo.flow.ui.view.signature.SignatureQuestionView;
@@ -52,7 +58,9 @@ import org.akvo.flow.ui.view.signature.SignatureQuestionView;
 import dagger.Component;
 
 @PerActivity
-@Component(dependencies = ApplicationComponent.class, modules = ViewModule.class)
+@Component(dependencies = ApplicationComponent.class, modules = {ViewModule.class,
+        WalkThroughModule.class
+})
 public interface ViewComponent {
 
     void inject(DatapointsFragment datapointsFragment);
@@ -93,6 +101,10 @@ public interface ViewComponent {
 
     void inject(CaddisflyQuestionView caddisflyQuestionView);
 
+    void inject(GeoQuestionView geoQuestionView);
+
+    void inject(GeoshapeQuestionView geoshapeQuestionView);
+
     void inject(AddUserActivity addUserActivity);
 
     void inject(SurveyActivity surveyActivity);
@@ -103,7 +115,13 @@ public interface ViewComponent {
 
     void inject(PublishFilesPreferenceView publishFilesPreferenceView);
 
-    void inject(WalkThroughActivity walkThroughActivity);
-
     void inject(MobileDataSettingDialog mobileDataSettingDialog);
+
+    void inject(DataPointMapActivity dataPointMapActivity);
+
+    void inject(CreateGeoShapeActivity createGeoShapeActivity);
+
+    void inject(ViewGeoShapeActivity viewGeoShapeActivity);
+
+    void inject(PropertiesDialog propertiesDialog);
 }

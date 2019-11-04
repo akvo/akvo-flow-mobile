@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010-2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2010-2019 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -30,7 +30,6 @@ public class ConstantUtil {
     /**
      * file system constants
      */
-    public static final String FILE_SURVEY_LOCATION_TYPE = "file";
     public static final String ARCHIVE_SUFFIX = ".zip";
     public static final String XML_SUFFIX = ".xml";
     public static final String BOOTSTRAP_DB_FILE = "dbinstructions.sql";
@@ -40,10 +39,6 @@ public class ConstantUtil {
     public static final String CASCADE_RES_SUFFIX = ".sqlite.zip";
     public static final String DOT_SEPARATOR = ".";
 
-    /**
-     * survey file locations
-     */
-    public static final String RESOURCE_LOCATION = "res";
     public static final String FILE_LOCATION = "sdcard";
 
     /**
@@ -122,14 +117,14 @@ public class ConstantUtil {
     public static final String RESPONDENT_ID_EXTRA = "survey_respondent_id";
     public static final String READ_ONLY_EXTRA = "readonly";
     public static final String SURVEY_GROUP_EXTRA = "survey_group";
-    public static final String SURVEYED_LOCALE_ID_EXTRA = "surveyed_locale_id";
-    public static final String RECORD_ID_EXTRA = "record_id";
+    public static final String DATA_POINT_ID_EXTRA = "datapoint_id";
     public static final String SURVEY_GROUP_ID_EXTRA = "survey_group_id";
     public static final String IMAGE_URL_EXTRA = "image_url";
     public static final String FORM_TITLE_EXTRA = "title";
     public static final String FORM_SUBTITLE_EXTRA = "subtitle";
     public static final String QUESTION_ID_EXTRA = "question_id";
     public static final String VIEW_USER_EXTRA = "view_user";
+    public static final String REQUEST_QUESTION_ID_EXTRA = "request_question_id";
 
     /**
      * intents
@@ -158,13 +153,6 @@ public class ConstantUtil {
      * S3 bucket directories (object prefixes)
      */
     public static final String S3_IMAGE_DIR = "images/";
-    public static final String S3_SURVEYS_DIR = "surveys/";
-
-    /**
-     * resource related constants
-     */
-    public static final String RESOURCE_PACKAGE = "org.akvo.flow";
-    public static final String RAW_RESOURCE = "raw";
 
     /**
      * SurveyedLocale meta question IDs. Negative IDs to avoid collisions.
@@ -179,19 +167,20 @@ public class ConstantUtil {
      */
     public static final int ORDER_BY_DATE = 0;
     public static final int ORDER_BY_DISTANCE = 1;
+    public static final int ORDER_BY_STATUS = 2;
+    public static final int ORDER_BY_NAME = 3;
 
-    public static final int NOTIFICATION_FORMS_SYNCED = 102;
-    public static final int NOTIFICATION_ASSIGNMENT_ERROR = 103;
-    public static final int NOTIFICATION_HEADER_ERROR = 104;
-    public static final int NOTIFICATION_FORM_ERROR = 105;
-    public static final int NOTIFICATION_RESOURCE_ERROR = 105;
+    public static final int NOTIFICATION_FORM = 106;
 
     public static final int NOTIFICATION_BOOTSTRAP = 106;
+
+    public static final String NOTIFICATION_CHANNEL_ID = "1";
+
+    public static final int UN_PUBLISH_NOTIFICATION_ID = 1235;
 
     /**
      * Caddisfly serialization settings
      */
-    public static final String EXTERNAL_SOURCE_ACTION = "org.akvo.flow.action.externalsource";
     public static final String CADDISFLY_ACTION = "org.akvo.flow.action.caddisfly";
     public static final String CADDISFLY_RESOURCE_ID = "caddisflyResourceUuid";
     public static final String CADDISFLY_QUESTION_ID = "questionId";
@@ -224,7 +213,6 @@ public class ConstantUtil {
     public static final int PHOTO_ACTIVITY_REQUEST = 1;
     public static final int VIDEO_ACTIVITY_REQUEST = 2;
     public static final int SCAN_ACTIVITY_REQUEST = 3;
-    public static final int EXTERNAL_SOURCE_REQUEST = 4;
     public static final int CADDISFLY_REQUEST = 5;
     public static final int PLOTTING_REQUEST = 6;
     public static final int SIGNATURE_REQUEST = 7;
@@ -241,6 +229,11 @@ public class ConstantUtil {
     public static final int SNACK_BAR_DURATION_IN_MS = 4000;
 
     public static final String FILE_PROVIDER_AUTHORITY = "org.akvo.flow.fileprovider";
+
+    public static final int LOCATION_PERMISSION_CODE = 1;
+    public static final int STORAGE_PERMISSION_CODE = 2;
+    public static final int STORAGE_AND_PHONE_STATE_PERMISSION_CODE = 3;
+
 
     /**
      * prevent instantiation

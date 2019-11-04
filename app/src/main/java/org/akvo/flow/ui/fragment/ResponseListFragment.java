@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2013-2018 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2013-2019 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -22,17 +22,10 @@ package org.akvo.flow.ui.fragment;
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.ListFragment;
-import android.support.v4.app.LoaderManager.LoaderCallbacks;
-import android.support.v4.content.Loader;
-import android.support.v4.content.LocalBroadcastManager;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.MenuItem;
@@ -54,10 +47,17 @@ import org.akvo.flow.util.ConstantUtil;
 
 import javax.inject.Inject;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.ListFragment;
+import androidx.loader.app.LoaderManager.LoaderCallbacks;
+import androidx.loader.content.Loader;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import timber.log.Timber;
 
+import static org.akvo.flow.util.ConstantUtil.DATA_POINT_ID_EXTRA;
 import static org.akvo.flow.util.ConstantUtil.READ_ONLY_TAG_KEY;
-import static org.akvo.flow.util.ConstantUtil.RECORD_ID_EXTRA;
 import static org.akvo.flow.util.ConstantUtil.RESPONDENT_ID_TAG_KEY;
 import static org.akvo.flow.util.ConstantUtil.SURVEY_GROUP_EXTRA;
 import static org.akvo.flow.util.ConstantUtil.SURVEY_ID_TAG_KEY;
@@ -83,7 +83,7 @@ public class ResponseListFragment extends ListFragment implements LoaderCallback
     }
 
     @Override
-    public void onAttach(Context context) {
+    public void onAttach(@NonNull Context context) {
         super.onAttach(context);
         FragmentActivity activity = getActivity();
         if (activity instanceof ResponseListListener) {
@@ -98,7 +98,7 @@ public class ResponseListFragment extends ListFragment implements LoaderCallback
         super.onActivityCreated(savedInstanceState);
         Intent intent = getActivity().getIntent();
         mSurveyGroup = (SurveyGroup) intent.getSerializableExtra(SURVEY_GROUP_EXTRA);
-        recordId = intent.getStringExtra(RECORD_ID_EXTRA);
+        recordId = intent.getStringExtra(DATA_POINT_ID_EXTRA);
 
         if (mAdapter == null) {
             mAdapter = new ResponseListAdapter(getActivity());
@@ -150,7 +150,7 @@ public class ResponseListFragment extends ListFragment implements LoaderCallback
     }
 
     @Override
-    public void onCreateContextMenu(ContextMenu menu, View view,
+    public void onCreateContextMenu(@NonNull ContextMenu menu, @NonNull View view,
             ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, view, menuInfo);
         menu.add(0, VIEW_HISTORY, 0, R.string.transmissionhist);
@@ -169,7 +169,7 @@ public class ResponseListFragment extends ListFragment implements LoaderCallback
                 .getMenuInfo();
 
         // This ID is the _id column in the SQLite db
-        Long surveyInstanceId = mAdapter.getItemId(info.position);
+        long surveyInstanceId = mAdapter.getItemId(info.position);
         switch (item.getItemId()) {
             case DELETE_ONE:
                 View itemView = info.targetView;
@@ -187,17 +187,9 @@ public class ResponseListFragment extends ListFragment implements LoaderCallback
         builder.setMessage(R.string.deleteonewarning)
                 .setCancelable(true)
                 .setPositiveButton(R.string.okbutton,
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                deleteSurveyInstance(surveyId, surveyInstanceId);
-                            }
-                        })
+                        (dialog, id) -> deleteSurveyInstance(surveyId, surveyInstanceId))
                 .setNegativeButton(R.string.cancelbutton,
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                dialog.cancel();
-                            }
-                        });
+                        (dialog, id) -> dialog.cancel());
         builder.show();
     }
 
@@ -223,7 +215,7 @@ public class ResponseListFragment extends ListFragment implements LoaderCallback
     }
 
     @Override
-    public void onListItemClick(ListView list, View view, int position, long id) {
+    public void onListItemClick(@NonNull ListView list, View view, int position, long id) {
         String formId = view.getTag(SURVEY_ID_TAG_KEY).toString();
         Long formInstanceId = (Long) view.getTag(RESPONDENT_ID_TAG_KEY);
         Boolean readOnly = (Boolean) view.getTag(READ_ONLY_TAG_KEY);
@@ -231,18 +223,19 @@ public class ResponseListFragment extends ListFragment implements LoaderCallback
                 formInstanceId, readOnly, mSurveyGroup);
     }
 
+    @NonNull
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         return new SurveyInstanceResponseLoader(getActivity(), recordId);
     }
 
     @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+    public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor cursor) {
         mAdapter.changeCursor(cursor);
     }
 
     @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
+    public void onLoaderReset(@NonNull Loader<Cursor> loader) {
         //EMPTY
     }
 
@@ -250,7 +243,7 @@ public class ResponseListFragment extends ListFragment implements LoaderCallback
      * TODO: make a static inner class to avoid memory leaks
      *
      * BroadcastReceiver to notify of data synchronisation. This should be
-     * fired from DataFixService.
+     * fired from DataFixWorker.
      */
     private final BroadcastReceiver dataSyncReceiver = new BroadcastReceiver() {
         @Override

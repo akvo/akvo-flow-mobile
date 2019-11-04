@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2018-2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -20,43 +20,21 @@
 
 package org.akvo.flow.data.entity;
 
-import android.test.suitebuilder.annotation.SmallTest;
-import android.text.TextUtils;
-
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
-import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 import java.util.Collections;
+import java.util.Iterator;
 
 import static junit.framework.Assert.assertNull;
 import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.any;
-import static org.powermock.api.mockito.PowerMockito.mockStatic;
 import static org.powermock.api.mockito.PowerMockito.spy;
 import static org.powermock.api.mockito.PowerMockito.when;
 
-@SmallTest
 @RunWith(PowerMockRunner.class)
-@PrepareForTest(TextUtils.class)
 public class FilesResultMapperTest {
-
-    @Before
-    public void setup() {
-        mockStatic(TextUtils.class);
-        when(TextUtils.isEmpty(any(CharSequence.class))).thenAnswer(new Answer<Boolean>() {
-            @Override
-            public Boolean answer(InvocationOnMock invocation) {
-                CharSequence a = (CharSequence) invocation.getArguments()[0];
-                return !(a != null && a.length() > 0);
-            }
-        });
-    }
 
     @Test
     public void transformShouldReturnEmptyDeletedFormsIfNullParam() {
@@ -133,8 +111,9 @@ public class FilesResultMapperTest {
         FilteredFilesResult result = new FilesResultMapper().transform(apiFilesResult);
 
         assertEquals(2, result.getMissingFiles().size());
-        assertEquals("123", result.getMissingFiles().get(0));
-        assertEquals("1234", result.getMissingFiles().get(1));
+        Iterator<String> iterator = result.getMissingFiles().iterator();
+        assertEquals("123", iterator.next());
+        assertEquals("1234", iterator.next());
     }
 
     @Test

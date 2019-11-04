@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -22,13 +22,9 @@ package org.akvo.flow.activity.form;
 
 import android.content.Context;
 import android.content.Intent;
-import android.support.annotation.NonNull;
-import android.support.annotation.StringRes;
-import android.support.test.InstrumentationRegistry;
-import android.support.test.espresso.Espresso;
-import android.support.test.espresso.ViewInteraction;
-import android.support.test.rule.ActivityTestRule;
 import android.view.View;
+import android.widget.EditText;
+import android.widget.RadioGroup;
 
 import org.akvo.flow.R;
 import org.akvo.flow.activity.Constants;
@@ -43,22 +39,32 @@ import org.akvo.flow.ui.view.FreetextQuestionView;
 import org.akvo.flow.ui.view.QuestionView;
 import org.akvo.flow.ui.view.geolocation.GeoQuestionView;
 import org.akvo.flow.util.ConstantUtil;
+import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.core.IsInstanceOf;
 
-import static android.support.test.espresso.Espresso.onView;
-import static android.support.test.espresso.action.ViewActions.click;
-import static android.support.test.espresso.action.ViewActions.scrollTo;
-import static android.support.test.espresso.action.ViewActions.swipeLeft;
-import static android.support.test.espresso.action.ViewActions.typeText;
-import static android.support.test.espresso.assertion.ViewAssertions.matches;
-import static android.support.test.espresso.matcher.ViewMatchers.hasDescendant;
-import static android.support.test.espresso.matcher.ViewMatchers.isDescendantOfA;
-import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
-import static android.support.test.espresso.matcher.ViewMatchers.isEnabled;
-import static android.support.test.espresso.matcher.ViewMatchers.withId;
-import static android.support.test.espresso.matcher.ViewMatchers.withTagValue;
-import static android.support.test.espresso.matcher.ViewMatchers.withText;
+import androidx.annotation.NonNull;
+import androidx.annotation.StringRes;
+import androidx.test.platform.app.InstrumentationRegistry;
+import androidx.test.espresso.Espresso;
+import androidx.test.espresso.ViewInteraction;
+import androidx.test.espresso.matcher.BoundedMatcher;
+import androidx.test.rule.ActivityTestRule;
+
+import static androidx.test.espresso.Espresso.onView;
+import static androidx.test.espresso.action.ViewActions.click;
+import static androidx.test.espresso.action.ViewActions.scrollTo;
+import static androidx.test.espresso.action.ViewActions.swipeLeft;
+import static androidx.test.espresso.action.ViewActions.typeText;
+import static androidx.test.espresso.assertion.ViewAssertions.matches;
+import static androidx.test.espresso.matcher.ViewMatchers.hasDescendant;
+import static androidx.test.espresso.matcher.ViewMatchers.isDescendantOfA;
+import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
+import static androidx.test.espresso.matcher.ViewMatchers.isEnabled;
+import static androidx.test.espresso.matcher.ViewMatchers.withId;
+import static androidx.test.espresso.matcher.ViewMatchers.withTagValue;
+import static androidx.test.espresso.matcher.ViewMatchers.withText;
+import static com.google.android.gms.common.internal.Preconditions.checkNotNull;
 import static org.akvo.flow.activity.ChildPositionMatcher.childAtPosition;
 import static org.akvo.flow.activity.ToolBarTitleSubtitleMatcher.withToolbarSubtitle;
 import static org.akvo.flow.activity.ToolBarTitleSubtitleMatcher.withToolbarTitle;
@@ -78,7 +84,7 @@ public class FormActivityTestUtil {
         result.putExtra(ConstantUtil.RESPONDENT_ID_EXTRA, dataPointId);
         result.putExtra(ConstantUtil.SURVEY_GROUP_EXTRA,
                 new SurveyGroup(surveyGroupId, formTitle, null, false));
-        result.putExtra(ConstantUtil.SURVEYED_LOCALE_ID_EXTRA,
+        result.putExtra(ConstantUtil.DATA_POINT_ID_EXTRA,
                 Constants.TEST_FORM_SURVEY_INSTANCE_ID);
         result.putExtra(ConstantUtil.READ_ONLY_EXTRA, readOnly);
         return result;
@@ -132,7 +138,7 @@ public class FormActivityTestUtil {
     }
 
     @NonNull
-    public static String getQuestionHeader(Question question) {
+    private static String getQuestionHeader(Question question) {
         String questionHeader = question.getOrder() + ". " + question.getText();
         if (question.isMandatory()) {
             questionHeader = questionHeader + "*";
@@ -147,7 +153,7 @@ public class FormActivityTestUtil {
 
     @NonNull
     private static Matcher<View> linearLayoutChild(int position) {
-        return childAtPosition(IsInstanceOf.<View>instanceOf(android.widget.LinearLayout.class),
+        return childAtPosition(IsInstanceOf.instanceOf(android.widget.LinearLayout.class),
                 position);
     }
 
@@ -172,8 +178,13 @@ public class FormActivityTestUtil {
     @NonNull
     public static <T extends View> Matcher<View> withQuestionViewParent(Question question,
             Class<T> parentClass) {
-        return isDescendantOfA(allOf(IsInstanceOf.<View>instanceOf(parentClass),
-                withTagValue(is((Object) question.getId()))));
+        return withQuestionViewParent(parentClass, question.getId());
+    }
+
+    public static <T extends View> Matcher<View> withQuestionViewParent(Class<T> parentClass,
+            String id) {
+        return isDescendantOfA(allOf(IsInstanceOf.instanceOf(parentClass),
+                withTagValue(is(id))));
     }
 
     @NonNull
@@ -260,6 +271,16 @@ public class FormActivityTestUtil {
         cascadeLevelNumber.check(matches(isDisplayed()));
     }
 
+    public static void fillSingleOptionsQuestion(int option) {
+        ViewInteraction radioButton = getSingleChoiceRadioButton(option);
+        radioButton.perform(click());
+    }
+
+    public static ViewInteraction getSingleChoiceRadioButton(int option) {
+        return onView(allOf(withId(option),
+                isDescendantOfA(IsInstanceOf.instanceOf(RadioGroup.class))));
+    }
+
     private static ViewInteraction checkBoxWithText(Option option, int optionPosition,
             int questionPosition) {
         if (option.isOther()) {
@@ -293,5 +314,23 @@ public class FormActivityTestUtil {
             ActivityTestRule<FormActivity> rule) {
         return rule.getActivity().getApplicationContext().getResources()
                 .getString(stringResId);
+    }
+
+    public static Matcher<View> hasErrorText(final Matcher<String> stringMatcher) {
+        checkNotNull(stringMatcher);
+        return new BoundedMatcher<View, EditText>(EditText.class) {
+
+            @Override
+            public void describeTo(Description description) {
+                description.appendText("with error: ");
+                stringMatcher.describeTo(description);
+            }
+
+            @Override
+            protected boolean matchesSafely(EditText view) {
+                if (view.getError() == null) return stringMatcher.matches(view.getError());
+                return stringMatcher.matches(view.getError().toString());
+            }
+        };
     }
 }

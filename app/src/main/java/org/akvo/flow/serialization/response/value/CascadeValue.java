@@ -20,12 +20,13 @@
 
 package org.akvo.flow.serialization.response.value;
 
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonIOException;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 
-import org.akvo.flow.domain.util.GsonMapper;
 import org.akvo.flow.domain.response.value.CascadeNode;
+import org.akvo.flow.domain.util.GsonMapper;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -36,7 +37,7 @@ import timber.log.Timber;
 public class CascadeValue {
 
     public static String serialize(List<CascadeNode> values) {
-        GsonMapper mapper = new GsonMapper();
+        GsonMapper mapper = new GsonMapper(new GsonBuilder().create());
         try {
             return mapper.write(values);
         } catch (JsonIOException | JsonSyntaxException e) {
@@ -48,7 +49,7 @@ public class CascadeValue {
     public static List<CascadeNode> deserialize(String data) {
         try {
             Type listType = new TypeToken<ArrayList<CascadeNode>>(){}.getType();
-            GsonMapper mapper = new GsonMapper();
+            GsonMapper mapper = new GsonMapper(new GsonBuilder().create());
             return mapper.read(data, listType);
         } catch (JsonSyntaxException e) {
             Timber.e("Value is not a valid JSON response: " + data);

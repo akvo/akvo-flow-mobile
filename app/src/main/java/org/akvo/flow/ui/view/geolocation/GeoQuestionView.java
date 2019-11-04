@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -21,12 +21,11 @@
 package org.akvo.flow.ui.view.geolocation;
 
 import android.content.Context;
-import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.DialogFragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v7.app.AppCompatActivity;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.appcompat.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -35,14 +34,19 @@ import android.widget.Button;
 import org.akvo.flow.R;
 import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionResponse;
+import org.akvo.flow.event.PermissionAwareLocationListener;
 import org.akvo.flow.event.SurveyListener;
 import org.akvo.flow.event.TimedLocationListener;
-import org.akvo.flow.presentation.SnackBarManager;
-import org.akvo.flow.ui.fragment.GpsDisabledDialogFragment;
+import org.akvo.flow.injector.component.DaggerViewComponent;
+import org.akvo.flow.injector.component.ViewComponent;
+import org.akvo.flow.ui.Navigator;
+import org.akvo.flow.ui.view.LocationSnackBarManager;
 import org.akvo.flow.ui.view.QuestionView;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.LocationValidator;
 import org.akvo.flow.util.PlatformUtil;
+
+import javax.inject.Inject;
 
 /**
  * Question that can handle geographic location input. This question can also
@@ -51,7 +55,8 @@ import org.akvo.flow.util.PlatformUtil;
  * @author Christopher Fagiani
  */
 public class GeoQuestionView extends QuestionView
-        implements OnClickListener, TimedLocationListener.Listener {
+        implements OnClickListener, TimedLocationListener.Listener,
+        PermissionAwareLocationListener.PermissionListener {
 
     private static final float UNKNOWN_ACCURACY = 99999999f;
     private static final String RESPONSE_DELIMITER = "|";
@@ -59,9 +64,16 @@ public class GeoQuestionView extends QuestionView
     private static final int POSITION_LONGITUDE = 1;
     private static final int POSITION_ALTITUDE = 2;
 
-    private final TimedLocationListener mLocationListener;
-    private final LocationValidator locationValidator = new LocationValidator();
-    private final SnackBarManager snackBarManager = new SnackBarManager();
+    @Inject
+    LocationSnackBarManager locationSnackBarManager;
+
+    @Inject
+    Navigator navigator;
+
+    @Inject
+    LocationValidator locationValidator;
+
+    private final PermissionAwareLocationListener mLocationListener;
 
     private Button mGeoButton;
     private View geoLoading;
@@ -71,7 +83,8 @@ public class GeoQuestionView extends QuestionView
 
     public GeoQuestionView(Context context, Question q, SurveyListener surveyListener) {
         super(context, q, surveyListener);
-        mLocationListener = new TimedLocationListener(context, this, allowMockLocations(q));
+        mLocationListener = new PermissionAwareLocationListener(context, this,
+                allowMockLocations(q), q.getQuestionId(), this);
         init();
     }
 
@@ -81,10 +94,11 @@ public class GeoQuestionView extends QuestionView
 
     private void init() {
         setQuestionView(R.layout.geo_question_view);
+        initialiseInjector();
         setId(R.id.geo_question_view);
-        mGeoButton = (Button) findViewById(R.id.geo_btn);
+        mGeoButton = findViewById(R.id.geo_btn);
         geoLoading = findViewById(R.id.auto_geo_location_progress);
-        geoInputContainer = (GeoInputContainer) findViewById(R.id.manual_geo_input_container);
+        geoInputContainer = findViewById(R.id.manual_geo_input_container);
 
         geoInputContainer.setTextWatchers(this);
         mGeoButton.setOnClickListener(this);
@@ -96,6 +110,13 @@ public class GeoQuestionView extends QuestionView
         if (mQuestion.isLocked()) {
             geoInputContainer.disableManualInputs();
         }
+    }
+
+    private void initialiseInjector() {
+        ViewComponent viewComponent =
+                DaggerViewComponent.builder().applicationComponent(getApplicationComponent())
+                        .build();
+        viewComponent.inject(this);
     }
 
     public void onClick(View v) {
@@ -115,7 +136,7 @@ public class GeoQuestionView extends QuestionView
         resetQuestion(true);
         showLocationListenerStarted();
         resetAccuracy();
-        startLocation();
+        mLocationListener.startLocationIfPossible();
     }
 
     private void displayConfirmResetFields() {
@@ -136,7 +157,7 @@ public class GeoQuestionView extends QuestionView
     }
 
     private void stopLocationListener() {
-        stopLocation();
+        mLocationListener.stopLocation();
         showLocationListenerStopped();
     }
 
@@ -158,12 +179,22 @@ public class GeoQuestionView extends QuestionView
         mLastAccuracy = UNKNOWN_ACCURACY;
     }
 
-    private void startLocation() {
-        mLocationListener.start();
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        mLocationListener.handlePermissionResult(requestCode, permissions, grantResults);
     }
 
-    private void stopLocation() {
-        mLocationListener.stop();
+    @Override
+    public void onPermissionNotGranted() {
+        stopLocationListener();
+        View coordinatorLayout = getRootView().findViewById(R.id.coordinator_layout);
+        locationSnackBarManager
+                .displayPermissionMissingSnackBar(coordinatorLayout, new OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                       startListeningToLocation();
+                    }
+                }, getContext());
     }
 
     @Override
@@ -202,11 +233,6 @@ public class GeoQuestionView extends QuestionView
         return token[POSITION_ALTITUDE];
     }
 
-    @Override
-    public void questionComplete(Bundle data) {
-        //EMPTY
-    }
-
     /**
      * clears the file path and the complete icon
      */
@@ -232,10 +258,10 @@ public class GeoQuestionView extends QuestionView
     }
 
     private void useAccurateCoordinates() {
-        stopLocation();
+        mLocationListener.stopLocation();
+        showLocationListenerStopped();
         setResponse();
         geoInputContainer.showCoordinatesAccurate();
-        showLocationListenerStopped();
     }
 
     private void updateWithNewCoordinates(double latitude, double longitude, double altitude,
@@ -244,18 +270,16 @@ public class GeoQuestionView extends QuestionView
                 .displayCoordinates(latitude + "", longitude + "", altitude + "", accuracy);
     }
 
-
     @Override
     public void onTimeout() {
         showLocationListenerStopped();
         View coordinatorLayout = getRootView().findViewById(R.id.coordinator_layout);
-        snackBarManager.displaySnackBarWithAction(coordinatorLayout, R.string.location_timeout,
-                R.string.action_retry,
-                new OnClickListener() {
+        locationSnackBarManager
+                .displayLocationTimeoutSnackBar(coordinatorLayout, new OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         resetAccuracy();
-                        startLocation();
+                        mLocationListener.startLocationIfPossible();
                         showLocationListenerStarted();
                     }
                 }, getContext());
@@ -266,10 +290,14 @@ public class GeoQuestionView extends QuestionView
         Context context = getContext();
         showLocationListenerStopped();
         if (context instanceof AppCompatActivity) {
-            FragmentManager fragmentManager = ((AppCompatActivity) context)
-                    .getSupportFragmentManager();
-            DialogFragment newFragment = GpsDisabledDialogFragment.newInstance();
-            newFragment.show(fragmentManager, GpsDisabledDialogFragment.GPS_DIALOG_TAG);
+            View coordinatorLayout = getRootView().findViewById(R.id.coordinator_layout);
+            locationSnackBarManager
+                    .displayGeoLocationDiabled(coordinatorLayout, new OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            navigator.navigateToLocationSettings(getContext());
+                        }
+                    }, getContext());
         }
     }
 
@@ -295,12 +323,7 @@ public class GeoQuestionView extends QuestionView
     }
 
     private void setGeoQuestionResponse(String lat, String lon) {
-        QuestionResponse questionResponse = new QuestionResponse.QuestionResponseBuilder()
-                .setValue(getResponse(lat, lon))
-                .setType(ConstantUtil.GEO_RESPONSE_TYPE)
-                .setQuestionId(getQuestion().getId())
-                .createQuestionResponse();
-        setResponse(questionResponse);
+        setResponse(getQuestion(), getResponse(lat, lon), ConstantUtil.GEO_RESPONSE_TYPE);
     }
 
     @NonNull
@@ -316,18 +339,20 @@ public class GeoQuestionView extends QuestionView
 
     @Override
     public void onDestroy() {
-        if (mLocationListener != null && mLocationListener.isListening()) {
-            mLocationListener.stop();
+        if (mLocationListener != null) {
+            mLocationListener.stopLocation();
         }
     }
 
     @Override
     public boolean isValid() {
-        final String lat = geoInputContainer.getLatitudeText();
-        final String lon = geoInputContainer.getLongitudeText();
-        if (!super.isValid() || !locationValidator.validCoordinates(lat, lon)) {
-            setError(getResources().getString(R.string.error_question_mandatory));
-            return false;
+        if (getQuestion().isMandatory()) {
+            final String lat = geoInputContainer.getLatitudeText();
+            final String lon = geoInputContainer.getLongitudeText();
+            if (!super.isValid() || !locationValidator.validCoordinates(lat, lon)) {
+                setError(getResources().getString(R.string.error_question_mandatory));
+                return false;
+            }
         }
         return true;
     }

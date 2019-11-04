@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2018-2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -20,29 +20,18 @@
 
 package org.akvo.flow.data.util;
 
-import android.support.annotation.Nullable;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Base64;
-
-import java.io.BufferedInputStream;
-import java.io.Closeable;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.zip.Adler32;
-import java.util.zip.CheckedOutputStream;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
+import okhttp3.ResponseBody;
+import timber.log.Timber;
 
 import javax.inject.Inject;
-
-import timber.log.Timber;
+import java.io.*;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.zip.*;
 
 public class FileHelper {
 
@@ -80,6 +69,7 @@ public class FileHelper {
         return null;
     }
 
+    @NonNull
     public String getMd5Base64(File file) {
         byte[] md5Checksum = getMD5Checksum(file);
         if (md5Checksum != null) {
@@ -89,7 +79,20 @@ public class FileHelper {
         }
     }
 
-    public String copyFileToFolder(File originalFile, File destinationFolder) throws IOException {
+    @NonNull
+    public String hexMd5(File file) {
+        byte[] rawHash = getMD5Checksum(file);
+        if (rawHash != null) {
+            StringBuilder builder = new StringBuilder();
+            for (byte b : rawHash) {
+                builder.append(String.format("%02x", b));
+            }
+            return builder.toString();
+        }
+        return "";
+    }
+
+    public String copyFileToFolder(File originalFile, File destinationFolder) {
         File file = new File(destinationFolder, originalFile.getName());
         return copyFile(originalFile, file);
     }
@@ -99,52 +102,24 @@ public class FileHelper {
      *
      * @return the destination file path if copy succeeded, null otherwise
      */
-    public String copyFile(File originalFile, File destinationFile) throws IOException {
+    public String copyFile(File originalFile, File destinationFile) {
         String destinationPath = null;
-        InputStream in = null;
-        OutputStream out = null;
         try {
-            in = new FileInputStream(originalFile);
-            out = new FileOutputStream(destinationFile);
-            byte[] buffer = new byte[1024];
-            int read;
-            while ((read = in.read(buffer)) != -1) {
-                out.write(buffer, 0, read);
-            }
-            out.flush();
-            destinationPath = destinationFile.getAbsolutePath();
+            destinationPath = saveStreamToFile(new FileInputStream(originalFile), destinationFile);
         } catch (FileNotFoundException e) {
             Timber.e(e);
-        } finally {
-            close(in);
-            close(out);
         }
         return destinationPath;
     }
 
     @Nullable
-    public String copyFile(File destinationFile, InputStream inputStream) throws IOException {
-        String destinationPath = null;
-        OutputStream out = null;
-        try {
-            out = new FileOutputStream(destinationFile);
-            byte[] buffer = new byte[1024];
-            int read;
-            while ((read = inputStream.read(buffer)) != -1) {
-                out.write(buffer, 0, read);
-            }
-            out.flush();
-            destinationPath = destinationFile.getAbsolutePath();
-        } catch (FileNotFoundException e) {
-            Timber.e(e);
-        } finally {
-            close(inputStream);
-            close(out);
-        }
-        return destinationPath;
+    public String saveStreamToFile(InputStream inputStream, File destinationFile) {
+        copyStream(inputStream, destinationFile);
+        close(inputStream);
+        return destinationFile.getAbsolutePath();
     }
 
-   public void close(Closeable closeable) {
+    public void close(Closeable closeable) {
         if (closeable != null) {
             try {
                 closeable.close();
@@ -158,7 +133,7 @@ public class FileHelper {
      * deletes all files in the directory (recursively) AND then deletes the
      * directory itself if the "deleteFlag" is true
      */
-    @SuppressWarnings({ "unchecked", "ResultOfMethodCallIgnored" })
+    @SuppressWarnings({ "ResultOfMethodCallIgnored" })
     public void deleteFilesInDirectory(File folder, boolean deleteFolder) {
         if (folder != null && folder.exists() && folder.isDirectory()) {
             File[] files = folder.listFiles();
@@ -189,6 +164,13 @@ public class FileHelper {
         return filename;
     }
 
+    public void deleteFile(File zipFolder, String zipFileName) {
+        File zipFile = new File(zipFolder, zipFileName);
+        if (zipFile.exists()) {
+            zipFile.delete();
+        }
+    }
+
     public void writeZipFile(File zipFolder, String zipFileName, String formInstanceData)
             throws IOException {
         File zipFile = new File(zipFolder, zipFileName);
@@ -204,8 +186,56 @@ public class FileHelper {
         fout.close();
     }
 
-    public boolean deleteFile(String path) {
-        File file = new File(path);
-        return file.exists() && file.delete();
+    public void extractOnlineArchive(ResponseBody responseBody, File targetFolder) {
+        InputStream inputStream = responseBody.byteStream();
+        extractZipContent(inputStream, targetFolder);
+        close(inputStream);
+    }
+
+    public boolean validFile(File file) {
+        return file.exists() && validZipFile(file);
+    }
+
+    private boolean validZipFile(File file) {
+        try {
+            return new ZipFile(file).size() > 0;
+        } catch (IOException e) {
+            Timber.e(e);
+            return false;
+        }
+    }
+
+    private void copyStream(InputStream inputStream, File destinationFile) {
+        OutputStream out = null;
+        try {
+            out = new FileOutputStream(destinationFile);
+            byte[] buffer = new byte[1024];
+            int read;
+            while ((read = inputStream.read(buffer)) != -1) {
+                out.write(buffer, 0, read);
+            }
+            out.flush();
+        } catch (IOException e) {
+            Timber.e(e);
+        } finally {
+            close(out);
+        }
+    }
+
+    private void extractZipContent(InputStream input, File destinationFolder) {
+        ZipInputStream zis = null;
+        try {
+            zis = new ZipInputStream(input);
+            ZipEntry entry;
+            while ((entry = zis.getNextEntry()) != null && !entry.isDirectory()) {
+                File f = new File(destinationFolder, entry.getName());
+                copyStream(zis, f);
+                zis.closeEntry();
+            }
+        } catch (IOException e) {
+            Timber.e(e);
+        } finally {
+            close(zis);
+        }
     }
 }

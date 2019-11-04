@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2014-2018 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2014-2019 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -21,7 +21,6 @@ package org.akvo.flow.ui.view;
 
 import android.content.Context;
 import android.graphics.Paint;
-import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -53,6 +52,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import androidx.annotation.NonNull;
 import timber.log.Timber;
 
 public class CascadeQuestionView extends QuestionView
@@ -79,7 +79,7 @@ public class CascadeQuestionView extends QuestionView
         setQuestionView(R.layout.cascade_question_view);
         initialiseInjector();
 
-        mSpinnerContainer = (LinearLayout) findViewById(R.id.cascade_content);
+        mSpinnerContainer = findViewById(R.id.cascade_content);
 
         // Load level names
         List<Level> levels = getQuestion().getLevels();
@@ -157,6 +157,7 @@ public class CascadeQuestionView extends QuestionView
     }
 
     private void addLevelView(int position, List<Node> values, int selection) {
+        Timber.d("Will add nodes to "+position+", values: "+values+ ", selection: "+selection);
         if (values.isEmpty()) {
             return;
         }
@@ -164,8 +165,8 @@ public class CascadeQuestionView extends QuestionView
         LayoutInflater inflater = LayoutInflater.from(getContext());
 
         View view = inflater.inflate(R.layout.cascading_level_item, mSpinnerContainer, false);
-        final TextView text = (TextView) view.findViewById(R.id.cascade_level_number);
-        final Spinner spinner = (Spinner) view.findViewById(R.id.cascade_level_spinner);
+        final TextView text = view.findViewById(R.id.cascade_level_number);
+        final Spinner spinner = view.findViewById(R.id.cascade_level_spinner);
 
         text.setText(mLevels != null && mLevels.length > position ? mLevels[position] : "");
 
@@ -180,12 +181,10 @@ public class CascadeQuestionView extends QuestionView
         if (selection != POSITION_NONE) {
             spinner.setSelection(selection + 1);// Skip level title item
         }
-        // Attach listener asynchronously, preventing selection event from being fired off right away
-        spinner.post(new Runnable() {
-            public void run() {
-                spinner.setOnItemSelectedListener(CascadeQuestionView.this);
-            }
-        });
+        if (!isReadOnly()) {
+            // Attach listener asynchronously, preventing selection event from being fired off right away
+            spinner.post(() -> spinner.setOnItemSelectedListener(CascadeQuestionView.this));
+        }
         mSpinnerContainer.addView(view);
     }
 
@@ -199,6 +198,7 @@ public class CascadeQuestionView extends QuestionView
 
     @Override
     public void onNothingSelected(AdapterView<?> parent) {
+        //EMPTY
     }
 
     @Override
@@ -260,11 +260,6 @@ public class CascadeQuestionView extends QuestionView
     }
 
     @Override
-    public void setResponse(QuestionResponse response) {
-        super.setResponse(response);
-    }
-
-    @Override
     public void captureResponse(boolean suppressListeners) {
         List<CascadeNode> values = new ArrayList<>();
         for (int i = 0; i < mSpinnerContainer.getChildCount(); i++) {
@@ -279,12 +274,7 @@ public class CascadeQuestionView extends QuestionView
 
         String response = CascadeValue.serialize(values);
         Question question = getQuestion();
-        setResponse(new QuestionResponse.QuestionResponseBuilder()
-                .setValue(response)
-                .setType(ConstantUtil.CASCADE_RESPONSE_TYPE)
-                .setQuestionId(question.getQuestionId())
-                .setIteration(question.getIteration())
-                .createQuestionResponse(), suppressListeners);
+        setResponse(suppressListeners, question, response, ConstantUtil.CASCADE_RESPONSE_TYPE);
     }
 
     private Spinner getSpinner(int position) {
@@ -325,7 +315,7 @@ public class CascadeQuestionView extends QuestionView
 
         private void setStyle(View view, int position) {
             try {
-                TextView text = (TextView) view.findViewById(R.id.cascade_spinner_item_text);
+                TextView text = view.findViewById(R.id.cascade_spinner_item_text);
                 int flags = text.getPaintFlags();
                 if (position == 0) {
                     flags |= Paint.FAKE_BOLD_TEXT_FLAG;

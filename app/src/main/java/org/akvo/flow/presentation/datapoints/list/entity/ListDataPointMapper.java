@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017,2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -20,8 +20,8 @@
 
 package org.akvo.flow.presentation.datapoints.list.entity;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import org.akvo.flow.domain.entity.DataPoint;
 import org.akvo.flow.presentation.datapoints.DisplayNameMapper;

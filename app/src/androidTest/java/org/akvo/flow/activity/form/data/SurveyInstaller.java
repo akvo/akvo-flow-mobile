@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2017-2019 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -20,12 +20,11 @@
 package org.akvo.flow.activity.form.data;
 
 import android.content.Context;
-import android.support.test.InstrumentationRegistry;
-import android.support.v4.util.Pair;
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.SparseArray;
 
+import com.google.gson.GsonBuilder;
 import com.squareup.sqlbrite2.BriteDatabase;
 import com.squareup.sqlbrite2.SqlBrite;
 
@@ -64,15 +63,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 
+import androidx.core.util.Pair;
+import androidx.test.platform.app.InstrumentationRegistry;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import timber.log.Timber;
 
 public class SurveyInstaller {
 
     private static final String TAG = "SurveyInstaller";
-    private SurveyDbDataSource adapter;
+    private final SurveyDbDataSource adapter;
     //Need an array that holds every File so we can delete them in the end
-    private Queue<File> surveyFiles = new ArrayDeque<>();
+    private final Queue<File> surveyFiles = new ArrayDeque<>();
 
     public SurveyInstaller(Context context) {
         SqlBrite sqlBrite = new SqlBrite.Builder().build();
@@ -99,7 +100,7 @@ public class SurveyInstaller {
         FormResourcesFileBrowser formResourcesFileUtil = new FormResourcesFileBrowser(
                 new FileBrowser());
         File cascadeFolder = formResourcesFileUtil
-                .getExistingAppInternalFolder(InstrumentationRegistry.getTargetContext());
+                .getExistingAppInternalFolder(InstrumentationRegistry.getInstrumentation().getTargetContext());
         for (QuestionGroup group : survey.getQuestionGroups()) {
             for (Question question : group.getQuestions()) {
                 String cascadeFileName = question.getSrc();
@@ -125,11 +126,11 @@ public class SurveyInstaller {
      * @return survey
      * @throws IOException if string cannot be written to file
      */
-    public Survey persistSurvey(String xml) throws IOException {
+    private Survey persistSurvey(String xml) throws IOException {
         Survey survey = parseSurvey(xml);
         FormFileBrowser formFileBrowser = new FormFileBrowser(new FileBrowser());
         File surveyFile = new File(
-                formFileBrowser.getExistingAppInternalFolder(InstrumentationRegistry.getTargetContext()),
+                formFileBrowser.getExistingAppInternalFolder(InstrumentationRegistry.getInstrumentation().getTargetContext()),
                 survey.getId() + ConstantUtil.XML_SUFFIX);
         writeString(surveyFile, xml);
 
@@ -203,7 +204,7 @@ public class SurveyInstaller {
                 .openRawResource(resId);
         try {
             String jsonDataString = FileUtil.readText(input);
-            GsonMapper mapper = new GsonMapper();
+            GsonMapper mapper = new GsonMapper(new GsonBuilder().create());
             TestDataPoint dataPoint = mapper.read(jsonDataString, TestDataPoint.class);
             List<TestResponse> responses = dataPoint.getResponses();
             List<QuestionResponse.QuestionResponseBuilder> builders = new ArrayList<>(
@@ -246,7 +247,7 @@ public class SurveyInstaller {
         FormResourcesFileBrowser formResourcesFileUtil = new FormResourcesFileBrowser(
                 new FileBrowser());
         File cascadeFolder = formResourcesFileUtil
-                .getExistingAppInternalFolder(InstrumentationRegistry.getTargetContext());
+                .getExistingAppInternalFolder(InstrumentationRegistry.getInstrumentation().getTargetContext());
         if (!TextUtils.isEmpty(src)) {
             File db = new File(cascadeFolder, src);
             if (db.exists()) {

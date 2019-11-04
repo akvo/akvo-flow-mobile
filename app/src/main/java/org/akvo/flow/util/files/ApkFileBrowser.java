@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -21,13 +21,13 @@
 package org.akvo.flow.util.files;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.annotation.VisibleForTesting;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.VisibleForTesting;
 
 import org.akvo.flow.BuildConfig;
+import org.akvo.flow.domain.util.VersionHelper;
 import org.akvo.flow.util.FileUtil;
-import org.akvo.flow.util.PlatformUtil;
 
 import java.io.File;
 import java.util.List;
@@ -41,10 +41,13 @@ public class ApkFileBrowser {
     private static final String DIR_APK = "apk"; // App upgrades
 
     private final FileBrowser fileBrowser;
+    private final VersionHelper versionHelper;
 
     @Inject
-    public ApkFileBrowser(FileBrowser fileBrowser) {
+    public ApkFileBrowser(FileBrowser fileBrowser,
+            VersionHelper versionHelper) {
         this.fileBrowser = fileBrowser;
+        this.versionHelper = versionHelper;
     }
 
     @Nullable
@@ -117,7 +120,7 @@ public class ApkFileBrowser {
             for (File versionFolder : versionsFolders) {
                 File[] apks = versionFolder.listFiles();
                 String currentFolderVersionName = versionFolder.getName();
-                if (!PlatformUtil.isNewerVersion(latestKnowVersion, currentFolderVersionName)) {
+                if (!versionHelper.isNewerVersion(latestKnowVersion, currentFolderVersionName)) {
                     // Delete old versions
                     FileUtil.deleteFilesInDirectory(versionFolder, true);
                 } else if (apks != null && apks.length > 0) {

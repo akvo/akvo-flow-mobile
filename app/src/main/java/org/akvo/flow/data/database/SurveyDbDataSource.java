@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -24,12 +24,11 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.text.TextUtils;
 
 import com.squareup.sqlbrite2.BriteDatabase;
 
-import org.akvo.flow.data.entity.FormIdMapper;
 import org.akvo.flow.database.RecordColumns;
 import org.akvo.flow.database.ResponseColumns;
 import org.akvo.flow.database.SurveyColumns;
@@ -46,7 +45,6 @@ import org.akvo.flow.domain.entity.User;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.PlatformUtil;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -62,7 +60,6 @@ public class SurveyDbDataSource {
     private final BriteSurveyDbAdapter briteSurveyDbAdapter;
     private final SurveyMapper surveyMapper = new SurveyMapper();
     private final TransmissionsMapper transmissionsMapper = new TransmissionsMapper();
-    private final FormIdMapper surveyIdMapper = new FormIdMapper();
 
     @Inject
     public SurveyDbDataSource(Context context, BriteDatabase briteDatabase) {
@@ -246,29 +243,6 @@ public class SurveyDbDataSource {
     }
 
     /**
-     * returns a list of survey objects that are out of date (missing from the
-     * db or with a lower version number). If a survey is present but marked as
-     * deleted, it will not be listed as out of date (and thus won't be updated)
-     *
-     */
-    public List<Survey> fetchOutDatedSurveys(List<Survey> surveys) {
-        List<Survey> outOfDateSurveys = new ArrayList<>();
-        for (int i = 0; i < surveys.size(); i++) {
-            Survey survey = surveys.get(i);
-            Cursor cursor = briteSurveyDbAdapter.getSurveys(survey.getId(),
-                    survey.getVersion() + "");
-
-            if (cursor == null || cursor.getCount() <= 0) {
-                outOfDateSurveys.add(survey);
-            }
-            if (cursor != null) {
-                cursor.close();
-            }
-        }
-        return outOfDateSurveys;
-    }
-
-    /**
      * updates a survey in the db and resets the deleted flag to "N"
      *
      */
@@ -362,28 +336,6 @@ public class SurveyDbDataSource {
         return sg;
     }
 
-    /**
-     * Convenience method to retrieve all non-deleted surveys, without the hassle of
-     * parsing the Cursor columns.
-     * To get the Cursor result, use getSurveys(surveyGroupId)
-     */
-    public List<Survey> getSurveyList(long surveyGroupId) {
-        Cursor cursor = briteSurveyDbAdapter.getForms(surveyGroupId);
-
-        ArrayList<Survey> surveys = new ArrayList<>();
-
-        if (cursor != null) {
-            if (cursor.getCount() > 0) {
-                cursor.moveToFirst();
-                do {
-                    surveys.add(surveyMapper.getSurvey(cursor));
-                } while (cursor.moveToNext());
-            }
-            cursor.close();
-        }
-        return surveys;
-    }
-
     public void updateSurveyedLocale(long surveyInstanceId, String response,
             SurveyDbAdapter.SurveyedLocaleMeta surveyedLocaleMeta) {
         if (!TextUtils.isEmpty(response)) {
@@ -427,21 +379,8 @@ public class SurveyDbDataSource {
         }
     }
 
-    public void markSurveyHelpDownloaded(String sid, boolean b) {
-        briteSurveyDbAdapter.markSurveyHelpDownloaded(sid, b);
-    }
-
-    public List<String> getSurveyIds() {
-        Cursor cursor = briteSurveyDbAdapter.getFormIds();
-        return surveyIdMapper.mapToFormId(cursor);
-    }
-
     public void deleteAllSurveys() {
         briteSurveyDbAdapter.deleteAllSurveys();
-    }
-
-    public void reinstallTestSurvey() {
-        briteSurveyDbAdapter.reinstallTestSurvey();
     }
 
     public void deleteEmptyRecords() {

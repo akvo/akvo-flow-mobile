@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010-2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2010-2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -26,11 +26,6 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.design.widget.TabLayout;
-import android.support.v4.app.DialogFragment;
-import android.support.v4.view.ViewPager;
-import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -41,6 +36,8 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
+
+import com.google.android.material.tabs.TabLayout;
 
 import org.akvo.flow.R;
 import org.akvo.flow.app.FlowApp;
@@ -65,7 +62,7 @@ import org.akvo.flow.presentation.SnackBarManager;
 import org.akvo.flow.presentation.form.FormPresenter;
 import org.akvo.flow.presentation.form.FormView;
 import org.akvo.flow.presentation.form.mobiledata.MobileDataSettingDialog;
-import org.akvo.flow.service.DataPointUploadService;
+import org.akvo.flow.service.DataPointUploadWorker;
 import org.akvo.flow.ui.Navigator;
 import org.akvo.flow.ui.adapter.LanguageAdapter;
 import org.akvo.flow.ui.adapter.SurveyTabAdapter;
@@ -93,6 +90,12 @@ import java.util.Set;
 
 import javax.inject.Inject;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.FileProvider;
+import androidx.fragment.app.DialogFragment;
+import androidx.viewpager.widget.ViewPager;
 import timber.log.Timber;
 
 import static org.akvo.flow.util.ViewUtil.showConfirmDialog;
@@ -166,7 +169,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
         mReadOnly = intent.getBooleanExtra(ConstantUtil.READ_ONLY_EXTRA, false);
         mSurveyInstanceId = intent.getLongExtra(ConstantUtil.RESPONDENT_ID_EXTRA, 0);
         mSurveyGroup = (SurveyGroup) intent.getSerializableExtra(ConstantUtil.SURVEY_GROUP_EXTRA);
-        mRecordId = intent.getStringExtra(ConstantUtil.SURVEYED_LOCALE_ID_EXTRA);
+        mRecordId = intent.getStringExtra(ConstantUtil.DATA_POINT_ID_EXTRA);
 
         mQuestionResponses = new HashMap<>();
         mDatabase.open();
@@ -174,6 +177,11 @@ public class FormActivity extends BackActivity implements SurveyListener,
         Context context = getApplicationContext();
         languageMapper = new LanguageMapper(context);
         surveyLanguagesDataSource = new SurveyLanguagesDbDataSource(context);
+
+        if (savedInstanceState != null) {
+            mRequestQuestionId = savedInstanceState.getString(ConstantUtil.REQUEST_QUESTION_ID_EXTRA);
+            imagePath = savedInstanceState.getParcelable(ConstantUtil.IMAGE_FILE_KEY);
+        }
 
         //TODO: move all loading to worker thread
         loadSurvey(surveyId);
@@ -189,13 +197,13 @@ public class FormActivity extends BackActivity implements SurveyListener,
             getSupportActionBar().setTitle(mSurvey.getName());
             getSupportActionBar().setSubtitle("v " + getVersion());
 
-            mPager = (ViewPager) findViewById(R.id.pager);
-            TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
+            mPager = findViewById(R.id.pager);
+            TabLayout tabLayout = findViewById(R.id.tabs);
             tabLayout.setupWithViewPager(mPager);
             mAdapter = new SurveyTabAdapter(this, mPager, this, this);
             mPager.setAdapter(mAdapter);
 
-            progressBar = (ProgressBar) findViewById(R.id.progressBar);
+            progressBar = findViewById(R.id.progressBar);
             rootView = findViewById(R.id.coordinator_layout);
             // Initialize new survey or load previous responses
             Map<String, QuestionResponse> responses = mDatabase.getResponses(mSurveyInstanceId);
@@ -204,6 +212,13 @@ public class FormActivity extends BackActivity implements SurveyListener,
             }
             spaceLeftOnCard();
         }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putString(ConstantUtil.REQUEST_QUESTION_ID_EXTRA, mRequestQuestionId);
+        outState.putParcelable(ConstantUtil.IMAGE_FILE_KEY, imagePath);
+        super.onSaveInstanceState(outState);
     }
 
     private void initializeInjector() {
@@ -558,12 +573,27 @@ public class FormActivity extends BackActivity implements SurveyListener,
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent intent) {
+    public void onActivityResult(final int requestCode, int resultCode, final Intent intent) {
         if (mRequestQuestionId == null || resultCode != RESULT_OK) {
             mRequestQuestionId = null;
             return;
         }
 
+        if (mAdapter.getQuestionView(mRequestQuestionId) == null) {
+            // Set the result only after the QuestionView is loaded
+            mAdapter.setOnTabLoadedListener(new SurveyTabAdapter.OnTabLoadedListener() {
+                @Override
+                public void onTabLoaded() {
+                    setResult(requestCode, intent, mRequestQuestionId);
+                    mAdapter.setOnTabLoadedListener(null);
+                }
+            });
+        } else {
+            setResult(requestCode, intent, mRequestQuestionId);
+        }
+    }
+
+    private void setResult(int requestCode, Intent intent, String requestQuestionId) {
         switch (requestCode) {
             case ConstantUtil.PHOTO_ACTIVITY_REQUEST:
                 onImageTaken();
@@ -577,43 +607,58 @@ public class FormActivity extends BackActivity implements SurveyListener,
             case ConstantUtil.GET_VIDEO_ACTIVITY_REQUEST:
                 onVideoAcquired(intent.getData());
                 break;
-            case ConstantUtil.EXTERNAL_SOURCE_REQUEST:
             case ConstantUtil.CADDISFLY_REQUEST:
             case ConstantUtil.SCAN_ACTIVITY_REQUEST:
             case ConstantUtil.PLOTTING_REQUEST:
             case ConstantUtil.SIGNATURE_REQUEST:
             default:
-                mAdapter.onQuestionComplete(mRequestQuestionId, intent.getExtras());
+                mAdapter.onQuestionResultReceived(requestQuestionId, intent.getExtras());
                 break;
         }
-
         mRequestQuestionId = null;
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+            @NonNull int[] grantResults) {
+        if (mRequestQuestionId == null) {
+            return;
+        }
+        mAdapter.onRequestPermissionsResult(requestCode, mRequestQuestionId, permissions,
+                grantResults);
+        mRequestQuestionId = null;
+    }
+
+    public void requestPermissions(@NonNull String[] permissions, int requestCode,
+            String questionId) {
+        mRequestQuestionId = questionId;
+        ActivityCompat.requestPermissions(this, permissions, requestCode);
     }
 
     private void onVideoAcquired(Uri uri) {
         Bundle mediaData = new Bundle();
         mediaData.putParcelable(ConstantUtil.VIDEO_FILE_KEY, uri);
-        mAdapter.onQuestionComplete(mRequestQuestionId, mediaData);
+        mAdapter.onQuestionResultReceived(mRequestQuestionId, mediaData);
     }
 
     private void onImageAcquired(Uri imageUri) {
         Bundle mediaData = new Bundle();
         mediaData.putParcelable(ConstantUtil.IMAGE_FILE_KEY, imageUri);
-        mAdapter.onQuestionComplete(mRequestQuestionId, mediaData);
+        mAdapter.onQuestionResultReceived(mRequestQuestionId, mediaData);
     }
 
     private void onImageTaken() {
         Bundle mediaData = new Bundle();
         mediaData.putParcelable(ConstantUtil.IMAGE_FILE_KEY, imagePath);
         mediaData.putBoolean(ConstantUtil.PARAM_REMOVE_ORIGINAL, true);
-        mAdapter.onQuestionComplete(mRequestQuestionId, mediaData);
+        mAdapter.onQuestionResultReceived(mRequestQuestionId, mediaData);
     }
 
     private void onVideoTaken(Uri uri) {
         Bundle mediaData = new Bundle();
         mediaData.putBoolean(ConstantUtil.PARAM_REMOVE_ORIGINAL, true);
         mediaData.putParcelable(ConstantUtil.VIDEO_FILE_KEY, uri);
-        mAdapter.onQuestionComplete(mRequestQuestionId, mediaData);
+        mAdapter.onQuestionResultReceived(mRequestQuestionId, mediaData);
     }
 
     @NonNull
@@ -626,7 +671,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
     private void loadLanguages() {
         Set<String> languagePreferences = surveyLanguagesDataSource
                 .getLanguagePreferences(mSurveyGroup.getId());
-        mLanguages = languagePreferences.toArray(new String[languagePreferences.size()]);
+        mLanguages = languagePreferences.toArray(new String[0]);
     }
 
     @Override
@@ -668,7 +713,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
 
     @Override
     public void startSync(boolean isMobileSyncAllowed) {
-        DataPointUploadService.scheduleUpload(getApplicationContext(), isMobileSyncAllowed);
+        DataPointUploadWorker.scheduleUpload(getApplicationContext(), isMobileSyncAllowed);
     }
 
     @Override
@@ -767,8 +812,6 @@ public class FormActivity extends BackActivity implements SurveyListener,
             clearQuestion(event);
         } else if (QuestionInteractionEvent.QUESTION_ANSWER_EVENT.equals(event.getEventType())) {
             storeAnswer(event);
-        } else if (QuestionInteractionEvent.EXTERNAL_SOURCE_EVENT.equals(event.getEventType())) {
-            navigateToExternalSource(event);
         } else if (QuestionInteractionEvent.CADDISFLY.equals(event.getEventType())) {
             navigateToCaddisfly(event);
         } else if (QuestionInteractionEvent.PLOTTING_EVENT.equals(event.getEventType())) {
@@ -795,18 +838,12 @@ public class FormActivity extends BackActivity implements SurveyListener,
 
     private void navigateToGeoShapeActivity(QuestionInteractionEvent event) {
         mRequestQuestionId = event.getSource().getQuestion().getId();
-        navigator.navigateToGeoShapeActivity(this, event.getData());
+        navigator.navigateToCreateGeoShapeActivity(this, event.getData());
     }
 
     private void navigateToCaddisfly(QuestionInteractionEvent event) {
         mRequestQuestionId = event.getSource().getQuestion().getId();
         navigator.navigateToCaddisfly(this, event.getData(), getString(R.string.caddisfly_test));
-    }
-
-    private void navigateToExternalSource(QuestionInteractionEvent event) {
-        mRequestQuestionId = event.getSource().getQuestion().getId();
-        navigator.navigateToExternalSource(this, event.getData(),
-                getString(R.string.use_external_source));
     }
 
     private void storeAnswer(QuestionInteractionEvent event) {
@@ -862,7 +899,8 @@ public class FormActivity extends BackActivity implements SurveyListener,
         recordSourceId(event);
         File imageTmpFile = mediaFileHelper.getTemporaryImageFile();
         if (imageTmpFile != null) {
-            imagePath = Uri.fromFile(imageTmpFile);
+            imagePath = FileProvider.getUriForFile(this, ConstantUtil.FILE_PROVIDER_AUTHORITY,
+                    imageTmpFile);
             navigator.navigateToTakePhoto(this, imagePath);
         }
         //TODO: notify error taking pictures

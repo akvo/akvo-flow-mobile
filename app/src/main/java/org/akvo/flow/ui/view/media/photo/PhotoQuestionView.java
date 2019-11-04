@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2018-2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -20,11 +20,10 @@
 
 package org.akvo.flow.ui.view.media.photo;
 
+import android.Manifest;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.ImageView;
@@ -32,6 +31,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import org.akvo.flow.R;
+import org.akvo.flow.activity.FormActivity;
 import org.akvo.flow.async.MediaSyncTask;
 import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionResponse;
@@ -39,7 +39,6 @@ import org.akvo.flow.domain.response.value.Location;
 import org.akvo.flow.domain.response.value.Media;
 import org.akvo.flow.event.QuestionInteractionEvent;
 import org.akvo.flow.event.SurveyListener;
-import org.akvo.flow.event.TimedLocationListener;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
 import org.akvo.flow.presentation.SnackBarManager;
@@ -48,6 +47,7 @@ import org.akvo.flow.ui.Navigator;
 import org.akvo.flow.ui.view.QuestionView;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.ImageUtil;
+import org.akvo.flow.util.StoragePermissionsHelper;
 import org.akvo.flow.util.image.GlideImageLoader;
 import org.akvo.flow.util.image.ImageLoader;
 
@@ -55,6 +55,8 @@ import java.io.File;
 
 import javax.inject.Inject;
 
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -65,8 +67,8 @@ import butterknife.OnClick;
  *
  * @author Christopher Fagiani
  */
-public class PhotoQuestionView extends QuestionView implements
-        TimedLocationListener.Listener, MediaSyncTask.DownloadListener, IPhotoQuestionView {
+public class PhotoQuestionView extends QuestionView
+        implements MediaSyncTask.DownloadListener, IPhotoQuestionView {
 
     @Inject
     SnackBarManager snackBarManager;
@@ -76,6 +78,9 @@ public class PhotoQuestionView extends QuestionView implements
 
     @Inject
     PhotoQuestionPresenter presenter;
+
+    @Inject
+    StoragePermissionsHelper storagePermissionsHelper;
 
     @BindView(R.id.acquire_media_ll)
     View mediaLayout;
@@ -92,13 +97,11 @@ public class PhotoQuestionView extends QuestionView implements
     @BindView(R.id.location_info)
     TextView mLocationInfo;
 
-    private final TimedLocationListener mLocationListener;
     private Media mMedia;
     private ImageLoader imageLoader;
 
     public PhotoQuestionView(Context context, Question q, SurveyListener surveyListener) {
         super(context, q, surveyListener);
-        mLocationListener = new TimedLocationListener(context, this, !q.isLocked());
         init();
     }
 
@@ -137,7 +140,42 @@ public class PhotoQuestionView extends QuestionView implements
 
     @OnClick(R.id.camera_btn)
     void onTakePictureClicked() {
-        notifyQuestionListeners(QuestionInteractionEvent.TAKE_PHOTO_EVENT);
+        if (storagePermissionsHelper.isStorageAllowed()) {
+            notifyQuestionListeners(QuestionInteractionEvent.TAKE_PHOTO_EVENT);
+        } else {
+            requestStoragePermissions();
+        }
+    }
+
+    private void requestStoragePermissions() {
+        final FormActivity activity = (FormActivity) getContext();
+        activity.requestPermissions(new String[] { Manifest.permission.WRITE_EXTERNAL_STORAGE },
+                ConstantUtil.STORAGE_PERMISSION_CODE, getQuestion().getQuestionId());
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        if (requestCode == ConstantUtil.STORAGE_PERMISSION_CODE) {
+            if (storagePermissionsHelper.storagePermissionsGranted(permissions[0], grantResults)) {
+                notifyQuestionListeners(QuestionInteractionEvent.TAKE_PHOTO_EVENT);
+            } else {
+                storagePermissionNotGranted();
+            }
+        }
+    }
+
+    private void storagePermissionNotGranted() {
+        final View.OnClickListener retryListener = v -> {
+            if (storagePermissionsHelper.userPressedDoNotShowAgain((FormActivity) getContext())) {
+                navigator.navigateToAppSystemSettings(getContext());
+            } else {
+                requestStoragePermissions();
+            }
+        };
+        snackBarManager
+                .displaySnackBarWithAction(this,
+                        R.string.storage_permission_missing,
+                        R.string.action_retry, retryListener, getContext());
     }
 
     @OnClick(R.id.gallery_btn)
@@ -164,7 +202,7 @@ public class PhotoQuestionView extends QuestionView implements
      * object
      */
     @Override
-    public void questionComplete(Bundle mediaData) {
+    public void onQuestionResultReceived(Bundle mediaData) {
         Uri imagePath =
                 mediaData != null ?
                         (Uri) mediaData.getParcelable(ConstantUtil.IMAGE_FILE_KEY) : null;
@@ -175,20 +213,12 @@ public class PhotoQuestionView extends QuestionView implements
     }
 
     @Override
-    public void displayImage(String mediaFilePath) {
-        mMedia = new Media();
-        mMedia.setFilename(mediaFilePath);
+    public void displayImage(Media media) {
+        mMedia = media;
 
         captureResponse();
         displayThumbnail();
 
-        updateImageLocation(mediaFilePath);
-    }
-
-    private void updateImageLocation(String mediaFilePath) {
-        if (ImageUtil.getLocation(mediaFilePath) == null) {
-            mLocationListener.start();
-        }
         displayLocationInfo();
     }
 
@@ -233,7 +263,6 @@ public class PhotoQuestionView extends QuestionView implements
         mImageView.setImageDrawable(null);
         hideDownloadViews();
         mLocationInfo.setVisibility(GONE);
-        mLocationListener.stop();
     }
 
     @Override
@@ -241,7 +270,7 @@ public class PhotoQuestionView extends QuestionView implements
         QuestionResponse response = null;
         if (mMedia != null && !TextUtils.isEmpty(mMedia.getFilename())) {
             Question question = getQuestion();
-            String value = MediaValue.serialize(mMedia);
+            String value = MediaValue.serialize(mMedia, true);
             response = new QuestionResponse.QuestionResponseBuilder()
                     .setValue(value)
                     .setType(ConstantUtil.IMAGE_RESPONSE_TYPE)
@@ -255,10 +284,18 @@ public class PhotoQuestionView extends QuestionView implements
 
     @Override
     public void onDestroy() {
-        if (mLocationListener.isListening()) {
-            mLocationListener.stop();
-        }
         presenter.destroy();
+    }
+
+    @Override
+    public boolean isValid() {
+        if (getQuestion().isMandatory()) {
+            File file = rebuildFilePath();
+            if (file == null|| !file.exists()) {
+                return false;
+            }
+        }
+        return super.isValid();
     }
 
     private void displayThumbnail() {
@@ -292,57 +329,31 @@ public class PhotoQuestionView extends QuestionView implements
     }
 
     @Override
-    public void onLocationReady(double latitude, double longitude, double altitude,
-            float accuracy) {
-        if (accuracy > TimedLocationListener.ACCURACY_DEFAULT) {
-            // This location is not accurate enough. Keep listening for updates
-            return;
-        }
-        mLocationListener.stop();
-        if (mMedia != null) {
-            Location location = new Location();
-            location.setLatitude(latitude);
-            location.setLongitude(longitude);
-            location.setAltitude(altitude);
-            location.setAccuracy(accuracy);
-
-            mMedia.setLocation(location);
+    public void displayLocationInfo() {
+        Location mediaLocation = mMedia.getLocation();
+        if (mediaLocation != null) {
+            displayLocation(mediaLocation.getLatitude(), mediaLocation.getLongitude());
+        } else {
             File file = rebuildFilePath();
             if (file != null && file.exists()) {
-                ImageUtil.setLocation(file.getAbsolutePath(), latitude, longitude);
-            }
-
-            captureResponse();
-            displayLocationInfo();
-        }
-    }
-
-    @Override
-    public void onTimeout() {
-        displayLocationInfo();
-    }
-
-    @Override
-    public void onGPSDisabled() {
-        displayLocationInfo();
-    }
-
-    @Override
-    public void displayLocationInfo() {
-        File file = rebuildFilePath();
-        if (file != null && file.exists()) {
-            mLocationInfo.setVisibility(VISIBLE);
-            double[] location = ImageUtil.getLocation(file.getAbsolutePath());
-            if (location != null) {
-                mLocationInfo.setText(R.string.image_location_saved);
-            } else if (mLocationListener.isListening()) {
-                mLocationInfo.setText(R.string.image_location_reading);
+                double[] location = ImageUtil.getLocation(file.getAbsolutePath());
+                if (location != null) {
+                    displayLocation(location[0], location[1]);
+                } else {
+                    mLocationInfo.setVisibility(VISIBLE);
+                    mLocationInfo.setText(R.string.image_location_unknown);
+                }
             } else {
-                mLocationInfo.setText(R.string.image_location_unknown);
+                mLocationInfo.setVisibility(GONE);
             }
-        } else {
-            mLocationInfo.setVisibility(GONE);
         }
+    }
+
+    private void displayLocation(double latitude, double longitude) {
+        String locationText = getContext()
+                .getString(R.string.image_location_coordinates, latitude + "", longitude + "");
+        mLocationInfo.setText(locationText);
+        mLocationInfo.setVisibility(VISIBLE);
     }
 
     private void showImageError() {

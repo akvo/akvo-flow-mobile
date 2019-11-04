@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2018-2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -20,10 +20,12 @@
 
 package org.akvo.flow.domain.interactor;
 
+import org.akvo.flow.domain.repository.MissingAndDeletedRepository;
 import org.akvo.flow.domain.repository.SurveyRepository;
 import org.akvo.flow.domain.repository.UserRepository;
 
 import java.util.List;
+import java.util.Set;
 
 import javax.inject.Inject;
 
@@ -41,12 +43,15 @@ public class AllDeviceNotifications {
     private final SurveyRepository surveyRepository;
     private final UserRepository userRepository;
     private final CompositeDisposable disposables;
+    private final MissingAndDeletedRepository missingAndDeletedRepository;
 
     @Inject
     protected AllDeviceNotifications(SurveyRepository surveyRepository,
-            UserRepository userRepository) {
+            UserRepository userRepository,
+            MissingAndDeletedRepository missingAndDeletedRepository) {
         this.surveyRepository = surveyRepository;
         this.userRepository = userRepository;
+        this.missingAndDeletedRepository = missingAndDeletedRepository;
         this.disposables = new CompositeDisposable();
     }
 
@@ -67,10 +72,17 @@ public class AllDeviceNotifications {
 
     private <T> Observable buildUseCaseObservable() {
         return userRepository.getDeviceId()
-                .concatMap(new Function<String, Observable<List<String>>>() {
+                .concatMap(new Function<String, Observable<Set<String>>>() {
                     @Override
-                    public Observable<List<String>> apply(String deviceId) {
-                        return surveyRepository.checkDeviceNotification(deviceId);
+                    public Observable<Set<String>> apply(final String deviceId) {
+                        return surveyRepository.getFormIds()
+                                .concatMap(new Function<List<String>, Observable<Set<String>>>() {
+                                    @Override
+                                    public Observable<Set<String>> apply(List<String> formIds) {
+                                        return missingAndDeletedRepository
+                                                .downloadMissingAndDeleted(formIds, deviceId);
+                                    }
+                                });
                     }
                 });
     }

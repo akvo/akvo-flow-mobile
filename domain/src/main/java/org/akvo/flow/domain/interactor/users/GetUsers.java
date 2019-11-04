@@ -20,7 +20,7 @@
 
 package org.akvo.flow.domain.interactor.users;
 
-import android.support.v4.util.Pair;
+import androidx.core.util.Pair;
 
 import org.akvo.flow.domain.entity.User;
 import org.akvo.flow.domain.executor.PostExecutionThread;

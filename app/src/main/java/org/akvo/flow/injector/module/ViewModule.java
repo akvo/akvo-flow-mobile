@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2016-2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -26,11 +26,10 @@ import org.akvo.flow.domain.interactor.ClearResponses;
 import org.akvo.flow.domain.interactor.CopyFile;
 import org.akvo.flow.domain.interactor.CopyVideo;
 import org.akvo.flow.domain.interactor.DeleteSurvey;
-import org.akvo.flow.domain.interactor.ExportSurveyInstance;
 import org.akvo.flow.domain.interactor.GetAllSurveys;
 import org.akvo.flow.domain.interactor.GetIsDeviceSetUp;
 import org.akvo.flow.domain.interactor.GetPublishDataTime;
-import org.akvo.flow.domain.interactor.GetSavedDataPoints;
+import org.akvo.flow.domain.interactor.datapoints.GetSavedDataPoints;
 import org.akvo.flow.domain.interactor.GetUserSettings;
 import org.akvo.flow.domain.interactor.MobileUploadSet;
 import org.akvo.flow.domain.interactor.PublishData;
@@ -41,12 +40,15 @@ import org.akvo.flow.domain.interactor.SaveImageSize;
 import org.akvo.flow.domain.interactor.SaveKeepScreenOn;
 import org.akvo.flow.domain.interactor.SaveResizedImage;
 import org.akvo.flow.domain.interactor.SaveSelectedSurvey;
-import org.akvo.flow.domain.interactor.SetWalkthroughSeen;
 import org.akvo.flow.domain.interactor.SurveyDeviceNotifications;
 import org.akvo.flow.domain.interactor.UnSyncedTransmissionsExist;
 import org.akvo.flow.domain.interactor.UploadSurveyDataPoints;
 import org.akvo.flow.domain.interactor.UseCase;
-import org.akvo.flow.domain.interactor.WasWalkthroughSeen;
+import org.akvo.flow.domain.interactor.apk.GetApkData;
+import org.akvo.flow.domain.interactor.apk.GetApkDataPreferences;
+import org.akvo.flow.domain.interactor.apk.SaveApkUpdateNotified;
+import org.akvo.flow.domain.interactor.forms.DownloadForm;
+import org.akvo.flow.domain.interactor.forms.ReloadForms;
 import org.akvo.flow.domain.interactor.setup.SaveSetup;
 import org.akvo.flow.domain.interactor.users.CreateUser;
 import org.akvo.flow.domain.interactor.users.DeleteUser;
@@ -208,18 +210,6 @@ public class ViewModule {
     }
 
     @Provides
-    @Named("wasWalkthroughSeen")
-    UseCase provideWasWalkthroughSeen(WasWalkthroughSeen wasWalkthroughSeen) {
-        return wasWalkthroughSeen;
-    }
-
-    @Provides
-    @Named("setWalkthroughSeen")
-    UseCase provideSetWalkthroughSeen(SetWalkthroughSeen setWalkthroughSeen) {
-        return setWalkthroughSeen;
-    }
-
-    @Provides
     @Named("saveSetup")
     UseCase provideSaveConfig(SaveSetup saveSetup) {
         return saveSetup;
@@ -244,12 +234,6 @@ public class ViewModule {
     }
 
     @Provides
-    @Named("exportSurveyInstance")
-    UseCase provideExportSurveyInstanceSync(ExportSurveyInstance exportSurveyInstance) {
-        return exportSurveyInstance;
-    }
-
-    @Provides
     @Named("mobileUploadSet")
     UseCase provideMobileUploadSet(MobileUploadSet mobileUploadSet) {
         return mobileUploadSet;
@@ -259,5 +243,35 @@ public class ViewModule {
     @Named("mobileUploadAllowed")
     UseCase provideAllowedToConnect(MobileUploadAllowed mobileUploadAllowed) {
         return mobileUploadAllowed;
+    }
+
+    @Provides
+    @Named("getApkData")
+    UseCase provideGetApkData(GetApkData getApkData) {
+        return getApkData;
+    }
+
+    @Provides
+    @Named("GetApkDataPreferences")
+    UseCase provideGetApkDataPreferences(GetApkDataPreferences getApkDataPreferences) {
+        return getApkDataPreferences;
+    }
+
+    @Provides
+    @Named("SaveApkUpdateNotified")
+    UseCase provideSaveApkUpdateNotified(SaveApkUpdateNotified saveApkUpdateNotified) {
+        return saveApkUpdateNotified;
+    }
+
+    @Provides
+    @Named("downloadForm")
+    UseCase provideDownloadForm(DownloadForm downloadForm) {
+        return downloadForm;
+    }
+
+    @Provides
+    @Named("reloadForms")
+    UseCase provideReloadForms(ReloadForms reloadForms) {
+        return reloadForms;
     }
 }

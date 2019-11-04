@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -20,14 +20,9 @@
 
 package org.akvo.flow.activity.form.submittedformsview;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
-import android.support.test.InstrumentationRegistry;
-import android.support.test.espresso.ViewInteraction;
-import android.support.test.rule.ActivityTestRule;
-import android.support.test.runner.AndroidJUnit4;
-import android.support.v4.util.Pair;
-import android.test.suitebuilder.annotation.LargeTest;
 import android.text.TextUtils;
 
 import com.google.gson.Gson;
@@ -69,19 +64,28 @@ import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 
-import static android.support.test.espresso.Espresso.onView;
-import static android.support.test.espresso.action.ViewActions.scrollTo;
-import static android.support.test.espresso.assertion.ViewAssertions.matches;
-import static android.support.test.espresso.contrib.RecyclerViewActions.scrollToPosition;
-import static android.support.test.espresso.matcher.ViewMatchers.hasDescendant;
-import static android.support.test.espresso.matcher.ViewMatchers.isChecked;
-import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
-import static android.support.test.espresso.matcher.ViewMatchers.isEnabled;
-import static android.support.test.espresso.matcher.ViewMatchers.isFocusable;
-import static android.support.test.espresso.matcher.ViewMatchers.withId;
-import static android.support.test.espresso.matcher.ViewMatchers.withSpinnerText;
-import static android.support.test.espresso.matcher.ViewMatchers.withTagValue;
-import static android.support.test.espresso.matcher.ViewMatchers.withText;
+import androidx.core.util.Pair;
+import androidx.test.espresso.ViewInteraction;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
+import androidx.test.filters.LargeTest;
+import androidx.test.platform.app.InstrumentationRegistry;
+import androidx.test.rule.ActivityTestRule;
+import androidx.test.rule.GrantPermissionRule;
+
+import static androidx.test.espresso.Espresso.onView;
+import static androidx.test.espresso.action.ViewActions.scrollTo;
+import static androidx.test.espresso.assertion.ViewAssertions.matches;
+import static androidx.test.espresso.contrib.RecyclerViewActions.scrollToPosition;
+import static androidx.test.espresso.matcher.ViewMatchers.hasDescendant;
+import static androidx.test.espresso.matcher.ViewMatchers.isChecked;
+import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
+import static androidx.test.espresso.matcher.ViewMatchers.isEnabled;
+import static androidx.test.espresso.matcher.ViewMatchers.isFocusable;
+import static androidx.test.espresso.matcher.ViewMatchers.withId;
+import static androidx.test.espresso.matcher.ViewMatchers.withSpinnerText;
+import static androidx.test.espresso.matcher.ViewMatchers.withTagValue;
+import static androidx.test.espresso.matcher.ViewMatchers.withText;
+import static org.akvo.flow.activity.form.FormActivityTestUtil.getCameraButton;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.getDateButton;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.getDateEditText;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.getDoubleEntryInput;
@@ -89,7 +93,6 @@ import static org.akvo.flow.activity.form.FormActivityTestUtil.getFormActivityIn
 import static org.akvo.flow.activity.form.FormActivityTestUtil.getFreeTextInput;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.getGalleryButton;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.getGeoButton;
-import static org.akvo.flow.activity.form.FormActivityTestUtil.getCameraButton;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.getOptionView;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.selectAndVerifyTab;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.verifyAccuracyLabel;
@@ -116,18 +119,30 @@ public class FormActivityReadOnlyTest {
     private Survey survey;
 
     @Rule
+    public GrantPermissionRule permissionRule = GrantPermissionRule
+            .grant(android.Manifest.permission.ACCESS_FINE_LOCATION);
+
+    @Rule
+    public GrantPermissionRule permissionRule2 = GrantPermissionRule
+            .grant(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+
+    @Rule
+    public GrantPermissionRule permissionRule3 = GrantPermissionRule
+            .grant(Manifest.permission.READ_PHONE_STATE);
+
+    @Rule
     public ActivityTestRule<FormActivity> rule = new ActivityTestRule<FormActivity>(
             FormActivity.class) {
         @Override
         protected Intent getActivityIntent() {
-            Context targetContext = InstrumentationRegistry.getTargetContext();
+            Context targetContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
             SurveyRequisite.setRequisites(targetContext);
             SurveyInstaller installer = new SurveyInstaller(targetContext);
             survey = installer
-                    .installSurvey(all_questions_form, InstrumentationRegistry.getContext());
+                    .installSurvey(all_questions_form, InstrumentationRegistry.getInstrumentation().getContext());
             Pair<Long, Map<String, QuestionResponse>> dataPointFromFile = installer
                     .createDataPointFromFile(survey.getSurveyGroup(),
-                            InstrumentationRegistry.getContext(), data);
+                            InstrumentationRegistry.getInstrumentation().getContext(), data);
             long dataPointId = dataPointFromFile.first;
             responseMap = dataPointFromFile.second;
             return getFormActivityIntent(155852013L, "156792013", FORM_TITLE, dataPointId, true);
@@ -136,7 +151,7 @@ public class FormActivityReadOnlyTest {
 
     @AfterClass
     public static void afterClass() {
-        Context targetContext = InstrumentationRegistry.getTargetContext();
+        Context targetContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
         SurveyRequisite.resetRequisites(targetContext);
         SurveyInstaller installer = new SurveyInstaller(targetContext);
         installer.clearSurveys();
@@ -145,7 +160,6 @@ public class FormActivityReadOnlyTest {
     @Test
     public void testViewFilledFormResponses() {
         verifyToolBar(survey.getName(), survey.getVersion());
-
         List<QuestionGroup> questionGroups = survey.getQuestionGroups();
         for (int i = 0; i < questionGroups.size(); i++) {
             QuestionGroup group = questionGroups.get(i);
@@ -416,7 +430,7 @@ public class FormActivityReadOnlyTest {
 
     private void verifyCascadeLevelSpinner(List<CascadeNode> values, int i) {
         ViewInteraction cascadeLevelSpinner = onView(
-                allOf(withId(R.id.cascade_level_spinner), withTagValue(is((Object) i))));
+                allOf(withId(R.id.cascade_level_spinner), withTagValue(is(i))));
         cascadeLevelSpinner.perform(scrollTo());
         cascadeLevelSpinner.check(matches(isDisplayed()));
         cascadeLevelSpinner

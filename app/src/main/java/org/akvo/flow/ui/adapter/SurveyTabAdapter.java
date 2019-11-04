@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2014-2018 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2014-2019 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -21,11 +21,11 @@ package org.akvo.flow.ui.adapter;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.support.v4.view.PagerAdapter;
-import android.support.v4.view.ViewPager;
+import androidx.annotation.NonNull;
+import androidx.viewpager.widget.PagerAdapter;
+import androidx.viewpager.widget.ViewPager;
 import android.view.View;
 import android.view.ViewGroup;
-
 import org.akvo.flow.R;
 import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionGroup;
@@ -34,11 +34,10 @@ import org.akvo.flow.event.SurveyListener;
 import org.akvo.flow.ui.view.QuestionGroupTab;
 import org.akvo.flow.ui.view.QuestionView;
 import org.akvo.flow.ui.view.SubmitTab;
+import timber.log.Timber;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import timber.log.Timber;
 
 public class SurveyTabAdapter extends PagerAdapter implements ViewPager.OnPageChangeListener {
 
@@ -46,6 +45,15 @@ public class SurveyTabAdapter extends PagerAdapter implements ViewPager.OnPageCh
     private List<QuestionGroup> mQuestionGroups;
     private List<QuestionGroupTab> mQuestionGroupTabs;
     private SubmitTab mSubmitTab;
+    private OnTabLoadedListener mOnTabLoadedListener;
+
+    public interface OnTabLoadedListener {
+        void onTabLoaded();
+    }
+
+    public void setOnTabLoadedListener(OnTabLoadedListener listener) {
+        mOnTabLoadedListener = listener;
+    }
 
     public SurveyTabAdapter(Context context, ViewPager pager, SurveyListener surveyListener,
             QuestionInteractionListener questionListener) {
@@ -87,6 +95,10 @@ public class SurveyTabAdapter extends PagerAdapter implements ViewPager.OnPageCh
             tab.load();
             tab.loadState();
             setupDependencies();// Dependencies might occur across tabs
+
+            if (mOnTabLoadedListener != null) {
+                mOnTabLoadedListener.onTabLoaded();
+            }
         }
     }
 
@@ -135,9 +147,16 @@ public class SurveyTabAdapter extends PagerAdapter implements ViewPager.OnPageCh
         }
     }
 
-    public void onQuestionComplete(String questionId, Bundle data) {
+    public void onQuestionResultReceived(String questionId, Bundle data) {
         for (QuestionGroupTab questionGroupTab : mQuestionGroupTabs) {
-            questionGroupTab.onQuestionComplete(questionId, data);
+            questionGroupTab.onQuestionResultReceived(questionId, data);
+        }
+    }
+
+    public void onRequestPermissionsResult(int requestCode, String questionId, String[] permissions,
+            int[] grantResults) {
+        for (QuestionGroupTab questionGroupTab : mQuestionGroupTabs) {
+            questionGroupTab.onRequestPermissionsResult(requestCode, questionId, permissions, grantResults);
         }
     }
 
@@ -168,8 +187,9 @@ public class SurveyTabAdapter extends PagerAdapter implements ViewPager.OnPageCh
         }
     }
 
+    @NonNull
     @Override
-    public Object instantiateItem(ViewGroup container, int position) {
+    public Object instantiateItem(@NonNull ViewGroup container, int position) {
         View view;
         if (position < mQuestionGroupTabs.size()) {
             view = mQuestionGroupTabs.get(position);// Already instantiated
@@ -240,4 +260,5 @@ public class SurveyTabAdapter extends PagerAdapter implements ViewPager.OnPageCh
 
         return invalidQuestions;
     }
+
 }

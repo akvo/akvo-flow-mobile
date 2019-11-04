@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -26,10 +26,11 @@ import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.design.widget.AppBarLayout;
-import android.support.v4.app.DialogFragment;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.widget.SwitchCompat;
+import androidx.annotation.StringRes;
+import com.google.android.material.appbar.AppBarLayout;
+import androidx.fragment.app.DialogFragment;
+import androidx.core.content.ContextCompat;
+import androidx.appcompat.widget.SwitchCompat;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
@@ -45,7 +46,8 @@ import org.akvo.flow.presentation.settings.passcode.PassCodeDeleteAllDialog;
 import org.akvo.flow.presentation.settings.passcode.PassCodeDeleteCollectedDialog;
 import org.akvo.flow.presentation.settings.passcode.PassCodeDownloadFormDialog;
 import org.akvo.flow.presentation.settings.passcode.PassCodeReloadFormsDialog;
-import org.akvo.flow.service.DataPointUploadService;
+import org.akvo.flow.service.DataPointUploadWorker;
+import org.akvo.flow.tracking.TrackingHelper;
 import org.akvo.flow.ui.Navigator;
 
 import java.util.Arrays;
@@ -66,7 +68,8 @@ public class PreferenceActivity extends BackActivity implements PreferenceView,
         PassCodeDownloadFormDialog.PassCodeDownloadFormListener,
         PassCodeReloadFormsDialog.PassCodeReloadFormsListener,
         DeleteResponsesWarningDialog.DeleteResponsesListener,
-        DeleteAllWarningDialog.DeleteAllListener {
+        DeleteAllWarningDialog.DeleteAllListener, DownloadFormDialog.DownloadFormListener,
+        ReloadFormsConfirmationDialog.ReloadFormsListener {
 
     @Inject
     Navigator navigator;
@@ -105,7 +108,8 @@ public class PreferenceActivity extends BackActivity implements PreferenceView,
     SnackBarManager snackBarManager;
 
     private List<String> languages;
-    private boolean trackChanges = false;
+    private boolean listenersEnabled = false;
+    private TrackingHelper trackingHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -118,6 +122,7 @@ public class PreferenceActivity extends BackActivity implements PreferenceView,
         updateProgressDrawable();
         languages = Arrays.asList(getResources().getStringArray(R.array.app_language_codes));
         presenter.setView(this);
+        trackingHelper = new TrackingHelper(this);
         presenter.loadPreferences(languages);
     }
 
@@ -173,7 +178,10 @@ public class PreferenceActivity extends BackActivity implements PreferenceView,
 
     @OnClick(R.id.send_data_points)
     void onDataPointSendTap() {
-        DataPointUploadService.scheduleUpload(getApplicationContext(), enableDataSc.isChecked());
+        if (trackingHelper != null) {
+            trackingHelper.logUploadDataEvent();
+        }
+        DataPointUploadWorker.scheduleUpload(getApplicationContext(), enableDataSc.isChecked());
         finish();
     }
 
@@ -181,6 +189,9 @@ public class PreferenceActivity extends BackActivity implements PreferenceView,
             R.id.preference_delete_collected_data_subtitle
     })
     void onDeleteCollectedDataTap() {
+        if (trackingHelper != null) {
+            trackingHelper.logDeleteDataPressed();
+        }
         DialogFragment newFragment = PassCodeDeleteCollectedDialog.newInstance();
         newFragment.show(getSupportFragmentManager(), PassCodeDeleteCollectedDialog.TAG);
     }
@@ -189,6 +200,9 @@ public class PreferenceActivity extends BackActivity implements PreferenceView,
             R.id.preference_delete_everything_subtitle
     })
     void onDeleteAllTap() {
+        if (trackingHelper != null) {
+            trackingHelper.logDeleteAllPressed();
+        }
         DialogFragment newFragment = PassCodeDeleteAllDialog.newInstance();
         newFragment.show(getSupportFragmentManager(), PassCodeDeleteAllDialog.TAG);
     }
@@ -197,6 +211,9 @@ public class PreferenceActivity extends BackActivity implements PreferenceView,
             R.id.preference_download_form_subtitle
     })
     void onDownloadFormOptionTap() {
+        if (trackingHelper != null) {
+            trackingHelper.logDownloadFormPressed();
+        }
         DialogFragment newFragment = PassCodeDownloadFormDialog.newInstance();
         newFragment.show(getSupportFragmentManager(), PassCodeDownloadFormDialog.TAG);
     }
@@ -205,44 +222,67 @@ public class PreferenceActivity extends BackActivity implements PreferenceView,
             R.id.preference_reload_forms_subtitle
     })
     void onReloadAllSurveysOptionTap() {
+        if (trackingHelper != null) {
+            trackingHelper.logDownloadFormsPressed();
+        }
         DialogFragment newFragment = PassCodeReloadFormsDialog.newInstance();
         newFragment.show(getSupportFragmentManager(), PassCodeReloadFormsDialog.TAG);
     }
 
     @OnClick(R.id.preference_gps_fixes)
     void onGpsFixesTap() {
+        if (trackingHelper != null) {
+            trackingHelper.logGpsFixesEvent();
+        }
         navigator.navigateToGpsFixes(this);
     }
 
     @OnClick(R.id.preference_storage)
     void onCheckSdCardStateOptionTap() {
+        if (trackingHelper != null) {
+            trackingHelper.logStorageEvent();
+        }
         navigator.navigateToStorageSettings(this);
     }
 
     @OnCheckedChanged(R.id.switch_enable_data)
     void onDataCheckChanged(boolean checked) {
-        if (trackChanges) {
+        if (listenersEnabled) {
+            if (trackingHelper != null) {
+                trackingHelper.logMobileDataChanged(checked);
+            }
             presenter.saveEnableMobileData(checked);
         }
     }
 
     @OnCheckedChanged(R.id.switch_screen_on)
     void onScreenOnCheckChanged(boolean checked) {
-        if (trackChanges) {
+        if (listenersEnabled) {
+            if (trackingHelper != null) {
+                trackingHelper.logScreenOnChanged(checked);
+            }
             presenter.saveKeepScreenOn(checked);
         }
     }
 
     @OnItemSelected(R.id.preference_language)
     void onLanguageSelected(int position) {
-        if (trackChanges) {
+        if (listenersEnabled) {
+            if (trackingHelper != null) {
+                trackingHelper.logLanguageChanged(languages.get(position));
+            }
             presenter.saveAppLanguage(position, languages);
         }
     }
 
     @OnItemSelected(R.id.preference_image_size)
     void onImageSizeSelected(int position) {
-        presenter.saveImageSize(position);
+        if (listenersEnabled) {
+            if (trackingHelper != null) {
+                trackingHelper.logImageSizeChanged(position);
+            }
+            presenter.saveImageSize(position);
+        }
     }
 
     @Override
@@ -273,7 +313,7 @@ public class PreferenceActivity extends BackActivity implements PreferenceView,
         appLanguageSp.postDelayed(new Runnable() {
             @Override
             public void run() {
-                trackChanges = true;
+                listenersEnabled = true;
             }
         }, 500);
     }
@@ -351,11 +391,17 @@ public class PreferenceActivity extends BackActivity implements PreferenceView,
 
     @Override
     public void deleteResponsesConfirmed() {
+        if (trackingHelper != null) {
+            trackingHelper.logDeleteDataConfirmed();
+        }
         presenter.deleteResponsesConfirmed();
     }
 
     @Override
     public void deleteAllConfirmed() {
+        if (trackingHelper != null) {
+            trackingHelper.logDeleteAllConfirmed();
+        }
         presenter.deleteAllConfirmed();
     }
 
@@ -364,7 +410,38 @@ public class PreferenceActivity extends BackActivity implements PreferenceView,
         finish();
     }
 
-    private void showMessage(int resId) {
+    @Override
+    public void downloadForm(String formId) {
+        if (trackingHelper != null) {
+            trackingHelper.logDownloadFormConfirmed(formId);
+        }
+        presenter.downloadForm(formId);
+    }
+
+    @Override
+    public void reloadFormsConfirmed() {
+        if (trackingHelper != null) {
+            trackingHelper.logDownloadFormsConfirmed();
+        }
+        presenter.reloadForms();
+    }
+
+    @Override
+    public void showDownloadFormsError(int numberOfForms) {
+        showQuantityMessage(R.plurals.download_forms_error, numberOfForms);
+    }
+
+    @Override
+    public void showDownloadFormsSuccess(int numberOfForms) {
+        showQuantityMessage(R.plurals.download_forms_success, numberOfForms);
+    }
+
+    private void showMessage(@StringRes int resId) {
         snackBarManager.displaySnackBar(instanceNameTv, resId, this);
+    }
+
+    private void showQuantityMessage(int resId, int quantity) {
+        String message = getResources().getQuantityString(resId, quantity);
+        snackBarManager.displaySnackBar(instanceNameTv, message, this);
     }
 }

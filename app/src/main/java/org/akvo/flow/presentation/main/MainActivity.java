@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -21,7 +21,6 @@
 package org.akvo.flow.presentation.main;
 
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
@@ -29,6 +28,8 @@ import org.akvo.flow.presentation.BaseActivity;
 import org.akvo.flow.ui.Navigator;
 
 import javax.inject.Inject;
+
+import androidx.annotation.Nullable;
 
 public class MainActivity extends BaseActivity implements MainView {
 
@@ -43,12 +44,13 @@ public class MainActivity extends BaseActivity implements MainView {
         super.onCreate(savedInstanceState);
         initializeInjector();
         presenter.setView(this);
-        presenter.checkWalkthroughDisplay();
+        presenter.checkWalkThroughDisplay();
     }
 
     private void initializeInjector() {
         ViewComponent viewComponent =
-                DaggerViewComponent.builder().applicationComponent(getApplicationComponent())
+                DaggerViewComponent.builder()
+                        .applicationComponent(getApplicationComponent())
                         .build();
         viewComponent.inject(this);
     }

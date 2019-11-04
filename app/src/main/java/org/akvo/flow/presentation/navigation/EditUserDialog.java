@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -23,12 +23,7 @@ package org.akvo.flow.presentation.navigation;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.DialogFragment;
-import android.support.v4.app.FragmentActivity;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -36,10 +31,17 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 
 import org.akvo.flow.R;
+import org.akvo.flow.uicomponents.NameInputTextWatcher;
+import org.akvo.flow.uicomponents.PositiveButtonHandler;
 import org.akvo.flow.util.ConstantUtil;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.FragmentActivity;
+
 public class EditUserDialog extends DialogFragment implements
-        UsernameInputTextWatcher.UsernameWatcherListener {
+        NameInputTextWatcher.UsernameWatcherListener {
 
     public static final String TAG = "EditUserDialog";
     private static final String USER_NAME_PARAM = "user_name";
@@ -91,32 +93,26 @@ public class EditUserDialog extends DialogFragment implements
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         View main = LayoutInflater.from(context).inflate(R.layout.user_name_input_dialog, null);
         builder.setTitle(R.string.edit_user);
-        userNameEt = (EditText) main.findViewById(R.id.user_name_et);
+        userNameEt = main.findViewById(R.id.user_name_et);
         userNameEt.setText(viewUser.getName());
-        userNameEt.addTextChangedListener(new UsernameInputTextWatcher(this));
+        userNameEt.addTextChangedListener(new NameInputTextWatcher(this));
         builder.setView(main);
-        builder.setPositiveButton(R.string.okbutton, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                String name = userNameEt.getText().toString();
-                if (name.equals(viewUser.getName())) {
-                    return;
-                }
-
-                if (listener != null) {
-                    listener.editUser(new ViewUser(viewUser.getId(), name));
-                }
-                dismiss();
+        builder.setPositiveButton(R.string.okbutton, (dialog, which) -> {
+            String name = userNameEt.getText().toString();
+            if (name.equals(viewUser.getName())) {
+                return;
             }
+
+            if (listener != null) {
+                listener.editUser(new ViewUser(viewUser.getId(), name));
+            }
+            dismiss();
         });
 
         builder.setNegativeButton(R.string.cancelbutton,
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        if (dialog != null) {
-                            dialog.dismiss();
-                        }
+                (dialog, which) -> {
+                    if (dialog != null) {
+                        dialog.dismiss();
                     }
                 });
 

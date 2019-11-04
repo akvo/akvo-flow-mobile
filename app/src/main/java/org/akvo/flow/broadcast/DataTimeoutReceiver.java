@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2018-2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -23,6 +23,7 @@ package org.akvo.flow.broadcast;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import androidx.core.content.ContextCompat;
 
 import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.service.UnPublishDataService;
@@ -39,7 +40,8 @@ public class DataTimeoutReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         initializeInjector(context);
         bootReceiverHelper.disableBootReceiver();
-        context.startService(new Intent(context, UnPublishDataService.class));
+        ContextCompat
+                .startForegroundService(context, new Intent(context, UnPublishDataService.class));
     }
 
     private void initializeInjector(Context context) {

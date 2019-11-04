@@ -1,5 +1,137 @@
 Akvo FLOW app release notes
 ===========================
+# ver 2.8.2
+Date: 30 October 2019
+
+* **Missing location data in image response** - [#1506](https://github.com/akvo/akvo-flow-mobile/issues/1506)
+* **Display image location instead of "geolocation saved"** - [#1480](https://github.com/akvo/akvo-flow-mobile/issues/1480)
+* **Small issues with data point name and ID pop up on the map** - [#1498](https://github.com/akvo/akvo-flow-mobile/issues/1498)
+* **App deployments are broken due to certificate not found** - [#1500](https://github.com/akvo/akvo-flow-mobile/issues/1500)
+* **Enable Bitrise CI** - [#1429](https://github.com/akvo/akvo-flow-mobile/issues/1429)
+
+---------------
+
+# ver 2.8.1
+Date: 02 October 2019
+
+* **Review background work tasks and services** - [#1414](https://github.com/akvo/akvo-flow-mobile/issues/1414)
+* **Use offline maps when capturing geoshapes** - [#1447](https://github.com/akvo/akvo-flow-mobile/issues/1447)
+* **View geoshape using Mapbox** - [#1462](https://github.com/akvo/akvo-flow-mobile/issues/1462)
+* **Deleting offline region should also delete it's id if it was selected** - [#1468](https://github.com/akvo/akvo-flow-mobile/issues/1468)
+* **Creating a geoshape area with more than 3 points does not follow point order** - [#1483](https://github.com/akvo/akvo-flow-mobile/issues/1483)
+* **Deleting geoshape points** - [#1484](https://github.com/akvo/akvo-flow-mobile/issues/1484)
+* **Issues with geoshape metadata** - [#1485](https://github.com/akvo/akvo-flow-mobile/issues/1485)
+* **Starting foreground services now requires a permission** - [#1489](https://github.com/akvo/akvo-flow-mobile/issues/1489)
+
+---------------
+
+# ver 2.8.0.1
+Date: 06 August 2019
+
+* **Crash when trying to create a geoshape in Android 9.0** - [#1458](https://github.com/akvo/akvo-flow-mobile/issues/1458)
+
+---------------
+# ver 2.8.0
+Date: 06 August 2019
+
+* **Offline maps** - [#238](https://github.com/akvo/akvo-flow-mobile/issues/238)
+* **Display data points map using Mapbox** - [#1339](https://github.com/akvo/akvo-flow-mobile/issues/1339)
+* **Offline maps button** - [#1340](https://github.com/akvo/akvo-flow-mobile/issues/1340)
+* **Display dialog to chose from offline or live map** - [#1341](https://github.com/akvo/akvo-flow-mobile/issues/1341)
+* **Offline area creation** - [#1342](https://github.com/akvo/akvo-flow-mobile/issues/1342)
+* **Add details about offline maps to walkthrough** - [#1343](https://github.com/akvo/akvo-flow-mobile/issues/1343)
+* **Offline maps list** - [#1344](https://github.com/akvo/akvo-flow-mobile/issues/1344)
+* **Offline maps list actions** - [#1345](https://github.com/akvo/akvo-flow-mobile/issues/1345)
+* **Offline maps tracking** - [#1359](https://github.com/akvo/akvo-flow-mobile/issues/1359)
+* **Migrate to jetpack** - [#1365](https://github.com/akvo/akvo-flow-mobile/issues/1365)
+* **Move offline maps to separate module** - [#1421](https://github.com/akvo/akvo-flow-mobile/issues/1421)
+* **Abstract maps in datapoints** - [#1424](https://github.com/akvo/akvo-flow-mobile/issues/1424)
+* **View single datapoint also to use mapbox** - [#1426](https://github.com/akvo/akvo-flow-mobile/issues/1426)
+* **Testing offline maps** - [#1428](https://github.com/akvo/akvo-flow-mobile/issues/1428)
+* **Move values to another module** - [#1443](https://github.com/akvo/akvo-flow-mobile/issues/1443)
+* **Offline maps issues part2** - [#1445](https://github.com/akvo/akvo-flow-mobile/issues/1445)
+* **Signature question not complete** - [#1446](https://github.com/akvo/akvo-flow-mobile/issues/1446)
+
+---------------
+# ver 2.7.4
+Date: 04 July 2019
+
+* **Store app URL with https when deploying** - [#1379](https://github.com/akvo/akvo-flow-mobile/issues/1379)
+* **Update deploy jar with new changes** - [#1381](https://github.com/akvo/akvo-flow-mobile/issues/1381)
+* **Travis deployments fixes** - [#1399](https://github.com/akvo/akvo-flow-mobile/issues/1399)
+* **Corrupt zip files issue fix attempt** - [#1403](https://github.com/akvo/akvo-flow-mobile/issues/1403)
+* **External result is lost if activity is destroyed due to low memory** - [#1406](https://github.com/akvo/akvo-flow-mobile/issues/1406)
+* **Update Firebase config file** - [#1408](https://github.com/akvo/akvo-flow-mobile/issues/1408)
+* **Ensure new Data Point (Record) identifiers are 14 chars long** - [#1411](https://github.com/akvo/akvo-flow-mobile/issues/1411)
+
+---------------
+# ver 2.7.3
+Date: 23 April 2019
+
+* **Integrate Firebase Test Lab** - [#1200](https://github.com/akvo/akvo-flow-mobile/issues/1200)
+* **Settings tracking** - [#1360](https://github.com/akvo/akvo-flow-mobile/issues/1360)
+* **Datapoint list tracking** - [#1361](https://github.com/akvo/akvo-flow-mobile/issues/1361)
+* **Connecting the issue no longer necessary in PR template** - [#1363](https://github.com/akvo/akvo-flow-mobile/issues/1363)
+* **Tests are broken on devices with android 4** - [#1368](https://github.com/akvo/akvo-flow-mobile/issues/1368)
+* **Add tracking to about screen** - [#1374](https://github.com/akvo/akvo-flow-mobile/issues/1374)
+
+---------------
+# ver 2.7.2.1
+Date: 26 March 2019
+
+* **Error downloading apk updates** - [#1355](https://github.com/akvo/akvo-flow-mobile/issues/1355)
+
+---------------
+# ver 2.7.2
+Date: 20 March 2019
+
+* **Caddisfly images can be a folder** - [#1293](https://github.com/akvo/akvo-flow-mobile/issues/1293)
+* **Deleting a repetition with answers does not delete** - [#1294](https://github.com/akvo/akvo-flow-mobile/issues/1294)
+* **Add missing translations to app** - [#1307](https://github.com/akvo/akvo-flow-mobile/issues/1307)
+* **Form version inconsistency** - [#1324](https://github.com/akvo/akvo-flow-mobile/issues/1324)
+* **Remove old caddisfly implementation** - [#1335](https://github.com/akvo/akvo-flow-mobile/issues/1335)
+* **Some notification strings should not be translated** - [#1346](https://github.com/akvo/akvo-flow-mobile/issues/1346)
+* **Camera seems to be not found on some device** - [#1350](https://github.com/akvo/akvo-flow-mobile/issues/1350)
+* **Unexpected folder found when moving private files** - [#1352](https://github.com/akvo/akvo-flow-mobile/issues/1352)
+
+---------------
+# ver 2.7.1
+Date: 28 February 2019
+
+# New and noteworthy
+* **Refactor ApkUpdateService to clean architecture** - [#537](https://github.com/akvo/akvo-flow-mobile/issues/537) Improve the code maintainability for apk update.
+* **Camera permission** - [#1232](https://github.com/akvo/akvo-flow-mobile/issues/1232) Camera permission is no longer required.
+* **Storage permission** - [#1233](https://github.com/akvo/akvo-flow-mobile/issues/1233) Require Storage permission at Runtime (only devices with Android 6.0 and later).
+* **Read Phone State Permission** - [#1234](https://github.com/akvo/akvo-flow-mobile/issues/1234) Require Phone State permission at Runtime (only devices with Android 6.0 and later).
+* **Location permission** - [#1235](https://github.com/akvo/akvo-flow-mobile/issues/1235) Require Location permission at Runtime (only devices with Android 6.0 and later).
+* **Media Uri permissions** - [#1252](https://github.com/akvo/akvo-flow-mobile/issues/1252) Grant permission to use the media uri (for photo and video questions).
+* **Notifications channel for android 26** - [#1261](https://github.com/akvo/akvo-flow-mobile/issues/1261) Use a notification channel for devices with Android 8 and 9.
+* **Background services limitation for target api 26** - [#1267](https://github.com/akvo/akvo-flow-mobile/issues/1267) Making sure we comply with the background services limitations.
+* **Add UI tests for issue with images** - [#1320](https://github.com/akvo/akvo-flow-mobile/issues/1320) Image questions now have UI tests.
+* **Add tests to form download logic** - [#1328](https://github.com/akvo/akvo-flow-mobile/issues/1328) Form download logic now has unit tests.
+
+# Resolved issues
+* **FormInstance mappers error** - [#1313](https://github.com/akvo/akvo-flow-mobile/issues/1313) Mappers are now tested and no longer produce a crash.
+* **Android 8.0 Notifications vibration** - [#1330](https://github.com/akvo/akvo-flow-mobile/issues/1330) Fix the excessive vibration on notifications.
+
+---------------
+# ver 2.6.4.1
+Date: 19 February 2019
+
+# Resolved issues
+* **Photo questions are all mandatory** - [#1318](https://github.com/akvo/akvo-flow-mobile/issues/1318) Allow submitting forms when a photo question is not mandatory and is empty.
+
+---------------
+# ver 2.6.4
+Date: 12 February 2019
+
+# Resolved issues
+* **Add tests to data syncing logic** - [#1297](https://github.com/akvo/akvo-flow-mobile/issues/1297) Unit tests added to data uploading logic to quickly detect errors.
+* **Corrupted files sent to s3** - [#1298](https://github.com/akvo/akvo-flow-mobile/issues/1298) Added checks after a file is sent to make sure it's not corrupted.
+* **Image checks and logic tests** - [#1304](https://github.com/akvo/akvo-flow-mobile/issues/1304) Making sure image processing logic is tested and that only valid images can be submitted.
+* **Failed files seem to be processed several times** - [#1310](https://github.com/akvo/akvo-flow-mobile/issues/1310) Fixed issue where some files were processed several times.
+
+---------------
 # ver 2.6.3.1
 Date: 19 December 2018
 

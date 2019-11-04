@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2016-2018 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2016-2019 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -24,40 +24,47 @@ import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 
 import org.akvo.flow.R;
 import org.akvo.flow.activity.AddUserActivity;
 import org.akvo.flow.activity.AppUpdateActivity;
 import org.akvo.flow.activity.FormActivity;
-import org.akvo.flow.activity.GeoshapeActivity;
-import org.akvo.flow.activity.MapActivity;
 import org.akvo.flow.activity.RecordActivity;
 import org.akvo.flow.activity.SurveyActivity;
 import org.akvo.flow.activity.TransmissionHistoryActivity;
 import org.akvo.flow.domain.SurveyGroup;
-import org.akvo.flow.domain.apkupdate.ViewApkData;
-import org.akvo.flow.presentation.AboutActivity;
+import org.akvo.flow.offlinemaps.presentation.list.OfflineAreasListActivity;
 import org.akvo.flow.presentation.AppDownloadDialogFragment;
 import org.akvo.flow.presentation.FullImageActivity;
+import org.akvo.flow.presentation.about.AboutActivity;
+import org.akvo.flow.presentation.datapoints.map.one.DataPointMapActivity;
+import org.akvo.flow.presentation.entity.ViewApkData;
+import org.akvo.flow.presentation.geoshape.ViewGeoShapeActivity;
+import org.akvo.flow.presentation.geoshape.create.CreateGeoShapeActivity;
 import org.akvo.flow.presentation.help.HelpActivity;
 import org.akvo.flow.presentation.legal.LegalNoticesActivity;
 import org.akvo.flow.presentation.settings.PreferenceActivity;
 import org.akvo.flow.presentation.signature.SignatureActivity;
-import org.akvo.flow.presentation.walkthrough.WalkThroughActivity;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.StringUtil;
+import org.akvo.flow.walkthrough.presentation.OfflineMapsWalkThroughActivity;
 
 import java.io.File;
+import java.util.List;
 
 import javax.inject.Inject;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.TaskStackBuilder;
+import androidx.core.content.FileProvider;
 import timber.log.Timber;
 
 public class Navigator {
@@ -92,30 +99,37 @@ public class Navigator {
         Intent intent = new Intent(context, RecordActivity.class);
         Bundle extras = new Bundle();
         extras.putSerializable(ConstantUtil.SURVEY_GROUP_EXTRA, mSurveyGroup);
-        extras.putString(ConstantUtil.RECORD_ID_EXTRA, surveyedLocaleId);
+        extras.putString(ConstantUtil.DATA_POINT_ID_EXTRA, surveyedLocaleId);
         intent.putExtras(extras);
         context.startActivity(intent);
     }
 
     //TODO: confusing, too many params, use object
-    public void navigateToFormActivity(Activity activity, String surveyedLocaleId, String formId,
+    public void navigateToFormActivity(Activity activity, String dataPointId, String formId,
             long formInstanceId, boolean readOnly, SurveyGroup mSurveyGroup) {
         Intent i = new Intent(activity, FormActivity.class);
         i.putExtra(ConstantUtil.FORM_ID_EXTRA, formId);
         i.putExtra(ConstantUtil.SURVEY_GROUP_EXTRA, mSurveyGroup);
-        i.putExtra(ConstantUtil.SURVEYED_LOCALE_ID_EXTRA, surveyedLocaleId);
+        i.putExtra(ConstantUtil.DATA_POINT_ID_EXTRA, dataPointId);
         i.putExtra(ConstantUtil.RESPONDENT_ID_EXTRA, formInstanceId);
         i.putExtra(ConstantUtil.READ_ONLY_EXTRA, readOnly);
         activity.startActivityForResult(i, ConstantUtil.FORM_FILLING_REQUEST);
     }
 
     public void navigateToTakePhoto(@NonNull Activity activity, Uri uri) {
-        Intent i = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
-        if (i.resolveActivity(activity.getPackageManager()) != null) {
-            i.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, uri);
-            activity.startActivityForResult(i, ConstantUtil.PHOTO_ACTIVITY_REQUEST);
+        Intent intent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+        PackageManager packageManager = activity.getPackageManager();
+        if (intent.resolveActivity(packageManager) != null) {
+            final List<ResolveInfo> activities = packageManager
+                    .queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY);
+            for (ResolveInfo resolvedIntentInfo : activities) {
+                final String name = resolvedIntentInfo.activityInfo.packageName;
+                activity.grantUriPermission(name, uri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+            }
+            intent.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, uri);
+            activity.startActivityForResult(intent, ConstantUtil.PHOTO_ACTIVITY_REQUEST);
         } else {
-            Timber.e(new Exception("No app found to take pictures"));
+            Timber.e(new Exception("No camera on device or no app found to take pictures"));
             //TODO: notify user
         }
     }
@@ -152,15 +166,6 @@ public class Navigator {
         activity.startActivity(intent);
     }
 
-    public void navigateToExternalSource(@NonNull Activity activity, Bundle data,
-            CharSequence title) {
-        Intent intent = new Intent(ConstantUtil.EXTERNAL_SOURCE_ACTION);
-        intent.putExtras(data);
-        intent.setType(ConstantUtil.CADDISFLY_MIME);
-        activity.startActivityForResult(Intent.createChooser(intent, title),
-                ConstantUtil.EXTERNAL_SOURCE_REQUEST);
-    }
-
     public void navigateToCaddisfly(@NonNull Activity activity, Bundle data, CharSequence title) {
         Intent intent = new Intent(ConstantUtil.CADDISFLY_ACTION);
         intent.putExtras(data);
@@ -169,12 +174,20 @@ public class Navigator {
                 ConstantUtil.CADDISFLY_REQUEST);
     }
 
-    public void navigateToGeoShapeActivity(@NonNull Activity activity, @Nullable Bundle data) {
-        Intent i = new Intent(activity, GeoshapeActivity.class);
+    public void navigateToCreateGeoShapeActivity(@NonNull Activity activity, @Nullable Bundle data) {
+        Intent i = new Intent(activity, CreateGeoShapeActivity.class);
         if (data != null) {
             i.putExtras(data);
         }
         activity.startActivityForResult(i, ConstantUtil.PLOTTING_REQUEST);
+    }
+
+    public void navigateToViewGeoShapeActivity(@NonNull Context context, @Nullable Bundle data) {
+        Intent i = new Intent(context, ViewGeoShapeActivity.class);
+        if (data != null) {
+            i.putExtras(data);
+        }
+        context.startActivity(i);
     }
 
     public void navigateToSignatureActivity(@NonNull Activity activity, @Nullable Bundle data) {
@@ -186,8 +199,8 @@ public class Navigator {
     }
 
     public void navigateToMapActivity(@NonNull Context context, String recordId) {
-        context.startActivity(new Intent(context, MapActivity.class)
-                .putExtra(ConstantUtil.SURVEYED_LOCALE_ID_EXTRA, recordId));
+        context.startActivity(new Intent(context, DataPointMapActivity.class)
+                .putExtra(ConstantUtil.DATA_POINT_ID_EXTRA, recordId));
     }
 
     public void navigateToTransmissionActivity(Context context, long surveyInstanceId) {
@@ -321,15 +334,25 @@ public class Navigator {
      */
     public void installAppUpdate(Context context, String filename) {
         Intent intent = new Intent(Intent.ACTION_VIEW);
-        intent.setDataAndType(Uri.fromFile(new File(filename)),
-                "application/vnd.android.package-archive");
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        Uri fileUri;
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            fileUri = FileProvider
+                    .getUriForFile(context, ConstantUtil.FILE_PROVIDER_AUTHORITY,
+                            new File(filename));
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        } else {
+            fileUri = Uri.fromFile(new File(filename));
+        }
+        intent.setDataAndType(fileUri, "application/vnd.android.package-archive");
         context.startActivity(intent);
     }
 
     public void navigateToWalkThrough(Context context) {
-        Intent intent = new Intent(context, WalkThroughActivity.class);
-        context.startActivity(intent);
+        TaskStackBuilder.create(context)
+                .addParentStack(OfflineMapsWalkThroughActivity.class)
+                .addNextIntent(new Intent(context, OfflineMapsWalkThroughActivity.class))
+                .startActivities();
     }
 
     public void navigateToGetPhoto(AppCompatActivity activity) {
@@ -347,6 +370,22 @@ public class Navigator {
         intent.addCategory(Intent.CATEGORY_OPENABLE);
         if (intent.resolveActivity(activity.getPackageManager()) != null) {
             activity.startActivityForResult(intent, ConstantUtil.GET_VIDEO_ACTIVITY_REQUEST);
+        }
+    }
+
+    public void navigateToAppSystemSettings(@Nullable Context context) {
+        if (context != null) {
+            Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                    Uri.fromParts("package", context.getPackageName(), null));
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            context.startActivity(intent);
+        }
+    }
+
+    public void navigateToOfflineAreasList(@Nullable Context context) {
+        if (context != null) {
+            Intent intent = new Intent(context, OfflineAreasListActivity.class);
+            context.startActivity(intent);
         }
     }
 }

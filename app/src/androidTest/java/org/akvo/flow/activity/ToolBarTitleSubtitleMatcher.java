@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017,2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -20,12 +20,13 @@
 
 package org.akvo.flow.activity;
 
-import android.support.test.espresso.matcher.BoundedMatcher;
-import android.support.v7.widget.Toolbar;
 import android.view.View;
 
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
+
+import androidx.appcompat.widget.Toolbar;
+import androidx.test.espresso.matcher.BoundedMatcher;
 
 public class ToolBarTitleSubtitleMatcher {
 

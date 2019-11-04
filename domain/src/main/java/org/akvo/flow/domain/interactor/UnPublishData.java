@@ -20,48 +20,36 @@
 
 package org.akvo.flow.domain.interactor;
 
+import org.akvo.flow.domain.executor.PostExecutionThread;
+import org.akvo.flow.domain.executor.ThreadExecutor;
 import org.akvo.flow.domain.repository.FileRepository;
 import org.akvo.flow.domain.repository.UserRepository;
+
+import java.util.Map;
 
 import javax.inject.Inject;
 
 import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
-import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Function;
-import io.reactivex.observers.DisposableObserver;
 
-/**
- * This is a single threaded UseCase to be used with IntentServices whose onHandleIntent method runs
- * on a worker thread
- */
-public class UnPublishData {
+public class UnPublishData extends UseCase {
 
     private final FileRepository fileRepository;
     private final UserRepository userRepository;
-    private final CompositeDisposable disposables;
 
     @Inject
-    protected UnPublishData(FileRepository fileRepository,
+    protected UnPublishData(ThreadExecutor threadExecutor,
+            PostExecutionThread postExecutionThread,
+            FileRepository fileRepository,
             UserRepository userRepository) {
+        super(threadExecutor, postExecutionThread);
         this.fileRepository = fileRepository;
         this.userRepository = userRepository;
-        this.disposables = new CompositeDisposable();
     }
 
-    @SuppressWarnings("unchecked")
-    public <T> void execute(DisposableObserver<T> observer) {
-        addDisposable(((Observable<T>) buildUseCaseObservable()).subscribeWith(observer));
-    }
-
-    public void dispose() {
-        if (!disposables.isDisposed()) {
-            disposables.clear();
-        }
-    }
-
-    private Observable<Boolean> buildUseCaseObservable() {
+    @Override
+    protected <T> Observable buildUseCaseObservable(Map<String, T> parameters) {
         return fileRepository.unPublishData()
                 .flatMap(new Function<Boolean, ObservableSource<Boolean>>() {
                     @Override
@@ -69,9 +57,5 @@ public class UnPublishData {
                         return userRepository.clearPublishDataTime();
                     }
                 });
-    }
-
-    private void addDisposable(Disposable disposable) {
-        disposables.add(disposable);
     }
 }

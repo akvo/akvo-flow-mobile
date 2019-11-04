@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017,2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -49,9 +49,9 @@ public class SaveImage extends UseCase {
 
     @Override
     protected <T> Observable buildUseCaseObservable(Map<String, T> parameters) {
-        if (parameters == null || !parameters.containsKey(ORIGINAL_FILE_NAME_PARAM)
-                || !parameters.containsKey(RESIZED_FILE_NAME_PARAM) || !parameters
-                .containsKey(IMAGE_BITMAP_PARAM)) {
+        if (parameters == null || parameters.get(ORIGINAL_FILE_NAME_PARAM) == null
+                || parameters.get(RESIZED_FILE_NAME_PARAM) == null || parameters
+                .get(IMAGE_BITMAP_PARAM) == null) {
             return Observable.error(new IllegalArgumentException("Missing params"));
         }
         Bitmap bitmap = (Bitmap) parameters.get(IMAGE_BITMAP_PARAM);

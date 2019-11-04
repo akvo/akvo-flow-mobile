@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2016-2018 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2016-2019 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -19,23 +19,28 @@
 
 package org.akvo.flow.serialization.response.value;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonIOException;
 import com.google.gson.JsonSyntaxException;
 
 import org.akvo.flow.domain.response.value.Media;
 import org.akvo.flow.domain.util.GsonMapper;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import timber.log.Timber;
 
 public class MediaValue {
 
     @NonNull
-    public static String serialize(Media media) {
-        GsonMapper mapper = new GsonMapper();
+    public static String serialize(Media media, boolean serializeNulls) {
+        GsonBuilder gsonBuilder = new GsonBuilder();
+        if (serializeNulls) {
+            gsonBuilder.serializeNulls();
+        }
+        GsonMapper mapper = new GsonMapper(gsonBuilder.create());
         try {
             return mapper.write(media, Media.class);
         } catch (JsonIOException | JsonSyntaxException e) {
@@ -50,7 +55,7 @@ public class MediaValue {
             return null;
         }
         try {
-            GsonMapper mapper = new GsonMapper();
+            GsonMapper mapper = new GsonMapper(new GsonBuilder().create());
             return mapper.read(data, Media.class);
         } catch (JsonIOException | JsonSyntaxException e) {
             Timber.e("Value is not a valid JSON response: " + data);

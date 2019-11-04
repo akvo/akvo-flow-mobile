@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2014-2018 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2014-2019 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -31,6 +31,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import org.akvo.flow.R;
+import org.akvo.flow.domain.util.VersionHelper;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
 import org.akvo.flow.presentation.BaseActivity;
@@ -53,6 +54,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import androidx.annotation.Nullable;
 import timber.log.Timber;
 
 public class AppUpdateActivity extends BaseActivity {
@@ -162,6 +164,7 @@ public class AppUpdateActivity extends BaseActivity {
 
     private static class UpdateAsyncTask extends AsyncTask<Void, Integer, String> {
 
+        @Nullable
         private final String mUrl;
         private final String mVersion;
         private final WeakReference<AppUpdateActivity> activityWeakReference;
@@ -170,15 +173,31 @@ public class AppUpdateActivity extends BaseActivity {
 
         UpdateAsyncTask(AppUpdateActivity context, String mUrl, String mVersion,
                 String mMd5Checksum) {
-            this.mUrl = mUrl;
+            this.mUrl = cleanUrl(mUrl);
             this.mVersion = mVersion;
             this.activityWeakReference = new WeakReference<>(context);
             this.mMd5Checksum = mMd5Checksum;
-            this.apkFileBrowser = new ApkFileBrowser(new FileBrowser());
+            this.apkFileBrowser = new ApkFileBrowser(new FileBrowser(), new VersionHelper());
+        }
+
+        @Nullable
+        private String cleanUrl(String url) {
+            if (TextUtils.isEmpty(url)) {
+                return null;
+            } else {
+                String cleanUrl = url.toLowerCase();
+                if (cleanUrl.startsWith("http:")) {
+                    cleanUrl = cleanUrl.replaceFirst("http:", "https:");
+                }
+                return cleanUrl;
+            }
         }
 
         @Override
         protected String doInBackground(Void... params) {
+            if (TextUtils.isEmpty(mUrl)) {
+                return null;
+            }
             cleanupDownloads();
 
             AppUpdateActivity appUpdateActivity = activityWeakReference.get();

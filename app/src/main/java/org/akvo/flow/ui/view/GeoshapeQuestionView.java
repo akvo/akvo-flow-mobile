@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015-2017 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2015-2019 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -31,13 +31,21 @@ import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionResponse;
 import org.akvo.flow.event.QuestionInteractionEvent;
 import org.akvo.flow.event.SurveyListener;
+import org.akvo.flow.injector.component.DaggerViewComponent;
+import org.akvo.flow.injector.component.ViewComponent;
+import org.akvo.flow.ui.Navigator;
 import org.akvo.flow.util.ConstantUtil;
+
+import javax.inject.Inject;
 
 public class GeoshapeQuestionView extends QuestionView implements OnClickListener {
     private View mResponseView;
     private Button mMapBtn;
 
     private String mValue;
+
+    @Inject
+    Navigator navigator;
 
     public GeoshapeQuestionView(Context context, Question q, SurveyListener surveyListener) {
         super(context, q, surveyListener);
@@ -46,13 +54,21 @@ public class GeoshapeQuestionView extends QuestionView implements OnClickListene
 
     private void init() {
         setQuestionView(R.layout.geoshape_question_view);
+        initialiseInjector();
         mResponseView = findViewById(R.id.response_view);
-        mMapBtn = (Button)findViewById(R.id.capture_shape_btn);
+        mMapBtn = findViewById(R.id.capture_shape_btn);
         mMapBtn.setOnClickListener(this);
         if (isReadOnly()) {
             mMapBtn.setText(R.string.view_shape);
         }
         displayResponseView();
+    }
+
+    private void initialiseInjector() {
+        ViewComponent viewComponent =
+                DaggerViewComponent.builder().applicationComponent(getApplicationComponent())
+                        .build();
+        viewComponent.inject(this);
     }
 
     private void displayResponseView() {
@@ -61,9 +77,14 @@ public class GeoshapeQuestionView extends QuestionView implements OnClickListene
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.capture_shape_btn:
-                Bundle data = new Bundle();
+        if (v.getId() == R.id.capture_shape_btn) {
+            Bundle data = new Bundle();
+            if (isReadOnly()) {
+                if (!TextUtils.isEmpty(mValue)) {
+                    data.putString(ConstantUtil.GEOSHAPE_RESULT, mValue);
+                }
+                navigator.navigateToViewGeoShapeActivity(getContext(), data);
+            } else {
                 data.putBoolean(ConstantUtil.EXTRA_ALLOW_POINTS, getQuestion().isAllowPoints());
                 data.putBoolean(ConstantUtil.EXTRA_ALLOW_LINE, getQuestion().isAllowLine());
                 data.putBoolean(ConstantUtil.EXTRA_ALLOW_POLYGON, getQuestion().isAllowPolygon());
@@ -73,12 +94,12 @@ public class GeoshapeQuestionView extends QuestionView implements OnClickListene
                     data.putString(ConstantUtil.GEOSHAPE_RESULT, mValue);
                 }
                 notifyQuestionListeners(QuestionInteractionEvent.PLOTTING_EVENT, data);
-                break;
+            }
         }
     }
 
     @Override
-    public void questionComplete(Bundle data) {
+    public void onQuestionResultReceived(Bundle data) {
         if (data != null) {
             mValue = data.getString(ConstantUtil.GEOSHAPE_RESULT);
             displayResponseView();
@@ -110,11 +131,6 @@ public class GeoshapeQuestionView extends QuestionView implements OnClickListene
     @Override
     public void captureResponse(boolean suppressListeners) {
         Question question = getQuestion();
-        setResponse(new QuestionResponse.QuestionResponseBuilder().setValue(mValue)
-                .setType(ConstantUtil.VALUE_RESPONSE_TYPE)
-                .setQuestionId(question.getQuestionId())
-                .setIteration(question.getIteration())
-                .createQuestionResponse(), suppressListeners);
+        setResponse(suppressListeners, question, mValue, ConstantUtil.VALUE_RESPONSE_TYPE);
     }
-
 }

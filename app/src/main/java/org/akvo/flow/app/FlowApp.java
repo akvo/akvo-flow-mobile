@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2013-2018 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2013-2019 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -19,18 +19,13 @@
 
 package org.akvo.flow.app;
 
-import android.app.Application;
-import android.content.Context;
 import android.content.res.Configuration;
-import android.support.annotation.Nullable;
-import android.support.multidex.MultiDex;
 import android.text.TextUtils;
 
-import com.crashlytics.android.Crashlytics;
-import com.crashlytics.android.core.CrashlyticsCore;
-import com.squareup.leakcanary.LeakCanary;
+import com.mapbox.mapboxsdk.Mapbox;
 
 import org.akvo.flow.BuildConfig;
+import org.akvo.flow.R;
 import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.domain.entity.User;
 import org.akvo.flow.domain.interactor.DefaultObserver;
@@ -40,8 +35,8 @@ import org.akvo.flow.domain.interactor.setup.SetUpParams;
 import org.akvo.flow.injector.component.ApplicationComponent;
 import org.akvo.flow.injector.component.DaggerApplicationComponent;
 import org.akvo.flow.injector.module.ApplicationModule;
-import org.akvo.flow.service.ApkUpdateService;
-import org.akvo.flow.service.FileChangeTrackingService;
+import org.akvo.flow.service.ApkUpdateWorker;
+import org.akvo.flow.service.FileChangeTrackingWorker;
 import org.akvo.flow.util.logging.LoggingHelper;
 
 import java.util.HashMap;
@@ -51,10 +46,11 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import io.fabric.sdk.android.Fabric;
+import androidx.annotation.Nullable;
+import androidx.multidex.MultiDexApplication;
 import timber.log.Timber;
 
-public class FlowApp extends Application {
+public class FlowApp extends MultiDexApplication {
 
     @Inject
     LoggingHelper loggingHelper;
@@ -66,50 +62,25 @@ public class FlowApp extends Application {
     @Named("getSelectedUser")
     UseCase getSelectedUser;
 
-    private ApplicationComponent applicationComponent;
-
     @Inject
     @Named("saveSetup")
     UseCase saveSetup;
 
-    @Override
-    protected void attachBaseContext(Context base) {
-        super.attachBaseContext(base);
-
-        if (BuildConfig.DEBUG) {
-            MultiDex.install(this);
-        }
-    }
+    private ApplicationComponent applicationComponent;
 
     @Override
     public void onCreate() {
         super.onCreate();
-        if (LeakCanary.isInAnalyzerProcess(this)) {
-            // This process is dedicated to LeakCanary for heap analysis.
-            // You should not init your app in this process.
-            return;
-        }
 
-        installLeakCanary();
+        Mapbox.getInstance(this, getString(R.string.mapbox_token));
+
         initializeInjector();
-        initFabric();
         initLogging();
         updateLocale();
         startUpdateService();
         startBootstrapFolderTracker();
         updateLoggingInfo();
         saveConfig();
-    }
-
-    protected void installLeakCanary() {
-        LeakCanary.install(this);
-    }
-
-    private void initFabric() {
-        CrashlyticsCore crashlyticsCore = new CrashlyticsCore.Builder()
-                .disabled(true)
-                .build();
-        Fabric.with(this, new Crashlytics.Builder().core(crashlyticsCore).build());
     }
 
     private void saveConfig() {
@@ -129,11 +100,11 @@ public class FlowApp extends Application {
     }
 
     private void startBootstrapFolderTracker() {
-        FileChangeTrackingService.scheduleVerifier(this);
+        FileChangeTrackingWorker.scheduleVerifier(this);
     }
 
     private void startUpdateService() {
-        ApkUpdateService.scheduleFirstTask(this);
+        ApkUpdateWorker.enqueueWork(getApplicationContext());
     }
 
     private void initializeInjector() {

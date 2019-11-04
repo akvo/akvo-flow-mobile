@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2013-2017 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2013-2019 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -20,12 +20,8 @@
 package org.akvo.flow.util;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.os.Build;
-import android.provider.Settings.Secure;
-import android.support.annotation.Nullable;
-import android.util.TypedValue;
 
 import java.util.UUID;
 
@@ -33,49 +29,6 @@ import java.util.UUID;
  * Utilities class to provide Android related functionalities
  */
 public class PlatformUtil {
-
-    /**
-     * TODO: use versionCode to compare versions as versionName field does not have to be X.Y.Z
-     * format
-     *
-     * Check if a given version is newer than the current one.
-     * Versions are expected to be formatted in a dot-decimal notation: X.Y.Z,
-     * being X, Y, and Z integers, and each number separated by a full stop (dot).
-     *
-     * @return true if the second version is newer than the first one, false otherwise
-     */
-    public static boolean isNewerVersion(@Nullable String installedVersion,
-            @Nullable String newVersion) {
-        if (installedVersion == null || newVersion == null) {
-            return false;
-        }
-        // Ensure the Strings are properly formatted
-        final String regex = "^\\d+(\\.\\d+)*$"; // Check dot-decimal notation
-        if (!installedVersion.matches(regex) || !newVersion.matches(regex)) {
-            return false;
-        }
-
-        String[] currentParts = installedVersion.split("\\.");
-        String[] newPartsParts = newVersion.split("\\.");
-        int length = Math.max(currentParts.length, newPartsParts.length);
-        for (int i = 0; i < length; i++) {
-            int currentPart = i < currentParts.length ? Integer.parseInt(currentParts[i]) : 0;
-            int newPart = i < newPartsParts.length ? Integer.parseInt(newPartsParts[i]) : 0;
-
-            if (currentPart < newPart) {
-                return true; // Newer version
-            } else if (newPart < currentPart) {
-                return false; // Older version
-            }
-        }
-
-        return false;
-    }
-
-    public static float dp2Pixel(Context context, int dp) {
-        Resources r = context.getResources();
-        return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, r.getDisplayMetrics());
-    }
 
     public static int getResource(Context context, int attr) {
         TypedArray a = context.getTheme().obtainStyledAttributes(new int[] { attr });
@@ -87,14 +40,10 @@ public class PlatformUtil {
     }
 
     public static String recordUuid() {
-        String base32Id = Base32.base32Uuid();
+        String base32Id = new Base32().base32Uuid();
         // Put dashes between the 4-5 and 8-9 positions to increase readability
         return base32Id.substring(0, 4) + "-" + base32Id.substring(4, 8) + "-" + base32Id
                 .substring(8);
-    }
-
-    public static String getAndroidID(Context context) {
-        return Secure.getString(context.getContentResolver(), Secure.ANDROID_ID);
     }
 
     public static boolean isEmulator() {

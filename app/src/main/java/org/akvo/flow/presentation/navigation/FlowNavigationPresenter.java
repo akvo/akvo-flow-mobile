@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017,2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -20,7 +20,7 @@
 
 package org.akvo.flow.presentation.navigation;
 
-import android.support.v4.util.Pair;
+import androidx.core.util.Pair;
 
 import org.akvo.flow.domain.entity.Survey;
 import org.akvo.flow.domain.interactor.DefaultObserver;

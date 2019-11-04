@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010-2016,2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2010-2016,2018-2019 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -19,16 +19,13 @@
 
 package org.akvo.flow.util;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.util.Log;
 
 import org.akvo.flow.exception.HttpException;
 
 import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -64,32 +61,6 @@ public class HttpUtil {
             if (conn != null) {
                 conn.disconnect();
             }
-        }
-    }
-
-    public static void httpGet(String url, @NonNull File dst) throws IOException {
-        InputStream in = null;
-        OutputStream out = null;
-        HttpURLConnection conn = null;
-        try {
-            conn = (HttpURLConnection) new URL(url).openConnection();
-
-            in = new BufferedInputStream(conn.getInputStream());
-            out = new BufferedOutputStream(new FileOutputStream(dst));
-
-            copyStream(in, out);
-
-            int status = conn.getResponseCode();
-            if (status != HttpURLConnection.HTTP_OK) {
-                // TODO: Use custom exception?
-                throw new IOException("Status Code: " + status + ". Expected: 200 - OK");
-            }
-        } finally {
-            if (conn != null) {
-                conn.disconnect();
-            }
-            FileUtil.close(in);
-            FileUtil.close(out);
         }
     }
 

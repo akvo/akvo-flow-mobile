@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2018-2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -24,10 +24,10 @@ import org.akvo.flow.domain.repository.FileRepository;
 
 import javax.inject.Inject;
 
-import io.reactivex.Observable;
+import io.reactivex.Completable;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.observers.DisposableObserver;
+import io.reactivex.observers.DisposableCompletableObserver;
 
 /**
  * This is a single threaded UseCase to be used with IntentServices whose onHandleIntent method runs
@@ -44,9 +44,8 @@ public class MakeDataPrivate {
         this.disposables = new CompositeDisposable();
     }
 
-    @SuppressWarnings("unchecked")
-    public <T> void execute(DisposableObserver<T> observer) {
-        final Observable<T> observable = buildUseCaseObservable();
+    public void execute(DisposableCompletableObserver observer) {
+        final Completable observable = buildUseCaseObservable();
         addDisposable(observable.subscribeWith(observer));
     }
 
@@ -56,7 +55,7 @@ public class MakeDataPrivate {
         }
     }
 
-    private Observable buildUseCaseObservable() {
+    private Completable buildUseCaseObservable() {
         return fileRepository.moveFiles();
     }
 

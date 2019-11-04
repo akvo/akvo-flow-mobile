@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -22,9 +22,6 @@ package org.akvo.flow.presentation.datapoints.list;
 
 import android.content.Context;
 import android.location.Location;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.annotation.StringRes;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -45,6 +42,10 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.StringRes;
+
 class DataPointListAdapter extends BaseAdapter {
 
     private Double latitude;
@@ -52,6 +53,7 @@ class DataPointListAdapter extends BaseAdapter {
     private final LayoutInflater inflater;
     private final String dataLabel;
     private final List<ListDataPoint> dataPoints;
+    private final GeoUtil geoUtil;
 
     DataPointListAdapter(Context context, @Nullable Double latitude,
             @Nullable Double longitude, SurveyGroup surveyGroup) {
@@ -60,6 +62,7 @@ class DataPointListAdapter extends BaseAdapter {
         this.inflater = LayoutInflater.from(context);
         this.dataLabel = context.getString(getDateLabel(surveyGroup));
         dataPoints = new ArrayList<>();
+        geoUtil = new GeoUtil();
     }
 
     @StringRes
@@ -96,12 +99,12 @@ class DataPointListAdapter extends BaseAdapter {
         } else {
             view = convertView;
         }
-        TextView nameView = (TextView) view.findViewById(R.id.locale_name);
-        TextView idView = (TextView) view.findViewById(R.id.locale_id);
-        TextView dateView = (TextView) view.findViewById(R.id.last_modified);
-        TextView distanceView = (TextView) view.findViewById(R.id.locale_distance);
-        TextView statusView = (TextView) view.findViewById(R.id.status);
-        ImageView statusImage = (ImageView) view.findViewById(R.id.status_img);
+        TextView nameView = view.findViewById(R.id.locale_name);
+        TextView idView = view.findViewById(R.id.locale_id);
+        TextView dateView = view.findViewById(R.id.last_modified);
+        TextView distanceView = view.findViewById(R.id.locale_distance);
+        TextView statusView = view.findViewById(R.id.status);
+        ImageView statusImage = view.findViewById(R.id.status_img);
 
         final ListDataPoint dataPoint = getItem(position);
         Context context = parent.getContext();
@@ -154,7 +157,7 @@ class DataPointListAdapter extends BaseAdapter {
                     dataPoint.getLongitude(), results);
             final double distance = results[0];
 
-            builder.append(GeoUtil.getDisplayLength(distance));
+            builder.append(geoUtil.getDisplayLength(distance));
             return builder.toString();
         }
 

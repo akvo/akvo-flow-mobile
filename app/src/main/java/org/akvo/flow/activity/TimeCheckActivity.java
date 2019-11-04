@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2014,2018 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2014,2018-2019 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -21,14 +21,14 @@ package org.akvo.flow.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.TextView;
 
 import org.akvo.flow.R;
-import org.akvo.flow.service.DataPointUploadService;
+import org.akvo.flow.service.DataPointUploadWorker;
 import org.akvo.flow.service.SurveyDownloadService;
 import org.akvo.flow.service.TimeCheckService;
 
@@ -62,7 +62,7 @@ public class TimeCheckActivity extends AppCompatActivity {
         // to time changes (the ones interacting with S3)
         startService(new Intent(this, TimeCheckService.class));// Re-check time setting status
         startService(new Intent(this, SurveyDownloadService.class));
-        DataPointUploadService.scheduleUpload(getApplicationContext(), false);
+        DataPointUploadWorker.scheduleUpload(getApplicationContext(), false);
         finish();
     }
 

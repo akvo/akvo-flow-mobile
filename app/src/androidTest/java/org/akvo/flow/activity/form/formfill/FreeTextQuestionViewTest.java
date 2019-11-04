@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017,2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -22,10 +22,6 @@ package org.akvo.flow.activity.form.formfill;
 
 import android.content.Context;
 import android.content.Intent;
-import android.support.test.InstrumentationRegistry;
-import android.support.test.filters.MediumTest;
-import android.support.test.rule.ActivityTestRule;
-import android.support.test.runner.AndroidJUnit4;
 
 import org.akvo.flow.activity.FormActivity;
 import org.akvo.flow.activity.form.data.SurveyInstaller;
@@ -36,6 +32,11 @@ import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import androidx.test.ext.junit.runners.AndroidJUnit4;
+import androidx.test.filters.MediumTest;
+import androidx.test.platform.app.InstrumentationRegistry;
+import androidx.test.rule.ActivityTestRule;
 
 import static org.akvo.flow.activity.form.FormActivityTestUtil.clickNext;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.fillFreeTextQuestion;
@@ -61,10 +62,10 @@ public class FreeTextQuestionViewTest {
 
     @BeforeClass
     public static void beforeClass() {
-        Context targetContext = InstrumentationRegistry.getTargetContext();
+        Context targetContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
         SurveyRequisite.setRequisites(targetContext);
         installer = new SurveyInstaller(targetContext);
-        installer.installSurvey(freetext_form, InstrumentationRegistry.getContext());
+        installer.installSurvey(freetext_form, InstrumentationRegistry.getInstrumentation().getContext());
     }
 
     @After
@@ -74,12 +75,12 @@ public class FreeTextQuestionViewTest {
 
     @AfterClass
     public static void afterClass() {
-        SurveyRequisite.resetRequisites(InstrumentationRegistry.getTargetContext());
+        SurveyRequisite.resetRequisites(InstrumentationRegistry.getInstrumentation().getTargetContext());
         installer.clearSurveys();
     }
 
     @Test
-    public void canFillFreeTextQuestion() throws Exception {
+    public void canFillFreeTextQuestion() {
         verifyQuestionTitleDisplayed();
         fillFreeTextQuestion("This is an answer to your question");
         clickNext();
@@ -87,7 +88,7 @@ public class FreeTextQuestionViewTest {
     }
 
     @Test
-    public void ensureCantSubmitEmptyFreeText() throws Exception {
+    public void ensureCantSubmitEmptyFreeText() {
         verifyQuestionTitleDisplayed();
         fillFreeTextQuestion("");
         clickNext();

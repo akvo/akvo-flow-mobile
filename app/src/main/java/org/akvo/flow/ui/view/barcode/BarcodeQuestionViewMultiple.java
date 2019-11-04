@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -23,8 +23,8 @@ package org.akvo.flow.ui.view.barcode;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import android.text.TextUtils;
 
 import org.akvo.flow.R;
@@ -68,7 +68,7 @@ public class BarcodeQuestionViewMultiple extends QuestionView implements
     }
 
     @Override
-    public void questionComplete(Bundle barcodeData) {
+    public void onQuestionResultReceived(Bundle barcodeData) {
         if (barcodeData != null) {
             String value = barcodeData.getString(ConstantUtil.BARCODE_CONTENT);
             barcodeQuestionAdapter.addBarcode(value);
@@ -100,12 +100,7 @@ public class BarcodeQuestionViewMultiple extends QuestionView implements
     @Override
     public void captureResponse(boolean suppressListeners) {
         String value = barcodeQuestionAdapter.getBarcodes();
-        QuestionResponse questionResponse = new QuestionResponse.QuestionResponseBuilder()
-                .setValue(value)
-                .setType(ConstantUtil.VALUE_RESPONSE_TYPE)
-                .setQuestionId(getQuestion().getId())
-                .createQuestionResponse();
-        setResponse(questionResponse, suppressListeners);
+        setResponse(suppressListeners, getQuestion(), value, ConstantUtil.VALUE_RESPONSE_TYPE);
     }
 
     @Override

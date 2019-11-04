@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017,2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -22,18 +22,15 @@ package org.akvo.flow.activity.form.formfill;
 
 import android.content.Context;
 import android.content.Intent;
-import android.support.test.InstrumentationRegistry;
-import android.support.test.espresso.ViewInteraction;
-import android.support.test.filters.MediumTest;
-import android.support.test.rule.ActivityTestRule;
-import android.support.test.runner.AndroidJUnit4;
-import android.view.View;
-import android.widget.RadioGroup;
+import androidx.test.platform.app.InstrumentationRegistry;
+import androidx.test.espresso.ViewInteraction;
+import androidx.test.filters.MediumTest;
+import androidx.test.rule.ActivityTestRule;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import org.akvo.flow.activity.FormActivity;
 import org.akvo.flow.activity.form.data.SurveyInstaller;
 import org.akvo.flow.activity.form.data.SurveyRequisite;
-import org.hamcrest.core.IsInstanceOf;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -41,19 +38,16 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import static android.support.test.espresso.Espresso.onView;
-import static android.support.test.espresso.action.ViewActions.click;
-import static android.support.test.espresso.assertion.ViewAssertions.matches;
-import static android.support.test.espresso.matcher.ViewMatchers.isChecked;
-import static android.support.test.espresso.matcher.ViewMatchers.isDescendantOfA;
-import static android.support.test.espresso.matcher.ViewMatchers.withId;
+import static androidx.test.espresso.assertion.ViewAssertions.matches;
+import static androidx.test.espresso.matcher.ViewMatchers.isChecked;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.clickNext;
+import static org.akvo.flow.activity.form.FormActivityTestUtil.fillSingleOptionsQuestion;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.getFormActivityIntent;
+import static org.akvo.flow.activity.form.FormActivityTestUtil.getSingleChoiceRadioButton;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.verifyQuestionTitleDisplayed;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.verifySubmitButtonDisabled;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.verifySubmitButtonEnabled;
 import static org.akvo.flow.tests.R.raw.option_form;
-import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.core.IsNot.not;
 
 @MediumTest
@@ -74,10 +68,10 @@ public class OptionsQuestionViewSingleTest {
 
     @BeforeClass
     public static void beforeClass() {
-        Context targetContext = InstrumentationRegistry.getTargetContext();
+        Context targetContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
         SurveyRequisite.setRequisites(targetContext);
         installer = new SurveyInstaller(targetContext);
-        installer.installSurvey(option_form, InstrumentationRegistry.getContext());
+        installer.installSurvey(option_form, InstrumentationRegistry.getInstrumentation().getContext());
     }
 
     @After
@@ -87,15 +81,15 @@ public class OptionsQuestionViewSingleTest {
 
     @AfterClass
     public static void afterClass() {
-        SurveyRequisite.resetRequisites(InstrumentationRegistry.getTargetContext());
+        SurveyRequisite.resetRequisites(InstrumentationRegistry.getInstrumentation().getTargetContext());
         installer.clearSurveys();
     }
 
     @Test
-    public void ensureCanFillOptionsQuestion() throws Exception {
+    public void ensureCanFillOptionsQuestion() {
         verifyQuestionTitleDisplayed();
 
-        fillOptionsQuestion(0);
+        fillSingleOptionsQuestion(0);
 
         verifyOptionSelected();
         verifyOtherOptionUnselected();
@@ -106,7 +100,7 @@ public class OptionsQuestionViewSingleTest {
     }
 
     @Test
-    public void ensureCannotSubmitIfNoOptionSelected() throws Exception {
+    public void ensureCannotSubmitIfNoOptionSelected() {
         verifyQuestionTitleDisplayed();
 
         clickNext();
@@ -122,15 +116,5 @@ public class OptionsQuestionViewSingleTest {
     private void verifyOtherOptionUnselected() {
         ViewInteraction singleChoiceOption = getSingleChoiceRadioButton(1);
         singleChoiceOption.check(matches(not(isChecked())));
-    }
-
-    private void fillOptionsQuestion(int option) {
-        ViewInteraction radioButton = getSingleChoiceRadioButton(option);
-        radioButton.perform(click());
-    }
-
-    private ViewInteraction getSingleChoiceRadioButton(int option) {
-        return onView(allOf(withId(option),
-                isDescendantOfA(IsInstanceOf.<View>instanceOf(RadioGroup.class))));
     }
 }

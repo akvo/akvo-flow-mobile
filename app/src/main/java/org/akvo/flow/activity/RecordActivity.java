@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2013-2018 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2013-2019 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -21,9 +21,6 @@ package org.akvo.flow.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.Loader;
-import android.support.v4.view.ViewPager;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -53,10 +50,12 @@ import org.akvo.flow.util.ConstantUtil;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import timber.log.Timber;
-
+import androidx.loader.app.LoaderManager;
+import androidx.loader.content.Loader;
+import androidx.viewpager.widget.ViewPager;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import timber.log.Timber;
 
 public class RecordActivity extends BackActivity implements FormListFragment.SurveyListListener,
         ResponseListFragment.ResponseListListener, LoaderManager.LoaderCallbacks<SurveyedLocale> {
@@ -109,7 +108,7 @@ public class RecordActivity extends BackActivity implements FormListFragment.Sur
         super.onResume();
         mDatabase.open();
 
-        recordId = getIntent().getStringExtra(ConstantUtil.RECORD_ID_EXTRA);
+        recordId = getIntent().getStringExtra(ConstantUtil.DATA_POINT_ID_EXTRA);
         getSupportLoaderManager().restartLoader(0, null, this);
     }
 
@@ -186,8 +185,7 @@ public class RecordActivity extends BackActivity implements FormListFragment.Sur
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.view_map:
-                startActivity(new Intent(this, MapActivity.class)
-                        .putExtra(ConstantUtil.SURVEYED_LOCALE_ID_EXTRA, recordId));
+                navigator.navigateToMapActivity(this, recordId);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

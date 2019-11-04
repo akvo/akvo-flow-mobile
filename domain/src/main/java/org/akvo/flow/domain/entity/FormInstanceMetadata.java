@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2018-2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -20,7 +20,8 @@
 
 package org.akvo.flow.domain.entity;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
+import android.text.TextUtils;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -54,5 +55,10 @@ public class FormInstanceMetadata {
 
     public String getFormInstanceData() {
         return formInstanceData;
+    }
+
+    public boolean isValid() {
+        return !TextUtils.isEmpty(zipFileName) && !TextUtils.isEmpty(formInstanceData) && !TextUtils
+                .isEmpty(formId);
     }
 }

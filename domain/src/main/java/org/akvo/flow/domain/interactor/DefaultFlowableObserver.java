@@ -39,12 +39,12 @@ public class DefaultFlowableObserver<T> implements Consumer<T>, Action {
     }
 
     @Override
-    public void run() throws Exception {
+    public void run() {
         onComplete();
     }
 
     @Override
-    public void accept(@NonNull T t) throws Exception {
+    public void accept(@NonNull T t) {
         onNext(t);
     }
 }

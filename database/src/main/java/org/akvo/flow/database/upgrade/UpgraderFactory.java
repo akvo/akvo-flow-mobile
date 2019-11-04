@@ -21,7 +21,7 @@
 package org.akvo.flow.database.upgrade;
 
 import android.database.sqlite.SQLiteDatabase;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 
 import org.akvo.flow.database.DatabaseHelper;
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -22,18 +22,22 @@ package org.akvo.flow.data.datasource;
 
 import android.content.ContentValues;
 import android.database.Cursor;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import android.text.TextUtils;
 
 import com.squareup.sqlbrite2.BriteDatabase;
 
 import org.akvo.flow.data.entity.ApiDataPoint;
+import org.akvo.flow.data.entity.ApiFormHeader;
 import org.akvo.flow.data.entity.ApiQuestionAnswer;
 import org.akvo.flow.data.entity.ApiSurveyInstance;
 import org.akvo.flow.data.entity.SurveyInstanceIdMapper;
+import org.akvo.flow.data.entity.form.Form;
+import org.akvo.flow.data.util.FlowFileBrowser;
 import org.akvo.flow.database.Constants;
 import org.akvo.flow.database.RecordColumns;
 import org.akvo.flow.database.ResponseColumns;
+import org.akvo.flow.database.SurveyColumns;
+import org.akvo.flow.database.SurveyGroupColumns;
 import org.akvo.flow.database.SurveyInstanceColumns;
 import org.akvo.flow.database.SurveyInstanceStatus;
 import org.akvo.flow.database.SyncTimeColumns;
@@ -41,17 +45,26 @@ import org.akvo.flow.database.TransmissionStatus;
 import org.akvo.flow.database.britedb.BriteSurveyDbAdapter;
 import org.akvo.flow.domain.entity.User;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import javax.inject.Inject;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import io.reactivex.Completable;
 import io.reactivex.Observable;
+import io.reactivex.Single;
 import io.reactivex.functions.Function;
 import io.reactivex.functions.Predicate;
 
 public class DatabaseDataSource {
+
+    private static final String DEFAULTS_SURVEY_LANGUAGE = "en";
+    private static final String DEFAULT_SURVEY_TYPE = "survey";
+    public static final String DEFAULT_SURVEY_LOCATION = "sdcard";
 
     private final BriteSurveyDbAdapter briteSurveyDbAdapter;
     private final SurveyInstanceIdMapper surveyInstanceIdMapper;
@@ -78,6 +91,10 @@ public class DatabaseDataSource {
         } else {
             return briteSurveyDbAdapter.getDataPoints(surveyGroupId);
         }
+    }
+
+    public Single<Cursor> getDataPoint(String dataPointId) {
+        return Single.just(briteSurveyDbAdapter.getDataPoint(dataPointId));
     }
 
     public Cursor getSyncedTime(long surveyGroupId) {
@@ -240,23 +257,15 @@ public class DatabaseDataSource {
         return Observable.just(briteSurveyDbAdapter.getFormIds());
     }
 
-    public Observable<Boolean> setFileTransmissionsFailed(@Nullable List<String> filenames) {
-        if (filenames == null || filenames.isEmpty()) {
-            return Observable.just(true);
-        }
-        briteSurveyDbAdapter.updateFailedTransmissions(filenames);
-        return Observable.just(true);
-    }
-
     public Observable<Boolean> updateFailedTransmissionsSurveyInstances(
-            @Nullable List<String> filenames) {
+            @Nullable final Set<String> filenames) {
         if (filenames == null || filenames.isEmpty()) {
             return Observable.just(true);
         }
         return Observable.fromIterable(filenames)
-                .concatMap(new Function<String, Observable<Boolean>>() {
+                .concatMap(new Function<String, Observable<Long>>() {
                     @Override
-                    public Observable<Boolean> apply(String filename) {
+                    public Observable<Long> apply(String filename) {
                         return Observable
                                 .just(briteSurveyDbAdapter.getTransmissionForFileName(filename))
                                 .map(new Function<Cursor, Long>() {
@@ -270,25 +279,25 @@ public class DatabaseDataSource {
                                     public boolean test(Long aLong) {
                                         return aLong != -1L;
                                     }
-                                })
-                                .toList()
-                                .toObservable()
-                                .concatMap(new Function<List<Long>, Observable<Boolean>>() {
-                                    @Override
-                                    public Observable<Boolean> apply(List<Long> instanceIds) {
-                                        return updateFailedSubmissions(new HashSet<>(instanceIds));
-                                    }
                                 });
+                    }
+                })
+                .toList()
+                .toObservable()
+                .concatMap(new Function<List<Long>, Observable<Boolean>>() {
+                    @Override
+                    public Observable<Boolean> apply(List<Long> instanceIds) {
+                        return updateFailedSubmissions(new HashSet<>(instanceIds));
                     }
                 });
     }
 
-    public Observable<Boolean> setDeletedForms(@Nullable List<String> deletedFormIds) {
+    public Observable<Set<String>> setDeletedForms(@Nullable Set<String> deletedFormIds) {
         if (deletedFormIds == null || deletedFormIds.isEmpty()) {
-            return Observable.just(true);
+            return Observable.just(Collections.<String>emptySet());
         }
         briteSurveyDbAdapter.setFormsDeleted(deletedFormIds);
-        return Observable.just(true);
+        return Observable.just(deletedFormIds);
     }
 
     public Observable<Cursor> getUnSyncedTransmissions(String formId) {
@@ -339,37 +348,95 @@ public class DatabaseDataSource {
         return Observable.just(true);
     }
 
-    public Observable<Cursor> getSubmittedInstances() {
-        return Observable.just(briteSurveyDbAdapter
+    public Single<Cursor> getSubmittedInstances() {
+        return Single.just(briteSurveyDbAdapter
                 .getSurveyInstancesByStatus(SurveyInstanceStatus.SUBMITTED));
     }
 
-    public Observable<Boolean> setInstanceStatusToRequested(long id) {
+    public Completable setInstanceStatusToRequested(long id) {
         briteSurveyDbAdapter.updateSurveyInstanceStatus(id, SurveyInstanceStatus.SUBMIT_REQUESTED);
-        return Observable.just(true);
+        return Completable.complete();
     }
 
-    public Observable<Cursor> getPendingSurveyInstances() {
-        return Observable.just(briteSurveyDbAdapter
+    public Single<Cursor> getPendingSurveyInstances() {
+        return Single.just(briteSurveyDbAdapter
                 .getSurveyInstancesByStatus(SurveyInstanceStatus.SUBMIT_REQUESTED));
     }
 
-    public Observable<Boolean> setInstanceStatusToSubmitted(long id) {
+    public Completable setInstanceStatusToSubmitted(long id) {
         briteSurveyDbAdapter.updateSurveyInstanceStatus(id, SurveyInstanceStatus.SUBMITTED);
+        return Completable.complete();
+    }
+
+    public Single<Cursor> getResponses(Long surveyInstanceId) {
+        return Single.just(briteSurveyDbAdapter.getResponses(surveyInstanceId));
+    }
+
+    public Completable createTransmissions(final Long instanceId, final String formId,
+            Set<String> filenames) {
+        if (filenames == null || filenames.isEmpty()) {
+            return Completable.complete();
+        }
+        briteSurveyDbAdapter.createTransmissions(instanceId, formId, filenames);
+        return Completable.complete();
+    }
+
+    public Observable<Boolean> installTestForm() {
+        briteSurveyDbAdapter.installTestForm();
         return Observable.just(true);
     }
 
-    public Observable<Cursor> getResponses(Long surveyInstanceId) {
-        return Observable.just(briteSurveyDbAdapter.getResponses(surveyInstanceId));
+    public Observable<Boolean> insertSurveyGroup(ApiFormHeader apiFormHeader) {
+        ContentValues values = new ContentValues();
+        values.put(SurveyGroupColumns.SURVEY_GROUP_ID, apiFormHeader.getGroupId());
+        values.put(SurveyGroupColumns.NAME, apiFormHeader.getGroupName());
+        values.put(SurveyGroupColumns.REGISTER_SURVEY_ID, apiFormHeader.getRegistrationSurveyId());
+        values.put(SurveyGroupColumns.MONITORED, apiFormHeader.isMonitored() ? 1 : 0);
+        briteSurveyDbAdapter.addSurveyGroup(values);
+        return Observable.just(true);
     }
 
+    public Observable<Boolean> formNeedsUpdate(ApiFormHeader apiFormHeader) {
+        final boolean surveyUpToDate = briteSurveyDbAdapter
+                .isSurveyUpToDate(apiFormHeader.getId(), apiFormHeader.getVersion());
+        return Observable.just(!surveyUpToDate);
+    }
 
-    public Observable<Boolean> createTransmissions(final Long instanceId, final String formId,
-            Set<String> filenames) {
-        if (filenames == null || filenames.isEmpty()) {
+    public Observable<Boolean> insertSurvey(ApiFormHeader formHeader,
+            boolean cascadeResourcesDownloaded, Form form) {
+        ContentValues updatedValues = new ContentValues();
+        updatedValues.put(SurveyColumns.SURVEY_ID, formHeader.getId());
+        String versionValue = form.getVersion() != null && !"0.0".equals(form.getVersion()) ?
+                form.getVersion() :
+                formHeader.getVersion();
+        updatedValues.put(SurveyColumns.VERSION, versionValue);
+        updatedValues.put(SurveyColumns.TYPE, DEFAULT_SURVEY_TYPE);
+        updatedValues.put(SurveyColumns.LOCATION, DEFAULT_SURVEY_LOCATION);
+        updatedValues.put(SurveyColumns.FILENAME, formHeader.getId() + FlowFileBrowser.XML_SUFFIX);
+        updatedValues.put(SurveyColumns.NAME, formHeader.getName());
+        updatedValues.put(SurveyColumns.LANGUAGE, getFormLanguage(formHeader));
+        updatedValues.put(SurveyColumns.SURVEY_GROUP_ID, formHeader.getGroupId());
+        updatedValues.put(SurveyColumns.HELP_DOWNLOADED, cascadeResourcesDownloaded? 1: 0);
+        briteSurveyDbAdapter.updateSurvey(updatedValues, formHeader.getId());
+        return Observable.just(true);
+    }
+
+    public Observable<Boolean> deleteAllForms() {
+        briteSurveyDbAdapter.deleteAllSurveys();
+        return Observable.just(true);
+    }
+
+    @NonNull
+    private String getFormLanguage(ApiFormHeader formHeader) {
+        final String language = formHeader != null ? formHeader.getLanguage() : "";
+        return TextUtils.isEmpty(language) ? DEFAULTS_SURVEY_LANGUAGE : language.toLowerCase();
+    }
+
+    public Observable<Boolean> saveMissingFiles(Set<String> missingFiles) {
+        if (missingFiles == null || missingFiles.isEmpty()) {
             return Observable.just(true);
         }
-        briteSurveyDbAdapter.createTransmissions(instanceId, formId, filenames);
+        briteSurveyDbAdapter.updateFailedTransmissions(missingFiles);
         return Observable.just(true);
     }
 }

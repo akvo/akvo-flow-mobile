@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2013-2018 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2013-2019 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -19,25 +19,16 @@
 
 package org.akvo.flow.api;
 
-import android.content.Context;
 import android.net.Uri;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.text.TextUtils;
 
 import org.akvo.flow.BuildConfig;
-import org.akvo.flow.data.preference.Prefs;
-import org.akvo.flow.domain.Survey;
-import org.akvo.flow.serialization.form.SurveyMetaParser;
 import org.akvo.flow.util.HttpUtil;
-import org.akvo.flow.util.PlatformUtil;
-import org.akvo.flow.util.StatusUtil;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 import timber.log.Timber;
 
@@ -46,21 +37,10 @@ public class FlowApi {
     private static final String HTTPS_PREFIX = "https";
     private static final String HTTP_PREFIX = "http";
 
-    private final String phoneNumber;
-    private final String imei;
-    private final String androidId;
-    private final String deviceIdentifier;
     private final String baseUrl;
 
-
-    public FlowApi(Context context) {
+    public FlowApi() {
         this.baseUrl = BuildConfig.SERVER_BASE;
-        this.phoneNumber = StatusUtil.getPhoneNumber(context);
-        this.imei = StatusUtil.getImei(context);
-        this.androidId = PlatformUtil.getAndroidID(context);
-        Prefs prefs = new Prefs(context);
-        this.deviceIdentifier = prefs
-                .getString(Prefs.KEY_DEVICE_IDENTIFIER, Prefs.DEFAULT_VALUE_DEVICE_IDENTIFIER);
     }
 
     public String getServerTime() throws IOException {
@@ -91,73 +71,12 @@ public class FlowApi {
         return builder.build().toString();
     }
 
-    @NonNull
-    public List<Survey> getSurveyHeader(@NonNull String surveyId)
-            throws IOException {
-        final String url = buildSurveyHeaderUrl(baseUrl, surveyId);
-        String response = HttpUtil.httpGet(url);
-        if (!TextUtils.isEmpty(response)) {
-            return new SurveyMetaParser().parseList(response, true);
-        }
-        return Collections.emptyList();
-    }
-
-    @NonNull
-    private String buildSurveyHeaderUrl(@NonNull String serverBaseUrl, @NonNull String surveyId) {
-        Uri.Builder builder = Uri.parse(serverBaseUrl).buildUpon();
-        builder.appendPath(Path.SURVEY_HEADER_SERVICE);
-        builder.appendQueryParameter(Param.PARAM_ACTION, Param.VALUE_HEADER);
-        builder.appendQueryParameter(Param.SURVEY_ID, surveyId);
-        appendDeviceParams(builder);
-        return builder.build().toString();
-    }
-
-    public List<Survey> getSurveys() throws IOException {
-        List<Survey> surveys = new ArrayList<>();
-        final String url = buildSurveysUrl(baseUrl);
-        String response = HttpUtil.httpGet(url);
-        if (!TextUtils.isEmpty(response)) {
-            surveys = new SurveyMetaParser().parseList(response);
-        }
-        return surveys;
-    }
-
-    @NonNull
-    private String buildSurveysUrl(@NonNull String serverBaseUrl) {
-        Uri.Builder builder = Uri.parse(serverBaseUrl).buildUpon();
-        builder.appendPath(Path.SURVEY_LIST_SERVICE);
-        builder.appendQueryParameter(Param.PARAM_ACTION, Param.VALUE_SURVEY);
-        appendDeviceParams(builder);
-        return builder.build().toString();
-    }
-
-    private void appendDeviceParams(@NonNull Uri.Builder builder) {
-        builder.appendQueryParameter(Param.PHONE_NUMBER, phoneNumber);
-        builder.appendQueryParameter(Param.ANDROID_ID, androidId);
-        builder.appendQueryParameter(Param.IMEI, imei);
-        builder.appendQueryParameter(Param.VERSION, BuildConfig.VERSION_NAME);
-        builder.appendQueryParameter(Param.DEVICE_ID, deviceIdentifier);
-    }
-
     interface Path {
-        String SURVEY_LIST_SERVICE = "surveymanager";
-        String SURVEY_HEADER_SERVICE = "surveymanager";
         String TIME_CHECK = "devicetimerest";
     }
 
     interface Param {
 
-        String PHONE_NUMBER = "phoneNumber";
-        String IMEI = "imei";
         String TIMESTAMP = "ts";
-        String VERSION = "ver";
-        String DEVICE_ID = "devId";
-        String ANDROID_ID = "androidId";
-
-        String PARAM_ACTION = "action";
-        String SURVEY_ID = "surveyId";
-
-        String VALUE_HEADER = "getSurveyHeader";
-        String VALUE_SURVEY = "getAvailableSurveysDevice";
     }
 }

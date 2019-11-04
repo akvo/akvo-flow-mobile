@@ -23,24 +23,26 @@ package org.akvo.flow.presentation.main;
 import org.akvo.flow.domain.interactor.DefaultObserver;
 import org.akvo.flow.domain.interactor.UseCase;
 import org.akvo.flow.presentation.Presenter;
+import org.akvo.flow.walkthrough.domain.interactor.GetWalkThroughSeen;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import io.reactivex.observers.DisposableSingleObserver;
 import timber.log.Timber;
 
 public class MainPresenter implements Presenter {
 
     private final UseCase isDeviceSetup;
-    private final UseCase wasWalkThroughSeen;
+    private final GetWalkThroughSeen wasWalkThroughSeen;
 
     private MainView view;
 
     @Inject
     public MainPresenter(@Named("getIsDeviceSetUp") UseCase isDeviceSetup,
-            @Named("wasWalkthroughSeen") UseCase wasWalkThroughSeen) {
+            GetWalkThroughSeen getWalkThroughSeen) {
         this.isDeviceSetup = isDeviceSetup;
-        this.wasWalkThroughSeen = wasWalkThroughSeen;
+        this.wasWalkThroughSeen = getWalkThroughSeen;
     }
 
     public void setView(MainView view) {
@@ -48,7 +50,7 @@ public class MainPresenter implements Presenter {
     }
 
     public void checkDeviceSetup() {
-        isDeviceSetup.execute(new DefaultObserver<Boolean>(){
+        isDeviceSetup.execute(new DefaultObserver<Boolean>() {
             @Override
             public void onError(Throwable e) {
                 Timber.e(e);
@@ -72,22 +74,22 @@ public class MainPresenter implements Presenter {
         wasWalkThroughSeen.dispose();
     }
 
-    public void checkWalkthroughDisplay() {
-        wasWalkThroughSeen.execute(new DefaultObserver<Boolean>() {
+    public void checkWalkThroughDisplay() {
+        wasWalkThroughSeen.execute(new DisposableSingleObserver<Boolean>() {
             @Override
-            public void onError(Throwable e) {
-                Timber.e(e);
-                view.navigateToWalkThrough();
-            }
-
-            @Override
-            public void onNext(Boolean seen) {
+            public void onSuccess(Boolean seen) {
                 if (seen) {
                     checkDeviceSetup();
                 } else {
                     view.navigateToWalkThrough();
                 }
             }
-        }, null);
+
+            @Override
+            public void onError(Throwable e) {
+                Timber.e(e);
+                view.navigateToWalkThrough();
+            }
+        });
     }
 }

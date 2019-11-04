@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017,2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -21,7 +21,6 @@
 package org.akvo.flow.data.entity;
 
 import android.database.Cursor;
-import android.support.annotation.NonNull;
 
 import org.akvo.flow.database.SurveyDbAdapter;
 import org.akvo.flow.database.SurveyInstanceColumns;
@@ -32,10 +31,21 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 public class DataPointMapper {
 
     @Inject
     public DataPointMapper() {
+    }
+
+    @Nullable
+    public DataPoint mapOneDataPoint(Cursor cursor) {
+        if (cursor != null && cursor.moveToFirst()) {
+            return getDataPoint(cursor);
+        }
+        return null;
     }
 
     private DataPoint getDataPoint(Cursor cursor) {

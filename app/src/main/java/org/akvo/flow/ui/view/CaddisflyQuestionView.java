@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2016-2018 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2016-2019 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -19,16 +19,18 @@
 
 package org.akvo.flow.ui.view;
 
+import android.Manifest;
 import android.content.Context;
 import android.os.Bundle;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 
 import org.akvo.flow.BuildConfig;
 import org.akvo.flow.R;
+import org.akvo.flow.activity.FormActivity;
 import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionResponse;
 import org.akvo.flow.event.QuestionInteractionEvent;
@@ -38,10 +40,12 @@ import org.akvo.flow.injector.component.ViewComponent;
 import org.akvo.flow.presentation.SnackBarManager;
 import org.akvo.flow.presentation.form.caddisfly.CaddisflyPresenter;
 import org.akvo.flow.presentation.form.caddisfly.CaddisflyView;
+import org.akvo.flow.ui.Navigator;
 import org.akvo.flow.ui.adapter.CaddisflyResultsAdapter;
 import org.akvo.flow.ui.model.caddisfly.CaddisflyJsonMapper;
 import org.akvo.flow.ui.model.caddisfly.CaddisflyTestResult;
 import org.akvo.flow.util.ConstantUtil;
+import org.akvo.flow.util.StoragePermissionsHelper;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -64,6 +68,12 @@ public class CaddisflyQuestionView extends QuestionView implements View.OnClickL
     @Inject
     SnackBarManager snackBarManager;
 
+    @Inject
+    StoragePermissionsHelper storagePermissionsHelper;
+
+    @Inject
+    Navigator navigator;
+
     private String mValue;
     private String mImage;
     private CaddisflyResultsAdapter caddisflyResultsAdapter;
@@ -79,12 +89,12 @@ public class CaddisflyQuestionView extends QuestionView implements View.OnClickL
 
         initialiseInjector();
 
-        RecyclerView resultsRv = (RecyclerView) findViewById(R.id.caddisfly_results_recycler_view);
+        RecyclerView resultsRv = findViewById(R.id.caddisfly_results_recycler_view);
         resultsRv.setLayoutManager(new LinearLayoutManager(resultsRv.getContext()));
         caddisflyResultsAdapter = new CaddisflyResultsAdapter(
                 new ArrayList<CaddisflyTestResult>());
         resultsRv.setAdapter(caddisflyResultsAdapter);
-        Button mButton = (Button) findViewById(R.id.caddisfly_button);
+        Button mButton = findViewById(R.id.caddisfly_button);
         if (isReadOnly()) {
             mButton.setVisibility(GONE);
         } else {
@@ -135,7 +145,7 @@ public class CaddisflyQuestionView extends QuestionView implements View.OnClickL
     }
 
     @Override
-    public void questionComplete(Bundle data) {
+    public void onQuestionResultReceived(Bundle data) {
         if (data != null) {
             mValue = data.getString(ConstantUtil.CADDISFLY_RESPONSE);
             caddisflyTestResults = caddisflyJsonMapper.transform(mValue);
@@ -145,7 +155,7 @@ public class CaddisflyQuestionView extends QuestionView implements View.OnClickL
             Timber.d("caddisflyTestComplete - Response: %s . Image: %s", mValue, image);
 
             File src = !TextUtils.isEmpty(image) ? new File(image) : null;
-            if (src != null && src.exists()) {
+            if (src != null && src.exists() && !src.isDirectory()) {
                 presenter.onImageReady(src);
             } else {
                 captureResponse();
@@ -156,6 +166,50 @@ public class CaddisflyQuestionView extends QuestionView implements View.OnClickL
 
     @Override
     public void onClick(View view) {
+        if (storagePermissionsHelper.isStorageAllowed()) {
+            launchCaddisflyTest();
+        } else {
+            requestStoragePermissions();
+        }
+    }
+
+    private void requestStoragePermissions() {
+        final FormActivity activity = (FormActivity) getContext();
+        activity.requestPermissions(new String[] { Manifest.permission.WRITE_EXTERNAL_STORAGE },
+                ConstantUtil.STORAGE_PERMISSION_CODE, getQuestion().getQuestionId());
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            int[] grantResults) {
+        if (requestCode == ConstantUtil.STORAGE_PERMISSION_CODE) {
+            if (storagePermissionsHelper.storagePermissionsGranted(permissions[0], grantResults)) {
+                launchCaddisflyTest();
+            } else {
+                storagePermissionNotGranted();
+            }
+        }
+    }
+
+    private void storagePermissionNotGranted() {
+        final View.OnClickListener retryListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (storagePermissionsHelper
+                        .userPressedDoNotShowAgain((FormActivity) getContext())) {
+                    navigator.navigateToAppSystemSettings(getContext());
+                } else {
+                    requestStoragePermissions();
+                }
+            }
+        };
+        snackBarManager
+                .displaySnackBarWithAction(this,
+                        R.string.storage_permission_missing,
+                        R.string.action_retry, retryListener, getContext());
+    }
+
+    private void launchCaddisflyTest() {
         Question q = getQuestion();
         Bundle data = new Bundle();
         data.putString(ConstantUtil.CADDISFLY_RESOURCE_ID, q.getCaddisflyRes());
@@ -165,8 +219,8 @@ public class CaddisflyQuestionView extends QuestionView implements View.OnClickL
         data.putString(ConstantUtil.CADDISFLY_FORM_ID, mSurveyListener.getFormId());
         data.putString(ConstantUtil.CADDISFLY_LANGUAGE, Locale.getDefault().getLanguage());
         String serverBase = BuildConfig.SERVER_BASE;
-        serverBase = serverBase.replaceFirst("https://","");
-        serverBase = serverBase.replaceFirst("http://","");
+        serverBase = serverBase.replaceFirst("https://", "");
+        serverBase = serverBase.replaceFirst("http://", "");
         serverBase = serverBase.replace(".appspot.com", "");
         data.putString(ConstantUtil.CADDISFLY_INSTANCE_NAME, serverBase);
         notifyQuestionListeners(QuestionInteractionEvent.CADDISFLY, data);

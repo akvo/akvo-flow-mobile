@@ -22,6 +22,7 @@ package org.akvo.flow.domain.interactor;
 
 import android.net.Uri;
 
+import org.akvo.flow.domain.entity.DomainImageMetadata;
 import org.akvo.flow.domain.executor.PostExecutionThread;
 import org.akvo.flow.domain.executor.ThreadExecutor;
 import org.akvo.flow.domain.repository.FileRepository;
@@ -54,8 +55,8 @@ public class SaveResizedImage extends UseCase {
 
     @Override
     protected <T> Observable buildUseCaseObservable(Map<String, T> parameters) {
-        if (parameters == null || !parameters.containsKey(ORIGINAL_FILE_NAME_PARAM)
-                || !parameters.containsKey(RESIZED_FILE_NAME_PARAM)) {
+        if (parameters == null || parameters.get(ORIGINAL_FILE_NAME_PARAM) == null
+                || parameters.get(RESIZED_FILE_NAME_PARAM) == null) {
             return Observable.error(new IllegalArgumentException("Missing params"));
         }
 
@@ -66,9 +67,9 @@ public class SaveResizedImage extends UseCase {
                 removeDuplicateParam != null && (Boolean) removeDuplicateParam;
 
         return userRepository.getImageSize()
-                .concatMap(new Function<Integer, Observable<Boolean>>() {
+                .concatMap(new Function<Integer, Observable<DomainImageMetadata>>() {
                     @Override
-                    public Observable<Boolean> apply(Integer imageSize) {
+                    public Observable<DomainImageMetadata> apply(Integer imageSize) {
                         return fileRepository
                                 .copyResizedImage(originalFilePath, resizedFilePath, imageSize,
                                         removeDuplicate);

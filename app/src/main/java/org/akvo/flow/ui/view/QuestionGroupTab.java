@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2014-2018 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2014-2019 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -22,8 +22,8 @@ package org.akvo.flow.ui.view;
 import android.animation.LayoutTransition;
 import android.content.Context;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.constraint.ConstraintLayout;
+import androidx.annotation.NonNull;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -137,10 +137,18 @@ public class QuestionGroupTab extends ConstraintLayout
         }
     }
 
-    public void onQuestionComplete(String questionId, Bundle data) {
+    public void onQuestionResultReceived(String questionId, Bundle data) {
         QuestionView qv = mQuestionViews.get(questionId);
         if (qv != null) {
-            qv.questionComplete(data);
+            qv.onQuestionResultReceived(data);
+        }
+    }
+
+    public void onRequestPermissionsResult(int requestCode, String questionId, String[] permissions,
+            int[] grantResults) {
+        QuestionView qv = mQuestionViews.get(questionId);
+        if (qv != null) {
+            qv.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
     }
 

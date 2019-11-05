@@ -596,13 +596,13 @@ public class SurveyDataRepository implements SurveyRepository {
                 .onErrorReturn(new Function<Throwable, UploadResult>() {
                     @Override
                     public UploadResult apply(Throwable throwable) {
-                        Timber.e(throwable);
                         boolean formNotFound = throwable instanceof HttpException && (
                                 ((HttpException) throwable).code() == 404);
                         if (formNotFound) {
                             dataBaseDataSource.setFileTransmissionFormDeleted(transmissionId);
                             return new UploadFormDeletedError(surveyInstanceId, formId);
                         } else {
+                            Timber.e(throwable);
                             dataBaseDataSource.setFileTransmissionFailed(transmissionId);
                             return new UploadError(surveyInstanceId);
                         }

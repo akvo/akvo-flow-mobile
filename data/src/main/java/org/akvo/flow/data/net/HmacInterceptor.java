@@ -20,13 +20,13 @@
 
 package org.akvo.flow.data.net;
 
-import androidx.annotation.NonNull;
 import android.util.Base64;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import androidx.annotation.NonNull;
 import okhttp3.HttpUrl;
 import okhttp3.Interceptor;
 import okhttp3.Request;
@@ -35,14 +35,14 @@ import okhttp3.Response;
 import static org.akvo.flow.data.util.ApiUrls.HMAC;
 import static org.akvo.flow.data.util.ApiUrls.TIMESTAMP;
 
-public class HMACInterceptor implements Interceptor {
+public class HmacInterceptor implements Interceptor {
 
     private final String key;
     private final SimpleDateFormat dateFormat;
     private final Encoder encoder;
     private final SignatureHelper signatureHelper;
 
-    public HMACInterceptor(String key, SimpleDateFormat dateFormat, Encoder encoder,
+    public HmacInterceptor(String key, SimpleDateFormat dateFormat, Encoder encoder,
             SignatureHelper signatureHelper) {
         this.dateFormat = dateFormat;
         this.key = key;

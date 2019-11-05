@@ -21,6 +21,22 @@
 package org.akvo.flow.data.datasource.files;
 
 import android.text.TextUtils;
+
+import org.akvo.flow.data.util.Constants;
+import org.akvo.flow.data.util.ExternalStorageHelper;
+import org.akvo.flow.data.util.FileHelper;
+import org.akvo.flow.data.util.FlowFileBrowser;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.List;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
@@ -30,16 +46,7 @@ import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.functions.Predicate;
 import okhttp3.ResponseBody;
-import org.akvo.flow.data.util.Constants;
-import org.akvo.flow.data.util.ExternalStorageHelper;
-import org.akvo.flow.data.util.FileHelper;
-import org.akvo.flow.data.util.FlowFileBrowser;
 import timber.log.Timber;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import java.io.*;
-import java.util.List;
 
 @Singleton
 public class FileDataSource {

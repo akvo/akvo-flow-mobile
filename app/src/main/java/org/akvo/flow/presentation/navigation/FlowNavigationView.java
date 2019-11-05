@@ -317,7 +317,8 @@ public class FlowNavigationView extends NavigationView implements IFlowNavigatio
         presenter.onDeleteSurvey(surveyGroupId);
     }
 
-    @SuppressLint("RestrictedApi") @Override
+    @SuppressLint("RestrictedApi")
+    @Override
     protected void onDetachedFromWindow() {
         presenter.destroy();
         super.onDetachedFromWindow();

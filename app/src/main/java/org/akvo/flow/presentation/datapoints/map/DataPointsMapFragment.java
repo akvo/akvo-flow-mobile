@@ -88,11 +88,12 @@ public class DataPointsMapFragment extends Fragment implements DataPointsMapView
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        initializeInjector();
         setHasOptionsMenu(true);
     }
 
     @Override
-    public void onAttach(Context context) {
+    public void onAttach(@NonNull Context context) {
         super.onAttach(context);
 
         FragmentActivity activity = getActivity();
@@ -123,7 +124,6 @@ public class DataPointsMapFragment extends Fragment implements DataPointsMapView
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        initializeInjector();
         presenter.setView(this);
         SurveyGroup surveyGroup = (SurveyGroup) getArguments()
                 .getSerializable(ConstantUtil.SURVEY_GROUP_EXTRA);
@@ -215,7 +215,7 @@ public class DataPointsMapFragment extends Fragment implements DataPointsMapView
     }
 
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         if (menuRes != null) {
             inflater.inflate(menuRes, menu);
         }

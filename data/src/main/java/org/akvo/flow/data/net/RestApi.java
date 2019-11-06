@@ -150,8 +150,7 @@ public class RestApi {
         return serviceFactory
                 .createScalarsRetrofitService(FlowApiService.class, apiUrls.getGaeUrl())
                 .downloadFormsHeader(phoneNumber, androidId, imei, version, deviceId)
-                .onErrorResumeNext(new ErrorLoggerFunction(
-                        "Error downloading all form headers"));
+                .onErrorResumeNext(new ErrorLoggerFunction("Error downloading all form headers"));
     }
 
     @SuppressWarnings("unchecked")

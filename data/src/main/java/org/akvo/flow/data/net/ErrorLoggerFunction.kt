@@ -20,12 +20,10 @@
 package org.akvo.flow.data.net
 
 import io.reactivex.Observable
-import io.reactivex.ObservableSource
 import io.reactivex.functions.Function
 import timber.log.Timber
 
-class ErrorLoggerFunction<T>(private val message: String) :
-    Function<Throwable, ObservableSource<*>> {
+class ErrorLoggerFunction<T>(private val message: String) : Function<Throwable, Observable<*>> {
 
     override fun apply(throwable: Throwable): Observable<T> {
         Timber.e(Exception(throwable), message)

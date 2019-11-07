@@ -136,6 +136,14 @@ public class LockedGeoQuestionViewTest {
 
     @Test
     public void ensureGeoQuestionProgressDisplayedOnButtonClick() {
+        //reset values just in case
+        onView(withId(R.id.lat_et)).perform(replaceText(""));
+        onView(withId(R.id.lon_et)).perform(replaceText(""));
+        onView(withId(R.id.height_et)).perform(replaceText(""));
+        onView(withId(R.id.acc_tv))
+                .perform(replaceTextInTextView(
+                        getString(R.string.geo_location_accuracy_default, rule)));
+
         closeSoftKeyboard();
         clickGeoButton();
 
@@ -167,7 +175,7 @@ public class LockedGeoQuestionViewTest {
     public void ensureLocationValuesDisplayedCorrectly() {
         clickGeoButton();
         addExecutionDelay(100);
-        provideMockLocation(MOCK_ACCURACY_ACCURATE);
+        provideMockLocation(MOCK_ACCURACY_ACCURATE, Criteria.ACCURACY_FINE);
         addExecutionDelay(100);
         verifyGeoInput(R.id.lat_et, MOCK_LATITUDE + "");
         verifyGeoInput(R.id.lon_et, MOCK_LONGITUDE + "");
@@ -181,7 +189,7 @@ public class LockedGeoQuestionViewTest {
         clickGeoButton();
         addExecutionDelay(100);
 
-        provideMockLocation(MOCK_ACCURACY_INACCURATE);
+        provideMockLocation(MOCK_ACCURACY_INACCURATE, Criteria.ACCURACY_LOW);
         addExecutionDelay(100);
 
         verifyAccuracy(accuracyFormat.format(MOCK_ACCURACY_INACCURATE), Color.RED);
@@ -237,13 +245,13 @@ public class LockedGeoQuestionViewTest {
         input.check(matches(hasTextColor(textColor)));
     }
 
-    private void provideMockLocation(float accuracy) {
+    private void provideMockLocation(float accuracy, int accuracyRequirement) {
         LocationManager locationManager = (LocationManager) InstrumentationRegistry.getInstrumentation().getContext()
                 .getSystemService(Context.LOCATION_SERVICE);
         assert locationManager != null;
         locationManager
                 .addTestProvider(LocationManager.GPS_PROVIDER, false, false, false, false, false,
-                        false, false, Criteria.POWER_LOW, Criteria.ACCURACY_FINE);
+                        false, false, Criteria.POWER_LOW, accuracyRequirement);
         locationManager.setTestProviderEnabled(LocationManager.GPS_PROVIDER, true);
 
         Location location = new Location(LocationManager.GPS_PROVIDER);

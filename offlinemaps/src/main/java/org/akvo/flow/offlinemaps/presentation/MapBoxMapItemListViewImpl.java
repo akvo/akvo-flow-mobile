@@ -66,6 +66,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.PermissionChecker;
 import androidx.fragment.app.FragmentActivity;
+import timber.log.Timber;
 
 import static android.graphics.Color.rgb;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.all;
@@ -326,13 +327,17 @@ public class MapBoxMapItemListViewImpl extends MapView implements OnMapReadyCall
         Context context = getContext();
         if (isLocationAllowed() && mapboxMap != null && context != null
                 && mapboxMap.getStyle() != null) {
-            LocationComponent locationComponent = mapboxMap.getLocationComponent();
-            locationComponent.activateLocationComponent(
-                    LocationComponentActivationOptions.builder(context, mapboxMap.getStyle())
-                            .build());
-            locationComponent.setLocationComponentEnabled(true);
-            locationComponent.setCameraMode(CameraMode.TRACKING);
-            locationComponent.setRenderMode(RenderMode.NORMAL);
+            try {
+                LocationComponent locationComponent = mapboxMap.getLocationComponent();
+                locationComponent.activateLocationComponent(
+                        LocationComponentActivationOptions.builder(context, mapboxMap.getStyle())
+                                .build());
+                locationComponent.setLocationComponentEnabled(true);
+                locationComponent.setCameraMode(CameraMode.TRACKING);
+                locationComponent.setRenderMode(RenderMode.NORMAL);
+            } catch (Exception e) {
+                Timber.e(e);
+            }
         }
     }
 

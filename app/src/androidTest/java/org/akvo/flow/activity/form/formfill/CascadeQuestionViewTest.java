@@ -45,7 +45,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.util.List;
-import java.util.Random;
 
 import androidx.test.espresso.ViewInteraction;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
@@ -63,7 +62,6 @@ import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withSpinnerText;
 import static androidx.test.espresso.matcher.ViewMatchers.withTagValue;
-import static org.akvo.flow.activity.form.FormActivityTestUtil.addExecutionDelay;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.getFormActivityIntent;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.verifyCascadeLevelNumber;
 import static org.akvo.flow.tests.R.raw.cascade_form;
@@ -77,8 +75,6 @@ public class CascadeQuestionViewTest {
 
     private static SurveyInstaller installer;
     private static Survey survey;
-
-    private final Random random = new Random();
 
     @Rule
     public ActivityTestRule<FormActivity> rule = new ActivityTestRule<FormActivity>(
@@ -125,36 +121,36 @@ public class CascadeQuestionViewTest {
                         allOf(withId(R.id.cascade_level_spinner), withTagValue(is(i))));
 
                 verifyCascadeInitialState(cascadeLevelSpinner);
-
-                int position = random.nextInt(levelNodes.size());
-                Node node = levelNodes.get(position);
+                Node node = null;
+                for (int position = 0; position < levelNodes.size(); position++) {
+                    node = levelNodes.get(position);
+                    selectSpinnerItem(cascadeLevelSpinner, node);
+                    verifyCascadeNewState(cascadeLevelSpinner, node);
+                }
                 levelNodes = cascadeNodes.get((int) node.getId());
-
-                selectSpinnerItem(cascadeLevelSpinner, node);
-
-                verifyCascadeNewState(cascadeLevelSpinner, node);
             }
         }
     }
 
     private void verifyCascadeInitialState(ViewInteraction cascadeLevelSpinner) {
+        System.out.println("Verifying cascade level initial state");
         cascadeLevelSpinner.perform(scrollTo());
         cascadeLevelSpinner.check(matches(isDisplayed()));
         cascadeLevelSpinner.check(matches(withSpinnerText(R.string.select)));
     }
 
     private void selectSpinnerItem(ViewInteraction cascadeLevelSpinner, Node node) {
+        System.out.println("Selecting spinner item " + node.getCode() + " name: " + node.getName());
         cascadeLevelSpinner.perform(click());
-        addExecutionDelay(100);
         onData(withNode(node))
                 .inAdapterView(allOf(
                         isAssignableFrom(AdapterView.class),
                         not(is(withId(R.id.submit_tab)))))
                 .perform(click());
-        addExecutionDelay(100);
     }
 
     private void verifyCascadeNewState(ViewInteraction cascadeLevelSpinner, Node node) {
+        System.out.println("Verifying cascade new state with node : " + node.getName());
         cascadeLevelSpinner.check(matches(withSpinnerText(node.getName())));
     }
 

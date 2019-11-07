@@ -154,6 +154,7 @@ android {
 
     testOptions {
         unitTests.returnDefaultValues = true
+        animationsDisabled = true
     }
 
     testOptions.unitTests.all {

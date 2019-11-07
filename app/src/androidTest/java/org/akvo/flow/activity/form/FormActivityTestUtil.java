@@ -265,6 +265,7 @@ public class FormActivityTestUtil {
     }
 
     public static void verifyCascadeLevelNumber(Level level) {
+        System.out.println("Verifying cascade level number: " + level.getText());
         ViewInteraction cascadeLevelNumber = onView(
                 allOf(withId(R.id.cascade_level_number), withText(level.getText())));
         cascadeLevelNumber.perform(scrollTo());

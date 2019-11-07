@@ -48,16 +48,16 @@ import org.junit.runner.RunWith;
 
 import java.text.DecimalFormat;
 
-import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.espresso.UiController;
 import androidx.test.espresso.ViewAction;
 import androidx.test.espresso.ViewInteraction;
 import androidx.test.espresso.matcher.BoundedMatcher;
 import androidx.test.espresso.matcher.ViewMatchers;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.filters.MediumTest;
+import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.rule.ActivityTestRule;
 import androidx.test.rule.GrantPermissionRule;
-import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import static androidx.test.espresso.Espresso.closeSoftKeyboard;
 import static androidx.test.espresso.Espresso.onView;
@@ -73,7 +73,6 @@ import static androidx.test.espresso.matcher.ViewMatchers.isFocusable;
 import static androidx.test.espresso.matcher.ViewMatchers.withEffectiveVisibility;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
-import static org.akvo.flow.activity.form.FormActivityTestUtil.addExecutionDelay;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.getFormActivityIntent;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.getString;
 import static org.akvo.flow.tests.R.raw.locked_geo_form;
@@ -143,7 +142,6 @@ public class LockedGeoQuestionViewTest {
         onView(withId(R.id.acc_tv))
                 .perform(replaceTextInTextView(
                         getString(R.string.geo_location_accuracy_default, rule)));
-
         closeSoftKeyboard();
         clickGeoButton();
 
@@ -174,9 +172,7 @@ public class LockedGeoQuestionViewTest {
     @Test
     public void ensureLocationValuesDisplayedCorrectly() {
         clickGeoButton();
-        addExecutionDelay(100);
         provideMockLocation(MOCK_ACCURACY_ACCURATE, Criteria.ACCURACY_FINE);
-        addExecutionDelay(100);
         verifyGeoInput(R.id.lat_et, MOCK_LATITUDE + "");
         verifyGeoInput(R.id.lon_et, MOCK_LONGITUDE + "");
         verifyGeoInput(R.id.height_et, MOCK_ALTITUDE + "");
@@ -187,10 +183,8 @@ public class LockedGeoQuestionViewTest {
     @Test
     public void ensureLocationValuesDisplayedCorrectlyIfInAccurate() {
         clickGeoButton();
-        addExecutionDelay(100);
 
         provideMockLocation(MOCK_ACCURACY_INACCURATE, Criteria.ACCURACY_LOW);
-        addExecutionDelay(100);
 
         verifyAccuracy(accuracyFormat.format(MOCK_ACCURACY_INACCURATE), Color.RED);
     }
@@ -208,7 +202,6 @@ public class LockedGeoQuestionViewTest {
 
         clickGeoButton();
         onView(withId(android.R.id.button1)).perform(click());
-        addExecutionDelay(100);
 
         onView(withId(R.id.lat_et)).check(matches(withText("")));
         onView(withId(R.id.lon_et)).check(matches(withText("")));
@@ -225,7 +218,6 @@ public class LockedGeoQuestionViewTest {
         closeSoftKeyboard();
 
         clickGeoButton();
-        addExecutionDelay(100);
 
         clickCancelButton();
 

@@ -48,6 +48,7 @@ ext {
     prettyTimeVersion = "4.0.1.Final"
     rxAndroidVersion = "2.1.1"
     rxJavaVersion = "2.2.8"
+    rxTracerVersion = "0.1.2"
     sentryVersion = "1.7.22"
     slfVersion = "1.7.25"
     sqlbriteVersion = "2.0.0"
@@ -72,6 +73,9 @@ allprojects {
         google()
         jcenter()
         maven { url "https://jitpack.io" }
+        maven {
+            url  "https://dl.bintray.com/halfhp/rxtracer"
+        }
     }
 }
 

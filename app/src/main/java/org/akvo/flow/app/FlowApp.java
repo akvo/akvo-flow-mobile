@@ -22,6 +22,7 @@ package org.akvo.flow.app;
 import android.content.res.Configuration;
 import android.text.TextUtils;
 
+import com.halfhp.rxtracer.RxTracer;
 import com.mapbox.mapboxsdk.Mapbox;
 
 import org.akvo.flow.BuildConfig;
@@ -76,6 +77,7 @@ public class FlowApp extends MultiDexApplication {
 
         initializeInjector();
         initLogging();
+        RxTracer.enable();
         updateLocale();
         startUpdateService();
         startBootstrapFolderTracker();

@@ -26,7 +26,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.zeugmasolutions.localehelper.LocaleHelper
 import com.zeugmasolutions.localehelper.LocaleHelperActivityDelegateImpl
-import java.util.*
+import java.util.Locale
 
 @SuppressLint("Registered")
 open class LocaleAwareActivity : AppCompatActivity() {

@@ -26,14 +26,14 @@ import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.injector.component.ApplicationComponent;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
-import org.akvo.flow.uicomponents.LocaleAwareActivity;
 import org.akvo.flow.ui.Navigator;
 
 import javax.inject.Inject;
 
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 
-public class MainActivity extends LocaleAwareActivity implements MainView {
+public class MainActivity extends AppCompatActivity implements MainView {
 
     @Inject
     Navigator navigator;

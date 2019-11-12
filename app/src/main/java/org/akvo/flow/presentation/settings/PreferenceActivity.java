@@ -33,10 +33,12 @@ import com.google.android.material.appbar.AppBarLayout;
 
 import org.akvo.flow.BuildConfig;
 import org.akvo.flow.R;
-import org.akvo.flow.activity.BackActivity;
+import org.akvo.flow.app.FlowApp;
+import org.akvo.flow.injector.component.ApplicationComponent;
+import org.akvo.flow.uicomponents.BackActivity;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
-import org.akvo.flow.presentation.SnackBarManager;
+import org.akvo.flow.uicomponents.SnackBarManager;
 import org.akvo.flow.presentation.settings.passcode.PassCodeDeleteAllDialog;
 import org.akvo.flow.presentation.settings.passcode.PassCodeDeleteCollectedDialog;
 import org.akvo.flow.presentation.settings.passcode.PassCodeDownloadFormDialog;
@@ -167,6 +169,15 @@ public class PreferenceActivity extends BackActivity implements PreferenceView,
         ViewComponent viewComponent = DaggerViewComponent.builder()
                 .applicationComponent(getApplicationComponent()).build();
         viewComponent.inject(this);
+    }
+
+    /**
+     * Get the Main Application component for dependency injection.
+     *
+     * @return {@link ApplicationComponent}
+     */
+    private ApplicationComponent getApplicationComponent() {
+        return ((FlowApp) getApplication()).getApplicationComponent();
     }
 
     @Override

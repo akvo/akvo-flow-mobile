@@ -21,7 +21,6 @@ package org.akvo.flow.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import androidx.appcompat.app.AppCompatActivity;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
@@ -31,11 +30,12 @@ import org.akvo.flow.R;
 import org.akvo.flow.service.DataPointUploadWorker;
 import org.akvo.flow.service.SurveyDownloadService;
 import org.akvo.flow.service.TimeCheckService;
+import org.akvo.flow.uicomponents.LocaleAwareActivity;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class TimeCheckActivity extends AppCompatActivity {
+public class TimeCheckActivity extends LocaleAwareActivity {
     private static final String PATTERN = "HH:mm, yyyy-MM-dd (zzzz)";
 
     @Override
@@ -60,6 +60,7 @@ public class TimeCheckActivity extends AppCompatActivity {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         // Since date/time settings (might) have been updated, we fire the services sensitive
         // to time changes (the ones interacting with S3)
+        super.onActivityResult(requestCode, resultCode, data);
         startService(new Intent(this, TimeCheckService.class));// Re-check time setting status
         startService(new Intent(this, SurveyDownloadService.class));
         DataPointUploadWorker.scheduleUpload(getApplicationContext(), false);

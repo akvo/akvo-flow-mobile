@@ -22,7 +22,6 @@ package org.akvo.flow.activity;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
-import android.view.Window;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 
@@ -33,8 +32,8 @@ import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.injector.component.ApplicationComponent;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
-import org.akvo.flow.uicomponents.LocaleAwareActivity;
 import org.akvo.flow.ui.Navigator;
+import org.akvo.flow.uicomponents.LocaleAwareActivity;
 import org.akvo.flow.util.logging.LoggingHelper;
 
 import javax.inject.Inject;
@@ -75,7 +74,6 @@ public class AddUserActivity extends LocaleAwareActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.add_user_activity);
         initializeInjector();
         ButterKnife.bind(this);

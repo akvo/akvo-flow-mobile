@@ -21,8 +21,6 @@
 package org.akvo.flow.presentation.help;
 
 import android.os.Bundle;
-import androidx.annotation.Nullable;
-import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import android.view.View;
 import android.webkit.WebResourceError;
 import android.webkit.WebResourceRequest;
@@ -31,15 +29,19 @@ import android.webkit.WebViewClient;
 import android.widget.ProgressBar;
 
 import org.akvo.flow.R;
-import org.akvo.flow.activity.BackActivity;
+import org.akvo.flow.app.FlowApp;
+import org.akvo.flow.injector.component.ApplicationComponent;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
-import org.akvo.flow.presentation.SnackBarManager;
+import org.akvo.flow.uicomponents.SnackBarManager;
+import org.akvo.flow.uicomponents.BackActivity;
 
 import java.lang.ref.WeakReference;
 
 import javax.inject.Inject;
 
+import androidx.annotation.Nullable;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -76,6 +78,15 @@ public class HelpActivity extends BackActivity {
                 DaggerViewComponent.builder().applicationComponent(getApplicationComponent())
                         .build();
         viewComponent.inject(this);
+    }
+
+    /**
+     * Get the Main Application component for dependency injection.
+     *
+     * @return {@link ApplicationComponent}
+     */
+    private ApplicationComponent getApplicationComponent() {
+        return ((FlowApp) getApplication()).getApplicationComponent();
     }
 
     private void setUpWebView() {

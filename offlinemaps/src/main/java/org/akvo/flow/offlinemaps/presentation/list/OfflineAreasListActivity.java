@@ -32,10 +32,11 @@ import org.akvo.flow.offlinemaps.di.OfflineFeatureModule;
 import org.akvo.flow.offlinemaps.domain.entity.DomainOfflineArea;
 import org.akvo.flow.offlinemaps.domain.entity.MapInfo;
 import org.akvo.flow.offlinemaps.presentation.Navigator;
-import org.akvo.flow.offlinemaps.presentation.ToolBarBackActivity;
 import org.akvo.flow.offlinemaps.presentation.list.delete.DeleteAreaDialog;
 import org.akvo.flow.offlinemaps.presentation.list.rename.RenameAreaDialog;
 import org.akvo.flow.offlinemaps.tracking.TrackingHelper;
+import org.akvo.flow.uicomponents.BackActivity;
+import org.akvo.flow.uicomponents.SnackBarManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,7 +48,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import timber.log.Timber;
 
-public class OfflineAreasListActivity extends ToolBarBackActivity
+public class OfflineAreasListActivity extends BackActivity
         implements OfflineAreasListView, OfflineAreasActionListener,
         RenameAreaDialog.RenameAreaListener, DeleteAreaDialog.DeleteAreaListener {
 
@@ -61,6 +62,9 @@ public class OfflineAreasListActivity extends ToolBarBackActivity
 
     @Inject
     OfflineAreasListPresenter presenter;
+
+    @Inject
+    SnackBarManager snackBarManager;
 
     @Inject
     Navigator navigator;
@@ -160,17 +164,17 @@ public class OfflineAreasListActivity extends ToolBarBackActivity
 
     @Override
     public void showRenameError() {
-        displaySnackBar(offlineAreasRv, R.string.offline_map_rename_error);
+        snackBarManager.displaySnackBar(offlineAreasRv, R.string.offline_map_rename_error);
     }
 
     @Override
     public void showDeleteError() {
-        displaySnackBar(offlineAreasRv, R.string.offline_map_delete_error);
+        snackBarManager.displaySnackBar(offlineAreasRv, R.string.offline_map_delete_error);
     }
 
     @Override
     public void showSelectError() {
-        displaySnackBar(offlineAreasRv, R.string.offline_map_delete_error);
+        snackBarManager.displaySnackBar(offlineAreasRv, R.string.offline_map_delete_error);
     }
 
     @Override

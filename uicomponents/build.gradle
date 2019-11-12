@@ -12,17 +12,23 @@ android {
         versionName "1.0"
     }
 
-    dependencies {
-        implementation "androidx.appcompat:appcompat:${rootProject.ext.appCompatVersion}"
-        implementation "com.google.android.material:material:${rootProject.ext.materialVersion}"
-        implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
-        implementation "androidx.core:core-ktx:${rootProject.ext.coreKtxVersion}"
-        implementation 'com.zeugmasolutions.localehelper:locale-helper-android:1.0.2'
-    }
-
     lintOptions {
         abortOnError false
         ignore 'InvalidPackage'
     }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
 }
 
+dependencies {
+    implementation "androidx.appcompat:appcompat:${rootProject.ext.appCompatVersion}"
+    implementation "com.google.android.material:material:${rootProject.ext.materialVersion}"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+    implementation "androidx.core:core-ktx:${rootProject.ext.coreKtxVersion}"
+    implementation "com.google.dagger:dagger:${rootProject.ext.daggerVersion}"
+    annotationProcessor "com.google.dagger:dagger-compiler:${rootProject.ext.daggerVersion}"
+    implementation 'com.zeugmasolutions.localehelper:locale-helper-android:1.0.2'
+}

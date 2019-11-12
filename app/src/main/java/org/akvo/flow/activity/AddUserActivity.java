@@ -27,11 +27,13 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 
 import org.akvo.flow.R;
+import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.data.database.SurveyDbDataSource;
 import org.akvo.flow.data.preference.Prefs;
+import org.akvo.flow.injector.component.ApplicationComponent;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
-import org.akvo.flow.presentation.BaseActivity;
+import org.akvo.flow.uicomponents.LocaleAwareActivity;
 import org.akvo.flow.ui.Navigator;
 import org.akvo.flow.util.logging.LoggingHelper;
 
@@ -45,7 +47,7 @@ import butterknife.OnTextChanged;
 
 import static butterknife.OnTextChanged.Callback.AFTER_TEXT_CHANGED;
 
-public class AddUserActivity extends BaseActivity {
+public class AddUserActivity extends LocaleAwareActivity {
 
     @BindView(R.id.login_btn)
     View nextBt;
@@ -109,6 +111,15 @@ public class AddUserActivity extends BaseActivity {
                 DaggerViewComponent.builder().applicationComponent(getApplicationComponent())
                         .build();
         viewComponent.inject(this);
+    }
+
+    /**
+     * Get the Main Application component for dependency injection.
+     *
+     * @return {@link ApplicationComponent}
+     */
+    private ApplicationComponent getApplicationComponent() {
+        return ((FlowApp) getApplication()).getApplicationComponent();
     }
 
     //TODO: database operations should be done on separate thread

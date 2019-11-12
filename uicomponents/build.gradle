@@ -1,4 +1,6 @@
 apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
 
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
@@ -13,6 +15,9 @@ android {
     dependencies {
         implementation "androidx.appcompat:appcompat:${rootProject.ext.appCompatVersion}"
         implementation "com.google.android.material:material:${rootProject.ext.materialVersion}"
+        implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+        implementation "androidx.core:core-ktx:${rootProject.ext.coreKtxVersion}"
+        implementation 'com.zeugmasolutions.localehelper:locale-helper-android:1.0.2'
     }
 
     lintOptions {

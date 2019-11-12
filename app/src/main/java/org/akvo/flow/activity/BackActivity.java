@@ -19,19 +19,15 @@
 
 package org.akvo.flow.activity;
 
-import android.Manifest;
-
 import org.akvo.flow.R;
 import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.injector.component.ApplicationComponent;
+import org.akvo.flow.uicomponents.LocaleAwareActivity;
 
 import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.content.ContextCompat;
-import androidx.core.content.PermissionChecker;
 
-public abstract class BackActivity extends AppCompatActivity {
+public abstract class BackActivity extends LocaleAwareActivity {
 
     protected void setupToolBar() {
         Toolbar toolbar = findViewById(R.id.toolbar);
@@ -45,10 +41,5 @@ public abstract class BackActivity extends AppCompatActivity {
 
     protected ApplicationComponent getApplicationComponent() {
         return ((FlowApp) getApplication()).getApplicationComponent();
-    }
-
-    protected boolean isLocationAllowed() {
-        return ContextCompat.checkSelfPermission(this,
-                Manifest.permission.ACCESS_FINE_LOCATION) == PermissionChecker.PERMISSION_GRANTED;
     }
 }

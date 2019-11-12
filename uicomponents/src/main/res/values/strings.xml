@@ -78,8 +78,6 @@
     <string name="data_sync_synced">Synced Forms: %1$d</string>
     <string name="data_sync_error_form_deleted_title">Form deleted</string>
     <string name="data_sync_error_form_deleted_text">Form %1$s has been deleted</string>
-    <!--Localization-->
-    <string name="please_restart">Please, restart the app</string>
     <!--Empty Views-->
     <string name="no_datapoints_error_text">You have no data points</string>
     <string name="no_search_results_error_text">No results found</string>

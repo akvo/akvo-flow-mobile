@@ -31,10 +31,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import org.akvo.flow.R;
+import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.domain.util.VersionHelper;
+import org.akvo.flow.injector.component.ApplicationComponent;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
-import org.akvo.flow.presentation.BaseActivity;
+import org.akvo.flow.uicomponents.LocaleAwareActivity;
 import org.akvo.flow.ui.Navigator;
 import org.akvo.flow.util.FileUtil;
 import org.akvo.flow.util.files.ApkFileBrowser;
@@ -57,7 +59,7 @@ import javax.inject.Inject;
 import androidx.annotation.Nullable;
 import timber.log.Timber;
 
-public class AppUpdateActivity extends BaseActivity {
+public class AppUpdateActivity extends LocaleAwareActivity {
     public static final String EXTRA_URL = "url";
     public static final String EXTRA_VERSION = "version";
     public static final String EXTRA_CHECKSUM = "md5Checksum";
@@ -141,6 +143,15 @@ public class AppUpdateActivity extends BaseActivity {
                 DaggerViewComponent.builder().applicationComponent(getApplicationComponent())
                         .build();
         viewComponent.inject(this);
+    }
+
+    /**
+     * Get the Main Application component for dependency injection.
+     *
+     * @return {@link ApplicationComponent}
+     */
+    private ApplicationComponent getApplicationComponent() {
+        return ((FlowApp) getApplication()).getApplicationComponent();
     }
 
     private void cancel() {

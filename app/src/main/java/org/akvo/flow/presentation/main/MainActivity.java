@@ -22,16 +22,18 @@ package org.akvo.flow.presentation.main;
 
 import android.os.Bundle;
 
+import org.akvo.flow.app.FlowApp;
+import org.akvo.flow.injector.component.ApplicationComponent;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
-import org.akvo.flow.presentation.BaseActivity;
+import org.akvo.flow.uicomponents.LocaleAwareActivity;
 import org.akvo.flow.ui.Navigator;
 
 import javax.inject.Inject;
 
 import androidx.annotation.Nullable;
 
-public class MainActivity extends BaseActivity implements MainView {
+public class MainActivity extends LocaleAwareActivity implements MainView {
 
     @Inject
     Navigator navigator;
@@ -53,6 +55,15 @@ public class MainActivity extends BaseActivity implements MainView {
                         .applicationComponent(getApplicationComponent())
                         .build();
         viewComponent.inject(this);
+    }
+
+    /**
+     * Get the Main Application component for dependency injection.
+     *
+     * @return {@link ApplicationComponent}
+     */
+    private ApplicationComponent getApplicationComponent() {
+        return ((FlowApp) getApplication()).getApplicationComponent();
     }
 
     @Override

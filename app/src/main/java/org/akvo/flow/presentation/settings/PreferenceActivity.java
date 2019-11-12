@@ -20,21 +20,16 @@
 
 package org.akvo.flow.presentation.settings;
 
-import android.content.res.Configuration;
-import android.content.res.Resources;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
-import androidx.annotation.StringRes;
-import com.google.android.material.appbar.AppBarLayout;
-import androidx.fragment.app.DialogFragment;
-import androidx.core.content.ContextCompat;
-import androidx.appcompat.widget.SwitchCompat;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
+
+import com.google.android.material.appbar.AppBarLayout;
 
 import org.akvo.flow.BuildConfig;
 import org.akvo.flow.R;
@@ -56,6 +51,10 @@ import java.util.Locale;
 
 import javax.inject.Inject;
 
+import androidx.annotation.StringRes;
+import androidx.appcompat.widget.SwitchCompat;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.DialogFragment;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnCheckedChanged;
@@ -123,7 +122,7 @@ public class PreferenceActivity extends BackActivity implements PreferenceView,
         languages = Arrays.asList(getResources().getStringArray(R.array.app_language_codes));
         presenter.setView(this);
         trackingHelper = new TrackingHelper(this);
-        presenter.loadPreferences(languages);
+        presenter.loadPreferences(languages, getLocale().getLanguage());
     }
 
     private void setUpToolBarAnimationListener() {
@@ -271,7 +270,8 @@ public class PreferenceActivity extends BackActivity implements PreferenceView,
             if (trackingHelper != null) {
                 trackingHelper.logLanguageChanged(languages.get(position));
             }
-            presenter.saveAppLanguage(position, languages);
+            final String language = languages.get(position);
+            updateLocale(new Locale(language));
         }
     }
 
@@ -310,27 +310,7 @@ public class PreferenceActivity extends BackActivity implements PreferenceView,
      * Delay enabling listeners in order to give ui time to draw spinners
      */
     private void delayListeners() {
-        appLanguageSp.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                listenersEnabled = true;
-            }
-        }, 500);
-    }
-
-    @Override
-    public void displayLanguageChanged(String languageCode) {
-        updateLocale(languageCode);
-        showMessage(R.string.please_restart);
-    }
-
-    private void updateLocale(String languageCode) {
-        Locale locale = new Locale(languageCode);
-        Locale.setDefault(locale);
-        Resources resources = getBaseContext().getResources();
-        Configuration config = resources.getConfiguration();
-        config.locale = locale;
-        resources.updateConfiguration(config, null);
+        appLanguageSp.postDelayed(() -> listenersEnabled = true, 500);
     }
 
     @Override

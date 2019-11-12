@@ -19,6 +19,7 @@
 
 package org.akvo.flow.presentation.geoshape.create;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.location.Location;
@@ -48,6 +49,8 @@ import org.akvo.flow.util.ConstantUtil;
 import javax.inject.Inject;
 
 import androidx.annotation.StringRes;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.PermissionChecker;
 
 import static org.akvo.flow.offlinemaps.presentation.geoshapes.GeoShapeConstants.ACCURACY_THRESHOLD;
 import static org.akvo.flow.offlinemaps.presentation.geoshapes.GeoShapeConstants.CIRCLE_SOURCE_ID;
@@ -209,6 +212,11 @@ public class CreateGeoShapeActivity extends BackActivity implements
         if (isLocationAllowed()) {
             mapView.displayUserLocation();
         }
+    }
+
+    protected boolean isLocationAllowed() {
+        return ContextCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION) == PermissionChecker.PERMISSION_GRANTED;
     }
 
     private void setMapClicks() {

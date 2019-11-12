@@ -30,5 +30,5 @@ dependencies {
     implementation "androidx.core:core-ktx:${rootProject.ext.coreKtxVersion}"
     implementation "com.google.dagger:dagger:${rootProject.ext.daggerVersion}"
     annotationProcessor "com.google.dagger:dagger-compiler:${rootProject.ext.daggerVersion}"
-    implementation 'com.zeugmasolutions.localehelper:locale-helper-android:1.0.2'
+    implementation "com.zeugmasolutions.localehelper:locale-helper-android:${rootProject.ext.localeHelperVersion}"
 }

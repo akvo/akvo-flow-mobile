@@ -21,8 +21,6 @@ package org.akvo.flow.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
-import android.view.Window;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -41,19 +39,14 @@ public class TimeCheckActivity extends LocaleAwareActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.time_check_activity);
 
-        TextView tv = (TextView)findViewById(R.id.local_time_tv);
+        TextView tv = findViewById(R.id.local_time_tv);
         tv.setText(new SimpleDateFormat(PATTERN).format(new Date()));
 
-        Button b = (Button)findViewById(R.id.adjust_btn);
-        b.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivityForResult(new Intent(android.provider.Settings.ACTION_DATE_SETTINGS), 0);
-            }
-        });
+        Button b = findViewById(R.id.adjust_btn);
+        b.setOnClickListener(v -> startActivityForResult(
+                new Intent(android.provider.Settings.ACTION_DATE_SETTINGS), 0));
     }
 
     @Override
@@ -66,5 +59,4 @@ public class TimeCheckActivity extends LocaleAwareActivity {
         DataPointUploadWorker.scheduleUpload(getApplicationContext(), false);
         finish();
     }
-
 }

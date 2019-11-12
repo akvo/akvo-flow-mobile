@@ -116,6 +116,7 @@ public class PreferenceActivity extends BackActivity implements PreferenceView,
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_preference);
+        setTitle(R.string.settings);
         ButterKnife.bind(this);
         initializeInjector();
         setupToolBar();

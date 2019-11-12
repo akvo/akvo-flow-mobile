@@ -72,7 +72,7 @@
             android:name=".activity.TimeCheckActivity"
             android:label="@string/time_check_activity"
             android:launchMode="singleTop"
-            android:theme="@style/Flow.Dialog" />
+            android:theme="@style/FlowAppThemeDialog" />
         <activity
             android:name=".presentation.signature.SignatureActivity"
             android:screenOrientation="landscape" />

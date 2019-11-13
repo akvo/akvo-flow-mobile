@@ -38,7 +38,6 @@ import org.akvo.flow.domain.repository.SurveyRepository;
 import org.akvo.flow.domain.repository.UserRepository;
 import org.akvo.flow.injector.module.ApplicationModule;
 import org.akvo.flow.injector.module.ViewModule;
-import org.akvo.flow.presentation.BaseActivity;
 import org.akvo.flow.service.ApkUpdateWorker;
 import org.akvo.flow.service.BootstrapService;
 import org.akvo.flow.service.DataFixWorker;
@@ -101,6 +100,4 @@ public interface ApplicationComponent {
     void inject(ApkUpdateWorker apkUpdateWorker);
 
     void inject(FlowApp app);
-
-    void inject(BaseActivity baseActivity);
 }

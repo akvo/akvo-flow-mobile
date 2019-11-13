@@ -21,6 +21,14 @@
         <item name="android:textColorTertiary">@color/text_color_primary</item>
     </style>
 
+    <style name="FlowAppTheme.NoTitle" parent="FlowAppTheme">
+        <item name="android:windowNoTitle">true</item>
+    </style>
+
+    <style name="FlowAppThemeDialog" parent="Theme.AppCompat.Light.Dialog">
+        <item name="android:windowNoTitle">true</item>
+    </style>
+
     <style name="Theme.AppCompat.Translucent" parent="@style/Theme.AppCompat.Light">
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowBackground">@android:color/transparent</item>

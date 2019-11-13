@@ -17,23 +17,12 @@
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.akvo.flow.offlinemaps.presentation;
+package org.akvo.flow.uicomponents;
 
-import android.content.Context;
-import android.view.View;
-import android.widget.TextView;
-
-import com.google.android.material.snackbar.Snackbar;
-
-import org.akvo.flow.offlinemaps.R;
-
-import androidx.annotation.StringRes;
 import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.content.ContextCompat;
 
-public class ToolBarBackActivity extends AppCompatActivity {
+public abstract class BackActivity extends LocaleAwareActivity {
 
     protected void setupToolBar() {
         Toolbar toolbar = findViewById(R.id.toolbar);
@@ -43,20 +32,5 @@ public class ToolBarBackActivity extends AppCompatActivity {
             supportActionBar.setDisplayHomeAsUpEnabled(true);
         }
         toolbar.setNavigationOnClickListener(v -> onBackPressed());
-    }
-
-    protected void displaySnackBar(View view, @StringRes int resId) {
-        Snackbar snackbar = Snackbar.make(view, resId, Snackbar.LENGTH_LONG);
-        fixSnackBarText(this, snackbar);
-        snackbar.show();
-    }
-
-    private void fixSnackBarText(Context context, Snackbar snackbar) {
-        View snackBarView = snackbar.getView();
-        int snackBarTextId = com.google.android.material.R.id.snackbar_text;
-        TextView textView = snackBarView.findViewById(snackBarTextId);
-        if (textView != null) {
-            textView.setTextColor(ContextCompat.getColor(context, android.R.color.white));
-        }
     }
 }

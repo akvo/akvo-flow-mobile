@@ -22,7 +22,6 @@ package org.akvo.flow.presentation.settings;
 
 import org.akvo.flow.domain.entity.UserSettings;
 import org.akvo.flow.domain.interactor.DefaultObserver;
-import org.akvo.flow.domain.interactor.SaveAppLanguage;
 import org.akvo.flow.domain.interactor.SaveEnableMobileData;
 import org.akvo.flow.domain.interactor.SaveImageSize;
 import org.akvo.flow.domain.interactor.SaveKeepScreenOn;
@@ -43,7 +42,6 @@ import timber.log.Timber;
 public class PreferencePresenter implements Presenter {
 
     private final UseCase getUserSettings;
-    private final UseCase saveAppLanguage;
     private final UseCase saveEnableMobileData;
     private final UseCase saveImageSize;
     private final UseCase saveKeepScreenOn;
@@ -59,7 +57,6 @@ public class PreferencePresenter implements Presenter {
 
     @Inject
     public PreferencePresenter(@Named("getUserSettings") UseCase getUserSettings,
-            @Named("saveAppLanguage") UseCase saveAppLanguage,
             @Named("saveEnableMobileData") UseCase saveEnableMobileData,
             @Named("saveImageSize") UseCase saveImageSize,
             @Named("saveKeepScreenOn") UseCase saveKeepScreenOn,
@@ -70,7 +67,6 @@ public class PreferencePresenter implements Presenter {
             @Named("reloadForms") UseCase reloadForms,
             ViewUserSettingsMapper mapper, LoggingHelper helper) {
         this.getUserSettings = getUserSettings;
-        this.saveAppLanguage = saveAppLanguage;
         this.saveEnableMobileData = saveEnableMobileData;
         this.saveImageSize = saveImageSize;
         this.saveKeepScreenOn = saveKeepScreenOn;
@@ -87,33 +83,17 @@ public class PreferencePresenter implements Presenter {
         this.view = view;
     }
 
-    public void loadPreferences(final List<String> languages) {
+    public void loadPreferences(final List<String> languages, String selectedLanguage) {
         view.showLoading();
         getUserSettings.execute(new DefaultObserver<UserSettings>() {
             @Override
             public void onNext(UserSettings userSettings) {
-                ViewUserSettings viewUserSettings = mapper.transform(userSettings, languages);
+                ViewUserSettings viewUserSettings = mapper
+                        .transform(userSettings, languages, selectedLanguage);
                 view.hideLoading();
                 view.displaySettings(viewUserSettings);
             }
         }, null);
-    }
-
-    public void saveAppLanguage(int languagePosition, final List<String> languages) {
-        Map<String, Object> params = new HashMap<>(2);
-        final String language = languages.get(languagePosition);
-        params.put(SaveAppLanguage.PARAM_LANGUAGE, language);
-        saveAppLanguage.execute(new DefaultObserver<Boolean>() {
-            @Override
-            public void onError(Throwable e) {
-                Timber.e(e);
-            }
-
-            @Override
-            public void onNext(Boolean aBoolean) {
-                view.displayLanguageChanged(language);
-            }
-        }, params);
     }
 
     public void saveEnableMobileData(boolean enable) {
@@ -152,7 +132,6 @@ public class PreferencePresenter implements Presenter {
     @Override
     public void destroy() {
         getUserSettings.dispose();
-        saveAppLanguage.dispose();
         saveEnableMobileData.dispose();
         saveImageSize.dispose();
         saveKeepScreenOn.dispose();

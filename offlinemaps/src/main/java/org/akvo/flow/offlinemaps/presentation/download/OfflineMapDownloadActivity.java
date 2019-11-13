@@ -40,14 +40,15 @@ import org.akvo.flow.offlinemaps.R;
 import org.akvo.flow.offlinemaps.di.DaggerOfflineFeatureComponent;
 import org.akvo.flow.offlinemaps.di.OfflineFeatureModule;
 import org.akvo.flow.offlinemaps.presentation.Navigator;
-import org.akvo.flow.offlinemaps.presentation.ToolBarBackActivity;
 import org.akvo.flow.offlinemaps.tracking.TrackingHelper;
+import org.akvo.flow.uicomponents.BackActivity;
+import org.akvo.flow.uicomponents.SnackBarManager;
 
 import javax.inject.Inject;
 
 import androidx.annotation.NonNull;
 
-public class OfflineMapDownloadActivity extends ToolBarBackActivity
+public class OfflineMapDownloadActivity extends BackActivity
         implements OfflineMapDownloadView {
 
     private MapView mapView;
@@ -63,6 +64,9 @@ public class OfflineMapDownloadActivity extends ToolBarBackActivity
 
     @Inject
     Navigator navigator;
+
+    @Inject
+    SnackBarManager snackBarManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -204,6 +208,6 @@ public class OfflineMapDownloadActivity extends ToolBarBackActivity
     public void showOfflineAreaError() {
         downloadProgress.setVisibility(View.GONE);
         saveBt.setEnabled(true);
-        displaySnackBar(downloadProgress, R.string.offline_map_create_error);
+        snackBarManager.displaySnackBar(downloadProgress, R.string.offline_map_create_error);
     }
 }

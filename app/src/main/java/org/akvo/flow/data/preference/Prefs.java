@@ -34,7 +34,6 @@ public class Prefs {
     public static final String KEY_SURVEY_GROUP_ID = "surveyGroupId";
     public static final String KEY_USER_ID = "userId";
     public static final String KEY_SETUP = "setup";
-    public static final String KEY_LOCALE = "pref.locale";
     public static final String KEY_SCREEN_ON = "screen.keepon";
     public static final String KEY_DEVICE_IDENTIFIER = "device.identifier";
     public static final String KEY_SPACE_AVAILABLE = "cardMBAvaliable";
@@ -42,7 +41,6 @@ public class Prefs {
     private static final String PREFS_NAME = "flow_prefs";
     private static final int PREFS_MODE = Context.MODE_PRIVATE;
 
-    public static final String DEFAULT_VALUE_DEVICE_IDENTIFIER = "unset";
     public static final boolean DEFAULT_VALUE_SCREEN_ON = true;
     public static final long DEF_VALUE_SPACE_AVAILABLE = 101L;
     public static final long DEFAULT_VALUE_USER_ID = -1;
@@ -80,10 +78,6 @@ public class Prefs {
 
     public void setLong(String key, long value) {
         getPrefs().edit().putLong(key, value).apply();
-    }
-
-    public void removePreference(String key) {
-        getPrefs().edit().remove(key).apply();
     }
 }
 

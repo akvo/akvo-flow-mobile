@@ -28,8 +28,6 @@ public interface UserRepository {
 
     Observable<Boolean> keepScreenOn();
 
-    Observable<String> getAppLanguage();
-
     Observable<Integer> getImageSize();
 
     Observable<String> getDeviceId();
@@ -37,8 +35,6 @@ public interface UserRepository {
     Observable<Boolean> saveScreenOnPreference(Boolean keepScreenOn);
 
     Observable<Boolean> saveEnableMobileDataPreference(Boolean enable);
-
-    Observable<Boolean> saveLanguagePreference(String language);
 
     Observable<Boolean> saveImageSizePreference(Integer size);
 

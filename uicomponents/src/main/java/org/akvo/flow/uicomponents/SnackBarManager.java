@@ -15,18 +15,15 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 
-package org.akvo.flow.presentation;
+package org.akvo.flow.uicomponents;
 
 import android.content.Context;
 import android.view.View;
 import android.widget.TextView;
 
 import com.google.android.material.snackbar.Snackbar;
-
-import org.akvo.flow.R;
 
 import javax.inject.Inject;
 
@@ -62,6 +59,11 @@ public class SnackBarManager {
 
     public void displaySnackBar(@Nullable View rootView, @StringRes int message, Context context) {
        displaySnackBar(rootView, context.getResources().getString(message), context);
+    }
+
+    public void displaySnackBar(@Nullable View rootView, @StringRes int message) {
+        Context context = rootView.getContext();
+        displaySnackBar(rootView, context.getResources().getString(message), context);
     }
 
     public void displaySnackBar(@Nullable View rootView, String message, Context context) {

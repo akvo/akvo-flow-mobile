@@ -23,19 +23,19 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.view.View;
-import android.view.Window;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import org.akvo.flow.R;
+import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.domain.util.VersionHelper;
+import org.akvo.flow.injector.component.ApplicationComponent;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
-import org.akvo.flow.presentation.BaseActivity;
 import org.akvo.flow.ui.Navigator;
+import org.akvo.flow.uicomponents.LocaleAwareActivity;
 import org.akvo.flow.util.FileUtil;
 import org.akvo.flow.util.files.ApkFileBrowser;
 import org.akvo.flow.util.files.FileBrowser;
@@ -57,7 +57,7 @@ import javax.inject.Inject;
 import androidx.annotation.Nullable;
 import timber.log.Timber;
 
-public class AppUpdateActivity extends BaseActivity {
+public class AppUpdateActivity extends LocaleAwareActivity {
     public static final String EXTRA_URL = "url";
     public static final String EXTRA_VERSION = "version";
     public static final String EXTRA_CHECKSUM = "md5Checksum";
@@ -82,7 +82,6 @@ public class AppUpdateActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.app_update_activity);
         initializeInjector();
         mUrl = getIntent().getStringExtra(EXTRA_URL);
@@ -105,35 +104,23 @@ public class AppUpdateActivity extends BaseActivity {
     }
 
     private void setCancelButton() {
-        findViewById(R.id.cancel_btn).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                cancel();
-            }
-        });
+        findViewById(R.id.cancel_btn).setOnClickListener(v -> cancel());
     }
 
     private void displayDownloadPrompt() {
-        mInstallBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mInstallBtn.setEnabled(false);
-                mTask = new UpdateAsyncTask(AppUpdateActivity.this, mUrl, mVersion,
-                        mMd5Checksum);
-                mTask.execute();
-            }
+        mInstallBtn.setOnClickListener(v -> {
+            mInstallBtn.setEnabled(false);
+            mTask = new UpdateAsyncTask(AppUpdateActivity.this, mUrl, mVersion,
+                    mMd5Checksum);
+            mTask.execute();
         });
     }
 
     private void displayInstallPrompt(final String newApkFilePath) {
         TextView updateTV = findViewById(R.id.update_text);
         updateTV.setText(R.string.clicktoinstall);
-        mInstallBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                navigator.installAppUpdate(AppUpdateActivity.this, newApkFilePath);
-            }
-        });
+        mInstallBtn.setOnClickListener(
+                v -> navigator.installAppUpdate(AppUpdateActivity.this, newApkFilePath));
     }
 
     private void initializeInjector() {
@@ -141,6 +128,15 @@ public class AppUpdateActivity extends BaseActivity {
                 DaggerViewComponent.builder().applicationComponent(getApplicationComponent())
                         .build();
         viewComponent.inject(this);
+    }
+
+    /**
+     * Get the Main Application component for dependency injection.
+     *
+     * @return {@link ApplicationComponent}
+     */
+    private ApplicationComponent getApplicationComponent() {
+        return ((FlowApp) getApplication()).getApplicationComponent();
     }
 
     private void cancel() {

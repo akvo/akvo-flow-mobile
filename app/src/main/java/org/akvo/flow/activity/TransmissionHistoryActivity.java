@@ -23,17 +23,22 @@ import android.os.Bundle;
 import android.widget.ListView;
 
 import org.akvo.flow.R;
+import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.data.database.SurveyDbDataSource;
 import org.akvo.flow.domain.FileTransmission;
+import org.akvo.flow.injector.component.ApplicationComponent;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
 import org.akvo.flow.ui.adapter.FileTransmissionArrayAdapter;
+import org.akvo.flow.uicomponents.BackActivity;
 import org.akvo.flow.util.ConstantUtil;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
+
+import androidx.annotation.NonNull;
 
 /**
  * Activity to show the transmission history of all files in a survey submission
@@ -54,7 +59,7 @@ public class TransmissionHistoryActivity extends BackActivity {
         setContentView(R.layout.activity_transmission_history);
         initializeInjector();
         setupToolBar();
-        transmissionsList = (ListView) findViewById(R.id.transmission_list);
+        transmissionsList = findViewById(R.id.transmission_list);
         surveyInstanceId = getSurveyInstanceId(savedInstanceState);
     }
 
@@ -63,6 +68,15 @@ public class TransmissionHistoryActivity extends BackActivity {
                 DaggerViewComponent.builder().applicationComponent(getApplicationComponent())
                         .build();
         viewComponent.inject(this);
+    }
+
+    /**
+     * Get the Main Application component for dependency injection.
+     *
+     * @return {@link ApplicationComponent}
+     */
+    private ApplicationComponent getApplicationComponent() {
+        return ((FlowApp) getApplication()).getApplicationComponent();
     }
 
     private Long getSurveyInstanceId(Bundle savedInstanceState) {
@@ -94,16 +108,14 @@ public class TransmissionHistoryActivity extends BackActivity {
         FileTransmissionArrayAdapter adapter = new FileTransmissionArrayAdapter(
                 this, R.layout.transmission_history_row,
                 transmissionList != null ? transmissionList
-                        : new ArrayList<FileTransmission>());
+                        : new ArrayList<>());
         transmissionsList.setAdapter(adapter);
     }
 
     @Override
-    protected void onSaveInstanceState(Bundle outState) {
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
-        if (outState != null) {
-            outState.putLong(ConstantUtil.RESPONDENT_ID_EXTRA, surveyInstanceId);
-        }
+        outState.putLong(ConstantUtil.RESPONDENT_ID_EXTRA, surveyInstanceId);
     }
 
     @Override

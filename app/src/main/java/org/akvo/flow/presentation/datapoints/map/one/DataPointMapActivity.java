@@ -25,7 +25,9 @@ import android.widget.Toast;
 import com.mapbox.geojson.Feature;
 
 import org.akvo.flow.R;
-import org.akvo.flow.activity.BackActivity;
+import org.akvo.flow.app.FlowApp;
+import org.akvo.flow.injector.component.ApplicationComponent;
+import org.akvo.flow.uicomponents.BackActivity;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
 import org.akvo.flow.offlinemaps.presentation.MapBoxMapItemView;
@@ -60,6 +62,15 @@ public class DataPointMapActivity extends BackActivity implements DataPointMapVi
         ViewComponent viewComponent = DaggerViewComponent.builder()
                 .applicationComponent(getApplicationComponent()).build();
         viewComponent.inject(this);
+    }
+
+    /**
+     * Get the Main Application component for dependency injection.
+     *
+     * @return {@link ApplicationComponent}
+     */
+    private ApplicationComponent getApplicationComponent() {
+        return ((FlowApp) getApplication()).getApplicationComponent();
     }
 
     @Override

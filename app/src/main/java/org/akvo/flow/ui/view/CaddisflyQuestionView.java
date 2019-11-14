@@ -37,7 +37,7 @@ import org.akvo.flow.event.QuestionInteractionEvent;
 import org.akvo.flow.event.SurveyListener;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
-import org.akvo.flow.presentation.SnackBarManager;
+import org.akvo.flow.uicomponents.SnackBarManager;
 import org.akvo.flow.presentation.form.caddisfly.CaddisflyPresenter;
 import org.akvo.flow.presentation.form.caddisfly.CaddisflyView;
 import org.akvo.flow.ui.Navigator;

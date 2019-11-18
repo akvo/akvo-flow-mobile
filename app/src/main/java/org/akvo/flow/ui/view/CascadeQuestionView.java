@@ -254,7 +254,7 @@ public class CascadeQuestionView extends QuestionView
         if (mDatabase == null) {
             String error = getContext()
                     .getString(R.string.cascade_error_message, getQuestion().getSrc());
-            Timber.e(new IllegalStateException(error), error);
+            Timber.e(error);
             setError(error);
         }
     }

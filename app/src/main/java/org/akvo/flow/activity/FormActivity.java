@@ -575,6 +575,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
 
     @Override
     public void onActivityResult(final int requestCode, int resultCode, final Intent intent) {
+        super.onActivityResult(requestCode, resultCode, intent);
         if (mRequestQuestionId == null || resultCode != RESULT_OK) {
             mRequestQuestionId = null;
             return;

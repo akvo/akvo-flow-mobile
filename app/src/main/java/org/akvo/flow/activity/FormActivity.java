@@ -58,7 +58,7 @@ import org.akvo.flow.event.SurveyListener;
 import org.akvo.flow.injector.component.ApplicationComponent;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
-import org.akvo.flow.presentation.SnackBarManager;
+import org.akvo.flow.uicomponents.SnackBarManager;
 import org.akvo.flow.presentation.form.FormPresenter;
 import org.akvo.flow.presentation.form.FormView;
 import org.akvo.flow.presentation.form.mobiledata.MobileDataSettingDialog;
@@ -71,6 +71,7 @@ import org.akvo.flow.ui.model.LanguageMapper;
 import org.akvo.flow.ui.view.QuestionView;
 import org.akvo.flow.ui.view.geolocation.GeoFieldsResetConfirmDialogFragment;
 import org.akvo.flow.ui.view.geolocation.GeoQuestionView;
+import org.akvo.flow.uicomponents.BackActivity;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.MediaFileHelper;
 import org.akvo.flow.util.PlatformUtil;
@@ -233,7 +234,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
      *
      * @return {@link ApplicationComponent}
      */
-    protected ApplicationComponent getApplicationComponent() {
+    private ApplicationComponent getApplicationComponent() {
         return ((FlowApp) getApplication()).getApplicationComponent();
     }
 
@@ -574,6 +575,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
 
     @Override
     public void onActivityResult(final int requestCode, int resultCode, final Intent intent) {
+        super.onActivityResult(requestCode, resultCode, intent);
         if (mRequestQuestionId == null || resultCode != RESULT_OK) {
             mRequestQuestionId = null;
             return;

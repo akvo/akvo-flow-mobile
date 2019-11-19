@@ -24,7 +24,7 @@ import androidx.annotation.StringRes;
 import android.view.View;
 
 import org.akvo.flow.R;
-import org.akvo.flow.presentation.SnackBarManager;
+import org.akvo.flow.uicomponents.SnackBarManager;
 
 import javax.inject.Inject;
 

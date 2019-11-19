@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -15,34 +15,18 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 
-package org.akvo.flow.presentation.settings;
+package org.akvo.flow.data.net
 
-public interface PreferenceView {
+import io.reactivex.Observable
+import io.reactivex.functions.Function
+import timber.log.Timber
 
-    void showLoading();
+class ErrorLoggerFunction<T>(private val message: String) : Function<Throwable, Observable<*>> {
 
-    void hideLoading();
-
-    void displaySettings(ViewUserSettings viewUserSettings);
-
-    void showDeleteCollectedData();
-
-    void showDeleteCollectedDataWithPending();
-
-    void showDeleteAllData();
-
-    void showDeleteAllDataWithPending();
-
-    void showClearDataError();
-
-    void showClearDataSuccess();
-
-    void dismiss();
-
-    void showDownloadFormsError(int numberOfForms);
-
-    void showDownloadFormsSuccess(int numberOfForms);
+    override fun apply(throwable: Throwable): Observable<T> {
+        Timber.e(Exception(throwable), message)
+        return Observable.error(throwable)
+    }
 }

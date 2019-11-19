@@ -20,8 +20,6 @@
 
 package org.akvo.flow.data.net;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import android.text.TextUtils;
 
 import org.akvo.flow.data.entity.ApiApkData;
@@ -45,6 +43,8 @@ import java.util.List;
 
 import javax.inject.Singleton;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.reactivex.functions.Function;
@@ -86,26 +86,35 @@ public class RestApi {
         this.bodyCreator = bodyCreator;
     }
 
+    @SuppressWarnings("unchecked")
     public Flowable<ApiLocaleResult> downloadDataPoints(long surveyGroup,
             @NonNull String timestamp) {
         String lastUpdated = !TextUtils.isEmpty(timestamp) ? timestamp : "0";
         String phoneNumber = encoder.encodeParam(this.phoneNumber);
         return serviceFactory.createRetrofitServiceWithInterceptor(DataPointDownloadService.class,
                 apiUrls.getGaeUrl())
-                .loadNewDataPoints(androidId, imei, lastUpdated, phoneNumber, surveyGroup + "");
+                .loadNewDataPoints(androidId, imei, lastUpdated, phoneNumber, surveyGroup + "")
+                .onErrorResumeNext(new ErrorLoggerFunction(
+                        "Error downloading datapoints for survey: " + surveyGroup));
     }
 
+    @SuppressWarnings("unchecked")
     public Observable<ApiFilesResult> getPendingFiles(List<String> formIds, String deviceId) {
         return serviceFactory.createRetrofitService(DeviceFilesService.class, apiUrls.getGaeUrl())
-                .getFilesLists(phoneNumber, androidId, imei, version, deviceId, formIds);
+                .getFilesLists(phoneNumber, androidId, imei, version, deviceId, formIds)
+                .onErrorResumeNext(new ErrorLoggerFunction(
+                        "Error getting device pending files"));
     }
 
+    @SuppressWarnings("unchecked")
     public Observable<?> notifyFileAvailable(String action, String formId,
             String filename, String deviceId) {
         return serviceFactory
                 .createRetrofitService(ProcessingNotificationService.class, apiUrls.getGaeUrl())
                 .notifyFileAvailable(action, formId, filename, phoneNumber, androidId, imei,
-                        version, deviceId);
+                        version, deviceId)
+                .onErrorResumeNext(new ErrorLoggerFunction(
+                        "Error notifying the file is available"));
     }
 
     public Observable<Response<ResponseBody>> uploadFile(Transmission transmission) {
@@ -119,31 +128,44 @@ public class RestApi {
         }
     }
 
+    @SuppressWarnings("unchecked")
     public Observable<ApiApkData> loadApkData(String appVersion) {
         return serviceFactory.createRetrofitService(FlowApiService.class, apiUrls.getGaeUrl())
-                .loadApkData(appVersion);
+                .loadApkData(appVersion)
+                .onErrorResumeNext(new ErrorLoggerFunction(
+                        "Error downloading apk data for version " + appVersion));
     }
 
+    @SuppressWarnings("unchecked")
     public Observable<String> downloadFormHeader(String formId, String deviceId) {
         return serviceFactory
                 .createScalarsRetrofitService(FlowApiService.class, apiUrls.getGaeUrl())
-                .downloadFormHeader(formId, phoneNumber, androidId, imei, version, deviceId);
+                .downloadFormHeader(formId, phoneNumber, androidId, imei, version, deviceId)
+                .onErrorResumeNext(new ErrorLoggerFunction(
+                        "Error downloading form " + formId + " header"));
     }
 
+    @SuppressWarnings("unchecked")
     public Observable<String> downloadFormsHeader(String deviceId) {
         return serviceFactory
                 .createScalarsRetrofitService(FlowApiService.class, apiUrls.getGaeUrl())
-                .downloadFormsHeader(phoneNumber, androidId, imei, version, deviceId);
+                .downloadFormsHeader(phoneNumber, androidId, imei, version, deviceId)
+                .onErrorResumeNext(new ErrorLoggerFunction("Error downloading all form headers"));
     }
 
-    public Observable<ResponseBody> downloadArchive(String fileName) {
+    @SuppressWarnings("unchecked")
+    public Observable<ResponseBody> downloadArchive(final String fileName) {
         final String date = getDate();
-        String authorization = amazonAuthHelper.getAmazonAuthForGet(date, PAYLOAD_GET, SURVEYS_FOLDER + "/" + fileName);
-        return createRetrofitService().getSurvey(SURVEYS_FOLDER, fileName, date, authorization);
+        String authorization = amazonAuthHelper
+                .getAmazonAuthForGet(date, PAYLOAD_GET, SURVEYS_FOLDER + "/" + fileName);
+        return createRetrofitService().getSurvey(SURVEYS_FOLDER, fileName, date, authorization)
+                .onErrorResumeNext(new ErrorLoggerFunction(
+                        "Error downloading " + fileName + " from s3"));
     }
 
     private Observable<Response<ResponseBody>> uploadPublicFile(String date, final S3File s3File) {
-            String authorization = amazonAuthHelper.getAmazonAuthForPut(date, PAYLOAD_PUT_PUBLIC, s3File);
+        String authorization = amazonAuthHelper
+                .getAmazonAuthForPut(date, PAYLOAD_PUT_PUBLIC, s3File);
         return createRetrofitService()
                 .uploadPublic(s3File.getDir(), s3File.getFilename(), s3File.getMd5Base64(),
                         s3File.getContentType(), date, authorization,
@@ -163,12 +185,14 @@ public class RestApi {
     }
 
     private Observable<Response<ResponseBody>> uploadPrivateFile(String date, final S3File s3File) {
-        String authorization = amazonAuthHelper.getAmazonAuthForPut(date, PAYLOAD_PUT_PRIVATE, s3File);
+        String authorization = amazonAuthHelper
+                .getAmazonAuthForPut(date, PAYLOAD_PUT_PRIVATE, s3File);
         RequestBody body = bodyCreator.createBody(s3File);
         return createRetrofitService()
                 .upload(s3File.getDir(), s3File.getFilename(), s3File.getMd5Base64(),
                         s3File.getContentType(), date, authorization, body)
-                .concatMap(new Function<Response<ResponseBody>, Observable<Response<ResponseBody>>>() {
+                .concatMap(
+                        new Function<Response<ResponseBody>, Observable<Response<ResponseBody>>>() {
                             @Override
                             public Observable<Response<ResponseBody>> apply(
                                     Response<ResponseBody> response) {
@@ -203,4 +227,5 @@ public class RestApi {
     private String getDate() {
         return dateFormat.format(new Date()) + "GMT";
     }
+
 }

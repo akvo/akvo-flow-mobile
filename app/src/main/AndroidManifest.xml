@@ -75,7 +75,8 @@
             android:theme="@style/FlowAppThemeDialog" />
         <activity
             android:name=".presentation.signature.SignatureActivity"
-            android:screenOrientation="landscape" />
+            android:screenOrientation="landscape"
+            android:theme="@style/FlowAppTheme.NoTitle"/>
         <activity android:name=".presentation.datapoints.map.one.DataPointMapActivity" />
 
         <service android:name=".service.SurveyDownloadService" />

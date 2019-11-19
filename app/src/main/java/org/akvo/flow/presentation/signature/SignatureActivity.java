@@ -24,7 +24,6 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.view.ViewTreeObserver;
-import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -34,8 +33,8 @@ import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.injector.component.ApplicationComponent;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
-import org.akvo.flow.uicomponents.LocaleAwareActivity;
 import org.akvo.flow.ui.view.signature.SignatureDrawView;
+import org.akvo.flow.uicomponents.LocaleAwareActivity;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.ViewUtil;
 import org.akvo.flow.util.image.GlideImageLoader;
@@ -73,7 +72,6 @@ public class SignatureActivity extends LocaleAwareActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_signature);
         ButterKnife.bind(this);
         initializeInjector();

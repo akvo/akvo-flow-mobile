@@ -21,6 +21,7 @@ package org.akvo.flow.uicomponents
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 
 import androidx.appcompat.app.AppCompatActivity
@@ -31,6 +32,7 @@ import java.util.Locale
 @SuppressLint("Registered")
 open class LocaleAwareActivity : AppCompatActivity() {
     private val localeDelegate = LocaleHelperActivityDelegateImpl()
+    private var receivingResult = false;
 
     override fun attachBaseContext(newBase: Context) {
         super.attachBaseContext(localeDelegate.attachBaseContext(newBase))
@@ -41,9 +43,17 @@ open class LocaleAwareActivity : AppCompatActivity() {
         localeDelegate.onCreate(this)
     }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        receivingResult = true;
+    }
+
     override fun onResume() {
         super.onResume()
-        localeDelegate.onResumed(this)
+        if (!receivingResult) {
+            localeDelegate.onResumed(this)
+        }
+        receivingResult = false
     }
 
     override fun onPause() {

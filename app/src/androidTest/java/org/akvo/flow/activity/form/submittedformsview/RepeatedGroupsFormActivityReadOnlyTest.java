@@ -101,7 +101,7 @@ public class RepeatedGroupsFormActivityReadOnlyTest {
     public void verifyOneRepetition() {
         clickOnTabNamed("RepeatedBarcodeGroup");
         onView(allOf(withId(R.id.barcode_input), isDisplayed())).check(matches(withText("123456")));
-        verifyRepeatHeaderText("Repetitions:1");
+        verifyRepeatHeaderText("Repetition: 1");
     }
 
     private void verifyRepeatHeaderText(String text) {
@@ -112,7 +112,7 @@ public class RepeatedGroupsFormActivityReadOnlyTest {
     @Test
     public void verifyThreeRepetitions() {
         clickOnTabNamed("RepeatedTextGroup");
-        verifyRepeatHeaderText("Repetitions:3");
+        verifyRepeatHeaderText("Repetitions: 3");
 
         verifyQuestionIteration(0, "test1");
         verifyQuestionIteration(1, "test2");

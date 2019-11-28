@@ -49,6 +49,8 @@ import org.akvo.flow.data.repository.UserDataRepository;
 import org.akvo.flow.data.util.ApiUrls;
 import org.akvo.flow.database.DatabaseHelper;
 import org.akvo.flow.database.LanguageTable;
+import org.akvo.flow.database.SurveyLanguagesDataSource;
+import org.akvo.flow.database.SurveyLanguagesDbDataSource;
 import org.akvo.flow.domain.executor.PostExecutionThread;
 import org.akvo.flow.domain.executor.ThreadExecutor;
 import org.akvo.flow.domain.repository.ApkRepository;
@@ -251,6 +253,12 @@ public class ApplicationModule {
     @Singleton
     Gson provideGson() {
         return new Gson();
+    }
+
+    @Provides
+    @Singleton
+    SurveyLanguagesDataSource provideSurveyLanguageDataSource(Context context) {
+        return new SurveyLanguagesDbDataSource(context);
     }
 
     @NonNull

@@ -22,8 +22,6 @@ package org.akvo.flow.ui.view;
 import android.animation.LayoutTransition;
 import android.content.Context;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.constraintlayout.widget.ConstraintLayout;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -47,13 +45,13 @@ import org.akvo.flow.util.ConstantUtil;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import androidx.constraintlayout.widget.ConstraintLayout;
 
 public class QuestionGroupTab extends ConstraintLayout
         implements QuestionGroupIterationHeader.OnDeleteListener {
@@ -96,9 +94,9 @@ public class QuestionGroupTab extends ConstraintLayout
         setFocusableInTouchMode(true);
 
         inflate(getContext(), R.layout.question_group_tab, this);
-        mScroller = (ScrollView) findViewById(R.id.scroller);
-        mContainer = (LinearLayout) findViewById(R.id.question_list);
-        mRepetitionsText = (TextView) findViewById(R.id.repeat_header);
+        mScroller = findViewById(R.id.scroller);
+        mContainer = findViewById(R.id.question_list);
+        mRepetitionsText = findViewById(R.id.repeat_header);
 
         // Animate view additions/removals if possible
         mContainer.setLayoutTransition(new LayoutTransition());
@@ -107,12 +105,9 @@ public class QuestionGroupTab extends ConstraintLayout
             mRepetitionsText.setVisibility(VISIBLE);
             View repeatButton = findViewById(R.id.repeat_btn);
             repeatButton.setVisibility(mSurveyListener.isReadOnly() ? GONE : VISIBLE);
-            repeatButton.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    loadGroup();
-                    setupDependencies();
-                }
+            repeatButton.setOnClickListener(v -> {
+                loadGroup();
+                setupDependencies();
             });
         }
         setTag(mQuestionGroup.getOrder());
@@ -262,9 +257,10 @@ public class QuestionGroupTab extends ConstraintLayout
     }
 
     private void updateRepetitionsHeader() {
-        //TODO: replace string concatenation by replaceable params inside string and/or plurals
         mRepetitionsText
-                .setText(getContext().getString(R.string.repetitions) + groupIterations.size());
+                .setText(getContext().getResources()
+                        .getQuantityString(R.plurals.repetitions_number, groupIterations.size(),
+                                groupIterations.size()));
     }
 
     private void loadGroup() {
@@ -421,60 +417,5 @@ public class QuestionGroupTab extends ConstraintLayout
             return Integer.parseInt(qid[1]);
         }
         return -1;
-    }
-
-    static class RepeatableGroupIterations implements Iterable<Integer> {
-
-        List<Integer> mIDs = new ArrayList<>();
-
-        /**
-         * For the given form instance, load the list of repetitions IDs.
-         * The populated list will contain the IDs of existing repetitions.
-         * Although IDs are auto-incremented numeric values, there might be
-         * gaps caused by deleted iterations.
-         */
-        void loadIDs(Set<String> questions, Collection<QuestionResponse> questionResponses) {
-            Set<Integer> reps = new HashSet<>();
-            for (QuestionResponse qr : questionResponses) {
-                String qid = qr.getQuestionId();
-                if (!TextUtils.isEmpty(qid) && questions.contains(qid) && qr
-                        .isAnswerToRepeatableGroup()) {
-                    reps.add(qr.getIteration());
-                }
-            }
-
-            mIDs = new ArrayList<>(reps);
-            Collections.sort(mIDs);
-        }
-
-        /**
-         * Create and return the next repetition's ID.
-         */
-        int next() {
-            int id = 0;
-            if (!mIDs.isEmpty()) {
-                id = mIDs.get(mIDs.size() - 1) + 1;// Increment last item's ID
-            }
-            mIDs.add(id);
-            return id;
-        }
-
-        int getRepetitionId(int index) {
-            return mIDs.get(index);
-        }
-
-        int size() {
-            return mIDs.size();
-        }
-
-        void remove(Integer repetitionID) {
-            mIDs.remove(repetitionID);
-        }
-
-        @NonNull
-        @Override
-        public Iterator<Integer> iterator() {
-            return mIDs.iterator();
-        }
     }
 }

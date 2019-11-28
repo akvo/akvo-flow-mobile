@@ -32,7 +32,7 @@ import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.data.datasource.preferences.SharedPreferencesDataSource;
 import org.akvo.flow.data.executor.JobExecutor;
 import org.akvo.flow.data.net.Encoder;
-import org.akvo.flow.data.net.HMACInterceptor;
+import org.akvo.flow.data.net.HmacInterceptor;
 import org.akvo.flow.data.net.RestApi;
 import org.akvo.flow.data.net.RestServiceFactory;
 import org.akvo.flow.data.net.S3User;
@@ -194,7 +194,7 @@ public class ApplicationModule {
         simpleDateFormat.setTimeZone(TimeZone.getTimeZone(TIMEZONE));
         OkHttpClient.Builder httpClient = createHttpClient(loggingInterceptor);
         httpClient.addInterceptor(
-                new HMACInterceptor(BuildConfig.API_KEY, simpleDateFormat, encoder,
+                new HmacInterceptor(BuildConfig.API_KEY, simpleDateFormat, encoder,
                         signatureHelper));
         OkHttpClient okHttpClientWithHmac = httpClient.build();
 

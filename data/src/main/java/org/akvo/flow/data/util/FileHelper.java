@@ -20,18 +20,33 @@
 
 package org.akvo.flow.data.util;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Base64;
-import okhttp3.ResponseBody;
-import timber.log.Timber;
 
-import javax.inject.Inject;
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.Closeable;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.zip.*;
+import java.util.zip.Adler32;
+import java.util.zip.CheckedOutputStream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
+import java.util.zip.ZipInputStream;
+import java.util.zip.ZipOutputStream;
+
+import javax.inject.Inject;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import okhttp3.ResponseBody;
+import timber.log.Timber;
 
 public class FileHelper {
 
@@ -45,7 +60,7 @@ public class FileHelper {
      * Compute MD5 checksum of the given file
      */
     @Nullable
-    public byte[] getMD5Checksum(File file) {
+    private byte[] getMD5Checksum(File file) {
         InputStream in = null;
         MessageDigest md;
         try {
@@ -174,7 +189,7 @@ public class FileHelper {
     public void writeZipFile(File zipFolder, String zipFileName, String formInstanceData)
             throws IOException {
         File zipFile = new File(zipFolder, zipFileName);
-        Timber.d("Writing zip to file " + zipFile.getName());
+        Timber.d("Writing zip to file %s", zipFile.getName());
         FileOutputStream fout = new FileOutputStream(zipFile);
         CheckedOutputStream checkedOutStream = new CheckedOutputStream(fout, new Adler32());
         ZipOutputStream zos = new ZipOutputStream(checkedOutStream);

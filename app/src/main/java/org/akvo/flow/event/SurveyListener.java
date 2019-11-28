@@ -35,7 +35,6 @@ public interface SurveyListener {
     void openQuestion(String questionId);
     Map<String, QuestionResponse> getResponses();
     void deleteResponse(String questionId);
-    void deleteResponse(String questionId, String iteration);
     QuestionView getQuestionView(String questionId);
     String getDataPointId();
     String getFormId();

@@ -355,11 +355,11 @@ public class QuestionGroupTab extends ConstraintLayout
             String qid = questionId + "|" + repetitionID;
             QuestionView qv = mQuestionViews.get(qid);
             if (qv != null) {
+                qv.resetQuestion(true);
                 qv.onDestroy();
                 mQuestionViews.remove(qid);
                 mContainer.removeView(qv);
             }
-            mSurveyListener.deleteResponse(questionId, String.valueOf(repetitionID));
         }
 
         // Rearrange header positions (just the visual indicator).

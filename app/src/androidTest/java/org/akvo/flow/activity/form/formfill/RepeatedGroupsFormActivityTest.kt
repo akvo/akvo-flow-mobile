@@ -30,10 +30,13 @@ import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.UiController
 import androidx.test.espresso.ViewAction
 import androidx.test.espresso.action.ViewActions.click
+import androidx.test.espresso.action.ViewActions.scrollTo
 import androidx.test.espresso.assertion.ViewAssertions.doesNotExist
+import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.BoundedMatcher
 import androidx.test.espresso.matcher.RootMatchers.isDialog
 import androidx.test.espresso.matcher.ViewMatchers.isAssignableFrom
+import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -41,6 +44,7 @@ import androidx.test.filters.MediumTest
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import androidx.test.rule.ActivityTestRule
 import androidx.test.rule.GrantPermissionRule
+import org.akvo.flow.R
 import org.akvo.flow.activity.FormActivity
 import org.akvo.flow.activity.form.FormActivityTestUtil.getFormActivityIntent
 import org.akvo.flow.activity.form.FormActivityTestUtil.verifyQuestionIteration
@@ -125,6 +129,18 @@ class RepeatedGroupsFormActivityTest {
             .perform(click())
 
         verifyQuestionIteration(1, "test2")
+    }
+
+    @Test
+    fun verifyRepeatHeader_IfRepeatPressed() {
+        verifyRepeatHeaderText("Repetitions: 3")
+        verifyQuestionIteration(0, "test1")
+        verifyQuestionIteration(1, "test2")
+        verifyQuestionIteration(2, "test3")
+
+        onView(withId(R.id.repeat_btn)).perform(scrollTo()).check(matches(isDisplayed()))
+            .perform(click())
+        verifyRepeatHeaderText("Repetitions: 4")
     }
 
     class ClickDrawableAction(@param:Location @field:Location private val drawableLocation: Int) :

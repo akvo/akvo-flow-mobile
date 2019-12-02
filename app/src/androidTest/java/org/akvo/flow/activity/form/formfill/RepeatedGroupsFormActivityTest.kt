@@ -29,9 +29,12 @@ import androidx.annotation.IntDef
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.UiController
 import androidx.test.espresso.ViewAction
+import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.assertion.ViewAssertions.doesNotExist
 import androidx.test.espresso.matcher.BoundedMatcher
+import androidx.test.espresso.matcher.RootMatchers.isDialog
 import androidx.test.espresso.matcher.ViewMatchers.isAssignableFrom
+import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
@@ -104,7 +107,8 @@ class RepeatedGroupsFormActivityTest {
         verifyQuestionIteration(2, "test3")
 
         onView(withText("RepeatedTextGroup - 2")).perform(ClickDrawableAction(ClickDrawableAction.RIGHT))
-
+        onView(allOf(withId(android.R.id.button1), withText("OK"))).inRoot(isDialog())
+            .perform(click())
         onView(withText("test2")).check(doesNotExist())
     }
 

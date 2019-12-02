@@ -100,7 +100,7 @@ class RepeatedGroupsFormActivityTest {
     }
 
     @Test
-    fun verifyRepetitionDelete() {
+    fun verifyRepetitionDelete_IfConfirmed() {
         verifyRepeatHeaderText("Repetitions: 3")
         verifyQuestionIteration(0, "test1")
         verifyQuestionIteration(1, "test2")
@@ -109,7 +109,22 @@ class RepeatedGroupsFormActivityTest {
         onView(withText("RepeatedTextGroup - 2")).perform(ClickDrawableAction(ClickDrawableAction.RIGHT))
         onView(allOf(withId(android.R.id.button1), withText("OK"))).inRoot(isDialog())
             .perform(click())
+
         onView(withText("test2")).check(doesNotExist())
+    }
+
+    @Test
+    fun verifyRepetitionNotDeleted_IfCancelled() {
+        verifyRepeatHeaderText("Repetitions: 3")
+        verifyQuestionIteration(0, "test1")
+        verifyQuestionIteration(1, "test2")
+        verifyQuestionIteration(2, "test3")
+
+        onView(withText("RepeatedTextGroup - 2")).perform(ClickDrawableAction(ClickDrawableAction.RIGHT))
+        onView(allOf(withId(android.R.id.button2), withText("CANCEL"))).inRoot(isDialog())
+            .perform(click())
+
+        verifyQuestionIteration(1, "test2")
     }
 
     class ClickDrawableAction(@param:Location @field:Location private val drawableLocation: Int) :

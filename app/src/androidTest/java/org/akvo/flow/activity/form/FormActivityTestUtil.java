@@ -41,6 +41,7 @@ import org.akvo.flow.ui.view.geolocation.GeoQuestionView;
 import org.akvo.flow.util.ConstantUtil;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
+import org.hamcrest.core.AllOf;
 import org.hamcrest.core.IsInstanceOf;
 
 import androidx.annotation.NonNull;
@@ -66,6 +67,7 @@ import static androidx.test.espresso.matcher.ViewMatchers.withTagValue;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static com.google.android.gms.common.internal.Preconditions.checkNotNull;
 import static org.akvo.flow.activity.ChildPositionMatcher.childAtPosition;
+import static org.akvo.flow.activity.MultiItemByPositionMatcher.getElementFromMatchAtPosition;
 import static org.akvo.flow.activity.ToolBarTitleSubtitleMatcher.withToolbarSubtitle;
 import static org.akvo.flow.activity.ToolBarTitleSubtitleMatcher.withToolbarTitle;
 import static org.hamcrest.CoreMatchers.is;
@@ -332,5 +334,15 @@ public class FormActivityTestUtil {
                 return stringMatcher.matches(view.getError().toString());
             }
         };
+    }
+
+    public static void verifyRepeatHeaderText(String text) {
+        onView(AllOf.allOf(withId(R.id.repeat_header), isDisplayed()))
+                .check(matches(withText(text)));
+    }
+
+    public static void verifyQuestionIteration(int position, String textToVerify) {
+        onView(AllOf.allOf(getElementFromMatchAtPosition(withId(R.id.input_et), position),
+                isDisplayed())).check(matches(withText(textToVerify)));
     }
 }

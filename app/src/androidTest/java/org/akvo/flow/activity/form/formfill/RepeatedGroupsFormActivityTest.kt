@@ -20,26 +20,34 @@ package org.akvo.flow.activity.form.formfill
 
 import android.Manifest
 import android.content.Intent
+import android.graphics.Point
+import android.os.SystemClock.uptimeMillis
+import android.view.MotionEvent
+import android.view.View
+import android.widget.TextView
+import androidx.annotation.IntDef
 import androidx.test.espresso.Espresso.onView
-import androidx.test.espresso.action.ViewActions.click
-import androidx.test.espresso.assertion.ViewAssertions.matches
-import androidx.test.espresso.matcher.ViewMatchers.*
+import androidx.test.espresso.UiController
+import androidx.test.espresso.ViewAction
+import androidx.test.espresso.assertion.ViewAssertions.doesNotExist
+import androidx.test.espresso.matcher.BoundedMatcher
+import androidx.test.espresso.matcher.ViewMatchers.isAssignableFrom
+import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import androidx.test.rule.ActivityTestRule
 import androidx.test.rule.GrantPermissionRule
-import org.akvo.flow.R
 import org.akvo.flow.activity.FormActivity
-import org.akvo.flow.activity.MultiItemByPositionMatcher.getElementFromMatchAtPosition
-import org.akvo.flow.activity.form.FormActivityTestUtil.addExecutionDelay
 import org.akvo.flow.activity.form.FormActivityTestUtil.getFormActivityIntent
+import org.akvo.flow.activity.form.FormActivityTestUtil.verifyQuestionIteration
+import org.akvo.flow.activity.form.FormActivityTestUtil.verifyRepeatHeaderText
 import org.akvo.flow.activity.form.data.SurveyInstaller
+import org.akvo.flow.activity.form.data.SurveyInstaller.generateRepeatedOneGroupResponseData
 import org.akvo.flow.activity.form.data.SurveyRequisite
-import org.akvo.flow.domain.QuestionResponse.QuestionResponseBuilder
-import org.akvo.flow.tests.R.raw
-import org.akvo.flow.util.ConstantUtil
+import org.akvo.flow.tests.R.raw.repeated_one_group_form
 import org.hamcrest.CoreMatchers.allOf
+import org.hamcrest.Matcher
 import org.junit.AfterClass
 import org.junit.Rule
 import org.junit.Test
@@ -65,79 +73,117 @@ class RepeatedGroupsFormActivityTest {
             SurveyRequisite.setRequisites(targetContext)
             val installer = SurveyInstaller(targetContext)
             val survey =
-                installer.installSurvey(raw.repeated_groups_form, getInstrumentation().context)
+                installer.installSurvey(repeated_one_group_form, getInstrumentation().context)
             val id =
-                installer.createDataPoint(survey.surveyGroup, *generateTestResponseData()).first!!
+                installer.createDataPoint(
+                    survey.surveyGroup,
+                    *generateRepeatedOneGroupResponseData()
+                ).first!!
             return getFormActivityIntent(207569117L, "200389118", SURVEY_TITLE, id, false)
         }
     }
 
-    @AfterClass
-    fun afterClass() {
-        val targetContext = getInstrumentation().targetContext
-        SurveyRequisite.resetRequisites(targetContext)
-        val installer = SurveyInstaller(targetContext)
-        installer.clearSurveys()
+    companion object {
+
+        private const val SURVEY_TITLE = "RepeatedGroup"
+
+        @AfterClass
+        fun afterClass() {
+            val targetContext = getInstrumentation().targetContext
+            SurveyRequisite.resetRequisites(targetContext)
+            val installer = SurveyInstaller(targetContext)
+            installer.clearSurveys()
+        }
     }
 
     @Test
-    fun verifyOneRepetition() {
-        clickOnTabNamed("RepeatedBarcodeGroup")
-        onView(allOf(withId(R.id.barcode_input), isDisplayed())).check(matches(withText("123456")))
-        verifyRepeatHeaderText("Repetition: 1")
-    }
-
-    private fun verifyRepeatHeaderText(text: String) {
-        onView(allOf(withId(R.id.repeat_header), isDisplayed())).check(matches(withText(text)))
-    }
-
-    @Test
-    fun verifyThreeRepetitions() {
-        clickOnTabNamed("RepeatedTextGroup")
+    fun verifyRepetitionDelete() {
         verifyRepeatHeaderText("Repetitions: 3")
         verifyQuestionIteration(0, "test1")
         verifyQuestionIteration(1, "test2")
         verifyQuestionIteration(2, "test3")
+
+        onView(withText("RepeatedTextGroup - 2")).perform(ClickDrawableAction(ClickDrawableAction.RIGHT))
+
+        onView(withText("test2")).check(doesNotExist())
     }
 
-    private fun clickOnTabNamed(tabText: String) {
-        onView(withText(tabText)).perform(click())
-        addExecutionDelay(800)
-    }
+    class ClickDrawableAction(@param:Location @field:Location private val drawableLocation: Int) :
+        ViewAction {
+        override fun getConstraints(): Matcher<View> {
+            return allOf(isAssignableFrom(TextView::class.java),
+                object :
+                    BoundedMatcher<View, TextView>(TextView::class.java) {
+                    override fun matchesSafely(tv: TextView): Boolean {
+                        val requestFocusFromTouch = tv.requestFocusFromTouch()
+                        val drawable = tv.compoundDrawables[drawableLocation]
+                        return requestFocusFromTouch && drawable != null
+                    }
 
-    private fun verifyQuestionIteration(position: Int, textToVerify: String) {
-        onView(
-            allOf(
-                getElementFromMatchAtPosition(withId(R.id.input_et), position),
-                isDisplayed()
+                    override fun describeTo(description: org.hamcrest.Description?) {
+                        description!!.appendText("has drawable")
+                    }
+                })
+        }
+
+        override fun getDescription(): String {
+            return "click drawable "
+        }
+
+        override fun perform(uiController: UiController, view: View) {
+            val tv = view as TextView
+            if (tv.requestFocusFromTouch()) {
+                val drawableBounds = tv.compoundDrawables[drawableLocation].bounds
+                val clickPoint = arrayOfNulls<Point>(SIZE_CLICK_POINT)
+                clickPoint[LEFT] = Point(
+                    tv.left + drawableBounds.width() / HALF_DIVISOR,
+                    (tv.pivotY + drawableBounds.height() / HALF_DIVISOR).toInt()
+                )
+                clickPoint[TOP] = Point(
+                    (tv.pivotX + drawableBounds.width() / HALF_DIVISOR).toInt(),
+                    tv.top + drawableBounds.height() / HALF_DIVISOR
+                )
+                clickPoint[RIGHT] = Point(
+                    tv.right + drawableBounds.width() / HALF_DIVISOR,
+                    (tv.pivotY + drawableBounds.height() / HALF_DIVISOR).toInt()
+                )
+                clickPoint[BOTTOM] = Point(
+                    (tv.pivotX + drawableBounds.width() / HALF_DIVISOR).toInt(),
+                    tv.bottom + drawableBounds.height() / HALF_DIVISOR
+                )
+                clickPoint[drawableLocation]?.let { point ->
+                    if (dispatchTextViewTouchEvent(tv, point, MotionEvent.ACTION_DOWN)) {
+                        dispatchTextViewTouchEvent(tv, point, MotionEvent.ACTION_UP)
+                    }
+                }
+
+            }
+        }
+
+        private fun dispatchTextViewTouchEvent(tv: TextView, point: Point, event: Int): Boolean {
+            return tv.dispatchTouchEvent(
+                MotionEvent.obtain(
+                    uptimeMillis(),
+                    uptimeMillis(),
+                    event,
+                    point.x.toFloat(),
+                    point.y.toFloat(),
+                    0
+                )
             )
-        ).check(matches(withText(textToVerify)))
-    }
+        }
 
-    private fun generateTestResponseData(): Array<QuestionResponseBuilder> {
-        return arrayOf(
-            QuestionResponseBuilder()
-                .setValue("123456")
-                .setType(ConstantUtil.VALUE_RESPONSE_TYPE)
-                .setQuestionId("205929117")
-                .setIteration(0), QuestionResponseBuilder()
-                .setValue("test1")
-                .setType(ConstantUtil.VALUE_RESPONSE_TYPE)
-                .setQuestionId("205929118")
-                .setIteration(0), QuestionResponseBuilder()
-                .setValue("test2")
-                .setType(ConstantUtil.VALUE_RESPONSE_TYPE)
-                .setQuestionId("205929118")
-                .setIteration(1),
-            QuestionResponseBuilder()
-                .setValue("test3")
-                .setType(ConstantUtil.VALUE_RESPONSE_TYPE)
-                .setQuestionId("205929118")
-                .setIteration(2)
-        )
-    }
+        @IntDef(LEFT, TOP, RIGHT, BOTTOM)
+        @Retention(AnnotationRetention.SOURCE)
+        annotation class Location
 
-    companion object {
-        private const val SURVEY_TITLE = "RepeatedBarcodeGroup"
+        companion object {
+            const val LEFT = 0
+            const val TOP = 1
+            const val RIGHT = 2
+            const val BOTTOM = 3
+            const val SIZE_CLICK_POINT = 4
+            const val HALF_DIVISOR = 2
+        }
     }
 }

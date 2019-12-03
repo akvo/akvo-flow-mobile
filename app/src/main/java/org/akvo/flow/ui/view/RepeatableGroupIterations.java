@@ -43,11 +43,11 @@ class RepeatableGroupIterations implements Iterable<Integer> {
      * Although IDs are auto-incremented numeric values, there might be
      * gaps caused by deleted iterations.
      */
-    void loadIDs(Set<String> questions, Collection<QuestionResponse> questionResponses) {
+    void loadIDs(Set<String> questionIds, Collection<QuestionResponse> questionResponses) {
         Set<Integer> reps = new HashSet<>();
         for (QuestionResponse qr : questionResponses) {
             String qid = qr.getQuestionId();
-            if (!TextUtils.isEmpty(qid) && questions.contains(qid) && qr
+            if (!TextUtils.isEmpty(qid) && questionIds.contains(qid) && qr
                     .isAnswerToRepeatableGroup()) {
                 reps.add(qr.getIteration());
             }

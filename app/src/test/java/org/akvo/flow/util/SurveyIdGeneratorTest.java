@@ -22,41 +22,13 @@ package org.akvo.flow.util;
 
 import android.text.TextUtils;
 
-import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
-import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
 
 import static junit.framework.Assert.assertEquals;
-import static org.mockito.Matchers.any;
 
-@RunWith(PowerMockRunner.class)
 @PrepareForTest(TextUtils.class)
 public class SurveyIdGeneratorTest {
-
-    @Before
-    public void setup() {
-        PowerMockito.mockStatic(TextUtils.class);
-        PowerMockito.when(TextUtils.isDigitsOnly(any(CharSequence.class)))
-                .thenAnswer(new Answer<Boolean>() {
-                    @Override
-                    public Boolean answer(InvocationOnMock invocation) throws Throwable {
-                        CharSequence str = (CharSequence) invocation.getArguments()[0];
-                        final int len = str.length();
-                        for (int cp, i = 0; i < len; i += Character.charCount(cp)) {
-                            cp = Character.codePointAt(str, i);
-                            if (!Character.isDigit(cp)) {
-                                return false;
-                            }
-                        }
-                        return true;
-                    }
-                });
-    }
 
     @Test
     public void getSurveyIdFromFilePath_shouldReturnEmptyIfFolderMissing() throws Exception {

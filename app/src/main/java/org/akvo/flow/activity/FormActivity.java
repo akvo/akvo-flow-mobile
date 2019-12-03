@@ -751,11 +751,6 @@ public class FormActivity extends BackActivity implements SurveyListener,
         }
     }
 
-    public void deleteResponse(String questionId, String iteration) {
-        mQuestionResponses.remove(questionId);
-        mDatabase.deleteResponse(mSurveyInstanceId, questionId, iteration);
-    }
-
     @Override
     public QuestionView getQuestionView(String questionId) {
         return mAdapter.getQuestionView(questionId);

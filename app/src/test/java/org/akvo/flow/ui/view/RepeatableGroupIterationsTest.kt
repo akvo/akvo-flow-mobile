@@ -32,8 +32,7 @@ class RepeatableGroupIterationsTest {
 
         assertEquals(0, iterations.size())
     }
-
-
+    
     @Test
     fun loadIDsShouldCreateEmptyListIfQuestionIdIsEmpty() {
         val iterations = RepeatableGroupIterations()
@@ -81,7 +80,6 @@ class RepeatableGroupIterationsTest {
 
         assertEquals(1, iterations.size())
         assertEquals(0, iterations.getRepetitionId(0))
-
     }
 
     @Test

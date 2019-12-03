@@ -25,7 +25,6 @@ public class TextUtils {
         return str == null || str.length() == 0;
     }
 
-
     /**
      * Returns whether the given CharSequence contains only digits.
      */

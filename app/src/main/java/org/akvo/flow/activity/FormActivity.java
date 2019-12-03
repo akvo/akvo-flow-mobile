@@ -20,8 +20,6 @@
 
 package org.akvo.flow.activity;
 
-import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
@@ -32,7 +30,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
@@ -47,7 +44,6 @@ import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.database.SurveyDbAdapter;
 import org.akvo.flow.database.SurveyInstanceStatus;
 import org.akvo.flow.database.SurveyLanguagesDataSource;
-import org.akvo.flow.database.SurveyLanguagesDbDataSource;
 import org.akvo.flow.domain.QuestionGroup;
 import org.akvo.flow.domain.QuestionResponse;
 import org.akvo.flow.domain.Survey;
@@ -58,7 +54,6 @@ import org.akvo.flow.event.SurveyListener;
 import org.akvo.flow.injector.component.ApplicationComponent;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
-import org.akvo.flow.uicomponents.SnackBarManager;
 import org.akvo.flow.presentation.form.FormPresenter;
 import org.akvo.flow.presentation.form.FormView;
 import org.akvo.flow.presentation.form.mobiledata.MobileDataSettingDialog;
@@ -72,6 +67,7 @@ import org.akvo.flow.ui.view.QuestionView;
 import org.akvo.flow.ui.view.geolocation.GeoFieldsResetConfirmDialogFragment;
 import org.akvo.flow.ui.view.geolocation.GeoQuestionView;
 import org.akvo.flow.uicomponents.BackActivity;
+import org.akvo.flow.uicomponents.SnackBarManager;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.MediaFileHelper;
 import org.akvo.flow.util.PlatformUtil;
@@ -92,6 +88,7 @@ import java.util.Set;
 import javax.inject.Inject;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.FileProvider;
@@ -124,8 +121,17 @@ public class FormActivity extends BackActivity implements SurveyListener,
     @Inject
     SnackBarManager snackBarManager;
 
-    private final Navigator navigator = new Navigator();
-    private final StorageHelper storageHelper = new StorageHelper();
+    @Inject
+    Navigator navigator;
+
+    @Inject
+    StorageHelper storageHelper;
+
+    @Inject
+    LanguageMapper languageMapper;
+
+    @Inject
+    SurveyLanguagesDataSource surveyLanguagesDataSource;
 
     /**
      * When a request is done to perform photo, video, barcode scan, etc we store
@@ -148,12 +154,10 @@ public class FormActivity extends BackActivity implements SurveyListener,
     private SurveyGroup mSurveyGroup;
     private Survey mSurvey;
 
-    private SurveyLanguagesDataSource surveyLanguagesDataSource;
-
     private String[] mLanguages;
-    private LanguageMapper languageMapper;
 
-    private Map<String, QuestionResponse> mQuestionResponses; // QuestionId - QuestionResponse
+    // QuestionId - QuestionResponse
+    private Map<String, QuestionResponse> mQuestionResponses = new HashMap<>();
     private String surveyId;
 
     private Uri imagePath;
@@ -164,48 +168,19 @@ public class FormActivity extends BackActivity implements SurveyListener,
         setContentView(R.layout.form_activity);
         initializeInjector();
         presenter.setView(this);
-        // Read all the params. Note that the survey instance id is now mandatory
-        Intent intent = getIntent();
-        surveyId = intent.getStringExtra(ConstantUtil.FORM_ID_EXTRA);
-        mReadOnly = intent.getBooleanExtra(ConstantUtil.READ_ONLY_EXTRA, false);
-        mSurveyInstanceId = intent.getLongExtra(ConstantUtil.RESPONDENT_ID_EXTRA, 0);
-        mSurveyGroup = (SurveyGroup) intent.getSerializableExtra(ConstantUtil.SURVEY_GROUP_EXTRA);
-        mRecordId = intent.getStringExtra(ConstantUtil.DATA_POINT_ID_EXTRA);
-
-        mQuestionResponses = new HashMap<>();
+        setupToolBar();
+        extractExtras();
+        restoreState(savedInstanceState);
         mDatabase.open();
-
-        Context context = getApplicationContext();
-        languageMapper = new LanguageMapper(context);
-        surveyLanguagesDataSource = new SurveyLanguagesDbDataSource(context);
-
-        if (savedInstanceState != null) {
-            mRequestQuestionId = savedInstanceState.getString(ConstantUtil.REQUEST_QUESTION_ID_EXTRA);
-            imagePath = savedInstanceState.getParcelable(ConstantUtil.IMAGE_FILE_KEY);
-        }
 
         //TODO: move all loading to worker thread
         loadSurvey(surveyId);
         loadLanguages();
         if (mSurvey == null) {
-            Timber.e("mSurvey is null. Finishing the Activity...");
-            Toast.makeText(getApplicationContext(), R.string.error_missing_form, Toast.LENGTH_LONG)
-                    .show();
-            finish();
+            showSurveyError();
         } else {
-            setupToolBar();
-            // Set the survey name as Activity title
-            getSupportActionBar().setTitle(mSurvey.getName());
-            getSupportActionBar().setSubtitle("v " + getVersion());
-
-            mPager = findViewById(R.id.pager);
-            TabLayout tabLayout = findViewById(R.id.tabs);
-            tabLayout.setupWithViewPager(mPager);
-            mAdapter = new SurveyTabAdapter(this, mPager, this, this);
-            mPager.setAdapter(mAdapter);
-
-            progressBar = findViewById(R.id.progressBar);
-            rootView = findViewById(R.id.coordinator_layout);
+            setTitle();
+            initViews();
             // Initialize new survey or load previous responses
             Map<String, QuestionResponse> responses = mDatabase.getResponses(mSurveyInstanceId);
             if (!responses.isEmpty()) {
@@ -213,6 +188,51 @@ public class FormActivity extends BackActivity implements SurveyListener,
             }
             spaceLeftOnCard();
         }
+    }
+
+    private void showSurveyError() {
+        Timber.e("mSurvey is null. Finishing the Activity...");
+        Toast.makeText(getApplicationContext(), R.string.error_missing_form, Toast.LENGTH_LONG)
+                .show();
+        finish();
+    }
+
+    private void setTitle() {
+        // Set the survey name as Activity title
+        ActionBar supportActionBar = getSupportActionBar();
+        if (supportActionBar != null) {
+            supportActionBar.setTitle(mSurvey.getName());
+            supportActionBar.setSubtitle("v " + getVersion());
+        }
+    }
+
+    private void initViews() {
+        mPager = findViewById(R.id.pager);
+        TabLayout tabLayout = findViewById(R.id.tabs);
+        tabLayout.setupWithViewPager(mPager);
+        mAdapter = new SurveyTabAdapter(this, mPager, this, this);
+        mPager.setAdapter(mAdapter);
+
+        progressBar = findViewById(R.id.progressBar);
+        rootView = findViewById(R.id.coordinator_layout);
+    }
+
+    private void restoreState(Bundle savedInstanceState) {
+        if (savedInstanceState != null) {
+            mRequestQuestionId = savedInstanceState
+                    .getString(ConstantUtil.REQUEST_QUESTION_ID_EXTRA);
+            imagePath = savedInstanceState.getParcelable(ConstantUtil.IMAGE_FILE_KEY);
+        }
+    }
+
+    private void extractExtras() {
+        // Read all the params. Note that the survey instance id is now mandatory
+        Intent intent = getIntent();
+        surveyId = intent.getStringExtra(ConstantUtil.FORM_ID_EXTRA);
+        mReadOnly = intent.getBooleanExtra(ConstantUtil.READ_ONLY_EXTRA, false);
+        mSurveyInstanceId = intent.getLongExtra(ConstantUtil.RESPONDENT_ID_EXTRA, 0);
+        mSurveyGroup = (SurveyGroup) intent.getSerializableExtra(ConstantUtil.SURVEY_GROUP_EXTRA);
+        mRecordId = intent.getStringExtra(ConstantUtil.DATA_POINT_ID_EXTRA);
     }
 
     @Override
@@ -249,19 +269,11 @@ public class FormActivity extends BackActivity implements SurveyListener,
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle(R.string.prefill_title);
             builder.setMessage(R.string.prefill_text);
-            builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    preFillSurvey(lastSurveyInstance);
-                    dialog.dismiss();
-                }
+            builder.setPositiveButton(R.string.yes, (dialog, which) -> {
+                preFillSurvey(lastSurveyInstance);
+                dialog.dismiss();
             });
-            builder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    dialog.dismiss();
-                }
-            });
+            builder.setNegativeButton(R.string.no, (dialog, which) -> dialog.dismiss());
 
             builder.show();
         }
@@ -493,14 +505,11 @@ public class FormActivity extends BackActivity implements SurveyListener,
 
     private void clearSurvey() {
         showConfirmDialog(R.string.cleartitle, R.string.cleardesc, this, true,
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        mDatabase.deleteResponses(String.valueOf(mSurveyInstanceId));
-                        resetRecordName();
-                        loadResponses();
-                        spaceLeftOnCard();
-                    }
+                (dialog, which) -> {
+                    mDatabase.deleteResponses(String.valueOf(mSurveyInstanceId));
+                    resetRecordName();
+                    loadResponses();
+                    spaceLeftOnCard();
                 });
     }
 
@@ -509,15 +518,11 @@ public class FormActivity extends BackActivity implements SurveyListener,
         AlertDialog alertDialog = new AlertDialog.Builder(this)
                 .setTitle(R.string.surveylanglabel)
                 .setView(listView)
-                .setPositiveButton(R.string.okbutton, new DialogInterface.OnClickListener() {
-
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        if (dialog != null) {
-                            dialog.dismiss();
-                        }
-                        useSelectedLanguages((LanguageAdapter) listView.getAdapter());
+                .setPositiveButton(R.string.okbutton, (dialog, which) -> {
+                    if (dialog != null) {
+                        dialog.dismiss();
                     }
+                    useSelectedLanguages((LanguageAdapter) listView.getAdapter());
                 }).create();
         alertDialog.show();
     }
@@ -534,16 +539,11 @@ public class FormActivity extends BackActivity implements SurveyListener,
     private void displayError() {
         ViewUtil.showConfirmDialog(R.string.langmandatorytitle,
                 R.string.langmandatorytext, this, false,
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(
-                            DialogInterface dialog,
-                            int which) {
-                        if (dialog != null) {
-                            dialog.dismiss();
-                        }
-                        displayLanguagesDialog();
+                (dialog, which) -> {
+                    if (dialog != null) {
+                        dialog.dismiss();
                     }
+                    displayLanguagesDialog();
                 });
     }
 
@@ -564,12 +564,8 @@ public class FormActivity extends BackActivity implements SurveyListener,
                 .inflate(R.layout.languages_list, null);
         listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
         listView.setAdapter(languageAdapter);
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                languageAdapter.updateSelected(position);
-            }
-        });
+        listView.setOnItemClickListener(
+                (parent, view, position, id) -> languageAdapter.updateSelected(position));
         return listView;
     }
 
@@ -583,12 +579,9 @@ public class FormActivity extends BackActivity implements SurveyListener,
 
         if (mAdapter.getQuestionView(mRequestQuestionId) == null) {
             // Set the result only after the QuestionView is loaded
-            mAdapter.setOnTabLoadedListener(new SurveyTabAdapter.OnTabLoadedListener() {
-                @Override
-                public void onTabLoaded() {
-                    setResult(requestCode, intent, mRequestQuestionId);
-                    mAdapter.setOnTabLoadedListener(null);
-                }
+            mAdapter.setOnTabLoadedListener(() -> {
+                setResult(requestCode, intent, mRequestQuestionId);
+                mAdapter.setOnTabLoadedListener(null);
             });
         } else {
             setResult(requestCode, intent, mRequestQuestionId);
@@ -663,13 +656,6 @@ public class FormActivity extends BackActivity implements SurveyListener,
         mAdapter.onQuestionResultReceived(mRequestQuestionId, mediaData);
     }
 
-    @NonNull
-    private String getDefaultLang() {
-        //TODO: check if survey is null?
-        return mSurvey.getDefaultLanguageCode();
-    }
-
-    //TODO: use loader
     private void loadLanguages() {
         Set<String> languagePreferences = surveyLanguagesDataSource
                 .getLanguagePreferences(mSurveyGroup.getId());
@@ -683,7 +669,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
 
     @Override
     public String getDefaultLanguage() {
-        return getDefaultLang();
+        return mSurvey.getDefaultLanguageCode();
     }
 
     @Override
@@ -742,11 +728,6 @@ public class FormActivity extends BackActivity implements SurveyListener,
     }
 
     @Override
-    public void nextTab() {
-        mPager.setCurrentItem(mPager.getCurrentItem() + 1, true);
-    }
-
-    @Override
     public void openQuestion(String questionId) {
         int tab = mAdapter.displayQuestion(questionId);
         if (tab != -1) {
@@ -781,7 +762,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
     }
 
     @Override
-    public String getDatapointId() {
+    public String getDataPointId() {
         return mRecordId;
     }
 
@@ -927,14 +908,11 @@ public class FormActivity extends BackActivity implements SurveyListener,
         if (megaAvailable <= 0L) {// All out, OR media not mounted
             // Bounce user
             showConfirmDialog(R.string.nocardspacetitle, R.string.nocardspacedialog, this, false,
-                    new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            if (dialog != null) {
-                                dialog.dismiss();
-                            }
-                            finish();
+                    (dialog, which) -> {
+                        if (dialog != null) {
+                            dialog.dismiss();
                         }
+                        finish();
                     }
             );
             return;
@@ -949,12 +927,9 @@ public class FormActivity extends BackActivity implements SurveyListener,
                     String message = getResources().getString(R.string.lowcardspacedialog);
                     message = message.replace("%%%", Long.toString(megaAvailable));
                     showConfirmDialog(R.string.lowcardspacetitle, message, this, false,
-                            new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    if (dialog != null) {
-                                        dialog.dismiss();
-                                    }
+                            (dialog, which) -> {
+                                if (dialog != null) {
+                                    dialog.dismiss();
                                 }
                             },
                             null);

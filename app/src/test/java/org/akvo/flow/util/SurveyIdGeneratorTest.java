@@ -20,18 +20,14 @@
 
 package org.akvo.flow.util;
 
-import android.text.TextUtils;
-
 import org.junit.Test;
-import org.powermock.core.classloader.annotations.PrepareForTest;
 
 import static junit.framework.Assert.assertEquals;
 
-@PrepareForTest(TextUtils.class)
 public class SurveyIdGeneratorTest {
 
     @Test
-    public void getSurveyIdFromFilePath_shouldReturnEmptyIfFolderMissing() throws Exception {
+    public void getSurveyIdFromFilePath_shouldReturnEmptyIfFolderMissing() {
         SurveyIdGenerator surveyIdGenerator = new SurveyIdGenerator();
 
         String surveyId = surveyIdGenerator.getSurveyIdFromFilePath("file.xml");
@@ -39,7 +35,7 @@ public class SurveyIdGeneratorTest {
     }
 
     @Test
-    public void getSurveyIdFromFilePath_shouldReturnCorrectIdFromFolder() throws Exception {
+    public void getSurveyIdFromFilePath_shouldReturnCorrectIdFromFolder() {
         SurveyIdGenerator surveyIdGenerator = new SurveyIdGenerator();
 
         String surveyId = surveyIdGenerator
@@ -64,7 +60,7 @@ public class SurveyIdGeneratorTest {
     }
 
     @Test
-    public void getSurveyIdFromFilePath_shouldReturnUseClosestFolderNameIfNoId() throws Exception {
+    public void getSurveyIdFromFilePath_shouldReturnUseClosestFolderNameIfNoId() {
         SurveyIdGenerator surveyIdGenerator = new SurveyIdGenerator();
 
         String surveyId = surveyIdGenerator

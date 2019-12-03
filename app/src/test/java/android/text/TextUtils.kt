@@ -16,26 +16,34 @@
  * You should have received a copy of the GNU General Public License
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
+package android.text
 
-package android.text;
+/**
+ * In tests, static classes always by default return false or a default value, to make sure these
+ * methods behave the same way as in the production code we need to add this class
+ */
+object TextUtils {
 
-public class TextUtils {
-
-    public static boolean isEmpty(CharSequence str) {
-        return str == null || str.length() == 0;
+    @JvmStatic
+    fun isEmpty(str: CharSequence?): Boolean {
+        return str == null || str.isEmpty()
     }
 
     /**
      * Returns whether the given CharSequence contains only digits.
      */
-    public static boolean isDigitsOnly(CharSequence str) {
-        final int len = str.length();
-        for (int cp, i = 0; i < len; i += Character.charCount(cp)) {
-            cp = Character.codePointAt(str, i);
+    @JvmStatic
+    fun isDigitsOnly(str: CharSequence): Boolean {
+        val len = str.length
+        var cp: Int
+        var i = 0
+        while (i < len) {
+            cp = Character.codePointAt(str, i)
             if (!Character.isDigit(cp)) {
-                return false;
+                return false
             }
+            i += Character.charCount(cp)
         }
-        return true;
+        return true
     }
 }

@@ -41,10 +41,10 @@ import static org.mockito.BDDMockito.given;
 public class ViewFormMapperTest {
 
     @Mock
-    SurveyGroup mockSurveyGroup;
+    private SurveyGroup mockSurveyGroup;
 
     @Mock
-    FormInfo mockSurveyItem;
+    private FormInfo mockSurveyItem;
 
     @Test
     public void transformShouldReturnEmptyArrayIfNull() {

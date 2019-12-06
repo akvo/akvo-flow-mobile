@@ -20,19 +20,12 @@
 
 package org.akvo.flow.ui.model;
 
-import android.text.TextUtils;
-
 import org.akvo.flow.data.loader.models.FormInfo;
 import org.akvo.flow.domain.SurveyGroup;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
+import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,10 +36,8 @@ import static junit.framework.Assert.assertNotNull;
 import static junit.framework.Assert.assertNull;
 import static junit.framework.Assert.assertTrue;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.any;
 
-@RunWith(PowerMockRunner.class)
-@PrepareForTest(TextUtils.class)
+@RunWith(MockitoJUnitRunner.class)
 public class ViewFormMapperTest {
 
     @Mock
@@ -54,18 +45,6 @@ public class ViewFormMapperTest {
 
     @Mock
     private FormInfo mockSurveyItem;
-
-    @Before
-    public void setUp() {
-        PowerMockito.mockStatic(TextUtils.class);
-        PowerMockito.when(TextUtils.isEmpty(any(CharSequence.class))).thenAnswer(new Answer<Boolean>() {
-            @Override
-            public Boolean answer(InvocationOnMock invocation) throws Throwable {
-                CharSequence a = (CharSequence) invocation.getArguments()[0];
-                return !(a != null && a.length() > 0);
-            }
-        });
-    }
 
     @Test
     public void transformShouldReturnEmptyArrayIfNull() {
@@ -114,7 +93,7 @@ public class ViewFormMapperTest {
 
         ViewForm mapped = mapper.transform(mockSurveyItem, mockSurveyGroup, "deleted");
 
-        assertEquals(null, mapped.getTime());
+        assertNull(mapped.getTime());
     }
 
     @Test

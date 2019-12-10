@@ -70,6 +70,7 @@ public class QuestionGroupTab extends ConstraintLayout
 
     private final Map<Integer, QuestionGroupIterationHeader> groupIterationHeaders;
     private final RepeatableGroupIterations groupIterations;
+    private View repeatButton;
 
     public QuestionGroupTab(Context context, QuestionGroup group, SurveyListener surveyListener,
             QuestionInteractionListener questionListener) {
@@ -97,13 +98,13 @@ public class QuestionGroupTab extends ConstraintLayout
         mScroller = findViewById(R.id.scroller);
         mContainer = findViewById(R.id.question_list);
         mRepetitionsText = findViewById(R.id.repeat_header);
+        repeatButton = findViewById(R.id.repeat_btn);
 
         // Animate view additions/removals if possible
         mContainer.setLayoutTransition(new LayoutTransition());
 
         if (mQuestionGroup.isRepeatable()) {
             mRepetitionsText.setVisibility(VISIBLE);
-            View repeatButton = findViewById(R.id.repeat_btn);
             repeatButton.setVisibility(mSurveyListener.isReadOnly() ? GONE : VISIBLE);
             repeatButton.setOnClickListener(v -> {
                 loadGroup();
@@ -383,6 +384,23 @@ public class QuestionGroupTab extends ConstraintLayout
     public void setupDependencies() {
         for (QuestionView qv : mQuestionViews.values()) {
             setupDependencies(qv);
+        }
+
+        if (!mSurveyListener.isReadOnly() && mQuestionGroup.isRepeatable()) {
+            boolean containsVisibleQuestions = false;
+            for (QuestionView qv : mQuestionViews.values()) {
+                if (qv.getVisibility() == VISIBLE) {
+                    containsVisibleQuestions = true;
+                    break;
+                }
+            }
+            repeatButton.setVisibility(containsVisibleQuestions ? VISIBLE : GONE);
+            mRepetitionsText.setVisibility(containsVisibleQuestions ? VISIBLE : GONE);
+            Collection<QuestionGroupIterationHeader> iterationHeaders = groupIterationHeaders
+                    .values();
+            for (QuestionGroupIterationHeader header : iterationHeaders) {
+                header.setVisibility(containsVisibleQuestions ? VISIBLE : GONE);
+            }
         }
     }
 

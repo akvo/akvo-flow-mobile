@@ -47,11 +47,6 @@ public class UserDataRepository implements UserRepository {
     }
 
     @Override
-    public Observable<String> getAppLanguage() {
-        return dataSourceFactory.getSharedPreferencesDataSource().getAppLanguage();
-    }
-
-    @Override
     public Observable<Integer> getImageSize() {
         return dataSourceFactory.getSharedPreferencesDataSource().getImageSize();
     }
@@ -69,11 +64,6 @@ public class UserDataRepository implements UserRepository {
     @Override
     public Observable<Boolean> saveEnableMobileDataPreference(Boolean enable) {
         return dataSourceFactory.getSharedPreferencesDataSource().saveEnableMobileData(enable);
-    }
-
-    @Override
-    public Observable<Boolean> saveLanguagePreference(String language) {
-        return dataSourceFactory.getSharedPreferencesDataSource().saveLanguage(language);
     }
 
     @Override

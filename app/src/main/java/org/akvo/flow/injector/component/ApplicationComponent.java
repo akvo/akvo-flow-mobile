@@ -28,6 +28,7 @@ import com.squareup.sqlbrite2.BriteDatabase;
 import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.broadcast.BootReceiver;
 import org.akvo.flow.broadcast.DataTimeoutReceiver;
+import org.akvo.flow.database.SurveyLanguagesDataSource;
 import org.akvo.flow.domain.executor.PostExecutionThread;
 import org.akvo.flow.domain.executor.ThreadExecutor;
 import org.akvo.flow.domain.repository.ApkRepository;
@@ -38,7 +39,6 @@ import org.akvo.flow.domain.repository.SurveyRepository;
 import org.akvo.flow.domain.repository.UserRepository;
 import org.akvo.flow.injector.module.ApplicationModule;
 import org.akvo.flow.injector.module.ViewModule;
-import org.akvo.flow.presentation.BaseActivity;
 import org.akvo.flow.service.ApkUpdateWorker;
 import org.akvo.flow.service.BootstrapService;
 import org.akvo.flow.service.DataFixWorker;
@@ -82,6 +82,8 @@ public interface ApplicationComponent {
 
     Gson gson();
 
+    SurveyLanguagesDataSource provideSurveyLanguageDataSource();
+
     void inject(FileChangeTrackingWorker fileChangeTrackingWorker);
 
     void inject(SurveyDownloadService surveyDownloadService);
@@ -101,6 +103,4 @@ public interface ApplicationComponent {
     void inject(ApkUpdateWorker apkUpdateWorker);
 
     void inject(FlowApp app);
-
-    void inject(BaseActivity baseActivity);
 }

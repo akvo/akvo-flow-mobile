@@ -14,7 +14,7 @@ set -e
 
 . util/upload-apk/version.properties
 
-FLOW_DEPLOY_JAR="util/upload-apk/build/libs/deploy-"${VERSION}".jar"
+FLOW_DEPLOY_JAR="util/upload-apk/build/libs/deploy-${VERSION}.jar"
 
 [[ -n "${FLOW_S3_ACCESS_KEY}" ]] || { echo "FLOW_S3_ACCESS_KEY env var needs to be set"; exit 1; }
 [[ -n "${FLOW_S3_SECRET_KEY}" ]] || { echo "FLOW_S3_SECRET_KEY env var needs to be set"; exit 1; }

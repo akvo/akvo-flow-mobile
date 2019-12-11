@@ -40,6 +40,7 @@ ext {
     gmsVersion = "15.0.1"
     gsonVersion = "2.8.2"
     leakCanaryVersion = "2.0-beta-3"
+    localeHelperVersion = "1.0.2"
     loggingInterceptorVersion = "3.12.1"
     mapboxMarkerVersion = "0.3.0"
     mapboxOfflineRxVersion = "1.2.0-alpha04"
@@ -48,6 +49,7 @@ ext {
     prettyTimeVersion = "4.0.1.Final"
     rxAndroidVersion = "2.1.1"
     rxJavaVersion = "2.2.8"
+    rxTracerVersion = "0.1.2"
     sentryVersion = "1.7.22"
     slfVersion = "1.7.25"
     sqlbriteVersion = "2.0.0"
@@ -72,6 +74,9 @@ allprojects {
         google()
         jcenter()
         maven { url "https://jitpack.io" }
+        maven {
+            url  "https://dl.bintray.com/halfhp/rxtracer"
+        }
     }
 }
 

@@ -21,9 +21,6 @@
 package org.akvo.flow.ui.adapter;
 
 import android.content.Context;
-import androidx.annotation.LayoutRes;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,17 +35,21 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
+import androidx.annotation.LayoutRes;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 public class LanguageAdapter extends ArrayAdapter<Language> {
 
     @LayoutRes
-    public static final int LAYOUT_RESOURCE_ID = R.layout.language_list_item;
+    private static final int LAYOUT_RESOURCE_ID = R.layout.language_list_item;
 
     private final List<Language> languages;
     private final LayoutInflater inflater;
 
     public LanguageAdapter(Context context, List<Language> languages) {
         super(context, LAYOUT_RESOURCE_ID, languages);
-        this.languages = languages == null ? new ArrayList<Language>() : languages;
+        this.languages = languages == null ? new ArrayList<>() : languages;
         this.inflater = LayoutInflater.from(context);
     }
 
@@ -62,13 +63,15 @@ public class LanguageAdapter extends ArrayAdapter<Language> {
         return selectedLanguages;
     }
 
-    @Nullable @Override
+    @Nullable
+    @Override
     public Language getItem(int position) {
         return languages.get(position);
     }
 
-    @NonNull @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    @NonNull
+    @Override
+    public View getView(int position, View convertView, @NonNull ViewGroup parent) {
         final View view;
         final CheckBox checkBox;
         Language language = getItem(position);
@@ -77,7 +80,7 @@ public class LanguageAdapter extends ArrayAdapter<Language> {
         } else {
             view = convertView;
         }
-        checkBox = (CheckBox)view.findViewById(R.id.language_checkbox);
+        checkBox = view.findViewById(R.id.language_checkbox);
         checkBox.setText(language.getLanguage());
         checkBox.setChecked(language.isSelected());
         return view;

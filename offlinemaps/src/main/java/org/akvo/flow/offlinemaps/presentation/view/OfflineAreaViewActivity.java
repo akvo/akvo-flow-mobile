@@ -29,9 +29,11 @@ import com.mapbox.mapboxsdk.maps.MapView;
 import org.akvo.flow.offlinemaps.Constants;
 import org.akvo.flow.offlinemaps.R;
 import org.akvo.flow.offlinemaps.domain.entity.MapInfo;
-import org.akvo.flow.offlinemaps.presentation.ToolBarBackActivity;
+import org.akvo.flow.uicomponents.BackActivity;
 
-public class OfflineAreaViewActivity extends ToolBarBackActivity {
+import androidx.annotation.NonNull;
+
+public class OfflineAreaViewActivity extends BackActivity {
 
     public static final String NAME_EXTRA = "name";
     public static final String MAP_INFO_EXTRA = "map-info";
@@ -102,7 +104,7 @@ public class OfflineAreaViewActivity extends ToolBarBackActivity {
     }
 
     @Override
-    protected void onSaveInstanceState(Bundle outState) {
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         mapView.onSaveInstanceState(outState);
     }

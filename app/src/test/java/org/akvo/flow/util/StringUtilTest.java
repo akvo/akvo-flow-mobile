@@ -20,100 +20,76 @@
 
 package org.akvo.flow.util;
 
-import android.text.TextUtils;
-
-import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertTrue;
-import static org.mockito.Matchers.any;
 
-@RunWith(PowerMockRunner.class)
-@PrepareForTest(TextUtils.class)
 public class StringUtilTest {
 
-    @Before
-    public void setup() {
-        PowerMockito.mockStatic(TextUtils.class);
-        PowerMockito.when(TextUtils.isEmpty(any(CharSequence.class))).thenAnswer(new Answer<Boolean>() {
-            @Override
-            public Boolean answer(InvocationOnMock invocation) throws Throwable {
-                CharSequence a = (CharSequence) invocation.getArguments()[0];
-                return !(a != null && a.length() > 0);
-            }
-        });
-    }
-
     @Test
-    public void isValid_ShouldReturnFalseIfNull() throws Exception {
+    public void isValid_ShouldReturnFalseIfNull() {
         boolean result = StringUtil.isValid(null);
         assertFalse(result);
     }
 
     @Test
-    public void isValid_ShouldReturnFalseIfEmpty() throws Exception {
+    public void isValid_ShouldReturnFalseIfEmpty() {
         boolean result = StringUtil.isValid("");
         assertFalse(result);
     }
 
     @Test
-    public void isValid_ShouldReturnFalseIfNullString() throws Exception {
+    public void isValid_ShouldReturnFalseIfNullString() {
         boolean result = StringUtil.isValid("null");
         assertFalse(result);
     }
 
     @Test
-    public void isValid_ShouldReturnTrueIfValid() throws Exception {
+    public void isValid_ShouldReturnTrueIfValid() {
         boolean result = StringUtil.isValid("value");
         assertTrue(result);
     }
 
     @Test
-    public void isNullOrEmpty_ShouldReturnTrueIfNull() throws Exception {
+    public void isNullOrEmpty_ShouldReturnTrueIfNull() {
         boolean result = StringUtil.isNullOrEmpty(null);
         assertTrue(result);
     }
 
     @Test
-    public void isNullOrEmpty_ShouldReturnTrueIfEmpty() throws Exception {
+    public void isNullOrEmpty_ShouldReturnTrueIfEmpty() {
         boolean result = StringUtil.isNullOrEmpty("");
         assertTrue(result);
     }
 
     @Test
-    public void isNullOrEmpty_ShouldReturnTrueIfOnlySpaces() throws Exception {
+    public void isNullOrEmpty_ShouldReturnTrueIfOnlySpaces() {
         boolean result = StringUtil.isNullOrEmpty("  ");
         assertTrue(result);
     }
 
     @Test
-    public void isNullOrEmpty_ShouldReturnFalseIfNotEmpty() throws Exception {
+    public void isNullOrEmpty_ShouldReturnFalseIfNotEmpty() {
         boolean result = StringUtil.isNullOrEmpty(" hello ");
         assertFalse(result);
     }
 
     @Test
-    public void controlToSpace_ShouldReturnEmptyIfNullValue() throws Exception {
+    public void controlToSpace_ShouldReturnEmptyIfNullValue() {
         String result = StringUtil.controlToSpace(null);
         assertEquals("", result);
     }
 
     @Test
-    public void controlToSpace_ShouldReturnEmptyIfEmptyValue() throws Exception {
+    public void controlToSpace_ShouldReturnEmptyIfEmptyValue() {
         String result = StringUtil.controlToSpace("");
         assertEquals("", result);
     }
 
     @Test
-    public void controlToSpace_ShouldReturnStringWithoutControlChars() throws Exception {
+    public void controlToSpace_ShouldReturnStringWithoutControlChars() {
         //testing with 2 line feeds
         String result = StringUtil.controlToSpace("" +'\u0010'+'\u0010');
         assertEquals("  ", result);

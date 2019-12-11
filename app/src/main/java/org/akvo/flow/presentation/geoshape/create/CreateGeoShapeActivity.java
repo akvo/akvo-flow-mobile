@@ -19,6 +19,7 @@
 
 package org.akvo.flow.presentation.geoshape.create;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.location.Location;
@@ -33,11 +34,13 @@ import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.Style;
 
 import org.akvo.flow.R;
-import org.akvo.flow.activity.BackActivity;
+import org.akvo.flow.app.FlowApp;
+import org.akvo.flow.injector.component.ApplicationComponent;
+import org.akvo.flow.uicomponents.BackActivity;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
 import org.akvo.flow.offlinemaps.presentation.geoshapes.GeoShapesMapViewImpl;
-import org.akvo.flow.presentation.SnackBarManager;
+import org.akvo.flow.uicomponents.SnackBarManager;
 import org.akvo.flow.presentation.geoshape.DeletePointDialog;
 import org.akvo.flow.presentation.geoshape.DeleteShapeDialog;
 import org.akvo.flow.presentation.geoshape.entities.Shape;
@@ -48,6 +51,8 @@ import org.akvo.flow.util.ConstantUtil;
 import javax.inject.Inject;
 
 import androidx.annotation.StringRes;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.PermissionChecker;
 
 import static org.akvo.flow.offlinemaps.presentation.geoshapes.GeoShapeConstants.ACCURACY_THRESHOLD;
 import static org.akvo.flow.offlinemaps.presentation.geoshapes.GeoShapeConstants.CIRCLE_SOURCE_ID;
@@ -103,6 +108,15 @@ public class CreateGeoShapeActivity extends BackActivity implements
                         .applicationComponent(getApplicationComponent())
                         .build();
         viewComponent.inject(this);
+    }
+
+    /**
+     * Get the Main Application component for dependency injection.
+     *
+     * @return {@link ApplicationComponent}
+     */
+    private ApplicationComponent getApplicationComponent() {
+        return ((FlowApp) getApplication()).getApplicationComponent();
     }
 
     private void setUpBottomBar() {
@@ -209,6 +223,11 @@ public class CreateGeoShapeActivity extends BackActivity implements
         if (isLocationAllowed()) {
             mapView.displayUserLocation();
         }
+    }
+
+    protected boolean isLocationAllowed() {
+        return ContextCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION) == PermissionChecker.PERMISSION_GRANTED;
     }
 
     private void setMapClicks() {

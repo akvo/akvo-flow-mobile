@@ -50,7 +50,7 @@ import butterknife.ButterKnife;
 
 public class HelpActivity extends BackActivity {
 
-    private static final String SUPPORT_URL = "http://flowsupport.akvo.org/container/show/akvo-flow-app";
+    private static final String SUPPORT_URL = "https://flowsupport.akvo.org/container/show/akvo-flow-app";
 
     @BindView(R.id.help_wv)
     WebView helpWv;

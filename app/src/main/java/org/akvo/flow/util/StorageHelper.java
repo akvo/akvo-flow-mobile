@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017,2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -23,9 +23,15 @@ package org.akvo.flow.util;
 import android.os.Environment;
 import android.os.StatFs;
 
+import javax.inject.Inject;
+
 import timber.log.Timber;
 
 public class StorageHelper {
+
+    @Inject
+    public StorageHelper() {
+    }
 
     public long getExternalStorageAvailableSpace() {
         if (!Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {

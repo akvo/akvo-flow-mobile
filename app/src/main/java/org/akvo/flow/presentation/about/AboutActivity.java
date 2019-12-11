@@ -25,10 +25,12 @@ import android.widget.TextView;
 
 import org.akvo.flow.BuildConfig;
 import org.akvo.flow.R;
-import org.akvo.flow.activity.BackActivity;
+import org.akvo.flow.app.FlowApp;
+import org.akvo.flow.injector.component.ApplicationComponent;
+import org.akvo.flow.uicomponents.BackActivity;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
-import org.akvo.flow.presentation.SnackBarManager;
+import org.akvo.flow.uicomponents.SnackBarManager;
 import org.akvo.flow.presentation.entity.ViewApkData;
 import org.akvo.flow.tracking.TrackingHelper;
 import org.akvo.flow.ui.Navigator;
@@ -85,6 +87,15 @@ public class AboutActivity extends BackActivity implements AboutView {
         ViewComponent viewComponent = DaggerViewComponent.builder()
                 .applicationComponent(getApplicationComponent()).build();
         viewComponent.inject(this);
+    }
+
+    /**
+     * Get the Main Application component for dependency injection.
+     *
+     * @return {@link ApplicationComponent}
+     */
+    private ApplicationComponent getApplicationComponent() {
+        return ((FlowApp) getApplication()).getApplicationComponent();
     }
 
     @OnClick(R.id.text_check_updates)

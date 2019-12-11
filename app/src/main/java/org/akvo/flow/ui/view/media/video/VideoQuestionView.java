@@ -24,8 +24,6 @@ import android.Manifest;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
-import androidx.annotation.Nullable;
-import androidx.core.content.FileProvider;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.ImageView;
@@ -41,7 +39,7 @@ import org.akvo.flow.event.QuestionInteractionEvent;
 import org.akvo.flow.event.SurveyListener;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
-import org.akvo.flow.presentation.SnackBarManager;
+import org.akvo.flow.uicomponents.SnackBarManager;
 import org.akvo.flow.serialization.response.value.MediaValue;
 import org.akvo.flow.ui.Navigator;
 import org.akvo.flow.ui.view.QuestionView;
@@ -55,6 +53,8 @@ import java.io.File;
 
 import javax.inject.Inject;
 
+import androidx.annotation.Nullable;
+import androidx.core.content.FileProvider;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -287,7 +287,7 @@ public class VideoQuestionView extends QuestionView
             Question question = getQuestion();
             Media media = new Media();
             media.setFilename(filePath);
-            String value = MediaValue.serialize(media);
+            String value = MediaValue.serialize(media, false);
             response = new QuestionResponse.QuestionResponseBuilder()
                     .setValue(value)
                     .setType(ConstantUtil.VIDEO_RESPONSE_TYPE)

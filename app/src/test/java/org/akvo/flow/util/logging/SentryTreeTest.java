@@ -41,7 +41,7 @@ public class SentryTreeTest {
     private static final IllegalArgumentException TEST_EXCEPTION = new IllegalArgumentException("");
 
     @Test
-    public void log_shouldIgnoreExceptionIfNullThrowable() throws Exception {
+    public void log_shouldIgnoreExceptionIfNullThrowable() {
         SentryTree tree = spy(new SentryTree());
 
         tree.log(Log.ERROR, TEST_TAG, TEST_MESSAGE, null);
@@ -50,7 +50,7 @@ public class SentryTreeTest {
     }
 
     @Test
-    public void log_shouldIgnoreExceptionIfLowerThanError() throws Exception {
+    public void log_shouldIgnoreExceptionIfLowerThanError() {
         SentryTree tree = spy(new SentryTree());
 
         tree.log(Log.DEBUG, TEST_TAG, TEST_MESSAGE, TEST_EXCEPTION);
@@ -59,7 +59,7 @@ public class SentryTreeTest {
     }
 
     @Test
-    public void log_shouldIgnoreExceptionIfFilteredException() throws Exception {
+    public void log_shouldIgnoreExceptionIfFilteredException() {
         SentryTree tree = spy(new SentryTree());
 
         tree.log(Log.ERROR, TEST_TAG, TEST_MESSAGE, new java.net.ConnectException());
@@ -68,7 +68,26 @@ public class SentryTreeTest {
     }
 
     @Test
-    public void log_shouldCaptureAcceptedException() throws Exception {
+    public void log_shouldIgnoreExceptionIfFilteredNestedException() {
+        SentryTree tree = spy(new SentryTree());
+
+        tree.log(Log.ERROR, TEST_TAG, TEST_MESSAGE, new Exception(new java.net.ConnectException()));
+
+        verify(tree, times(0)).captureException(any(Throwable.class), anyString());
+    }
+
+    @Test
+    public void log_shouldIgnoreExceptionIfFilteredMessage() {
+        SentryTree tree = spy(new SentryTree());
+
+        tree.log(Log.ERROR, TEST_TAG, "HTTP 500 Internal Server Error",
+                new java.net.ConnectException());
+
+        verify(tree, times(0)).captureException(any(Throwable.class), anyString());
+    }
+
+    @Test
+    public void log_shouldCaptureAcceptedException() {
         SentryTree tree = spy(new SentryTree());
         doNothing().when(tree).captureException(any(Throwable.class), anyString());
 

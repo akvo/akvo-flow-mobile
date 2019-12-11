@@ -35,7 +35,7 @@ import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.injector.component.ApplicationComponent;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
-import org.akvo.flow.presentation.SnackBarManager;
+import org.akvo.flow.uicomponents.SnackBarManager;
 import org.akvo.flow.tracking.TrackingHelper;
 import org.akvo.flow.util.AlarmHelper;
 import org.akvo.flow.util.BootReceiverHelper;

@@ -24,16 +24,17 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.view.ViewTreeObserver;
-import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
 import org.akvo.flow.R;
+import org.akvo.flow.app.FlowApp;
+import org.akvo.flow.injector.component.ApplicationComponent;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
-import org.akvo.flow.presentation.BaseActivity;
 import org.akvo.flow.ui.view.signature.SignatureDrawView;
+import org.akvo.flow.uicomponents.LocaleAwareActivity;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.ViewUtil;
 import org.akvo.flow.util.image.GlideImageLoader;
@@ -50,7 +51,7 @@ import butterknife.OnTextChanged;
 
 import static org.akvo.flow.R.id.signature;
 
-public class SignatureActivity extends BaseActivity
+public class SignatureActivity extends LocaleAwareActivity
         implements SignatureDrawView.SignatureViewListener,
         SignatureView {
 
@@ -71,7 +72,6 @@ public class SignatureActivity extends BaseActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_signature);
         ButterKnife.bind(this);
         initializeInjector();
@@ -88,6 +88,15 @@ public class SignatureActivity extends BaseActivity
         ViewComponent viewComponent = DaggerViewComponent.builder()
                 .applicationComponent(getApplicationComponent()).build();
         viewComponent.inject(this);
+    }
+
+    /**
+     * Get the Main Application component for dependency injection.
+     *
+     * @return {@link ApplicationComponent}
+     */
+    private ApplicationComponent getApplicationComponent() {
+        return ((FlowApp) getApplication()).getApplicationComponent();
     }
 
     @Override

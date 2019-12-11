@@ -34,7 +34,6 @@ import io.reactivex.Observable;
 @Singleton
 public class SharedPreferencesDataSource {
 
-    private static final String KEY_LOCALE = "pref.locale";
     private static final String KEY_SCREEN_ON = "screen.keepon";
     private static final String KEY_DEVICE_IDENTIFIER = "device.identifier";
     private static final String KEY_MAX_IMG_SIZE = "media.img.maxsize";
@@ -67,10 +66,6 @@ public class SharedPreferencesDataSource {
 
     public Observable<Boolean> keepScreenOn() {
         return Observable.just(getBoolean(KEY_SCREEN_ON, DEFAULT_VALUE_SCREEN_ON));
-    }
-
-    public Observable<String> getAppLanguage() {
-        return Observable.just(getString(KEY_LOCALE, ""));
     }
 
     public Observable<Integer> getImageSize() {
@@ -115,11 +110,6 @@ public class SharedPreferencesDataSource {
 
     public Observable<Boolean> saveEnableMobileData(Boolean enable) {
         setBoolean(KEY_CELL_UPLOAD, enable);
-        return Observable.just(true);
-    }
-
-    public Observable<Boolean> saveLanguage(String language) {
-        setString(KEY_LOCALE, language);
         return Observable.just(true);
     }
 

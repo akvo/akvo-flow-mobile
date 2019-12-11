@@ -22,8 +22,6 @@ package org.akvo.flow.ui.view;
 import android.Manifest;
 import android.content.Context;
 import android.os.Bundle;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
@@ -37,13 +35,13 @@ import org.akvo.flow.event.QuestionInteractionEvent;
 import org.akvo.flow.event.SurveyListener;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
-import org.akvo.flow.presentation.SnackBarManager;
 import org.akvo.flow.presentation.form.caddisfly.CaddisflyPresenter;
 import org.akvo.flow.presentation.form.caddisfly.CaddisflyView;
 import org.akvo.flow.ui.Navigator;
 import org.akvo.flow.ui.adapter.CaddisflyResultsAdapter;
 import org.akvo.flow.ui.model.caddisfly.CaddisflyJsonMapper;
 import org.akvo.flow.ui.model.caddisfly.CaddisflyTestResult;
+import org.akvo.flow.uicomponents.SnackBarManager;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.StoragePermissionsHelper;
 
@@ -54,6 +52,8 @@ import java.util.Locale;
 
 import javax.inject.Inject;
 
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import timber.log.Timber;
 
 public class CaddisflyQuestionView extends QuestionView implements View.OnClickListener,
@@ -91,8 +91,7 @@ public class CaddisflyQuestionView extends QuestionView implements View.OnClickL
 
         RecyclerView resultsRv = findViewById(R.id.caddisfly_results_recycler_view);
         resultsRv.setLayoutManager(new LinearLayoutManager(resultsRv.getContext()));
-        caddisflyResultsAdapter = new CaddisflyResultsAdapter(
-                new ArrayList<CaddisflyTestResult>());
+        caddisflyResultsAdapter = new CaddisflyResultsAdapter(new ArrayList<>());
         resultsRv.setAdapter(caddisflyResultsAdapter);
         Button mButton = findViewById(R.id.caddisfly_button);
         if (isReadOnly()) {
@@ -140,7 +139,7 @@ public class CaddisflyQuestionView extends QuestionView implements View.OnClickL
     public void resetQuestion(boolean fireEvent) {
         super.resetQuestion(fireEvent);
         mValue = null;
-        caddisflyTestResults = caddisflyJsonMapper.transform(mValue);
+        caddisflyTestResults = new ArrayList<>();
         displayResponseView();
     }
 
@@ -192,15 +191,12 @@ public class CaddisflyQuestionView extends QuestionView implements View.OnClickL
     }
 
     private void storagePermissionNotGranted() {
-        final View.OnClickListener retryListener = new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (storagePermissionsHelper
-                        .userPressedDoNotShowAgain((FormActivity) getContext())) {
-                    navigator.navigateToAppSystemSettings(getContext());
-                } else {
-                    requestStoragePermissions();
-                }
+        final View.OnClickListener retryListener = v -> {
+            if (storagePermissionsHelper
+                    .userPressedDoNotShowAgain((FormActivity) getContext())) {
+                navigator.navigateToAppSystemSettings(getContext());
+            } else {
+                requestStoragePermissions();
             }
         };
         snackBarManager
@@ -215,7 +211,7 @@ public class CaddisflyQuestionView extends QuestionView implements View.OnClickL
         data.putString(ConstantUtil.CADDISFLY_RESOURCE_ID, q.getCaddisflyRes());
         data.putString(ConstantUtil.CADDISFLY_QUESTION_ID, q.getId());
         data.putString(ConstantUtil.CADDISFLY_QUESTION_TITLE, q.getText());
-        data.putString(ConstantUtil.CADDISFLY_DATAPOINT_ID, mSurveyListener.getDatapointId());
+        data.putString(ConstantUtil.CADDISFLY_DATAPOINT_ID, mSurveyListener.getDataPointId());
         data.putString(ConstantUtil.CADDISFLY_FORM_ID, mSurveyListener.getFormId());
         data.putString(ConstantUtil.CADDISFLY_LANGUAGE, Locale.getDefault().getLanguage());
         String serverBase = BuildConfig.SERVER_BASE;

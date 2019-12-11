@@ -30,7 +30,7 @@ import java.util.Map;
 import javax.inject.Inject;
 
 import io.reactivex.Observable;
-import io.reactivex.functions.Function5;
+import io.reactivex.functions.Function4;
 
 public class GetUserSettings extends UseCase {
 
@@ -46,13 +46,12 @@ public class GetUserSettings extends UseCase {
     @Override
     protected <T> Observable buildUseCaseObservable(Map<String, T> parameters) {
         return Observable.zip(userRepository.keepScreenOn(), userRepository.mobileSyncAllowed(),
-                userRepository.getAppLanguage(), userRepository.getImageSize(),
-                userRepository.getDeviceId(),
-                new Function5<Boolean, Boolean, String, Integer, String, UserSettings>() {
+                userRepository.getImageSize(), userRepository.getDeviceId(),
+                new Function4<Boolean, Boolean, Integer, String, UserSettings>() {
                     @Override
-                    public UserSettings apply(Boolean screenOn, Boolean mobileSync, String language,
+                    public UserSettings apply(Boolean screenOn, Boolean mobileSync,
                             Integer imageSize, String deviceId) {
-                        return new UserSettings(screenOn, mobileSync, language, imageSize,
+                        return new UserSettings(screenOn, mobileSync, imageSize,
                                 deviceId);
                     }
                 });

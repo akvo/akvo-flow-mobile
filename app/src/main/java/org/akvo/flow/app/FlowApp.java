@@ -19,11 +19,8 @@
 
 package org.akvo.flow.app;
 
-import android.content.res.Configuration;
-import android.text.TextUtils;
-
+import com.halfhp.rxtracer.RxTracer;
 import com.mapbox.mapboxsdk.Mapbox;
-import com.squareup.leakcanary.LeakCanary;
 
 import org.akvo.flow.BuildConfig;
 import org.akvo.flow.R;
@@ -41,13 +38,11 @@ import org.akvo.flow.service.FileChangeTrackingWorker;
 import org.akvo.flow.util.logging.LoggingHelper;
 
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import androidx.annotation.Nullable;
 import androidx.multidex.MultiDexApplication;
 import timber.log.Timber;
 
@@ -72,26 +67,16 @@ public class FlowApp extends MultiDexApplication {
     @Override
     public void onCreate() {
         super.onCreate();
-        if (LeakCanary.isInAnalyzerProcess(this)) {
-            // This process is dedicated to LeakCanary for heap analysis.
-            // You should not init your app in this process.
-            return;
-        }
 
         Mapbox.getInstance(this, getString(R.string.mapbox_token));
 
-        installLeakCanary();
         initializeInjector();
         initLogging();
-        updateLocale();
+        RxTracer.enable();
         startUpdateService();
         startBootstrapFolderTracker();
         updateLoggingInfo();
         saveConfig();
-    }
-
-    private void installLeakCanary() {
-        LeakCanary.install(this);
     }
 
     private void saveConfig() {
@@ -147,55 +132,5 @@ public class FlowApp extends MultiDexApplication {
             }
         }, null);
 
-    }
-
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-
-        // This config will contain system locale. We need a workaround
-        // to enable our custom locale again. Note that this approach
-        // is not very 'clean', but Android makes it really hard to
-        // customize an application wide locale.
-        Locale savedLocale = getSavedLocale();
-        if (localeNeedsUpdating(savedLocale, newConfig.locale)) {
-            // Re-enable our custom locale, using this newConfig reference
-            Locale.setDefault(savedLocale);
-            updateConfiguration(savedLocale, newConfig);
-        }
-    }
-
-    private void updateLocale() {
-        Locale savedLocale = getSavedLocale();
-        Locale currentLocale = Locale.getDefault();
-        if (localeNeedsUpdating(savedLocale, currentLocale)) {
-            Locale.setDefault(savedLocale);
-            updateConfiguration(savedLocale, new Configuration());
-        }
-    }
-
-    private boolean localeNeedsUpdating(Locale savedLocale, Locale currentLocale) {
-        return savedLocale != null && currentLocale != null && !currentLocale.getLanguage()
-                .equalsIgnoreCase(savedLocale.getLanguage());
-    }
-
-    private void updateConfiguration(Locale savedLocale, Configuration config) {
-        config.locale = savedLocale;
-        getBaseContext().getResources().updateConfiguration(config, null);
-    }
-
-    @Nullable
-    private Locale getSavedLocale() {
-        String languageCode = loadLocalePref();
-        Locale savedLocale = null;
-        if (!TextUtils.isEmpty(languageCode)) {
-            savedLocale = new Locale(languageCode);
-        }
-        return savedLocale;
-    }
-
-    @Nullable
-    private String loadLocalePref() {
-        return prefs.getString(Prefs.KEY_LOCALE, null);
     }
 }

@@ -23,12 +23,16 @@ package org.akvo.flow.data.datasource.files;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.ParcelFileDescriptor;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
+
+import org.akvo.flow.data.entity.images.DomainImageMetadataMapper;
+import org.akvo.flow.data.entity.images.DataImageLocation;
+import org.akvo.flow.domain.entity.DomainImageMetadata;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import io.reactivex.Observable;
 import io.reactivex.functions.BiFunction;
 import io.reactivex.functions.Function;
@@ -38,11 +42,14 @@ public class ImageDataSource {
 
     private final MediaResolverHelper mediaResolverHelper;
     private final BitmapHelper bitmapHelper;
+    private final DomainImageMetadataMapper metadataMapper;
 
     @Inject
-    public ImageDataSource(MediaResolverHelper mediaResolverHelper, BitmapHelper bitmapHelper) {
+    public ImageDataSource(MediaResolverHelper mediaResolverHelper, BitmapHelper bitmapHelper,
+            DomainImageMetadataMapper metadataMapper) {
         this.mediaResolverHelper = mediaResolverHelper;
         this.bitmapHelper = bitmapHelper;
+        this.metadataMapper = metadataMapper;
     }
 
     public Observable<Boolean> saveImages(@NonNull Bitmap bitmap, String originalFilePath,
@@ -57,29 +64,34 @@ public class ImageDataSource {
                 });
     }
 
-    public Observable<Boolean> copyResizedImage(final Uri uri, final String resizedImagePath,
+    public Observable<DomainImageMetadata> copyResizedImage(final Uri uri, final String resizedImagePath,
             final int imageSize, final boolean removeDuplicate) {
         return saveResizedImage(uri, resizedImagePath, imageSize)
-                .concatMap(new Function<Boolean, Observable<Boolean>>() {
+                .concatMap(new Function<DomainImageMetadata, Observable<DomainImageMetadata>>() {
                     @Override
-                    public Observable<Boolean> apply(Boolean saved) {
+                    public Observable<DomainImageMetadata> apply(DomainImageMetadata metadata) {
                         if (removeDuplicate) {
-                            return Observable.just(mediaResolverHelper.removeDuplicateImage(uri));
-                        } else {
-                            return Observable.just(saved);
+                           mediaResolverHelper.removeDuplicateImage(uri);
                         }
+                        return Observable.just(metadata);
                     }
                 });
     }
 
-    private Observable<Boolean> saveResizedImage(final Uri originalImagePath,
+    private Observable<DomainImageMetadata> saveResizedImage(final Uri originalImagePath,
             final String resizedImagePath, int imageSize) {
         return resizeImage(originalImagePath, resizedImagePath, imageSize)
-                .concatMap(new Function<Boolean, Observable<Boolean>>() {
+                .concatMap(new Function<Boolean, Observable<DomainImageMetadata>>() {
                     @Override
-                    public Observable<Boolean> apply(Boolean result) {
+                    public Observable<DomainImageMetadata> apply(Boolean result) {
                         return Observable.just(mediaResolverHelper
-                                .updateExifData(originalImagePath, resizedImagePath));
+                                .updateExifData(originalImagePath, resizedImagePath))
+                                .map(new Function<DataImageLocation, DomainImageMetadata>() {
+                                    @Override
+                                    public DomainImageMetadata apply(DataImageLocation location) {
+                                        return metadataMapper.transform(location, resizedImagePath);
+                                    }
+                                });
                     }
                 });
     }

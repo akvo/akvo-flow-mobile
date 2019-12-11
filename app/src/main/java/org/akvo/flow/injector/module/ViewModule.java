@@ -33,7 +33,6 @@ import org.akvo.flow.domain.interactor.datapoints.GetSavedDataPoints;
 import org.akvo.flow.domain.interactor.GetUserSettings;
 import org.akvo.flow.domain.interactor.MobileUploadSet;
 import org.akvo.flow.domain.interactor.PublishData;
-import org.akvo.flow.domain.interactor.SaveAppLanguage;
 import org.akvo.flow.domain.interactor.SaveEnableMobileData;
 import org.akvo.flow.domain.interactor.SaveImage;
 import org.akvo.flow.domain.interactor.SaveImageSize;
@@ -81,12 +80,6 @@ public class ViewModule {
     @Named("getUserSettings")
     UseCase provideGetUserSettings(GetUserSettings getUserSettings) {
         return getUserSettings;
-    }
-
-    @Provides
-    @Named("saveAppLanguage")
-    UseCase provideSaveAppLanguage(SaveAppLanguage saveAppLanguage) {
-        return saveAppLanguage;
     }
 
     @Provides

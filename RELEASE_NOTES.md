@@ -1,5 +1,25 @@
 Akvo FLOW app release notes
 ===========================
+# ver 2.8.3
+Date: 19 November 2019
+
+* **Fine tune sentry exceptions** - [#1289](https://github.com/akvo/akvo-flow-mobile/issues/1289)
+* **Fix crash after pressing delete everything** - [#1520](https://github.com/akvo/akvo-flow-mobile/issues/1520)
+* **Fix language change stopped working** - [#1526](https://github.com/akvo/akvo-flow-mobile/issues/1526)
+* **Crash when trying to submit a signature question** - [#1533](https://github.com/akvo/akvo-flow-mobile/issues/1533)
+
+---------------
+# ver 2.8.2
+Date: 30 October 2019
+
+* **Missing location data in image response** - [#1506](https://github.com/akvo/akvo-flow-mobile/issues/1506)
+* **Display image location instead of "geolocation saved"** - [#1480](https://github.com/akvo/akvo-flow-mobile/issues/1480)
+* **Small issues with data point name and ID pop up on the map** - [#1498](https://github.com/akvo/akvo-flow-mobile/issues/1498)
+* **App deployments are broken due to certificate not found** - [#1500](https://github.com/akvo/akvo-flow-mobile/issues/1500)
+* **Enable Bitrise CI** - [#1429](https://github.com/akvo/akvo-flow-mobile/issues/1429)
+
+---------------
+
 # ver 2.8.1
 Date: 02 October 2019
 

@@ -83,7 +83,7 @@ public class DatapointsFragment extends Fragment {
     }
 
     @Override
-    public void onAttach(Context context) {
+    public void onAttach(@NonNull Context context) {
         super.onAttach(context);
         if (! (context instanceof TrackingListener)) {
             throw new IllegalArgumentException("Activity must implement TrackingListener");
@@ -107,6 +107,7 @@ public class DatapointsFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        initializeInjector();
         mSurveyGroup = (SurveyGroup) getArguments()
                 .getSerializable(ConstantUtil.SURVEY_GROUP_EXTRA);
         tabNames = getResources().getStringArray(R.array.records_activity_tabs);
@@ -116,7 +117,6 @@ public class DatapointsFragment extends Fragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        initializeInjector();
         mDatabase.open();
     }
 
@@ -292,6 +292,7 @@ public class DatapointsFragment extends Fragment {
             }
         }
 
+        @NonNull
         @Override
         public Fragment getItem(int position) {
             if (position == POSITION_LIST) {

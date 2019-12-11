@@ -123,6 +123,13 @@ public class CascadeQuestionView extends QuestionView
         }
     }
 
+    @Override
+    public void onDestroy() {
+        if (mDatabase != null) {
+            mDatabase.close();
+        }
+    }
+
     private void updateSpinners(int updatedSpinnerIndex) {
         if (mDatabase == null) {
             return;

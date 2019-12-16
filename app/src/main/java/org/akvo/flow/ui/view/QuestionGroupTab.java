@@ -201,15 +201,31 @@ public class QuestionGroupTab extends ConstraintLayout
         }
     }
 
+    //TODO: this method should be refactored to find a better way to distinguish between
+    //repeatable and non repeatable groups
     private void displayResponses() {
         Map<String, QuestionResponse> responses = mSurveyListener.getResponses();
         for (QuestionView qv : mQuestionViews.values()) {
             String questionId = qv.getQuestion().getId();
+            /*
+             * This works for questions without repetitions in format 123456
+             * or the questions whose repetition is not 0 the the key is 123456|1
+             */
             if (responses.containsKey(questionId)) {
                 qv.rehydrate(responses.get(questionId));
             } else if (qv.getQuestion().isRepeatable() && !TextUtils.isEmpty(questionId)) {
-                questionId = questionId.split("\\|")[0];
-                if (responses.containsKey(questionId)) {
+                String[] questionIdRepetition = questionId.split("\\|");
+                questionId = questionIdRepetition[0];
+                int repetition = 0;
+                if (questionIdRepetition.length > 1) {
+                    repetition = Integer.parseInt(questionIdRepetition[1]);
+                }
+                /*
+                 * First rep (or rep 0), its questionId is in format 123456
+                 * after the second rep, the questionId format is 123451|1 etc...
+                 * So only the first repetition needs to be updated this way
+                 */
+                if (repetition == 0 && responses.containsKey(questionId)) {
                     qv.rehydrate(responses.get(questionId));
                 }
             }

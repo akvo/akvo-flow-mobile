@@ -29,8 +29,11 @@ import org.powermock.modules.junit4.PowerMockRunner;
 
 import java.io.File;
 
-import static junit.framework.Assert.*;
+import static junit.framework.TestCase.assertNotNull;
 import static junit.framework.TestCase.assertTrue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;

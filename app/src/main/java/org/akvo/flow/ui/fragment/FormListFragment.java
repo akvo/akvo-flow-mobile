@@ -142,7 +142,8 @@ public class FormListFragment extends ListFragment
             return viewForm.isEnabled();
         }
 
-        @NonNull @Override
+        @NonNull
+        @Override
         public View getView(int position, View convertView, @NonNull ViewGroup parent) {
             View listItem = convertView;
             FormViewHolder formViewHolder;

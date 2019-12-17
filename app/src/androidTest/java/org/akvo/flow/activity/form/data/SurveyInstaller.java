@@ -166,6 +166,15 @@ public class SurveyInstaller {
         };
     }
 
+    @NonNull
+    public static QuestionResponse.QuestionResponseBuilder[] generatePartialRepeatedGroupResponseData() {
+        return new QuestionResponse.QuestionResponseBuilder[] {
+                generateResponse("text-response-rep-one", ConstantUtil.VALUE_RESPONSE_TYPE, "205929118", 0),
+                generateResponse("1234567", ConstantUtil.VALUE_RESPONSE_TYPE, "205929119", 0),
+                generateResponse("text-response-rep-two", ConstantUtil.VALUE_RESPONSE_TYPE, "205929118", 1),
+        };
+    }
+
     public void clearSurveys() {
         for (File file : surveyFiles) {
             file.delete();

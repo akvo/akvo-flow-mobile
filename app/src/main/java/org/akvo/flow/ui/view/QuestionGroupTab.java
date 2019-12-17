@@ -201,7 +201,6 @@ public class QuestionGroupTab extends ConstraintLayout
         }
     }
 
-    //TODO: this method should be refactored to find a better way to distinguish between
     //repeatable and non repeatable groups
     private void displayResponses() {
         Map<String, QuestionResponse> responses = mSurveyListener.getResponses();

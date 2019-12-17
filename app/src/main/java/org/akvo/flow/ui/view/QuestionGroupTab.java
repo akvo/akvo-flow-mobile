@@ -201,7 +201,6 @@ public class QuestionGroupTab extends ConstraintLayout
         }
     }
 
-    //repeatable and non repeatable groups
     private void displayResponses() {
         Map<String, QuestionResponse> responses = mSurveyListener.getResponses();
         for (QuestionView qv : mQuestionViews.values()) {

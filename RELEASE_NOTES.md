@@ -1,5 +1,15 @@
 Akvo FLOW app release notes
 ===========================
+# ver 2.8.4
+Date: 18 December 2019
+
+* **Fix some codacy issues** - [#1517](https://github.com/akvo/akvo-flow-mobile/issues/1517)
+* **Empty repeated groups can be repeated** - [#1539](https://github.com/akvo/akvo-flow-mobile/issues/1539)
+* **Deleting a repeatable question group bug** - [#1540](https://github.com/akvo/akvo-flow-mobile/issues/1540)
+* **Filter out some sentry issues** - [#1545](https://github.com/akvo/akvo-flow-mobile/issues/1545)
+* **Repeatable groups get copied** - [#1555](https://github.com/akvo/akvo-flow-mobile/issues/1555)
+
+---------------
 # ver 2.8.3
 Date: 19 November 2019
 

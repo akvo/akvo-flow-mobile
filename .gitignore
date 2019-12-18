@@ -43,7 +43,7 @@ util/scripts/temp.md
 captures/
 
 #sentry config files
-sentry.properties
+/sentry.properties
 
 #CI config
 build_config

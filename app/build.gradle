@@ -1,10 +1,10 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
+
 if (!project.hasProperty("nodexcount")) {
     apply plugin: 'com.getkeepsafe.dexcount'
 }
-apply plugin: 'io.fabric'
 
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
@@ -34,6 +34,10 @@ android {
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    dexOptions {
+        preDexLibraries true
     }
 
     signingConfigs {
@@ -85,36 +89,47 @@ android {
             proguardFile 'proguard-files/proguard-glide.pro'
             proguardFile 'proguard-files/proguard-google-play-services.pro'
             proguardFile 'proguard-files/proguard-gson.pro'
-            proguardFile 'proguard-files/proguard-maps-utils.pro'
             proguardFile 'proguard-files/proguard-prettytime.pro'
             proguardFile 'proguard-files/proguard-rxjava.pro'
             proguardFile 'proguard-files/proguard-square-retrofit.pro'
             proguardFile 'proguard-files/proguard-support-v7-appcompat.pro'
             proguardFile 'proguard-files/okhttp3.pro'
             proguardFile 'proguard-files/mapbox.pro'
-            proguardFile 'proguard-files/crashlytics.pro'
+            proguardFile 'proguard-files/leakcanary.pro'
             proguardFile getDefaultProguardFile('proguard-android.txt')
             signingConfig signingConfigs.flowRelease
         }
         debug {
             minifyEnabled true
             multiDexEnabled true
-            useProguard false
             proguardFile 'proguard-files/proguard-rules.pro'
             proguardFile 'proguard-files/proguard-butterknife.pro'
             proguardFile 'proguard-files/proguard-glide.pro'
             proguardFile 'proguard-files/proguard-google-play-services.pro'
             proguardFile 'proguard-files/proguard-gson.pro'
-            proguardFile 'proguard-files/proguard-maps-utils.pro'
             proguardFile 'proguard-files/proguard-prettytime.pro'
             proguardFile 'proguard-files/proguard-rxjava.pro'
             proguardFile 'proguard-files/proguard-square-retrofit.pro'
             proguardFile 'proguard-files/proguard-support-v7-appcompat.pro'
             proguardFile 'proguard-files/okhttp3.pro'
             proguardFile 'proguard-files/mapbox.pro'
-            proguardFile 'proguard-files/crashlytics.pro'
+            proguardFile 'proguard-files/leakcanary.pro'
             proguardFile getDefaultProguardFile('proguard-android.txt')
             multiDexKeepProguard file('proguard-files/proguard-multidex-rules.pro')
+
+            testProguardFile 'proguard-files/proguard-rules.pro'
+            testProguardFile 'proguard-files/proguard-butterknife.pro'
+            testProguardFile 'proguard-files/proguard-glide.pro'
+            testProguardFile 'proguard-files/proguard-google-play-services.pro'
+            testProguardFile 'proguard-files/proguard-gson.pro'
+            testProguardFile 'proguard-files/proguard-prettytime.pro'
+            testProguardFile 'proguard-files/proguard-rxjava.pro'
+            testProguardFile 'proguard-files/proguard-square-retrofit.pro'
+            testProguardFile 'proguard-files/proguard-support-v7-appcompat.pro'
+            testProguardFile 'proguard-files/okhttp3.pro'
+            testProguardFile 'proguard-files/mapbox.pro'
+            testProguardFile 'proguard-files/leakcanary.pro'
+            testProguardFile getDefaultProguardFile('proguard-android.txt')
         }
     }
 
@@ -231,7 +246,7 @@ dependencies {
     androidTestImplementation "androidx.test:core:${rootProject.ext.androidXCore}"
     androidTestImplementation "com.google.dexmaker:dexmaker:${rootProject.ext.dexMakerVersion}"
     androidTestImplementation "com.google.dexmaker:dexmaker-mockito:${rootProject.ext.dexMakerVersion}"
-    androidTestImplementation "androidx.test:rules:${rootProject.ext.supportTestRulesVersion}"
+    androidTestImplementation "androidx.test:rules:${rootProject.ext.rulesVersion}"
     androidTestImplementation "androidx.test.espresso:espresso-core:${rootProject.ext.espressoCoreVersion}"
     androidTestImplementation "androidx.test.espresso:espresso-contrib:${rootProject.ext.espressoContribVersion}"
 

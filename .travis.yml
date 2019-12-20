@@ -26,8 +26,10 @@ cache:
 android:
   components:
     - tools
+    - build-tools-29.0.2
     - build-tools-28.0.3
     - android-28
+    - android-29
     - extra-android-support
     - extra-google-m2repository
     - extra-android-m2repository
@@ -36,6 +38,7 @@ android:
     - 'android-sdk-preview-license-.+'
     - 'android-sdk-license-.+'
     - 'google-gdk-license-.+'
+
 before_install:
   - openssl aes-256-cbc -K $encrypted_b2f5a33a8343_key -iv $encrypted_b2f5a33a8343_iv -in build_config.enc -out build_config -d
   - tar xvf build_config

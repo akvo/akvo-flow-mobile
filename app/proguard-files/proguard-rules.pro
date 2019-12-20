@@ -36,7 +36,11 @@
 # Samsung Android 4.2 bug workaround
 -keep class !android.support.v7.view.menu.**,!android.support.design.internal.NavigationMenu,!android.support.design.internal.NavigationMenuPresenter,!android.support.design.internal.NavigationSubMenu,** {*;}
 
+# for tests
 -dontwarn org.xmlpull.v1.**
+-dontwarn org.mockito.**
+-dontwarn sun.reflect.**
+-dontwarn android.test.**
 
 # In case of proguard issues just delete all the proguard config files
 # and uncomment the following lines

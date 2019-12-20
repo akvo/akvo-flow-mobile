@@ -123,6 +123,20 @@ android {
             proguardFile 'proguard-files/leakcanary.pro'
             proguardFile getDefaultProguardFile('proguard-android.txt')
             multiDexKeepProguard file('proguard-files/proguard-multidex-rules.pro')
+
+            testProguardFile 'proguard-files/proguard-rules.pro'
+            testProguardFile 'proguard-files/proguard-butterknife.pro'
+            testProguardFile 'proguard-files/proguard-glide.pro'
+            testProguardFile 'proguard-files/proguard-google-play-services.pro'
+            testProguardFile 'proguard-files/proguard-gson.pro'
+            testProguardFile 'proguard-files/proguard-prettytime.pro'
+            testProguardFile 'proguard-files/proguard-rxjava.pro'
+            testProguardFile 'proguard-files/proguard-square-retrofit.pro'
+            testProguardFile 'proguard-files/proguard-support-v7-appcompat.pro'
+            testProguardFile 'proguard-files/okhttp3.pro'
+            testProguardFile 'proguard-files/mapbox.pro'
+            testProguardFile 'proguard-files/leakcanary.pro'
+            testProguardFile getDefaultProguardFile('proguard-android.txt')
         }
     }
 

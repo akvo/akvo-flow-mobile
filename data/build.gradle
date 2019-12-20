@@ -26,12 +26,6 @@ android {
         exclude '.readme'
     }
 
-    buildTypes {
-        release {
-            minifyEnabled false
-        }
-    }
-
     lintOptions {
         abortOnError false
         ignore 'InvalidPackage'

@@ -240,7 +240,7 @@ dependencies {
     androidTestImplementation "androidx.test:core:${rootProject.ext.androidXCore}"
     androidTestImplementation "com.google.dexmaker:dexmaker:${rootProject.ext.dexMakerVersion}"
     androidTestImplementation "com.google.dexmaker:dexmaker-mockito:${rootProject.ext.dexMakerVersion}"
-    androidTestImplementation "androidx.test:rules:${rootProject.ext.supportTestRulesVersion}"
+    androidTestImplementation "androidx.test:rules:${rootProject.ext.rulesVersion}"
     androidTestImplementation "androidx.test.espresso:espresso-core:${rootProject.ext.espressoCoreVersion}"
     androidTestImplementation "androidx.test.espresso:espresso-contrib:${rootProject.ext.espressoContribVersion}"
 

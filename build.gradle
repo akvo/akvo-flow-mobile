@@ -11,7 +11,6 @@ buildscript {
 
     dependencies {
         classpath 'com.android.tools.build:gradle:3.3.2'
-        classpath 'io.sentry:sentry-android-gradle-plugin:1.7.22'
         classpath 'com.getkeepsafe.dexcount:dexcount-gradle-plugin:0.8.6'
         classpath 'com.google.gms:google-services:4.3.3'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
@@ -55,7 +54,6 @@ ext {
     rxAndroidVersion = "2.1.1"
     rxJavaVersion = "2.2.8"
     rxTracerVersion = "0.1.2"
-    sentryVersion = "1.7.22"
     slfVersion = "1.7.25"
     sqlbriteVersion = "2.0.0"
     timberVersion = "4.7.1"

@@ -1,16 +1,10 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
-apply plugin: 'io.sentry.android.gradle'
 if (!project.hasProperty("nodexcount")) {
     apply plugin: 'com.getkeepsafe.dexcount'
 }
 apply plugin: 'io.fabric'
-
-sentry {
-    autoProguardConfig true
-    autoUpload true
-}
 
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
@@ -94,7 +88,6 @@ android {
             proguardFile 'proguard-files/proguard-maps-utils.pro'
             proguardFile 'proguard-files/proguard-prettytime.pro'
             proguardFile 'proguard-files/proguard-rxjava.pro'
-            proguardFile 'proguard-files/proguard-sentry.pro'
             proguardFile 'proguard-files/proguard-square-retrofit.pro'
             proguardFile 'proguard-files/proguard-support-v7-appcompat.pro'
             proguardFile 'proguard-files/okhttp3.pro'
@@ -115,7 +108,6 @@ android {
             proguardFile 'proguard-files/proguard-maps-utils.pro'
             proguardFile 'proguard-files/proguard-prettytime.pro'
             proguardFile 'proguard-files/proguard-rxjava.pro'
-            proguardFile 'proguard-files/proguard-sentry.pro'
             proguardFile 'proguard-files/proguard-square-retrofit.pro'
             proguardFile 'proguard-files/proguard-support-v7-appcompat.pro'
             proguardFile 'proguard-files/okhttp3.pro'
@@ -209,8 +201,6 @@ dependencies {
     annotationProcessor "com.google.dagger:dagger-compiler:${rootProject.ext.daggerVersion}"
     implementation "com.jakewharton:butterknife:${rootProject.ext.butterKnifeVersion}"
     annotationProcessor "com.jakewharton:butterknife-compiler:${rootProject.ext.butterKnifeVersion}"
-    implementation "io.sentry:sentry-android:${rootProject.ext.sentryVersion}"
-    implementation "org.slf4j:slf4j-nop:${rootProject.ext.slfVersion}"
     implementation "com.github.bumptech.glide:glide:${rootProject.ext.glideVersion}"
     annotationProcessor "com.github.bumptech.glide:compiler:${rootProject.ext.glideVersion}"
     implementation "com.squareup.sqlbrite2:sqlbrite:${rootProject.ext.sqlbriteVersion}"

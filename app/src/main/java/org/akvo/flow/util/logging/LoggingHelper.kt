@@ -17,16 +17,10 @@
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
+package org.akvo.flow.util.logging
 
-package org.akvo.flow.util.logging;
-
-import androidx.annotation.Nullable;
-
-public interface LoggingHelper {
-
-    void init();
-
-    void initLoginData(@Nullable String username, @Nullable String deviceId);
-
-    void clearUser();
+interface LoggingHelper {
+    fun init()
+    fun initLoginData(username: String?, deviceId: String?)
+    fun clearUser()
 }

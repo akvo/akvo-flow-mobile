@@ -5,6 +5,7 @@ apply plugin: 'io.sentry.android.gradle'
 if (!project.hasProperty("nodexcount")) {
     apply plugin: 'com.getkeepsafe.dexcount'
 }
+apply plugin: 'io.fabric'
 
 sentry {
     autoProguardConfig true
@@ -220,7 +221,8 @@ dependencies {
 
     debugImplementation "com.squareup.leakcanary:leakcanary-android:${rootProject.ext.leakCanaryVersion}"
 
-    implementation "com.google.firebase:firebase-analytics:${rootProject.ext.firebaseVersion}"
+    implementation "com.google.firebase:firebase-analytics:${rootProject.ext.firebaseAnalyticsVersion}"
+    implementation "com.crashlytics.sdk.android:crashlytics:${rootProject.ext.crashlyticsVersion}"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
     implementation "androidx.core:core-ktx:${rootProject.ext.coreKtxVersion}"
     implementation "com.mapbox.mapboxsdk:mapbox-android-sdk:${rootProject.ext.mapboxVersion}"

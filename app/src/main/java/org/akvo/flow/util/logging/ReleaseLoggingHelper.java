@@ -21,12 +21,12 @@ package org.akvo.flow.util.logging;
 
 import android.content.Context;
 import android.content.res.Resources;
-import androidx.annotation.NonNull;
 import android.text.TextUtils;
 
 import org.akvo.flow.BuildConfig;
 import org.akvo.flow.R;
 
+import androidx.annotation.NonNull;
 import io.sentry.Sentry;
 import io.sentry.android.AndroidSentryClientFactory;
 import io.sentry.event.UserBuilder;
@@ -51,6 +51,7 @@ public class ReleaseLoggingHelper implements LoggingHelper {
             Sentry.getContext().addTag(GAE_INSTANCE_ID_TAG_KEY, BuildConfig.AWS_BUCKET);
             Timber.plant(new SentryTree());
         }
+        Timber.plant(new CrashlyticsTree()); //TODO: add all the tags
     }
 
     @Override

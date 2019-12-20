@@ -101,7 +101,7 @@ android {
             proguardFile 'proguard-files/proguard-support-v7-appcompat.pro'
             proguardFile 'proguard-files/okhttp3.pro'
             proguardFile 'proguard-files/mapbox.pro'
-            proguardFile 'proguard-files/crashlytics.pro'
+            proguardFile 'proguard-files/leakcanary.pro'
             proguardFile getDefaultProguardFile('proguard-android.txt')
             signingConfig signingConfigs.flowRelease
         }
@@ -120,7 +120,7 @@ android {
             proguardFile 'proguard-files/proguard-support-v7-appcompat.pro'
             proguardFile 'proguard-files/okhttp3.pro'
             proguardFile 'proguard-files/mapbox.pro'
-            proguardFile 'proguard-files/crashlytics.pro'
+            proguardFile 'proguard-files/leakcanary.pro'
             proguardFile getDefaultProguardFile('proguard-android.txt')
             multiDexKeepProguard file('proguard-files/proguard-multidex-rules.pro')
         }

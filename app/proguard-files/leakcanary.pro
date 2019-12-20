@@ -1,2 +1,2 @@
 #leak canary
--keep class leakcanary.** { *; }
+-dontwarn leakcanary.**

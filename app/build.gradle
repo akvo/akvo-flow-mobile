@@ -94,7 +94,6 @@ android {
             proguardFile 'proguard-files/proguard-glide.pro'
             proguardFile 'proguard-files/proguard-google-play-services.pro'
             proguardFile 'proguard-files/proguard-gson.pro'
-            proguardFile 'proguard-files/proguard-maps-utils.pro'
             proguardFile 'proguard-files/proguard-prettytime.pro'
             proguardFile 'proguard-files/proguard-rxjava.pro'
             proguardFile 'proguard-files/proguard-sentry.pro'
@@ -109,13 +108,11 @@ android {
         debug {
             minifyEnabled true
             multiDexEnabled true
-            useProguard false
             proguardFile 'proguard-files/proguard-rules.pro'
             proguardFile 'proguard-files/proguard-butterknife.pro'
             proguardFile 'proguard-files/proguard-glide.pro'
             proguardFile 'proguard-files/proguard-google-play-services.pro'
             proguardFile 'proguard-files/proguard-gson.pro'
-            proguardFile 'proguard-files/proguard-maps-utils.pro'
             proguardFile 'proguard-files/proguard-prettytime.pro'
             proguardFile 'proguard-files/proguard-rxjava.pro'
             proguardFile 'proguard-files/proguard-sentry.pro'

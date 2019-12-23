@@ -2,13 +2,15 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'io.sentry.android.gradle'
-if (!project.hasProperty("nodexcount")) {
-    apply plugin: 'com.getkeepsafe.dexcount'
-}
+apply plugin: 'com.getkeepsafe.dexcount'
 
 sentry {
-    autoProguardConfig true
-    autoUpload true
+    autoProguardConfig false
+    autoUpload false
+}
+
+dexcount {
+    enabled = !project.hasProperty("nodexcount")
 }
 
 android {

@@ -186,6 +186,7 @@ android {
         abortOnError false
         // if true, only report errors
         ignoreWarnings false
+        xmlReport false
         lintConfig file('lint.xml')
         ignore 'InvalidPackage'
     }

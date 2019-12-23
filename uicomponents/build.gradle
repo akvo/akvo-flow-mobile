@@ -19,6 +19,7 @@ android {
     lintOptions {
         abortOnError false
         ignore 'InvalidPackage'
+        xmlReport false
     }
 }
 

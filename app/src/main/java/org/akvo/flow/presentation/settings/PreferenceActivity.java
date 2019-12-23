@@ -39,10 +39,6 @@ import org.akvo.flow.uicomponents.BackActivity;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
 import org.akvo.flow.uicomponents.SnackBarManager;
-import org.akvo.flow.presentation.settings.passcode.PassCodeDeleteAllDialog;
-import org.akvo.flow.presentation.settings.passcode.PassCodeDeleteCollectedDialog;
-import org.akvo.flow.presentation.settings.passcode.PassCodeDownloadFormDialog;
-import org.akvo.flow.presentation.settings.passcode.PassCodeReloadFormsDialog;
 import org.akvo.flow.service.DataPointUploadWorker;
 import org.akvo.flow.tracking.TrackingHelper;
 import org.akvo.flow.ui.Navigator;
@@ -64,10 +60,6 @@ import butterknife.OnClick;
 import butterknife.OnItemSelected;
 
 public class PreferenceActivity extends BackActivity implements PreferenceView,
-        PassCodeDeleteCollectedDialog.PassCodeDeleteCollectedListener,
-        PassCodeDeleteAllDialog.PassCodeDeleteAllListener,
-        PassCodeDownloadFormDialog.PassCodeDownloadFormListener,
-        PassCodeReloadFormsDialog.PassCodeReloadFormsListener,
         DeleteResponsesWarningDialog.DeleteResponsesListener,
         DeleteAllWarningDialog.DeleteAllListener, DownloadFormDialog.DownloadFormListener,
         ReloadFormsConfirmationDialog.ReloadFormsListener {
@@ -203,8 +195,7 @@ public class PreferenceActivity extends BackActivity implements PreferenceView,
         if (trackingHelper != null) {
             trackingHelper.logDeleteDataPressed();
         }
-        DialogFragment newFragment = PassCodeDeleteCollectedDialog.newInstance();
-        newFragment.show(getSupportFragmentManager(), PassCodeDeleteCollectedDialog.TAG);
+        presenter.deleteCollectedData();
     }
 
     @OnClick({ R.id.preference_delete_everything_title,
@@ -214,8 +205,7 @@ public class PreferenceActivity extends BackActivity implements PreferenceView,
         if (trackingHelper != null) {
             trackingHelper.logDeleteAllPressed();
         }
-        DialogFragment newFragment = PassCodeDeleteAllDialog.newInstance();
-        newFragment.show(getSupportFragmentManager(), PassCodeDeleteAllDialog.TAG);
+        presenter.deleteAllData();
     }
 
     @OnClick({ R.id.preference_download_form_title,
@@ -225,19 +215,19 @@ public class PreferenceActivity extends BackActivity implements PreferenceView,
         if (trackingHelper != null) {
             trackingHelper.logDownloadFormPressed();
         }
-        DialogFragment newFragment = PassCodeDownloadFormDialog.newInstance();
-        newFragment.show(getSupportFragmentManager(), PassCodeDownloadFormDialog.TAG);
+        DialogFragment newFragment = DownloadFormDialog.newInstance();
+        newFragment.show(getSupportFragmentManager(), DownloadFormDialog.TAG);
     }
 
     @OnClick({ R.id.preference_reload_forms_title,
             R.id.preference_reload_forms_subtitle
     })
-    void onReloadAllSurveysOptionTap() {
+    void onReloadAllFormsOptionTap() {
         if (trackingHelper != null) {
             trackingHelper.logDownloadFormsPressed();
         }
-        DialogFragment newFragment = PassCodeReloadFormsDialog.newInstance();
-        newFragment.show(getSupportFragmentManager(), PassCodeReloadFormsDialog.TAG);
+        DialogFragment newFragment = ReloadFormsConfirmationDialog.newInstance();
+        newFragment.show(getSupportFragmentManager(), ReloadFormsConfirmationDialog.TAG);
     }
 
     @OnClick(R.id.preference_gps_fixes)
@@ -323,28 +313,6 @@ public class PreferenceActivity extends BackActivity implements PreferenceView,
      */
     private void delayListeners() {
         appLanguageSp.postDelayed(() -> listenersEnabled = true, 500);
-    }
-
-    @Override
-    public void deleteCollectedData() {
-        presenter.deleteCollectedData();
-    }
-
-    @Override
-    public void deleteAllData() {
-        presenter.deleteAllData();
-    }
-
-    @Override
-    public void downloadForm() {
-        DialogFragment newFragment = DownloadFormDialog.newInstance();
-        newFragment.show(getSupportFragmentManager(), DownloadFormDialog.TAG);
-    }
-
-    @Override
-    public void reloadForms() {
-        DialogFragment newFragment = ReloadFormsConfirmationDialog.newInstance();
-        newFragment.show(getSupportFragmentManager(), ReloadFormsConfirmationDialog.TAG);
     }
 
     @Override

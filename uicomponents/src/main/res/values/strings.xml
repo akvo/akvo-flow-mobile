@@ -41,10 +41,6 @@
     <string name="nextbutton">Next</string>
     <string name="cleartitle">Clear Survey Answers</string>
     <string name="cleardesc">Are you sure you want to clear your responses?</string>
-    <string name="authtitle">Authorization Required</string>
-    <string name="authtext">Please enter the administrator passcode: </string>
-    <string name="authfailed">Authorization Failed</string>
-    <string name="invalidpassword">Invalid passcode</string>
     <string name="clearquestion">Clear Response</string>
     <string name="clearquestiondesc">Do you want to clear the response to this question?</string>
     <string name="identlabel">Device Identifier</string>
@@ -279,7 +275,6 @@
     <string name="preference_publish_data_error_no_data">No data available for bulk upload.</string>
     <string name="preference_publish_data_error_generic">Error publishing data, please try again.</string>
     <string name="preference_publish_data_error_no_space">Error publishing data. No storage space. Please delete unneeded files and try again.</string>
-    <string name="pass_code">Passcode</string>
 
     <string name="submit_tab_description">You can view but not edit submitted responses</string>
     <string name="snackbar_submitted">Submitted</string>

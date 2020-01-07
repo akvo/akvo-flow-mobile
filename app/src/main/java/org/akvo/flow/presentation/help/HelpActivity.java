@@ -20,6 +20,9 @@
 
 package org.akvo.flow.presentation.help;
 
+import android.annotation.SuppressLint;
+import android.content.res.Configuration;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.webkit.WebResourceError;
@@ -33,8 +36,8 @@ import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.injector.component.ApplicationComponent;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
-import org.akvo.flow.uicomponents.SnackBarManager;
 import org.akvo.flow.uicomponents.BackActivity;
+import org.akvo.flow.uicomponents.SnackBarManager;
 
 import java.lang.ref.WeakReference;
 
@@ -47,7 +50,7 @@ import butterknife.ButterKnife;
 
 public class HelpActivity extends BackActivity {
 
-    private static final String SUPPORT_URL = "http://flowsupport.akvo.org/container/show/akvo-flow-app";
+    private static final String SUPPORT_URL = "https://flowsupport.akvo.org/container/show/akvo-flow-app";
 
     @BindView(R.id.help_wv)
     WebView helpWv;
@@ -73,6 +76,15 @@ public class HelpActivity extends BackActivity {
         loadWebView();
     }
 
+    @Override
+    public void applyOverrideConfiguration(final Configuration overrideConfiguration) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP
+                && Build.VERSION.SDK_INT < Build.VERSION_CODES.N_MR1) {
+            overrideConfiguration.uiMode &= ~Configuration.UI_MODE_NIGHT_MASK;
+        }
+        super.applyOverrideConfiguration(overrideConfiguration);
+    }
+
     private void initializeInjector() {
         ViewComponent viewComponent =
                 DaggerViewComponent.builder().applicationComponent(getApplicationComponent())
@@ -89,6 +101,7 @@ public class HelpActivity extends BackActivity {
         return ((FlowApp) getApplication()).getApplicationComponent();
     }
 
+    @SuppressLint("SetJavaScriptEnabled")
     private void setUpWebView() {
         helpWv.setWebViewClient(new HelpWebViewClient(this));
         helpWv.getSettings().setJavaScriptEnabled(true);
@@ -96,12 +109,7 @@ public class HelpActivity extends BackActivity {
 
     public void displayError() {
         snackBarManager.displaySnackBarWithAction(rootView, R.string.error_loading_help,
-                R.string.action_retry, new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                       loadWebView();
-                    }
-                }, this);
+                R.string.action_retry, v -> loadWebView(), this);
     }
 
     public void loadWebView() {

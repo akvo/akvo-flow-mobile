@@ -36,6 +36,7 @@ gradle.properties
 #Builds
 builds/
 tmp/
+reports/
 
 util/scripts/temp.md
 

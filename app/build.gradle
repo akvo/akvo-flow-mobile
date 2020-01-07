@@ -1,16 +1,26 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
+apply plugin: 'com.getkeepsafe.dexcount'
 
-if (!project.hasProperty("nodexcount")) {
-    apply plugin: 'com.getkeepsafe.dexcount'
+dexcount {
+    enabled = !project.hasProperty("nodexcount")
+}
+
+loadProperties()
+
+def loadProperties() {
+    def file = hasProperty('file') ? file : 'survey.properties'
+    println "Survey config file: " + file
+
+    Properties surveyProps = readProperties(file)
+    project.ext.surveyProps = surveyProps
 }
 
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
 
-    Properties versionProps = loadProperties('version.properties')
-    Properties surveyProps = loadProperties('survey.properties')
+    Properties versionProps = readProperties('version.properties')
 
     def versionMajor = versionProps['VERSION_MAJOR'].toString()
     def versionMinor = versionProps['VERSION_MINOR'].toString()
@@ -177,6 +187,7 @@ android {
         abortOnError false
         // if true, only report errors
         ignoreWarnings false
+        xmlReport false
         lintConfig file('lint.xml')
         ignore 'InvalidPackage'
     }
@@ -187,7 +198,7 @@ android {
     }
 }
 
-private Properties loadProperties(String fileName) {
+private Properties readProperties(String fileName) {
     Properties versionProps = new Properties()
     def versionPropsFile = file(fileName)
     if (versionPropsFile.canRead()) {

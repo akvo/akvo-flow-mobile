@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017,2019 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -15,18 +15,19 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
+package org.akvo.flow.util.logging
 
-package org.akvo.flow.util.logging;
+import com.crashlytics.android.Crashlytics
+import timber.log.Timber
 
-import androidx.annotation.Nullable;
+class CrashlyticsTree : Timber.Tree() {
 
-public interface LoggingHelper {
-
-    void init();
-
-    void initLoginData(@Nullable String username, @Nullable String deviceId);
-
-    void clearUser();
+    override fun log(priority: Int, tag: String?, message: String, t: Throwable?) {
+        if (t != null) {
+            Crashlytics.logException(t)
+        } else {
+            Crashlytics.log(priority, tag, message)
+        }
+    }
 }

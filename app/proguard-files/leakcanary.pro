@@ -1,0 +1,2 @@
+#leak canary
+-dontwarn leakcanary.**

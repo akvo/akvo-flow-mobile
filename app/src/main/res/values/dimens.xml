@@ -11,8 +11,6 @@
     <dimen name="form_left_right_padding">16dp</dimen>
     <dimen name="scroll_bottom_padding">98dp</dimen>
     <dimen name="scroll_bottom_padding_when_repeatable_group">176dp</dimen>
-    <dimen name="button_corner">2dp</dimen>
-    <dimen name="button_border_width">1dp</dimen>
     <dimen name="fab_margin">16dp</dimen>
 
 </resources>

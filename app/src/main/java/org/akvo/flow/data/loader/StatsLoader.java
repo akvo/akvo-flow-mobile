@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2014-2017 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2014-2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -23,12 +23,12 @@ package org.akvo.flow.data.loader;
 import android.content.Context;
 import android.database.Cursor;
 
-import org.akvo.flow.data.database.RecordColumns;
-import org.akvo.flow.data.database.SurveyDbAdapter;
-import org.akvo.flow.data.database.SurveyDbAdapter.RecordQuery;
-import org.akvo.flow.data.database.Tables;
 import org.akvo.flow.data.loader.base.AsyncLoader;
 import org.akvo.flow.data.loader.models.Stats;
+import org.akvo.flow.database.RecordColumns;
+import org.akvo.flow.database.SurveyDbAdapter;
+import org.akvo.flow.database.SurveyDbAdapter.RecordQuery;
+import org.akvo.flow.database.Tables;
 
 import java.util.Calendar;
 
@@ -45,7 +45,8 @@ public class StatsLoader extends AsyncLoader<Stats> {
 
     @Override
     public Stats loadInBackground() {
-        SurveyDbAdapter database = new SurveyDbAdapter(getContext());
+        Context context = getContext();
+        SurveyDbAdapter database = new SurveyDbAdapter(context);
         database.open();
         Stats stats = new Stats();
 

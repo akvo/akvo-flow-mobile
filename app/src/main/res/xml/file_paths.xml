@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths>
+    <files-path path="akvoflow/data/media/" name="videos" />
+    <external-files-path path="apk/" name="apk" />
+    <external-path path="Pictures/" name="pictures" />
+</paths>

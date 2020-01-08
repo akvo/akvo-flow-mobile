@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2013-2017 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2013-2019 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -21,60 +21,98 @@ package org.akvo.flow.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.view.ViewPager;
+import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
 import org.akvo.flow.R;
 import org.akvo.flow.app.FlowApp;
-import org.akvo.flow.data.database.SurveyDbAdapter;
-import org.akvo.flow.data.database.SurveyInstanceStatus;
+import org.akvo.flow.data.database.SurveyDbDataSource;
+import org.akvo.flow.data.loader.SurveyedLocaleItemLoader;
+import org.akvo.flow.database.SurveyInstanceStatus;
 import org.akvo.flow.domain.Survey;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.SurveyedLocale;
-import org.akvo.flow.domain.User;
+import org.akvo.flow.domain.entity.User;
+import org.akvo.flow.domain.interactor.DefaultObserver;
+import org.akvo.flow.domain.interactor.UseCase;
+import org.akvo.flow.injector.component.ApplicationComponent;
+import org.akvo.flow.injector.component.DaggerViewComponent;
+import org.akvo.flow.injector.component.ViewComponent;
+import org.akvo.flow.uicomponents.SnackBarManager;
 import org.akvo.flow.service.BootstrapService;
+import org.akvo.flow.ui.Navigator;
+import org.akvo.flow.ui.adapter.RecordTabsAdapter;
 import org.akvo.flow.ui.fragment.FormListFragment;
-import org.akvo.flow.ui.fragment.FormListFragment.SurveyListListener;
-import org.akvo.flow.ui.fragment.RecordListListener;
 import org.akvo.flow.ui.fragment.ResponseListFragment;
+import org.akvo.flow.uicomponents.BackActivity;
 import org.akvo.flow.util.ConstantUtil;
 
-public class RecordActivity extends BackActivity implements SurveyListListener,
-        RecordListListener {
-    public static final String EXTRA_SURVEY_GROUP = "survey_group";
-    public static final String EXTRA_RECORD_ID = "record";
+import javax.inject.Inject;
+import javax.inject.Named;
 
-    private static final int POSITION_SURVEYS = 0;
-    private static final int POSITION_RESPONSES = 1;
+import androidx.loader.app.LoaderManager;
+import androidx.loader.content.Loader;
+import androidx.viewpager.widget.ViewPager;
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import timber.log.Timber;
 
-    private static final int REQUEST_FORM = 0;
+public class RecordActivity extends BackActivity implements FormListFragment.SurveyListListener,
+        ResponseListFragment.ResponseListListener, LoaderManager.LoaderCallbacks<SurveyedLocale> {
 
-    private User mUser;
-    private SurveyedLocale mRecord;
     private SurveyGroup mSurveyGroup;
-    private SurveyDbAdapter mDatabase;
+    private String recordId;
 
-    private String[] mTabs;
+    @Inject
+    SurveyDbDataSource mDatabase;
+
+    @Inject
+    Navigator navigator;
+
+    @Inject
+    @Named("getSelectedUser")
+    UseCase getSelectedUser;
+
+    @Inject
+    SnackBarManager snackBarManager;
+
+    @BindView(R.id.record_root_layout)
+    View rootLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.record_activity);
+        initializeInjector();
+        ButterKnife.bind(this);
 
-        mTabs = getResources().getStringArray(R.array.record_tabs);
-        ViewPager mPager = (ViewPager) findViewById(R.id.pager);
-        mPager.setAdapter(new TabsAdapter(getSupportFragmentManager()));
-        mDatabase = new SurveyDbAdapter(this);
+        ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
+        RecordTabsAdapter recordTabsAdapter = new RecordTabsAdapter(getSupportFragmentManager(),
+                getResources().getStringArray(R.array.record_tabs));
+        viewPager.setAdapter(recordTabsAdapter);
 
-        mSurveyGroup = (SurveyGroup) getIntent().getSerializableExtra(EXTRA_SURVEY_GROUP);
-        setTitle(mSurveyGroup.getName());
-
+        mSurveyGroup = (SurveyGroup) getIntent().getSerializableExtra(
+                ConstantUtil.SURVEY_GROUP_EXTRA);
         setupToolBar();
+    }
+
+    private void initializeInjector() {
+        ViewComponent viewComponent =
+                DaggerViewComponent.builder().applicationComponent(getApplicationComponent())
+                        .build();
+        viewComponent.inject(this);
+    }
+
+    /**
+     * Get the Main Application component for dependency injection.
+     *
+     * @return {@link ApplicationComponent}
+     */
+    private ApplicationComponent getApplicationComponent() {
+        return ((FlowApp) getApplication()).getApplicationComponent();
     }
 
     @Override
@@ -82,11 +120,8 @@ public class RecordActivity extends BackActivity implements SurveyListListener,
         super.onResume();
         mDatabase.open();
 
-        mUser = FlowApp.getApp().getUser();
-        // Record might have changed while answering a registration survey
-        String recordId = getIntent().getStringExtra(EXTRA_RECORD_ID);
-        mRecord = mDatabase.getSurveyedLocale(recordId);
-        displayRecord();
+        recordId = getIntent().getStringExtra(ConstantUtil.DATA_POINT_ID_EXTRA);
+        getSupportLoaderManager().restartLoader(0, null, this);
     }
 
     @Override
@@ -97,73 +132,56 @@ public class RecordActivity extends BackActivity implements SurveyListListener,
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_FORM && resultCode == RESULT_OK) {
-            finish();
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == ConstantUtil.FORM_FILLING_REQUEST && resultCode == RESULT_OK) {
+            snackBarManager.displaySnackBar(rootLayout, R.string.snackbar_submitted, this);
         }
     }
 
-    private void displayRecord() {
-        setTitle(mRecord.getDisplayName(this));
-    }
-
     @Override
-    public void onSurveyClick(final String surveyId) {
+    public void onSurveyClick(final String formId) {
         if (BootstrapService.isProcessing) {
             Toast.makeText(this, R.string.pleasewaitforbootstrap, Toast.LENGTH_LONG).show();
             return;
         }
-        Survey survey = mDatabase.getSurvey(surveyId);
+        final Survey survey = mDatabase.getSurvey(formId);
         if (!survey.isHelpDownloaded()) {
             Toast.makeText(this, R.string.error_missing_cascade, Toast.LENGTH_LONG).show();
             return;
         }
 
-        // Check if there are saved (non-submitted) responses for this Survey, and take the 1st one
-        long[] instances = mDatabase.getFormInstances(mRecord.getId(), surveyId,
-                SurveyInstanceStatus.SAVED);
-        long instance = instances.length > 0 ?
-                instances[0]
-                :
-                mDatabase.createSurveyRespondent(surveyId, survey.getVersion(), mUser,
-                        mRecord.getId());
-
-        Intent i = new Intent(this, FormActivity.class);
-        i.putExtra(ConstantUtil.USER_ID_KEY, mUser.getId());
-        i.putExtra(ConstantUtil.SURVEY_ID_KEY, surveyId);
-        i.putExtra(ConstantUtil.SURVEY_GROUP, mSurveyGroup);
-        i.putExtra(ConstantUtil.SURVEYED_LOCALE_ID, mRecord.getId());
-        i.putExtra(ConstantUtil.RESPONDENT_ID_KEY, instance);
-        startActivityForResult(i, REQUEST_FORM);
-    }
-
-    class TabsAdapter extends FragmentPagerAdapter {
-
-        public TabsAdapter(FragmentManager fm) {
-            super(fm);
-        }
-
-        @Override
-        public int getCount() {
-            return mTabs.length;
-        }
-
-        @Override
-        public Fragment getItem(int position) {
-            switch (position) {
-                case POSITION_SURVEYS:
-                    return FormListFragment.newInstance(mSurveyGroup, mRecord);
-                case POSITION_RESPONSES:
-                    return ResponseListFragment.instantiate(mSurveyGroup, mRecord);
+        getSelectedUser.execute(new DefaultObserver<User>() {
+            @Override
+            public void onError(Throwable e) {
+                Timber.e(e);
             }
 
-            return null;
-        }
+            @Override
+            public void onNext(User user) {
+                String userName = user.getName();
+                if (!TextUtils.isEmpty(userName)) {
+                    displayForm(user, formId, survey);
+                }
+            }
+        }, null);
 
-        @Override
-        public CharSequence getPageTitle(int position) {
-            return mTabs[position];
-        }
 
+    }
+
+    private void displayForm(User user, String formId, Survey survey) {
+        // Check if there are saved (non-submitted) responses for this Survey, and take the 1st one
+        long[] instances = mDatabase.getFormInstances(recordId, formId, SurveyInstanceStatus.SAVED);
+        long formInstanceId = instances.length > 0 ?
+                instances[0] :
+                mDatabase.createSurveyRespondent(formId, survey.getVersion(), user, recordId);
+
+        navigator.navigateToFormActivity(this, recordId, formId, formInstanceId, false,
+                mSurveyGroup);
+    }
+
+    @Override
+    public void onNamedRecordDeleted() {
+        getSupportLoaderManager().restartLoader(0, null, this);
     }
 
     // ==================================== //
@@ -172,7 +190,7 @@ public class RecordActivity extends BackActivity implements SurveyListListener,
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.datapoint_activity, menu);
+        getMenuInflater().inflate(R.menu.record_activity, menu);
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -180,8 +198,7 @@ public class RecordActivity extends BackActivity implements SurveyListListener,
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.view_map:
-                startActivity(new Intent(this, MapActivity.class)
-                        .putExtra(ConstantUtil.SURVEYED_LOCALE_ID, mRecord.getId()));
+                navigator.navigateToMapActivity(this, recordId);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -189,6 +206,21 @@ public class RecordActivity extends BackActivity implements SurveyListListener,
     }
 
     @Override
-    public void onRecordSelected(String recordId) {
+    public Loader<SurveyedLocale> onCreateLoader(int id, Bundle args) {
+        return new SurveyedLocaleItemLoader(this, recordId);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<SurveyedLocale> loader, SurveyedLocale data) {
+        if (data != null) {
+            setTitle(data.getDisplayName(this));
+        } else {
+            setTitle(getString(R.string.unknown));
+        }
+    }
+
+    @Override
+    public void onLoaderReset(Loader<SurveyedLocale> loader) {
+        // EMPTY
     }
 }

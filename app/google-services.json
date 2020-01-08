@@ -1,0 +1,56 @@
+{
+  "project_info": {
+    "project_number": "744812609171",
+    "firebase_url": "https://akvoflowapp.firebaseio.com",
+    "project_id": "akvoflowapp",
+    "storage_bucket": "akvoflowapp.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:744812609171:android:dfe13f3030bd3edc",
+        "android_client_info": {
+          "package_name": "org.akvo.flow"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "744812609171-brqp8kigu71s1gaeo0161obopkap2339.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "org.akvo.flow",
+            "certificate_hash": "fd921e9e9fe9f6d8ed2101000da036e1db091585"
+          }
+        },
+        {
+          "client_id": "744812609171-6qp6ni9ncrao9a8ujbk8kohbcf490lld.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "org.akvo.flow",
+            "certificate_hash": "60b9875eabe66cb0d6410a82ffc07c81ffa6e5d0"
+          }
+        },
+        {
+          "client_id": "744812609171-gts6cl4o0uu6bj59i3equvdg3mmv63ci.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAGxfhw5jiCx53Dyg6ER_ySHYKJj6qZIsk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "744812609171-gts6cl4o0uu6bj59i3equvdg3mmv63ci.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

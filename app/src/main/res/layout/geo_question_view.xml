@@ -11,12 +11,12 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-        <org.akvo.flow.ui.view.GeoInputContainer
+        <org.akvo.flow.ui.view.geolocation.GeoInputContainer
                 android:id="@+id/manual_geo_input_container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
-        </org.akvo.flow.ui.view.GeoInputContainer>
+        </org.akvo.flow.ui.view.geolocation.GeoInputContainer>
 
         <LinearLayout
                 android:id="@+id/auto_geo_location_progress"
@@ -33,9 +33,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginRight="4dp"
+                    android:visibility="gone"
                     android:gravity="center"
-                    android:layout_gravity="center"
-                    android:id="@+id/progressBar"/>
+                    android:layout_gravity="center"/>
 
             <TextView
                     android:text="@string/auto_geo_location_pending"
@@ -56,7 +56,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/getgeo"
-            android:textSize="16sp"
-            style="@style/button_primary"/>
+            style="@style/FormButtonStyle"/>
 
 </merge>

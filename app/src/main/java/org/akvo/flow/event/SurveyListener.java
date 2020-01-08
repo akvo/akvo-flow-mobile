@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015-2016 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2015-2017,2019 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -32,11 +32,10 @@ public interface SurveyListener {
     String[] getLanguages();
     boolean isReadOnly();
     void onSurveySubmit();
-    void nextTab();
     void openQuestion(String questionId);
     Map<String, QuestionResponse> getResponses();
     void deleteResponse(String questionId);
     QuestionView getQuestionView(String questionId);
-    String getDatapointId();
+    String getDataPointId();
     String getFormId();
 }

@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2016 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2019 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -60,15 +60,13 @@ public class Question {
      */
     private Map<String, AltText> languageTranslationMap = new HashMap<>();
     private List<Dependency> dependencies;
-    private List<ScoringRule> scoringRules;
     private boolean useStrength;
     private int strengthMin;
     private int strengthMax;
     private boolean localeName = false;
     private boolean localeLocation = false;
-    private String sourceQuestionId;// "Copied-from" question Id
+    private String sourceQuestionId; // "Copied-from" question Id
     private boolean isDoubleEntry;
-    private boolean useExternalSource;
     private boolean allowPoints, allowLine, allowPolygon;
     private String caddisflyRes;
 
@@ -218,13 +216,13 @@ public class Question {
 
     public void addDependency(Dependency dep) {
         if (dependencies == null) {
-            dependencies = new ArrayList<Dependency>();
+            dependencies = new ArrayList<>();
         }
         dependencies.add(dep);
     }
 
     public List<QuestionHelp> getHelpByType(String type) {
-        List<QuestionHelp> help = new ArrayList<QuestionHelp>();
+        List<QuestionHelp> help = new ArrayList<>();
         if (questionHelp != null && type != null) {
             for (int i = 0; i < questionHelp.size(); i++) {
                 if (type.equalsIgnoreCase(questionHelp.get(i).getType())) {
@@ -237,7 +235,7 @@ public class Question {
 
     public void addQuestionHelp(QuestionHelp help) {
         if (questionHelp == null) {
-            questionHelp = new ArrayList<QuestionHelp>();
+            questionHelp = new ArrayList<>();
         }
         questionHelp.add(help);
     }
@@ -260,71 +258,26 @@ public class Question {
 
     /**
      * counts the number of non-empty help tip types
-     * 
-     * @return
+     *
      */
     public int getHelpTypeCount() {
         int count = 0;
-        if (getHelpByType(ConstantUtil.IMAGE_HELP_TYPE).size() > 0) {
-            count++;
-        }
         if (getHelpByType(ConstantUtil.TIP_HELP_TYPE).size() > 0) {
             count++;
         }
-        if (getHelpByType(ConstantUtil.VIDEO_HELP_TYPE).size() > 0) {
-            count++;
-        }
         return count;
-    }
-
-    public void addScoringRule(ScoringRule rule) {
-        if (scoringRules == null) {
-            scoringRules = new ArrayList<ScoringRule>();
-        }
-        scoringRules.add(rule);
-    }
-
-    public List<ScoringRule> getScoringRules() {
-        return scoringRules;
-    }
-
-    /**
-     * scores a response according to the question's scoring rules. If there are
-     * no rules or none of the rules match, this method will return null
-     * otherwise it will return the scored value
-     * 
-     * @param response
-     * @return
-     */
-    public String getResponseScore(String response) {
-        String result = null;
-        if (scoringRules != null) {
-            int i = 0;
-            while (i < scoringRules.size() && result == null) {
-                result = scoringRules.get(i++).scoreResponse(response);
-            }
-        }
-        return result;
     }
 
     public String toString() {
         return text;
     }
 
-    public void setIsDoubleEntry(boolean isdoubleEntry) {
-        this.isDoubleEntry = isdoubleEntry;
+    public void setIsDoubleEntry(boolean isDoubleEntry) {
+        this.isDoubleEntry = isDoubleEntry;
     }
 
     public boolean isDoubleEntry() {
         return isDoubleEntry;
-    }
-
-    public void useExternalSource(boolean useExternalSource) {
-        this.useExternalSource = useExternalSource;
-    }
-
-    public boolean useExternalSource() {
-        return useExternalSource;
     }
 
     public void setSrc(String src) {
@@ -398,16 +351,14 @@ public class Question {
         q.localeLocation = question.isLocaleLocation();
         q.sourceQuestionId = question.getSourceQuestionId();
         q.isDoubleEntry = question.isDoubleEntry();
-        q.useExternalSource = question.useExternalSource();
         q.allowPoints = question.isAllowPoints();
         q.allowLine = question.isAllowLine();
         q.allowPolygon = question.isAllowPolygon();
         q.src = question.getSrc();
-        q.validationRule = question.getValidationRule();// Shallow copy
-        q.questionHelp = question.getQuestionHelp();// Shallow copy
-        q.languageTranslationMap = question.getLanguageTranslationMap();// Shallow copy
-        q.scoringRules = question.getScoringRules();// Shallow copy
-        q.levels = question.getLevels();// Shallow copy
+        q.validationRule = question.getValidationRule();
+        q.questionHelp = question.getQuestionHelp();
+        q.languageTranslationMap = question.getLanguageTranslationMap();
+        q.levels = question.getLevels();
         q.caddisflyRes = question.getCaddisflyRes();
 
         // Deep-copy dependencies
@@ -426,5 +377,28 @@ public class Question {
             }
         }
         return q;
+    }
+
+    public boolean isRepeatable() {
+        return id != null && id.contains("|");
+    }
+
+    public String getQuestionId() {
+        if (isRepeatable()) {
+            String[] questionIdAndIteration = id.split("\\|");
+            return questionIdAndIteration[0];
+        } else {
+            return id;
+        }
+    }
+
+    public int getIteration() {
+        if (isRepeatable()) {
+            String[] questionIdAndIteration = id.split("\\|");
+            String iteration = questionIdAndIteration[1];
+            return Integer.parseInt(iteration);
+        } else {
+            return QuestionResponse.NO_ITERATION;
+        }
     }
 }

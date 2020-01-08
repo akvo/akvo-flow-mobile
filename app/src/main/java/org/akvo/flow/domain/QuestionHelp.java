@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2012 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2012,2018 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -27,7 +27,7 @@ import java.util.HashMap;
  * @author Christopher Fagiani
  */
 public class QuestionHelp {
-    private HashMap<String, AltText> altTextMap = new HashMap<String, AltText>();
+    private HashMap<String, AltText> altTextMap = new HashMap<>();
     private String type;
     private String text;
     private String value;
@@ -75,16 +75,11 @@ public class QuestionHelp {
         if (text == null || text.trim().length() == 0) {
             // if text is null, then value must be populated for this to be
             // valid
-            if (value == null || value.trim().length() == 0) {
-                return false;
-            }
+            return value != null && value.trim().length() != 0;
         } else {
             // if text is not null, then it can't be the string "null"
-            if ("null".equalsIgnoreCase(text.trim())) {
-                return false;
-            }
+            return !"null".equalsIgnoreCase(text.trim());
         }
 
-        return true;
     }
 }

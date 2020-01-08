@@ -1,10 +1,27 @@
 apply plugin: 'com.android.application'
-apply plugin: 'com.neenbedankt.android-apt'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+apply plugin: 'io.sentry.android.gradle'
+apply plugin: 'com.getkeepsafe.dexcount'
 apply plugin: 'jacoco'
 
-repositories {
-    mavenCentral()
-    jcenter()
+sentry {
+    autoProguardConfig false
+    autoUpload false
+}
+
+dexcount {
+    enabled = !project.hasProperty("nodexcount")
+}
+
+loadProperties()
+
+def loadProperties() {
+    def file = hasProperty('file') ? file : 'survey.properties'
+    println "Survey config file: " + file
+
+    Properties surveyProps = readProperties(file)
+    project.ext.surveyProps = surveyProps
 }
 
 task jacocoTestReport(type: JacocoReport, dependsOn: ['testFlowDebugUnitTest', 'createFlowDebugCoverageReport']) {
@@ -27,155 +44,261 @@ task jacocoTestReport(type: JacocoReport, dependsOn: ['testFlowDebugUnitTest', '
 
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
-    buildToolsVersion rootProject.ext.buildToolsVersion
-    def versionPropsFile = file('version.properties')
 
-    if (versionPropsFile.canRead()) {
-        def Properties versionProps = new Properties()
+    Properties versionProps = readProperties('version.properties')
 
-        versionProps.load(new FileInputStream(versionPropsFile))
+    def versionMajor = versionProps['VERSION_MAJOR'].toString()
+    def versionMinor = versionProps['VERSION_MINOR'].toString()
+    def versionPatch = versionProps['VERSION_PATCH'].toString()
+    def versionCodeProperty = versionProps['VERSION_CODE'].toInteger()
+    def buildYear = getBuildYear()
 
-        def versionMajor = versionProps['VERSION_MAJOR'].toString()
-        def versionMinor = versionProps['VERSION_MINOR'].toString()
-        def versionPatch = versionProps['VERSION_PATCH'].toString()
-        def versionCodeProperty = versionProps['VERSION_CODE'].toInteger()
+    defaultConfig {
+        versionCode versionCodeProperty
+        versionName "${versionMajor}.${versionMinor}.${versionPatch}"
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+        applicationId "org.akvo.flow"
+        testApplicationId "org.akvo.flow.tests"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        testHandleProfiling true
+        testFunctionalTest true
+        vectorDrawables.useSupportLibrary = true
+    }
 
-        defaultConfig {
-            versionCode versionCodeProperty
-            versionName "${versionMajor}.${versionMinor}.${versionPatch}"
-            minSdkVersion rootProject.ext.minSdkVersion
-            targetSdkVersion rootProject.ext.targetSdkVersion
-            applicationId "org.akvo.flow"
-            testApplicationId "org.akvo.flow.tests"
-            testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-            testHandleProfiling true
-            testFunctionalTest true
-            vectorDrawables.useSupportLibrary = true
-        }
-        compileOptions {
-            sourceCompatibility JavaVersion.VERSION_1_7
-            targetCompatibility JavaVersion.VERSION_1_7
-        }
-        signingConfigs {
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
 
-            debug {
-                keyAlias 'androiddebugkey'
-                keyPassword 'android'
-                storeFile file('debug-key/debug.keystore')
-                storePassword 'android'
-            }
+    dexOptions {
+        preDexLibraries true
+    }
 
-            flowRelease {
-                storeFile file(RELEASE_STORE_FILE)
-                storePassword RELEASE_STORE_PASSWORD
-                keyAlias RELEASE_KEY_ALIAS
-                keyPassword RELEASE_KEY_PASSWORD
-            }
-            buildTypes {
-                release {
-                    signingConfig signingConfigs.flowRelease
-                }
-                debug {
-                    testCoverageEnabled true
-                }
-            }
-        }
-        packagingOptions {
-            exclude 'META-INF/DEPENDENCIES'
-            exclude 'META-INF/LICENSE'
-            exclude 'META-INF/LICENSE.txt'
-            exclude 'META-INF/license.txt'
-            exclude 'META-INF/NOTICE'
-            exclude 'META-INF/NOTICE.txt'
-            exclude 'META-INF/notice.txt'
-            exclude 'META-INF/ASL2.0'
-            exclude 'META-INF/services/javax.annotation.processing.Processor'
-            exclude '.readme'
+    signingConfigs {
+
+        debug {
+            keyAlias 'androiddebugkey'
+            keyPassword 'android'
+            storeFile file('debug-key/debug.keystore')
+            storePassword 'android'
         }
 
-        productFlavors {
-            flow {
-            }
-            biogas {
-            }
-            cookstoves {
-            }
+        flowRelease {
+            storeFile file(RELEASE_STORE_FILE)
+            storePassword RELEASE_STORE_PASSWORD
+            keyAlias RELEASE_KEY_ALIAS
+            keyPassword RELEASE_KEY_PASSWORD
         }
+    }
+
+    buildTypes {
+        buildTypes.each {
+            def serverBase = surveyProps['serverBase'].toString()
+            def awsBucket = surveyProps['awsBucket'].toString()
+            def awsAccessKeyId = surveyProps['awsAccessKeyId'].toString()
+            def awsSecretKey = surveyProps['awsSecretKey'].toString()
+            def apiKey = surveyProps['apiKey'].toString()
+
+            def instanceUrl = surveyProps['instanceUrl'].toString()
+            if ("null" == instanceUrl) {
+                instanceUrl = serverBase
+            }
+
+            it.buildConfigField "String", "SERVER_BASE", "\"${serverBase}\""
+            it.buildConfigField "String", "INSTANCE_URL", "\"${instanceUrl}\""
+            it.buildConfigField "String", "AWS_BUCKET", "\"${awsBucket}\""
+            it.buildConfigField "String", "AWS_ACCESS_KEY_ID", "\"${awsAccessKeyId}\""
+            it.buildConfigField "String", "AWS_SECRET_KEY", "\"${awsSecretKey}\""
+            it.buildConfigField "String", "API_KEY", "\"${apiKey}\""
+            it.buildConfigField "String", "SIGNING_KEY", "\"\""
+            it.buildConfigField "String", "BUILD_YEAR", "\"${buildYear}\""
+        }
+
+        release {
+            minifyEnabled true
+            shrinkResources true
+            multiDexEnabled true
+            proguardFile 'proguard-files/proguard-rules.pro'
+            proguardFile 'proguard-files/proguard-butterknife.pro'
+            proguardFile 'proguard-files/proguard-glide.pro'
+            proguardFile 'proguard-files/proguard-google-play-services.pro'
+            proguardFile 'proguard-files/proguard-gson.pro'
+            proguardFile 'proguard-files/proguard-prettytime.pro'
+            proguardFile 'proguard-files/proguard-rxjava.pro'
+            proguardFile 'proguard-files/proguard-sentry.pro'
+            proguardFile 'proguard-files/proguard-square-retrofit.pro'
+            proguardFile 'proguard-files/proguard-support-v7-appcompat.pro'
+            proguardFile 'proguard-files/okhttp3.pro'
+            proguardFile 'proguard-files/mapbox.pro'
+            proguardFile 'proguard-files/leakcanary.pro'
+            proguardFile getDefaultProguardFile('proguard-android.txt')
+            signingConfig signingConfigs.flowRelease
+        }
+        debug {
+            minifyEnabled true
+            multiDexEnabled true
+            testCoverageEnabled true
+            proguardFile 'proguard-files/proguard-rules.pro'
+            proguardFile 'proguard-files/proguard-butterknife.pro'
+            proguardFile 'proguard-files/proguard-glide.pro'
+            proguardFile 'proguard-files/proguard-google-play-services.pro'
+            proguardFile 'proguard-files/proguard-gson.pro'
+            proguardFile 'proguard-files/proguard-prettytime.pro'
+            proguardFile 'proguard-files/proguard-rxjava.pro'
+            proguardFile 'proguard-files/proguard-sentry.pro'
+            proguardFile 'proguard-files/proguard-square-retrofit.pro'
+            proguardFile 'proguard-files/proguard-support-v7-appcompat.pro'
+            proguardFile 'proguard-files/okhttp3.pro'
+            proguardFile 'proguard-files/mapbox.pro'
+            proguardFile 'proguard-files/leakcanary.pro'
+            proguardFile getDefaultProguardFile('proguard-android.txt')
+            multiDexKeepProguard file('proguard-files/proguard-multidex-rules.pro')
+
+            testProguardFile 'proguard-files/proguard-rules.pro'
+            testProguardFile 'proguard-files/proguard-butterknife.pro'
+            testProguardFile 'proguard-files/proguard-glide.pro'
+            testProguardFile 'proguard-files/proguard-google-play-services.pro'
+            testProguardFile 'proguard-files/proguard-gson.pro'
+            testProguardFile 'proguard-files/proguard-prettytime.pro'
+            testProguardFile 'proguard-files/proguard-rxjava.pro'
+            testProguardFile 'proguard-files/proguard-square-retrofit.pro'
+            testProguardFile 'proguard-files/proguard-support-v7-appcompat.pro'
+            testProguardFile 'proguard-files/okhttp3.pro'
+            testProguardFile 'proguard-files/mapbox.pro'
+            testProguardFile 'proguard-files/leakcanary.pro'
+            testProguardFile getDefaultProguardFile('proguard-android.txt')
+        }
+    }
+
+    packagingOptions {
+        exclude 'META-INF/DEPENDENCIES'
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/license.txt'
+        exclude 'META-INF/NOTICE'
+        exclude 'META-INF/NOTICE.txt'
+        exclude 'META-INF/notice.txt'
+        exclude 'META-INF/ASL2.0'
+        exclude '.readme'
+        exclude 'androidsupportmultidexversion.txt'
+    }
+
+    flavorDimensions "default"
+
+    productFlavors {
+        flow {
+            dimension "default"
+        }
+        biogas {
+            dimension "default"
+        }
+        cookstoves {
+            dimension "default"
+        }
+    }
 
         testOptions {
             unitTests.returnDefaultValues = true
-            unitTests.all {
-                jacoco {
-                    includeNoLocationClasses = true
-                }
-            }
         }
 
-        lintOptions {
-            // set to true to turn off analysis progress reporting by lint
-            quiet false
-            // if true, stop the gradle build if errors are found
-            abortOnError false
-            // if true, only report errors
-            ignoreWarnings false
-            lintConfig file('lint.xml')
+    testOptions.unitTests.all {
+        testLogging {
+            events 'passed', 'skipped', 'failed', 'standardOut', 'standardError'
         }
-    } else {
-        throw new GradleException("Could not read version.properties!")
+        jacoco {
+            includeNoLocationClasses = true
+        }
+    }
+
+    lintOptions {
+        // set to true to turn off analysis progress reporting by lint
+        quiet false
+        // if true, stop the gradle build if errors are found
+        abortOnError false
+        // if true, only report errors
+        ignoreWarnings false
+        xmlReport false
+        lintConfig file('lint.xml')
+        ignore 'InvalidPackage'
+    }
+
+    sourceSets {
+        biogas.res.srcDirs = ['src/snv/res', 'src/biogas/res']
+        cookstoves.res.srcDirs = ['src/snv/res', 'src/cookstoves/res']
     }
 }
 
-android.applicationVariants.all { variant ->
-    variant.outputs.each { output ->
-        output.outputFile = file("bin/flow.apk")
+private Properties readProperties(String fileName) {
+    Properties versionProps = new Properties()
+    def versionPropsFile = file(fileName)
+    if (versionPropsFile.canRead()) {
+        versionProps.load(new FileInputStream(versionPropsFile))
+    } else {
+        throw new GradleException("Could not read ${fileName}")
     }
+    versionProps
+}
+
+private static String getBuildYear() {
+    new Date().format('yyyy')
 }
 
 dependencies {
-    compile fileTree(include: '*.jar', dir: 'libs')
-    compile 'com.android.support:appcompat-v7:25.3.1'
-    compile 'com.android.support:recyclerview-v7:25.3.1'
-    compile 'com.android.support:support-annotations:25.3.1'
-    compile 'com.android.support:design:25.3.1'
-    compile 'com.google.android.gms:play-services-base:7.5.0'
-    compile 'com.google.android.gms:play-services-maps:7.5.0'
-    compile 'com.google.android.gms:play-services-gcm:7.5.0'
-    compile 'org.ocpsoft.prettytime:prettytime:3.2.4.Final'
-    compile 'com.google.maps.android:android-maps-utils:0.4'
-    compile 'com.fasterxml.jackson.core:jackson-databind:2.4.4'
-    compile 'com.google.code.gson:gson:2.3'
-    compile 'com.jakewharton.timber:timber:4.3.1'
-    compile 'com.google.dagger:dagger:2.4'
-    apt 'com.google.dagger:dagger-compiler:2.4'
+    implementation "androidx.appcompat:appcompat:${rootProject.ext.appCompatVersion}"
+    implementation "androidx.exifinterface:exifinterface:${rootProject.ext.exifVersion}"
+    implementation "androidx.recyclerview:recyclerview:${rootProject.ext.recyclerVersion}"
+    implementation "androidx.annotation:annotation:${rootProject.ext.annotationVersion}"
+    implementation "com.google.android.material:material:${rootProject.ext.materialVersion}"
+    implementation "androidx.constraintlayout:constraintlayout:${rootProject.ext.constraintLayoutVersion}"
+    implementation "androidx.multidex:multidex:${rootProject.ext.multidexVersion}"
+    implementation "org.ocpsoft.prettytime:prettytime:${rootProject.ext.prettyTimeVersion}"
+    implementation "com.jakewharton.timber:timber:${rootProject.ext.timberVersion}"
+    implementation "com.google.dagger:dagger:${rootProject.ext.daggerVersion}"
+    annotationProcessor "com.google.dagger:dagger-compiler:${rootProject.ext.daggerVersion}"
+    implementation "com.jakewharton:butterknife:${rootProject.ext.butterKnifeVersion}"
+    annotationProcessor "com.jakewharton:butterknife-compiler:${rootProject.ext.butterKnifeVersion}"
+    implementation "io.sentry:sentry-android:$sentryVersion"
+    implementation "org.slf4j:slf4j-nop:${rootProject.ext.slfVersion}"
+    implementation "com.github.bumptech.glide:glide:${rootProject.ext.glideVersion}"
+    annotationProcessor "com.github.bumptech.glide:compiler:${rootProject.ext.glideVersion}"
+    implementation "com.squareup.sqlbrite2:sqlbrite:${rootProject.ext.sqlbriteVersion}"
+    implementation "io.reactivex.rxjava2:rxandroid:${rootProject.ext.rxAndroidVersion}"
+    implementation "io.reactivex.rxjava2:rxjava:${rootProject.ext.rxJavaVersion}"
+    implementation "com.squareup.okhttp3:logging-interceptor:${rootProject.ext.loggingInterceptorVersion}"
+    implementation "com.google.code.gson:gson:${rootProject.ext.gsonVersion}"
 
-    testCompile 'junit:junit:4.12'
-    testCompile 'org.mockito:mockito-core:1.10.19'
-    testCompile 'org.powermock:powermock-module-junit4:1.6.2'
-    testCompile 'org.powermock:powermock-module-junit4-rule:1.6.2'
-    testCompile 'org.powermock:powermock-api-mockito:1.6.2'
-    testCompile 'org.powermock:powermock-classloading-xstream:1.6.2'
+    debugImplementation "com.squareup.leakcanary:leakcanary-android:${rootProject.ext.leakCanaryVersion}"
 
-    androidTestCompile 'com.google.dexmaker:dexmaker:1.2'
-    androidTestCompile 'com.google.dexmaker:dexmaker-mockito:1.2'
-    androidTestCompile ('com.android.support.test:rules:0.5') {
-        exclude module: 'support-annotations'
-        exclude group: 'com.android.support', module: 'appcompat'
-        exclude group: 'com.android.support', module: 'support-v4'
-        exclude module: 'recyclerview-v7'
-    }
-    androidTestCompile ('com.android.support.test.espresso:espresso-core:2.2.2') {
-        exclude module: 'support-annotations'
-        exclude group: 'com.android.support', module: 'appcompat'
-        exclude group: 'com.android.support', module: 'support-v4'
-        exclude module: 'recyclerview-v7'
-    }
-    androidTestCompile ('com.android.support.test.espresso:espresso-contrib:2.2.1') {
-        exclude module: 'support-annotations'
-        exclude group: 'com.android.support', module: 'appcompat'
-        exclude group: 'com.android.support', module: 'support-v4'
-        exclude module: 'recyclerview-v7'
-    }
+    implementation "com.google.firebase:firebase-analytics:${rootProject.ext.firebaseVersion}"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+    implementation "androidx.core:core-ktx:${rootProject.ext.coreKtxVersion}"
+    implementation "com.mapbox.mapboxsdk:mapbox-android-sdk:${rootProject.ext.mapboxVersion}"
+    implementation "androidx.work:work-runtime:${rootProject.ext.workVersion}"
+    implementation "com.halfhp.rxtracer:rxtracer:${rootProject.ext.rxTracerVersion}"
 
-    compile project(':domain')
-    compile project(':data')
+    testImplementation "junit:junit:${rootProject.ext.jUnitVersion}"
+    testImplementation "org.mockito:mockito-core:${rootProject.ext.mockitoCoreVersion}"
+    testImplementation "org.powermock:powermock-module-junit4:${rootProject.ext.powerMockVersion}"
+    testImplementation "org.powermock:powermock-module-junit4-rule:${rootProject.ext.powerMockVersion}"
+    testImplementation "org.powermock:powermock-api-mockito:${rootProject.ext.powerMockVersion}"
+    testImplementation "org.powermock:powermock-classloading-xstream:${rootProject.ext.powerMockVersion}"
+    testImplementation "io.kotlintest:kotlintest-runner-junit4:${rootProject.ext.kotlintestVerion}"
+
+    androidTestImplementation "androidx.test.ext:junit:${rootProject.ext.androidXJunit}"
+    androidTestImplementation "androidx.test:core:${rootProject.ext.androidXCore}"
+    androidTestImplementation "com.google.dexmaker:dexmaker:${rootProject.ext.dexMakerVersion}"
+    androidTestImplementation "com.google.dexmaker:dexmaker-mockito:${rootProject.ext.dexMakerVersion}"
+    androidTestImplementation "androidx.test:rules:${rootProject.ext.rulesVersion}"
+    androidTestImplementation "androidx.test.espresso:espresso-core:${rootProject.ext.espressoCoreVersion}"
+    androidTestImplementation "androidx.test.espresso:espresso-contrib:${rootProject.ext.espressoContribVersion}"
+
+    implementation project(':domain')
+    implementation project(':data')
+    implementation project(':database')
+    implementation project(':offlinemaps')
+    implementation project(':walkthrough')
+    implementation project(':uicomponents')
+
+    apply plugin: 'com.google.gms.google-services'
 }

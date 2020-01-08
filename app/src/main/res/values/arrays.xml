@@ -26,9 +26,10 @@
         <item>Français</item>
         <item>Hindi</item>
         <item>Khmer</item>
+        <item>Nederlands</item>
+        <item>Nepali</item>
         <item>Portuguese</item>
         <item>Vietnamese</item>
-        <item>Nepali</item>
     </string-array>
     <string-array name="app_language_codes">
         <item>in</item>
@@ -37,9 +38,10 @@
         <item>fr</item>
         <item>hi</item>
         <item>km</item>
+        <item>nl</item>
+        <item>ne</item>
         <item>pt</item>
         <item>vi</item>
-        <item>ne</item>
     </string-array>
 
     <!-- NOTE: Main color will suits the light theme. Must have enough colors for all languages -->
@@ -57,6 +59,11 @@
         <item>320x240px</item>
         <item>640x480px</item>
         <item>1280x960px</item>
+    </string-array>
+
+    <string-array name="user_options">
+        <item>@string/edit_user</item>
+        <item>@string/delete_user</item>
     </string-array>
 
 </resources>

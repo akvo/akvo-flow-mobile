@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:orientation="vertical"
+        >
+
+    <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1">
+
+        <EditText
+                android:id="@+id/barcode_input"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="@string/type_code"
+                android:singleLine="true"
+                android:visibility="gone"
+                tools:visibility="visible"
+                />
+
+        <ImageButton
+                android:id="@+id/barcode_add_btn"
+                android:layout_width="30dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:adjustViewBounds="true"
+                android:background="@android:color/transparent"
+                android:scaleType="centerInside"
+                android:enabled="false"
+                android:visibility="gone"
+                tools:visibility="visible"
+                android:src="@drawable/ic_add_box"/>
+
+    </LinearLayout>
+
+    <TextView
+            android:id="@+id/barcode_manual_input_separator"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/or"
+            android:textColor="@color/black_disabled"
+            android:textSize="12sp"
+            android:visibility="gone"
+            tools:visibility="visible"
+            />
+
+    <Button
+            android:id="@+id/scan_btn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/scanbarcode"
+            style="@style/FormButtonStyle"
+            />
+</LinearLayout>

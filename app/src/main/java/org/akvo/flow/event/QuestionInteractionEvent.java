@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2012 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2012,2018-2019 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -30,15 +30,13 @@ import org.akvo.flow.ui.view.QuestionView;
  * @author Christopher Fagiani
  */
 public class QuestionInteractionEvent {
-    public static final String TAKE_PHOTO_EVENT = "PHOTO";
-    public static final String TAKE_VIDEO_EVENT = "VIDEO";
+    public static final String TAKE_PHOTO_EVENT = "TAKE_PHOTO";
+    public static final String TAKE_VIDEO_EVENT = "TAKE_VIDEO";
+    public static final String GET_PHOTO_EVENT = "GET_PHOTO";
+    public static final String GET_VIDEO_EVENT = "GET_VIDEO";
     public static final String QUESTION_ANSWER_EVENT = "ANS";
     public static final String QUESTION_CLEAR_EVENT = "CLR";
-    public static final String VIDEO_TIP_VIEW = "VIDTIP";
-    public static final String PHOTO_TIP_VIEW = "PHOTOTIP";
-    public static final String ACTIVITY_TIP_VIEW = "ACTIVITYTIP";
     public static final String SCAN_BARCODE_EVENT = "SCAN";
-    public static final String EXTERNAL_SOURCE_EVENT = "EXTERNALSOURCE";
     public static final String CADDISFLY = "CADDISFLY";
     public static final String PLOTTING_EVENT = "PLOTTING";
     public static final String ADD_SIGNATURE_EVENT = "SIGNATURE";

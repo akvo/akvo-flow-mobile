@@ -1,0 +1,113 @@
+{
+  "dataPointId": "g5g8-ue0s-rpht",
+  "deviceId": "valeria_nexus6",
+  "duration": 173,
+  "formId": "156792013",
+  "responses": [
+    {
+      "answerType": "META_NAME",
+      "iteration": 0,
+      "questionId": "-1",
+      "value": "2"
+    },
+    {
+      "answerType": "META_GEO",
+      "iteration": 0,
+      "questionId": "-2",
+      "value": "42|2.2|5|5cy1631s"
+    },
+    {
+      "answerType": "IMAGE",
+      "iteration": 0,
+      "questionId": "152712013",
+      "value": "{\"filename\":\"/storage/emulated/0/akvoflow/data/media/7c6351bd-1a35-4b7e-a8b1-b8b0360171b0.jpg\",\"location\":{\"accuracy\":8.0,\"altitude\":25.0,\"latitude\":41.61529072,\"longitude\":2.6652623}}"
+    },
+    {
+      "answerType": "DATE",
+      "iteration": 0,
+      "questionId": "152722013",
+      "value": "1510649580939"
+    },
+    {
+      "answerType": "SIGNATURE",
+      "iteration": 0,
+      "questionId": "152732013",
+      "value": "{\"image\":\"iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAIAAABLbSncAAAA2ElEQVR4nADIADf/BKpWn8fxE/iaWHFjY/z8ROmbqeM5U1EejwDM0g041gwKS+RANcuoy2FLgwDx7joujjQAvXGbkMG9lGEAM+7013P2F0d+6ukGGwuxA0yN/yabry7Wk/lSYcPrP8UTFSoaYjIfewAN2oMLcQUugn6xO+rX5knFKmYLCETnLb8BwU7eAR4CcOlYT4k1h5qjrRMvKxpIheikAAqPQxYUD/km58EC8zljvtS8fH4SAjgJlwDJIekOwLK+ZvOu36AMPRghlzeePzDZnDUBAAD//4a1Waf6Fl4mAAAAAElFTkSuQmCC\",\"name\":\"tttt\"}"
+    },
+    {
+      "answerType": "VALUE",
+      "iteration": 0,
+      "questionId": "153562013",
+      "value": "2"
+    },
+    {
+      "answerType": "CASCADE",
+      "iteration": 0,
+      "questionId": "153562014",
+      "value": "[{\"code\":\"autumn\",\"name\":\"autumn\"},{\"code\":\"spring\",\"name\":\"spring\"},{\"code\":\"summer \",\"name\":\"summer \"},{\"code\":\"winter \",\"name\":\"winter \"}]"
+    },
+    {
+      "answerType": "VALUE",
+      "iteration": 0,
+      "questionId": "153562015",
+      "value": "123"
+    },
+    {
+      "answerType": "VALUE",
+      "iteration": 0,
+      "questionId": "153562016",
+      "value": "{\"type\":\"FeatureCollection\",\"features\":[{\"type\":\"Feature\",\"geometry\":{\"type\":\"MultiPoint\",\"coordinates\":[[2.670156173408032,41.618688525671374],[2.657729499042034,41.61396016190888],[2.664365954697132,41.611628938968934]]},\"properties\":{\"pointCount\":\"3\"}}]}"
+    },
+    {
+      "answerType": "VIDEO",
+      "iteration": 0,
+      "questionId": "154052014",
+      "value": "{\"filename\":\"/storage/emulated/0/akvoflow/data/media/8d994307-dadf-4b21-b8cb-5f6ed9efa164.mp4\"}"
+    },
+    {
+      "answerType": "VALUE",
+      "iteration": 0,
+      "questionId": "154822013",
+      "value": "test"
+    },
+    {
+      "answerType": "OPTION",
+      "iteration": 0,
+      "questionId": "154852013",
+      "value": "[{\"text\":\"yes\",\"code\":\"1\"}]"
+    },
+    {
+      "answerType": "OPTION",
+      "iteration": 0,
+      "questionId": "154872013",
+      "value": "[{\"text\":\"nooo\",\"code\":\"OTHER\",\"isOther\":true}]"
+    },
+    {
+      "answerType": "VALUE",
+      "iteration": 0,
+      "questionId": "155922013",
+      "value": "123|456"
+    },
+    {
+      "answerType": "VALUE",
+      "iteration": 0,
+      "questionId": "155932013",
+      "value": "3282779021197"
+    },
+    {
+      "answerType": "GEO",
+      "iteration": 0,
+      "questionId": "157782013",
+      "value": "42|2.2|5|5cy1631s"
+    },
+    {
+      "answerType": "CADDISFLY",
+      "iteration": 0,
+      "questionId": "154062013",
+      "value": "{\"testDate\":\"2017-01-16 16:38\",\"app\":{\"appVersion\":\"Version 1.0.0 Alpha 7.2\",\"language\":\"en\"},\"result\":[{\"value\":\"0.0\",\"id\":1,\"unit\":\"ppm\",\"name\":\"Nitrate Nitrogen\"},{\"value\":\"0.0\",\"id\":2,\"unit\":\"ppm\",\"name\":\"Nitrite Nitrogen\"}],\"name\":\"Nitrate - N \u0026 Nitrite - N\",\"device\":{\"product\":\"WW_zc451cg\",\"os\":\"Android - 4.4.2 (19)\",\"model\":\"ASUS_Z007\",\"language\":\"en\",\"manufacturer\":\"asus\",\"country\":\"US\"},\"image\":\"c811a10f-a9f0-48fe-9996-90986e67359d.png\",\"uuid\":\"c801b70c-39e4-493a-b20e-6843158b47b4\",\"type\":\"caddisfly\",\"user\":{\"backDropDetection\":true,\"language\":\"en\"}}"
+    }
+  ],
+  "submissionDate": 1510649869472,
+  "username": "valeria_nexus6",
+  "uuid": "ce5f8f8c-a75c-4ed9-8228-4dba884cf7d5"
+}

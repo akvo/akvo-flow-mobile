@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2016 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2016-2019 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -16,42 +16,48 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package org.akvo.flow.serialization.response.value;
 
 import android.text.TextUtils;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.PropertyAccessor;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonIOException;
+import com.google.gson.JsonSyntaxException;
 
 import org.akvo.flow.domain.response.value.Media;
+import org.akvo.flow.domain.util.GsonMapper;
 
-import java.io.IOException;
-
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import timber.log.Timber;
 
 public class MediaValue {
 
-    public static String serialize(Media media) {
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.NONE);
-        mapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
+    @NonNull
+    public static String serialize(Media media, boolean serializeNulls) {
+        GsonBuilder gsonBuilder = new GsonBuilder();
+        if (serializeNulls) {
+            gsonBuilder.serializeNulls();
+        }
+        GsonMapper mapper = new GsonMapper(gsonBuilder.create());
         try {
-            return mapper.writeValueAsString(media);
-        } catch (IOException e) {
+            return mapper.write(media, Media.class);
+        } catch (JsonIOException | JsonSyntaxException e) {
             Timber.e(e.getMessage());
         }
         return "";
     }
 
+    @Nullable
     public static Media deserialize(String data) {
         if (TextUtils.isEmpty(data)) {
             return null;
         }
         try {
-            ObjectMapper mapper = new ObjectMapper();
-            return mapper.readValue(data, Media.class);
-        } catch (IOException e) {
+            GsonMapper mapper = new GsonMapper(new GsonBuilder().create());
+            return mapper.read(data, Media.class);
+        } catch (JsonIOException | JsonSyntaxException e) {
             Timber.e("Value is not a valid JSON response: " + data);
         }
 

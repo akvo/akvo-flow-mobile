@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2012 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2012,2017 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -18,8 +18,6 @@
  */
 
 package org.akvo.flow.domain;
-
-import java.util.StringTokenizer;
 
 import org.akvo.flow.exception.ValidationException;
 import org.akvo.flow.util.ConstantUtil;
@@ -170,13 +168,10 @@ public class ValidationRule {
      * validation rules, a ValidationException is thrown
      */
     public String performValidation(String val) throws ValidationException {
-        String result = val;
-        if (val != null) {
-            if (ConstantUtil.NUMERIC_VALIDATION_TYPE
-                    .equalsIgnoreCase(validationType)) {
-                Double numVal = null;
+        if (val != null && ConstantUtil.NUMERIC_VALIDATION_TYPE.equalsIgnoreCase(validationType)) {
+                Double numVal;
                 try {
-                    numVal = new Double(val.trim());
+                    numVal = Double.valueOf(val.trim());
                     if (minVal != null && minVal > numVal) {
                         throw new ValidationException("Value too small",
                                 ValidationException.TOO_SMALL, null);
@@ -189,21 +184,7 @@ public class ValidationRule {
                     throw new ValidationException("Value must be numeric",
                             ValidationException.INVALID_DATATYPE, e);
                 }
-            } else if (ConstantUtil.NAME_VALIDATION_TYPE
-                    .equalsIgnoreCase(validationType)) {
-                StringTokenizer strTok = new StringTokenizer(val, " ");
-                StringBuilder builder = new StringBuilder();
-                while (strTok.hasMoreTokens()) {
-                    String word = strTok.nextToken();
-                    builder.append(word.substring(0, 1).toUpperCase());
-                    builder.append(word.substring(1));
-                    if (strTok.hasMoreTokens()) {
-                        builder.append(" ");
-                    }
-                }
-                result = builder.toString();
-            }
         }
-        return result;
+        return val;
     }
 }

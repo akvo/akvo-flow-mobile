@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/coordinator_layout"
+        tools:context="org.akvo.flow.presentation.help.HelpActivity">
+
+    <include layout="@layout/app_bar_layout"/>
+
+    <WebView
+            android:id="@+id/help_wv"
+            android:layout_marginTop="?actionBarSize"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            />
+
+    <ProgressBar
+            android:id="@+id/help_pb"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            />
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/root_layout"
+        tools:context="org.akvo.flow.presentation.about.AboutActivity">
+
+    <include layout="@layout/app_bar_layout"/>
+
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="?actionBarSize"
+            android:orientation="vertical"
+            android:gravity="center">
+
+        <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="@string/about_view_title"
+                android:textSize="30sp"
+                android:textStyle="bold"/>
+
+        <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:layout_marginTop="8dp"
+                android:text="@string/about_view_subtitle"
+                android:textSize="14sp"
+                android:textStyle="bold"/>
+
+        <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal|top"
+                android:layout_marginTop="16dp"
+                android:contentDescription="@string/app_icon_description"
+                android:minHeight="80dp"
+                android:minWidth="80dp"
+                android:src="@mipmap/ic_launcher"/>
+
+        <TextView
+                android:id="@+id/text_copyright"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:gravity="center"
+                tools:text="Copyright"
+                android:textSize="15sp"/>
+
+        <TextView
+                android:id="@+id/text_version"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:padding="8dp"
+                android:textSize="14sp"
+                tools:text="Version 2.3.2"/>
+
+        <TextView
+                android:id="@+id/text_check_updates"
+                android:text="@string/about_view_update"
+                style="@style/LinkTextViewStyle"/>
+
+        <TextView
+                android:id="@+id/text_release_notes"
+                android:text="@string/about_view_release_notes"
+                style="@style/LinkTextViewStyle"/>
+
+        <TextView
+                android:id="@+id/text_legal_info"
+                android:text="@string/about_view_legal"
+                style="@style/LinkTextViewStyle"/>
+
+        <TextView
+                android:id="@+id/text_terms"
+                android:text="@string/about_view_terms"
+                style="@style/LinkTextViewStyle"/>
+    </LinearLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

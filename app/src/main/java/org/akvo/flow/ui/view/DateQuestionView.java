@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2019 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -22,7 +22,7 @@ package org.akvo.flow.ui.view;
 import android.app.DatePickerDialog;
 import android.app.DatePickerDialog.OnDateSetListener;
 import android.content.Context;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 import android.view.View;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -73,8 +73,11 @@ public class DateQuestionView extends QuestionView implements View.OnClickListen
         mDateTextEdit = (EditText) findViewById(R.id.date_et);
 
         View pickButton = findViewById(R.id.date_btn);
-        pickButton.setOnClickListener(this);
-        pickButton.setEnabled(!isReadOnly());
+        if (isReadOnly()) {
+            pickButton.setVisibility(GONE);
+        } else {
+            pickButton.setOnClickListener(this);
+        }
     }
 
     @Override
@@ -98,6 +101,7 @@ public class DateQuestionView extends QuestionView implements View.OnClickListen
     private void displayFormattedDate() {
         String formattedTime = userDisplayedDateFormat.format(mLocalCalendar.getTime());
         mDateTextEdit.setText(formattedTime);
+        mDateTextEdit.setVisibility(VISIBLE);
     }
 
     @Override
@@ -142,10 +146,9 @@ public class DateQuestionView extends QuestionView implements View.OnClickListen
     @Override
     public void captureResponse(boolean suppressListeners) {
         String utcTimeStampString = mLocalCalendar.getTimeInMillis() + "";
-        setResponse(new QuestionResponse(utcTimeStampString,
-                        ConstantUtil.DATE_RESPONSE_TYPE,
-                        getQuestion().getId()),
-                suppressListeners);
+        Question question = getQuestion();
+        setResponse(suppressListeners, question, utcTimeStampString,
+                ConstantUtil.DATE_RESPONSE_TYPE);
     }
 
     @Override

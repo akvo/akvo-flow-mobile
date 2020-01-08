@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017,2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -22,8 +22,6 @@ package org.akvo.flow.ui.model;
 
 import android.content.Context;
 import android.content.res.Resources;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import org.akvo.flow.R;
@@ -34,10 +32,16 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
+import javax.inject.Inject;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 public class LanguageMapper {
 
     private final Context context;
 
+    @Inject
     public LanguageMapper(Context context) {
         this.context = context;
     }
@@ -68,7 +72,7 @@ public class LanguageMapper {
         Resources res = context.getResources();
         String[] languageCodes = res.getStringArray(R.array.alllanguagecodes);
         String[] languages = res.getStringArray(R.array.alllanguages);
-        /**
+        /*
          * This presupposes that both arrays languages and language codes have the same order
          * and contain the same languages
          */

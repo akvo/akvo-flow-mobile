@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2015,2017,2018 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -18,38 +18,38 @@
  */
 package org.akvo.flow.serialization.response.value;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.PropertyAccessor;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import android.text.TextUtils;
+
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonIOException;
+import com.google.gson.JsonSyntaxException;
 
 import org.akvo.flow.domain.response.value.Signature;
-
-import java.io.IOException;
+import org.akvo.flow.domain.util.GsonMapper;
 
 import timber.log.Timber;
 
 public class SignatureValue {
 
     public static String serialize(Signature signature) {
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.NONE);
-        mapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
+        GsonMapper mapper = new GsonMapper(new GsonBuilder().create());
         try {
-            return mapper.writeValueAsString(signature);
-        } catch (IOException e) {
+            return mapper.write(signature, Signature.class);
+        } catch (JsonIOException | JsonSyntaxException e) {
             Timber.e(e.getMessage());
         }
         return "";
     }
 
     public static Signature deserialize(String data) {
-        try {
-            ObjectMapper mapper = new ObjectMapper();
-            return mapper.readValue(data, Signature.class);
-        } catch (IOException e) {
-            Timber.e("Value is not a valid JSON response: " + data);
+        if (!TextUtils.isEmpty(data)) {
+            try {
+                GsonMapper mapper = new GsonMapper(new GsonBuilder().create());
+                return mapper.read(data, Signature.class);
+            } catch (JsonSyntaxException e) {
+                Timber.e("Value is not a valid JSON response: %s", data);
+            }
         }
         return new Signature();
     }
-
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -20,27 +20,39 @@
 
 package org.akvo.flow.ui.model.caddisfly;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import android.text.TextUtils;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 
 import java.util.Collections;
 import java.util.List;
 
+import javax.inject.Inject;
+
+import timber.log.Timber;
+
 public class CaddisflyJsonMapper {
 
-    private final Gson gson = new Gson();
+    private final Gson gson;
 
-    public CaddisflyJsonMapper() {
+    @Inject
+    public CaddisflyJsonMapper(Gson gson) {
+        this.gson = gson;
     }
 
     @NonNull
     public List<CaddisflyTestResult> transform(@Nullable String result) {
-        if (result != null) {
-            CaddisflyResult caddisflyResult = gson.fromJson(result, CaddisflyResult.class);
-            if (caddisflyResult != null && caddisflyResult.getResults() != null) {
-                return caddisflyResult.getResults();
+        if (!TextUtils.isEmpty(result)) {
+            try {
+                CaddisflyResult caddisflyResult = gson.fromJson(result, CaddisflyResult.class);
+                if (caddisflyResult != null && caddisflyResult.getResults() != null) {
+                    return caddisflyResult.getResults();
+                }
+            } catch (JsonSyntaxException e) {
+                Timber.e(e, "Unable to parse caddisfly result: %s", result);
             }
         }
         return Collections.emptyList();

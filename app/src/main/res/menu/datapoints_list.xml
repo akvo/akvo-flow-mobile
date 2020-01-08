@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:flowapp="http://schemas.android.com/apk/res-auto">
+
+    <item android:id="@+id/search"
+          android:title="@string/search"
+          android:icon="@drawable/ic_action_search"
+          flowapp:showAsAction="collapseActionView|ifRoom"
+          flowapp:actionViewClass="androidx.appcompat.widget.SearchView" />
+    <item
+            android:id="@+id/more_submenu"
+            android:icon="@drawable/ic_more"
+            android:orderInCategory="100"
+            android:title="@string/more"
+            flowapp:showAsAction="always">
+
+        <menu>
+            <item
+                    android:id="@+id/upload"
+                    android:title="@string/upload"/>
+            <item
+                    android:id="@+id/order_by"
+                    android:title="@string/sort"/>
+
+            <item
+                    android:id="@+id/stats"
+                    android:title="@string/stats"/>
+
+        </menu>
+
+    </item>
+</menu>

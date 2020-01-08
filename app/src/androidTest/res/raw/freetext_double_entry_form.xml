@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<survey
+        name="FreeTextForm"
+        defaultLanguageCode="en"
+        version='1.0'
+        app="akvoflowsandbox"
+        surveyGroupId="44173002"
+        surveyGroupName="FreeTextForm"
+        surveyId="47313002">
+    <questionGroup>
+        <heading>FreeTextGroup</heading>
+        <question
+                order="1"
+                type="free"
+                mandatory="true"
+                localeNameFlag="false"
+                requireDoubleEntry="true"
+                id="47313003">
+            <text>FreeTextQuestion</text>
+        </question>
+    </questionGroup>
+</survey>

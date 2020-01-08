@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2015 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2018 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -42,10 +42,11 @@ public class QuestionHeaderView extends QuestionView implements View.OnClickList
 
     private void init() {
         setQuestionView(R.layout.invalid_question_view);
+        View openButton = findViewById(R.id.invalid_question_open_btn);
         if (mDisplayShortcut) {
-            findViewById(R.id.open_btn).setOnClickListener(this);
+            openButton.setOnClickListener(this);
         } else {
-            findViewById(R.id.open_btn).setVisibility(GONE);
+            openButton.setVisibility(GONE);
         }
     }
 

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context="org.akvo.flow.presentation.legal.LegalNoticesActivity">
+
+    <include layout="@layout/app_bar_layout"/>
+
+    <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/licenses_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="?actionBarSize"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:scrollbars="none"
+            />
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

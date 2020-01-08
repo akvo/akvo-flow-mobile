@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010-2016 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2010-2017,2019 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -19,27 +19,35 @@
 
 package org.akvo.flow.util.logging;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.annotation.VisibleForTesting;
 import android.text.TextUtils;
 import android.util.Log;
-
-import com.joshdholtz.sentry.Sentry;
 
 import java.util.Arrays;
 import java.util.List;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.VisibleForTesting;
+import io.sentry.Sentry;
 import timber.log.Timber;
 
 class SentryTree extends Timber.Tree {
 
     private static final List<Class> IGNORED_EXCEPTIONS = Arrays
-            .asList(new Class[] { java.net.ConnectException.class,
-                    javax.net.ssl.SSLHandshakeException.class,
+            .asList(new Class[] {
+                    java.io.EOFException.class,
+                    java.io.InterruptedIOException.class,
+                    java.net.ConnectException.class,
+                    java.net.NoRouteToHostException.class,
+                    java.net.SocketTimeoutException.class,
+                    java.net.SocketException.class,
+                    java.net.UnknownHostException.class,
                     java.security.cert.CertificateNotYetValidException.class,
                     javax.net.ssl.SSLProtocolException.class,
-                    java.net.SocketTimeoutException.class
+                    javax.net.ssl.SSLHandshakeException.class,
+                    javax.net.ssl.SSLException.class,
+                    okhttp3.internal.http2.StreamResetException.class,
+                    okhttp3.internal.http2.ConnectionShutdownException.class
             });
 
     @Override
@@ -56,30 +64,34 @@ class SentryTree extends Timber.Tree {
     @VisibleForTesting
     void captureException(@NonNull Throwable t, @Nullable String message) {
         if (TextUtils.isEmpty(message)) {
-            Sentry.captureException(t);
+            Sentry.capture(t);
         } else {
-            Sentry.captureException(t, message);
+            Sentry.capture(new Throwable(message, t));
         }
     }
 
     /**
      * Some exceptions are not useful to be sent to sentry, this method will filter them out
-     * @param t
-     * @return
      */
     private boolean isThrowableExcluded(Throwable t) {
-        return IGNORED_EXCEPTIONS.contains(t.getClass()) || containsFilteredMessage(t);
+        return IGNORED_EXCEPTIONS.contains(t.getClass()) || containsExcludedCause(t) ||
+                containsFilteredMessage(t);
+    }
+
+    private boolean containsExcludedCause(Throwable t) {
+        return t.getCause() != null && IGNORED_EXCEPTIONS.contains(t.getCause().getClass());
     }
 
     private boolean containsFilteredMessage(Throwable t) {
-        return !TextUtils.isEmpty(t.getMessage()) && t.getMessage()
-                .contains("Connection timed out");
+        String message = t.getMessage();
+        return !TextUtils.isEmpty(message) &&
+                (message.contains("HTTP 5") ||
+                        message.contains("Connection timed out") ||
+                        message.contains("unexpected end of stream"));
     }
 
     /**
      * Configure which level should be sent
-     * @param priority
-     * @return
      */
     private boolean priorityTooLow(int priority) {
         return priority < Log.ERROR;

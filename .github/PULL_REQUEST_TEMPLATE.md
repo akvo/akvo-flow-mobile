@@ -5,8 +5,9 @@
 #### Screenshots (if appropriate)
 
 #### Reviewer Checklist
-* [ ] Connect the issue
-* [ ] Test plan
-* [ ] Copyright header
-* [ ] Code formatting
-* [ ] Documentation
+* [ ] Added an explanation about the work done
+* [ ] Connected the PR and the issue on Zenhub
+* [ ] Added a test plan to the issue
+* [ ] Updated the copyright header
+* [ ] Formatted the code per our style guide
+* [ ] Added a documentation (if relevant)

@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2015 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2015,2018-2019 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -20,7 +20,9 @@
 package org.akvo.flow.ui.view;
 
 import android.content.Context;
-import android.graphics.Color;
+import androidx.annotation.Nullable;
+import androidx.annotation.VisibleForTesting;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -32,47 +34,50 @@ import android.widget.TextView;
 import org.akvo.flow.R;
 import org.akvo.flow.domain.Question;
 import org.akvo.flow.event.SurveyListener;
-import org.akvo.flow.util.PlatformUtil;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class SubmitTab extends ListView implements OnClickListener {
+
+    @VisibleForTesting
+    public static final String FOOTER = "FOOTER";
+
+    private final QuestionListAdapter adapter;
+
     private SurveyListener mListener;
 
     private TextView mHeaderView;
     private Button mSubmitButton;
 
-    public SubmitTab(Context context, SurveyListener listener) {
+    public SubmitTab(Context context) {
         super(context);
+        if (!(context instanceof SurveyListener)) {
+            throw new IllegalArgumentException("Activity must implement SurveyListener");
+        }
+        mListener = (SurveyListener) context;
+        setId(R.id.submit_tab);
+        final int listPadding = (int) getResources().getDimension(R.dimen.form_left_right_padding);
+        setPadding(listPadding, 0, listPadding, listPadding);
 
-        mListener = listener;
+        mHeaderView = (TextView) inflate(context, R.layout.submit_tab_header);
 
-        mHeaderView = new TextView(context);
-        mHeaderView.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT,
-                LayoutParams.WRAP_CONTENT));
-        final int padding = (int)PlatformUtil.dp2Pixel(context, 8);
-        mHeaderView.setPadding(padding, padding, padding, padding);
-        mHeaderView.setTextSize(18);
-        mHeaderView.setClickable(false);
-        mSubmitButton = new Button(context);
-        mSubmitButton.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT,
-                LayoutParams.WRAP_CONTENT));
-        mSubmitButton.setTextColor(Color.WHITE);
-        mSubmitButton.setBackgroundResource(R.drawable.button_primary);
-        mSubmitButton.setText(context.getString(R.string.submitbutton));
+        mSubmitButton = (Button) inflate(context, R.layout.submit_tab_footer);
         mSubmitButton.setOnClickListener(this);
 
         addHeaderView(mHeaderView);
-        addFooterView(mSubmitButton);
+        addFooterView(mSubmitButton, FOOTER, true);
+        adapter = new QuestionListAdapter();
+        setAdapter(adapter);
+        refresh(adapter.questions);
+    }
 
-        refresh(new ArrayList<Question>());
+    private View inflate(Context context, int layoutResId) {
+        return LayoutInflater.from(context).inflate(layoutResId, this, false);
     }
 
     public void refresh(List<Question> invalidQuestions) {
-        QuestionListAdapter adapter = new QuestionListAdapter(invalidQuestions);
-        setAdapter(adapter);
-
+        adapter.setQuestions(invalidQuestions);
         if (!invalidQuestions.isEmpty()) {
             mHeaderView.setText(R.string.error_responses);
             mSubmitButton.setEnabled(false);
@@ -80,7 +85,7 @@ public class SubmitTab extends ListView implements OnClickListener {
             mHeaderView.setText(R.string.error_empty_form);
             mSubmitButton.setEnabled(false);
         } else {
-            mHeaderView.setText(R.string.submittext);
+            mHeaderView.setText(R.string.submit_tab_description);
             mSubmitButton.setEnabled(true);
         }
     }
@@ -89,35 +94,55 @@ public class SubmitTab extends ListView implements OnClickListener {
         mListener.onSurveySubmit();
     }
 
-    class QuestionListAdapter extends BaseAdapter {
-        private List<Question> mQuestions;
+    static class QuestionListAdapter extends BaseAdapter {
 
-        public QuestionListAdapter(List<Question> questions) {
-            mQuestions = questions;
+        private final List<Question> questions = new ArrayList<>();
+
+        QuestionListAdapter() {
+        }
+
+        void setQuestions(@Nullable List<Question> questions) {
+            this.questions.clear();
+            if (questions != null) {
+                this.questions.addAll(questions);
+            }
+            notifyDataSetChanged();
         }
 
         @Override
         public int getCount() {
-            return mQuestions.size();
+            return questions.size();
         }
 
         @Override
         public Object getItem(int position) {
-            return mQuestions.get(position);
+            return questions.get(position);
         }
 
         @Override
         public long getItemId(int position) {
-            return 0;
+            return position;
         }
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
-            final QuestionView qv = new QuestionHeaderView(getContext(), mQuestions.get(position),
-                    mListener, true);
+            QuestionView qv;
+            Question question = questions.get(position);
+            if (convertView == null) {
+                Context context = parent.getContext();
+                if (!(context instanceof SurveyListener)) {
+                    throw new IllegalArgumentException("Activity must implement SurveyListener");
+                }
+                SurveyListener listener = (SurveyListener) context;
+                qv = new QuestionHeaderView(context, question, listener, true);
+            } else {
+                qv = (QuestionHeaderView) convertView;
+                qv.mQuestion = question;
+                qv.displayContent();
+            }
             // force the view to be visible (if the question has
             // dependencies, it'll be hidden by default)
-            qv.setTag(mQuestions.get(position).getId());
+            qv.setTag(question.getId());
             qv.setVisibility(View.VISIBLE);
             return qv;
         }

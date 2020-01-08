@@ -2,22 +2,22 @@
 
 <merge xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <include layout="@layout/question_header" />
+    <include layout="@layout/question_header"/>
 
     <EditText
-        android:id="@+id/date_et"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:enabled="false"
-        android:imeOptions="actionDone"
-        android:inputType="textNoSuggestions" />
+            android:id="@+id/date_et"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            android:enabled="false"
+            android:imeOptions="actionDone"
+            android:inputType="textNoSuggestions"/>
 
     <Button
-        android:id="@+id/date_btn"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textSize="16sp"
-        android:text="@string/pickdate"
-        style="@style/button_primary"/>
+            android:id="@+id/date_btn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            style="@style/FormButtonStyle"
+            android:text="@string/pickdate"/>
 
 </merge>

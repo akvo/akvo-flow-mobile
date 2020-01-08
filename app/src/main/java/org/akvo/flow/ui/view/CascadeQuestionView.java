@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2014-2017 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2014-2019 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -33,35 +33,41 @@ import android.widget.SpinnerAdapter;
 import android.widget.TextView;
 
 import org.akvo.flow.R;
-import org.akvo.flow.data.CascadeDB;
+import org.akvo.flow.data.database.cascade.CascadeDB;
 import org.akvo.flow.domain.Level;
 import org.akvo.flow.domain.Node;
 import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionResponse;
 import org.akvo.flow.domain.response.value.CascadeNode;
 import org.akvo.flow.event.SurveyListener;
+import org.akvo.flow.injector.component.DaggerViewComponent;
+import org.akvo.flow.injector.component.ViewComponent;
 import org.akvo.flow.serialization.response.value.CascadeValue;
 import org.akvo.flow.util.ConstantUtil;
-import org.akvo.flow.util.FileUtil;
-import org.akvo.flow.util.FileUtil.FileType;
+import org.akvo.flow.util.files.FormResourcesFileBrowser;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.inject.Inject;
+
+import androidx.annotation.NonNull;
 import timber.log.Timber;
 
 public class CascadeQuestionView extends QuestionView
         implements AdapterView.OnItemSelectedListener {
 
-    private static final int POSITION_NONE = -1;// no spinner position id
+    @Inject
+    FormResourcesFileBrowser resourcesFileUtil;
 
-    private static final long ID_NONE = -1;// no node id
-    private static final long ID_ROOT = 0;// root node id
+    private static final int POSITION_NONE = -1; // no spinner position id
+    private static final long ID_NONE = -1; // no node id
+    private static final long ID_ROOT = 0; // root node id
 
     private String[] mLevels;
     private LinearLayout mSpinnerContainer;
     private boolean mFinished;
-
     private CascadeDB mDatabase;
 
     public CascadeQuestionView(Context context, Question q, SurveyListener surveyListener) {
@@ -71,8 +77,9 @@ public class CascadeQuestionView extends QuestionView
 
     private void init() {
         setQuestionView(R.layout.cascade_question_view);
+        initialiseInjector();
 
-        mSpinnerContainer = (LinearLayout) findViewById(R.id.cascade_content);
+        mSpinnerContainer = findViewById(R.id.cascade_content);
 
         // Load level names
         List<Level> levels = getQuestion().getLevels();
@@ -86,13 +93,20 @@ public class CascadeQuestionView extends QuestionView
         // Construct local filename (src refers to remote location of the resource)
         String src = getQuestion().getSrc();
         if (!TextUtils.isEmpty(src)) {
-            File db = new File(FileUtil.getFilesDir(FileType.RES), src);
+            File db = resourcesFileUtil.findFile(getContext().getApplicationContext(), src);
             if (db.exists()) {
                 mDatabase = new CascadeDB(getContext(), db.getAbsolutePath());
                 mDatabase.open();
             }
         }
         updateSpinners(POSITION_NONE);
+    }
+
+    private void initialiseInjector() {
+        ViewComponent viewComponent =
+                DaggerViewComponent.builder().applicationComponent(getApplicationComponent())
+                        .build();
+        viewComponent.inject(this);
     }
 
     @Override
@@ -104,6 +118,13 @@ public class CascadeQuestionView extends QuestionView
 
     @Override
     public void onPause() {
+        if (mDatabase != null) {
+            mDatabase.close();
+        }
+    }
+
+    @Override
+    public void onDestroy() {
         if (mDatabase != null) {
             mDatabase.close();
         }
@@ -143,6 +164,7 @@ public class CascadeQuestionView extends QuestionView
     }
 
     private void addLevelView(int position, List<Node> values, int selection) {
+        Timber.d("Will add nodes to "+position+", values: "+values+ ", selection: "+selection);
         if (values.isEmpty()) {
             return;
         }
@@ -150,13 +172,13 @@ public class CascadeQuestionView extends QuestionView
         LayoutInflater inflater = LayoutInflater.from(getContext());
 
         View view = inflater.inflate(R.layout.cascading_level_item, mSpinnerContainer, false);
-        final TextView text = (TextView) view.findViewById(R.id.text);
-        final Spinner spinner = (Spinner) view.findViewById(R.id.spinner);
+        final TextView text = view.findViewById(R.id.cascade_level_number);
+        final Spinner spinner = view.findViewById(R.id.cascade_level_spinner);
 
         text.setText(mLevels != null && mLevels.length > position ? mLevels[position] : "");
 
         // Insert a fake 'Select' value
-        Node node = new Node(ID_NONE, getContext().getString(R.string.select), null);
+        Node node = new Node(ID_NONE, getContext().getString(R.string.select), null, ID_NONE);
         values.add(0, node);
 
         SpinnerAdapter adapter = new CascadeAdapter(getContext(), values);
@@ -166,12 +188,10 @@ public class CascadeQuestionView extends QuestionView
         if (selection != POSITION_NONE) {
             spinner.setSelection(selection + 1);// Skip level title item
         }
-        // Attach listener asynchronously, preventing selection event from being fired off right away
-        spinner.post(new Runnable() {
-            public void run() {
-                spinner.setOnItemSelectedListener(CascadeQuestionView.this);
-            }
-        });
+        if (!isReadOnly()) {
+            // Attach listener asynchronously, preventing selection event from being fired off right away
+            spinner.post(() -> spinner.setOnItemSelectedListener(CascadeQuestionView.this));
+        }
         mSpinnerContainer.addView(view);
     }
 
@@ -185,17 +205,18 @@ public class CascadeQuestionView extends QuestionView
 
     @Override
     public void onNothingSelected(AdapterView<?> parent) {
+        //EMPTY
     }
 
     @Override
     public void rehydrate(QuestionResponse resp) {
         super.rehydrate(resp);
 
+        mSpinnerContainer.removeAllViews();
         String answer = resp != null ? resp.getValue() : null;
         if (mDatabase == null || TextUtils.isEmpty(answer)) {
             return;
         }
-        mSpinnerContainer.removeAllViews();
 
         List<CascadeNode> values = CascadeValue.deserialize(answer);
 
@@ -232,9 +253,14 @@ public class CascadeQuestionView extends QuestionView
     @Override
     public void resetQuestion(boolean fireEvent) {
         super.resetQuestion(fireEvent);
-        updateSpinners(POSITION_NONE);
+        if (isReadOnly()) {
+            mSpinnerContainer.removeAllViews();
+        } else {
+            updateSpinners(POSITION_NONE);
+        }
         if (mDatabase == null) {
-            String error = "Cannot load cascade resource: " + getQuestion().getSrc();
+            String error = getContext()
+                    .getString(R.string.cascade_error_message, getQuestion().getSrc());
             Timber.e(new IllegalStateException(error), error);
             setError(error);
         }
@@ -254,12 +280,12 @@ public class CascadeQuestionView extends QuestionView
         }
 
         String response = CascadeValue.serialize(values);
-        setResponse(new QuestionResponse(response, ConstantUtil.CASCADE_RESPONSE_TYPE,
-                getQuestion().getId()), suppressListeners);
+        Question question = getQuestion();
+        setResponse(suppressListeners, question, response, ConstantUtil.CASCADE_RESPONSE_TYPE);
     }
 
     private Spinner getSpinner(int position) {
-        return (Spinner) mSpinnerContainer.getChildAt(position).findViewById(R.id.spinner);
+        return (Spinner) mSpinnerContainer.getChildAt(position).findViewById(R.id.cascade_level_spinner);
     }
 
     @Override
@@ -278,15 +304,17 @@ public class CascadeQuestionView extends QuestionView
             setDropDownViewResource(R.layout.cascade_spinner_item);
         }
 
+        @NonNull
         @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
+        public View getView(int position, View convertView, @NonNull ViewGroup parent) {
             View view = super.getView(position, convertView, parent);
             setStyle(view, position);
             return view;
         }
 
         @Override
-        public View getDropDownView(final int position, View convertView, ViewGroup parent) {
+        public View getDropDownView(final int position, View convertView,
+                @NonNull ViewGroup parent) {
             View view = super.getDropDownView(position, convertView, parent);
             setStyle(view, position);
             return view;
@@ -294,7 +322,7 @@ public class CascadeQuestionView extends QuestionView
 
         private void setStyle(View view, int position) {
             try {
-                TextView text = (TextView) view.findViewById(R.id.cascade_spinner_item_text);
+                TextView text = view.findViewById(R.id.cascade_spinner_item_text);
                 int flags = text.getPaintFlags();
                 if (position == 0) {
                     flags |= Paint.FAKE_BOLD_TEXT_FLAG;

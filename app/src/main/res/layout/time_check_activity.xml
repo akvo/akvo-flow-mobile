@@ -1,44 +1,30 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical">
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:orientation="vertical"
+              android:paddingBottom="@dimen/activity_vertical_margin"
+              android:paddingLeft="@dimen/activity_horizontal_margin"
+              android:paddingRight="@dimen/activity_horizontal_margin"
+              android:paddingTop="@dimen/activity_vertical_margin">
 
     <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@drawable/ab_solid_flow"
-        android:padding="@dimen/activity_horizontal_margin"
-        android:text="@string/time_check_activity"
-        android:textSize="20sp" />
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:paddingBottom="@dimen/activity_vertical_margin"
-        android:paddingLeft="@dimen/activity_horizontal_margin"
-        android:paddingRight="@dimen/activity_horizontal_margin"
-        android:paddingTop="@dimen/activity_vertical_margin">
-
-        <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
             android:text="@string/time_warning"
-            android:textSize="18sp" />
+            android:textSize="18sp"/>
 
-        <TextView
+    <TextView
             android:id="@+id/local_time_tv"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
-            android:textSize="18sp" />
+            android:textSize="18sp"/>
 
-        <Button
+    <Button
             android:id="@+id/adjust_btn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/adjust_date" />
-
-    </LinearLayout>
+            style="@style/PrimaryButtonStyle"
+            android:text="@string/adjust_date"/>
 </LinearLayout>

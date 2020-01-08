@@ -2,8 +2,7 @@
           package="org.akvo.flow.data">
 
     <application
-            android:allowBackup="true"
-            android:supportsRtl="true">
-    </application>
+            android:allowBackup="false"
+            android:supportsRtl="true"/>
 
 </manifest>

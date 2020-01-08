@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <color name="snv_blue">#0091cc</color>
+
+    <!-- SNV branding-->
+    <color name="background_alternate">#e4f1f9</color>
+
+    <!-- Text -->
+    <color name="text_primary">@color/black_main</color>
+    <color name="text_primary_disabled">@color/black_disabled</color>
+
+    <!-- Buttons -->
+
+    <color name="record_name_background">#cec6bc</color>
+    <color name="feature_menu_background">#e0736357</color>
+
+    <color name="colorPrimary">#2BB5E5</color>
+    <color name="colorPrimaryDark">@color/snv_blue</color>
+    <color name="colorAccent">@color/snv_blue</color>
+    <color name="tabIndicatorColor">@color/orange_main</color>
+
+</resources>

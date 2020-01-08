@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2012 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2018 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -19,73 +19,110 @@
 
 package org.akvo.flow.activity;
 
-import android.app.ListActivity;
 import android.os.Bundle;
-import android.view.Window;
+import android.widget.ListView;
 
 import org.akvo.flow.R;
-import org.akvo.flow.data.database.SurveyDbAdapter;
+import org.akvo.flow.app.FlowApp;
+import org.akvo.flow.data.database.SurveyDbDataSource;
 import org.akvo.flow.domain.FileTransmission;
+import org.akvo.flow.injector.component.ApplicationComponent;
+import org.akvo.flow.injector.component.DaggerViewComponent;
+import org.akvo.flow.injector.component.ViewComponent;
 import org.akvo.flow.ui.adapter.FileTransmissionArrayAdapter;
+import org.akvo.flow.uicomponents.BackActivity;
 import org.akvo.flow.util.ConstantUtil;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
+
+import androidx.annotation.NonNull;
+
 /**
  * Activity to show the transmission history of all files in a survey submission
- * 
+ *
  * @author Christopher Fagiani
  */
-public class TransmissionHistoryActivity extends ListActivity {
-    private SurveyDbAdapter databaseAdapter;
-    private Long respondentId;
+public class TransmissionHistoryActivity extends BackActivity {
+
+    @Inject
+    SurveyDbDataSource databaseAdapter;
+
+    private Long surveyInstanceId;
+    private ListView transmissionsList;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        setContentView(R.layout.activity_transmission_history);
+        initializeInjector();
+        setupToolBar();
+        transmissionsList = findViewById(R.id.transmission_list);
+        surveyInstanceId = getSurveyInstanceId(savedInstanceState);
+    }
+
+    private void initializeInjector() {
+        ViewComponent viewComponent =
+                DaggerViewComponent.builder().applicationComponent(getApplicationComponent())
+                        .build();
+        viewComponent.inject(this);
+    }
+
+    /**
+     * Get the Main Application component for dependency injection.
+     *
+     * @return {@link ApplicationComponent}
+     */
+    private ApplicationComponent getApplicationComponent() {
+        return ((FlowApp) getApplication()).getApplicationComponent();
+    }
+
+    private Long getSurveyInstanceId(Bundle savedInstanceState) {
+        Long surveyInstanceId;
         if (savedInstanceState != null) {
-            respondentId = savedInstanceState
-                    .getLong(ConstantUtil.RESPONDENT_ID_KEY);
+            surveyInstanceId = savedInstanceState
+                    .getLong(ConstantUtil.RESPONDENT_ID_EXTRA);
         } else {
             Bundle extras = getIntent().getExtras();
-            respondentId = extras != null ? extras
-                    .getLong(ConstantUtil.RESPONDENT_ID_KEY) : null;
+            surveyInstanceId = extras != null ? extras
+                    .getLong(ConstantUtil.RESPONDENT_ID_EXTRA) : null;
         }
-        setContentView(R.layout.transmissionhistory);
-        databaseAdapter = new SurveyDbAdapter(this);
-
+        return surveyInstanceId;
     }
 
     public void onResume() {
         super.onResume();
         databaseAdapter.open();
-        getData();
+        getTransmissionData();
     }
 
-    private void getData() {
-        List<FileTransmission> transmissionList = databaseAdapter.getFileTransmissions(respondentId);
+    private void getTransmissionData() {
+        List<FileTransmission> transmissionList = databaseAdapter
+                .getSurveyInstanceTransmissions(surveyInstanceId);
+        displayTransmissionData(transmissionList);
+    }
+
+    private void displayTransmissionData(List<FileTransmission> transmissionList) {
         FileTransmissionArrayAdapter adapter = new FileTransmissionArrayAdapter(
-                this, R.layout.transmissionrow,
+                this, R.layout.transmission_history_row,
                 transmissionList != null ? transmissionList
-                        : new ArrayList<FileTransmission>());
-        setListAdapter(adapter);
+                        : new ArrayList<>());
+        transmissionsList.setAdapter(adapter);
     }
 
     @Override
-    protected void onSaveInstanceState(Bundle outState) {
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
-        if (outState != null) {
-            outState.putLong(ConstantUtil.RESPONDENT_ID_KEY, respondentId);
-        }
+        outState.putLong(ConstantUtil.RESPONDENT_ID_EXTRA, surveyInstanceId);
     }
 
+    @Override
     protected void onPause() {
         if (databaseAdapter != null) {
             databaseAdapter.close();
         }
         super.onPause();
     }
-
 }

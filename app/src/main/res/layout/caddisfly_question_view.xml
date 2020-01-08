@@ -4,8 +4,8 @@
 
     <include layout="@layout/question_header" />
 
-    <android.support.v7.widget.RecyclerView
-            android:id="@+id/results_recycler_view"
+    <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/caddisfly_results_recycler_view"
             android:scrollbars="none"
             android:layout_marginTop="2dp"
             android:layout_marginBottom="4dp"
@@ -13,11 +13,10 @@
             android:layout_height="wrap_content" />
 
     <Button
-        android:id="@+id/button"
-        style="@style/button_primary"
+        android:id="@+id/caddisfly_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/caddisfly_test"
-        android:textSize="16sp" />
+        style="@style/FormButtonStyle" />
 
 </merge>

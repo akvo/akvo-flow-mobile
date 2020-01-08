@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2014-2017 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2014-2019 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -19,23 +19,26 @@
 
 package org.akvo.flow.activity;
 
-import android.app.Activity;
+import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.view.View;
-import android.view.Window;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import org.akvo.flow.R;
-import org.akvo.flow.data.preference.Prefs;
-import org.akvo.flow.util.ConnectivityStateManager;
+import org.akvo.flow.app.FlowApp;
+import org.akvo.flow.domain.util.VersionHelper;
+import org.akvo.flow.injector.component.ApplicationComponent;
+import org.akvo.flow.injector.component.DaggerViewComponent;
+import org.akvo.flow.injector.component.ViewComponent;
+import org.akvo.flow.ui.Navigator;
+import org.akvo.flow.uicomponents.LocaleAwareActivity;
 import org.akvo.flow.util.FileUtil;
-import org.akvo.flow.util.FileUtil.FileType;
-import org.akvo.flow.util.PlatformUtil;
+import org.akvo.flow.util.files.ApkFileBrowser;
+import org.akvo.flow.util.files.FileBrowser;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -47,16 +50,26 @@ import java.io.OutputStream;
 import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.List;
 
+import javax.inject.Inject;
+
+import androidx.annotation.Nullable;
 import timber.log.Timber;
 
-public class AppUpdateActivity extends Activity {
+public class AppUpdateActivity extends LocaleAwareActivity {
     public static final String EXTRA_URL = "url";
     public static final String EXTRA_VERSION = "version";
     public static final String EXTRA_CHECKSUM = "md5Checksum";
 
     private static final int IO_BUFFER_SIZE = 8192;
-    private static final int MAX_PROGRESS = 100;
+    private static final int MAX_PROGRESS_IN_PERCENT = 100;
+
+    @Inject
+    ApkFileBrowser apkFileBrowser;
+
+    @Inject
+    Navigator navigator;
 
     private Button mInstallBtn;
     private ProgressBar mProgress;
@@ -69,75 +82,66 @@ public class AppUpdateActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.app_update_activity);
-
+        initializeInjector();
         mUrl = getIntent().getStringExtra(EXTRA_URL);
         mVersion = getIntent().getStringExtra(EXTRA_VERSION);
         mMd5Checksum = getIntent().getStringExtra(EXTRA_CHECKSUM);
 
-        mInstallBtn = (Button) findViewById(R.id.install_btn);
-        mProgress = (ProgressBar) findViewById(R.id.progress);
-        mProgress.setMax(MAX_PROGRESS);// Values will be in percentage
+        mInstallBtn = findViewById(R.id.install_btn);
+        mProgress = findViewById(R.id.progress);
+        mProgress.setMax(MAX_PROGRESS_IN_PERCENT);
 
-        // If the file is already downloaded, just prompt the install text
-        final String filename = checkLocalFile();
-        if (filename != null) {
-            TextView updateTV = (TextView) findViewById(R.id.update_text);
-            updateTV.setText(R.string.clicktoinstall);
-            mInstallBtn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    PlatformUtil.installAppUpdate(AppUpdateActivity.this, filename);
-                }
-            });
+        final String newApkFilePath = apkFileBrowser
+                .verifyLatestApkFile(getApplicationContext(), mMd5Checksum);
+        if (newApkFilePath != null) {
+            displayInstallPrompt(newApkFilePath);
         } else {
-            mInstallBtn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    mInstallBtn.setEnabled(false);
-                    mTask = new UpdateAsyncTask(AppUpdateActivity.this, mUrl, mVersion,
-                            mMd5Checksum);
-                    mTask.execute();
-                }
-            });
+            displayDownloadPrompt();
         }
 
-        Button cancelBtn = (Button) findViewById(R.id.cancel_btn);
-        cancelBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                cancel();
-            }
+        setCancelButton();
+    }
+
+    private void setCancelButton() {
+        findViewById(R.id.cancel_btn).setOnClickListener(v -> cancel());
+    }
+
+    private void displayDownloadPrompt() {
+        mInstallBtn.setOnClickListener(v -> {
+            mInstallBtn.setEnabled(false);
+            mTask = new UpdateAsyncTask(AppUpdateActivity.this, mUrl, mVersion,
+                    mMd5Checksum);
+            mTask.execute();
         });
     }
 
+    private void displayInstallPrompt(final String newApkFilePath) {
+        TextView updateTV = findViewById(R.id.update_text);
+        updateTV.setText(R.string.clicktoinstall);
+        mInstallBtn.setOnClickListener(
+                v -> navigator.installAppUpdate(AppUpdateActivity.this, newApkFilePath));
+    }
+
+    private void initializeInjector() {
+        ViewComponent viewComponent =
+                DaggerViewComponent.builder().applicationComponent(getApplicationComponent())
+                        .build();
+        viewComponent.inject(this);
+    }
+
     /**
-     * Check out previously downloaded files. If the APK update is already downloaded,
-     * and the MD5 checksum matches, the file is considered downloaded.
+     * Get the Main Application component for dependency injection.
      *
-     * @return filename of the already downloaded file, if exists. Null otherwise
+     * @return {@link ApplicationComponent}
      */
-    private String checkLocalFile() {
-        final String latestVersion = FileUtil.checkDownloadedVersions();
-        if (latestVersion != null) {
-            if (mMd5Checksum != null) {
-                // The file was found, but we need to ensure the checksum matches,
-                // to ensure the download succeeded
-                File file = new File(latestVersion);
-                if (!mMd5Checksum.equals(FileUtil.hexMd5(file))) {
-                    file.delete();// Wipe corrupted files
-                    return null;
-                }
-            }
-            return latestVersion;
-        }
-        return null;
+    private ApplicationComponent getApplicationComponent() {
+        return ((FlowApp) getApplication()).getApplicationComponent();
     }
 
     private void cancel() {
         if (isRunning()) {
-            mTask.cancel(true);// Stop the update process
+            mTask.cancel(true); // Stop the update process
         }
         finish();
     }
@@ -156,37 +160,52 @@ public class AppUpdateActivity extends Activity {
 
     private static class UpdateAsyncTask extends AsyncTask<Void, Integer, String> {
 
-        private final Prefs prefs;
+        @Nullable
         private final String mUrl;
         private final String mVersion;
         private final WeakReference<AppUpdateActivity> activityWeakReference;
-        private final ConnectivityStateManager connectivityStateManager;
+        private final ApkFileBrowser apkFileBrowser;
         private String mMd5Checksum;
 
-        public UpdateAsyncTask(AppUpdateActivity context, String mUrl, String mVersion,
+        UpdateAsyncTask(AppUpdateActivity context, String mUrl, String mVersion,
                 String mMd5Checksum) {
-            this.prefs = new Prefs(context);
-            this.mUrl = mUrl;
+            this.mUrl = cleanUrl(mUrl);
             this.mVersion = mVersion;
             this.activityWeakReference = new WeakReference<>(context);
-            this.connectivityStateManager = new ConnectivityStateManager(context);
             this.mMd5Checksum = mMd5Checksum;
+            this.apkFileBrowser = new ApkFileBrowser(new FileBrowser(), new VersionHelper());
+        }
+
+        @Nullable
+        private String cleanUrl(String url) {
+            if (TextUtils.isEmpty(url)) {
+                return null;
+            } else {
+                String cleanUrl = url.toLowerCase();
+                if (cleanUrl.startsWith("http:")) {
+                    cleanUrl = cleanUrl.replaceFirst("http:", "https:");
+                }
+                return cleanUrl;
+            }
         }
 
         @Override
         protected String doInBackground(Void... params) {
-            // Create parent directories, and delete files, if necessary
-            String filename = createFile(mUrl, mVersion).getAbsolutePath();
-
-            boolean syncOver3GAllowed = prefs
-                    .getBoolean(Prefs.KEY_CELL_UPLOAD, Prefs.DEFAULT_VALUE_CELL_UPLOAD);
-            if (!connectivityStateManager.isConnectionAvailable(syncOver3GAllowed)) {
-                Timber.d("No internet connection available. Can't perform the requested operation");
-            } else if (downloadApk(mUrl, filename) && !isCancelled()) {
-                return filename;
+            if (TextUtils.isEmpty(mUrl)) {
+                return null;
             }
-            // Clean up sd-card to ensure no corrupted file is leaked.
-            cleanupDownloads(mVersion);
+            cleanupDownloads();
+
+            AppUpdateActivity appUpdateActivity = activityWeakReference.get();
+            if (appUpdateActivity != null) {
+                String apkFileName = mUrl.substring(mUrl.lastIndexOf('/') + 1);
+                Context context = appUpdateActivity.getApplicationContext();
+                String apkFullPath = apkFileBrowser.getFileName(context, mVersion, apkFileName);
+                if (apkFullPath != null && downloadApk(mUrl, apkFullPath) && !isCancelled()) {
+                    return apkFullPath;
+                }
+                cleanupDownloads();
+            }
             return null;
         }
 
@@ -199,8 +218,8 @@ public class AppUpdateActivity extends Activity {
             if (bytesWritten > 0 && totalBytes > 0) {
                 percentComplete = (int) ((bytesWritten) / ((float) totalBytes) * 100);
             }
-            if (percentComplete > MAX_PROGRESS) {
-                percentComplete = MAX_PROGRESS;
+            if (percentComplete > MAX_PROGRESS_IN_PERCENT) {
+                percentComplete = MAX_PROGRESS_IN_PERCENT;
             }
             Timber.d("onProgressUpdate() - APK update: " + percentComplete + "%");
             notifyProgress(percentComplete);
@@ -216,15 +235,12 @@ public class AppUpdateActivity extends Activity {
         @Override
         protected void onPostExecute(String filename) {
             AppUpdateActivity appUpdateActivity = activityWeakReference.get();
-            if (TextUtils.isEmpty(filename)) {
-                if (appUpdateActivity != null) {
-                    appUpdateActivity.onDownloadError();
-                }
-                return;
-            }
-
             if (appUpdateActivity != null) {
-                appUpdateActivity.onDownloadSuccess(filename);
+                if (TextUtils.isEmpty(filename)) {
+                    appUpdateActivity.onDownloadError();
+                } else {
+                    appUpdateActivity.onDownloadSuccess(filename);
+                }
             }
         }
 
@@ -232,32 +248,21 @@ public class AppUpdateActivity extends Activity {
         protected void onCancelled() {
             Timber.d("onCancelled() - APK update task cancelled");
             notifyProgress(0);
-            cleanupDownloads(mVersion);
-        }
-
-        private void cleanupDownloads(String version) {
-            File directory = new File(FileUtil.getFilesDir(FileType.APK), version);
-            FileUtil.deleteFilesInDirectory(directory, true);
+            cleanupDownloads();
         }
 
         /**
-         * Wipe any existing apk file, and create a new File for the new one, according to the
-         * given version
-         *
-         * @param location
-         * @param version
-         * @return
+         * Clean up sd-card to ensure no corrupted file remains.
          */
-        private File createFile(String location, String version) {
-            cleanupDownloads(version);
-
-            String fileName = location.substring(location.lastIndexOf('/') + 1);
-            File directory = new File(FileUtil.getFilesDir(FileType.APK), version);
-            if (!directory.exists()) {
-                directory.mkdir();
+        private void cleanupDownloads() {
+            AppUpdateActivity appUpdateActivity = activityWeakReference.get();
+            if (appUpdateActivity != null) {
+                List<File> foldersToDelete = apkFileBrowser
+                        .findAllPossibleFolders(appUpdateActivity.getApplicationContext());
+                for (File folder : foldersToDelete) {
+                    FileUtil.deleteFilesInDirectory(folder, true);
+                }
             }
-
-            return new File(directory, fileName);
         }
 
         /**
@@ -308,7 +313,7 @@ public class AppUpdateActivity extends Activity {
                         // If we don't have a checksum yet, try to get it form the ETag header
                         String etag = conn.getHeaderField("ETag");
                         mMd5Checksum =
-                                etag != null ? etag.replaceAll("\"", "") : null;// Remove quotes
+                                etag != null ? etag.replaceAll("\"", "") : null;
                     }
                     // Compare the MD5, if found. Otherwise, rely on the 200 status code
                     ok = mMd5Checksum == null || mMd5Checksum.equals(checksum);
@@ -331,13 +336,13 @@ public class AppUpdateActivity extends Activity {
     }
 
     private void onDownloadSuccess(String filename) {
-        PlatformUtil.installAppUpdate(AppUpdateActivity.this, filename);
+        navigator.installAppUpdate(this, filename);
         finish();
     }
 
     private void onDownloadError() {
         Toast.makeText(this, R.string.apk_upgrade_error, Toast.LENGTH_SHORT).show();
-        mInstallBtn.setText(R.string.retry);
+        mInstallBtn.setText(R.string.action_retry);
         mInstallBtn.setEnabled(true);
     }
 

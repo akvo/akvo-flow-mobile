@@ -1,54 +1,70 @@
 <?xml version="1.0" encoding="utf-8"?>
-<merge xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                                                   xmlns:app="http://schemas.android.com/apk/res-auto"
+                                                   xmlns:tools="http://schemas.android.com/tools"
+                                                   android:layout_width="match_parent"
+                                                   android:layout_height="match_parent"
+                                                   android:id="@+id/relativeLayout"
+                                                   tools:layout_editor_absoluteY="25dp">
 
-    <TextView
-        android:id="@+id/repeat_header"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:gravity="start|center_vertical"
-        android:background="@color/record_name_background"
-        android:padding="6dp"
-        android:textSize="16sp"
-        android:visibility="gone" />
     <ScrollView
-        android:id="@+id/scroller"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+            android:id="@+id/scroller"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/repeat_header">
 
         <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
 
             <LinearLayout
-                android:id="@+id/question_list"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"/>
-
+                    android:id="@+id/question_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"/>
+            <include
+                    layout="@layout/divider"
+                    android:layout_height="1dp"
+                    android:layout_marginLeft="@dimen/form_left_right_padding"
+                    android:layout_marginRight="@dimen/form_left_right_padding"
+                    android:layout_width="match_parent"/>
             <Button
-                android:id="@+id/repeat_btn"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="8dp"
-                android:visibility="gone"
-                android:textSize="16sp"
-                android:text="@string/repeat_group"
-                style="@style/button_secondary"/>
-
-            <Button
-                android:id="@+id/next_btn"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="8dp"
-                android:textSize="16sp"
-                android:text="@string/nextbutton"
-                style="@style/button_tertiary"/>
-
+                    android:id="@+id/repeat_btn"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="@dimen/form_left_right_padding"
+                    android:layout_marginRight="@dimen/form_left_right_padding"
+                    style="@style/RepeatButtonStyle"
+                    android:text="@string/repeat_group"
+                    android:visibility="gone"
+                    tools:visibility="visible"
+                    android:layout_gravity="center_horizontal"/>
         </LinearLayout>
-
     </ScrollView>
 
-</merge>
+    <TextView
+            android:id="@+id/repeat_header"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:gravity="start|center_vertical"
+            android:background="@color/light_grey"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
+            android:paddingLeft="@dimen/form_left_right_padding"
+            android:paddingStart="@dimen/form_left_right_padding"
+            android:paddingEnd="@dimen/form_left_right_padding"
+            android:paddingRight="@dimen/form_left_right_padding"
+            tools:visibility="visible"
+            tools:text="Repetitions:1"
+            android:textSize="16sp"
+            android:visibility="gone"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

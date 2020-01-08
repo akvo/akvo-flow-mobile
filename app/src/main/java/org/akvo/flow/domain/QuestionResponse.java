@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2016 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2019 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -19,41 +19,40 @@
 
 package org.akvo.flow.domain;
 
+import androidx.annotation.Nullable;
+
 import org.akvo.flow.serialization.response.value.CascadeValue;
 import org.akvo.flow.serialization.response.value.OptionValue;
 import org.akvo.flow.util.ConstantUtil;
 
 public class QuestionResponse {
-    private String value;
-    private String type;
-    private Long id;
-    private Long respondentId;
-    private String questionId;
-    private String filename;
-    private boolean includeFlag;
 
-    public QuestionResponse(String val, String t, String questionId) {
-        this.value = val;
-        this.type = t;
+    public static final int NO_ITERATION = -1;
+    private static final int ONE_ITERATION = 0;
+
+    private final String value;
+    private final String type;
+    private final Long id;
+    private final Long surveyInstanceId;
+    private final String questionId;
+    private final String filename;
+    private final boolean includeFlag;
+    private final int iteration;
+
+    private QuestionResponse(String value, String type, Long id, Long surveyInstanceId,
+            String questionId, String filename, boolean includeFlag, int iteration) {
+        this.value = value;
+        this.type = type;
+        this.id = id;
+        this.surveyInstanceId = surveyInstanceId;
         this.questionId = questionId;
-        this.includeFlag = true;
-    }
-
-    public QuestionResponse() {
-        id = null;
-        type = null;
-        value = null;
-        respondentId = null;
-        questionId = null;
-        includeFlag = true;
+        this.filename = filename;
+        this.includeFlag = includeFlag;
+        this.iteration = iteration;
     }
 
     public boolean getIncludeFlag() {
         return includeFlag;
-    }
-
-    public void setIncludeFlag(boolean includeFlag) {
-        this.includeFlag = includeFlag;
     }
 
     public boolean isValid() {
@@ -89,48 +88,24 @@ public class QuestionResponse {
         return questionId;
     }
 
-    public void setQuestionId(String questionId) {
-        this.questionId = questionId;
-    }
-
-    public Long getRespondentId() {
-        return respondentId;
-    }
-
-    public void setRespondentId(Long respondentId) {
-        this.respondentId = respondentId;
+    public Long getSurveyInstanceId() {
+        return surveyInstanceId;
     }
 
     public String getValue() {
         return value;
     }
 
-    public void setValue(String value) {
-        this.value = value;
-    }
-
     public String getType() {
         return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
     }
 
     public Long getId() {
         return id;
     }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
     public String getFilename() {
         return filename;
-    }
-
-    public void setFilename(String filename) {
-        this.filename = filename;
     }
 
     public boolean hasValue() {
@@ -169,4 +144,154 @@ public class QuestionResponse {
         return name.trim();
     }
 
+    public int getIteration() {
+        return iteration;
+    }
+
+    /**
+     * The key is usually the questionId except for questions that belong to a repeatable group
+     * whose key is composed by questionId|iteration
+     */
+    public String getResponseKey() {
+        String responseKey = getQuestionId();
+        if (getIteration() > ONE_ITERATION) {
+            responseKey = responseKey + "|" + getIteration();
+        }
+        return responseKey;
+    }
+
+    public boolean isAnswerToRepeatableGroup() {
+        return iteration != NO_ITERATION;
+    }
+
+    public static class QuestionResponseBuilder {
+
+        private String value;
+        private String type;
+        private Long id;
+        private Long surveyInstanceId;
+        private String questionId;
+        private String filename;
+        private boolean includeFlag = true;
+        private int iteration = NO_ITERATION;
+
+        public QuestionResponseBuilder setValue(String value) {
+            this.value = value;
+            return this;
+        }
+
+        public QuestionResponseBuilder setType(String type) {
+            this.type = type;
+            return this;
+        }
+
+        public QuestionResponseBuilder setId(Long id) {
+            this.id = id;
+            return this;
+        }
+
+        public QuestionResponseBuilder setSurveyInstanceId(Long surveyInstanceId) {
+            this.surveyInstanceId = surveyInstanceId;
+            return this;
+        }
+
+        public QuestionResponseBuilder setQuestionId(String questionId) {
+            this.questionId = questionId;
+            return this;
+        }
+
+        public QuestionResponseBuilder setFilename(String filename) {
+            this.filename = filename;
+            return this;
+        }
+
+        public QuestionResponseBuilder setIncludeFlag(boolean includeFlag) {
+            this.includeFlag = includeFlag;
+            return this;
+        }
+
+        public QuestionResponseBuilder setIteration(int iteration) {
+            this.iteration = iteration;
+            return this;
+        }
+
+        public QuestionResponse createQuestionResponse() {
+            return new QuestionResponse(value, type, id, surveyInstanceId, questionId, filename,
+                    includeFlag, iteration);
+        }
+
+        @Nullable
+        public QuestionResponse createFromQuestionResponse(
+                @Nullable QuestionResponse questionResponse,
+                long id) {
+            if (questionResponse == null) {
+                return null;
+            }
+            return setId(id)
+                    .setValue(questionResponse.getValue())
+                    .setIteration(questionResponse.getIteration())
+                    .setFilename(questionResponse.getFilename())
+                    .setIncludeFlag(questionResponse.getIncludeFlag())
+                    .setQuestionId(questionResponse.getQuestionId())
+                    .setSurveyInstanceId(questionResponse.getSurveyInstanceId())
+                    .setType(questionResponse.getType())
+                    .createQuestionResponse();
+        }
+
+        @Nullable
+        public QuestionResponse createFromQuestionResponse(
+                @Nullable QuestionResponse questionResponse,
+                boolean includeFlag) {
+            if (questionResponse == null) {
+                return null;
+            }
+            return setId(questionResponse.getId())
+                    .setValue(questionResponse.getValue())
+                    .setIteration(questionResponse.getIteration())
+                    .setFilename(questionResponse.getFilename())
+                    .setIncludeFlag(includeFlag)
+                    .setQuestionId(questionResponse.getQuestionId())
+                    .setSurveyInstanceId(questionResponse.getSurveyInstanceId())
+                    .setType(questionResponse.getType())
+                    .createQuestionResponse();
+        }
+
+        /**
+         * Return new response object using ids from the existing response
+         */
+        public QuestionResponse createFromQuestionResponse(@Nullable QuestionResponse oldResponse,
+                @Nullable QuestionResponse newResponse) {
+            if (oldResponse == null && newResponse == null) {
+                return null;
+            } else if (oldResponse == null) {
+                return newResponse;
+            } else if (newResponse == null) {
+                return null;
+            } else {
+                return setId(oldResponse.getId())
+                        .setValue(newResponse.getValue())
+                        .setIteration(oldResponse.getIteration())
+                        .setFilename(newResponse.getFilename())
+                        .setIncludeFlag(oldResponse.getIncludeFlag())
+                        .setQuestionId(oldResponse.getQuestionId())
+                        .setSurveyInstanceId(oldResponse.getSurveyInstanceId())
+                        .setType(newResponse.getType())
+                        .createQuestionResponse();
+            }
+        }
+
+        public QuestionResponse createFromQuestionResponse(@Nullable QuestionResponse newResponse) {
+            if (newResponse != null) {
+                return setValue(newResponse.getValue())
+                        .setIteration(newResponse.getIteration())
+                        .setFilename(newResponse.getFilename())
+                        .setIncludeFlag(newResponse.getIncludeFlag())
+                        .setQuestionId(newResponse.getQuestionId())
+                        .setSurveyInstanceId(newResponse.getSurveyInstanceId())
+                        .setType(newResponse.getType())
+                        .createQuestionResponse();
+            }
+            return null;
+        }
+    }
 }

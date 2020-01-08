@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<survey
+        name="GeoForm"
+        defaultLanguageCode="en"
+        version='2.0'
+        app="akvoflow-dev2"
+        surveyGroupId="155852013"
+        surveyGroupName="New survey"
+        surveyId="156792013">
+    <questionGroup>
+        <heading>group1</heading>
+        <question
+                order="1"
+                locked="false"
+                type="geo"
+                mandatory="true"
+                localeNameFlag="false"
+                localeLocationFlag="true"
+                id="152742013">
+            <text>geolocation manual disabled</text>
+        </question>
+    </questionGroup>
+</survey>

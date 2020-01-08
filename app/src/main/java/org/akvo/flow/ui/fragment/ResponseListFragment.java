@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2013-2014 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2013-2019 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -22,16 +22,10 @@ package org.akvo.flow.ui.fragment;
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.support.v4.app.ListFragment;
-import android.support.v4.app.LoaderManager.LoaderCallbacks;
-import android.support.v4.content.Loader;
-import android.support.v4.content.LocalBroadcastManager;
-import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.MenuItem;
@@ -40,50 +34,95 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 
 import org.akvo.flow.R;
-import org.akvo.flow.activity.FormActivity;
-import org.akvo.flow.activity.TransmissionHistoryActivity;
-import org.akvo.flow.data.loader.SurveyInstanceLoader;
-import org.akvo.flow.data.database.SurveyDbAdapter;
+import org.akvo.flow.app.FlowApp;
+import org.akvo.flow.data.loader.SurveyInstanceResponseLoader;
+import org.akvo.flow.database.SurveyDbAdapter;
 import org.akvo.flow.domain.SurveyGroup;
-import org.akvo.flow.domain.SurveyedLocale;
+import org.akvo.flow.injector.component.ApplicationComponent;
+import org.akvo.flow.injector.component.DaggerViewComponent;
+import org.akvo.flow.injector.component.ViewComponent;
+import org.akvo.flow.ui.Navigator;
 import org.akvo.flow.ui.adapter.ResponseListAdapter;
 import org.akvo.flow.util.ConstantUtil;
 
+import javax.inject.Inject;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.ListFragment;
+import androidx.loader.app.LoaderManager.LoaderCallbacks;
+import androidx.loader.content.Loader;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import timber.log.Timber;
+
+import static org.akvo.flow.util.ConstantUtil.DATA_POINT_ID_EXTRA;
+import static org.akvo.flow.util.ConstantUtil.READ_ONLY_TAG_KEY;
+import static org.akvo.flow.util.ConstantUtil.RESPONDENT_ID_TAG_KEY;
+import static org.akvo.flow.util.ConstantUtil.SURVEY_GROUP_EXTRA;
+import static org.akvo.flow.util.ConstantUtil.SURVEY_ID_TAG_KEY;
+
 public class ResponseListFragment extends ListFragment implements LoaderCallbacks<Cursor> {
-    private static final String TAG = ResponseListFragment.class.getSimpleName();
-
-    private static final String EXTRA_SURVEY_GROUP = "survey_group";
-    private static final String EXTRA_RECORD = "record";
-
-    // TODO: Move all id constants to ConstantUtil
-    private static int SURVEY_ID_KEY = R.integer.surveyidkey;
-    private static int SURVEY_INSTANCE_ID_KEY = R.integer.respidkey;
-    private static int FINISHED_KEY = R.integer.finishedkey;
 
     // Context menu items
     private static final int DELETE_ONE = 0;
     private static final int VIEW_HISTORY = 1;
 
     private SurveyGroup mSurveyGroup;
-    private SurveyedLocale mRecord;
     private ResponseListAdapter mAdapter;
+    private String recordId;
 
-    private SurveyDbAdapter mDatabase;
+    @Nullable
+    private ResponseListListener responseListListener;
 
-    public static ResponseListFragment instantiate(SurveyGroup surveyGroup, SurveyedLocale record) {
-        ResponseListFragment fragment = new ResponseListFragment();
-        Bundle args = new Bundle();
-        args.putSerializable(EXTRA_SURVEY_GROUP, surveyGroup);
-        args.putSerializable(EXTRA_RECORD, record);
-        fragment.setArguments(args);
-        return fragment;
+    @Inject
+    Navigator navigator;
+
+    public static ResponseListFragment newInstance() {
+        return new ResponseListFragment();
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        mSurveyGroup = (SurveyGroup) getArguments().getSerializable(EXTRA_SURVEY_GROUP);
-        mRecord = (SurveyedLocale) getArguments().getSerializable(EXTRA_RECORD);
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        FragmentActivity activity = getActivity();
+        if (activity instanceof ResponseListListener) {
+            responseListListener = (ResponseListListener) activity;
+        } else {
+            throw new IllegalArgumentException("activity must implement ResponseListListener");
+        }
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        Intent intent = getActivity().getIntent();
+        mSurveyGroup = (SurveyGroup) intent.getSerializableExtra(SURVEY_GROUP_EXTRA);
+        recordId = intent.getStringExtra(DATA_POINT_ID_EXTRA);
+
+        if (mAdapter == null) {
+            mAdapter = new ResponseListAdapter(getActivity());
+            setListAdapter(mAdapter);
+        }
+        registerForContextMenu(getListView());
+        setHasOptionsMenu(true);
+        initializeInjector();
+    }
+
+    private void initializeInjector() {
+        ViewComponent viewComponent = DaggerViewComponent.builder()
+                .applicationComponent(getApplicationComponent())
+                .build();
+        viewComponent.inject(this);
+    }
+
+    /**
+     * Get the Main Application component for dependency injection.
+     *
+     * @return {@link ApplicationComponent}
+     */
+    private ApplicationComponent getApplicationComponent() {
+        return ((FlowApp) getActivity().getApplication()).getApplicationComponent();
     }
 
     @Override
@@ -101,10 +140,9 @@ public class ResponseListFragment extends ListFragment implements LoaderCallback
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
-        mDatabase.close();
-        mDatabase = null;
+    public void onDetach() {
+        super.onDetach();
+        this.responseListListener = null;
     }
 
     private void refresh() {
@@ -112,24 +150,7 @@ public class ResponseListFragment extends ListFragment implements LoaderCallback
     }
 
     @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-
-        if (mDatabase == null) {
-            mDatabase = new SurveyDbAdapter(getActivity());
-            mDatabase.open();
-        }
-
-        if (mAdapter == null) {
-            mAdapter = new ResponseListAdapter(getActivity());// Cursor Adapter
-            setListAdapter(mAdapter);
-        }
-        registerForContextMenu(getListView());// Same implementation as before
-        setHasOptionsMenu(true);
-    }
-
-    @Override
-    public void onCreateContextMenu(ContextMenu menu, View view,
+    public void onCreateContextMenu(@NonNull ContextMenu menu, @NonNull View view,
             ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, view, menuInfo);
         menu.add(0, VIEW_HISTORY, 0, R.string.transmissionhist);
@@ -137,7 +158,7 @@ public class ResponseListFragment extends ListFragment implements LoaderCallback
         // Allow deletion only for 'saved' responses
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
         View itemView = info.targetView;
-        if (!(Boolean) itemView.getTag(FINISHED_KEY)) {
+        if (!(Boolean) itemView.getTag(READ_ONLY_TAG_KEY)) {
             menu.add(0, DELETE_ONE, 2, R.string.deleteresponse);
         }
     }
@@ -146,11 +167,13 @@ public class ResponseListFragment extends ListFragment implements LoaderCallback
     public boolean onContextItemSelected(MenuItem item) {
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item
                 .getMenuInfo();
-        Long surveyInstanceId = mAdapter
-                .getItemId(info.position);// This ID is the _id column in the SQLite db
+
+        // This ID is the _id column in the SQLite db
+        long surveyInstanceId = mAdapter.getItemId(info.position);
         switch (item.getItemId()) {
             case DELETE_ONE:
-                deleteSurveyInstance(surveyInstanceId);
+                View itemView = info.targetView;
+                showConfirmationDialog(surveyInstanceId, itemView.getTag(SURVEY_ID_TAG_KEY) + "");
                 break;
             case VIEW_HISTORY:
                 viewSurveyInstanceHistory(surveyInstanceId);
@@ -159,85 +182,78 @@ public class ResponseListFragment extends ListFragment implements LoaderCallback
         return true;
     }
 
-    private void deleteSurveyInstance(final long surveyInstanceId) {
+    private void showConfirmationDialog(final long surveyInstanceId, final String surveyId) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setMessage(R.string.deleteonewarning)
                 .setCancelable(true)
                 .setPositiveButton(R.string.okbutton,
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog,
-                                    int id) {
-                                SurveyDbAdapter db = new SurveyDbAdapter(getActivity()).open();
-                                db.deleteSurveyInstance(String.valueOf(surveyInstanceId));
-                                db.close();
-                                refresh();
-                            }
-                        })
+                        (dialog, id) -> deleteSurveyInstance(surveyId, surveyInstanceId))
                 .setNegativeButton(R.string.cancelbutton,
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog,
-                                    int id) {
-                                dialog.cancel();
-                            }
-                        });
+                        (dialog, id) -> dialog.cancel());
         builder.show();
     }
 
-    private void viewSurveyInstanceHistory(long surveyInstanceId) {
-        Intent i = new Intent(getActivity(), TransmissionHistoryActivity.class);
-        i.putExtra(ConstantUtil.RESPONDENT_ID_KEY, surveyInstanceId);
-        startActivity(i);
-    }
-
-    /**
-     * when a list item is clicked, get the user id and name of the selected
-     * item and open one-survey activity, readonly.
-     */
-    @Override
-    public void onListItemClick(ListView list, View view, int position, long id) {
-        super.onListItemClick(list, view, position, id);
-
-        Intent i = new Intent(view.getContext(), FormActivity.class);
-        i.putExtra(ConstantUtil.SURVEY_ID_KEY, view.getTag(SURVEY_ID_KEY).toString());
-        i.putExtra(ConstantUtil.RESPONDENT_ID_KEY, (Long) view.getTag(SURVEY_INSTANCE_ID_KEY));
-
-        i.putExtra(ConstantUtil.SURVEY_GROUP, mSurveyGroup);
-        i.putExtra(ConstantUtil.SURVEYED_LOCALE_ID, mRecord.getId());
-
-        // Read-only vs editable
-        if ((Boolean) view.getTag(FINISHED_KEY)) {
-            i.putExtra(ConstantUtil.READONLY_KEY, true);
-        } else {
-            i.putExtra(ConstantUtil.SINGLE_SURVEY_KEY, true);
+    private void deleteSurveyInstance(String surveyId, long surveyInstanceId) {
+        Context context = getActivity().getApplicationContext();
+        SurveyDbAdapter db = new SurveyDbAdapter(context);
+        boolean nameResetNeeded = surveyId != null && surveyId
+                .equals(mSurveyGroup.getRegisterSurveyId());
+        db.open();
+        if (nameResetNeeded) {
+            db.clearSurveyedLocaleName(surveyInstanceId);
         }
-
-        startActivity(i);
+        db.deleteSurveyInstance(String.valueOf(surveyInstanceId));
+        db.close();
+        if (nameResetNeeded && responseListListener != null) {
+            responseListListener.onNamedRecordDeleted();
+        }
+        refresh();
     }
 
+    private void viewSurveyInstanceHistory(long surveyInstanceId) {
+        navigator.navigateToTransmissionActivity(getActivity(), surveyInstanceId);
+    }
+
+    @Override
+    public void onListItemClick(@NonNull ListView list, View view, int position, long id) {
+        String formId = view.getTag(SURVEY_ID_TAG_KEY).toString();
+        Long formInstanceId = (Long) view.getTag(RESPONDENT_ID_TAG_KEY);
+        Boolean readOnly = (Boolean) view.getTag(READ_ONLY_TAG_KEY);
+        navigator.navigateToFormActivity(getActivity(), recordId, formId,
+                formInstanceId, readOnly, mSurveyGroup);
+    }
+
+    @NonNull
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        return new SurveyInstanceLoader(getActivity(), mDatabase, mRecord.getId());
+        return new SurveyInstanceResponseLoader(getActivity(), recordId);
     }
 
     @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+    public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor cursor) {
         mAdapter.changeCursor(cursor);
     }
 
     @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
+    public void onLoaderReset(@NonNull Loader<Cursor> loader) {
+        //EMPTY
     }
 
     /**
+     * TODO: make a static inner class to avoid memory leaks
+     *
      * BroadcastReceiver to notify of data synchronisation. This should be
-     * fired from DataSyncService.
+     * fired from DataFixWorker.
      */
-    private BroadcastReceiver dataSyncReceiver = new BroadcastReceiver() {
+    private final BroadcastReceiver dataSyncReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            Log.i(TAG, "Survey Instance status has changed. Refreshing UI...");
+            Timber.i("Survey Instance status has changed. Refreshing UI...");
             refresh();
         }
     };
 
+    public interface ResponseListListener {
+        void onNamedRecordDeleted();
+    }
 }

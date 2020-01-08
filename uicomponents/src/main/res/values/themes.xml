@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <style name="Flow.Dialog" parent="Theme.AppCompat.Dialog">
+        <item name="android:textColor">@color/white</item>
+        <item name="android:listViewStyle">@style/Flow.ListView</item>
+    </style>
+
+    <style name="FlowAppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorPrimary</item>
+        <item name="colorControlNormal">@color/colorControlNormal</item>
+
+        <item name="android:listViewStyle">@style/Flow.ListView</item>
+        <item name="listitem_bg1">@drawable/listitem_row_1</item>
+        <item name="listitem_bg2">@drawable/listitem_row_2</item>
+
+        <item name="android:textColorPrimary">@color/text_color_primary</item>
+        <item name="android:textColorSecondary">@color/text_color_primary</item>
+        <item name="android:textColorTertiary">@color/text_color_primary</item>
+    </style>
+
+    <style name="FlowAppTheme.NoTitle" parent="FlowAppTheme">
+        <item name="android:windowNoTitle">true</item>
+    </style>
+
+    <style name="FlowAppThemeDialog" parent="Theme.AppCompat.Light.Dialog">
+        <item name="android:windowNoTitle">true</item>
+    </style>
+
+    <style name="Theme.AppCompat.Translucent" parent="@style/Theme.AppCompat.Light">
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:colorBackgroundCacheHint">@null</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowAnimationStyle">@android:style/Animation</item>
+    </style>
+
+    <style name="GreyButtonTheme" parent="ThemeOverlay.AppCompat.Dark">
+        <item name="colorButtonNormal">@color/light_grey</item>
+        <item name="colorAccent">@color/dark_grey</item>
+    </style>
+
+</resources>

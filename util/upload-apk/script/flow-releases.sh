@@ -1,32 +1,27 @@
 #!/bin/bash
 set -e
 
-# Script to automatically build and upload the FLOW apk. It needs to be run 
-# from the /survey folder in the mobile repo holding the FLOW apk code.
-# The script makes use of a jar file deploy.jar, which uploads the apk
-# to S3 nd notifies GAE.
+# Script to automatically build and upload the FLOW apks. It needs to be run
+# from folder in the mobile repo holding the FLOW apk code.
+# The script makes use of a jar file deploy-vxx.jar, which uploads the apk
+# to S3 and notifies GAE.
 # To deploy FLOW, the following env variables must be set:
 #
-# FLOW_DEPLOY_JAR=/path/to/deploy.jar
-# FLOW_SERVER_CONFIG=/path/to/akvo-flow-server-config
 # FLOW_S3_ACCESS_KEY=your_S3_access_key
 # FLOW_S3_SECRET_KEY=your_S3_secret_key
+# FLOW_SERVER_CONFIG=/path/to/akvo-flow-server-config
 #
-# The scripts reads the version number of the apk directly from the versionName 
-# property in AndroidManifest.xml
 
-[[ -n "${FLOW_MOBILE}" ]] || { echo "FLOW_MOBILE env var needs to be set"; exit 1; }
-[[ -n "${FLOW_DEPLOY_JAR}" ]] || { echo "FLOW_DEPLOY_JAR env var needs to be set"; exit 1; }
-[[ -n "${FLOW_SERVER_CONFIG}" ]] || { echo "FLOW_SERVER_CONFIG env var needs to be set"; exit 1; }
+. util/upload-apk/version.properties
+
+FLOW_DEPLOY_JAR="util/upload-apk/build/libs/deploy-${VERSION}.jar"
+
 [[ -n "${FLOW_S3_ACCESS_KEY}" ]] || { echo "FLOW_S3_ACCESS_KEY env var needs to be set"; exit 1; }
 [[ -n "${FLOW_S3_SECRET_KEY}" ]] || { echo "FLOW_S3_SECRET_KEY env var needs to be set"; exit 1; }
-
-# Move to the project directory
-cd $FLOW_MOBILE
+[[ -n "${FLOW_SERVER_CONFIG}" ]] || { echo "FLOW_SERVER_CONFIG env var needs to be set"; exit 1; }
 
 . app/version.properties
 version=${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}
-echo $version
 
 rm -rf tmp
 rm -rf builds
@@ -35,14 +30,21 @@ mkdir builds
 
 build_name() {
     if [[ "$1" == "akvoflow-89" ]]; then
-	# Biogas custom build
         echo "assembleBiogasRelease"
     elif [[ "$1" == "akvoflow-101" ]]; then
-	# Cookstoves custom build
         echo "assembleCookstovesRelease"
     else
-	# Regular Flow build
         echo "assembleFlowRelease"
+    fi
+}
+
+flavor() {
+    if [[ "$1" == "akvoflow-89" ]]; then
+        echo "biogas"
+    elif [[ "$1" == "akvoflow-101" ]]; then
+        echo "cookstoves"
+    else
+        echo "flow"
     fi
 }
 
@@ -61,14 +63,16 @@ for i in $(cat tmp/instances.txt); do
         accountSecret=$FLOW_SERVER_CONFIG/$i/$i.p12
         filename=builds/$i/$version/flow-$version.apk
         build=$(build_name $i)
+        flavor=$(flavor $i)
 
-        echo "generating apk version" $version "for instance" $i "and build" $build
-        cp $FLOW_SERVER_CONFIG/$i/survey.properties app/src/main/res/raw/survey.properties
-        ./gradlew $build
+        echo "generating apk version" $version "for instance" $i "and" $build
+        cp $FLOW_SERVER_CONFIG/$i/survey.properties app/survey.properties
+
+        ./gradlew $build -Pnodexcount=true
         mkdir -p builds/$i/$version
-        mv app/bin/flow.apk $filename
+        mv app/build/outputs/apk/$flavor/release/app-$flavor-release.apk $filename
         java -jar "$FLOW_DEPLOY_JAR" "$FLOW_S3_ACCESS_KEY" "$FLOW_S3_SECRET_KEY" "$i" "$filename" "$version" "$accountId" "$accountSecret"
     else
-        echo "Cannot find survey.properties file for instance" $i
+        echo "Cannot find survey.properties or p12 file for instance" $i
     fi
 done

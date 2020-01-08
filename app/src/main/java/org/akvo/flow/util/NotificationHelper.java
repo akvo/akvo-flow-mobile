@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2016-2019 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -19,16 +19,24 @@
 
 package org.akvo.flow.util;
 
+import android.app.Notification;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.content.ContextCompat;
+import android.os.Build;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.TaskStackBuilder;
+import androidx.core.content.ContextCompat;
+import android.text.TextUtils;
 
 import org.akvo.flow.R;
+import org.akvo.flow.activity.SurveyActivity;
 
 public class NotificationHelper {
+
+    private static final int SYNCING_NOTIFICATION_ID = 1235;
 
     private NotificationHelper() {
     }
@@ -36,98 +44,149 @@ public class NotificationHelper {
     /**
      * Displays a notification in the system status bar
      *
-     * @param title - headline to display in notification bar
-     * @param text - body of notification (when user expands bar)
+     * @param title          - headline to display in notification bar
+     * @param text           - body of notification (when user expands bar)
      * @param notificationId - unique (within app) ID of notification
      */
-    public static void displayNotification(String title, String text, Context context, int notificationId) {
+    public static void displayNotification(String title, String text, Context context,
+            int notificationId) {
         NotificationCompat.Builder builder =
-            createNotificationBuilder(title, text, context);
+                createNotificationBuilder(title, text, context);
         notifyWithDummyIntent(context, notificationId, builder);
     }
 
     /**
      * Displays a notification in the system status bar
      *
-     * @param title - headline to display in notification bar
-     * @param text - body of notification (when user expands bar)
+     * @param title          - headline to display in notification bar
+     * @param text           - body of notification (when user expands bar)
      * @param notificationId - unique (within app) ID of notification
      */
-    public static void displayErrorNotification(String title, String text, Context context, int notificationId) {
+    public static void displayErrorNotification(String title, String text, Context context,
+            int notificationId) {
         NotificationCompat.Builder builder =
-            createErrorNotificationBuilder(title, text, context);
+                createErrorNotificationBuilder(title, text, context);
         notifyWithDummyIntent(context, notificationId, builder);
     }
 
-
-    public static void displayNonOnGoingErrorNotification(Context context, int notificationId, String text, String title) {
+    public static void displayNonOnGoingErrorNotification(Context context, int notificationId,
+            String text, String title) {
         NotificationCompat.Builder builder = createErrorNotificationBuilder(title, text, context);
         builder.setOngoing(false);
 
         notifyWithDummyIntent(context, notificationId, builder);
     }
 
-    public static void displayNotification(Context context, int total, String title, String text, int notificationId,
-                                           boolean ongoing, int progress) {
+    public static void displayFormsSyncedNotification(Context context, int synced) {
+        String title = context.getString(R.string.downloading_forms);
+        String text = String.format(context.getString(R.string.data_sync_synced), synced);
+
         NotificationCompat.Builder builder = createNotificationBuilder(title, text, context);
 
-        builder.setOngoing(ongoing);// Ongoing if still syncing the records
+        builder.setProgress(synced, synced, false);
 
-        // Progress will only be displayed in Android versions > 4.0
-        builder.setProgress(total, progress, false);
-
-        notifyWithDummyIntent(context, notificationId, builder);
+        notifyWithDummyIntent(context, ConstantUtil.NOTIFICATION_FORM, builder);
     }
 
-    public static void displayNotificationWithProgress(Context context, String title, String text, boolean ongoing,
-                                                       boolean indeterminate, int notificationId) {
-        NotificationCompat.Builder builder = createNotificationBuilder(title, text, context);
+    public static void displayFormsSyncingNotification(Context context) {
+        String title = context.getString(R.string.downloading_forms);
 
-        builder.setOngoing(ongoing); // Ongoing if still syncing the records
+        NotificationCompat.Builder builder = createNotificationBuilder(title, "", context);
 
-        // Progress will only be displayed in Android versions > 4.0
-        builder.setProgress(1, 1, indeterminate);
+        builder.setProgress(0, 0, true);
 
-        notifyWithDummyIntent(context, notificationId, builder);
+        notifyWithDummyIntent(context, ConstantUtil.NOTIFICATION_FORM, builder);
     }
 
-    public static void displayErrorNotificationWithProgress(Context context, String title, String text, boolean ongoing,
-                                                       boolean indeterminate, int notificationId) {
-        NotificationCompat.Builder builder = createErrorNotificationBuilder(title, text, context);
-
-        builder.setOngoing(ongoing); // Ongoing if still syncing the records
-
-        // Progress will only be displayed in Android versions > 4.0
-        builder.setProgress(1, 1, indeterminate);
-
-        notifyWithDummyIntent(context, notificationId, builder);
+    public static Notification getUnPublishingNotification(Context context) {
+        createNotificationChannel(context);
+        String title = context.getString(R.string.unpublish_service_notification_title);
+        NotificationCompat.Builder b = new NotificationCompat.Builder(context,
+                ConstantUtil.NOTIFICATION_CHANNEL_ID)
+                .setSmallIcon(R.drawable.notification_icon)
+                .setContentTitle(title)
+                .setTicker(context.getString(R.string.unpublish_service_notification_ticker))
+                .setProgress(0, 0, true)
+                .setColor(ContextCompat.getColor(context, R.color.orange_main))
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setOngoing(true);
+        return (b.build());
     }
 
-    private static void notifyWithDummyIntent(Context context, int notificationId, NotificationCompat.Builder builder) {
-        // Dummy intent. Do nothing when clicked
-        PendingIntent dummyIntent = PendingIntent.getActivity(context, 0, new Intent(), 0);
-        builder.setContentIntent(dummyIntent);
+    public static void showSyncingNotification(Context context) {
+        String title = context.getString(R.string.sync_service_notification_title);
+        NotificationCompat.Builder b = new NotificationCompat.Builder(context,
+                ConstantUtil.NOTIFICATION_CHANNEL_ID)
+                .setSmallIcon(R.drawable.notification_icon)
+                .setContentTitle(title)
+                .setTicker(context.getString(R.string.sync_service_notification_ticker))
+                .setProgress(0, 0, true)
+                .setColor(ContextCompat.getColor(context, R.color.orange_main))
+                .setOngoing(true);
+        notifyWithDummyIntent(context, SYNCING_NOTIFICATION_ID, b);
+    }
+
+    public static void hideSyncingNotification(Context context) {
+        NotificationManager notificationManager =
+                (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.cancel(SYNCING_NOTIFICATION_ID);
+    }
+
+    private static void notifyWithDummyIntent(Context context, int notificationId,
+            NotificationCompat.Builder builder) {
+        Intent resultIntent = new Intent(context, SurveyActivity.class);
+        TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
+        stackBuilder.addNextIntentWithParentStack(resultIntent);
+        PendingIntent resultPendingIntent =
+                stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+        builder.setContentIntent(resultPendingIntent);
+
+        createNotificationChannel(context);
 
         NotificationManager notificationManager =
-            (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+                (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.notify(notificationId, builder.build());
     }
 
-    private static NotificationCompat.Builder createNotificationBuilder(String title, String text, Context context) {
+    private static NotificationCompat.Builder createNotificationBuilder(String title, String text,
+            Context context) {
         return createDefaultNotification(title, text, context)
                 .setColor(ContextCompat.getColor(context, R.color.orange_main));
     }
 
-    private static NotificationCompat.Builder createDefaultNotification(String title, String text, Context context) {
-        return new NotificationCompat.Builder(context).setSmallIcon(R.drawable.notification_icon)
-                .setStyle(new NotificationCompat.BigTextStyle().bigText(text))
+    private static NotificationCompat.Builder createDefaultNotification(String title, String text,
+            Context context) {
+        final NotificationCompat.Builder builder = new NotificationCompat.Builder(context,
+                ConstantUtil.NOTIFICATION_CHANNEL_ID)
+                .setSmallIcon(R.drawable.notification_icon)
                 .setContentTitle(title)
-                .setContentText(text)
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .setTicker(title);
+        if (!TextUtils.isEmpty(text)) {
+            builder.setStyle(new NotificationCompat.BigTextStyle().bigText(text));
+            builder.setContentText(text);
+        }
+        return builder;
     }
 
-    private static NotificationCompat.Builder createErrorNotificationBuilder(String title, String text, Context context) {
+    private static NotificationCompat.Builder createErrorNotificationBuilder(String title,
+            String text, Context context) {
         return createDefaultNotification(title, text, context)
                 .setColor(ContextCompat.getColor(context, R.color.red));
+    }
+
+    private static void createNotificationChannel(Context context) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            CharSequence name = context.getString(R.string.channel_name);
+            String description = context.getString(R.string.channel_description);
+            NotificationChannel channel = new NotificationChannel(
+                    ConstantUtil.NOTIFICATION_CHANNEL_ID, name,
+                    NotificationManager.IMPORTANCE_LOW);
+            channel.setDescription(description);
+            channel.enableVibration(false);
+            NotificationManager notificationManager = context
+                    .getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(channel);
+        }
     }
 }

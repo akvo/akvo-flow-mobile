@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -21,93 +21,63 @@
 package org.akvo.flow.util;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
+import android.os.Environment;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
-import org.akvo.flow.R;
+import org.akvo.flow.util.files.FileBrowser;
 
 import java.io.File;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
-import timber.log.Timber;
+import javax.inject.Inject;
 
 public class MediaFileHelper {
 
     private static final String TEMP_PHOTO_NAME_PREFIX = "image";
-    private static final String TEMP_VIDEO_NAME_PREFIX = "video";
     private static final String IMAGE_SUFFIX = ".jpg";
-    private static final String VIDEO_SUFFIX = ".mp4";
+    private static final String DIR_MEDIA = "akvoflow/data/media";
 
     private final Context context;
+    private final DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US);
+    private final FileBrowser fileBrowser;
 
-    public MediaFileHelper(Context context) {
+    @Inject
+    public MediaFileHelper(Context context, FileBrowser fileBrowser) {
         this.context = context;
+        this.fileBrowser = fileBrowser;
     }
 
     @NonNull
-    public String getImageFilePath(int maxImgSize) {
-        File tmp = getImageTmpFile();
-        String tempAbsolutePath = tmp.getAbsolutePath();
+    public String getImageFilePath() {
+        return getNamedMediaFile(IMAGE_SUFFIX).getAbsolutePath();
+    }
 
-        // Ensure no image is saved in the DCIM folder
-        FileUtil.cleanDCIM(context, tempAbsolutePath);
-
-        File imgFile = getNamedMediaFile(IMAGE_SUFFIX);
-        String absolutePath = imgFile.getAbsolutePath();
-
-        if (ImageUtil.resizeImage(tempAbsolutePath, absolutePath, maxImgSize)) {
-            Timber.i("Image resized to: %s", getReadableImageSize(maxImgSize));
-            if (!tmp.delete()) { // must check return value to know if it failed
-                Timber.e("Media file delete failed");
-            }
-        } else if (!tmp.renameTo(imgFile)) {
-            // must check  return  value to  know if it  failed!
-            Timber.e("Media file rename failed");
+    @Nullable
+    public File getTemporaryImageFile() {
+        String timeStamp = dateFormat.format(new Date());
+        String imageFileName = TEMP_PHOTO_NAME_PREFIX + "_" + timeStamp;
+        File storageDir = Environment
+                .getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
+        if (!storageDir.exists()) {
+            storageDir.mkdirs();
         }
-        return absolutePath;
+        return new File(storageDir, imageFileName + IMAGE_SUFFIX);
     }
 
     @NonNull
-    public String getVideoFilePath() {
-        File tmp = getVideoTmpFile();
-        String tempAbsolutePath = tmp.getAbsolutePath();
-
-        // Ensure no image is saved in the DCIM folder
-        FileUtil.cleanDCIM(context, tempAbsolutePath);
-
-        File imgFile = getNamedMediaFile(VIDEO_SUFFIX);
-        String absolutePath = imgFile.getAbsolutePath();
-
-       if (!tmp.renameTo(imgFile)) {
-            // must check  return  value to  know if it  failed!
-            Timber.e("Media file rename failed");
-        }
-        return absolutePath;
+    public File getMediaFile(String filename) {
+        File mediaFolder = fileBrowser.getExistingAppInternalFolder(context, DIR_MEDIA);
+        return new File(mediaFolder, filename);
     }
 
     @NonNull
     private File getNamedMediaFile(String fileSuffix) {
         String filename = PlatformUtil.uuid() + fileSuffix;
-        return new File(FileUtil.getFilesDir(FileUtil.FileType.MEDIA), filename);
-    }
-
-    private String getReadableImageSize(int maxImgSize) {
-        return context.getResources()
-                .getStringArray(R.array.max_image_size_pref)[maxImgSize];
-    }
-
-    @NonNull
-    public File getVideoTmpFile() {
-        String filename = TEMP_VIDEO_NAME_PREFIX + VIDEO_SUFFIX;
-        return getMediaFile(filename);
-    }
-
-    @NonNull
-    public File getImageTmpFile() {
-        String filename = TEMP_PHOTO_NAME_PREFIX + IMAGE_SUFFIX;
-        return getMediaFile(filename);
-    }
-
-    @NonNull
-    private File getMediaFile(String filename) {
-        return new File(FileUtil.getFilesDir(FileUtil.FileType.TMP), filename);
+        File mediaFolder = fileBrowser.getExistingAppInternalFolder(context, DIR_MEDIA);
+        return new File(mediaFolder, filename);
     }
 }

@@ -1,12 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <dimen name="action_bar_title">16dp</dimen>
-    <dimen name="action_bar_subtitle">12dp</dimen>
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
 
     <dimen name="survey_version_text_size">18sp</dimen>
     <dimen name="survey_title_text_size">22sp</dimen>
+    <dimen name="tabs_height">48dp</dimen>
+    <dimen name="small_padding">8dp</dimen>
+    <dimen name="form_left_right_padding">16dp</dimen>
+    <dimen name="scroll_bottom_padding">98dp</dimen>
+    <dimen name="scroll_bottom_padding_when_repeatable_group">176dp</dimen>
+    <dimen name="fab_margin">16dp</dimen>
 
 </resources>

@@ -1,125 +1,149 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="org.akvo.flow">
+    xmlns:tools="http://schemas.android.com/tools"
+    package="org.akvo.flow">
 
-    <uses-permission android:name="android.permission.CAMERA"/>
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
-    <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE"/>
-    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
-    <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
-    <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES"/>
-    <!-- For GcmTaskService -->
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
-    <uses-feature android:name="android.hardware.camera"/>
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false" />
 
     <application
-            android:name=".app.FlowApp"
-            android:hasCode="true"
-            android:icon="@drawable/app_icon"
-            android:label="@string/app_name"
-            android:theme="@style/FlowAppTheme">
-        <activity
-                android:name=".activity.AddUserActivity"
-                android:label="@string/add_user"
-                android:configChanges="locale|layoutDirection"/>
-        <activity
-                android:name=".activity.SurveyActivity"
-                android:configChanges="locale|layoutDirection"
-                android:launchMode="singleTop">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-                <category android:name="android.intent.category.LAUNCHER"/>
-            </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.SEARCH"/>
-            </intent-filter>
+        android:name=".app.FlowApp"
+        android:allowBackup="false"
+        android:hasCode="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:theme="@style/FlowAppTheme"
+        android:usesCleartextTraffic="true"
+        tools:ignore="GoogleAppIndexingWarning">
 
-            <meta-data
-                    android:name="android.app.searchable"
-                    android:resource="@xml/searchable"/>
+        <uses-library
+            android:name="org.apache.http.legacy"
+            android:required="false" />
+
+        <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="89dc21727e76a10511ecda549cab1b2d3aff2ec7" />
+
+        <activity
+            android:name=".presentation.main.MainActivity"
+            android:launchMode="singleInstance"
+            android:noHistory="true"
+            android:theme="@style/Theme.AppCompat.Translucent">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
         <activity
-                android:name=".activity.RecordActivity"
-                android:configChanges="locale|layoutDirection"/>
+            android:name=".activity.AddUserActivity"
+            android:theme="@style/FlowAppTheme.NoTitle"/>
         <activity
-                android:name=".activity.FormActivity"
-                android:configChanges="keyboardHidden|orientation|screenSize|locale|layoutDirection"
-                android:windowSoftInputMode="adjustResize"/>
+            android:name=".activity.SurveyActivity"
+            android:label="@string/app_name" />
         <activity
-                android:name=".activity.SettingsActivity"
-                android:configChanges="locale|layoutDirection"
-                android:label="@string/settingslabel"/>
+            android:name=".activity.RecordActivity"/>
         <activity
-                android:name=".activity.PreferencesActivity"
-                android:configChanges="locale|layoutDirection"
-                android:label="@string/prefoptlabel"/>
+            android:name=".activity.FormActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:windowSoftInputMode="adjustResize" />
         <activity
-                android:name=".activity.TransmissionHistoryActivity"
-                android:configChanges="locale|layoutDirection"/>
+            android:name=".activity.TransmissionHistoryActivity"
+            android:label="@string/transmissionhist" />
         <activity
-                android:name=".activity.GeoshapeActivity"
-                android:configChanges="locale|layoutDirection|orientation|screenSize"/>
+            android:name=".activity.AppUpdateActivity"
+            android:label="@string/app_update_activity"
+            android:launchMode="singleTop"
+            android:theme="@style/FlowAppThemeDialog" />
         <activity
-                android:name=".activity.AppUpdateActivity"
-                android:configChanges="locale|layoutDirection"
-                android:label="@string/app_update_activity"
-                android:launchMode="singleTop"
-                android:theme="@style/Flow.Dialog"/>
+            android:name=".activity.TimeCheckActivity"
+            android:label="@string/time_check_activity"
+            android:launchMode="singleTop"
+            android:theme="@style/FlowAppThemeDialog" />
         <activity
-                android:name=".activity.TimeCheckActivity"
-                android:configChanges="locale|layoutDirection"
-                android:label="@string/time_check_activity"
-                android:launchMode="singleTop"
-                android:theme="@style/Flow.Dialog"/>
-        <activity android:name=".activity.MapActivity"/>
+            android:name=".presentation.signature.SignatureActivity"
+            android:screenOrientation="landscape"
+            android:theme="@style/FlowAppTheme.NoTitle"/>
+        <activity android:name=".presentation.datapoints.map.one.DataPointMapActivity" />
 
-        <activity
-                android:name=".activity.SignatureActivity"
-                android:screenOrientation="landscape"
-                android:configChanges="locale|layoutDirection"/>
+        <service android:name=".service.SurveyDownloadService" />
+        <service android:name=".service.BootstrapService" />
+        <service android:name=".service.TimeCheckService" />
+        <service android:name=".service.UnPublishDataService" />
 
-        <service android:name=".service.DataSyncService"/>
-        <service android:name=".service.SurveyDownloadService"/>
-        <service android:name=".service.BootstrapService"/>
-        <service android:name=".service.UserRequestedApkUpdateService"/>
-        <service android:name=".service.SurveyedDataPointSyncService"/>
-        <service android:name=".service.TimeCheckService"/>
-        <service
-                android:name=".service.ApkUpdateService"
-                android:permission="com.google.android.gms.permission.BIND_NETWORK_TASK_SERVICE"
+        <receiver android:name=".broadcast.UpdateReceiver">
+            <intent-filter
+                android:enabled="true"
                 android:exported="true">
-            <intent-filter>
-                <action android:name="com.google.android.gms.gcm.ACTION_TASK_READY"/>
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
             </intent-filter>
-        </service>
-
-        <receiver android:name=".broadcast.SyncDataReceiver">
+        </receiver>
+        <receiver
+            android:name=".broadcast.BootStrapReceiver"
+            android:exported="false">
             <intent-filter>
-                <action android:name="org.akvo.flow.DATA_SUBMITTED"/>
-                <action android:name="android.net.conn.CONNECTIVITY_CHANGE"/>
+                <action android:name="org.akvo.flow.BOOTSTRAP_NEEDED" />
+            </intent-filter>
+        </receiver>
+        <receiver
+            android:name=".broadcast.DataTimeoutReceiver"
+            android:exported="false" />
+        <receiver
+            android:name=".broadcast.BootReceiver"
+            android:enabled="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
 
-        <meta-data
-                android:name="com.google.android.geo.API_KEY"
-                android:value="@string/google_maps_key"/>
-        <meta-data
-                android:name="com.google.android.gms.version"
-                android:value="@integer/google_play_services_version"/>
+        <activity
+            android:name=".presentation.about.AboutActivity"
+            android:label="@string/about_activity_title" />
+        <activity
+            android:name=".presentation.help.HelpActivity"
+            android:label="@string/help" />
+        <activity
+            android:name=".presentation.legal.LegalNoticesActivity"
+            android:label="@string/licences_title" />
+        <activity
+            android:name=".presentation.settings.PreferenceActivity"
+            android:label="@string/settings" />
+        <activity
+            android:name=".presentation.FullImageActivity"
+            android:label="" />
+        <activity android:name="org.akvo.flow.walkthrough.presentation.OfflineMapsWalkThroughActivity"
+            android:parentActivityName=".activity.SurveyActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activity.SurveyActivity" />
+        </activity>
+        <activity android:name=".presentation.geoshape.ViewGeoShapeActivity"
+            android:configChanges="orientation|screenSize"/>
+        <activity android:name=".presentation.geoshape.create.CreateGeoShapeActivity"
+            android:configChanges="orientation|screenSize"/>
 
         <provider
-                android:name=".data.DataProvider"
-                android:authorities="org.akvo.flow"
-                android:label="@string/app_name"
-                android:syncable="true"
-                android:writePermission="org.akvo.flow.permission.WRITE_SCHEDULE"/>
-
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="org.akvo.flow.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
     </application>
 
 </manifest>

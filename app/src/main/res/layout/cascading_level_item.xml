@@ -4,7 +4,7 @@
               android:orientation="vertical">
 
     <TextView
-            android:id="@+id/text"
+            android:id="@+id/cascade_level_number"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
@@ -12,7 +12,7 @@
             android:textSize="18sp"/>
 
     <Spinner
-        android:id="@+id/spinner"
+        android:id="@+id/cascade_level_spinner"
         style="@style/Base.Widget.AppCompat.Spinner.Underlined"
         android:theme="@style/Spinner"
         android:spinnerMode="dropdown"

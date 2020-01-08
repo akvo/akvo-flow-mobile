@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2016-2017 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2016-2019 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -19,38 +19,63 @@
 
 package org.akvo.flow.ui.view;
 
+import android.Manifest;
 import android.content.Context;
 import android.os.Bundle;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 
+import org.akvo.flow.BuildConfig;
 import org.akvo.flow.R;
-import org.akvo.flow.app.FlowApp;
+import org.akvo.flow.activity.FormActivity;
 import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionResponse;
 import org.akvo.flow.event.QuestionInteractionEvent;
 import org.akvo.flow.event.SurveyListener;
+import org.akvo.flow.injector.component.DaggerViewComponent;
+import org.akvo.flow.injector.component.ViewComponent;
+import org.akvo.flow.presentation.form.caddisfly.CaddisflyPresenter;
+import org.akvo.flow.presentation.form.caddisfly.CaddisflyView;
+import org.akvo.flow.ui.Navigator;
 import org.akvo.flow.ui.adapter.CaddisflyResultsAdapter;
 import org.akvo.flow.ui.model.caddisfly.CaddisflyJsonMapper;
 import org.akvo.flow.ui.model.caddisfly.CaddisflyTestResult;
+import org.akvo.flow.uicomponents.SnackBarManager;
 import org.akvo.flow.util.ConstantUtil;
-import org.akvo.flow.util.FileUtil;
+import org.akvo.flow.util.StoragePermissionsHelper;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
+import javax.inject.Inject;
+
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import timber.log.Timber;
 
-public class CaddisflyQuestionView extends QuestionView implements View.OnClickListener {
+public class CaddisflyQuestionView extends QuestionView implements View.OnClickListener,
+        CaddisflyView {
 
-    private Button mButton;
+    @Inject
+    CaddisflyPresenter presenter;
+
+    @Inject
+    CaddisflyJsonMapper caddisflyJsonMapper;
+
+    @Inject
+    SnackBarManager snackBarManager;
+
+    @Inject
+    StoragePermissionsHelper storagePermissionsHelper;
+
+    @Inject
+    Navigator navigator;
+
     private String mValue;
     private String mImage;
-    private final CaddisflyJsonMapper caddisflyJsonMapper = new CaddisflyJsonMapper();
     private CaddisflyResultsAdapter caddisflyResultsAdapter;
     private List<CaddisflyTestResult> caddisflyTestResults = new ArrayList<>();
 
@@ -61,26 +86,44 @@ public class CaddisflyQuestionView extends QuestionView implements View.OnClickL
 
     private void init() {
         setQuestionView(R.layout.caddisfly_question_view);
-        RecyclerView resultsRv = (RecyclerView) findViewById(R.id.results_recycler_view);
+
+        initialiseInjector();
+
+        RecyclerView resultsRv = findViewById(R.id.caddisfly_results_recycler_view);
         resultsRv.setLayoutManager(new LinearLayoutManager(resultsRv.getContext()));
-        caddisflyResultsAdapter = new CaddisflyResultsAdapter(
-                new ArrayList<CaddisflyTestResult>());
+        caddisflyResultsAdapter = new CaddisflyResultsAdapter(new ArrayList<>());
         resultsRv.setAdapter(caddisflyResultsAdapter);
-        mButton = (Button) findViewById(R.id.button);
-        mButton.setOnClickListener(this);
+        Button mButton = findViewById(R.id.caddisfly_button);
+        if (isReadOnly()) {
+            mButton.setVisibility(GONE);
+        } else {
+            mButton.setOnClickListener(this);
+        }
         displayResponseView();
+        presenter.setView(this);
+    }
+
+    private void initialiseInjector() {
+        ViewComponent viewComponent =
+                DaggerViewComponent.builder().applicationComponent(getApplicationComponent())
+                        .build();
+        viewComponent.inject(this);
     }
 
     private void displayResponseView() {
         caddisflyResultsAdapter.setCaddisflyTestResults(caddisflyTestResults);
-        mButton.setEnabled(!mSurveyListener.isReadOnly());
     }
 
     @Override
     public void captureResponse(boolean suppressListeners) {
-        QuestionResponse r = new QuestionResponse(mValue, ConstantUtil.CADDISFLY_RESPONSE_TYPE,
-                getQuestion().getId());
-        r.setFilename(mImage);
+        Question question = getQuestion();
+        QuestionResponse r = new QuestionResponse.QuestionResponseBuilder()
+                .setValue(mValue)
+                .setType(ConstantUtil.CADDISFLY_RESPONSE_TYPE)
+                .setQuestionId(question.getQuestionId())
+                .setIteration(question.getIteration())
+                .setFilename(mImage)
+                .createQuestionResponse();
         setResponse(r);
     }
 
@@ -96,12 +139,12 @@ public class CaddisflyQuestionView extends QuestionView implements View.OnClickL
     public void resetQuestion(boolean fireEvent) {
         super.resetQuestion(fireEvent);
         mValue = null;
-        caddisflyTestResults = caddisflyJsonMapper.transform(mValue);
+        caddisflyTestResults = new ArrayList<>();
         displayResponseView();
     }
 
     @Override
-    public void questionComplete(Bundle data) {
+    public void onQuestionResultReceived(Bundle data) {
         if (data != null) {
             mValue = data.getString(ConstantUtil.CADDISFLY_RESPONSE);
             caddisflyTestResults = caddisflyJsonMapper.transform(mValue);
@@ -111,34 +154,88 @@ public class CaddisflyQuestionView extends QuestionView implements View.OnClickL
             Timber.d("caddisflyTestComplete - Response: %s . Image: %s", mValue, image);
 
             File src = !TextUtils.isEmpty(image) ? new File(image) : null;
-            if (src != null && src.exists()) {
-                // Move the image into the FLOW directory
-                File dst = new File(FileUtil.getFilesDir(FileUtil.FileType.MEDIA), src.getName());
-
-                if (!src.renameTo(dst)) {
-                    Timber.e("Could not move file %s to %s", src.getAbsoluteFile(),
-                            dst.getAbsoluteFile());
-                } else {
-                    mImage = dst.getAbsolutePath();
-                }
+            if (src != null && src.exists() && !src.isDirectory()) {
+                presenter.onImageReady(src);
+            } else {
+                captureResponse();
             }
-
             displayResponseView();
         }
-        captureResponse();
     }
 
     @Override
     public void onClick(View view) {
+        if (storagePermissionsHelper.isStorageAllowed()) {
+            launchCaddisflyTest();
+        } else {
+            requestStoragePermissions();
+        }
+    }
+
+    private void requestStoragePermissions() {
+        final FormActivity activity = (FormActivity) getContext();
+        activity.requestPermissions(new String[] { Manifest.permission.WRITE_EXTERNAL_STORAGE },
+                ConstantUtil.STORAGE_PERMISSION_CODE, getQuestion().getQuestionId());
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            int[] grantResults) {
+        if (requestCode == ConstantUtil.STORAGE_PERMISSION_CODE) {
+            if (storagePermissionsHelper.storagePermissionsGranted(permissions[0], grantResults)) {
+                launchCaddisflyTest();
+            } else {
+                storagePermissionNotGranted();
+            }
+        }
+    }
+
+    private void storagePermissionNotGranted() {
+        final View.OnClickListener retryListener = v -> {
+            if (storagePermissionsHelper
+                    .userPressedDoNotShowAgain((FormActivity) getContext())) {
+                navigator.navigateToAppSystemSettings(getContext());
+            } else {
+                requestStoragePermissions();
+            }
+        };
+        snackBarManager
+                .displaySnackBarWithAction(this,
+                        R.string.storage_permission_missing,
+                        R.string.action_retry, retryListener, getContext());
+    }
+
+    private void launchCaddisflyTest() {
         Question q = getQuestion();
         Bundle data = new Bundle();
         data.putString(ConstantUtil.CADDISFLY_RESOURCE_ID, q.getCaddisflyRes());
         data.putString(ConstantUtil.CADDISFLY_QUESTION_ID, q.getId());
         data.putString(ConstantUtil.CADDISFLY_QUESTION_TITLE, q.getText());
-        data.putString(ConstantUtil.CADDISFLY_DATAPOINT_ID, mSurveyListener.getDatapointId());
+        data.putString(ConstantUtil.CADDISFLY_DATAPOINT_ID, mSurveyListener.getDataPointId());
         data.putString(ConstantUtil.CADDISFLY_FORM_ID, mSurveyListener.getFormId());
-        data.putString(ConstantUtil.CADDISFLY_LANGUAGE, FlowApp.getApp().getAppLanguageCode());
+        data.putString(ConstantUtil.CADDISFLY_LANGUAGE, Locale.getDefault().getLanguage());
+        String serverBase = BuildConfig.SERVER_BASE;
+        serverBase = serverBase.replaceFirst("https://", "");
+        serverBase = serverBase.replaceFirst("http://", "");
+        serverBase = serverBase.replace(".appspot.com", "");
+        data.putString(ConstantUtil.CADDISFLY_INSTANCE_NAME, serverBase);
         notifyQuestionListeners(QuestionInteractionEvent.CADDISFLY, data);
     }
 
+    @Override
+    public void showErrorGettingMedia() {
+        snackBarManager.displaySnackBar(this, R.string.error_getting_media, getContext());
+    }
+
+    @Override
+    public void updateResponse() {
+        mImage = null;
+        captureResponse();
+    }
+
+    @Override
+    public void updateResponse(String copiedImagePath) {
+        mImage = copiedImagePath;
+        captureResponse();
+    }
 }

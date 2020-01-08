@@ -1,2 +1,2 @@
-include ':domain', ':data'
+include ':domain', ':data', ':database', ':offlinemaps', ':walkthrough', ':uicomponents'
 include 'app'

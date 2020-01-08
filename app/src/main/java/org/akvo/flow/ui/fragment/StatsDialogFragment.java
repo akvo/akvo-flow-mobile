@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2014-2017 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2014-2017,2019 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -23,9 +23,9 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.support.v4.app.DialogFragment;
-import android.support.v4.app.LoaderManager.LoaderCallbacks;
-import android.support.v4.content.Loader;
+import androidx.fragment.app.DialogFragment;
+import androidx.loader.app.LoaderManager.LoaderCallbacks;
+import androidx.loader.content.Loader;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TextView;
@@ -36,9 +36,9 @@ import org.akvo.flow.data.loader.StatsLoader;
 
 import timber.log.Timber;
 
-public class StatsDialogFragment extends DialogFragment implements LoaderCallbacks<Stats> {
+import static org.akvo.flow.util.ConstantUtil.SURVEY_GROUP_ID_EXTRA;
 
-    public static final String SURVEY_GROUP_ID_EXTRA = "surveyGroupId";
+public class StatsDialogFragment extends DialogFragment implements LoaderCallbacks<Stats> {
 
     private long mSurveyGroupId;
 

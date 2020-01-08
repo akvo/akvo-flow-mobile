@@ -26,15 +26,17 @@
                 android:scaleType="centerInside" />
 
             <ProgressBar
-                android:id="@+id/progress"
+                android:id="@+id/media_progress"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
+                android:visibility="gone"
                 android:layout_centerInParent="true" />
 
             <ImageButton
-                android:id="@+id/download"
+                android:id="@+id/media_download"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
+                android:visibility="gone"
                 android:layout_centerInParent="true"
                 android:background="@android:color/transparent"
                 android:src="@drawable/download" />
@@ -42,17 +44,39 @@
 
         <TextView
             android:id="@+id/location_info"
+            android:layout_marginTop="4dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:visibility="gone"/>
 
-        <Button
-            android:id="@+id/media_btn"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textSize="16sp"
-            android:text="@string/takephoto"
-            style="@style/button_primary"/>
+        <LinearLayout
+                android:id="@+id/acquire_media_ll"
+                android:orientation="horizontal"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="16dp"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+            <Button
+                    android:id="@+id/camera_btn"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    style="@style/FormButtonStyle"
+                    android:text="@string/media_from_camera"
+                    android:layout_marginRight="8dp"
+                    android:layout_marginEnd="8dp"/>
+            <Button
+                    android:id="@+id/gallery_btn"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    style="@style/FormButtonStyle"
+                    android:text="@string/media_from_gallery"
+                    android:layout_marginLeft="8dp"
+                    android:layout_marginStart="8dp"/>
+        </LinearLayout>
+
+
 
     </LinearLayout>
 

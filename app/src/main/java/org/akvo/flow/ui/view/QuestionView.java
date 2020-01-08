@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2016 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2019 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -22,10 +22,11 @@ package org.akvo.flow.ui.view;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.res.Resources;
 import android.os.Bundle;
+import androidx.annotation.Nullable;
 import android.text.Html;
 import android.text.Spanned;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageButton;
@@ -34,6 +35,7 @@ import android.widget.TextView;
 import android.widget.TextView.BufferType;
 
 import org.akvo.flow.R;
+import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.domain.AltText;
 import org.akvo.flow.domain.Dependency;
 import org.akvo.flow.domain.Question;
@@ -42,8 +44,8 @@ import org.akvo.flow.domain.QuestionResponse;
 import org.akvo.flow.event.QuestionInteractionEvent;
 import org.akvo.flow.event.QuestionInteractionListener;
 import org.akvo.flow.event.SurveyListener;
+import org.akvo.flow.injector.component.ApplicationComponent;
 import org.akvo.flow.util.ConstantUtil;
-import org.akvo.flow.util.PlatformUtil;
 import org.akvo.flow.util.ViewUtil;
 
 import java.util.ArrayList;
@@ -52,8 +54,8 @@ import java.util.Map;
 import java.util.StringTokenizer;
 
 public abstract class QuestionView extends LinearLayout implements QuestionInteractionListener {
-    private static final int PADDING_DIP = 8;
     protected static String[] sColors = null;
+    final ErrorMessageFormatter errorMessageFormatter = new ErrorMessageFormatter();
 
     protected Question mQuestion;
     private QuestionResponse mResponse;
@@ -73,15 +75,21 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
     public QuestionView(final Context context, Question q, SurveyListener surveyListener) {
         super(context);
         setOrientation(VERTICAL);
-        final int padding = (int) PlatformUtil.dp2Pixel(getContext(), PADDING_DIP);
-        setPadding(padding, padding, padding, padding);
+        final int topBottomPadding = getDimension(R.dimen.small_padding);
+        final int leftRightPadding = getDimension(R.dimen.form_left_right_padding);
+        setPadding(leftRightPadding, topBottomPadding, leftRightPadding, topBottomPadding);
         if (sColors == null) {
             // must have enough colors for all enabled languages
             sColors = context.getResources().getStringArray(R.array.colors);
         }
         mQuestion = q;
+        setTag(q.getId());
         mSurveyListener = surveyListener;
-        mError = null;// so far so good.
+        mError = null;
+    }
+
+    protected int getDimension(int resId) {
+        return (int) getResources().getDimension(resId);
     }
 
     /**
@@ -96,40 +104,20 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
         LayoutInflater inflater = LayoutInflater.from(getContext());
         inflater.inflate(layoutRes, this, true);
 
-        mQuestionText = (TextView) findViewById(R.id.question_tv);
-        mTipImage = (ImageButton) findViewById(R.id.tip_ib);
+        mQuestionText = findViewById(R.id.question_tv);
+        mTipImage = findViewById(R.id.tip_ib);
 
         if (mQuestionText == null || mTipImage == null) {
             throw new RuntimeException(
                     "Subclasses must inflate the common question header before calling this method.");
         }
 
-        mQuestionText.setText(formText(), BufferType.SPANNABLE);
+        displayContent();
+    }
 
-        // if there is a tip for this question, construct an alert dialog box with the data
-        final int tips = mQuestion.getHelpTypeCount();
-        if (tips > 0) {
-            mTipImage.setVisibility(View.VISIBLE);// GONE by default
-            mTipImage.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (tips > 1) {
-                        displayHelpChoices();
-                    } else {
-                        if (mQuestion.getHelpByType(ConstantUtil.TIP_HELP_TYPE)
-                                .size() > 0) {
-                            displayHelp(ConstantUtil.TIP_HELP_TYPE);
-                        } else if (mQuestion.getHelpByType(
-                                ConstantUtil.VIDEO_HELP_TYPE).size() > 0) {
-                            displayHelp(ConstantUtil.VIDEO_HELP_TYPE);
-                        } else if (mQuestion.getHelpByType(
-                                ConstantUtil.IMAGE_HELP_TYPE).size() > 0) {
-                            displayHelp(ConstantUtil.IMAGE_HELP_TYPE);
-                        }
-                    }
-                }
-            });
-        }
+    protected void displayContent() {
+        mQuestionText.setText(formText(), BufferType.SPANNABLE);
+        displayTip();
 
         if (!isReadOnly()) {
             mQuestionText.setLongClickable(true);
@@ -146,6 +134,24 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
         // if this question has 1 or more dependencies, then it needs to be invisible initially
         if (mQuestion.getDependencies() != null && mQuestion.getDependencies().size() > 0) {
             setVisibility(View.GONE);
+        }
+    }
+
+    private void displayTip() {
+        // if there is a tip for this question, construct an alert dialog box with the data
+        final int tips = mQuestion.getHelpTypeCount();
+        if (tips > 0) {
+            mTipImage.setVisibility(View.VISIBLE);
+            mTipImage.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                        if (mQuestion.getHelpByType(ConstantUtil.TIP_HELP_TYPE).size() > 0) {
+                            displayHelp();
+                    }
+                }
+            });
+        } else {
+            mTipImage.setVisibility(View.GONE);
         }
     }
 
@@ -210,105 +216,50 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
     }
 
     /**
-     * displays a dialog box with options for each of the help types that have
-     * been initialized for this particular question.
-     */
-    @SuppressWarnings("rawtypes")
-    private void displayHelpChoices() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        builder.setTitle(R.string.helpheading);
-        final CharSequence[] items = new CharSequence[mQuestion
-                .getHelpTypeCount()];
-        final Resources resources = getResources();
-        int itemIndex = 0;
-        List tempList = mQuestion.getHelpByType(ConstantUtil.IMAGE_HELP_TYPE);
-
-        if (tempList != null && tempList.size() > 0) {
-            items[itemIndex++] = resources.getString(R.string.photohelpoption);
-        }
-        tempList = mQuestion.getHelpByType(ConstantUtil.VIDEO_HELP_TYPE);
-        if (tempList != null && tempList.size() > 0) {
-            items[itemIndex++] = resources.getString(R.string.videohelpoption);
-        }
-        tempList = mQuestion.getHelpByType(ConstantUtil.TIP_HELP_TYPE);
-        if (tempList != null && tempList.size() > 0) {
-            items[itemIndex++] = resources.getString(R.string.texthelpoption);
-        }
-
-        builder.setItems(items, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                String val = items[id].toString();
-                if (resources.getString(R.string.texthelpoption).equals(val)) {
-                    displayHelp(ConstantUtil.TIP_HELP_TYPE);
-                } else if (resources.getString(R.string.videohelpoption)
-                        .equals(val)) {
-                    displayHelp(ConstantUtil.VIDEO_HELP_TYPE);
-                } else if (resources.getString(R.string.photohelpoption)
-                        .equals(val)) {
-                    displayHelp(ConstantUtil.IMAGE_HELP_TYPE);
-                }
-                if (dialog != null) {
-                    dialog.dismiss();
-                }
-            }
-        });
-        builder.show();
-    }
-
-    /**
      * displays the selected help type
      *
-     * @param type
      */
-    private void displayHelp(String type) {
-        if (ConstantUtil.VIDEO_HELP_TYPE.equals(type)) {
-            notifyQuestionListeners(QuestionInteractionEvent.VIDEO_TIP_VIEW);
-        } else if (ConstantUtil.TIP_HELP_TYPE.equals(type)) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-            StringBuilder textBuilder = new StringBuilder();
-            List<QuestionHelp> helpItems = mQuestion.getHelpByType(type);
-            boolean isFirst = true;
-            String[] langs = getLanguages();
-            String language = getDefaultLang();
-            if (helpItems != null) {
-                for (int i = 0; i < helpItems.size(); i++) {
-                    if (i > 0) {
-                        textBuilder.append("<br>");
+    private void displayHelp() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        StringBuilder textBuilder = new StringBuilder();
+        List<QuestionHelp> helpItems = mQuestion.getHelpByType(ConstantUtil.TIP_HELP_TYPE);
+        boolean isFirst = true;
+        String[] langs = getLanguages();
+        String language = getDefaultLang();
+        if (helpItems != null) {
+            for (int i = 0; i < helpItems.size(); i++) {
+                if (i > 0) {
+                    textBuilder.append("<br>");
+                }
+
+                for (int j = 0; j < langs.length; j++) {
+                    if (language.equalsIgnoreCase(langs[j])) {
+                        textBuilder.append(helpItems.get(i).getText());
+                        isFirst = false;
                     }
 
-                    for (int j = 0; j < langs.length; j++) {
-                        if (language.equalsIgnoreCase(langs[j])) {
-                            textBuilder.append(helpItems.get(i).getText());
+                    AltText aText = helpItems.get(i).getAltText(langs[j]);
+                    if (aText != null) {
+                        if (!isFirst) {
+                            textBuilder.append(" / ");
+                        } else {
                             isFirst = false;
                         }
 
-                        AltText aText = helpItems.get(i).getAltText(langs[j]);
-                        if (aText != null) {
-                            if (!isFirst) {
-                                textBuilder.append(" / ");
-                            } else {
-                                isFirst = false;
-                            }
-
-                            textBuilder.append("<font color='").append(sColors[j]).append("'>")
-                                    .append(aText.getText()).append("</font>");
-                        }
+                        textBuilder.append("<font color='").append(sColors[j]).append("'>")
+                                .append(aText.getText()).append("</font>");
                     }
                 }
             }
-            builder.setMessage(Html.fromHtml(textBuilder.toString()));
-            builder.setPositiveButton(R.string.okbutton,
-                    new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                            dialog.cancel();
-                        }
-                    });
-            builder.show();
-        } else if (ConstantUtil.IMAGE_HELP_TYPE.equals(type)) {
-            notifyQuestionListeners(QuestionInteractionEvent.PHOTO_TIP_VIEW);
-        } else {
-            notifyQuestionListeners(QuestionInteractionEvent.ACTIVITY_TIP_VIEW);
         }
+        builder.setMessage(Html.fromHtml(textBuilder.toString()));
+        builder.setPositiveButton(R.string.okbutton,
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.cancel();
+                    }
+                });
+        builder.show();
     }
 
     /**
@@ -319,7 +270,7 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
      */
     public void addQuestionInteractionListener(QuestionInteractionListener listener) {
         if (mListeners == null) {
-            mListeners = new ArrayList<QuestionInteractionListener>();
+            mListeners = new ArrayList<>();
         }
         if (listener != null && !mListeners.contains(listener) && listener != this) {
             mListeners.add(listener);
@@ -343,12 +294,20 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
         notifyQuestionListeners(type, null);
     }
 
+    protected ApplicationComponent getApplicationComponent() {
+        return ((FlowApp) getContext().getApplicationContext()).getApplicationComponent();
+    }
+
     /**
-     * method that can be overridden by sub classes if they want to have some
-     * sort of visual response to a question interaction.
+     * Receiving question input from other apps or activities such as image, video, barcode
+     * By default this does nothing
      */
-    public void questionComplete(Bundle data) {
-        // do nothing
+    public void onQuestionResultReceived(Bundle data) {
+        // EMPTY
+    }
+
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        // EMTPY
     }
 
     /**
@@ -406,17 +365,12 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
      */
     public boolean handleDependencyParentResponse(Dependency dep, QuestionResponse resp) {
         boolean isMatch = false;
-        if (dep.getAnswer() != null
-                && resp != null
-                && dep.isMatch(resp.getValue())
-                && resp.getIncludeFlag()) {
+        if (dep.getAnswer() != null && resp != null && dep.isMatch(resp.getValue()) && resp
+                .getIncludeFlag()) {
             isMatch = true;
-        } else if (dep.getAnswer() != null
-                && resp != null
-                && resp.getIncludeFlag()) {
+        } else if (dep.getAnswer() != null && resp != null && resp.getIncludeFlag()) {
             if (resp.getValue() != null) {
-                StringTokenizer strTok = new StringTokenizer(resp.getValue(),
-                        "|");
+                StringTokenizer strTok = new StringTokenizer(resp.getValue(), "|");
                 while (strTok.hasMoreTokens()) {
                     if (dep.isMatch(strTok.nextToken().trim())) {
                         isMatch = true;
@@ -429,18 +383,16 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
         // if we're here, then the question on which we depend
         // has been answered. Check the value to see if it's the
         // one we are looking for
+        boolean includeFlag = true;
         if (isMatch) {
             setVisibility(View.VISIBLE);
-            if (mResponse != null) {
-                mResponse.setIncludeFlag(true);
-            }
             setVisible = true;
         } else {
-            if (mResponse != null) {
-                mResponse.setIncludeFlag(false);
-            }
+            includeFlag = false;
             setVisibility(View.GONE);
         }
+        mResponse = new QuestionResponse.QuestionResponseBuilder()
+                .createFromQuestionResponse(mResponse, includeFlag);
 
         // now notify our own listeners to make sure we correctly toggle
         // nested dependencies (i.e. if A -> B -> C and C changes, A needs to
@@ -461,6 +413,15 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
      * in a QuestionResponse object
      */
     public abstract void captureResponse(boolean suppressListeners);
+
+    public void setResponse(boolean suppressListeners, Question question, String value,
+            String type) {
+        setResponse(createResponse(question, value, type), suppressListeners);
+    }
+
+    public void setResponse(Question question, String value, String type) {
+        setResponse(createResponse(question, value, type));
+    }
 
     /**
      * this method should be overridden by subclasses so they can manage the UI
@@ -505,18 +466,8 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
     }
 
     public void setResponse(QuestionResponse response, boolean suppressListeners) {
-        if (response != null) {
-            if (this.mResponse == null) {
-                this.mResponse = response;
-            } else {
-                // we need to preserve the ID so we don't get duplicates in the db
-                this.mResponse.setType(response.getType());
-                this.mResponse.setValue(response.getValue());
-                this.mResponse.setFilename(response.getFilename());
-            }
-        } else {
-            this.mResponse = response;
-        }
+        this.mResponse = new QuestionResponse.QuestionResponseBuilder()
+                .createFromQuestionResponse(this.mResponse, response);
         if (!suppressListeners) {
             notifyQuestionListeners(QuestionInteractionEvent.QUESTION_ANSWER_EVENT);
         }
@@ -529,15 +480,6 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
 
     public void setTextSize(float size) {
         mQuestionText.setTextSize(size);
-    }
-
-    /**
-     * hides or shows the tips button
-     *
-     * @param isSuppress
-     */
-    public void suppressHelp(boolean isSuppress) {
-        mTipImage.setVisibility(isSuppress ? View.GONE : View.VISIBLE);
     }
 
     protected String getDefaultLang() {
@@ -564,8 +506,12 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
      *
      * @param error Error text
      */
-    public void displayError(String error) {
-        mQuestionText.setError(error);
+    public void displayError(@Nullable String error) {
+        if (TextUtils.isEmpty(error)) {
+            mQuestionText.setError(null);
+        } else {
+            mQuestionText.setError(errorMessageFormatter.getErrorSpannable(error));
+        }
     }
 
     public void checkMandatory() {
@@ -588,7 +534,7 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
     }
 
     public boolean isDoubleEntry() {
-        return mQuestion != null ? mQuestion.isDoubleEntry() : false;// Avoid NPE
+        return mQuestion != null && mQuestion.isDoubleEntry();
     }
 
     /**
@@ -612,5 +558,12 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
         return true;
     }
 
+    private QuestionResponse createResponse(Question question, String value, String type) {
+        return new QuestionResponse.QuestionResponseBuilder()
+                .setValue(value)
+                .setType(type)
+                .setQuestionId(question.getQuestionId())
+                .setIteration(question.getIteration())
+                .createQuestionResponse();
+    }
 }
-

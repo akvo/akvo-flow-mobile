@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context="org.akvo.flow.presentation.settings.PreferenceActivity">
+
+    <com.google.android.material.appbar.AppBarLayout
+            android:id="@+id/appbar_layout"
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:theme="@style/FlowAppTheme.AppBarOverlay">
+
+        <androidx.appcompat.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:background="?attr/colorPrimary"
+                app:layout_scrollFlags="scroll|enterAlways"
+                app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+                app:popupTheme="@style/FlowAppTheme.PopupOverlay"/>
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <androidx.core.widget.NestedScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+            <TextView
+                    android:text="@string/preferences_general_section"
+                    style="@style/PreferenceSectionTitleStyle"/>
+
+            <androidx.appcompat.widget.SwitchCompat
+                    android:id="@+id/switch_screen_on"
+                    android:text="@string/preference_screen_on"
+                    style="@style/PreferenceSwitch"/>
+
+            <View
+                    style="@style/PreferenceItemSeparator"/>
+
+            <androidx.appcompat.widget.SwitchCompat
+                    android:id="@+id/switch_enable_data"
+                    android:text="@string/preference_upload_mobile_data"
+                    style="@style/PreferenceSwitch"/>
+
+            <View
+                    style="@style/PreferenceItemSeparator"/>
+
+            <TextView
+                    android:text="@string/preference_app_language"
+                    style="@style/PreferenceTitleStyle"
+                    android:paddingBottom="4dp"/>
+
+            <Spinner
+                    android:entries="@array/app_languages"
+                    android:id="@+id/preference_language"
+                    style="@style/PreferenceSpinnerStyle"/>
+
+            <View
+                    style="@style/PreferenceItemSeparator"/>
+
+            <TextView
+                    android:text="@string/preference_image_size"
+                    style="@style/PreferenceTitleStyle"
+                    android:paddingBottom="4dp"/>
+
+            <Spinner
+                    android:entries="@array/max_image_size_pref"
+                    android:id="@+id/preference_image_size"
+                    style="@style/PreferenceSpinnerStyle"/>
+
+            <View
+                    style="@style/PreferenceSectionSeparator"/>
+
+            <TextView
+                    android:text="@string/preferences_data_section"
+                    style="@style/PreferenceSectionTitleStyle"/>
+
+            <TextView
+                    android:id="@+id/send_data_points"
+                    android:text="@string/preference_sync_datapoints"
+                    style="@style/PreferenceTitleStyle"
+                    android:paddingBottom="8dp"/>
+
+            <View
+                    style="@style/PreferenceItemSeparator"/>
+
+            <org.akvo.flow.presentation.settings.publish.PublishFilesPreferenceView
+                    android:id="@+id/publish_files_preference"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+            </org.akvo.flow.presentation.settings.publish.PublishFilesPreferenceView>
+
+            <View
+                    style="@style/PreferenceItemSeparator"/>
+
+            <TextView
+                    android:id="@+id/preference_delete_collected_data_title"
+                    android:text="@string/preference_delete_collected_data"
+                    style="@style/PreferenceTitleStyle"
+                    android:paddingBottom="4dp"/>
+
+            <TextView
+                    android:id="@+id/preference_delete_collected_data_subtitle"
+                    android:text="@string/reset_responses_desc"
+                    style="@style/PreferenceSubtitleStyle"/>
+
+            <View
+                    style="@style/PreferenceItemSeparator"/>
+
+            <TextView
+                    android:id="@+id/preference_delete_everything_title"
+                    android:text="@string/preference_delete_everything"
+                    style="@style/PreferenceTitleStyle"
+                    android:paddingBottom="4dp"/>
+
+            <TextView
+                    android:id="@+id/preference_delete_everything_subtitle"
+                    android:text="@string/resetalldesc"
+                    style="@style/PreferenceSubtitleStyle"/>
+
+            <View
+                    style="@style/PreferenceItemSeparator"/>
+
+            <TextView
+                    android:id="@+id/preference_download_form_title"
+                    android:text="@string/preference_download_form_title"
+                    style="@style/PreferenceTitleStyle"
+                    android:paddingBottom="4dp"/>
+
+            <TextView
+                    android:id="@+id/preference_download_form_subtitle"
+                    android:text="@string/preference_download_form_subtitle"
+                    style="@style/PreferenceSubtitleStyle"/>
+
+            <View
+                    style="@style/PreferenceItemSeparator"/>
+
+            <TextView
+                    android:id="@+id/preference_reload_forms_title"
+                    android:text="@string/reloadsurveyslabel"
+                    style="@style/PreferenceTitleStyle"
+                    android:paddingBottom="4dp"/>
+
+            <TextView
+                    android:id="@+id/preference_reload_forms_subtitle"
+                    android:text="@string/reloadsurveysdesc"
+                    style="@style/PreferenceSubtitleStyle"/>
+
+            <View
+                    style="@style/PreferenceSectionSeparator"/>
+
+            <TextView
+                    android:text="@string/preferences_configuration_section"
+                    style="@style/PreferenceSectionTitleStyle"/>
+
+            <TextView
+                    android:id="@+id/preference_gps_fixes"
+                    android:text="@string/preference_gps"
+                    style="@style/PreferenceTitleStyle"
+                    android:paddingBottom="8dp"/>
+
+            <View
+                    style="@style/PreferenceItemSeparator"/>
+
+            <TextView
+                    android:id="@+id/preference_storage"
+                    android:text="@string/preference_storage"
+                    style="@style/PreferenceTitleStyle"
+                    android:paddingBottom="8dp"/>
+
+            <View
+                    style="@style/PreferenceSectionSeparator"/>
+
+            <TextView
+                    android:text="@string/preferences_section_information"
+                    style="@style/PreferenceSectionTitleStyle"/>
+
+            <TextView
+                    android:text="@string/preference_identifier"
+                    style="@style/PreferenceTitleStyle"
+                    android:paddingBottom="4dp"/>
+
+            <TextView
+                    android:id="@+id/preference_identifier_value"
+                    tools:text="valeria"
+                    style="@style/PreferenceSubtitleStyle"/>
+
+            <View
+                    style="@style/PreferenceItemSeparator"/>
+
+            <TextView
+                    android:text="@string/preference_instance_name"
+                    style="@style/PreferenceTitleStyle"
+                    android:paddingBottom="4dp"/>
+
+            <TextView
+                    android:id="@+id/preference_instance_value"
+                    tools:text="https://some_instance.akvoflow.org"
+                    style="@style/PreferenceSubtitleStyle"/>
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <View
+            android:id="@+id/toolbar_shadow"
+            android:layout_marginTop="?actionBarSize"
+            android:layout_height="6dp"
+            android:layout_width="match_parent"
+            android:background="@drawable/shadow_background"/>
+
+    <ProgressBar
+            android:id="@+id/progress"
+            style="?android:attr/progressBarStyleSmall"
+            android:layout_gravity="center"
+            android:padding="2dp"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="@drawable/progress_circle_background"
+            android:elevation="2dp"
+            android:visibility="gone"
+            tools:visibility="visible"/>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

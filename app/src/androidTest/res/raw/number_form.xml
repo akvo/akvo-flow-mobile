@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<survey name="NumberForm" defaultLanguageCode="en" version='1.0' app="akvoflowsandbox" surveyGroupId="47323002" surveyGroupName="NumberForm" surveyId="49783002">
+	<questionGroup>
+		<heading>NumberFormGroup</heading>
+		<question order="1" type="free" mandatory="false" localeNameFlag="false" id="48963002">
+			<text>NumberQuestion</text>
+			<validationRule minVal="1.0" allowDecimal="false" validationType="numeric" signed="false" maxVal="1024.0"/></question>
+		</questionGroup>
+	</survey>

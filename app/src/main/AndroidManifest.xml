@@ -33,10 +33,6 @@
             android:name="org.apache.http.legacy"
             android:required="false" />
 
-        <meta-data
-            android:name="io.fabric.ApiKey"
-            android:value="89dc21727e76a10511ecda549cab1b2d3aff2ec7" />
-
         <activity
             android:name=".presentation.main.MainActivity"
             android:launchMode="singleInstance"

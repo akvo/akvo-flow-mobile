@@ -42,6 +42,10 @@
 -dontwarn sun.reflect.**
 -dontwarn android.test.**
 
+-dontwarn org.mockito.**
+-dontwarn sun.reflect.**
+-dontwarn android.test.**
+
 # In case of proguard issues just delete all the proguard config files
 # and uncomment the following lines
 #-keepattributes **

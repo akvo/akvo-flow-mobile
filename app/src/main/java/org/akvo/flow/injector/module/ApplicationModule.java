@@ -126,7 +126,7 @@ public class ApplicationModule {
         if (BuildConfig.DEBUG) {
             return new DebugLoggingHelper();
         } else {
-            return new ReleaseLoggingHelper(application);
+            return new ReleaseLoggingHelper();
         }
     }
 

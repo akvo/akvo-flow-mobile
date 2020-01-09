@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017,2019 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -17,25 +17,22 @@
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
+package org.akvo.flow.util.logging
 
-package org.akvo.flow.util.logging;
+import timber.log.Timber
+import timber.log.Timber.DebugTree
 
-import timber.log.Timber;
+class DebugLoggingHelper : LoggingHelper {
 
-public class DebugLoggingHelper implements LoggingHelper {
-
-    @Override
-    public void init() {
-        Timber.plant(new Timber.DebugTree());
+    override fun init() {
+        Timber.plant(DebugTree())
     }
 
-    @Override
-    public void initLoginData(String username, String deviceId) {
+    override fun initLoginData(username: String?, deviceId: String?) {
         // ignored
     }
 
-    @Override
-    public void clearUser() {
+    override fun clearUser() {
         // ignored
     }
 }

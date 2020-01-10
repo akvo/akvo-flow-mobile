@@ -1,5 +1,6 @@
 buildscript {
     ext.kotlin_version = '1.3.61'
+    ext.jacocoVersion = '0.8.4'
     repositories {
         google()
         mavenCentral()
@@ -15,22 +16,8 @@ buildscript {
         classpath 'com.google.gms:google-services:4.3.3'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath 'io.fabric.tools:gradle:1.31.2'
+        classpath "org.jacoco:org.jacoco.core:$jacocoVersion"
     }
-
-    configurations.all {
-        //bug in jacoco (coverage reporting) so we must use this specific version for now
-        resolutionStrategy {
-            force 'org.jacoco:org.jacoco.report:0.7.4.201502262128'
-            force 'org.jacoco:org.jacoco.core:0.7.4.201502262128'
-        }
-    }
-}
-
-ext {
-    compileSdkVersion = 25
-    buildToolsVersion = "25.0.1"
-    minSdkVersion = 10
-    targetSdkVersion = 21
 }
 
 ext {
@@ -110,5 +97,4 @@ task clean(type: Delete) {
     delete rootProject.buildDir
 }
 
-apply plugin: 'android-reporting'
 apply plugin: 'checkstyle'

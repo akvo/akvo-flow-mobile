@@ -2,8 +2,8 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'com.getkeepsafe.dexcount'
-apply plugin: 'jacoco'
 apply plugin: 'io.fabric'
+apply from: rootProject.file("jacoco.gradle")
 
 dexcount {
     enabled = !project.hasProperty("nodexcount")
@@ -13,28 +13,7 @@ loadProperties()
 
 def loadProperties() {
     def file = hasProperty('file') ? file : 'survey.properties'
-    println "Survey config file: " + file
-
-    Properties surveyProps = readProperties(file)
-    project.ext.surveyProps = surveyProps
-}
-
-task jacocoTestReport(type: JacocoReport, dependsOn: ['testFlowDebugUnitTest', 'createFlowDebugCoverageReport']) {
-
-    reports {
-        xml.enabled = true
-        html.enabled = true
-    }
-
-    def fileFilter = ['**/R.class', '**/R$*.class', '**/BuildConfig.*', '**/Manifest*.*', '**/*Test*.*', 'android/**/*.*']
-    def debugTree = fileTree(dir: "$project.buildDir/intermediates/classes/debug", excludes: fileFilter)
-    def mainSrc = "$project.projectDir/src/main/java"
-
-    sourceDirectories = files([mainSrc])
-    classDirectories = files([debugTree])
-    executionData = fileTree(dir: project.buildDir, includes: [
-            'jacoco/testFlowDebugUnitTest.exec', 'outputs/code-coverage/connected/*coverage.ec'
-    ])
+    project.ext.surveyProps = readProperties(file)
 }
 
 android {
@@ -192,15 +171,18 @@ android {
     }
 
     testOptions {
-        unitTests.returnDefaultValues = true
-    }
-
-    testOptions.unitTests.all {
-        testLogging {
-            events 'passed', 'skipped', 'failed', 'standardOut', 'standardError'
-        }
-        jacoco {
-            includeNoLocationClasses = true
+        animationsDisabled true
+        unitTests {
+            includeAndroidResources = true
+            returnDefaultValues = true
+            all {
+                testLogging {
+                    events 'passed', 'skipped', 'failed', 'standardOut', 'standardError'
+                }
+                jacoco {
+                    includeNoLocationClasses = true
+                }
+            }
         }
     }
 

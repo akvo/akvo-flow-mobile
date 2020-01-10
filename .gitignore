@@ -62,3 +62,6 @@ gradle.deps
 #errors
 hs_err_*
 .attach_pid*
+
+#reports
+jacoco.exec

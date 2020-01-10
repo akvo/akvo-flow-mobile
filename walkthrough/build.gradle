@@ -1,4 +1,5 @@
 apply plugin: 'com.android.library'
+apply from: rootProject.file("jacoco.gradle")
 
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
@@ -36,12 +37,23 @@ android {
     }
 
     testOptions {
-        unitTests.returnDefaultValues = true
+        unitTests {
+            returnDefaultValues = true
+            includeAndroidResources = true
+            all {
+                testLogging {
+                    events 'passed', 'skipped', 'failed', 'standardOut', 'standardError'
+                }
+            }
+        }
     }
 
-    testOptions.unitTests.all {
-        testLogging {
-            events 'passed', 'skipped', 'failed', 'standardOut', 'standardError'
+    buildTypes {
+        debug {
+            testCoverageEnabled true
+        }
+        release {
+            minifyEnabled true
         }
     }
 }

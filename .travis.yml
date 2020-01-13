@@ -60,7 +60,3 @@ script:
 notifications:
   slack:
     secure: OiWLWDEXvCwsYENslrKRTh3JPky1WaokDqFEA23kRd/jD616n4uKCRCsOeslGcV7dJX98k7GsS2XC7xKIonV/3IE99dztyxJAXdWW6h4I2ztJt9LZ/14NevU2k927FKyKOg3kbnHEGVYOb0HTDQztoj/TBXhLEWKjUzCp66ojxs=
-
-# after_success:
-#   - ./gradlew createFlowDebugCoverageReport --continue --stacktrace
-#  - bash <(curl -s https://codecov.io/bash)

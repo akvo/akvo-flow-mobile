@@ -33,9 +33,6 @@ android {
                 testLogging {
                     events 'passed', 'skipped', 'failed', 'standardOut', 'standardError'
                 }
-                jacoco {
-                    includeNoLocationClasses = true
-                }
             }
         }
     }

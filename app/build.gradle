@@ -276,3 +276,6 @@ dependencies {
 
     apply plugin: 'com.google.gms.google-services'
 }
+
+task testDebugUnitTest(dependsOn: ['testFlowDebugUnitTest'])
+task createDebugCoverageReport(dependsOn: ['createFlowDebugCoverageReport'])

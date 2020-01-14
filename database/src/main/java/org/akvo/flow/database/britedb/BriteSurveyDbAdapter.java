@@ -115,7 +115,7 @@ public class BriteSurveyDbAdapter {
                         });
     }
 
-    public Cursor getSubmittedDataPoints(long surveyGroupId) {
+    public Cursor getDataPointsToDelete(long surveyGroupId) {
         String queryString = "SELECT " + RecordColumns.RECORD_ID + " FROM"
                 + " (SELECT " + RecordColumns.RECORD_ID
                 + ", MIN(r." + SurveyInstanceColumns.STATUS + ") as " + SurveyInstanceColumns.STATUS
@@ -124,7 +124,9 @@ public class BriteSurveyDbAdapter {
                 + "sl." + RecordColumns.RECORD_ID + "=" + "r." + SurveyInstanceColumns.RECORD_ID
                 + " WHERE sl." + RecordColumns.SURVEY_GROUP_ID + " = " + surveyGroupId
                 + " GROUP BY sl." + RecordColumns.RECORD_ID + ")"
-                + " WHERE " + SurveyInstanceColumns.STATUS + " != " + SurveyInstanceStatus.SAVED;
+                + " WHERE " + SurveyInstanceColumns.STATUS + " == " + SurveyInstanceStatus.UPLOADED
+                +
+                " OR " + SurveyInstanceColumns.STATUS + " == " + SurveyInstanceStatus.DOWNLOADED;
 
         return briteDatabase.query(queryString);
     }
@@ -207,7 +209,7 @@ public class BriteSurveyDbAdapter {
     }
 
     public void deleteSubmittedRecordsForSurvey(long surveyId) {
-        Cursor cursor = getSubmittedDataPoints(surveyId);
+        Cursor cursor = getDataPointsToDelete(surveyId);
         List<String> records = new ArrayList<>();
         if (cursor != null) {
             if (cursor.moveToFirst()) {
@@ -218,9 +220,12 @@ public class BriteSurveyDbAdapter {
                 cursor.close();
             }
         }
+        int numberOfDeletedPoints = 0;
         for (String recordId : records) {
             briteDatabase.delete(Tables.RECORD, RecordColumns.RECORD_ID + " = ?", recordId);
+            numberOfDeletedPoints++;
         }
+        Timber.d(numberOfDeletedPoints +" datapoints deleted");
     }
 
     /**

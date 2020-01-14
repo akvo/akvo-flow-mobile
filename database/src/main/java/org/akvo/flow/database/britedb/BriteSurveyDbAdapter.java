@@ -115,22 +115,6 @@ public class BriteSurveyDbAdapter {
                         });
     }
 
-    public Cursor getDataPointsToDelete(long surveyGroupId) {
-        String queryString = "SELECT " + RecordColumns.RECORD_ID + " FROM"
-                + " (SELECT " + RecordColumns.RECORD_ID
-                + ", MIN(r." + SurveyInstanceColumns.STATUS + ") as " + SurveyInstanceColumns.STATUS
-                + " FROM " + Tables.RECORD
-                + " AS sl LEFT JOIN " + Tables.SURVEY_INSTANCE + " AS r ON "
-                + "sl." + RecordColumns.RECORD_ID + "=" + "r." + SurveyInstanceColumns.RECORD_ID
-                + " WHERE sl." + RecordColumns.SURVEY_GROUP_ID + " = " + surveyGroupId
-                + " GROUP BY sl." + RecordColumns.RECORD_ID + ")"
-                + " WHERE " + SurveyInstanceColumns.STATUS + " == " + SurveyInstanceStatus.UPLOADED
-                +
-                " OR " + SurveyInstanceColumns.STATUS + " == " + SurveyInstanceStatus.DOWNLOADED;
-
-        return briteDatabase.query(queryString);
-    }
-
     /**
      * Uses a simple planar approximation of distance
      */
@@ -209,23 +193,25 @@ public class BriteSurveyDbAdapter {
     }
 
     public void deleteSubmittedRecordsForSurvey(long surveyId) {
-        Cursor cursor = getDataPointsToDelete(surveyId);
-        List<String> records = new ArrayList<>();
-        if (cursor != null) {
-            if (cursor.moveToFirst()) {
-                int columnIdx = cursor.getColumnIndexOrThrow(RecordColumns.RECORD_ID);
-                do {
-                    records.add(cursor.getString(columnIdx));
-                } while (cursor.moveToNext());
-                cursor.close();
-            }
-        }
-        int numberOfDeletedPoints = 0;
-        for (String recordId : records) {
-            briteDatabase.delete(Tables.RECORD, RecordColumns.RECORD_ID + " = ?", recordId);
-            numberOfDeletedPoints++;
-        }
-        Timber.d(numberOfDeletedPoints +" datapoints deleted");
+        String whereClause =
+                RecordColumns.RECORD_ID + " IN (SELECT " + RecordColumns.RECORD_ID + " FROM"
+                        + " (SELECT " + RecordColumns.RECORD_ID
+                        + ", MIN(r." + SurveyInstanceColumns.STATUS + ") as "
+                        + SurveyInstanceColumns.STATUS
+                        + " FROM " + Tables.RECORD
+                        + " AS sl LEFT JOIN " + Tables.SURVEY_INSTANCE + " AS r ON "
+                        + "sl." + RecordColumns.RECORD_ID + "=" + "r."
+                        + SurveyInstanceColumns.RECORD_ID
+                        + " WHERE sl." + RecordColumns.SURVEY_GROUP_ID + " = " + surveyId
+                        + " GROUP BY sl." + RecordColumns.RECORD_ID + ")"
+                        + " WHERE " + SurveyInstanceColumns.STATUS + " == "
+                        + SurveyInstanceStatus.UPLOADED
+                        +
+                        " OR " + SurveyInstanceColumns.STATUS + " == "
+                        + SurveyInstanceStatus.DOWNLOADED + ")";
+
+        int numberOfDeletedPoints = briteDatabase.delete(Tables.RECORD, whereClause);
+        Timber.d("%s datapoints deleted", numberOfDeletedPoints);
     }
 
     /**

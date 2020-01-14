@@ -43,8 +43,6 @@ public interface SurveyRepository {
 
     Single<DataPoint> getDataPoint(String datapointId);
 
-    Single<Integer> downloadDataPoints(long surveyGroupId);
-
     Observable<Boolean> deleteSurvey(long surveyToDeleteId);
 
     Observable<List<User>> getUsers();

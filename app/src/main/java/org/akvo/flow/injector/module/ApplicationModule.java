@@ -40,6 +40,7 @@ import org.akvo.flow.data.net.SignatureHelper;
 import org.akvo.flow.data.net.s3.AmazonAuthHelper;
 import org.akvo.flow.data.net.s3.BodyCreator;
 import org.akvo.flow.data.repository.ApkDataRepository;
+import org.akvo.flow.data.repository.DataPointDataRepository;
 import org.akvo.flow.data.repository.FileDataRepository;
 import org.akvo.flow.data.repository.FormDataRepository;
 import org.akvo.flow.data.repository.MissingAndDeletedDataRepository;
@@ -54,6 +55,7 @@ import org.akvo.flow.database.SurveyLanguagesDbDataSource;
 import org.akvo.flow.domain.executor.PostExecutionThread;
 import org.akvo.flow.domain.executor.ThreadExecutor;
 import org.akvo.flow.domain.repository.ApkRepository;
+import org.akvo.flow.domain.repository.DataPointRepository;
 import org.akvo.flow.domain.repository.FileRepository;
 import org.akvo.flow.domain.repository.FormRepository;
 import org.akvo.flow.domain.repository.MissingAndDeletedRepository;
@@ -159,6 +161,12 @@ public class ApplicationModule {
     @Singleton
     FormRepository provideFormRepository(FormDataRepository formDataRepository) {
         return formDataRepository;
+    }
+
+    @Provides
+    @Singleton
+    DataPointRepository provideDataPointRepository(DataPointDataRepository dataPointDataRepository) {
+        return dataPointDataRepository;
     }
 
     @Provides

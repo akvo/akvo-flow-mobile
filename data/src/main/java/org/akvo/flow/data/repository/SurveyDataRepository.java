@@ -24,7 +24,6 @@ import android.database.Cursor;
 
 import org.akvo.flow.data.datasource.DataSourceFactory;
 import org.akvo.flow.data.datasource.DatabaseDataSource;
-import org.akvo.flow.data.entity.ApiLocaleResult;
 import org.akvo.flow.data.entity.DataPointMapper;
 import org.akvo.flow.data.entity.FormInstanceMapper;
 import org.akvo.flow.data.entity.FormInstanceMetadataMapper;
@@ -45,10 +44,8 @@ import org.akvo.flow.domain.entity.FormInstanceMetadata;
 import org.akvo.flow.domain.entity.InstanceIdUuid;
 import org.akvo.flow.domain.entity.Survey;
 import org.akvo.flow.domain.entity.User;
-import org.akvo.flow.domain.exception.AssignmentRequiredException;
 import org.akvo.flow.domain.repository.SurveyRepository;
 
-import java.net.HttpURLConnection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -139,44 +136,6 @@ public class SurveyDataRepository implements SurveyRepository {
                         return Single.just(dataPoint);
                     }
                 });
-    }
-
-    @Override
-    public Single<Integer> downloadDataPoints(final long surveyGroupId) {
-        return syncDataPoints(surveyGroupId)
-                .onErrorResumeNext(new Function<Throwable, Single<Integer>>() {
-                    @Override
-                    public Single<Integer> apply(Throwable throwable) {
-                        if (isErrorForbidden(throwable)) {
-                            return Single.error(new AssignmentRequiredException(
-                                    "Dashboard Assignment missing"));
-                        } else {
-                            return Single.error(throwable);
-                        }
-                    }
-                });
-    }
-
-    private boolean isErrorForbidden(Throwable throwable) {
-        return throwable instanceof HttpException
-                && ((HttpException) throwable).code() == HttpURLConnection.HTTP_FORBIDDEN;
-    }
-
-    private Single<Integer> syncDataPoints(final long surveyGroupId) {
-       return restApi.downloadDataPoints(surveyGroupId)
-               .flatMap(new Function<ApiLocaleResult, Single<Integer>>() {
-                   @Override
-                   public Single<Integer> apply(ApiLocaleResult apiLocaleResult) {
-                      return syncDataPoints(apiLocaleResult, surveyGroupId);
-                   }
-               });
-    }
-
-    private Single<Integer> syncDataPoints(ApiLocaleResult apiLocaleResult,
-            final long surveyGroupId) {
-        return dataSourceFactory.getDataBaseDataSource()
-                .syncDataPoints(apiLocaleResult.getDataPoints(), surveyGroupId)
-                .andThen(Single.just(apiLocaleResult.getDataPoints().size()));
     }
 
     @Override

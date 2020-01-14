@@ -62,11 +62,10 @@ public class DataPointsListPresenter implements Presenter {
     private Double latitude;
     private Double longitude;
 
-    @Inject
-    DataPointsListPresenter(@Named("getSavedDataPoints") UseCase getSavedDataPoints,
+    @Inject DataPointsListPresenter(@Named("getSavedDataPoints") UseCase getSavedDataPoints,
             ListDataPointMapper mapper, DownloadDataPoints downloadDataPoints,
-            @Named("checkDeviceNotification")
-            UseCase checkDeviceNotification, @Named("uploadSync") UseCase upload) {
+            @Named("checkDeviceNotification") UseCase checkDeviceNotification,
+            @Named("uploadSync") UseCase upload) {
         this.getSavedDataPoints = getSavedDataPoints;
         this.mapper = mapper;
         this.downloadDataPoints = downloadDataPoints;

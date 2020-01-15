@@ -64,4 +64,5 @@ hs_err_*
 .attach_pid*
 
 #reports
-jacoco.exec
+*/jacoco.exec
+codacy-coverage-reporter

@@ -16,12 +16,10 @@
  * You should have received a copy of the GNU General Public License
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
+package org.akvo.flow.domain.repository
 
-package org.akvo.flow.domain.repository;
+import io.reactivex.Single
 
-import io.reactivex.Single;
-
-public interface DataPointRepository {
-
-    Single<Integer> downloadDataPoints(long surveyGroupId);
+interface DataPointRepository {
+    fun downloadDataPoints(surveyGroupId: Long): Single<Int>
 }

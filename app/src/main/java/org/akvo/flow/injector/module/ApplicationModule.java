@@ -39,6 +39,7 @@ import org.akvo.flow.data.net.S3User;
 import org.akvo.flow.data.net.SignatureHelper;
 import org.akvo.flow.data.net.s3.AmazonAuthHelper;
 import org.akvo.flow.data.net.s3.BodyCreator;
+import org.akvo.flow.data.net.s3.S3RestApi;
 import org.akvo.flow.data.repository.ApkDataRepository;
 import org.akvo.flow.data.repository.DataPointDataRepository;
 import org.akvo.flow.data.repository.FileDataRepository;
@@ -242,11 +243,17 @@ public class ApplicationModule {
     @Provides
     @Singleton
     RestApi provideRestApi(DeviceHelper deviceHelper, RestServiceFactory serviceFactory,
-            ApiUrls apiUrls, AmazonAuthHelper amazonAuthHelper, BodyCreator bodyCreator) {
+            ApiUrls apiUrls) {
+        return new RestApi(deviceHelper, serviceFactory, BuildConfig.VERSION_NAME, apiUrls);
+    }
+
+    @Provides
+    @Singleton
+    S3RestApi provideS3RestApi( RestServiceFactory serviceFactory, ApiUrls apiUrls, AmazonAuthHelper amazonAuthHelper,
+            BodyCreator bodyCreator) {
         final DateFormat df = new SimpleDateFormat(REST_API_DATE_PATTERN, Locale.US);
         df.setTimeZone(TimeZone.getTimeZone(TIMEZONE));
-        return new RestApi(deviceHelper, serviceFactory, BuildConfig.VERSION_NAME,
-                apiUrls, amazonAuthHelper, df, bodyCreator);
+        return new S3RestApi(serviceFactory, apiUrls, amazonAuthHelper, df, bodyCreator);
     }
 
     @Provides

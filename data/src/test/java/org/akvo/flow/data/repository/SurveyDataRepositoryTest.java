@@ -34,6 +34,7 @@ import org.akvo.flow.data.entity.UploadSuccess;
 import org.akvo.flow.data.net.RestApi;
 import org.akvo.flow.data.net.s3.AmazonAuthHelper;
 import org.akvo.flow.data.net.s3.BodyCreator;
+import org.akvo.flow.data.net.s3.S3RestApi;
 import org.akvo.flow.data.util.ApiUrls;
 import org.akvo.flow.domain.util.DeviceHelper;
 import org.junit.After;
@@ -123,7 +124,10 @@ public class SurveyDataRepositoryTest {
                 .thenReturn(Observable.just(mockCursor));
 
         RestApi restApi = new RestApi(mockDeviceHelper, new TestRestServiceFactory(),
-                "1.2.3", new ApiUrls("", ""), mockAmazonAuth, mockDateFormat, mockBodyCreator);
+                "1.2.3", new ApiUrls("", ""));
+
+        S3RestApi s3RestApi = new S3RestApi(new TestRestServiceFactory(),
+                new ApiUrls("", ""), mockAmazonAuth, mockDateFormat, mockBodyCreator);
         when(mockDateFormat
                 .format(any(Date.class), any(StringBuffer.class), any(FieldPosition.class)))
                 .thenReturn(new StringBuffer().append("12-12-2012"));
@@ -132,7 +136,7 @@ public class SurveyDataRepositoryTest {
                 .thenReturn("123");
 
         surveyDataRepository = new SurveyDataRepository(mockDataSourceFactory, null, restApi,
-                null, null, null, mockTransmissionMapper, null, mockFormIdMapper, null);
+                null, null, null, mockTransmissionMapper, null, mockFormIdMapper, null, s3RestApi);
 
         when(mockDeviceHelper.getPhoneNumber()).thenReturn("123");
         when(mockDeviceHelper.getImei()).thenReturn("123");

@@ -54,6 +54,7 @@ ext {
     rxAndroidVersion = "2.1.1"
     rxJavaVersion = "2.2.8"
     rxTracerVersion = "0.1.2"
+    slf4JVersion = "1.7.30"
     sqlbriteVersion = "2.0.0"
     timberVersion = "4.7.1"
 

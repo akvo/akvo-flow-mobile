@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2020 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -16,26 +16,15 @@
  * You should have received a copy of the GNU General Public License
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
+package org.akvo.flow.database.upgrade
 
-package org.akvo.flow.database.upgrade;
+import android.database.sqlite.SQLiteDatabase
+import org.akvo.flow.database.DatabaseHelper
 
-import android.database.sqlite.SQLiteDatabase;
+class AssignmentsUpgrader(private val helper: DatabaseHelper, private val db: SQLiteDatabase) :
+    DatabaseUpgrader {
 
-import org.akvo.flow.database.DatabaseHelper;
-
-public class AssignmentsUpgrader implements DatabaseUpgrader {
-
-    private final DatabaseHelper helper;
-    private final SQLiteDatabase db;
-
-    public AssignmentsUpgrader(DatabaseHelper helper, SQLiteDatabase db) {
-
-        this.helper = helper;
-        this.db = db;
-    }
-
-    @Override
-    public void upgrade() {
-        helper.upgradeFromAssignments(db);
+    override fun upgrade() {
+        helper.upgradeFromAssignments(db)
     }
 }

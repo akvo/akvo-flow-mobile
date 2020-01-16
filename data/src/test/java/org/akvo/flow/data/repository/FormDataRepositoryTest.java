@@ -31,6 +31,7 @@ import org.akvo.flow.data.entity.form.FormIdMapper;
 import org.akvo.flow.data.entity.form.XmlFormParser;
 import org.akvo.flow.data.net.RestApi;
 import org.akvo.flow.data.net.s3.AmazonAuthHelper;
+import org.akvo.flow.data.net.s3.BodyCreator;
 import org.akvo.flow.data.net.s3.S3RestApi;
 import org.akvo.flow.data.util.ApiUrls;
 import org.akvo.flow.domain.util.DeviceHelper;
@@ -60,6 +61,7 @@ import okhttp3.mockwebserver.MockWebServer;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -84,25 +86,22 @@ public class FormDataRepositoryTest {
     FormIdMapper mockFormIdMapper;
 
     @Mock
-    ApiFormHeader mockApiFormHeader;
-
-    @Mock
     DeviceHelper mockDeviceHelper;
 
     @Mock
     InputStream mockInputStream;
 
     @Mock
-    DateFormat mockDateFormat;
-
-    @Mock
-    AmazonAuthHelper mockAmazonAuth;
-
-    @Mock
     Cursor mockCursor;
 
     @Mock
     Form mockForm;
+
+    @Mock
+    DateFormat mockDateFormat;
+
+    @Mock
+    AmazonAuthHelper mockAmazonAuth;
 
     private MockWebServer mockWebServer;
     private FormDataRepository formDataRepository;
@@ -117,16 +116,19 @@ public class FormDataRepositoryTest {
         ApiUrls apiUrls = new ApiUrls(null, null);
         restApi = spy(new RestApi(mockDeviceHelper, new TestRestServiceFactory(),
                 "1.2.3", apiUrls));
-        s3RestApi = spy(new S3RestApi(new TestRestServiceFactory(), apiUrls, mockAmazonAuth, mockDateFormat, null));
+        s3RestApi = spy(
+                new S3RestApi(new TestRestServiceFactory(), apiUrls, mockAmazonAuth, mockDateFormat,
+                        new BodyCreator()));
+        doReturn("12-12-2012GMT").when(s3RestApi).formattedDate();
         DataSourceFactory dataSourceFactory = new DataSourceFactory(null, null,
                 mockDatabaseDataSource, null, mockFileDataSource, null);
         formDataRepository = new FormDataRepository(mockFormHeaderParser, mockXmlParser,
                 restApi, dataSourceFactory, mockFormIdMapper, s3RestApi);
 
-        when(mockFormHeaderParser.parseOne(anyString())).thenReturn(mockApiFormHeader);
+        ApiFormHeader apiFormHeader = new ApiFormHeader("123456", "", "", "", 1.0, "", true, "");
+        when(mockFormHeaderParser.parseOne(anyString())).thenReturn(apiFormHeader);
         when(mockFormHeaderParser.parseMultiple(anyString())).thenReturn(
-                Collections.<ApiFormHeader>emptyList());
-        when(mockApiFormHeader.getId()).thenReturn("123456");
+                Collections.emptyList());
         when(mockDateFormat
                 .format(any(Date.class), any(StringBuffer.class), any(FieldPosition.class)))
                 .thenReturn(new StringBuffer().append("12-12-2012"));
@@ -169,7 +171,7 @@ public class FormDataRepositoryTest {
 
         observer.assertNoErrors();
         observer.assertValueCount(1);
-        verify(s3RestApi, times(0)).downloadArchive(anyString());
+        verify(s3RestApi, times(0)).downloadArchive("123456.zip");
         verify(mockFileDataSource, times(0))
                 .extractRemoteArchive(any(ResponseBody.class), anyString());
     }
@@ -193,7 +195,7 @@ public class FormDataRepositoryTest {
 
         observer.assertNoErrors();
         observer.assertValueCount(1);
-        verify(s3RestApi, times(1)).downloadArchive(anyString());
+        verify(s3RestApi, times(1)).downloadArchive("123456.zip");
         verify(mockFileDataSource, times(1))
                 .extractRemoteArchive(any(ResponseBody.class), anyString());
     }

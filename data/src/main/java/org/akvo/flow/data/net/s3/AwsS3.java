@@ -59,4 +59,10 @@ public interface AwsS3 {
             @Path("file") String file,
             @Header("Date") String date,
             @Header("Authorization") String authorization);
+
+    @GET(S3_FILE_PATH)
+    Observable<ResponseBody> downloadImage(@Path("key") String key,
+            @Path("file") String file,
+            @Header("Date") String date,
+            @Header("Authorization") String authorization);
 }

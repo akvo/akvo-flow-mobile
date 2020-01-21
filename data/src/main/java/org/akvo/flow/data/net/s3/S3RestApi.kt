@@ -63,6 +63,17 @@ open class S3RestApi(
             })
     }
 
+    fun downloadImage(fileName: String): Observable<ResponseBody> {
+        val date = formattedDate()
+        val authorization = amazonAuthHelper
+            .getAmazonAuthForGet(date, PAYLOAD_GET, "$IMAGES_FOLDER/$fileName")
+        return createRetrofitService().downloadImage(IMAGES_FOLDER, fileName, date, authorization)
+            .onErrorResumeNext(fun(throwable: Throwable): Observable<ResponseBody> {
+                Timber.e(Exception(throwable), "Error downloading $fileName from s3")
+                return Observable.error(throwable)
+            })
+    }
+
     private fun uploadPublicFile(date: String, s3File: S3File): Observable<Response<ResponseBody>> {
         val authorization = amazonAuthHelper.getAmazonAuthForPut(date, PAYLOAD_PUT_PUBLIC, s3File)
         return createRetrofitService()
@@ -139,5 +150,6 @@ open class S3RestApi(
             "PUT\n%s\n%s\n%s\n/%s/%s" // md5, type, date, bucket, obj
         private const val PAYLOAD_GET = "GET\n\n\n%s\n/%s/%s" // date, bucket, obj
         private const val SURVEYS_FOLDER = "surveys"
+        private const val IMAGES_FOLDER = "images"
     }
 }

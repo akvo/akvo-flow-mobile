@@ -72,7 +72,7 @@ class DataPointDataRepositoryTest {
         `when`(mockDeviceHelper!!.androidId).thenReturn("")
         `when`(mockDeviceHelper!!.imei).thenReturn("")
         `when`(mockDeviceHelper!!.phoneNumber).thenReturn("")
-        spyRestApi = spy(RestApi(mockDeviceHelper, null, null, null))
+        spyRestApi = spy(RestApi(mockDeviceHelper, null, null, ""))
         `when`(mockDataSourceFactory.dataBaseDataSource).thenReturn(mockDatabaseDataSource)
     }
 

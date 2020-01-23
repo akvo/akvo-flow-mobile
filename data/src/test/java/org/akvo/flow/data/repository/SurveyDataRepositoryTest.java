@@ -24,18 +24,17 @@ import android.database.Cursor;
 
 import org.akvo.flow.data.datasource.DataSourceFactory;
 import org.akvo.flow.data.datasource.DatabaseDataSource;
-import org.akvo.flow.data.entity.form.FormIdMapper;
 import org.akvo.flow.data.entity.S3File;
 import org.akvo.flow.data.entity.Transmission;
 import org.akvo.flow.data.entity.TransmissionMapper;
 import org.akvo.flow.data.entity.UploadError;
 import org.akvo.flow.data.entity.UploadFormDeletedError;
 import org.akvo.flow.data.entity.UploadSuccess;
+import org.akvo.flow.data.entity.form.FormIdMapper;
 import org.akvo.flow.data.net.RestApi;
 import org.akvo.flow.data.net.s3.AmazonAuthHelper;
 import org.akvo.flow.data.net.s3.BodyCreator;
 import org.akvo.flow.data.net.s3.S3RestApi;
-import org.akvo.flow.data.util.ApiUrls;
 import org.akvo.flow.domain.util.DeviceHelper;
 import org.junit.After;
 import org.junit.Before;
@@ -124,10 +123,10 @@ public class SurveyDataRepositoryTest {
                 .thenReturn(Observable.just(mockCursor));
 
         RestApi restApi = new RestApi(mockDeviceHelper, new TestRestServiceFactory(),
-                "1.2.3", new ApiUrls("", ""));
+                "1.2.3", "");
 
         S3RestApi s3RestApi = new S3RestApi(new TestRestServiceFactory(),
-                new ApiUrls("", ""), mockAmazonAuth, mockDateFormat, mockBodyCreator);
+                mockAmazonAuth, mockDateFormat, mockBodyCreator, "");
         when(mockDateFormat
                 .format(any(Date.class), any(StringBuffer.class), any(FieldPosition.class)))
                 .thenReturn(new StringBuffer().append("12-12-2012"));

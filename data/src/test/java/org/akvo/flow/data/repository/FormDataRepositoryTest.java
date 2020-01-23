@@ -33,7 +33,6 @@ import org.akvo.flow.data.net.RestApi;
 import org.akvo.flow.data.net.s3.AmazonAuthHelper;
 import org.akvo.flow.data.net.s3.BodyCreator;
 import org.akvo.flow.data.net.s3.S3RestApi;
-import org.akvo.flow.data.util.ApiUrls;
 import org.akvo.flow.domain.util.DeviceHelper;
 import org.junit.After;
 import org.junit.Before;
@@ -113,12 +112,11 @@ public class FormDataRepositoryTest {
         mockWebServer = new MockWebServer();
         mockWebServer.start(8080);
 
-        ApiUrls apiUrls = new ApiUrls(null, null);
         restApi = spy(new RestApi(mockDeviceHelper, new TestRestServiceFactory(),
-                "1.2.3", apiUrls));
+                "1.2.3", ""));
         s3RestApi = spy(
-                new S3RestApi(new TestRestServiceFactory(), apiUrls, mockAmazonAuth, mockDateFormat,
-                        new BodyCreator()));
+                new S3RestApi(new TestRestServiceFactory(), mockAmazonAuth, mockDateFormat,
+                        new BodyCreator(), ""));
         doReturn("12-12-2012GMT").when(s3RestApi).formattedDate();
         DataSourceFactory dataSourceFactory = new DataSourceFactory(null, null,
                 mockDatabaseDataSource, null, mockFileDataSource, null);

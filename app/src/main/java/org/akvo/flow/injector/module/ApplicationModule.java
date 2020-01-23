@@ -48,7 +48,6 @@ import org.akvo.flow.data.repository.MissingAndDeletedDataRepository;
 import org.akvo.flow.data.repository.SetupDataRepository;
 import org.akvo.flow.data.repository.SurveyDataRepository;
 import org.akvo.flow.data.repository.UserDataRepository;
-import org.akvo.flow.data.util.ApiUrls;
 import org.akvo.flow.database.DatabaseHelper;
 import org.akvo.flow.database.LanguageTable;
 import org.akvo.flow.database.SurveyLanguagesDataSource;
@@ -242,24 +241,18 @@ public class ApplicationModule {
 
     @Provides
     @Singleton
-    RestApi provideRestApi(DeviceHelper deviceHelper, RestServiceFactory serviceFactory,
-            ApiUrls apiUrls) {
-        return new RestApi(deviceHelper, serviceFactory, BuildConfig.VERSION_NAME, apiUrls);
+    RestApi provideRestApi(DeviceHelper deviceHelper, RestServiceFactory serviceFactory) {
+        return new RestApi(deviceHelper, serviceFactory, BuildConfig.VERSION_NAME,
+                BuildConfig.SERVER_BASE);
     }
 
     @Provides
     @Singleton
-    S3RestApi provideS3RestApi( RestServiceFactory serviceFactory, ApiUrls apiUrls, AmazonAuthHelper amazonAuthHelper,
+    S3RestApi provideS3RestApi(RestServiceFactory serviceFactory, AmazonAuthHelper amazonAuthHelper,
             BodyCreator bodyCreator) {
         final DateFormat df = new SimpleDateFormat(REST_API_DATE_PATTERN, Locale.US);
         df.setTimeZone(TimeZone.getTimeZone(TIMEZONE));
-        return new S3RestApi(serviceFactory, apiUrls, amazonAuthHelper, df, bodyCreator);
-    }
-
-    @Provides
-    @Singleton
-    ApiUrls provideApiUrls() {
-        return new ApiUrls(BuildConfig.SERVER_BASE,
+        return new S3RestApi(serviceFactory, amazonAuthHelper, df, bodyCreator,
                 "https://" + BuildConfig.AWS_BUCKET + ".s3.amazonaws.com");
     }
 

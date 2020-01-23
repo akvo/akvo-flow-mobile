@@ -20,15 +20,11 @@
 
 package org.akvo.flow.data.util;
 
-import javax.inject.Singleton;
-
-@Singleton
 public class ApiUrls {
     public static final String DATA_POINTS = "/datapoints";
     public static final String DEVICE_NOTIFICATION = "/devicenotification";
     public static final String PROCESSING_NOTIFICATION = "processor";
     public static final String S3_FILE_PATH = "/{key}/{file}";
-    public static final String SURVEY_GROUP = "surveyGroupId";
     public static final String PHONE_NUMBER = "phoneNumber";
     public static final String IMEI = "imei";
     public static final String TIMESTAMP = "ts";
@@ -47,20 +43,4 @@ public class ApiUrls {
 
     public static final String FORM_HEADER_PATH = "/surveymanager?action=getSurveyHeader";
     public static final String FORMS_HEADER_PATH = "/surveymanager?action=getAvailableSurveysDevice";
-
-    private final String gaeUrl;
-    private final String s3Url;
-
-    public ApiUrls(String gaeUrl, String s3Url) {
-        this.gaeUrl = gaeUrl;
-        this.s3Url = s3Url;
-    }
-
-    public String getGaeUrl() {
-        return gaeUrl;
-    }
-
-    public String getS3Url() {
-        return s3Url;
-    }
 }

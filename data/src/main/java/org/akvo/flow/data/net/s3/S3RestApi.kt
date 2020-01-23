@@ -24,7 +24,6 @@ import okhttp3.ResponseBody
 import org.akvo.flow.data.entity.S3File
 import org.akvo.flow.data.entity.Transmission
 import org.akvo.flow.data.net.RestServiceFactory
-import org.akvo.flow.data.util.ApiUrls
 import retrofit2.HttpException
 import retrofit2.Response
 import timber.log.Timber
@@ -34,9 +33,10 @@ import javax.inject.Singleton
 
 @Singleton
 open class S3RestApi(
-    private val serviceFactory: RestServiceFactory, private val apiUrls: ApiUrls,
+    private val serviceFactory: RestServiceFactory,
     private val amazonAuthHelper: AmazonAuthHelper, private val dateFormat: DateFormat,
-    private val bodyCreator: BodyCreator
+    private val bodyCreator: BodyCreator,
+    private val baseUrl: String
 ) {
 
     fun uploadFile(transmission: Transmission): Observable<Response<ResponseBody>> {
@@ -90,7 +90,7 @@ open class S3RestApi(
     }
 
     private fun createRetrofitService(): AwsS3 {
-        return serviceFactory.createRetrofitService(AwsS3::class.java, apiUrls.s3Url)
+        return serviceFactory.createRetrofitService(AwsS3::class.java, baseUrl)
     }
 
     private fun uploadPrivateFile(

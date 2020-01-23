@@ -27,7 +27,6 @@ import org.akvo.flow.BuildConfig
 import org.akvo.flow.data.net.RestServiceFactory
 import org.akvo.flow.data.net.S3User
 import org.akvo.flow.data.net.SignatureHelper
-import org.akvo.flow.data.util.ApiUrls
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -41,7 +40,6 @@ import java.util.TimeZone
 class S3RestApiTest {
 
     private lateinit var serviceFactory: RestServiceFactory
-    private lateinit var apiUrls: ApiUrls
     private lateinit var amazonAuthHelper: AmazonAuthHelper
 
     @Before
@@ -53,9 +51,6 @@ class S3RestApiTest {
         val okHttpClient = httpClient2.build()
 
         serviceFactory = RestServiceFactory(null, okHttpClient)
-        apiUrls = ApiUrls("",
-            "https://${BuildConfig.AWS_BUCKET}.s3.amazonaws.com"
-        )
         val s3User = S3User(
             BuildConfig.AWS_BUCKET,
             BuildConfig.AWS_ACCESS_KEY_ID,
@@ -70,7 +65,9 @@ class S3RestApiTest {
             SimpleDateFormat(REST_API_DATE_PATTERN, Locale.US)
         df.timeZone = TimeZone.getTimeZone("GMT")
         val s3RestApi =
-            S3RestApi(serviceFactory, apiUrls, amazonAuthHelper, df, BodyCreator())
+            S3RestApi(serviceFactory, amazonAuthHelper, df, BodyCreator(),
+                baseUrl()
+            )
 
         val observer = TestObserver<ResponseBody>()
         s3RestApi.downloadImage("6af199a2-a507-4def-ad97-b81f944c9929.jpg").subscribe(observer)
@@ -84,13 +81,17 @@ class S3RestApiTest {
             SimpleDateFormat(REST_API_DATE_PATTERN, Locale.US)
         df.timeZone = TimeZone.getTimeZone("GMT")
         val s3RestApi =
-            S3RestApi(serviceFactory, apiUrls, amazonAuthHelper, df, BodyCreator())
+            S3RestApi(serviceFactory, amazonAuthHelper, df, BodyCreator(),
+                baseUrl()
+            )
 
         val observer = TestObserver<ResponseBody>()
         s3RestApi.downloadArchive("10029122.zip").subscribe(observer)
 
         observer.assertNoErrors()
     }
+
+    private fun baseUrl() = "https://" + BuildConfig.AWS_BUCKET + ".s3.amazonaws.com"
 
     private fun createHttpClient(loggingInterceptor: HttpLoggingInterceptor): OkHttpClient.Builder {
         val httpClient = OkHttpClient.Builder()

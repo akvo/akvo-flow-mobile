@@ -24,7 +24,6 @@ import org.akvo.flow.data.datasource.DataSourceFactory;
 import org.akvo.flow.data.datasource.DatabaseDataSource;
 import org.akvo.flow.data.entity.FilesResultMapper;
 import org.akvo.flow.data.net.RestApi;
-import org.akvo.flow.data.util.ApiUrls;
 import org.akvo.flow.domain.util.DeviceHelper;
 import org.junit.After;
 import org.junit.Before;
@@ -78,7 +77,7 @@ public class MissingAndDeletedDataRepositoryTest {
                 mockDatabaseDataSource, null, null, null);
 
         RestApi restApi = new RestApi(mockDeviceHelper, new TestRestServiceFactory(),
-                "1.2.3", new ApiUrls(null, null));
+                "1.2.3", "");
 
         missingAndDeletedDataRepository = spy(new MissingAndDeletedDataRepository(restApi,
                 new FilesResultMapper(), dataSourceFactory));

@@ -27,7 +27,6 @@ import org.akvo.flow.data.net.gae.DataPointDownloadService;
 import org.akvo.flow.data.net.gae.DeviceFilesService;
 import org.akvo.flow.data.net.gae.FlowApiService;
 import org.akvo.flow.data.net.gae.ProcessingNotificationService;
-import org.akvo.flow.data.util.ApiUrls;
 import org.akvo.flow.domain.util.DeviceHelper;
 
 import java.util.List;
@@ -44,29 +43,30 @@ public class RestApi {
     private final String phoneNumber;
     private final RestServiceFactory serviceFactory;
     private final String version;
-    private final ApiUrls apiUrls;
+    private final String baseUrl;
 
     public RestApi(DeviceHelper deviceHelper, RestServiceFactory serviceFactory, String version,
-            ApiUrls apiUrls) {
+            String baseUrl) {
         this.androidId = deviceHelper.getAndroidId();
         this.imei = deviceHelper.getImei();
         this.phoneNumber = deviceHelper.getPhoneNumber();
         this.serviceFactory = serviceFactory;
         this.version = version;
-        this.apiUrls = apiUrls;
+        this.baseUrl = baseUrl;
     }
 
     @SuppressWarnings("unchecked")
     public Single<ApiLocaleResult> downloadDataPoints(long surveyId) {
+
         return serviceFactory.createRetrofitServiceWithInterceptor(DataPointDownloadService.class,
-                apiUrls.getGaeUrl()).getAssignedDataPoints(androidId, surveyId + "")
+                baseUrl).getAssignedDataPoints(androidId, surveyId + "")
                 .onErrorResumeNext(new ErrorLoggerFunction(
                         "Error downloading datapoints for survey: " + surveyId));
     }
 
     @SuppressWarnings("unchecked")
     public Observable<ApiFilesResult> getPendingFiles(List<String> formIds, String deviceId) {
-        return serviceFactory.createRetrofitService(DeviceFilesService.class, apiUrls.getGaeUrl())
+        return serviceFactory.createRetrofitService(DeviceFilesService.class, baseUrl)
                 .getFilesLists(phoneNumber, androidId, imei, version, deviceId, formIds)
                 .onErrorResumeNext(new ErrorLoggerFunction(
                         "Error getting device pending files"));
@@ -76,7 +76,7 @@ public class RestApi {
     public Observable<?> notifyFileAvailable(String action, String formId,
             String filename, String deviceId) {
         return serviceFactory
-                .createRetrofitService(ProcessingNotificationService.class, apiUrls.getGaeUrl())
+                .createRetrofitService(ProcessingNotificationService.class, baseUrl)
                 .notifyFileAvailable(action, formId, filename, phoneNumber, androidId, imei,
                         version, deviceId)
                 .onErrorResumeNext(new ErrorLoggerFunction(
@@ -85,7 +85,7 @@ public class RestApi {
 
     @SuppressWarnings("unchecked")
     public Observable<ApiApkData> loadApkData(String appVersion) {
-        return serviceFactory.createRetrofitService(FlowApiService.class, apiUrls.getGaeUrl())
+        return serviceFactory.createRetrofitService(FlowApiService.class, baseUrl)
                 .loadApkData(appVersion)
                 .onErrorResumeNext(new ErrorLoggerFunction(
                         "Error downloading apk data for version " + appVersion));
@@ -94,7 +94,7 @@ public class RestApi {
     @SuppressWarnings("unchecked")
     public Observable<String> downloadFormHeader(String formId, String deviceId) {
         return serviceFactory
-                .createScalarsRetrofitService(FlowApiService.class, apiUrls.getGaeUrl())
+                .createScalarsRetrofitService(FlowApiService.class, baseUrl)
                 .downloadFormHeader(formId, phoneNumber, androidId, imei, version, deviceId)
                 .onErrorResumeNext(new ErrorLoggerFunction(
                         "Error downloading form " + formId + " header"));
@@ -103,7 +103,7 @@ public class RestApi {
     @SuppressWarnings("unchecked")
     public Observable<String> downloadFormsHeader(String deviceId) {
         return serviceFactory
-                .createScalarsRetrofitService(FlowApiService.class, apiUrls.getGaeUrl())
+                .createScalarsRetrofitService(FlowApiService.class, baseUrl)
                 .downloadFormsHeader(phoneNumber, androidId, imei, version, deviceId)
                 .onErrorResumeNext(new ErrorLoggerFunction("Error downloading all form headers"));
     }

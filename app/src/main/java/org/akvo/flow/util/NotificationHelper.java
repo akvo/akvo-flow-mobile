@@ -119,12 +119,12 @@ public class NotificationHelper {
         createPendingNotification(context, title, R.string.sync_service_notification_ticker);
     }
 
-    private static void createPendingNotification(Context context, String title, int p) {
+    private static void createPendingNotification(Context context, String title, int tickerRes) {
         NotificationCompat.Builder b = new NotificationCompat.Builder(context,
                 ConstantUtil.NOTIFICATION_CHANNEL_ID)
                 .setSmallIcon(R.drawable.notification_icon)
                 .setContentTitle(title)
-                .setTicker(context.getString(p))
+                .setTicker(context.getString(tickerRes))
                 .setProgress(0, 0, true)
                 .setColor(ContextCompat.getColor(context, R.color.orange_main))
                 .setOngoing(true);

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2019 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2020 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -28,6 +28,7 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.material.appbar.AppBarLayout;
 
@@ -35,13 +36,13 @@ import org.akvo.flow.BuildConfig;
 import org.akvo.flow.R;
 import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.injector.component.ApplicationComponent;
-import org.akvo.flow.uicomponents.BackActivity;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
-import org.akvo.flow.uicomponents.SnackBarManager;
-import org.akvo.flow.service.DataPointUploadWorker;
+import org.akvo.flow.service.DataFixWorker;
 import org.akvo.flow.tracking.TrackingHelper;
 import org.akvo.flow.ui.Navigator;
+import org.akvo.flow.uicomponents.BackActivity;
+import org.akvo.flow.uicomponents.SnackBarManager;
 
 import java.util.Arrays;
 import java.util.List;
@@ -184,7 +185,9 @@ public class PreferenceActivity extends BackActivity implements PreferenceView,
         if (trackingHelper != null) {
             trackingHelper.logUploadDataEvent();
         }
-        DataPointUploadWorker.scheduleUpload(getApplicationContext(), enableDataSc.isChecked());
+        Toast.makeText(getApplicationContext(), R.string.data_upload_will_start_message,
+                Toast.LENGTH_LONG).show();
+        DataFixWorker.scheduleWork(getApplicationContext(), enableDataSc.isChecked());
         finish();
     }
 

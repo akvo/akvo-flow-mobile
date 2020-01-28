@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2019 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2018-2020 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -86,7 +86,7 @@ public class DataPointUploadWorker extends Worker {
     public Result doWork() {
         NotificationHelper.showSyncingNotification(getApplicationContext());
         checkDeviceNotification();
-        NotificationHelper.hideSyncingNotification(getApplicationContext());
+        NotificationHelper.hidePendingNotification(getApplicationContext());
         return Result.success();
     }
 

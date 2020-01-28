@@ -27,11 +27,19 @@ import org.akvo.flow.domain.interactor.CheckSubmittedFiles;
 import org.akvo.flow.domain.interactor.ExportSurveyInstances;
 import org.akvo.flow.domain.interactor.MakeDataPrivate;
 import org.akvo.flow.util.ConstantUtil;
+import org.akvo.flow.util.NotificationHelper;
+
+import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 
 import androidx.annotation.NonNull;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.work.Constraints;
+import androidx.work.ExistingWorkPolicy;
+import androidx.work.NetworkType;
+import androidx.work.OneTimeWorkRequest;
+import androidx.work.WorkManager;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 import io.reactivex.observers.DisposableCompletableObserver;
@@ -56,9 +64,36 @@ public class DataFixWorker extends Worker {
         application.getApplicationComponent().inject(this);
     }
 
+    public static void scheduleWork(Context context, boolean isMobileSyncAllowed) {
+        OneTimeWorkRequest dataFixRequest = new OneTimeWorkRequest
+                .Builder(DataFixWorker.class)
+                .setInitialDelay(0, TimeUnit.SECONDS)
+                .addTag(DataFixWorker.TAG)
+                .build();
+        final NetworkType requiredNetwork = isMobileSyncAllowed ?
+                NetworkType.CONNECTED : //require a connection to a network
+                NetworkType.UNMETERED; //require a connection to a wifi network
+        Constraints uploadConstraints = new Constraints.Builder()
+                .setRequiredNetworkType(requiredNetwork)
+                .build();
+        OneTimeWorkRequest uploadWorkRequest = new OneTimeWorkRequest.Builder(
+                DataPointUploadWorker.class)
+                .setInitialDelay(0, TimeUnit.SECONDS)
+                .setConstraints(uploadConstraints)
+                .addTag(DataPointUploadWorker.TAG)
+                .build();
+        WorkManager instance = WorkManager.getInstance(context.getApplicationContext());
+        instance.cancelAllWorkByTag(DataPointUploadWorker.TAG);
+        instance
+                .beginUniqueWork(DataFixWorker.TAG, ExistingWorkPolicy.REPLACE, dataFixRequest)
+                .then(uploadWorkRequest)
+                .enqueue();
+    }
+
     @NonNull
     @Override
     public Result doWork() {
+        NotificationHelper.showCheckingNotification(getApplicationContext());
         makeDataPrivate.execute(new DisposableCompletableObserver() {
             @Override
             public void onComplete() {
@@ -100,18 +135,19 @@ public class DataFixWorker extends Worker {
         exportSurveyInstances.execute(new DisposableCompletableObserver() {
             @Override
             public void onComplete() {
-                broadcastDataPointStatusChange();
+                onWorkComplete();
             }
 
             @Override
             public void onError(Throwable e) {
                 Timber.e(e);
-                broadcastDataPointStatusChange();
+                onWorkComplete();
             }
         });
     }
 
-    private void broadcastDataPointStatusChange() {
+    private void onWorkComplete() {
+        NotificationHelper.hidePendingNotification(getApplicationContext());
         Intent intentBroadcast = new Intent(ConstantUtil.ACTION_DATA_SYNC);
         LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intentBroadcast);
     }

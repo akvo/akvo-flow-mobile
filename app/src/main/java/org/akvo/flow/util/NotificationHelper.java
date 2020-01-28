@@ -26,17 +26,18 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
-import androidx.core.app.NotificationCompat;
-import androidx.core.app.TaskStackBuilder;
-import androidx.core.content.ContextCompat;
 import android.text.TextUtils;
 
 import org.akvo.flow.R;
 import org.akvo.flow.activity.SurveyActivity;
 
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.TaskStackBuilder;
+import androidx.core.content.ContextCompat;
+
 public class NotificationHelper {
 
-    private static final int SYNCING_NOTIFICATION_ID = 1235;
+    private static final int PENDING_WORK_NOTIFICATION_ID = 1235;
 
     private NotificationHelper() {
     }
@@ -115,21 +116,30 @@ public class NotificationHelper {
 
     public static void showSyncingNotification(Context context) {
         String title = context.getString(R.string.sync_service_notification_title);
+        createPendingNotification(context, title, R.string.sync_service_notification_ticker);
+    }
+
+    private static void createPendingNotification(Context context, String title, int p) {
         NotificationCompat.Builder b = new NotificationCompat.Builder(context,
                 ConstantUtil.NOTIFICATION_CHANNEL_ID)
                 .setSmallIcon(R.drawable.notification_icon)
                 .setContentTitle(title)
-                .setTicker(context.getString(R.string.sync_service_notification_ticker))
+                .setTicker(context.getString(p))
                 .setProgress(0, 0, true)
                 .setColor(ContextCompat.getColor(context, R.color.orange_main))
                 .setOngoing(true);
-        notifyWithDummyIntent(context, SYNCING_NOTIFICATION_ID, b);
+        notifyWithDummyIntent(context, PENDING_WORK_NOTIFICATION_ID, b);
     }
 
-    public static void hideSyncingNotification(Context context) {
+    public static void showCheckingNotification(Context context) {
+        String title = context.getString(R.string.check_service_notification_title);
+        createPendingNotification(context, title, R.string.check_service_notification_ticker);
+    }
+
+    public static void hidePendingNotification(Context context) {
         NotificationManager notificationManager =
                 (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        notificationManager.cancel(SYNCING_NOTIFICATION_ID);
+        notificationManager.cancel(PENDING_WORK_NOTIFICATION_ID);
     }
 
     private static void notifyWithDummyIntent(Context context, int notificationId,

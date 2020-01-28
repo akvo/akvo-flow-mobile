@@ -86,7 +86,7 @@ public class DataPointUploadWorker extends Worker {
     public Result doWork() {
         NotificationHelper.showSyncingNotification(getApplicationContext());
         checkDeviceNotification();
-        NotificationHelper.hideSyncingNotification(getApplicationContext());
+        NotificationHelper.hidePendingNotification(getApplicationContext());
         return Result.success();
     }
 

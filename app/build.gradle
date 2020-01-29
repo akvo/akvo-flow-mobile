@@ -3,6 +3,7 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'com.getkeepsafe.dexcount'
 apply plugin: 'io.fabric'
+apply from: rootProject.file("jacoco.gradle")
 
 dexcount {
     enabled = !project.hasProperty("nodexcount")
@@ -12,10 +13,7 @@ loadProperties()
 
 def loadProperties() {
     def file = hasProperty('file') ? file : 'survey.properties'
-    println "Survey config file: " + file
-
-    Properties surveyProps = readProperties(file)
-    project.ext.surveyProps = surveyProps
+    project.ext.surveyProps = readProperties(file)
 }
 
 android {
@@ -113,6 +111,7 @@ android {
         debug {
             minifyEnabled true
             multiDexEnabled true
+            testCoverageEnabled true
             proguardFile 'proguard-files/proguard-rules.pro'
             proguardFile 'proguard-files/proguard-butterknife.pro'
             proguardFile 'proguard-files/proguard-glide.pro'
@@ -172,12 +171,18 @@ android {
     }
 
     testOptions {
-        unitTests.returnDefaultValues = true
-    }
-
-    testOptions.unitTests.all {
-        testLogging {
-            events 'passed', 'skipped', 'failed', 'standardOut', 'standardError'
+        animationsDisabled true
+        unitTests {
+            includeAndroidResources = true
+            returnDefaultValues = true
+            all {
+                testLogging {
+                    events 'passed', 'skipped', 'failed', 'standardOut', 'standardError'
+                }
+                jacoco {
+                    includeNoLocationClasses = true
+                }
+            }
         }
     }
 

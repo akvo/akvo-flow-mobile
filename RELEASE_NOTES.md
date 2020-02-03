@@ -1,5 +1,18 @@
 Akvo FLOW app release notes
 ===========================
+# ver 2.8.5
+Date: 29 January 2020
+
+* **Add code coverage reports** - [#681](https://github.com/akvo/akvo-flow-mobile/issues/681)
+* **Use https for flow support url** - [#1463](https://github.com/akvo/akvo-flow-mobile/issues/1463)
+* **Move crashes to firebase crashlytics** - [#1531](https://github.com/akvo/akvo-flow-mobile/issues/1531)
+* **Remove the need for password on Flow app** - [#1532](https://github.com/akvo/akvo-flow-mobile/issues/1532)
+* **Make sure to close the cascade database** - [#1535](https://github.com/akvo/akvo-flow-mobile/issues/1535)
+* **Crash in WebView with android 5** - [#1551](https://github.com/akvo/akvo-flow-mobile/issues/1551)
+* **Optimize builds** - [#1553](https://github.com/akvo/akvo-flow-mobile/issues/1553)
+* **Datapoint submission stuck in Submitted state** - [#1572](https://github.com/akvo/akvo-flow-mobile/issues/1572)
+
+---------------
 # ver 2.8.4
 Date: 18 December 2019
 

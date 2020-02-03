@@ -1,0 +1,7 @@
+<component name="CopyrightManager">
+  <settings default="Akvo Flow Copyright">
+    <module2copyright>
+      <element module="java" copyright="Akvo Flow Copyright" />
+    </module2copyright>
+  </settings>
+</component>

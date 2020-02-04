@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2019-2020 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -39,15 +39,12 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.DateFormat;
-import java.text.FieldPosition;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -125,11 +122,6 @@ public class FormDataRepositoryTest {
 
         ApiFormHeader apiFormHeader = new ApiFormHeader("123456", "", "", "", 1.0, "", true, "");
         when(mockFormHeaderParser.parseOne(anyString())).thenReturn(apiFormHeader);
-        when(mockFormHeaderParser.parseMultiple(anyString())).thenReturn(
-                Collections.emptyList());
-        when(mockDateFormat
-                .format(any(Date.class), any(StringBuffer.class), any(FieldPosition.class)))
-                .thenReturn(new StringBuffer().append("12-12-2012"));
         when(mockAmazonAuth.getAmazonAuthForGet(anyString(), anyString(), anyString()))
                 .thenReturn("123");
         when(mockDatabaseDataSource.insertSurveyGroup(any(ApiFormHeader.class)))

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2019-2020 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -41,15 +41,13 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import java.io.File;
 import java.io.IOException;
-import java.text.FieldPosition;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -127,19 +125,12 @@ public class SurveyDataRepositoryTest {
 
         S3RestApi s3RestApi = new S3RestApi(new TestRestServiceFactory(),
                 mockAmazonAuth, mockDateFormat, mockBodyCreator, "");
-        when(mockDateFormat
-                .format(any(Date.class), any(StringBuffer.class), any(FieldPosition.class)))
-                .thenReturn(new StringBuffer().append("12-12-2012"));
 
         when(mockAmazonAuth.getAmazonAuthForPut(anyString(), anyString(), any(S3File.class)))
                 .thenReturn("123");
 
         surveyDataRepository = new SurveyDataRepository(mockDataSourceFactory, null, restApi,
                 null, null, null, mockTransmissionMapper, null, mockFormIdMapper, null, s3RestApi);
-
-        when(mockDeviceHelper.getPhoneNumber()).thenReturn("123");
-        when(mockDeviceHelper.getImei()).thenReturn("123");
-        when(mockDeviceHelper.getAndroidId()).thenReturn("123");
 
         when(mockBodyCreator.createBody(any(S3File.class))).thenReturn(mockBody);
 

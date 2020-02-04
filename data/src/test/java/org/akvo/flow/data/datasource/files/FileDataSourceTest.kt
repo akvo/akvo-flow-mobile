@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2019-2020 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -24,14 +24,14 @@ import org.akvo.flow.data.util.FileHelper
 import org.akvo.flow.data.util.FlowFileBrowser
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.Matchers.any
+import org.mockito.ArgumentMatchers.any
 import org.mockito.Mock
 import org.mockito.Mockito.`when`
 import org.mockito.Mockito.anyString
 import org.mockito.Mockito.spy
 import org.mockito.Mockito.times
 import org.mockito.Mockito.verify
-import org.mockito.runners.MockitoJUnitRunner
+import org.mockito.junit.MockitoJUnitRunner
 import java.io.File
 import kotlin.test.assertEquals
 
@@ -139,9 +139,7 @@ class FileDataSourceTest {
 
     @Test
     fun moveAndDeleteFolderShouldCompleteSuccessfullyForEmptyFolder() {
-        `when`(mockFolder!!.exists()).thenReturn(true)
         val listOfFiles = emptyArray<File>()
-        `when`(mockFolder!!.listFiles()).thenReturn(listOfFiles)
 
         val fileDataSource = spy(FileDataSource(mockFileHelper, mockFlowFileBrowser, null))
 
@@ -153,9 +151,7 @@ class FileDataSourceTest {
 
     @Test
     fun moveAndDeleteFolderShouldNoDeleteIfNotAllFilesWereMoved() {
-        `when`(mockFolder!!.exists()).thenReturn(true)
         val listOfFiles = arrayOf(mockFile, mockFile)
-        `when`(mockFolder!!.listFiles()).thenReturn(listOfFiles)
 
         val fileDataSource = spy(FileDataSource(mockFileHelper, mockFlowFileBrowser, null))
         `when`(fileDataSource!!.moveFiles(any(), anyString())).thenReturn(1)
@@ -168,9 +164,7 @@ class FileDataSourceTest {
 
     @Test
     fun moveAndDeleteFolderShouldCompleteSuccessfullyForNonEmptyFolder() {
-        `when`(mockFolder!!.exists()).thenReturn(true)
         val listOfFiles = arrayOf(mockFile, mockFile)
-        `when`(mockFolder!!.listFiles()).thenReturn(listOfFiles)
 
         val fileDataSource = spy(FileDataSource(mockFileHelper, mockFlowFileBrowser, null))
         `when`(fileDataSource!!.moveFiles(any(), anyString())).thenReturn(2)

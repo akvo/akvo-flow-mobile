@@ -23,7 +23,7 @@ import org.akvo.flow.data.entity.ApiDataPoint
 import java.io.File
 import javax.inject.Inject
 
-class DataPointImageMapper @Inject constructor() {
+open class DataPointImageMapper @Inject constructor() {
 
     fun getImagesList(dataPoints: List<ApiDataPoint>): List<String> {
         val images = mutableListOf<String>()

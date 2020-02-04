@@ -26,6 +26,7 @@ import org.akvo.flow.data.util.Constants;
 import org.akvo.flow.data.util.ExternalStorageHelper;
 import org.akvo.flow.data.util.FileHelper;
 import org.akvo.flow.data.util.FlowFileBrowser;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -82,6 +83,14 @@ public class FileDataSource {
             return Observable.error(new Exception("Error copying file: " + originFilePath));
         }
         return Observable.just(true);
+    }
+
+    @NotNull
+    public Completable saveRemoteImageFile(@NotNull String filename,
+            @NotNull ResponseBody responseBody) {
+        File folder = flowFileBrowser.getExistingInternalFolder(FlowFileBrowser.DIR_MEDIA);
+        fileHelper.saveRemoteFile(responseBody, new File(folder, filename));
+        return Completable.complete();
     }
 
     @VisibleForTesting

@@ -18,10 +18,15 @@
  */
 package org.akvo.flow.data.repository
 
+import io.reactivex.Completable
+import io.reactivex.Observable
 import io.reactivex.Single
 import org.akvo.flow.data.datasource.DataSourceFactory
+import org.akvo.flow.data.entity.ApiDataPoint
 import org.akvo.flow.data.entity.ApiLocaleResult
+import org.akvo.flow.data.entity.images.DataPointImageMapper
 import org.akvo.flow.data.net.RestApi
+import org.akvo.flow.data.net.s3.S3RestApi
 import org.akvo.flow.domain.exception.AssignmentRequiredException
 import org.akvo.flow.domain.repository.DataPointRepository
 import retrofit2.HttpException
@@ -30,7 +35,9 @@ import javax.inject.Inject
 
 class DataPointDataRepository @Inject constructor(
     private val dataSourceFactory: DataSourceFactory,
-    private val restApi: RestApi
+    private val restApi: RestApi,
+    private val s3RestApi: S3RestApi,
+    private val mapper: DataPointImageMapper
 ) : DataPointRepository {
 
     override fun downloadDataPoints(surveyGroupId: Long): Single<Int> {
@@ -57,6 +64,19 @@ class DataPointDataRepository @Inject constructor(
     private fun syncDataPoints(apiLocaleResult: ApiLocaleResult, surveyGroupId: Long): Single<Int> {
         return dataSourceFactory.dataBaseDataSource
             .syncDataPoints(apiLocaleResult.dataPoints, surveyGroupId)
+            .andThen(downLoadImages(apiLocaleResult.dataPoints))
             .andThen(Single.just(apiLocaleResult.dataPoints.size))
+    }
+
+    private fun downLoadImages(dataPoints: List<ApiDataPoint>): Completable {
+        val images: List<String> = mapper.getImagesList(dataPoints)
+        return Observable.fromIterable(images)
+            .flatMapCompletable { image -> downLoadImage(image) }
+    }
+
+    private fun downLoadImage(filename: String): Completable {
+        return s3RestApi.downloadImage(filename).flatMapCompletable { responseBody ->
+            dataSourceFactory.fileDataSource.saveRemoteImageFile(filename, responseBody)
+        }
     }
 }

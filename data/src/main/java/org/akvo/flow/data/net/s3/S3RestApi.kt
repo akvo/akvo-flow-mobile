@@ -20,6 +20,7 @@ package org.akvo.flow.data.net.s3
 
 import android.text.TextUtils
 import io.reactivex.Observable
+import io.reactivex.Single
 import okhttp3.ResponseBody
 import org.akvo.flow.data.entity.S3File
 import org.akvo.flow.data.entity.Transmission
@@ -63,14 +64,14 @@ open class S3RestApi(
             })
     }
 
-    fun downloadImage(fileName: String): Observable<ResponseBody> {
+    fun downloadImage(fileName: String): Single<ResponseBody> {
         val date = formattedDate()
         val authorization = amazonAuthHelper
             .getAmazonAuthForGet(date, PAYLOAD_GET, "$IMAGES_FOLDER/$fileName")
         return createRetrofitService().downloadImage(IMAGES_FOLDER, fileName, date, authorization)
-            .onErrorResumeNext(fun(throwable: Throwable): Observable<ResponseBody> {
+            .onErrorResumeNext(fun(throwable: Throwable): Single<ResponseBody> {
                 Timber.e(Exception(throwable), "Error downloading $fileName from s3")
-                return Observable.error(throwable)
+                return Single.error(throwable)
             })
     }
 

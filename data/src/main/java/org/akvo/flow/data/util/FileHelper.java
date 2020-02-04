@@ -207,6 +207,11 @@ public class FileHelper {
         close(inputStream);
     }
 
+    public void saveRemoteFile(ResponseBody responseBody, File filePath) {
+        InputStream inputStream = responseBody.byteStream();
+        saveStreamToFile(inputStream, filePath);
+    }
+
     public boolean validFile(File file) {
         return file.exists() && validZipFile(file);
     }

@@ -91,16 +91,16 @@ public class FormDataRepositoryTest {
     InputStream mockInputStream;
 
     @Mock
-    Cursor mockCursor;
-
-    @Mock
-    Form mockForm;
-
-    @Mock
     DateFormat mockDateFormat;
 
     @Mock
     AmazonAuthHelper mockAmazonAuth;
+
+    @Mock
+    Cursor mockCursor;
+
+    @Mock
+    Form mockForm;
 
     private MockWebServer mockWebServer;
     private FormDataRepository formDataRepository;

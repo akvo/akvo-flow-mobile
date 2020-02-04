@@ -20,7 +20,6 @@
 package org.akvo.flow.data.entity.images
 
 import org.akvo.flow.data.entity.ApiDataPoint
-import org.akvo.flow.data.entity.ApiQuestionAnswer
 import java.io.File
 import javax.inject.Inject
 
@@ -28,11 +27,11 @@ class DataPointImageMapper @Inject constructor() {
 
     fun getImagesList(dataPoints: List<ApiDataPoint>): List<String> {
         val images = mutableListOf<String>()
-        for (d in dataPoints) {
-            for (i in d.surveyInstances) {
-                for (a in i.qasList) {
-                    if (!a.answer.isNullOrBlank() && ("IMAGE" == a.type)) {
-                        images.add(cleanImageName(a))
+        dataPoints.forEach { dataPoint ->
+            dataPoint.surveyInstances.forEach { surveyInstance ->
+                surveyInstance.qasList.forEach { questionAnswer ->
+                    if (!questionAnswer.answer.isNullOrBlank() && ("IMAGE" == questionAnswer.type)) {
+                        images.add(cleanImageName(questionAnswer.answer))
                     }
                 }
             }
@@ -40,11 +39,14 @@ class DataPointImageMapper @Inject constructor() {
         return images
     }
 
-    private fun cleanImageName(a: ApiQuestionAnswer): String {
-        var filename: String = a.answer
-        if (a.answer.contains(File.separator)) {
-            filename = a.answer.substring(a.answer.lastIndexOf(File.separator) + 1)
+    private fun cleanImageName(answer: String): String {
+        return when {
+            answer.contains(File.separator) -> {
+                answer.substring(answer.lastIndexOf(File.separator) + 1)
+            }
+            else -> {
+                answer
+            }
         }
-        return filename
     }
 }

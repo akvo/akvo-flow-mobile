@@ -32,7 +32,7 @@ local.properties
 !.idea/copyright/
 .gradle/
 build/
-gradle.properties
+app/gradle.properties
 
 #Builds
 builds/
@@ -51,7 +51,6 @@ captures/
 build_config
 .env.default
 akvo-flow-server-config/
-app/fabric.properties
 akvoflowapp-firebase-adminsdk*
 
 #bitrise

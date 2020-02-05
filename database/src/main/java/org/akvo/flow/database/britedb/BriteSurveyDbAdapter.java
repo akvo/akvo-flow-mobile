@@ -210,8 +210,7 @@ public class BriteSurveyDbAdapter {
                         " OR " + SurveyInstanceColumns.STATUS + " == "
                         + SurveyInstanceStatus.DOWNLOADED + ")";
 
-        int numberOfDeletedPoints = briteDatabase.delete(Tables.RECORD, whereClause);
-        Timber.d("%s datapoints deleted", numberOfDeletedPoints);
+        briteDatabase.delete(Tables.RECORD, whereClause);
     }
 
     /**

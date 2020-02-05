@@ -59,7 +59,7 @@ android {
         }
 
         flowRelease {
-            if (RELEASE_STORE_FILE) {
+            if (project.hasProperty('RELEASE_STORE_FILE')) {
                 storeFile file(RELEASE_STORE_FILE)
                 storePassword RELEASE_STORE_PASSWORD
                 keyAlias RELEASE_KEY_ALIAS

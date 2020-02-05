@@ -20,13 +20,13 @@
 
 package org.akvo.flow.util.image;
 
-        import android.widget.ImageView;
+import android.widget.ImageView;
 
-        import org.akvo.flow.domain.util.ImageSize;
+import org.akvo.flow.domain.util.ImageSize;
 
-        import java.io.File;
+import java.io.File;
 
-        import androidx.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 public interface ImageLoader {
 

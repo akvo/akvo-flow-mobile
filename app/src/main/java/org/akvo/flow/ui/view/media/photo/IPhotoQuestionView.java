@@ -35,4 +35,8 @@ public interface IPhotoQuestionView {
     void updateResponse(String localFilePath);
 
     void displayLocationInfo();
+
+    void displayThumbnail();
+
+    void showImageError();
 }

@@ -51,6 +51,12 @@ class DataPointDataRepository @Inject constructor(
             })
     }
 
+    override fun downLoadImage(filename: String): Completable {
+        return s3RestApi.downloadMedia(filename).flatMapCompletable { responseBody ->
+            dataSourceFactory.fileDataSource.saveRemoteMediaFile(filename, responseBody)
+        }
+    }
+
     private fun isErrorForbidden(throwable: Throwable): Boolean {
         return (throwable is HttpException
             && throwable.code() == HttpURLConnection.HTTP_FORBIDDEN)
@@ -72,11 +78,5 @@ class DataPointDataRepository @Inject constructor(
         val images: List<String> = mapper.getImagesList(dataPoints)
         return Observable.fromIterable(images)
             .flatMapCompletable { image -> downLoadImage(image) }
-    }
-
-    private fun downLoadImage(filename: String): Completable {
-        return s3RestApi.downloadImage(filename).flatMapCompletable { responseBody ->
-            dataSourceFactory.fileDataSource.saveRemoteImageFile(filename, responseBody)
-        }
     }
 }

@@ -18,8 +18,10 @@
  */
 package org.akvo.flow.domain.repository
 
+import io.reactivex.Completable
 import io.reactivex.Single
 
 interface DataPointRepository {
     fun downloadDataPoints(surveyGroupId: Long): Single<Int>
+    fun downLoadImage(filename: String): Completable
 }

@@ -32,7 +32,6 @@ import android.widget.TextView;
 
 import org.akvo.flow.R;
 import org.akvo.flow.activity.FormActivity;
-import org.akvo.flow.async.MediaSyncTask;
 import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionResponse;
 import org.akvo.flow.domain.response.value.Location;
@@ -41,10 +40,10 @@ import org.akvo.flow.event.QuestionInteractionEvent;
 import org.akvo.flow.event.SurveyListener;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
-import org.akvo.flow.uicomponents.SnackBarManager;
 import org.akvo.flow.serialization.response.value.MediaValue;
 import org.akvo.flow.ui.Navigator;
 import org.akvo.flow.ui.view.QuestionView;
+import org.akvo.flow.uicomponents.SnackBarManager;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.ImageUtil;
 import org.akvo.flow.util.StoragePermissionsHelper;
@@ -68,7 +67,7 @@ import butterknife.OnClick;
  * @author Christopher Fagiani
  */
 public class PhotoQuestionView extends QuestionView
-        implements MediaSyncTask.DownloadListener, IPhotoQuestionView {
+        implements IPhotoQuestionView {
 
     @Inject
     SnackBarManager snackBarManager;
@@ -185,10 +184,7 @@ public class PhotoQuestionView extends QuestionView
 
     @OnClick(R.id.media_download)
     void onImageDownloadClick() {
-        showLoading();
-
-        MediaSyncTask downloadTask = new MediaSyncTask(new File(mMedia.getFilename()), this);
-        downloadTask.execute();
+        presenter.downloadMedia(mMedia.getFilename());
     }
 
     @Override
@@ -298,7 +294,8 @@ public class PhotoQuestionView extends QuestionView
         return super.isValid();
     }
 
-    private void displayThumbnail() {
+    @Override
+    public void displayThumbnail() {
         hideDownloadViews();
 
         File file = rebuildFilePath();
@@ -317,15 +314,6 @@ public class PhotoQuestionView extends QuestionView
     private void hideDownloadViews() {
         mProgressBar.setVisibility(View.GONE);
         mDownloadBtn.setVisibility(View.GONE);
-    }
-
-    @Override
-    public void onResourceDownload(boolean done) {
-        if (!done) {
-            showImageError();
-        }
-        displayThumbnail();
-        displayLocationInfo();
     }
 
     @Override
@@ -349,15 +337,16 @@ public class PhotoQuestionView extends QuestionView
         }
     }
 
+    @Override
+    public void showImageError() {
+        snackBarManager.displaySnackBar(this, R.string.error_img_preview, getContext());
+    }
+
     private void displayLocation(double latitude, double longitude) {
         String locationText = getContext()
                 .getString(R.string.image_location_coordinates, latitude + "", longitude + "");
         mLocationInfo.setText(locationText);
         mLocationInfo.setVisibility(VISIBLE);
-    }
-
-    private void showImageError() {
-        snackBarManager.displaySnackBar(this, R.string.error_img_preview, getContext());
     }
 
     /**

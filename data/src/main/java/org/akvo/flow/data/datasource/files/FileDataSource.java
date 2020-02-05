@@ -86,7 +86,7 @@ public class FileDataSource {
     }
 
     @NotNull
-    public Completable saveRemoteImageFile(@NotNull String filename,
+    public Completable saveRemoteMediaFile(@NotNull String filename,
             @NotNull ResponseBody responseBody) {
         File folder = flowFileBrowser.getExistingInternalFolder(FlowFileBrowser.DIR_MEDIA);
         fileHelper.saveRemoteFile(responseBody, new File(folder, filename));

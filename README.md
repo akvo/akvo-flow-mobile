@@ -21,7 +21,7 @@ To set up your development environment you'll need:
 ## Building the app
 
 * Before building the app, ensure the corresponding `survey.properties` file is located in `app/`.
-* You will need to set up the `gradle.properties` file in the `app` module. Just copy the sample `gradle.properties.template` file without the *.template* extension, and edit the values according to your local environment.
+* In order to build for release, you will need to set up the `gradle.properties` file in the `app` module. Just copy the sample `gradle.properties.template` file without the *.template* extension, and edit the values according to your local environment.
 * To build a **release** version of the app, for example for the **flow** flavour: `./gradlew assembleFlowRelease` (or simply `./gradlew aFR`). The generated APK will be located in the `app/build/outputs/apk/flow/release/` folder.
 
 ## Contributing

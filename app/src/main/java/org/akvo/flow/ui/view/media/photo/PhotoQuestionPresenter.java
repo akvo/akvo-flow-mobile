@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2019 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2018-2020 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -45,10 +45,11 @@ import timber.log.Timber;
 public class PhotoQuestionPresenter implements Presenter {
 
     private final UseCase saveResizedImage;
-    private final MediaFileHelper mediaFileHelper;
-    private IPhotoQuestionView view;
-    private final MediaMapper mediaMapper;
     private final DownloadMedia downloadMediaUseCase;
+    private final MediaFileHelper mediaFileHelper;
+    private final MediaMapper mediaMapper;
+
+    private IPhotoQuestionView view;
 
     @Inject
     public PhotoQuestionPresenter(@Named("copyResizedImage") UseCase saveResizedImage,

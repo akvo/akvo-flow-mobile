@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2019 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2014-2020 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -64,10 +64,8 @@ import butterknife.OnClick;
  * Question type that supports taking a picture with the
  * device's on-board camera.
  *
- * @author Christopher Fagiani
  */
-public class PhotoQuestionView extends QuestionView
-        implements IPhotoQuestionView {
+public class PhotoQuestionView extends QuestionView implements IPhotoQuestionView {
 
     @Inject
     SnackBarManager snackBarManager;

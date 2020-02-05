@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2018,2020 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -29,4 +29,8 @@ public interface IVideoQuestionView {
     void hideLoading();
 
     void displayThumbnail(String videoFilePath);
+
+    void displayThumbnail();
+
+    void showVideoLoadError();
 }

@@ -73,7 +73,7 @@ public class PhotoQuestionPresenter implements Presenter {
     public void downloadMedia(String filename) {
         view.showLoading();
         Map<String, Object> params = new HashMap<>(2);
-        params.put(DownloadMedia.PARAM_FILE_NAME, filename);
+        params.put(DownloadMedia.PARAM_FILE_PATH, filename);
         downloadMediaUseCase.execute(new DisposableCompletableObserver() {
             @Override
             public void onComplete() {

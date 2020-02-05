@@ -20,10 +20,10 @@
 package org.akvo.flow.data.entity.images
 
 import org.akvo.flow.data.entity.ApiDataPoint
-import java.io.File
+import org.akvo.flow.data.util.MediaHelper
 import javax.inject.Inject
 
-open class DataPointImageMapper @Inject constructor() {
+open class DataPointImageMapper @Inject constructor(private val mediaHelper: MediaHelper) {
 
     fun getImagesList(dataPoints: List<ApiDataPoint>): List<String> {
         val images = mutableListOf<String>()
@@ -31,22 +31,11 @@ open class DataPointImageMapper @Inject constructor() {
             dataPoint.surveyInstances.forEach { surveyInstance ->
                 surveyInstance.qasList.forEach { questionAnswer ->
                     if (!questionAnswer.answer.isNullOrBlank() && ("IMAGE" == questionAnswer.type)) {
-                        images.add(cleanImageName(questionAnswer.answer))
+                        images.add(mediaHelper.cleanMediaFileName(questionAnswer.answer))
                     }
                 }
             }
         }
         return images
-    }
-
-    private fun cleanImageName(answer: String): String {
-        return when {
-            answer.contains(File.separator) -> {
-                answer.substring(answer.lastIndexOf(File.separator) + 1)
-            }
-            else -> {
-                answer
-            }
-        }
     }
 }

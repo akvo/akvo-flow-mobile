@@ -16,12 +16,22 @@
  * You should have received a copy of the GNU General Public License
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.akvo.flow.domain.repository
 
-import io.reactivex.Completable
-import io.reactivex.Single
+package org.akvo.flow.data.util
 
-interface DataPointRepository {
-    fun downloadDataPoints(surveyGroupId: Long): Single<Int>
-    fun cleanPathAndDownLoadMedia(filename: String): Completable
+import java.io.File
+import javax.inject.Inject
+
+open class MediaHelper @Inject constructor() {
+
+    fun cleanMediaFileName(answer: String): String {
+        return when {
+            answer.contains(File.separator) -> {
+                answer.substring(answer.lastIndexOf(File.separator) + 1)
+            }
+            else -> {
+                answer
+            }
+        }
+    }
 }

@@ -52,11 +52,11 @@ class DownloadMedia @Inject constructor(
     }
 
     private fun <T> buildUseCaseObservable(parameters: Map<String?, T>?): Completable {
-        if (parameters == null || !parameters.containsKey(PARAM_FILE_NAME)) {
+        if (parameters == null || !parameters.containsKey(PARAM_FILE_PATH)) {
             return Completable.error(IllegalArgumentException("Missing file name"))
         }
-        val filename = parameters[PARAM_FILE_NAME] as String
-        return dataPointRepository.downLoadImage(filename)
+        val filePath = parameters[PARAM_FILE_PATH] as String
+        return dataPointRepository.cleanPathAndDownLoadMedia(filePath)
     }
 
     private fun addDisposable(disposable: Disposable) {
@@ -64,6 +64,6 @@ class DownloadMedia @Inject constructor(
     }
 
     companion object {
-        const val PARAM_FILE_NAME = "data_point_id"
+        const val PARAM_FILE_PATH = "data_point_id"
     }
 }

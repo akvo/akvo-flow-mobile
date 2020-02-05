@@ -20,11 +20,13 @@
 
 package org.akvo.flow.ui.view.media.photo;
 
+import org.akvo.flow.domain.response.value.Media;
+
 public interface IPhotoQuestionView {
 
     void showLoading();
 
-    void displayImage(String mediaFilePath);
+    void displayImage(Media media);
 
     void hideLoading();
 

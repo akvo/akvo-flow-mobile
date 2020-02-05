@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<survey name="RepeatedForm" defaultLanguageCode="en" version='1.0' app="akvoflowsandbox"
+        surveyGroupId="207569117" surveyGroupName="RepeatedGroup" surveyId="200389118">
+    <questionGroup repeatable="true">
+        <heading>RepeatedTextGroup</heading>
+        <question order="1" type="free" mandatory="true" localeNameFlag="false" id="205929118">
+            <text>RepeatedTextQuestion</text>
+        </question>
+        <question order="2" type="scan" mandatory="true" localeNameFlag="false" id="205929119">
+            <text>RepeatedBarcode</text>
+        </question>
+    </questionGroup>
+</survey>

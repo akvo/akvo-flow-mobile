@@ -50,7 +50,7 @@ import org.akvo.flow.offlinemaps.domain.entity.DomainOfflineArea;
 import org.akvo.flow.offlinemaps.presentation.OfflineMapSelectedListener;
 import org.akvo.flow.offlinemaps.presentation.dialog.OfflineMapsDialog;
 import org.akvo.flow.offlinemaps.presentation.infowindow.InfoWindowLayout;
-import org.akvo.flow.presentation.SnackBarManager;
+import org.akvo.flow.uicomponents.SnackBarManager;
 import org.akvo.flow.presentation.UserDeleteConfirmationDialog;
 import org.akvo.flow.presentation.entity.ViewApkData;
 import org.akvo.flow.presentation.navigation.CreateUserDialog;
@@ -63,7 +63,6 @@ import org.akvo.flow.presentation.survey.FABListener;
 import org.akvo.flow.presentation.survey.SurveyPresenter;
 import org.akvo.flow.presentation.survey.SurveyView;
 import org.akvo.flow.service.BootstrapService;
-import org.akvo.flow.service.DataFixService;
 import org.akvo.flow.service.SurveyDownloadService;
 import org.akvo.flow.service.TimeCheckService;
 import org.akvo.flow.tracking.TrackingHelper;
@@ -71,6 +70,7 @@ import org.akvo.flow.tracking.TrackingListener;
 import org.akvo.flow.ui.Navigator;
 import org.akvo.flow.ui.fragment.DatapointsFragment;
 import org.akvo.flow.ui.fragment.RecordListListener;
+import org.akvo.flow.uicomponents.LocaleAwareActivity;
 import org.akvo.flow.util.AppPermissionsHelper;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.StatusUtil;
@@ -85,7 +85,6 @@ import javax.inject.Named;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.ActionBarDrawerToggle;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.view.GravityCompat;
@@ -97,7 +96,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import timber.log.Timber;
 
-public class SurveyActivity extends AppCompatActivity implements RecordListListener,
+public class SurveyActivity extends LocaleAwareActivity implements RecordListListener,
         FlowNavigationView.DrawerNavigationListener,
         SurveyDeleteConfirmationDialog.SurveyDeleteListener, UserOptionsDialog.UserOptionListener,
         UserDeleteConfirmationDialog.UserDeleteListener, EditUserDialog.EditUserListener,
@@ -154,7 +153,6 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     private boolean activityJustCreated;
     private boolean permissionsResults;
     private TrackingHelper trackingHelper;
-    private boolean dataFixServiceStarted = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -263,6 +261,7 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == ConstantUtil.FORM_FILLING_REQUEST && resultCode == RESULT_OK) {
             snackBarManager.displaySnackBar(rootLayout, R.string.snackbar_submitted, this);
         }
@@ -385,10 +384,6 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     private void startServices() {
         startService(new Intent(this, BootstrapService.class));
         startService(new Intent(this, TimeCheckService.class));
-        if (!dataFixServiceStarted) {
-            DataFixService.enqueueWork(getApplicationContext(), new Intent());
-            dataFixServiceStarted = true;
-        }
     }
 
     private void displayExternalStorageMissing() {
@@ -400,6 +395,7 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
 
     @Override
     protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
         setIntent(intent);
         if (Intent.ACTION_VIEW.equals(intent.getAction())) {
             String surveyedLocaleId = intent.getDataString();

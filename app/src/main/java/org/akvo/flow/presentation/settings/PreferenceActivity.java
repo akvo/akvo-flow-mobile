@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2019 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2020 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -20,35 +20,29 @@
 
 package org.akvo.flow.presentation.settings;
 
-import android.content.res.Configuration;
-import android.content.res.Resources;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
-import androidx.annotation.StringRes;
-import com.google.android.material.appbar.AppBarLayout;
-import androidx.fragment.app.DialogFragment;
-import androidx.core.content.ContextCompat;
-import androidx.appcompat.widget.SwitchCompat;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.google.android.material.appbar.AppBarLayout;
 
 import org.akvo.flow.BuildConfig;
 import org.akvo.flow.R;
-import org.akvo.flow.activity.BackActivity;
+import org.akvo.flow.app.FlowApp;
+import org.akvo.flow.injector.component.ApplicationComponent;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
-import org.akvo.flow.presentation.SnackBarManager;
-import org.akvo.flow.presentation.settings.passcode.PassCodeDeleteAllDialog;
-import org.akvo.flow.presentation.settings.passcode.PassCodeDeleteCollectedDialog;
-import org.akvo.flow.presentation.settings.passcode.PassCodeDownloadFormDialog;
-import org.akvo.flow.presentation.settings.passcode.PassCodeReloadFormsDialog;
-import org.akvo.flow.service.DataPointUploadService;
+import org.akvo.flow.service.DataFixWorker;
 import org.akvo.flow.tracking.TrackingHelper;
 import org.akvo.flow.ui.Navigator;
+import org.akvo.flow.uicomponents.BackActivity;
+import org.akvo.flow.uicomponents.SnackBarManager;
 
 import java.util.Arrays;
 import java.util.List;
@@ -56,6 +50,10 @@ import java.util.Locale;
 
 import javax.inject.Inject;
 
+import androidx.annotation.StringRes;
+import androidx.appcompat.widget.SwitchCompat;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.DialogFragment;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnCheckedChanged;
@@ -63,10 +61,6 @@ import butterknife.OnClick;
 import butterknife.OnItemSelected;
 
 public class PreferenceActivity extends BackActivity implements PreferenceView,
-        PassCodeDeleteCollectedDialog.PassCodeDeleteCollectedListener,
-        PassCodeDeleteAllDialog.PassCodeDeleteAllListener,
-        PassCodeDownloadFormDialog.PassCodeDownloadFormListener,
-        PassCodeReloadFormsDialog.PassCodeReloadFormsListener,
         DeleteResponsesWarningDialog.DeleteResponsesListener,
         DeleteAllWarningDialog.DeleteAllListener, DownloadFormDialog.DownloadFormListener,
         ReloadFormsConfirmationDialog.ReloadFormsListener {
@@ -115,6 +109,7 @@ public class PreferenceActivity extends BackActivity implements PreferenceView,
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_preference);
+        setTitle(R.string.settings);
         ButterKnife.bind(this);
         initializeInjector();
         setupToolBar();
@@ -123,7 +118,7 @@ public class PreferenceActivity extends BackActivity implements PreferenceView,
         languages = Arrays.asList(getResources().getStringArray(R.array.app_language_codes));
         presenter.setView(this);
         trackingHelper = new TrackingHelper(this);
-        presenter.loadPreferences(languages);
+        presenter.loadPreferences(languages, getLocale().getLanguage());
     }
 
     private void setUpToolBarAnimationListener() {
@@ -170,6 +165,15 @@ public class PreferenceActivity extends BackActivity implements PreferenceView,
         viewComponent.inject(this);
     }
 
+    /**
+     * Get the Main Application component for dependency injection.
+     *
+     * @return {@link ApplicationComponent}
+     */
+    private ApplicationComponent getApplicationComponent() {
+        return ((FlowApp) getApplication()).getApplicationComponent();
+    }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -181,7 +185,9 @@ public class PreferenceActivity extends BackActivity implements PreferenceView,
         if (trackingHelper != null) {
             trackingHelper.logUploadDataEvent();
         }
-        DataPointUploadService.scheduleUpload(getApplicationContext(), enableDataSc.isChecked());
+        Toast.makeText(getApplicationContext(), R.string.data_upload_will_start_message,
+                Toast.LENGTH_LONG).show();
+        DataFixWorker.scheduleWork(getApplicationContext(), enableDataSc.isChecked());
         finish();
     }
 
@@ -192,8 +198,7 @@ public class PreferenceActivity extends BackActivity implements PreferenceView,
         if (trackingHelper != null) {
             trackingHelper.logDeleteDataPressed();
         }
-        DialogFragment newFragment = PassCodeDeleteCollectedDialog.newInstance();
-        newFragment.show(getSupportFragmentManager(), PassCodeDeleteCollectedDialog.TAG);
+        presenter.deleteCollectedData();
     }
 
     @OnClick({ R.id.preference_delete_everything_title,
@@ -203,8 +208,7 @@ public class PreferenceActivity extends BackActivity implements PreferenceView,
         if (trackingHelper != null) {
             trackingHelper.logDeleteAllPressed();
         }
-        DialogFragment newFragment = PassCodeDeleteAllDialog.newInstance();
-        newFragment.show(getSupportFragmentManager(), PassCodeDeleteAllDialog.TAG);
+        presenter.deleteAllData();
     }
 
     @OnClick({ R.id.preference_download_form_title,
@@ -214,19 +218,19 @@ public class PreferenceActivity extends BackActivity implements PreferenceView,
         if (trackingHelper != null) {
             trackingHelper.logDownloadFormPressed();
         }
-        DialogFragment newFragment = PassCodeDownloadFormDialog.newInstance();
-        newFragment.show(getSupportFragmentManager(), PassCodeDownloadFormDialog.TAG);
+        DialogFragment newFragment = DownloadFormDialog.newInstance();
+        newFragment.show(getSupportFragmentManager(), DownloadFormDialog.TAG);
     }
 
     @OnClick({ R.id.preference_reload_forms_title,
             R.id.preference_reload_forms_subtitle
     })
-    void onReloadAllSurveysOptionTap() {
+    void onReloadAllFormsOptionTap() {
         if (trackingHelper != null) {
             trackingHelper.logDownloadFormsPressed();
         }
-        DialogFragment newFragment = PassCodeReloadFormsDialog.newInstance();
-        newFragment.show(getSupportFragmentManager(), PassCodeReloadFormsDialog.TAG);
+        DialogFragment newFragment = ReloadFormsConfirmationDialog.newInstance();
+        newFragment.show(getSupportFragmentManager(), ReloadFormsConfirmationDialog.TAG);
     }
 
     @OnClick(R.id.preference_gps_fixes)
@@ -271,7 +275,8 @@ public class PreferenceActivity extends BackActivity implements PreferenceView,
             if (trackingHelper != null) {
                 trackingHelper.logLanguageChanged(languages.get(position));
             }
-            presenter.saveAppLanguage(position, languages);
+            final String language = languages.get(position);
+            updateLocale(new Locale(language));
         }
     }
 
@@ -310,49 +315,7 @@ public class PreferenceActivity extends BackActivity implements PreferenceView,
      * Delay enabling listeners in order to give ui time to draw spinners
      */
     private void delayListeners() {
-        appLanguageSp.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                listenersEnabled = true;
-            }
-        }, 500);
-    }
-
-    @Override
-    public void displayLanguageChanged(String languageCode) {
-        updateLocale(languageCode);
-        showMessage(R.string.please_restart);
-    }
-
-    private void updateLocale(String languageCode) {
-        Locale locale = new Locale(languageCode);
-        Locale.setDefault(locale);
-        Resources resources = getBaseContext().getResources();
-        Configuration config = resources.getConfiguration();
-        config.locale = locale;
-        resources.updateConfiguration(config, null);
-    }
-
-    @Override
-    public void deleteCollectedData() {
-        presenter.deleteCollectedData();
-    }
-
-    @Override
-    public void deleteAllData() {
-        presenter.deleteAllData();
-    }
-
-    @Override
-    public void downloadForm() {
-        DialogFragment newFragment = DownloadFormDialog.newInstance();
-        newFragment.show(getSupportFragmentManager(), DownloadFormDialog.TAG);
-    }
-
-    @Override
-    public void reloadForms() {
-        DialogFragment newFragment = ReloadFormsConfirmationDialog.newInstance();
-        newFragment.show(getSupportFragmentManager(), ReloadFormsConfirmationDialog.TAG);
+        appLanguageSp.postDelayed(() -> listenersEnabled = true, 500);
     }
 
     @Override

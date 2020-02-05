@@ -34,7 +34,6 @@ import org.akvo.flow.R;
 import org.akvo.flow.activity.AddUserActivity;
 import org.akvo.flow.activity.AppUpdateActivity;
 import org.akvo.flow.activity.FormActivity;
-import org.akvo.flow.activity.GeoshapeActivity;
 import org.akvo.flow.activity.SurveyActivity;
 import org.akvo.flow.activity.TransmissionHistoryActivity;
 import org.akvo.flow.domain.SurveyGroup;
@@ -45,6 +44,7 @@ import org.akvo.flow.presentation.about.AboutActivity;
 import org.akvo.flow.presentation.datapoints.map.one.DataPointMapActivity;
 import org.akvo.flow.presentation.entity.ViewApkData;
 import org.akvo.flow.presentation.geoshape.ViewGeoShapeActivity;
+import org.akvo.flow.presentation.geoshape.create.CreateGeoShapeActivity;
 import org.akvo.flow.presentation.help.HelpActivity;
 import org.akvo.flow.presentation.legal.LegalNoticesActivity;
 import org.akvo.flow.presentation.record.RecordActivity;
@@ -175,7 +175,7 @@ public class Navigator {
     }
 
     public void navigateToCreateGeoShapeActivity(@NonNull Activity activity, @Nullable Bundle data) {
-        Intent i = new Intent(activity, GeoshapeActivity.class);
+        Intent i = new Intent(activity, CreateGeoShapeActivity.class);
         if (data != null) {
             i.putExtras(data);
         }

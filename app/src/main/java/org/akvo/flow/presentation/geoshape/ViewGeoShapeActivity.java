@@ -23,138 +23,75 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.mapbox.geojson.Feature;
-import com.mapbox.geojson.FeatureCollection;
-import com.mapbox.geojson.Geometry;
-import com.mapbox.geojson.LineString;
-import com.mapbox.geojson.MultiPoint;
-import com.mapbox.geojson.Point;
-import com.mapbox.geojson.Polygon;
-import com.mapbox.mapboxsdk.camera.CameraUpdate;
-import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
-import com.mapbox.mapboxsdk.geometry.LatLng;
-import com.mapbox.mapboxsdk.geometry.LatLngBounds;
-import com.mapbox.mapboxsdk.maps.MapView;
-import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.Style;
-import com.mapbox.mapboxsdk.style.layers.CircleLayer;
-import com.mapbox.mapboxsdk.style.layers.FillLayer;
-import com.mapbox.mapboxsdk.style.layers.LineLayer;
-import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 
 import org.akvo.flow.R;
-import org.akvo.flow.activity.BackActivity;
+import org.akvo.flow.app.FlowApp;
+import org.akvo.flow.injector.component.ApplicationComponent;
+import org.akvo.flow.uicomponents.BackActivity;
+import org.akvo.flow.injector.component.DaggerViewComponent;
+import org.akvo.flow.injector.component.ViewComponent;
+import org.akvo.flow.offlinemaps.presentation.geoshapes.GeoShapesMapViewImpl;
+import org.akvo.flow.presentation.geoshape.entities.FeatureMapper;
+import org.akvo.flow.presentation.geoshape.entities.Shape;
+import org.akvo.flow.presentation.geoshape.entities.ViewFeatures;
 import org.akvo.flow.util.ConstantUtil;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import androidx.annotation.NonNull;
-import timber.log.Timber;
-
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.circleColor;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.circleRadius;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.circleStrokeColor;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.circleStrokeWidth;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.fillColor;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.lineColor;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.lineWidth;
+import javax.inject.Inject;
 
 public class ViewGeoShapeActivity extends BackActivity {
 
-    private static final String CIRCLE_SOURCE_ID = "circle-source-id";
-    private static final String FILL_SOURCE_ID = "fill-source-id";
-    private static final String LINE_SOURCE_ID = "line-source-id";
-    private static final String CIRCLE_LAYER_ID = "circle-layer-id";
-    private static final String FILL_LAYER_ID = "fill-layer-polygon-id";
-    private static final String LINE_LAYER_ID = "line-layer-id";
-    private static final int FILL_COLOR = 0x88736357;
-    private static final int LINE_COLOR = 0xEE736357;
-    private static final int POINT_COLOR = 0xFF736357;
-    private static final int POINT_LINE_COLOR = 0xFF5B5048;
+    private GeoShapesMapViewImpl mapView;
 
-    private MapView mapView;
-    private MapboxMap mapboxMap;
+    private ViewFeatures viewFeatures = new ViewFeatures(new ArrayList<>(), new ArrayList<>(),
+            new ArrayList<>());
 
-    private Style.OnStyleLoaded callback = this::updateSources;
-    private FeatureCollection features;
-    private LatLngBounds latLngBounds;
+    @Inject
+    FeatureMapper featureMapper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_geo_shape);
+        initializeInjector();
         setupToolBar();
         setUpFeatures();
         setUpMapView(savedInstanceState);
     }
 
+    private void initializeInjector() {
+        ViewComponent viewComponent =
+                DaggerViewComponent.builder()
+                        .applicationComponent(getApplicationComponent())
+                        .build();
+        viewComponent.inject(this);
+    }
+
+    /**
+     * Get the Main Application component for dependency injection.
+     *
+     * @return {@link ApplicationComponent}
+     */
+    private ApplicationComponent getApplicationComponent() {
+        return ((FlowApp) getApplication()).getApplicationComponent();
+    }
+
     private void setUpMapView(Bundle savedInstanceState) {
-        mapView = findViewById(org.akvo.flow.offlinemaps.R.id.mapView);
+        mapView = findViewById(R.id.mapView);
         mapView.onCreate(savedInstanceState);
-        mapView.getMapAsync(mapboxMap -> {
-            this.mapboxMap = mapboxMap;
-            mapboxMap.setStyle(Style.OUTDOORS, callback);
+        mapView.getMapAsyncWithCallback(() -> {
+            mapView.initSources(viewFeatures.getFeatures(), viewFeatures.getPointFeatures());
+            mapView.centerMap(viewFeatures.getListOfCoordinates());
         });
     }
 
     private void setUpFeatures() {
         String geoJSON = getIntent().getStringExtra(ConstantUtil.GEOSHAPE_RESULT);
-        Timber.d(geoJSON);
-        features = geoJSON == null ?
-                FeatureCollection.fromFeatures(new Feature[0]) :
-                FeatureCollection.fromJson(geoJSON);
-
-        List<Feature> features = this.features.features();
-        if (features != null && !features.isEmpty()) {
-            LatLngBounds.Builder builder = new LatLngBounds.Builder();
-            for (Feature feature : features) {
-                Geometry geometry = feature.geometry();
-                if (geometry instanceof Polygon) {
-                    List<List<Point>> coordinates = ((Polygon) geometry).coordinates();
-                    for (List<Point> points : coordinates) {
-                        for (Point p : points) {
-                            builder.include(new LatLng(p.latitude(), p.longitude()));
-                        }
-                    }
-                } else if (geometry instanceof LineString) {
-                    List<Point> coordinates = ((LineString) geometry).coordinates();
-                    builder.includes(getListOfCoordinates(coordinates));
-                } else if (geometry instanceof MultiPoint) {
-                    List<Point> coordinates = ((MultiPoint) geometry).coordinates();
-                    builder.includes(getListOfCoordinates(coordinates));
-                }
-            }
-            latLngBounds = builder.build();
-        }
-    }
-
-    private void updateSources(Style style) {
-        GeoJsonSource circleSource = initCircleSource(style, features);
-        GeoJsonSource fillSource = initFillSource(style, features);
-        GeoJsonSource lineSource = initLineSource(style, features);
-
-        initFillLayer(style);
-        initLineLayer(style);
-        initCircleLayer(style);
-
-        fillSource.setGeoJson(features);
-        lineSource.setGeoJson(features);
-        circleSource.setGeoJson(features);
-
-        if (latLngBounds != null) {
-            CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngBounds(latLngBounds, 100);
-            mapboxMap.animateCamera(cameraUpdate, 400);
-        }
-    }
-
-    private List<LatLng> getListOfCoordinates(List<Point> coordinates) {
-        List<LatLng> latLngs = new ArrayList<>();
-        for (Point p : coordinates) {
-            LatLng latLng = new LatLng(p.latitude(), p.longitude());
-            latLngs.add(latLng);
-        }
-        return latLngs;
+        final List<Shape> shapes = featureMapper.toShapes(geoJSON);
+        viewFeatures = featureMapper.toViewFeatures(shapes);
     }
 
     @Override
@@ -165,25 +102,30 @@ public class ViewGeoShapeActivity extends BackActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (mapboxMap != null) {
-            switch (item.getItemId()) {
-                case R.id.map_normal:
-                    mapboxMap.setStyle(Style.LIGHT, callback);
-                    break;
-                case R.id.map_satellite:
-                    mapboxMap.setStyle(Style.SATELLITE_STREETS, callback);
-                    break;
-                case R.id.map_terrain:
-                    mapboxMap.setStyle(Style.OUTDOORS, callback);
-                    break;
-                case android.R.id.home:
-                    onBackPressed();
-                    break;
-                default:
-                    break;
-            }
+        switch (item.getItemId()) {
+            case R.id.map_normal:
+                updateMapStyle(Style.LIGHT);
+                break;
+            case R.id.map_satellite:
+                updateMapStyle(Style.SATELLITE_STREETS);
+                break;
+            case R.id.map_terrain:
+                updateMapStyle(Style.OUTDOORS);
+                break;
+            case android.R.id.home:
+                onBackPressed();
+                break;
+            default:
+                break;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void updateMapStyle(String style) {
+        mapView.updateMapStyle(style, callback -> {
+            mapView.initSources(viewFeatures.getFeatures(), viewFeatures.getFeatures());
+            mapView.centerMap(viewFeatures.getListOfCoordinates());
+        });
     }
 
     @Override
@@ -226,72 +168,5 @@ public class ViewGeoShapeActivity extends BackActivity {
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         mapView.onSaveInstanceState(outState);
-    }
-
-    /**
-     * Set up the FillLayer for showing the set boundaries' polygons
-     */
-    private void initFillLayer(@NonNull Style loadedMapStyle) {
-        FillLayer fillLayer = new FillLayer(FILL_LAYER_ID, FILL_SOURCE_ID);
-        fillLayer.setProperties(
-                fillColor(FILL_COLOR)
-        );
-        loadedMapStyle.addLayer(fillLayer);
-    }
-
-    /**
-     * Set up the LineLayer for showing the set boundaries' polygons
-     */
-    private void initLineLayer(@NonNull Style loadedMapStyle) {
-        LineLayer lineLayer = new LineLayer(LINE_LAYER_ID, LINE_SOURCE_ID);
-        lineLayer.setProperties(
-                lineColor(LINE_COLOR),
-                lineWidth(4f)
-        );
-        loadedMapStyle.addLayerAbove(lineLayer, FILL_LAYER_ID);
-    }
-
-    /**
-     * Set up the CircleLayer for showing polygon click points
-     */
-    private void initCircleLayer(@NonNull Style loadedMapStyle) {
-        CircleLayer circleLayer = new CircleLayer(CIRCLE_LAYER_ID, CIRCLE_SOURCE_ID);
-        circleLayer.setProperties(
-                circleRadius(6f),
-                circleColor(POINT_COLOR),
-                circleStrokeWidth(1f),
-                circleStrokeColor(POINT_LINE_COLOR)
-        );
-        loadedMapStyle.addLayerAbove(circleLayer, LINE_LAYER_ID);
-    }
-
-    /**
-     * Set up the LineLayer source for showing map click points
-     */
-    private GeoJsonSource initLineSource(@NonNull Style loadedMapStyle,
-            FeatureCollection featureCollection) {
-        GeoJsonSource lineGeoJsonSource = new GeoJsonSource(LINE_SOURCE_ID, featureCollection);
-        loadedMapStyle.addSource(lineGeoJsonSource);
-        return lineGeoJsonSource;
-    }
-
-    /**
-     * Set up the FillLayer source for showing map click points
-     */
-    private GeoJsonSource initFillSource(@NonNull Style loadedMapStyle,
-            FeatureCollection featureCollection) {
-        GeoJsonSource fillGeoJsonSource = new GeoJsonSource(FILL_SOURCE_ID, featureCollection);
-        loadedMapStyle.addSource(fillGeoJsonSource);
-        return fillGeoJsonSource;
-    }
-
-    /**
-     * Set up the CircleLayer source for showing map click points
-     */
-    private GeoJsonSource initCircleSource(@NonNull Style loadedMapStyle,
-            FeatureCollection featureCollection) {
-        GeoJsonSource circleGeoJsonSource = new GeoJsonSource(CIRCLE_SOURCE_ID, featureCollection);
-        loadedMapStyle.addSource(circleGeoJsonSource);
-        return circleGeoJsonSource;
     }
 }

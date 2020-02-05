@@ -1,5 +1,62 @@
 Akvo FLOW app release notes
 ===========================
+# ver 2.8.5
+Date: 29 January 2020
+
+* **Add code coverage reports** - [#681](https://github.com/akvo/akvo-flow-mobile/issues/681)
+* **Use https for flow support url** - [#1463](https://github.com/akvo/akvo-flow-mobile/issues/1463)
+* **Move crashes to firebase crashlytics** - [#1531](https://github.com/akvo/akvo-flow-mobile/issues/1531)
+* **Remove the need for password on Flow app** - [#1532](https://github.com/akvo/akvo-flow-mobile/issues/1532)
+* **Make sure to close the cascade database** - [#1535](https://github.com/akvo/akvo-flow-mobile/issues/1535)
+* **Crash in WebView with android 5** - [#1551](https://github.com/akvo/akvo-flow-mobile/issues/1551)
+* **Optimize builds** - [#1553](https://github.com/akvo/akvo-flow-mobile/issues/1553)
+* **Datapoint submission stuck in Submitted state** - [#1572](https://github.com/akvo/akvo-flow-mobile/issues/1572)
+
+---------------
+# ver 2.8.4
+Date: 18 December 2019
+
+* **Fix some codacy issues** - [#1517](https://github.com/akvo/akvo-flow-mobile/issues/1517)
+* **Empty repeated groups can be repeated** - [#1539](https://github.com/akvo/akvo-flow-mobile/issues/1539)
+* **Deleting a repeatable question group bug** - [#1540](https://github.com/akvo/akvo-flow-mobile/issues/1540)
+* **Filter out some sentry issues** - [#1545](https://github.com/akvo/akvo-flow-mobile/issues/1545)
+* **Repeatable groups get copied** - [#1555](https://github.com/akvo/akvo-flow-mobile/issues/1555)
+
+---------------
+# ver 2.8.3
+Date: 19 November 2019
+
+* **Fine tune sentry exceptions** - [#1289](https://github.com/akvo/akvo-flow-mobile/issues/1289)
+* **Fix crash after pressing delete everything** - [#1520](https://github.com/akvo/akvo-flow-mobile/issues/1520)
+* **Fix language change stopped working** - [#1526](https://github.com/akvo/akvo-flow-mobile/issues/1526)
+* **Crash when trying to submit a signature question** - [#1533](https://github.com/akvo/akvo-flow-mobile/issues/1533)
+
+---------------
+# ver 2.8.2
+Date: 30 October 2019
+
+* **Missing location data in image response** - [#1506](https://github.com/akvo/akvo-flow-mobile/issues/1506)
+* **Display image location instead of "geolocation saved"** - [#1480](https://github.com/akvo/akvo-flow-mobile/issues/1480)
+* **Small issues with data point name and ID pop up on the map** - [#1498](https://github.com/akvo/akvo-flow-mobile/issues/1498)
+* **App deployments are broken due to certificate not found** - [#1500](https://github.com/akvo/akvo-flow-mobile/issues/1500)
+* **Enable Bitrise CI** - [#1429](https://github.com/akvo/akvo-flow-mobile/issues/1429)
+
+---------------
+
+# ver 2.8.1
+Date: 02 October 2019
+
+* **Review background work tasks and services** - [#1414](https://github.com/akvo/akvo-flow-mobile/issues/1414)
+* **Use offline maps when capturing geoshapes** - [#1447](https://github.com/akvo/akvo-flow-mobile/issues/1447)
+* **View geoshape using Mapbox** - [#1462](https://github.com/akvo/akvo-flow-mobile/issues/1462)
+* **Deleting offline region should also delete it's id if it was selected** - [#1468](https://github.com/akvo/akvo-flow-mobile/issues/1468)
+* **Creating a geoshape area with more than 3 points does not follow point order** - [#1483](https://github.com/akvo/akvo-flow-mobile/issues/1483)
+* **Deleting geoshape points** - [#1484](https://github.com/akvo/akvo-flow-mobile/issues/1484)
+* **Issues with geoshape metadata** - [#1485](https://github.com/akvo/akvo-flow-mobile/issues/1485)
+* **Starting foreground services now requires a permission** - [#1489](https://github.com/akvo/akvo-flow-mobile/issues/1489)
+
+---------------
+
 # ver 2.8.0.1
 Date: 06 August 2019
 

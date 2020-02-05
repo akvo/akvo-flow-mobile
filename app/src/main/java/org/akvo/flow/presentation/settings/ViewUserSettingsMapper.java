@@ -20,8 +20,6 @@
 
 package org.akvo.flow.presentation.settings;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import android.text.TextUtils;
 
 import org.akvo.flow.domain.entity.UserSettings;
@@ -30,6 +28,9 @@ import java.util.List;
 import java.util.Locale;
 
 import javax.inject.Inject;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 public class ViewUserSettingsMapper {
 
@@ -41,12 +42,11 @@ public class ViewUserSettingsMapper {
     }
 
     public ViewUserSettings transform(@Nullable UserSettings userSettings,
-            @NonNull List<String> languages) {
+            @NonNull List<String> languages, @Nullable String language) {
         if (userSettings == null) {
             int englishPosition = getEnglishLanguagePosition(languages);
             return new ViewUserSettings(false, false, englishPosition, 0, "");
         }
-        String language = userSettings.getLanguage();
         if (TextUtils.isEmpty(language)) {
             language = Locale.getDefault().getLanguage();
         }

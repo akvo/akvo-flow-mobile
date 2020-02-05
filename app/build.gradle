@@ -1,31 +1,25 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
-apply plugin: 'io.sentry.android.gradle'
-if (!project.hasProperty("nodexcount")) {
-    apply plugin: 'com.getkeepsafe.dexcount'
-}
+apply plugin: 'com.getkeepsafe.dexcount'
 apply plugin: 'io.fabric'
+apply from: rootProject.file("jacoco.gradle")
 
-repositories {
-    mavenCentral()
-    jcenter()
-    maven { url 'https://maven.fabric.io/public' }
-    google()
+dexcount {
+    enabled = !project.hasProperty("nodexcount")
 }
 
-sentry {
-    autoProguardConfig true
-    autoUpload true
-}
+loadProperties()
 
-def isCi = "true" == System.getenv("TRAVIS")
+def loadProperties() {
+    def file = hasProperty('file') ? file : 'survey.properties'
+    project.ext.surveyProps = readProperties(file)
+}
 
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
 
-    Properties versionProps = loadProperties('version.properties')
-    Properties surveyProps = loadProperties('survey.properties')
+    Properties versionProps = readProperties('version.properties')
 
     def versionMajor = versionProps['VERSION_MAJOR'].toString()
     def versionMinor = versionProps['VERSION_MINOR'].toString()
@@ -51,6 +45,10 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
 
+    dexOptions {
+        preDexLibraries true
+    }
+
     signingConfigs {
 
         debug {
@@ -61,10 +59,12 @@ android {
         }
 
         flowRelease {
-            storeFile file(RELEASE_STORE_FILE)
-            storePassword RELEASE_STORE_PASSWORD
-            keyAlias RELEASE_KEY_ALIAS
-            keyPassword RELEASE_KEY_PASSWORD
+            if (project.hasProperty('RELEASE_STORE_FILE')) {
+                storeFile file(RELEASE_STORE_FILE)
+                storePassword RELEASE_STORE_PASSWORD
+                keyAlias RELEASE_KEY_ALIAS
+                keyPassword RELEASE_KEY_PASSWORD
+            }
         }
     }
 
@@ -100,39 +100,48 @@ android {
             proguardFile 'proguard-files/proguard-glide.pro'
             proguardFile 'proguard-files/proguard-google-play-services.pro'
             proguardFile 'proguard-files/proguard-gson.pro'
-            proguardFile 'proguard-files/proguard-maps-utils.pro'
             proguardFile 'proguard-files/proguard-prettytime.pro'
             proguardFile 'proguard-files/proguard-rxjava.pro'
-            proguardFile 'proguard-files/proguard-sentry.pro'
             proguardFile 'proguard-files/proguard-square-retrofit.pro'
             proguardFile 'proguard-files/proguard-support-v7-appcompat.pro'
             proguardFile 'proguard-files/okhttp3.pro'
             proguardFile 'proguard-files/mapbox.pro'
-            proguardFile 'proguard-files/crashlytics.pro'
+            proguardFile 'proguard-files/leakcanary.pro'
             proguardFile getDefaultProguardFile('proguard-android.txt')
             signingConfig signingConfigs.flowRelease
         }
         debug {
-            ext.enableCrashlytics = false
             minifyEnabled true
             multiDexEnabled true
-            useProguard false
+            testCoverageEnabled true
             proguardFile 'proguard-files/proguard-rules.pro'
             proguardFile 'proguard-files/proguard-butterknife.pro'
             proguardFile 'proguard-files/proguard-glide.pro'
             proguardFile 'proguard-files/proguard-google-play-services.pro'
             proguardFile 'proguard-files/proguard-gson.pro'
-            proguardFile 'proguard-files/proguard-maps-utils.pro'
             proguardFile 'proguard-files/proguard-prettytime.pro'
             proguardFile 'proguard-files/proguard-rxjava.pro'
-            proguardFile 'proguard-files/proguard-sentry.pro'
             proguardFile 'proguard-files/proguard-square-retrofit.pro'
             proguardFile 'proguard-files/proguard-support-v7-appcompat.pro'
             proguardFile 'proguard-files/okhttp3.pro'
             proguardFile 'proguard-files/mapbox.pro'
-            proguardFile 'proguard-files/crashlytics.pro'
+            proguardFile 'proguard-files/leakcanary.pro'
             proguardFile getDefaultProguardFile('proguard-android.txt')
             multiDexKeepProguard file('proguard-files/proguard-multidex-rules.pro')
+
+            testProguardFile 'proguard-files/proguard-rules.pro'
+            testProguardFile 'proguard-files/proguard-butterknife.pro'
+            testProguardFile 'proguard-files/proguard-glide.pro'
+            testProguardFile 'proguard-files/proguard-google-play-services.pro'
+            testProguardFile 'proguard-files/proguard-gson.pro'
+            testProguardFile 'proguard-files/proguard-prettytime.pro'
+            testProguardFile 'proguard-files/proguard-rxjava.pro'
+            testProguardFile 'proguard-files/proguard-square-retrofit.pro'
+            testProguardFile 'proguard-files/proguard-support-v7-appcompat.pro'
+            testProguardFile 'proguard-files/okhttp3.pro'
+            testProguardFile 'proguard-files/mapbox.pro'
+            testProguardFile 'proguard-files/leakcanary.pro'
+            testProguardFile getDefaultProguardFile('proguard-android.txt')
         }
     }
 
@@ -164,12 +173,18 @@ android {
     }
 
     testOptions {
-        unitTests.returnDefaultValues = true
-    }
-
-    testOptions.unitTests.all {
-        testLogging {
-            events 'passed', 'skipped', 'failed', 'standardOut', 'standardError'
+        animationsDisabled true
+        unitTests {
+            includeAndroidResources = true
+            returnDefaultValues = true
+            all {
+                testLogging {
+                    events 'passed', 'skipped', 'failed', 'standardOut', 'standardError'
+                }
+                jacoco {
+                    includeNoLocationClasses = true
+                }
+            }
         }
     }
 
@@ -180,6 +195,7 @@ android {
         abortOnError false
         // if true, only report errors
         ignoreWarnings false
+        xmlReport false
         lintConfig file('lint.xml')
         ignore 'InvalidPackage'
     }
@@ -190,7 +206,7 @@ android {
     }
 }
 
-private Properties loadProperties(String fileName) {
+private Properties readProperties(String fileName) {
     Properties versionProps = new Properties()
     def versionPropsFile = file(fileName)
     if (versionPropsFile.canRead()) {
@@ -213,17 +229,12 @@ dependencies {
     implementation "com.google.android.material:material:${rootProject.ext.materialVersion}"
     implementation "androidx.constraintlayout:constraintlayout:${rootProject.ext.constraintLayoutVersion}"
     implementation "androidx.multidex:multidex:${rootProject.ext.multidexVersion}"
-    implementation "com.google.android.gms:play-services-maps:${rootProject.ext.gmsVersion}"
-    implementation "com.google.android.gms:play-services-gcm:${rootProject.ext.gmsVersion}"
-    implementation "com.google.maps.android:android-maps-utils:${rootProject.ext.mapUtilsVersion}"
     implementation "org.ocpsoft.prettytime:prettytime:${rootProject.ext.prettyTimeVersion}"
     implementation "com.jakewharton.timber:timber:${rootProject.ext.timberVersion}"
     implementation "com.google.dagger:dagger:${rootProject.ext.daggerVersion}"
     annotationProcessor "com.google.dagger:dagger-compiler:${rootProject.ext.daggerVersion}"
     implementation "com.jakewharton:butterknife:${rootProject.ext.butterKnifeVersion}"
     annotationProcessor "com.jakewharton:butterknife-compiler:${rootProject.ext.butterKnifeVersion}"
-    implementation "io.sentry:sentry-android:${rootProject.ext.sentryVersion}"
-    implementation "org.slf4j:slf4j-nop:${rootProject.ext.slfVersion}"
     implementation "com.github.bumptech.glide:glide:${rootProject.ext.glideVersion}"
     annotationProcessor "com.github.bumptech.glide:compiler:${rootProject.ext.glideVersion}"
     implementation "com.squareup.sqlbrite2:sqlbrite:${rootProject.ext.sqlbriteVersion}"
@@ -231,23 +242,16 @@ dependencies {
     implementation "io.reactivex.rxjava2:rxjava:${rootProject.ext.rxJavaVersion}"
     implementation "com.squareup.okhttp3:logging-interceptor:${rootProject.ext.loggingInterceptorVersion}"
     implementation "com.google.code.gson:gson:${rootProject.ext.gsonVersion}"
-    implementation("com.crashlytics.sdk.android:crashlytics:${rootProject.ext.crashlyticsVersion}") {
-        transitive = true
-    }
-    if (isCi) {
-        implementation "com.squareup.leakcanary:leakcanary-android-no-op:${rootProject.ext.leakCanaryVersion}"
-    } else {
-        debugImplementation "com.squareup.leakcanary:leakcanary-android:${rootProject.ext.leakCanaryVersion}"
-        releaseImplementation "com.squareup.leakcanary:leakcanary-android-no-op:${rootProject.ext.leakCanaryVersion}"
-        debugImplementation "com.squareup.leakcanary:leakcanary-support-fragment:${rootProject.ext.leakCanaryVersion}"
-    }
 
-    implementation "com.android.support:multidex:${rootProject.ext.multidexVersion}"
-    implementation "com.google.firebase:firebase-analytics:${rootProject.ext.firebaseVersion}"
+    debugImplementation "com.squareup.leakcanary:leakcanary-android:${rootProject.ext.leakCanaryVersion}"
+
+    implementation "com.google.firebase:firebase-analytics:${rootProject.ext.firebaseAnalyticsVersion}"
+    implementation "com.crashlytics.sdk.android:crashlytics:${rootProject.ext.crashlyticsVersion}"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
     implementation "androidx.core:core-ktx:${rootProject.ext.coreKtxVersion}"
     implementation "com.mapbox.mapboxsdk:mapbox-android-sdk:${rootProject.ext.mapboxVersion}"
-    implementation "com.mapbox.mapboxsdk:mapbox-android-plugin-markerview-v7:${rootProject.ext.mapboxMarkerVersion}"
+    implementation "androidx.work:work-runtime:${rootProject.ext.workVersion}"
+    implementation "com.halfhp.rxtracer:rxtracer:${rootProject.ext.rxTracerVersion}"
 
     testImplementation "junit:junit:${rootProject.ext.jUnitVersion}"
     testImplementation "org.mockito:mockito-core:${rootProject.ext.mockitoCoreVersion}"
@@ -261,7 +265,7 @@ dependencies {
     androidTestImplementation "androidx.test:core:${rootProject.ext.androidXCore}"
     androidTestImplementation "com.google.dexmaker:dexmaker:${rootProject.ext.dexMakerVersion}"
     androidTestImplementation "com.google.dexmaker:dexmaker-mockito:${rootProject.ext.dexMakerVersion}"
-    androidTestImplementation "androidx.test:rules:${rootProject.ext.supportTestRulesVersion}"
+    androidTestImplementation "androidx.test:rules:${rootProject.ext.rulesVersion}"
     androidTestImplementation "androidx.test.espresso:espresso-core:${rootProject.ext.espressoCoreVersion}"
     androidTestImplementation "androidx.test.espresso:espresso-contrib:${rootProject.ext.espressoContribVersion}"
 

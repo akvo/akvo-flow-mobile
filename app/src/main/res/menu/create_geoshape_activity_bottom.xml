@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/shape_info"
+        android:icon="@drawable/ic_info_path"
+        android:visible="true"
+        app:showAsAction="always"
+        android:title="@string/geoshape_bottom_item_info" />
+    <item
+        android:id="@+id/add_point"
+        android:icon="@drawable/ic_add_point"
+        android:visible="true"
+        app:showAsAction="always"
+        android:title="@string/geoshape_bottom_item_add_point" />
+    <item
+        android:id="@+id/delete_point"
+        android:icon="@drawable/ic_delete_point"
+        android:visible="true"
+        app:showAsAction="always"
+        android:title="@string/geoshape_bottom_item_delete_point" />
+    <item
+        android:id="@+id/delete_feature"
+        android:icon="@drawable/ic_delete_feature"
+        android:visible="true"
+        app:showAsAction="always"
+        android:title="@string/geoshape_bottom_item_delete_feature" />
+</menu>

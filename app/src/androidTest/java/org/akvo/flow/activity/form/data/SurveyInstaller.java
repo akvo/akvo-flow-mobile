@@ -63,6 +63,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 
+import androidx.annotation.NonNull;
 import androidx.core.util.Pair;
 import androidx.test.platform.app.InstrumentationRegistry;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -96,11 +97,126 @@ public class SurveyInstaller {
         return survey;
     }
 
+    public Pair<Long, Map<String, QuestionResponse>> createDataPoint(SurveyGroup surveyGroup,
+            QuestionResponse.QuestionResponseBuilder... responseBuilders) {
+        adapter.open();
+        Survey registrationForm = adapter.getRegistrationForm(surveyGroup);
+        String surveyedLocaleId = adapter.createSurveyedLocale(surveyGroup.getId());
+        User user = new User(1L, "User");
+        long surveyInstanceId = adapter
+                .createSurveyRespondent(registrationForm.getId(), registrationForm.getVersion(),
+                        user, surveyedLocaleId);
+        Map<String, QuestionResponse> questionResponseMap = new HashMap<>();
+        if (responseBuilders != null) {
+            int length = responseBuilders.length;
+            for (int i = 0; i < length; i++) {
+                QuestionResponse responseToSave = responseBuilders[i]
+                        .setSurveyInstanceId(surveyInstanceId)
+                        .createQuestionResponse();
+                questionResponseMap.put(responseToSave.getResponseKey(), responseToSave);
+                adapter.createOrUpdateSurveyResponse(responseToSave);
+            }
+        }
+        adapter.close();
+        return new Pair<>(surveyInstanceId, questionResponseMap);
+    }
+
+    public Pair<Long, Map<String, QuestionResponse>> createDataPointFromFile(
+            SurveyGroup surveyGroup, Context context, int resId) {
+
+        InputStream input = context.getResources()
+                .openRawResource(resId);
+        try {
+            String jsonDataString = FileUtil.readText(input);
+            GsonMapper mapper = new GsonMapper(new GsonBuilder().create());
+            TestDataPoint dataPoint = mapper.read(jsonDataString, TestDataPoint.class);
+            List<TestResponse> responses = dataPoint.getResponses();
+            List<QuestionResponse.QuestionResponseBuilder> builders = new ArrayList<>(
+                    responses.size());
+            for (TestResponse response : responses) {
+                QuestionResponse.QuestionResponseBuilder questionResponse =
+                        generateResponse(response.getValue(), response.getAnswerType(),
+                                response.getQuestionId(), response.getIteration());
+                builders.add(questionResponse);
+            }
+            return createDataPoint(surveyGroup, builders
+                    .toArray(new QuestionResponse.QuestionResponseBuilder[builders.size()]));
+        } catch (IOException e) {
+            Timber.e(e);
+        }
+        return null;
+    }
+
+    @NonNull
+    public static QuestionResponse.QuestionResponseBuilder[] generateRepeatedTwoGroupsResponseData() {
+        return new QuestionResponse.QuestionResponseBuilder[] {
+                generateResponse("123456", ConstantUtil.VALUE_RESPONSE_TYPE, "205929117", 0),
+                generateResponse("test1", ConstantUtil.VALUE_RESPONSE_TYPE, "205929118", 0),
+                generateResponse("test2", ConstantUtil.VALUE_RESPONSE_TYPE, "205929118", 1),
+                generateResponse("test3", ConstantUtil.VALUE_RESPONSE_TYPE, "205929118", 2)
+        };
+    }
+
+    @NonNull
+    public static QuestionResponse.QuestionResponseBuilder[] generateRepeatedOneGroupResponseData() {
+        return new QuestionResponse.QuestionResponseBuilder[] {
+                generateResponse("test1", ConstantUtil.VALUE_RESPONSE_TYPE, "205929118", 0),
+                generateResponse("test2", ConstantUtil.VALUE_RESPONSE_TYPE, "205929118", 1),
+                generateResponse("test3", ConstantUtil.VALUE_RESPONSE_TYPE, "205929118", 2)
+        };
+    }
+
+    @NonNull
+    public static QuestionResponse.QuestionResponseBuilder[] generatePartialRepeatedGroupResponseData() {
+        return new QuestionResponse.QuestionResponseBuilder[] {
+                generateResponse("text-response-rep-one", ConstantUtil.VALUE_RESPONSE_TYPE, "205929118", 0),
+                generateResponse("1234567", ConstantUtil.VALUE_RESPONSE_TYPE, "205929119", 0),
+                generateResponse("text-response-rep-two", ConstantUtil.VALUE_RESPONSE_TYPE, "205929118", 1),
+        };
+    }
+
+    public void clearSurveys() {
+        for (File file : surveyFiles) {
+            file.delete();
+        }
+        adapter.open();
+        adapter.deleteAllSurveys();
+        adapter.clearCollectedData();
+        adapter.close();
+    }
+
+    public void deleteResponses() {
+        adapter.open();
+        adapter.deleteAllResponses();
+        adapter.close();
+    }
+
+    public SparseArray<List<Node>> getAllNodes(Question question, Context context) {
+        String src = question.getSrc();
+        FormResourcesFileBrowser formResourcesFileUtil = new FormResourcesFileBrowser(
+                new FileBrowser());
+        File cascadeFolder = formResourcesFileUtil
+                .getExistingAppInternalFolder(
+                        InstrumentationRegistry.getInstrumentation().getTargetContext());
+        if (!TextUtils.isEmpty(src)) {
+            File db = new File(cascadeFolder, src);
+            if (db.exists()) {
+                CascadeDB cascadeDB = new CascadeDB(context, db.getAbsolutePath());
+                cascadeDB.open();
+                SparseArray<List<Node>> values = cascadeDB.getValues();
+                cascadeDB.close();
+                return values;
+            }
+        }
+        return new SparseArray<>(0);
+    }
+
     private void installCascades(Survey survey, Context context) throws IOException {
         FormResourcesFileBrowser formResourcesFileUtil = new FormResourcesFileBrowser(
                 new FileBrowser());
         File cascadeFolder = formResourcesFileUtil
-                .getExistingAppInternalFolder(InstrumentationRegistry.getInstrumentation().getTargetContext());
+                .getExistingAppInternalFolder(
+                        InstrumentationRegistry.getInstrumentation().getTargetContext());
         for (QuestionGroup group : survey.getQuestionGroups()) {
             for (Question question : group.getQuestions()) {
                 String cascadeFileName = question.getSrc();
@@ -130,7 +246,8 @@ public class SurveyInstaller {
         Survey survey = parseSurvey(xml);
         FormFileBrowser formFileBrowser = new FormFileBrowser(new FileBrowser());
         File surveyFile = new File(
-                formFileBrowser.getExistingAppInternalFolder(InstrumentationRegistry.getInstrumentation().getTargetContext()),
+                formFileBrowser.getExistingAppInternalFolder(
+                        InstrumentationRegistry.getInstrumentation().getTargetContext()),
                 survey.getId() + ConstantUtil.XML_SUFFIX);
         writeString(surveyFile, xml);
 
@@ -173,91 +290,12 @@ public class SurveyInstaller {
         adapter.close();
     }
 
-    public Pair<Long, Map<String, QuestionResponse>> createDataPoint(SurveyGroup surveyGroup,
-            QuestionResponse.QuestionResponseBuilder... responseBuilders) {
-        adapter.open();
-        Survey registrationForm = adapter.getRegistrationForm(surveyGroup);
-        String surveyedLocaleId = adapter.createSurveyedLocale(surveyGroup.getId());
-        User user = new User(1L, "User");
-        long surveyInstanceId = adapter
-                .createSurveyRespondent(registrationForm.getId(), registrationForm.getVersion(),
-                        user, surveyedLocaleId);
-        Map<String, QuestionResponse> questionResponseMap = new HashMap<>();
-        if (responseBuilders != null) {
-            int length = responseBuilders.length;
-            for (int i = 0; i < length; i++) {
-                QuestionResponse responseToSave = responseBuilders[i]
-                        .setSurveyInstanceId(surveyInstanceId)
-                        .createQuestionResponse();
-                questionResponseMap.put(responseToSave.getResponseKey(), responseToSave);
-                adapter.createOrUpdateSurveyResponse(responseToSave);
-            }
-        }
-        adapter.close();
-        return new Pair<>(surveyInstanceId, questionResponseMap);
-    }
-
-    public Pair<Long, Map<String, QuestionResponse>> createDataPointFromFile(
-            SurveyGroup surveyGroup, Context context, int resId) {
-
-        InputStream input = context.getResources()
-                .openRawResource(resId);
-        try {
-            String jsonDataString = FileUtil.readText(input);
-            GsonMapper mapper = new GsonMapper(new GsonBuilder().create());
-            TestDataPoint dataPoint = mapper.read(jsonDataString, TestDataPoint.class);
-            List<TestResponse> responses = dataPoint.getResponses();
-            List<QuestionResponse.QuestionResponseBuilder> builders = new ArrayList<>(
-                    responses.size());
-            for (TestResponse response : responses) {
-                QuestionResponse.QuestionResponseBuilder questionResponse =
-                        new QuestionResponse.QuestionResponseBuilder()
-                        .setValue(response.getValue())
-                        .setType(response.getAnswerType())
-                        .setQuestionId(response.getQuestionId())
-                        .setIteration(response.getIteration());
-                builders.add(questionResponse);
-            }
-            return createDataPoint(surveyGroup, builders
-                    .toArray(new QuestionResponse.QuestionResponseBuilder[builders.size()]));
-        } catch (IOException e) {
-            Timber.e(e);
-        }
-        return null;
-    }
-
-    public void clearSurveys() {
-        for (File file : surveyFiles) {
-            file.delete();
-        }
-        adapter.open();
-        adapter.deleteAllSurveys();
-        adapter.clearCollectedData();
-        adapter.close();
-    }
-
-    public void deleteResponses() {
-        adapter.open();
-        adapter.deleteAllResponses();
-        adapter.close();
-    }
-
-    public SparseArray<List<Node>> getAllNodes(Question question, Context context) {
-        String src = question.getSrc();
-        FormResourcesFileBrowser formResourcesFileUtil = new FormResourcesFileBrowser(
-                new FileBrowser());
-        File cascadeFolder = formResourcesFileUtil
-                .getExistingAppInternalFolder(InstrumentationRegistry.getInstrumentation().getTargetContext());
-        if (!TextUtils.isEmpty(src)) {
-            File db = new File(cascadeFolder, src);
-            if (db.exists()) {
-                CascadeDB cascadeDB = new CascadeDB(context, db.getAbsolutePath());
-                cascadeDB.open();
-                SparseArray<List<Node>> values = cascadeDB.getValues();
-                cascadeDB.close();
-                return values;
-            }
-        }
-        return new SparseArray<>(0);
+    private static QuestionResponse.QuestionResponseBuilder generateResponse(String value,
+            String valueResponseType, String questionId, int iteration) {
+        return new QuestionResponse.QuestionResponseBuilder()
+                .setValue(value)
+                .setType(valueResponseType)
+                .setQuestionId(questionId)
+                .setIteration(iteration);
     }
 }

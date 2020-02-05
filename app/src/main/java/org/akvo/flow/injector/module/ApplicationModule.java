@@ -32,7 +32,7 @@ import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.data.datasource.preferences.SharedPreferencesDataSource;
 import org.akvo.flow.data.executor.JobExecutor;
 import org.akvo.flow.data.net.Encoder;
-import org.akvo.flow.data.net.HMACInterceptor;
+import org.akvo.flow.data.net.HmacInterceptor;
 import org.akvo.flow.data.net.RestApi;
 import org.akvo.flow.data.net.RestServiceFactory;
 import org.akvo.flow.data.net.S3User;
@@ -49,6 +49,8 @@ import org.akvo.flow.data.repository.UserDataRepository;
 import org.akvo.flow.data.util.ApiUrls;
 import org.akvo.flow.database.DatabaseHelper;
 import org.akvo.flow.database.LanguageTable;
+import org.akvo.flow.database.SurveyLanguagesDataSource;
+import org.akvo.flow.database.SurveyLanguagesDbDataSource;
 import org.akvo.flow.domain.executor.PostExecutionThread;
 import org.akvo.flow.domain.executor.ThreadExecutor;
 import org.akvo.flow.domain.repository.ApkRepository;
@@ -124,7 +126,7 @@ public class ApplicationModule {
         if (BuildConfig.DEBUG) {
             return new DebugLoggingHelper();
         } else {
-            return new ReleaseLoggingHelper(application);
+            return new ReleaseLoggingHelper();
         }
     }
 
@@ -192,7 +194,7 @@ public class ApplicationModule {
         simpleDateFormat.setTimeZone(TimeZone.getTimeZone(TIMEZONE));
         OkHttpClient.Builder httpClient = createHttpClient(loggingInterceptor);
         httpClient.addInterceptor(
-                new HMACInterceptor(BuildConfig.API_KEY, simpleDateFormat, encoder,
+                new HmacInterceptor(BuildConfig.API_KEY, simpleDateFormat, encoder,
                         signatureHelper));
         OkHttpClient okHttpClientWithHmac = httpClient.build();
 
@@ -251,6 +253,12 @@ public class ApplicationModule {
     @Singleton
     Gson provideGson() {
         return new Gson();
+    }
+
+    @Provides
+    @Singleton
+    SurveyLanguagesDataSource provideSurveyLanguageDataSource(Context context) {
+        return new SurveyLanguagesDbDataSource(context);
     }
 
     @NonNull

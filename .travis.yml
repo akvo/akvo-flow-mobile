@@ -26,8 +26,10 @@ cache:
 android:
   components:
     - tools
+    - build-tools-29.0.2
     - build-tools-28.0.3
     - android-28
+    - android-29
     - extra-android-support
     - extra-google-m2repository
     - extra-android-m2repository
@@ -36,16 +38,12 @@ android:
     - 'android-sdk-preview-license-.+'
     - 'android-sdk-license-.+'
     - 'google-gdk-license-.+'
+
 before_install:
   - openssl aes-256-cbc -K $encrypted_b2f5a33a8343_key -iv $encrypted_b2f5a33a8343_iv -in build_config.enc -out build_config -d
   - tar xvf build_config
-  - gem install fastlane --no-document --quiet
-  - git remote set-url origin https://$GITHUB_USER:$GITHUB_API_KEY@github.com/akvo/akvo-flow-mobile.git
-  - echo "android.useAndroidX=true" >> gradle.properties
-  - echo "android.enableJetifier=true" >> gradle.properties
-  - echo "android.enableR8=false" >> gradle.properties
-  - echo "android.enableR8=false" >> app/gradle.properties
-  - chmod +x fastlane/deploy_beta.sh
+  - PWD=echo pwd
+  - echo "RELEASE_STORE_FILE="$PWD"/app/fieldsurvey-release.keystore" >> app/gradle.properties
   - chmod +x travis/deploy_release.sh
   - chmod +x travis/setup_gcloud.sh
   - chmod +x travis/run_firebase_tests.sh
@@ -55,9 +53,6 @@ script:
   - ./gradlew check --continue -Pnodexcount=true
   - ./gradlew :app:assembleFlowDebugAndroidTest -Pnodexcount=true
   - "if [ \"$TRAVIS_PULL_REQUEST\" != \"false\" ]; then . ./travis/run_firebase_tests.sh; fi"
-
-after_success:
-  - ./fastlane/deploy_beta.sh
 
 notifications:
   slack:

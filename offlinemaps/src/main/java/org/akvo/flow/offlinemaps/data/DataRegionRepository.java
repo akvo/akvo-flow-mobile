@@ -54,6 +54,6 @@ public class DataRegionRepository implements RegionRepository {
 
     @Override
     public Maybe<MapInfo> getOfflineRegion(Long regionId) {
-        return getOfflineRegion.execute(regionId).toMaybe().map(mapInfoMapper::getMapInfo);
+        return getOfflineRegion.execute(regionId).map(mapInfoMapper::getMapInfo);
     }
 }

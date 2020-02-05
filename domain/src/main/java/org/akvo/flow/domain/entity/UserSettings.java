@@ -24,15 +24,13 @@ public class UserSettings {
 
     private final boolean screenOn;
     private final boolean dataEnabled;
-    private final String language;
     private final int imageSize;
     private final String identifier;
 
-    public UserSettings(boolean screenOn, boolean dataEnabled, String language, int imageSize,
+    public UserSettings(boolean screenOn, boolean dataEnabled, int imageSize,
             String identifier) {
         this.screenOn = screenOn;
         this.dataEnabled = dataEnabled;
-        this.language = language;
         this.imageSize = imageSize;
         this.identifier = identifier;
     }
@@ -43,10 +41,6 @@ public class UserSettings {
 
     public boolean isDataEnabled() {
         return dataEnabled;
-    }
-
-    public String getLanguage() {
-        return language;
     }
 
     public int getImageSize() {

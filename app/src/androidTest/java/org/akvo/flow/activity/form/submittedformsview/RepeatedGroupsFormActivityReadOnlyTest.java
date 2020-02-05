@@ -28,20 +28,17 @@ import org.akvo.flow.R;
 import org.akvo.flow.activity.FormActivity;
 import org.akvo.flow.activity.form.data.SurveyInstaller;
 import org.akvo.flow.activity.form.data.SurveyRequisite;
-import org.akvo.flow.domain.QuestionResponse;
 import org.akvo.flow.domain.Survey;
-import org.akvo.flow.util.ConstantUtil;
 import org.junit.AfterClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import androidx.annotation.NonNull;
-import androidx.test.platform.app.InstrumentationRegistry;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.filters.MediumTest;
+import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.rule.ActivityTestRule;
 import androidx.test.rule.GrantPermissionRule;
-import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
@@ -49,9 +46,9 @@ import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
-import static org.akvo.flow.activity.MultiItemByPositionMatcher.getElementFromMatchAtPosition;
-import static org.akvo.flow.activity.form.FormActivityTestUtil.addExecutionDelay;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.getFormActivityIntent;
+import static org.akvo.flow.activity.form.FormActivityTestUtil.verifyQuestionIteration;
+import static org.akvo.flow.activity.form.FormActivityTestUtil.verifyRepeatHeaderText;
 import static org.akvo.flow.tests.R.raw.repeated_groups_form;
 import static org.hamcrest.core.AllOf.allOf;
 
@@ -84,7 +81,8 @@ public class RepeatedGroupsFormActivityReadOnlyTest {
             Survey survey = installer
                     .installSurvey(repeated_groups_form, InstrumentationRegistry.getInstrumentation().getContext());
             long id = installer
-                    .createDataPoint(survey.getSurveyGroup(), generateTestResponseData()).first;
+                    .createDataPoint(survey.getSurveyGroup(), SurveyInstaller
+                            .generateRepeatedTwoGroupsResponseData()).first;
             return getFormActivityIntent(207569117L, "200389118", SURVEY_TITLE, id, true);
         }
     };
@@ -101,18 +99,13 @@ public class RepeatedGroupsFormActivityReadOnlyTest {
     public void verifyOneRepetition() {
         clickOnTabNamed("RepeatedBarcodeGroup");
         onView(allOf(withId(R.id.barcode_input), isDisplayed())).check(matches(withText("123456")));
-        verifyRepeatHeaderText("Repetitions:1");
-    }
-
-    private void verifyRepeatHeaderText(String text) {
-        onView(allOf(withId(R.id.repeat_header), isDisplayed()))
-                .check(matches(withText(text)));
+        verifyRepeatHeaderText("Repetition: 1");
     }
 
     @Test
     public void verifyThreeRepetitions() {
         clickOnTabNamed("RepeatedTextGroup");
-        verifyRepeatHeaderText("Repetitions:3");
+        verifyRepeatHeaderText("Repetitions: 3");
 
         verifyQuestionIteration(0, "test1");
         verifyQuestionIteration(1, "test2");
@@ -121,35 +114,6 @@ public class RepeatedGroupsFormActivityReadOnlyTest {
 
     private void clickOnTabNamed(String tabText) {
         onView(withText(tabText)).perform(click());
-        addExecutionDelay(800);
     }
 
-    private void verifyQuestionIteration(int position, String textToVerify) {
-        onView(allOf(getElementFromMatchAtPosition(withId(R.id.input_et), position),
-                isDisplayed())).check(matches(withText(textToVerify)));
-    }
-
-    @NonNull
-    private QuestionResponse.QuestionResponseBuilder[] generateTestResponseData() {
-        return new QuestionResponse.QuestionResponseBuilder[] {
-                new QuestionResponse.QuestionResponseBuilder()
-                        .setValue("123456")
-                        .setType(ConstantUtil.VALUE_RESPONSE_TYPE)
-                        .setQuestionId("205929117")
-                        .setIteration(0), new QuestionResponse.QuestionResponseBuilder()
-                .setValue("test1")
-                .setType(ConstantUtil.VALUE_RESPONSE_TYPE)
-                .setQuestionId("205929118")
-                .setIteration(0), new QuestionResponse.QuestionResponseBuilder()
-                .setValue("test2")
-                .setType(ConstantUtil.VALUE_RESPONSE_TYPE)
-                .setQuestionId("205929118")
-                .setIteration(1),
-                new QuestionResponse.QuestionResponseBuilder()
-                        .setValue("test3")
-                        .setType(ConstantUtil.VALUE_RESPONSE_TYPE)
-                        .setQuestionId("205929118")
-                        .setIteration(2)
-        };
-    }
 }

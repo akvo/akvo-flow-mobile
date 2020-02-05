@@ -13,6 +13,7 @@
 # Testing
 .calabash_settings
 .kotlintest
+data/abc
 
 app/bin
 app/gen
@@ -27,17 +28,16 @@ local.properties
 *.iml
 *.iws
 *.ipr
-.idea/
+.idea/*
+!.idea/copyright/
 .gradle/
 build/
-gradle.properties
-
-# Local debug settings
-app/src/debug/raw/survey.properties
+app/gradle.properties
 
 #Builds
 builds/
 tmp/
+reports/
 
 util/scripts/temp.md
 
@@ -45,19 +45,24 @@ util/scripts/temp.md
 captures/
 
 #sentry config files
-sentry.properties
-
-!/util/upload-apk/build/libs/deploy-1.0.jar
+/sentry.properties
 
 #CI config
-fastlane/report.xml
-fastlane/README.md
 build_config
 .env.default
 akvo-flow-server-config/
-app/fabric.properties
+akvoflowapp-firebase-adminsdk*
+
+#bitrise
+.bitrise.secrets.yml
+bitrise.yml
+*.keystore
+gradle.deps
 
 #errors
 hs_err_*
 .attach_pid*
 
+#reports
+*/jacoco.exec
+codacy-coverage-reporter

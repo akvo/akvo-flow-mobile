@@ -1,4 +1,7 @@
 apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+apply from: rootProject.file("jacoco.gradle")
 
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
@@ -18,9 +21,31 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
 
+    lintOptions {
+        abortOnError false
+        ignore 'InvalidPackage'
+        xmlReport false
+    }
+
+    testOptions {
+        unitTests {
+            returnDefaultValues = true
+            includeAndroidResources = true
+            all {
+                testLogging {
+                    events 'passed', 'skipped', 'failed', 'standardOut', 'standardError'
+                }
+            }
+        }
+    }
+
     buildTypes {
+        debug {
+            testCoverageEnabled true
+            multiDexEnabled true
+        }
         release {
-            minifyEnabled false
+            minifyEnabled true
         }
     }
 }
@@ -32,14 +57,16 @@ dependencies {
     implementation "com.google.android.material:material:${rootProject.ext.materialVersion}"
     implementation "androidx.constraintlayout:constraintlayout:${rootProject.ext.constraintLayoutVersion}"
     implementation "com.mapbox.mapboxsdk:mapbox-android-sdk:${rootProject.ext.mapboxVersion}"
-    implementation "com.mapbox.mapboxsdk:mapbox-android-plugin-markerview-v7:${rootProject.ext.mapboxMarkerVersion}"
+    implementation "com.mapbox.mapboxsdk:mapbox-android-plugin-markerview-v8:${rootProject.ext.mapboxMarkerVersion}"
     implementation "com.github.akvo:mapbox-offline-reactive:${rootProject.ext.mapboxOfflineRxVersion}"
     implementation "com.jakewharton.timber:timber:${rootProject.ext.timberVersion}"
     implementation "io.reactivex.rxjava2:rxandroid:${rootProject.ext.rxAndroidVersion}"
     implementation "io.reactivex.rxjava2:rxjava:${rootProject.ext.rxJavaVersion}"
     implementation "com.google.dagger:dagger:${rootProject.ext.daggerVersion}"
     annotationProcessor "com.google.dagger:dagger-compiler:${rootProject.ext.daggerVersion}"
-    implementation "com.google.firebase:firebase-analytics:${rootProject.ext.firebaseVersion}"
+    implementation "com.google.firebase:firebase-analytics:${rootProject.ext.firebaseAnalyticsVersion}"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+    implementation "androidx.core:core-ktx:${rootProject.ext.coreKtxVersion}"
 
     implementation project(':uicomponents')
 }

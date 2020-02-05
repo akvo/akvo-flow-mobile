@@ -22,17 +22,17 @@ package org.akvo.flow.presentation;
 
 import android.content.Intent;
 import android.os.Bundle;
-import androidx.appcompat.app.ActionBar;
 import android.widget.ImageView;
 
 import org.akvo.flow.R;
-import org.akvo.flow.activity.BackActivity;
+import org.akvo.flow.uicomponents.BackActivity;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.image.GlideImageLoader;
 import org.akvo.flow.util.image.ImageLoader;
 
 import java.io.File;
 
+import androidx.appcompat.app.ActionBar;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 

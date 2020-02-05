@@ -32,6 +32,8 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
+
+import androidx.annotation.NonNull;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
@@ -61,6 +63,7 @@ import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
 import org.akvo.flow.presentation.datapoints.DataPointSyncSnackBarManager;
 import org.akvo.flow.presentation.datapoints.list.entity.ListDataPoint;
+import org.akvo.flow.service.DataPointUploadWorker;
 import org.akvo.flow.tracking.TrackingListener;
 import org.akvo.flow.ui.Navigator;
 import org.akvo.flow.ui.fragment.OrderByDialogFragment;
@@ -108,7 +111,7 @@ public class DataPointsListFragment extends Fragment implements LocationListener
 
     /**
      * BroadcastReceiver to notify of data synchronisation. This should be
-     * fired from {@link org.akvo.flow.service.DataPointUploadService}
+     * fired from {@link DataPointUploadWorker}
      */
     private final BroadcastReceiver dataSyncReceiver = new DataSyncBroadcastReceiver(this);
 
@@ -123,11 +126,12 @@ public class DataPointsListFragment extends Fragment implements LocationListener
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        initializeInjector();
         setHasOptionsMenu(true);
     }
 
     @Override
-    public void onAttach(Context context) {
+    public void onAttach(@NonNull Context context) {
         super.onAttach(context);
 
         // This makes sure that the container activity has implemented
@@ -173,7 +177,7 @@ public class DataPointsListFragment extends Fragment implements LocationListener
         listView.setOnItemClickListener(this);
         progressBar = view.findViewById(R.id.progress);
         updateProgressDrawable();
-        initializeInjector();
+
         presenter.setView(this);
         presenter.onDataReady(surveyGroup);
     }
@@ -313,7 +317,7 @@ public class DataPointsListFragment extends Fragment implements LocationListener
     }
 
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         if (menuRes != null) {
             inflater.inflate(menuRes, menu);
             setUpSearchView(menu);

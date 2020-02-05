@@ -19,6 +19,7 @@
 
 package org.akvo.flow.data.datasource.files;
 
+import org.akvo.flow.data.entity.images.DataImageLocation;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -29,6 +30,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import static junit.framework.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 
 @RunWith(PowerMockRunner.class)
 public class ExifHelperTest {
@@ -40,9 +42,10 @@ public class ExifHelperTest {
     public void updateExifDataShouldReturnFalseForNullInputStream() {
         ExifHelper helper = new ExifHelper();
 
-        boolean updated = helper.updateExifData(null, "");
+        DataImageLocation location = helper.updateExifData(null, "");
 
-        assertFalse(updated);
+        assertNull(location.getLatitude());
+        assertNull(location.getLongitude());
     }
 
     @Test
@@ -50,9 +53,10 @@ public class ExifHelperTest {
         ExifHelper helper = new ExifHelper();
         File file = File.createTempFile("abc", ".txt");
 
-        boolean updated = helper.updateExifData(mockInputStrem, file.getAbsolutePath());
+        DataImageLocation location = helper.updateExifData(mockInputStrem, file.getAbsolutePath());
 
-        assertFalse(updated);
+        assertNull(location.getLatitude());
+        assertNull(location.getLongitude());
     }
 
     @Test

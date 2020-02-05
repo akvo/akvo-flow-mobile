@@ -22,6 +22,7 @@ package org.akvo.flow.offlinemaps.di;
 import org.akvo.flow.offlinemaps.presentation.MapBoxMapItemListViewImpl;
 import org.akvo.flow.offlinemaps.presentation.dialog.OfflineMapsDialog;
 import org.akvo.flow.offlinemaps.presentation.download.OfflineMapDownloadActivity;
+import org.akvo.flow.offlinemaps.presentation.geoshapes.GeoShapesMapViewImpl;
 import org.akvo.flow.offlinemaps.presentation.list.OfflineAreasListActivity;
 
 import javax.inject.Singleton;
@@ -40,4 +41,6 @@ public interface OfflineFeatureComponent {
     void inject(OfflineMapsDialog dialog);
 
     void inject(MapBoxMapItemListViewImpl flowMapView);
+
+    void inject(GeoShapesMapViewImpl geoShapesMapView);
 }

@@ -145,11 +145,6 @@ public class ConstantUtil {
     public static final String ENGLISH_CODE = "en";
 
     /**
-     * "code" to prevent unauthorized use of administrative settings/preferences
-     */
-    public static final String ADMIN_AUTH_CODE = "12345";
-
-    /**
      * S3 bucket directories (object prefixes)
      */
     public static final String S3_IMAGE_DIR = "images/";

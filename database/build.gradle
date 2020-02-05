@@ -1,4 +1,5 @@
 apply plugin: 'com.android.library'
+apply from: rootProject.file("jacoco.gradle")
 
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
@@ -24,21 +25,36 @@ android {
         exclude '.readme'
     }
 
-    buildTypes {
-        release {
-            minifyEnabled false
-        }
-    }
-
-    testOptions.unitTests.all {
-        testLogging {
-            events 'passed', 'skipped', 'failed', 'standardOut', 'standardError'
+    testOptions {
+        unitTests {
+            returnDefaultValues = true
+            includeAndroidResources = true
+            all {
+                testLogging {
+                    events 'passed', 'skipped', 'failed', 'standardOut', 'standardError'
+                }
+            }
         }
     }
 
     lintOptions {
         abortOnError false
         ignore 'InvalidPackage'
+        xmlReport false
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    buildTypes {
+        debug {
+            testCoverageEnabled true
+        }
+        release {
+            minifyEnabled true
+        }
     }
 }
 

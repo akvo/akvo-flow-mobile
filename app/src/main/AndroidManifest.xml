@@ -12,9 +12,8 @@
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
-    <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
-    <!-- For GcmTaskService -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
     <uses-feature
         android:name="android.hardware.camera"
@@ -29,16 +28,10 @@
         android:theme="@style/FlowAppTheme"
         android:usesCleartextTraffic="true"
         tools:ignore="GoogleAppIndexingWarning">
-        <activity
-            android:name=".presentation.geoshape.ViewGeoShapeActivity"/>
 
         <uses-library
             android:name="org.apache.http.legacy"
             android:required="false" />
-
-        <meta-data
-            android:name="io.fabric.ApiKey"
-            android:value="89dc21727e76a10511ecda549cab1b2d3aff2ec7" />
 
         <activity
             android:name=".presentation.main.MainActivity"
@@ -53,76 +46,47 @@
         </activity>
         <activity
             android:name=".activity.AddUserActivity"
-            android:configChanges="locale|layoutDirection" />
+            android:theme="@style/FlowAppTheme.NoTitle"/>
         <activity
             android:name=".activity.SurveyActivity"
-            android:configChanges="locale|layoutDirection"
             android:label="@string/app_name" />
         <activity
-            android:name=".presentation.record.RecordActivity"
-            android:configChanges="locale|layoutDirection" />
+            android:name=".presentation.record.RecordActivity"/>
         <activity
             android:name=".activity.FormActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize|locale|layoutDirection"
+            android:configChanges="keyboardHidden|orientation|screenSize"
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".activity.TransmissionHistoryActivity"
-            android:configChanges="locale|layoutDirection"
             android:label="@string/transmissionhist" />
         <activity
-            android:name=".activity.GeoshapeActivity"
-            android:configChanges="locale|layoutDirection|orientation|screenSize" />
-        <activity
             android:name=".activity.AppUpdateActivity"
-            android:configChanges="locale|layoutDirection"
             android:label="@string/app_update_activity"
             android:launchMode="singleTop"
-            android:theme="@style/Theme.AppCompat.Light.Dialog" />
+            android:theme="@style/FlowAppThemeDialog" />
         <activity
             android:name=".activity.TimeCheckActivity"
-            android:configChanges="locale|layoutDirection"
             android:label="@string/time_check_activity"
             android:launchMode="singleTop"
-            android:theme="@style/Flow.Dialog" />
+            android:theme="@style/FlowAppThemeDialog" />
         <activity
             android:name=".presentation.signature.SignatureActivity"
-            android:configChanges="locale|layoutDirection"
-            android:screenOrientation="landscape" />
+            android:screenOrientation="landscape"
+            android:theme="@style/FlowAppTheme.NoTitle"/>
         <activity android:name=".presentation.datapoints.map.one.DataPointMapActivity" />
 
-        <service
-            android:name=".service.DataFixService"
-            android:exported="false"
-            android:permission="android.permission.BIND_JOB_SERVICE" />
         <service android:name=".service.SurveyDownloadService" />
         <service android:name=".service.BootstrapService" />
         <service android:name=".service.TimeCheckService" />
-        <service
-            android:name=".service.ApkUpdateService"
-            android:exported="true"
-            android:permission="com.google.android.gms.permission.BIND_NETWORK_TASK_SERVICE">
-            <intent-filter>
-                <action android:name="com.google.android.gms.gcm.ACTION_TASK_READY" />
-            </intent-filter>
-        </service>
-        <service
-            android:name=".service.FileChangeTrackingService"
-            android:exported="true"
-            android:permission="com.google.android.gms.permission.BIND_NETWORK_TASK_SERVICE">
-            <intent-filter>
-                <action android:name="com.google.android.gms.gcm.ACTION_TASK_READY" />
-            </intent-filter>
-        </service>
-        <service
-            android:name=".service.DataPointUploadService"
-            android:exported="true"
-            android:permission="com.google.android.gms.permission.BIND_NETWORK_TASK_SERVICE">
-            <intent-filter>
-                <action android:name="com.google.android.gms.gcm.ACTION_TASK_READY" />
-            </intent-filter>
-        </service>
         <service android:name=".service.UnPublishDataService" />
 
+        <receiver android:name=".broadcast.UpdateReceiver">
+            <intent-filter
+                android:enabled="true"
+                android:exported="true">
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+            </intent-filter>
+        </receiver>
         <receiver
             android:name=".broadcast.BootStrapReceiver"
             android:exported="false">
@@ -141,32 +105,20 @@
             </intent-filter>
         </receiver>
 
-        <meta-data
-            android:name="com.google.android.geo.API_KEY"
-            android:value="@string/google_maps_key" />
-        <meta-data
-            android:name="com.google.android.gms.version"
-            android:value="@integer/google_play_services_version" />
-
         <activity
             android:name=".presentation.about.AboutActivity"
-            android:configChanges="locale|layoutDirection"
             android:label="@string/about_activity_title" />
         <activity
             android:name=".presentation.help.HelpActivity"
-            android:configChanges="locale|layoutDirection"
             android:label="@string/help" />
         <activity
             android:name=".presentation.legal.LegalNoticesActivity"
-            android:configChanges="locale|layoutDirection"
             android:label="@string/licences_title" />
         <activity
             android:name=".presentation.settings.PreferenceActivity"
-            android:configChanges="locale|layoutDirection"
             android:label="@string/settings" />
         <activity
             android:name=".presentation.FullImageActivity"
-            android:configChanges="locale|layoutDirection"
             android:label="" />
         <activity android:name="org.akvo.flow.walkthrough.presentation.OfflineMapsWalkThroughActivity"
             android:parentActivityName=".activity.SurveyActivity">
@@ -174,6 +126,10 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".activity.SurveyActivity" />
         </activity>
+        <activity android:name=".presentation.geoshape.ViewGeoShapeActivity"
+            android:configChanges="orientation|screenSize"/>
+        <activity android:name=".presentation.geoshape.create.CreateGeoShapeActivity"
+            android:configChanges="orientation|screenSize"/>
 
         <provider
             android:name="androidx.core.content.FileProvider"

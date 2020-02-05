@@ -20,14 +20,14 @@
 package org.akvo.flow.ui.view;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.graphics.drawable.Drawable;
-import androidx.core.content.ContextCompat;
 import android.view.MotionEvent;
 import android.view.View;
 
 import org.akvo.flow.R;
 import org.akvo.flow.util.ViewUtil;
+
+import androidx.core.content.ContextCompat;
 
 public class QuestionGroupIterationHeader extends androidx.appcompat.widget.AppCompatTextView
         implements View.OnTouchListener {
@@ -60,6 +60,8 @@ public class QuestionGroupIterationHeader extends androidx.appcompat.widget.AppC
         setTextColor(ContextCompat.getColor(context, R.color.repetitions_text_color));
         setBackgroundColor(ContextCompat.getColor(context, R.color.background_alternate));
         showTitleWithPosition(pos);
+        setFocusable(true);
+        setFocusableInTouchMode(true);
     }
 
     private int getDimension(int resId) {
@@ -94,14 +96,11 @@ public class QuestionGroupIterationHeader extends androidx.appcompat.widget.AppC
                 return true;
             case MotionEvent.ACTION_UP:
                 if (isDeleteButtonPressed(event)) {
+                    //TODO: use dialog fragment
                     ViewUtil.showConfirmDialog(R.string.delete_group_title,
                             R.string.delete_group_text,
-                            getContext(), true, new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    mListener.onDeleteRepetition(mID);
-                                }
-                            });
+                            getContext(), true,
+                            (dialog, which) -> mListener.onDeleteRepetition(mID));
                     return true;
                 }
                 return false;

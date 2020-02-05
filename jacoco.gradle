@@ -1,0 +1,115 @@
+apply plugin: 'jacoco'
+
+// for the flow flavour for example do ./gradlew testFlowDebugUnitTestCoverage to generate a report
+
+jacoco {
+    toolVersion = "$jacocoVersion"
+}
+
+tasks.withType(Test) {
+    jacoco.includeNoLocationClasses = true
+}
+
+project.afterEvaluate {
+
+    (android.hasProperty('applicationVariants')
+            ? android.'applicationVariants'
+            : android.'libraryVariants').all { variant ->
+        def variantName = variant.name
+        def unitTestTask = "test${variantName.capitalize()}UnitTest"
+        def uiTestCoverageTask = "create${variantName.capitalize()}CoverageReport"
+
+        tasks.create(name: "${unitTestTask}Coverage", type: JacocoReport, dependsOn: [
+                "$unitTestTask",
+                "$uiTestCoverageTask",
+                ":data:testDebugUnitTest",
+                ":database:testDebugUnitTest",
+                ":domain:testDebugUnitTest",
+                ":offlinemaps:testDebugUnitTest",
+                ":uicomponents:testDebugUnitTest",
+                ":walkthrough:testDebugUnitTest",
+        ]) {
+            group = "Reporting"
+            description = "Generate Jacoco coverage reports for the ${variantName.capitalize()} build"
+
+            reports {
+                html.enabled = true
+                xml.enabled = true
+                csv.enabled = false
+            }
+
+            def excludedFiles = [
+                    '**/R.class',
+                    '**/R$*.class',
+                    '**/BuildConfig.*',
+                    '**/Manifest*.*',
+                    '**/*Test*.*',
+                    'android/**/*.*',
+                    '**/*$ViewInjector*.*',
+                    '**/*Component*.*',
+                    '**/*$Lambda$*.*',
+                    '**/*Companion*.*',
+                    '**/*Module.*',
+                    '**/*Dagger*.*',
+                    '**/*MembersInjector*.*',
+                    '**/*_Factory*.*',
+                    '**/*_Provide*Factory*.*'
+            ]
+
+            classDirectories.setFrom(files([
+                    fileTree(dir: "${buildDir}/tmp/kotlin-classes/${variantName}", excludes: excludedFiles),
+                    fileTree(dir: "${buildDir}/intermediates/javac/${variantName}", excludes: excludedFiles),
+                    fileTree(dir: kotlinClassesPath("data"), excludes: excludedFiles),
+                    fileTree(dir: javaClassesPath("data"), excludes: excludedFiles),
+                    fileTree(dir: kotlinClassesPath("domain"), excludes: excludedFiles),
+                    fileTree(dir: javaClassesPath("domain"), excludes: excludedFiles),
+                    fileTree(dir: kotlinClassesPath("database"), excludes: excludedFiles),
+                    fileTree(dir: javaClassesPath("database"), excludes: excludedFiles),
+                    fileTree(dir: kotlinClassesPath("offlinemaps"), excludes: excludedFiles),
+                    fileTree(dir: javaClassesPath("offlinemaps"), excludes: excludedFiles),
+                    fileTree(dir: kotlinClassesPath("uicomponents"), excludes: excludedFiles),
+                    fileTree(dir: javaClassesPath("uicomponents"), excludes: excludedFiles),
+                    fileTree(dir: kotlinClassesPath("walkthrough"), excludes: excludedFiles),
+                    fileTree(dir: javaClassesPath("walkthrough"), excludes: excludedFiles),
+            ]))
+
+            def coverageSourceDirs = [
+                    sourcesPath("app"),
+                    sourcesPath("data"),
+                    sourcesPath("domain"),
+                    sourcesPath("database"),
+                    sourcesPath("offlinemaps"),
+                    sourcesPath("uicomponents"),
+                    sourcesPath("walkthrough"),
+            ]
+            additionalSourceDirs.setFrom(files(coverageSourceDirs))
+            sourceDirectories.setFrom(files(coverageSourceDirs))
+
+            def uiTestsData = fileTree(dir: "${buildDir}/outputs/code_coverage/${variantName}AndroidTest/connected/", includes: ["**/*.ec"])
+
+            executionData(files([
+                    "$project.buildDir/jacoco/${unitTestTask}.exec",
+                    uiTestsData,
+                    reportPath("data"),
+                    reportPath("domain"),
+                    reportPath("database"),
+            ]))
+        }
+    }
+}
+
+private GString reportPath(module) {
+    "$project.rootDir/" + module + "/build/jacoco/testDebugUnitTest.exec"
+}
+
+private GString sourcesPath(module) {
+    "$project.rootDir/" + module + "/src/main/java"
+}
+
+private GString javaClassesPath(module) {
+    "$project.rootDir/" + module + "/build/intermediates/javac/debug"
+}
+
+private GString kotlinClassesPath(module) {
+    "$project.rootDir/" + module + "/build/tmp/kotlin-classes/debug"
+}

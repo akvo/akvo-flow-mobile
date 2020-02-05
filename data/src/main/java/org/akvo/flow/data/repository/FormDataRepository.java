@@ -204,7 +204,7 @@ public class FormDataRepository implements FormRepository {
                 });
     }
 
-    private Observable<Boolean> downloadAndExtractFile(String fileName, final String folder) {
+    private Observable<Boolean> downloadAndExtractFile(final String fileName, final String folder) {
         return restApi.downloadArchive(fileName)
                 .concatMap(new Function<ResponseBody, Observable<Boolean>>() {
                     @Override

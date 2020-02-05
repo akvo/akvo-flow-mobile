@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2013-2020 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -28,7 +28,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import org.akvo.flow.R;
-import org.akvo.flow.activity.BackActivity;
+import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.data.database.SurveyDbDataSource;
 import org.akvo.flow.data.loader.SurveyedLocaleItemLoader;
 import org.akvo.flow.database.SurveyInstanceStatus;
@@ -38,14 +38,16 @@ import org.akvo.flow.domain.SurveyedLocale;
 import org.akvo.flow.domain.entity.User;
 import org.akvo.flow.domain.interactor.DefaultObserver;
 import org.akvo.flow.domain.interactor.UseCase;
+import org.akvo.flow.injector.component.ApplicationComponent;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
-import org.akvo.flow.presentation.SnackBarManager;
 import org.akvo.flow.service.BootstrapService;
 import org.akvo.flow.ui.Navigator;
 import org.akvo.flow.ui.adapter.RecordTabsAdapter;
 import org.akvo.flow.ui.fragment.FormListFragment;
 import org.akvo.flow.ui.fragment.ResponseListFragment;
+import org.akvo.flow.uicomponents.BackActivity;
+import org.akvo.flow.uicomponents.SnackBarManager;
 import org.akvo.flow.util.ConstantUtil;
 
 import javax.inject.Inject;
@@ -104,6 +106,15 @@ public class RecordActivity extends BackActivity implements FormListFragment.Sur
         viewComponent.inject(this);
     }
 
+    /**
+     * Get the Main Application component for dependency injection.
+     *
+     * @return {@link ApplicationComponent}
+     */
+    private ApplicationComponent getApplicationComponent() {
+        return ((FlowApp) getApplication()).getApplicationComponent();
+    }
+
     @Override
     public void onResume() {
         super.onResume();
@@ -121,6 +132,7 @@ public class RecordActivity extends BackActivity implements FormListFragment.Sur
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == ConstantUtil.FORM_FILLING_REQUEST && resultCode == RESULT_OK) {
             snackBarManager.displaySnackBar(rootLayout, R.string.snackbar_submitted, this);
         }

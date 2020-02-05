@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010-2016,2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2010-2016,2018-2019 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -22,65 +22,35 @@ package org.akvo.flow.domain;
 import android.content.Context;
 import android.text.TextUtils;
 
-import com.google.android.gms.maps.model.LatLng;
-import com.google.maps.android.clustering.ClusterItem;
-
 import org.akvo.flow.R;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
-import java.util.List;
 
-public class SurveyedLocale implements Serializable, ClusterItem {
+public class SurveyedLocale implements Serializable {
 
     private static final long serialVersionUID = -3556354410813212814L;
 
     private String mId;
     private String mName;
-    private long mLastModified;
     private long mSurveyGroupId;
     private Double mLatitude;
     private Double mLongitude;
-    private transient LatLng mLatLng;// This var won't be serialized, just recreated with the lat/lon values
-    private List<SurveyInstance> mSurveyInstances = null;
     private int status;
 
-    public SurveyedLocale(String id, String name, long lastModified, long surveyGroupId,
+    public SurveyedLocale(String id, String name, long surveyGroupId,
             Double latitude, Double longitude, int status) {
         mId = id;
         mName = name;
-        mLastModified = lastModified;
         mSurveyGroupId = surveyGroupId;
         mLatitude = latitude;
         mLongitude = longitude;
         this.status = status;
-        if (latitude != null && longitude != null) {
-            mLatLng = new LatLng(latitude, longitude);
-        }
-    }
-
-    @Override
-    public LatLng getPosition() {
-        return mLatLng;
-    }
-
-    @Override
-    public String getTitle() {
-        return mId;
-    }
-
-    @Override
-    public String getSnippet() {
-        return mName;
     }
 
     public long getSurveyGroupId() {
         return mSurveyGroupId;
-    }
-
-    public long getLastModified() {
-        return mLastModified;
     }
 
     public String getId() {
@@ -95,14 +65,6 @@ public class SurveyedLocale implements Serializable, ClusterItem {
         return mLongitude;
     }
 
-    public void setSurveyInstances(List<SurveyInstance> surveyInstances) {
-        mSurveyInstances = surveyInstances;
-    }
-
-    public List<SurveyInstance> getSurveyInstances() {
-        return mSurveyInstances;
-    }
-
     public String getName() {
         return mName;
     }
@@ -115,15 +77,8 @@ public class SurveyedLocale implements Serializable, ClusterItem {
         this.status = status;
     }
 
-    /**
-     * Since LatLng cannot be (automatically) serialized, we'll just populate it with the
-     * denormalized lat/lon
-     */
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
         in.defaultReadObject();
-        if (mLatitude != null && mLongitude != null) {
-            mLatLng = new LatLng(mLatitude, mLongitude);
-        }
     }
 
     /**

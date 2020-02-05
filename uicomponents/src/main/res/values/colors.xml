@@ -20,6 +20,7 @@
     <color name="image_button_grey_disabled">#5094918e</color>
     <color name="image_button_grey">#94918e</color>
     <color name="image_button_grey_selected">#85827f</color>
+    <color name="bottom_bar_background_color">#85827f</color>
 
     <!-- FLOW branding -->
     <color name="background_alternate">#f1eae4</color>
@@ -29,9 +30,6 @@
     <color name="text_primary_disabled">@color/black_disabled</color>
 
     <color name="red">#FF0000</color>
-
-    <color name="record_name_background">#cec6bc</color>
-    <color name="feature_menu_background">#e0736357</color>
 
     <color name="colorPrimary">@color/orange_main</color>
     <color name="colorPrimaryDark">@color/orange_dark</color>

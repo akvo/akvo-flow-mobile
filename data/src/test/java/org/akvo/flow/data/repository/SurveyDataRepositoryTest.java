@@ -120,8 +120,7 @@ public class SurveyDataRepositoryTest {
         when(mockDataBaseDataSource.getUnSyncedTransmissions(anyString()))
                 .thenReturn(Observable.just(mockCursor));
 
-        RestApi restApi = new RestApi(mockDeviceHelper, new TestRestServiceFactory(),
-                "1.2.3", "");
+        RestApi restApi = new RestApi(mockDeviceHelper, new TestRestServiceFactory(), "1.2.3", "");
 
         S3RestApi s3RestApi = new S3RestApi(new TestRestServiceFactory(),
                 mockAmazonAuth, mockDateFormat, mockBodyCreator, "");
@@ -170,7 +169,7 @@ public class SurveyDataRepositoryTest {
 
     @Test
     public void shouldReturnEmptySurveyTransmissionsForEmptyFormsList() {
-        when(mockFormIdMapper.mapToFormId(any(Cursor.class))).thenReturn(Collections.<String>emptyList());
+        when(mockFormIdMapper.mapToFormId(any(Cursor.class))).thenReturn(Collections.emptyList());
 
         TestObserver observer = new TestObserver<List<Transmission>>();
 
@@ -189,7 +188,7 @@ public class SurveyDataRepositoryTest {
         when(mockFormIdMapper.mapToFormId(any(Cursor.class))).thenReturn(formIds);
 
         when(mockTransmissionMapper.transform(any(Cursor.class)))
-                .thenReturn(Collections.<Transmission>emptyList());
+                .thenReturn(Collections.emptyList());
 
         TestObserver observer = new TestObserver<List<Transmission>>();
 

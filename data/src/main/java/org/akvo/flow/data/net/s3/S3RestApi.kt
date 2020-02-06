@@ -122,7 +122,7 @@ open class S3RestApi(
             response.isSuccessful -> {
                 val etag = getEtag(response)
                 if (TextUtils.isEmpty(etag) || etag != s3File.md5Hex) {
-                    return Observable.error(Exception("File upload to S3 Failed" + s3File.filename))
+                    return Observable.error(Exception("File ${s3File.filename} upload to S3 Failed"))
                 }
             }
             else -> {
@@ -141,7 +141,7 @@ open class S3RestApi(
     }
 
     open fun formattedDate(): String {
-        return dateFormat.format(Date()) + "GMT"
+        return "${dateFormat.format(Date())}GMT"
     }
 
     companion object {

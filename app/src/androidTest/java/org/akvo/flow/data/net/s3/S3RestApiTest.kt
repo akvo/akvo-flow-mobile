@@ -61,13 +61,9 @@ class S3RestApiTest {
 
     @Test
     fun shouldDownloadImageCorrectly() {
-        val df: DateFormat =
-            SimpleDateFormat(REST_API_DATE_PATTERN, Locale.US)
+        val df: DateFormat = SimpleDateFormat(REST_API_DATE_PATTERN, Locale.US)
         df.timeZone = TimeZone.getTimeZone("GMT")
-        val s3RestApi =
-            S3RestApi(serviceFactory, amazonAuthHelper, df, BodyCreator(),
-                baseUrl()
-            )
+        val s3RestApi = S3RestApi(serviceFactory, amazonAuthHelper, df, BodyCreator(), baseUrl())
 
         val observer = TestObserver<ResponseBody>()
         s3RestApi.downloadMedia("6af199a2-a507-4def-ad97-b81f944c9929.jpg").subscribe(observer)
@@ -77,13 +73,9 @@ class S3RestApiTest {
 
     @Test
     fun shouldDownloadFolderCorrectly() {
-        val df: DateFormat =
-            SimpleDateFormat(REST_API_DATE_PATTERN, Locale.US)
+        val df: DateFormat = SimpleDateFormat(REST_API_DATE_PATTERN, Locale.US)
         df.timeZone = TimeZone.getTimeZone("GMT")
-        val s3RestApi =
-            S3RestApi(serviceFactory, amazonAuthHelper, df, BodyCreator(),
-                baseUrl()
-            )
+        val s3RestApi = S3RestApi(serviceFactory, amazonAuthHelper, df, BodyCreator(), baseUrl())
 
         val observer = TestObserver<ResponseBody>()
         s3RestApi.downloadArchive("10029122.zip").subscribe(observer)
@@ -103,5 +95,4 @@ class S3RestApiTest {
         private const val REST_API_DATE_PATTERN = "EEE, dd MMM yyyy HH:mm:ss "
 
     }
-
 }

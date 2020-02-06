@@ -74,8 +74,7 @@ public class MissingAndDeletedDataRepositoryTest {
         DataSourceFactory dataSourceFactory = new DataSourceFactory(null, null,
                 mockDatabaseDataSource, null, null, null);
 
-        RestApi restApi = new RestApi(mockDeviceHelper, new TestRestServiceFactory(),
-                "1.2.3", "");
+        RestApi restApi = new RestApi(mockDeviceHelper, new TestRestServiceFactory(), "1.2.3", "");
 
         missingAndDeletedDataRepository = spy(new MissingAndDeletedDataRepository(restApi,
                 new FilesResultMapper(), dataSourceFactory));
@@ -83,10 +82,8 @@ public class MissingAndDeletedDataRepositoryTest {
         when(mockDatabaseDataSource.saveMissingFiles(anySet())).thenReturn(Observable.just(true));
         when(mockDatabaseDataSource.updateFailedTransmissionsSurveyInstances(anySet()))
                 .thenReturn(Observable.just(true));
-        when(mockDatabaseDataSource.setDeletedForms(anySet())).thenAnswer(invocation -> {
-            Object[] args = invocation.getArguments();
-            return Observable.just((HashSet) args[0]);
-        });
+        when(mockDatabaseDataSource.setDeletedForms(anySet()))
+                .thenAnswer(invocation -> Observable.just((HashSet) invocation.getArguments()[0]));
     }
 
     @Test

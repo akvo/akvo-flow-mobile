@@ -109,17 +109,14 @@ public class FormDataRepositoryTest {
         mockWebServer = new MockWebServer();
         mockWebServer.start(8080);
 
-        restApi = spy(new RestApi(mockDeviceHelper, new TestRestServiceFactory(),
-                "1.2.3", ""));
-        s3RestApi = spy(
-                new S3RestApi(new TestRestServiceFactory(), mockAmazonAuth, mockDateFormat,
-                        new BodyCreator(), ""));
+        restApi = spy(new RestApi(mockDeviceHelper, new TestRestServiceFactory(), "1.2.3", ""));
+        s3RestApi = spy(new S3RestApi(new TestRestServiceFactory(), mockAmazonAuth, mockDateFormat,
+                new BodyCreator(), ""));
         doReturn("12-12-2012GMT").when(s3RestApi).formattedDate();
         DataSourceFactory dataSourceFactory = new DataSourceFactory(null, null,
                 mockDatabaseDataSource, null, mockFileDataSource, null);
         formDataRepository = new FormDataRepository(mockFormHeaderParser, mockXmlParser,
                 restApi, dataSourceFactory, mockFormIdMapper, s3RestApi);
-
         ApiFormHeader apiFormHeader = new ApiFormHeader("123456", "", "", "", 1.0, "", true, "");
         when(mockFormHeaderParser.parseOne(anyString())).thenReturn(apiFormHeader);
         when(mockAmazonAuth.getAmazonAuthForGet(anyString(), anyString(), anyString()))

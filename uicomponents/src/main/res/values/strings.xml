@@ -304,7 +304,7 @@
     <string name="error_displaying_datapoint">This datapoint cannot be viewed on a map</string>
 
     <string name="walkthrough_title">Datapoint assignment</string>
-    <string name="walkthrough_subtitle">For monitoring surveys, when you press ‘Download’, only specific datapoints assigned to your device will be downloaded</string>
+    <string name="walkthrough_subtitle">In monitoring surveys, when you press \'download\' only datapoints assigned to the device will be downloaded</string>
 
     <string name="offline_maps_dialog_title">Select map</string>
     <string name="offline_maps_dialog_online_label">Online</string>

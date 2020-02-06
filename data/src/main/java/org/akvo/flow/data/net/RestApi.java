@@ -43,10 +43,9 @@ import java.util.List;
 
 import javax.inject.Singleton;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import io.reactivex.Flowable;
 import io.reactivex.Observable;
+import io.reactivex.Single;
 import io.reactivex.functions.Function;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
@@ -64,21 +63,19 @@ public class RestApi {
     private final String imei;
     private final String phoneNumber;
     private final RestServiceFactory serviceFactory;
-    private final Encoder encoder;
     private final String version;
     private final ApiUrls apiUrls;
     private final AmazonAuthHelper amazonAuthHelper;
     private final DateFormat dateFormat;
     private final BodyCreator bodyCreator;
 
-    public RestApi(DeviceHelper deviceHelper, RestServiceFactory serviceFactory,
-            Encoder encoder, String version, ApiUrls apiUrls, AmazonAuthHelper amazonAuthHelper,
-            DateFormat dateFormat, BodyCreator bodyCreator) {
+    public RestApi(DeviceHelper deviceHelper, RestServiceFactory serviceFactory, String version,
+            ApiUrls apiUrls, AmazonAuthHelper amazonAuthHelper, DateFormat dateFormat,
+            BodyCreator bodyCreator) {
         this.androidId = deviceHelper.getAndroidId();
         this.imei = deviceHelper.getImei();
         this.phoneNumber = deviceHelper.getPhoneNumber();
         this.serviceFactory = serviceFactory;
-        this.encoder = encoder;
         this.version = version;
         this.apiUrls = apiUrls;
         this.amazonAuthHelper = amazonAuthHelper;
@@ -87,15 +84,11 @@ public class RestApi {
     }
 
     @SuppressWarnings("unchecked")
-    public Flowable<ApiLocaleResult> downloadDataPoints(long surveyGroup,
-            @NonNull String timestamp) {
-        String lastUpdated = !TextUtils.isEmpty(timestamp) ? timestamp : "0";
-        String phoneNumber = encoder.encodeParam(this.phoneNumber);
+    public Single<ApiLocaleResult> downloadDataPoints(long surveyId) {
         return serviceFactory.createRetrofitServiceWithInterceptor(DataPointDownloadService.class,
-                apiUrls.getGaeUrl())
-                .loadNewDataPoints(androidId, imei, lastUpdated, phoneNumber, surveyGroup + "")
+                apiUrls.getGaeUrl()).getAssignedDataPoints(androidId, surveyId + "")
                 .onErrorResumeNext(new ErrorLoggerFunction(
-                        "Error downloading datapoints for survey: " + surveyGroup));
+                        "Error downloading datapoints for survey: " + surveyId));
     }
 
     @SuppressWarnings("unchecked")

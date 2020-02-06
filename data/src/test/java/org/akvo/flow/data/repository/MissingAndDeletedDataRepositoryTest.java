@@ -77,7 +77,7 @@ public class MissingAndDeletedDataRepositoryTest {
         DataSourceFactory dataSourceFactory = new DataSourceFactory(null, null,
                 mockDatabaseDataSource, null, null, null);
 
-        RestApi restApi = new RestApi(mockDeviceHelper, new TestRestServiceFactory(), null,
+        RestApi restApi = new RestApi(mockDeviceHelper, new TestRestServiceFactory(),
                 "1.2.3", new ApiUrls(null, null), null, null, null);
 
         missingAndDeletedDataRepository = spy(new MissingAndDeletedDataRepository(restApi,

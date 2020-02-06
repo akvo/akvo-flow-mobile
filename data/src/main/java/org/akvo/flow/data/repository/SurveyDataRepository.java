@@ -24,15 +24,11 @@ import android.database.Cursor;
 
 import org.akvo.flow.data.datasource.DataSourceFactory;
 import org.akvo.flow.data.datasource.DatabaseDataSource;
-import org.akvo.flow.data.entity.ApiDataPoint;
-import org.akvo.flow.data.entity.ApiLocaleResult;
-import org.akvo.flow.data.entity.ApiSurveyInstance;
 import org.akvo.flow.data.entity.DataPointMapper;
 import org.akvo.flow.data.entity.FormInstanceMapper;
 import org.akvo.flow.data.entity.FormInstanceMetadataMapper;
 import org.akvo.flow.data.entity.S3File;
 import org.akvo.flow.data.entity.SurveyMapper;
-import org.akvo.flow.data.entity.SyncedTimeMapper;
 import org.akvo.flow.data.entity.Transmission;
 import org.akvo.flow.data.entity.TransmissionFilenameMapper;
 import org.akvo.flow.data.entity.TransmissionMapper;
@@ -48,32 +44,22 @@ import org.akvo.flow.domain.entity.FormInstanceMetadata;
 import org.akvo.flow.domain.entity.InstanceIdUuid;
 import org.akvo.flow.domain.entity.Survey;
 import org.akvo.flow.domain.entity.User;
-import org.akvo.flow.domain.exception.AssignmentRequiredException;
 import org.akvo.flow.domain.repository.SurveyRepository;
-import org.reactivestreams.Publisher;
 
-import java.net.HttpURLConnection;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.Callable;
-import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.VisibleForTesting;
 import io.reactivex.Completable;
-import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.reactivex.Single;
-import io.reactivex.SingleSource;
 import io.reactivex.functions.BiFunction;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
-import io.reactivex.functions.Predicate;
 import okhttp3.ResponseBody;
 import retrofit2.HttpException;
 import retrofit2.Response;
@@ -83,7 +69,6 @@ public class SurveyDataRepository implements SurveyRepository {
 
     private final DataSourceFactory dataSourceFactory;
     private final DataPointMapper dataPointMapper;
-    private final SyncedTimeMapper syncedTimeMapper;
     private final RestApi restApi;
     private final SurveyMapper surveyMapper;
     private final UserMapper userMapper;
@@ -96,14 +81,12 @@ public class SurveyDataRepository implements SurveyRepository {
     //TODO: this needs to be split, too many methods and params
     @Inject
     public SurveyDataRepository(DataSourceFactory dataSourceFactory,
-            DataPointMapper dataPointMapper, SyncedTimeMapper syncedTimeMapper, RestApi restApi,
-            SurveyMapper surveyMapper, UserMapper userMapper,
-            TransmissionFilenameMapper transmissionFilenameMapper,
+            DataPointMapper dataPointMapper, RestApi restApi, SurveyMapper surveyMapper,
+            UserMapper userMapper, TransmissionFilenameMapper transmissionFilenameMapper,
             TransmissionMapper transmissionMapper, FormInstanceMapper formInstanceMapper,
             FormIdMapper formIdMapper, FormInstanceMetadataMapper formInstanceMetadataMapper) {
         this.dataSourceFactory = dataSourceFactory;
         this.dataPointMapper = dataPointMapper;
-        this.syncedTimeMapper = syncedTimeMapper;
         this.restApi = restApi;
         this.surveyMapper = surveyMapper;
         this.userMapper = userMapper;
@@ -153,151 +136,6 @@ public class SurveyDataRepository implements SurveyRepository {
                         return Single.just(dataPoint);
                     }
                 });
-    }
-
-    @Override
-    public Flowable<Integer> downloadDataPoints(final long surveyGroupId) {
-        return syncDataPoints(surveyGroupId)
-                .onErrorResumeNext(new Function<Throwable, Flowable<Integer>>() {
-                    @Override
-                    public Flowable<Integer> apply(Throwable throwable) {
-                        if (isErrorForbidden(throwable)) {
-                            return Flowable.error(new AssignmentRequiredException(
-                                    "Dashboard Assignment missing"));
-                        } else {
-                            return Flowable.error(throwable);
-                        }
-                    }
-                });
-    }
-
-    private boolean isErrorForbidden(Throwable throwable) {
-        return throwable instanceof HttpException
-                && ((HttpException) throwable).code() == HttpURLConnection.HTTP_FORBIDDEN;
-    }
-
-    private String getSyncedTime(long surveyGroupId) {
-        Cursor syncedTime = dataSourceFactory.getDataBaseDataSource().getSyncedTime(surveyGroupId);
-        return syncedTimeMapper.getTime(syncedTime);
-    }
-
-    private Flowable<Integer> syncDataPoints(final long surveyGroupId) {
-        final State state = new State(getSyncedTime(surveyGroupId));
-        return downloadDataPoints(surveyGroupId, state)
-                .doOnNext(new Consumer<State>() {
-                    @Override
-                    public void accept(@NonNull State state) {
-                        List<ApiDataPoint> lastBatch = state.getLastBatch();
-                        dataSourceFactory.getDataBaseDataSource().syncDataPoints(lastBatch);
-                    }
-                })
-                .repeatWhen(new Function<Flowable<Object>, Publisher<?>>() {
-                    @Override
-                    public Publisher<?> apply(@NonNull Flowable<Object> flowable) {
-                        return flowable.delay(15, TimeUnit.SECONDS);
-                    }
-                })
-                .takeUntil(new Predicate<State>() {
-                    @Override
-                    public boolean test(State state) {
-                        return state.getLastBatch().isEmpty();
-                    }
-                })
-                .filter(new Predicate<State>() {
-                    @Override
-                    public boolean test(State state) {
-                        return state.getLastBatch().isEmpty();
-                    }
-                })
-                .map(new Function<State, Integer>() {
-                    @Override
-                    public Integer apply(State state) {
-                        return state.retrievedItems;
-                    }
-                });
-    }
-
-    private Flowable<State> downloadDataPoints(final long surveyGroupId,
-            final State state) {
-        return Flowable.defer(new Callable<Flowable<ApiLocaleResult>>() {
-            @Override
-            public Flowable<ApiLocaleResult> call() {
-                return restApi.downloadDataPoints(surveyGroupId,
-                        state.getTimestamp());
-            }
-        }).map(new Function<ApiLocaleResult, List<ApiDataPoint>>() {
-            @Override
-            public List<ApiDataPoint> apply(@NonNull ApiLocaleResult apiLocaleResult) {
-                if (apiLocaleResult == null || apiLocaleResult.getDataPoints() == null) {
-                    return Collections.emptyList();
-                }
-                List<ApiDataPoint> dataPoints = apiLocaleResult.getDataPoints();
-                dataPoints.removeAll(state.getLastBatch()); //remove duplicates
-                return dataPoints;
-            }
-        }).concatMap(new Function<List<ApiDataPoint>, Flowable<State>>() {
-            @Override
-            public Flowable<State> apply(@NonNull List<ApiDataPoint> dataPoints) {
-                return filterDataPoints(dataPoints, state);
-            }
-        });
-    }
-
-    private Flowable<State> filterDataPoints(@NonNull List<ApiDataPoint> dataPoints,
-            final State state) {
-        return Flowable.fromIterable(dataPoints)
-                .filter(new Predicate<ApiDataPoint>() {
-                    @Override
-                    public boolean test(@NonNull ApiDataPoint apiDataPoint) {
-                        List<ApiSurveyInstance> instances = apiDataPoint.getSurveyInstances();
-                        return instances != null && !instances.isEmpty();
-                    }
-                })
-                .toList()
-                .flatMap(new Function<List<ApiDataPoint>, SingleSource<State>>() {
-                    @Override
-                    public SingleSource<State> apply(@NonNull List<ApiDataPoint> points) {
-                        state.update(points);
-                        return Single.just(state);
-                    }
-                })
-                .toFlowable();
-    }
-
-    public class State {
-
-        @NonNull
-        private final List<ApiDataPoint> lastBatch;
-
-        private String timestamp;
-        private int retrievedItems = 0;
-
-        State(String timestamp) {
-            this.timestamp = timestamp;
-            this.lastBatch = new ArrayList<>();
-        }
-
-        void update(List<ApiDataPoint> dataPoints) {
-            if (dataPoints == null) {
-                return;
-            }
-            lastBatch.clear();
-            lastBatch.addAll(dataPoints);
-            retrievedItems += dataPoints.size();
-            int size = lastBatch.size();
-            if (size != 0) {
-                ApiDataPoint lastDataPoint = lastBatch.get(size - 1);
-                timestamp = String.valueOf(lastDataPoint.getLastModified());
-            }
-        }
-
-        String getTimestamp() {
-            return timestamp;
-        }
-
-        List<ApiDataPoint> getLastBatch() {
-            return lastBatch;
-        }
     }
 
     @Override

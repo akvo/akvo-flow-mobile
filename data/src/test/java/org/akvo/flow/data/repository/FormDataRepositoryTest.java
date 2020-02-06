@@ -112,7 +112,7 @@ public class FormDataRepositoryTest {
         mockWebServer = new MockWebServer();
         mockWebServer.start(8080);
 
-        restApi = spy(new RestApi(mockDeviceHelper, new TestRestServiceFactory(), null,
+        restApi = spy(new RestApi(mockDeviceHelper, new TestRestServiceFactory(),
                 "1.2.3", new ApiUrls(null, null), mockAmazonAuth, mockDateFormat, null));
         DataSourceFactory dataSourceFactory = new DataSourceFactory(null, null,
                 mockDatabaseDataSource, null, mockFileDataSource, null);

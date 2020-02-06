@@ -122,7 +122,7 @@ public class SurveyDataRepositoryTest {
         when(mockDataBaseDataSource.getUnSyncedTransmissions(anyString()))
                 .thenReturn(Observable.just(mockCursor));
 
-        RestApi restApi = new RestApi(mockDeviceHelper, new TestRestServiceFactory(), null,
+        RestApi restApi = new RestApi(mockDeviceHelper, new TestRestServiceFactory(),
                 "1.2.3", new ApiUrls("", ""), mockAmazonAuth, mockDateFormat, mockBodyCreator);
         when(mockDateFormat
                 .format(any(Date.class), any(StringBuffer.class), any(FieldPosition.class)))
@@ -131,7 +131,7 @@ public class SurveyDataRepositoryTest {
         when(mockAmazonAuth.getAmazonAuthForPut(anyString(), anyString(), any(S3File.class)))
                 .thenReturn("123");
 
-        surveyDataRepository = new SurveyDataRepository(mockDataSourceFactory, null, null, restApi,
+        surveyDataRepository = new SurveyDataRepository(mockDataSourceFactory, null, restApi,
                 null, null, null, mockTransmissionMapper, null, mockFormIdMapper, null);
 
         when(mockDeviceHelper.getPhoneNumber()).thenReturn("123");

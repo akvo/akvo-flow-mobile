@@ -50,7 +50,7 @@ before_install:
   - "if [ \"$TRAVIS_PULL_REQUEST\" != \"false\" ]; then . ./travis/setup_gcloud.sh; fi"
 
 script:
-  - ./gradlew check --continue -Pnodexcount=true
+  - ./gradlew lintDebug lintFlowDebug testDebugUnitTest testFlowDebugUnitTest --continue -Pnodexcount=true
   - ./gradlew :app:assembleFlowDebugAndroidTest -Pnodexcount=true
   - "if [ \"$TRAVIS_PULL_REQUEST\" != \"false\" ]; then . ./travis/run_firebase_tests.sh; fi"
 

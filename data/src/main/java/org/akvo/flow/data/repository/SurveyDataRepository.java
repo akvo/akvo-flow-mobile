@@ -21,6 +21,7 @@
 package org.akvo.flow.data.repository;
 
 import android.database.Cursor;
+import android.util.Pair;
 
 import org.akvo.flow.data.datasource.DataSourceFactory;
 import org.akvo.flow.data.datasource.DatabaseDataSource;
@@ -50,6 +51,8 @@ import org.akvo.flow.domain.entity.Survey;
 import org.akvo.flow.domain.entity.User;
 import org.akvo.flow.domain.exception.AssignmentRequiredException;
 import org.akvo.flow.domain.repository.SurveyRepository;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.reactivestreams.Publisher;
 
 import java.net.HttpURLConnection;
@@ -388,6 +391,20 @@ public class SurveyDataRepository implements SurveyRepository {
                         return formIdMapper.mapToFormId(cursor);
                     }
                 });
+    }
+
+    @Override
+    @NotNull
+    public Single<Pair<Boolean, String>> getFormMeta(@NotNull String formId) {
+        return dataSourceFactory.getDataBaseDataSource().getFormMetaData(formId);
+    }
+
+    @Override
+    @NotNull
+    public Single<Long> fetchSurveyInstance(@NotNull String formId, @NotNull String datapointId,
+            @NotNull String formVersion, long userId, @Nullable String userName) {
+        return dataSourceFactory.getDataBaseDataSource()
+                .fetchSurveyInstance(formId, datapointId, formVersion, userId, userName);
     }
 
     @Override

@@ -21,7 +21,6 @@ package org.akvo.flow.presentation.record;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -31,17 +30,11 @@ import org.akvo.flow.R;
 import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.data.database.SurveyDbDataSource;
 import org.akvo.flow.data.loader.SurveyedLocaleItemLoader;
-import org.akvo.flow.database.SurveyInstanceStatus;
-import org.akvo.flow.domain.Survey;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.SurveyedLocale;
-import org.akvo.flow.domain.entity.User;
-import org.akvo.flow.domain.interactor.DefaultObserver;
-import org.akvo.flow.domain.interactor.UseCase;
 import org.akvo.flow.injector.component.ApplicationComponent;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
-import org.akvo.flow.service.BootstrapService;
 import org.akvo.flow.ui.Navigator;
 import org.akvo.flow.ui.adapter.RecordTabsAdapter;
 import org.akvo.flow.ui.fragment.FormListFragment;
@@ -49,19 +42,20 @@ import org.akvo.flow.ui.fragment.ResponseListFragment;
 import org.akvo.flow.uicomponents.BackActivity;
 import org.akvo.flow.uicomponents.SnackBarManager;
 import org.akvo.flow.util.ConstantUtil;
+import org.jetbrains.annotations.NotNull;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 
+import androidx.annotation.StringRes;
 import androidx.loader.app.LoaderManager;
 import androidx.loader.content.Loader;
 import androidx.viewpager.widget.ViewPager;
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import timber.log.Timber;
 
 public class RecordActivity extends BackActivity implements FormListFragment.SurveyListListener,
-        ResponseListFragment.ResponseListListener, LoaderManager.LoaderCallbacks<SurveyedLocale> {
+        ResponseListFragment.ResponseListListener, LoaderManager.LoaderCallbacks<SurveyedLocale>,
+        RecordView {
 
     private SurveyGroup mSurveyGroup;
     private String recordId;
@@ -73,11 +67,10 @@ public class RecordActivity extends BackActivity implements FormListFragment.Sur
     Navigator navigator;
 
     @Inject
-    @Named("getSelectedUser")
-    UseCase getSelectedUser;
+    SnackBarManager snackBarManager;
 
     @Inject
-    SnackBarManager snackBarManager;
+    RecordPresenter presenter;
 
     @BindView(R.id.record_root_layout)
     View rootLayout;
@@ -88,7 +81,7 @@ public class RecordActivity extends BackActivity implements FormListFragment.Sur
         setContentView(R.layout.record_activity);
         initializeInjector();
         ButterKnife.bind(this);
-
+        presenter.setView(this);
         ViewPager viewPager = findViewById(R.id.pager);
         RecordTabsAdapter recordTabsAdapter = new RecordTabsAdapter(getSupportFragmentManager(),
                 getResources().getStringArray(R.array.record_tabs));
@@ -139,45 +132,23 @@ public class RecordActivity extends BackActivity implements FormListFragment.Sur
     }
 
     @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (presenter != null) {
+            presenter.destroy();
+        }
+    }
+
+    @Override
     public void onSurveyClick(final String formId) {
-        if (BootstrapService.isProcessing) {
-            Toast.makeText(this, R.string.pleasewaitforbootstrap, Toast.LENGTH_LONG).show();
-            return;
-        }
-        final Survey survey = mDatabase.getSurvey(formId);
-        if (!survey.isHelpDownloaded()) {
-            Toast.makeText(this, R.string.error_missing_cascade, Toast.LENGTH_LONG).show();
-            return;
-        }
-
-        getSelectedUser.execute(new DefaultObserver<User>() {
-            @Override
-            public void onError(Throwable e) {
-                Timber.e(e);
-            }
-
-            @Override
-            public void onNext(User user) {
-                String userName = user.getName();
-                if (!TextUtils.isEmpty(userName)) {
-                    displayForm(user, formId, survey);
-                }
-            }
-        }, null);
-
-
+        presenter.onSurveyClick(formId, recordId);
     }
 
-    private void displayForm(User user, String formId, Survey survey) {
-        // Check if there are saved (non-submitted) responses for this Survey, and take the 1st one
-        long[] instances = mDatabase.getFormInstances(recordId, formId, SurveyInstanceStatus.SAVED);
-        long formInstanceId = instances.length > 0 ?
-                instances[0] :
-                mDatabase.createSurveyRespondent(formId, survey.getVersion(), user, recordId);
-
-        navigator.navigateToFormActivity(this, recordId, formId, formInstanceId, false,
-                mSurveyGroup);
+    private void showErrorMessage(@StringRes int stringResId) {
+        Toast.makeText(this, stringResId, Toast.LENGTH_LONG).show();
     }
+
+
 
     @Override
     public void onNamedRecordDeleted() {
@@ -222,5 +193,21 @@ public class RecordActivity extends BackActivity implements FormListFragment.Sur
     @Override
     public void onLoaderReset(Loader<SurveyedLocale> loader) {
         // EMPTY
+    }
+
+    @Override
+    public void showBootStrapPendingError() {
+        showErrorMessage(R.string.pleasewaitforbootstrap);
+    }
+
+    @Override
+    public void showMissingCascadeError() {
+        showErrorMessage(R.string.error_missing_cascade);
+    }
+
+    @Override
+    public void navigateToForm(@NotNull String formId, long formInstanceId) {
+        navigator.navigateToFormActivity(this, recordId, formId, formInstanceId, false,
+                mSurveyGroup);
     }
 }

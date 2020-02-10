@@ -20,15 +20,21 @@
 package org.akvo.flow.presentation.record
 
 import io.reactivex.observers.DisposableSingleObserver
+import org.akvo.flow.domain.entity.DataPoint
 import org.akvo.flow.domain.exception.CascadeResourceMissing
+import org.akvo.flow.domain.interactor.datapoints.GetDataPoint
 import org.akvo.flow.domain.interactor.forms.GetFormInstanceId
 import org.akvo.flow.presentation.Presenter
+import org.akvo.flow.presentation.datapoints.DisplayNameMapper
 import org.akvo.flow.service.BootstrapService
 import timber.log.Timber
 import javax.inject.Inject
 
-class RecordPresenter @Inject constructor(private val getFormInstanceIdUseCase: GetFormInstanceId) :
-    Presenter {
+class RecordPresenter @Inject constructor(
+    private val getFormInstanceIdUseCase: GetFormInstanceId,
+    private val getDataPoint: GetDataPoint,
+    private val displayNameMapper: DisplayNameMapper
+) : Presenter {
 
     var view: RecordView? = null
 
@@ -41,6 +47,7 @@ class RecordPresenter @Inject constructor(private val getFormInstanceIdUseCase: 
             view?.showBootStrapPendingError()
             return
         }
+
         val params: MutableMap<String, Any> = HashMap(4)
         params[GetFormInstanceId.PARAM_FORM_ID] = formId
         params[GetFormInstanceId.PARAM_DATAPOINT_ID] = datapointId
@@ -58,6 +65,22 @@ class RecordPresenter @Inject constructor(private val getFormInstanceIdUseCase: 
                 //TODO: add error messages
             }
 
+        }, params)
+    }
+
+    fun loadDataPoint(dataPointId: String) {
+        val params: MutableMap<String, Any> = HashMap(2)
+        params[GetDataPoint.PARAM_DATA_POINT_ID] = dataPointId
+        getDataPoint.execute(object : DisposableSingleObserver<DataPoint>() {
+            override fun onSuccess(dataPoint: DataPoint) {
+                val displayName: String = displayNameMapper.createDisplayName(dataPoint.name)
+                view?.showDataPointTitle(displayName)
+            }
+
+            override fun onError(e: Throwable) {
+                Timber.e(e)
+                view?.onDataPointError()
+            }
         }, params)
     }
 }

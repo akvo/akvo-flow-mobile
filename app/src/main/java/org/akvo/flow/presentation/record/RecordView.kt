@@ -23,4 +23,6 @@ interface RecordView {
     fun showBootStrapPendingError()
     fun showMissingCascadeError()
     fun navigateToForm(formId: String, formInstanceId: Long)
+    fun showDataPointTitle(displayName: String)
+    fun onDataPointError()
 }

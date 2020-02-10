@@ -205,7 +205,7 @@ public class ResponseListFragment extends ListFragment implements LoaderCallback
         db.deleteSurveyInstance(String.valueOf(surveyInstanceId));
         db.close();
         if (nameResetNeeded && responseListListener != null) {
-            responseListListener.onNamedRecordDeleted();
+            responseListListener.onDataPointNameDeleted();
         }
         refresh();
     }
@@ -254,6 +254,6 @@ public class ResponseListFragment extends ListFragment implements LoaderCallback
     };
 
     public interface ResponseListListener {
-        void onNamedRecordDeleted();
+        void onDataPointNameDeleted();
     }
 }

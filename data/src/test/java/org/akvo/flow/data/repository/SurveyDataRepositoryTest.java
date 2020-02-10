@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2019-2020 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -24,32 +24,30 @@ import android.database.Cursor;
 
 import org.akvo.flow.data.datasource.DataSourceFactory;
 import org.akvo.flow.data.datasource.DatabaseDataSource;
-import org.akvo.flow.data.entity.form.FormIdMapper;
 import org.akvo.flow.data.entity.S3File;
 import org.akvo.flow.data.entity.Transmission;
 import org.akvo.flow.data.entity.TransmissionMapper;
 import org.akvo.flow.data.entity.UploadError;
 import org.akvo.flow.data.entity.UploadFormDeletedError;
 import org.akvo.flow.data.entity.UploadSuccess;
+import org.akvo.flow.data.entity.form.FormIdMapper;
 import org.akvo.flow.data.net.RestApi;
 import org.akvo.flow.data.net.s3.AmazonAuthHelper;
 import org.akvo.flow.data.net.s3.BodyCreator;
-import org.akvo.flow.data.util.ApiUrls;
+import org.akvo.flow.data.net.s3.S3RestApi;
 import org.akvo.flow.domain.util.DeviceHelper;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import java.io.File;
 import java.io.IOException;
-import java.text.FieldPosition;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -122,21 +120,16 @@ public class SurveyDataRepositoryTest {
         when(mockDataBaseDataSource.getUnSyncedTransmissions(anyString()))
                 .thenReturn(Observable.just(mockCursor));
 
-        RestApi restApi = new RestApi(mockDeviceHelper, new TestRestServiceFactory(),
-                "1.2.3", new ApiUrls("", ""), mockAmazonAuth, mockDateFormat, mockBodyCreator);
-        when(mockDateFormat
-                .format(any(Date.class), any(StringBuffer.class), any(FieldPosition.class)))
-                .thenReturn(new StringBuffer().append("12-12-2012"));
+        RestApi restApi = new RestApi(mockDeviceHelper, new TestRestServiceFactory(), "1.2.3", "");
+
+        S3RestApi s3RestApi = new S3RestApi(new TestRestServiceFactory(),
+                mockAmazonAuth, mockDateFormat, mockBodyCreator, "");
 
         when(mockAmazonAuth.getAmazonAuthForPut(anyString(), anyString(), any(S3File.class)))
                 .thenReturn("123");
 
         surveyDataRepository = new SurveyDataRepository(mockDataSourceFactory, null, restApi,
-                null, null, null, mockTransmissionMapper, null, mockFormIdMapper, null);
-
-        when(mockDeviceHelper.getPhoneNumber()).thenReturn("123");
-        when(mockDeviceHelper.getImei()).thenReturn("123");
-        when(mockDeviceHelper.getAndroidId()).thenReturn("123");
+                null, null, null, mockTransmissionMapper, null, mockFormIdMapper, null, s3RestApi);
 
         when(mockBodyCreator.createBody(any(S3File.class))).thenReturn(mockBody);
 
@@ -176,7 +169,7 @@ public class SurveyDataRepositoryTest {
 
     @Test
     public void shouldReturnEmptySurveyTransmissionsForEmptyFormsList() {
-        when(mockFormIdMapper.mapToFormId(any(Cursor.class))).thenReturn(Collections.<String>emptyList());
+        when(mockFormIdMapper.mapToFormId(any(Cursor.class))).thenReturn(Collections.emptyList());
 
         TestObserver observer = new TestObserver<List<Transmission>>();
 
@@ -195,7 +188,7 @@ public class SurveyDataRepositoryTest {
         when(mockFormIdMapper.mapToFormId(any(Cursor.class))).thenReturn(formIds);
 
         when(mockTransmissionMapper.transform(any(Cursor.class)))
-                .thenReturn(Collections.<Transmission>emptyList());
+                .thenReturn(Collections.emptyList());
 
         TestObserver observer = new TestObserver<List<Transmission>>();
 

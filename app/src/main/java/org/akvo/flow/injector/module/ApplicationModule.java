@@ -39,6 +39,7 @@ import org.akvo.flow.data.net.S3User;
 import org.akvo.flow.data.net.SignatureHelper;
 import org.akvo.flow.data.net.s3.AmazonAuthHelper;
 import org.akvo.flow.data.net.s3.BodyCreator;
+import org.akvo.flow.data.net.s3.S3RestApi;
 import org.akvo.flow.data.repository.ApkDataRepository;
 import org.akvo.flow.data.repository.DataPointDataRepository;
 import org.akvo.flow.data.repository.FileDataRepository;
@@ -47,7 +48,6 @@ import org.akvo.flow.data.repository.MissingAndDeletedDataRepository;
 import org.akvo.flow.data.repository.SetupDataRepository;
 import org.akvo.flow.data.repository.SurveyDataRepository;
 import org.akvo.flow.data.repository.UserDataRepository;
-import org.akvo.flow.data.util.ApiUrls;
 import org.akvo.flow.database.DatabaseHelper;
 import org.akvo.flow.database.LanguageTable;
 import org.akvo.flow.database.SurveyLanguagesDataSource;
@@ -241,18 +241,18 @@ public class ApplicationModule {
 
     @Provides
     @Singleton
-    RestApi provideRestApi(DeviceHelper deviceHelper, RestServiceFactory serviceFactory,
-            ApiUrls apiUrls, AmazonAuthHelper amazonAuthHelper, BodyCreator bodyCreator) {
-        final DateFormat df = new SimpleDateFormat(REST_API_DATE_PATTERN, Locale.US);
-        df.setTimeZone(TimeZone.getTimeZone(TIMEZONE));
+    RestApi provideRestApi(DeviceHelper deviceHelper, RestServiceFactory serviceFactory) {
         return new RestApi(deviceHelper, serviceFactory, BuildConfig.VERSION_NAME,
-                apiUrls, amazonAuthHelper, df, bodyCreator);
+                BuildConfig.SERVER_BASE);
     }
 
     @Provides
     @Singleton
-    ApiUrls provideApiUrls() {
-        return new ApiUrls(BuildConfig.SERVER_BASE,
+    S3RestApi provideS3RestApi(RestServiceFactory serviceFactory, AmazonAuthHelper amazonAuthHelper,
+            BodyCreator bodyCreator) {
+        final DateFormat df = new SimpleDateFormat(REST_API_DATE_PATTERN, Locale.US);
+        df.setTimeZone(TimeZone.getTimeZone(TIMEZONE));
+        return new S3RestApi(serviceFactory, amazonAuthHelper, df, bodyCreator,
                 "https://" + BuildConfig.AWS_BUCKET + ".s3.amazonaws.com");
     }
 

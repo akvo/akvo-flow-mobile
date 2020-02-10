@@ -39,6 +39,7 @@ import org.akvo.flow.data.entity.UploadSuccess;
 import org.akvo.flow.data.entity.UserMapper;
 import org.akvo.flow.data.entity.form.FormIdMapper;
 import org.akvo.flow.data.net.RestApi;
+import org.akvo.flow.data.net.s3.S3RestApi;
 import org.akvo.flow.domain.entity.DataPoint;
 import org.akvo.flow.domain.entity.FormInstanceMetadata;
 import org.akvo.flow.domain.entity.InstanceIdUuid;
@@ -77,6 +78,7 @@ public class SurveyDataRepository implements SurveyRepository {
     private final TransmissionMapper transmissionMapper;
     private final FormInstanceMapper formInstanceMapper;
     private final FormInstanceMetadataMapper formInstanceMetadataMapper;
+    private final S3RestApi s3RestApi;
 
     //TODO: this needs to be split, too many methods and params
     @Inject
@@ -84,7 +86,8 @@ public class SurveyDataRepository implements SurveyRepository {
             DataPointMapper dataPointMapper, RestApi restApi, SurveyMapper surveyMapper,
             UserMapper userMapper, TransmissionFilenameMapper transmissionFilenameMapper,
             TransmissionMapper transmissionMapper, FormInstanceMapper formInstanceMapper,
-            FormIdMapper formIdMapper, FormInstanceMetadataMapper formInstanceMetadataMapper) {
+            FormIdMapper formIdMapper, FormInstanceMetadataMapper formInstanceMetadataMapper,
+            S3RestApi s3RestApi) {
         this.dataSourceFactory = dataSourceFactory;
         this.dataPointMapper = dataPointMapper;
         this.restApi = restApi;
@@ -95,6 +98,7 @@ public class SurveyDataRepository implements SurveyRepository {
         this.transmissionMapper = transmissionMapper;
         this.formInstanceMapper = formInstanceMapper;
         this.formInstanceMetadataMapper = formInstanceMetadataMapper;
+        this.s3RestApi = s3RestApi;
     }
 
     @Override
@@ -410,7 +414,7 @@ public class SurveyDataRepository implements SurveyRepository {
         final long transmissionId = transmission.getId();
         final long surveyInstanceId = transmission.getRespondentId();
         final String formId = transmission.getFormId();
-        return restApi.uploadFile(transmission)
+        return s3RestApi.uploadFile(transmission)
                 .concatMap(new Function<Response<ResponseBody>, Observable<?>>() {
                     @Override
                     public Observable<?> apply(Response ignored) {

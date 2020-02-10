@@ -36,7 +36,7 @@ class RecordPresenter @Inject constructor(private val getFormInstanceIdUseCase: 
         getFormInstanceIdUseCase.dispose()
     }
 
-    fun onSurveyClick(formId: String, datapointId: String) {
+    fun onFormClick(formId: String, datapointId: String) {
         if (BootstrapService.isProcessing) {
             view?.showBootStrapPendingError()
             return

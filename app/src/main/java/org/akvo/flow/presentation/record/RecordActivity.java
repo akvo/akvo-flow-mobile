@@ -141,7 +141,7 @@ public class RecordActivity extends BackActivity implements FormListFragment.Sur
 
     @Override
     public void onSurveyClick(final String formId) {
-        presenter.onSurveyClick(formId, recordId);
+        presenter.onFormClick(formId, recordId);
     }
 
     private void showErrorMessage(@StringRes int stringResId) {

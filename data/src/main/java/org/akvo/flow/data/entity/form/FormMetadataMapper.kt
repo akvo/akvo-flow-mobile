@@ -20,9 +20,9 @@
 package org.akvo.flow.data.entity.form
 
 import android.database.Cursor
+import android.util.Pair
 import org.akvo.flow.database.SurveyColumns
 import javax.inject.Inject
-import android.util.Pair
 
 class FormMetadataMapper @Inject constructor() {
 

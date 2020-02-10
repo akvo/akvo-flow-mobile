@@ -33,6 +33,7 @@ import org.akvo.flow.data.net.RestServiceFactory
 import org.akvo.flow.data.net.s3.AmazonAuthHelper
 import org.akvo.flow.data.net.s3.BodyCreator
 import org.akvo.flow.data.net.s3.S3RestApi
+import org.akvo.flow.data.util.MediaHelper
 import org.akvo.flow.domain.exception.AssignmentRequiredException
 import org.akvo.flow.domain.util.DeviceHelper
 import org.junit.Before
@@ -70,7 +71,10 @@ class DataPointDataRepositoryTest {
         DataSourceFactory(null, null, null, null, null, null)
 
     @Mock
-    internal var mapper = DataPointImageMapper()
+    internal var mediaHelper = MediaHelper()
+
+    @Mock
+    internal var mapper = DataPointImageMapper(mediaHelper)
 
     @Mock
     internal var mockS3RestApi: S3RestApi = S3RestApi(
@@ -103,7 +107,13 @@ class DataPointDataRepositoryTest {
         doReturn(HttpURLConnection.HTTP_FORBIDDEN).`when`(spyHttpException).code()
 
         val repository =
-            DataPointDataRepository(mockDataSourceFactory, spyRestApi, mockS3RestApi, mapper)
+            DataPointDataRepository(
+                mockDataSourceFactory,
+                spyRestApi,
+                mockS3RestApi,
+                mapper,
+                mediaHelper
+            )
         val observer = TestObserver<Int>()
 
         repository.downloadDataPoints(123L).subscribe(observer)
@@ -118,7 +128,13 @@ class DataPointDataRepositoryTest {
         doReturn(HttpURLConnection.HTTP_BAD_GATEWAY).`when`(spyHttpException).code()
 
         val repository =
-            DataPointDataRepository(mockDataSourceFactory, spyRestApi, mockS3RestApi, mapper)
+            DataPointDataRepository(
+                mockDataSourceFactory,
+                spyRestApi,
+                mockS3RestApi,
+                mapper,
+                mediaHelper
+            )
         val observer = TestObserver<Int>()
 
         repository.downloadDataPoints(123L).subscribe(observer)
@@ -132,7 +148,13 @@ class DataPointDataRepositoryTest {
             .downloadDataPoints(anyLong())
 
         val repository =
-            DataPointDataRepository(mockDataSourceFactory, spyRestApi, mockS3RestApi, mapper)
+            DataPointDataRepository(
+                mockDataSourceFactory,
+                spyRestApi,
+                mockS3RestApi,
+                mapper,
+                mediaHelper
+            )
         val observer = TestObserver<Int>()
 
         repository.downloadDataPoints(123L).subscribe(observer)
@@ -151,7 +173,13 @@ class DataPointDataRepositoryTest {
         doReturn(1).`when`(mockApiDataPoints)!!.size
 
         val repository =
-            DataPointDataRepository(mockDataSourceFactory, spyRestApi, mockS3RestApi, mapper)
+            DataPointDataRepository(
+                mockDataSourceFactory,
+                spyRestApi,
+                mockS3RestApi,
+                mapper,
+                mediaHelper
+            )
         val observer = TestObserver<Int>()
 
         repository.downloadDataPoints(123L).subscribe(observer)

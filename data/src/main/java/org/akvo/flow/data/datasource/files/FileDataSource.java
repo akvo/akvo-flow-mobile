@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2019 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2018-2020 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -86,7 +86,7 @@ public class FileDataSource {
     }
 
     @NotNull
-    public Completable saveRemoteImageFile(@NotNull String filename,
+    public Completable saveRemoteMediaFile(@NotNull String filename,
             @NotNull ResponseBody responseBody) {
         File folder = flowFileBrowser.getExistingInternalFolder(FlowFileBrowser.DIR_MEDIA);
         fileHelper.saveRemoteFile(responseBody, new File(folder, filename));

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010-2019 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2010-2020 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -145,11 +145,6 @@ public class ConstantUtil {
     public static final String ENGLISH_CODE = "en";
 
     /**
-     * S3 bucket directories (object prefixes)
-     */
-    public static final String S3_IMAGE_DIR = "images/";
-
-    /**
      * SurveyedLocale meta question IDs. Negative IDs to avoid collisions.
      * Irrelevant for the server side, they are used to identify a locale meta-data
      * response among the rest of the 'real' question answers
@@ -191,14 +186,6 @@ public class ConstantUtil {
     //broadcasts
     public static final String ACTION_DATA_SYNC = "fieldsurvey.ACTION_DATA_SYNC";
 
-    //apk update
-    public static final int REPEAT_INTERVAL_IN_SECONDS = 1 * 60 * 60 * 24; //every 24Hrs
-    public static final int FLEX_INTERVAL_IN_SECONDS = 1 * 60 * 60; //1 hour
-
-    //first runs will be faster
-    public static final int FIRST_REPEAT_INTERVAL_IN_SECONDS = 1 * 60;
-    public static final int FIRST_FLEX_INTERVAL_IN_SECOND = 30;
-
     /**
      * 7 days
      */
@@ -220,8 +207,6 @@ public class ConstantUtil {
     public static final int SURVEY_ID_TAG_KEY = R.integer.surveyidkey;
     public static final int RESPONDENT_ID_TAG_KEY = R.integer.respidkey;
     public static final int READ_ONLY_TAG_KEY = R.integer.finishedkey;
-
-    public static final int SNACK_BAR_DURATION_IN_MS = 4000;
 
     public static final String FILE_PROVIDER_AUTHORITY = "org.akvo.flow.fileprovider";
 

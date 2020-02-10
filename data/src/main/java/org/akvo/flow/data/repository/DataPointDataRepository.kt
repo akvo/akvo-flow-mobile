@@ -27,6 +27,7 @@ import org.akvo.flow.data.entity.ApiLocaleResult
 import org.akvo.flow.data.entity.images.DataPointImageMapper
 import org.akvo.flow.data.net.RestApi
 import org.akvo.flow.data.net.s3.S3RestApi
+import org.akvo.flow.data.util.MediaHelper
 import org.akvo.flow.domain.exception.AssignmentRequiredException
 import org.akvo.flow.domain.repository.DataPointRepository
 import retrofit2.HttpException
@@ -37,7 +38,8 @@ class DataPointDataRepository @Inject constructor(
     private val dataSourceFactory: DataSourceFactory,
     private val restApi: RestApi,
     private val s3RestApi: S3RestApi,
-    private val mapper: DataPointImageMapper
+    private val mapper: DataPointImageMapper,
+    private val mediaHelper: MediaHelper
 ) : DataPointRepository {
 
     override fun downloadDataPoints(surveyGroupId: Long): Single<Int> {
@@ -49,6 +51,10 @@ class DataPointDataRepository @Inject constructor(
                     Single.error(throwable)
                 }
             })
+    }
+
+    override fun cleanPathAndDownLoadMedia(filePath: String): Completable {
+        return downLoadMedia(mediaHelper.cleanMediaFileName(filePath))
     }
 
     private fun isErrorForbidden(throwable: Throwable): Boolean {
@@ -71,12 +77,12 @@ class DataPointDataRepository @Inject constructor(
     private fun downLoadImages(dataPoints: List<ApiDataPoint>): Completable {
         val images: List<String> = mapper.getImagesList(dataPoints)
         return Observable.fromIterable(images)
-            .flatMapCompletable { image -> downLoadImage(image) }
+            .flatMapCompletable { image -> downLoadMedia(image) }
     }
 
-    private fun downLoadImage(filename: String): Completable {
-        return s3RestApi.downloadImage(filename).flatMapCompletable { responseBody ->
-            dataSourceFactory.fileDataSource.saveRemoteImageFile(filename, responseBody)
+    private fun downLoadMedia(filename: String): Completable {
+        return s3RestApi.downloadMedia(filename).flatMapCompletable { responseBody ->
+            dataSourceFactory.fileDataSource.saveRemoteMediaFile(filename, responseBody)
         }
     }
 }

@@ -66,7 +66,7 @@ class S3RestApiTest {
         val s3RestApi = S3RestApi(serviceFactory, amazonAuthHelper, df, BodyCreator(), baseUrl())
 
         val observer = TestObserver<ResponseBody>()
-        s3RestApi.downloadImage("6af199a2-a507-4def-ad97-b81f944c9929.jpg").subscribe(observer)
+        s3RestApi.downloadMedia("6af199a2-a507-4def-ad97-b81f944c9929.jpg").subscribe(observer)
 
         observer.assertNoErrors()
     }

@@ -64,7 +64,7 @@ open class S3RestApi(
             })
     }
 
-    fun downloadImage(fileName: String): Single<ResponseBody> {
+    fun downloadMedia(fileName: String): Single<ResponseBody> {
         val date = formattedDate()
         val authorization = amazonAuthHelper
             .getAmazonAuthForGet(date, PAYLOAD_GET, "$IMAGES_FOLDER/$fileName")

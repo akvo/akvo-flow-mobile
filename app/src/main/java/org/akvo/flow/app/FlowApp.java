@@ -43,6 +43,7 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import androidx.annotation.VisibleForTesting;
 import androidx.multidex.MultiDexApplication;
 import timber.log.Timber;
 
@@ -62,7 +63,8 @@ public class FlowApp extends MultiDexApplication {
     @Named("saveSetup")
     UseCase saveSetup;
 
-    private ApplicationComponent applicationComponent;
+    @VisibleForTesting
+    public ApplicationComponent applicationComponent;
 
     @Override
     public void onCreate() {

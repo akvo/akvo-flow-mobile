@@ -44,6 +44,8 @@ class RecordActivity : BackActivity(), FormListListener, ResponseListListener, R
     private var surveyGroup: SurveyGroup? = null
     private var dataPointId: String? = null
 
+    private lateinit var rootLayout: View
+
     @Inject
     lateinit var navigator: Navigator
 
@@ -52,8 +54,6 @@ class RecordActivity : BackActivity(), FormListListener, ResponseListListener, R
 
     @Inject
     lateinit var presenter: RecordPresenter
-
-    lateinit var rootLayout: View
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

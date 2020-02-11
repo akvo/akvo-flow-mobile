@@ -271,6 +271,8 @@ dependencies {
     androidTestImplementation "androidx.test:rules:${rootProject.ext.rulesVersion}"
     androidTestImplementation "androidx.test.espresso:espresso-core:${rootProject.ext.espressoCoreVersion}"
     androidTestImplementation "androidx.test.espresso:espresso-contrib:${rootProject.ext.espressoContribVersion}"
+    androidTestImplementation 'com.github.fabioCollini.daggermock:daggermock:0.8.5'
+    androidTestImplementation 'com.github.fabioCollini.daggermock:daggermock-kotlin:0.8.5'
 
     implementation project(':domain')
     implementation project(':data')

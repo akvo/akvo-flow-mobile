@@ -35,7 +35,6 @@ import java.util.Set;
 
 import androidx.annotation.NonNull;
 import io.reactivex.Completable;
-import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 
@@ -47,8 +46,6 @@ public interface SurveyRepository {
             Double longitude, Integer orderBy);
 
     Single<DataPoint> getDataPoint(String datapointId);
-
-    Flowable<Integer> downloadDataPoints(long surveyGroupId);
 
     Observable<Boolean> deleteSurvey(long surveyToDeleteId);
 

@@ -26,7 +26,7 @@ import java.util.List;
 
 public class ApiLocaleResult {
 
-    @SerializedName("surveyedLocaleData")
+    @SerializedName("dataPointData")
     private List<ApiDataPoint> dataPoints;
 
     private String message;

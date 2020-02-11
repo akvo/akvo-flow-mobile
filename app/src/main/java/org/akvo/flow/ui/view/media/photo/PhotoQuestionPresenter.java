@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2019 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2018-2020 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -27,6 +27,7 @@ import org.akvo.flow.domain.entity.DomainImageMetadata;
 import org.akvo.flow.domain.interactor.DefaultObserver;
 import org.akvo.flow.domain.interactor.SaveResizedImage;
 import org.akvo.flow.domain.interactor.UseCase;
+import org.akvo.flow.domain.interactor.datapoints.DownloadMedia;
 import org.akvo.flow.presentation.Presenter;
 import org.akvo.flow.util.MediaFileHelper;
 
@@ -38,21 +39,26 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import androidx.annotation.Nullable;
+import io.reactivex.observers.DisposableCompletableObserver;
 import timber.log.Timber;
 
 public class PhotoQuestionPresenter implements Presenter {
 
     private final UseCase saveResizedImage;
+    private final DownloadMedia downloadMediaUseCase;
     private final MediaFileHelper mediaFileHelper;
-    private IPhotoQuestionView view;
     private final MediaMapper mediaMapper;
+
+    private IPhotoQuestionView view;
 
     @Inject
     public PhotoQuestionPresenter(@Named("copyResizedImage") UseCase saveResizedImage,
-            MediaFileHelper mediaFileHelper, MediaMapper mediaMapper) {
+            MediaFileHelper mediaFileHelper, MediaMapper mediaMapper,
+            DownloadMedia downloadMediaUseCase) {
         this.saveResizedImage = saveResizedImage;
         this.mediaFileHelper = mediaFileHelper;
         this.mediaMapper = mediaMapper;
+        this.downloadMediaUseCase = downloadMediaUseCase;
     }
 
     public void setView(IPhotoQuestionView view) {
@@ -62,6 +68,29 @@ public class PhotoQuestionPresenter implements Presenter {
     @Override
     public void destroy() {
         saveResizedImage.dispose();
+        downloadMediaUseCase.dispose();
+    }
+
+    public void downloadMedia(String filename) {
+        view.showLoading();
+        Map<String, Object> params = new HashMap<>(2);
+        params.put(DownloadMedia.PARAM_FILE_PATH, filename);
+        downloadMediaUseCase.execute(new DisposableCompletableObserver() {
+            @Override
+            public void onComplete() {
+                view.hideLoading();
+                view.displayThumbnail();
+                view.displayLocationInfo();
+            }
+
+            @Override
+            public void onError(Throwable e) {
+                view.hideLoading();
+                view.displayThumbnail();
+                view.displayLocationInfo();
+                view.showImageError();
+            }
+        }, params);
     }
 
     @Nullable

@@ -21,9 +21,10 @@
 package org.akvo.flow.database.upgrade;
 
 import android.database.sqlite.SQLiteDatabase;
-import androidx.annotation.Nullable;
 
 import org.akvo.flow.database.DatabaseHelper;
+
+import androidx.annotation.Nullable;
 
 public class UpgraderFactory {
 
@@ -34,6 +35,8 @@ public class UpgraderFactory {
         switch (upgradingFromVersion) {
             case DatabaseHelper.VER_RESPONSE_ITERATION:
                 databaseUpgrader.addUpgrader(new ResponsesUpgrader(helper, db));
+                case DatabaseHelper.VER_TRANSMISSION_ITERATION:
+                    databaseUpgrader.addUpgrader(new AssignmentsUpgrader(helper, db));
             default:
                 break;
         }

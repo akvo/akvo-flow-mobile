@@ -29,6 +29,4 @@ public class Tables {
     public static final String TRANSMISSION = "transmission";
     public static final String SURVEY_GROUP = "survey_group";// Introduced in Point Updates
     public static final String RECORD = "record";// Introduced in Point Updates
-    public static final String SYNC_TIME = "sync_time";// Introduced in Point Updates
-
 }

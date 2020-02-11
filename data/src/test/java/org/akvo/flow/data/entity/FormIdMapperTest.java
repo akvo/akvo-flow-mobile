@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2019-2020 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -26,20 +26,20 @@ import org.akvo.flow.data.entity.form.FormIdMapper;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.powermock.modules.junit4.PowerMockRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.List;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.TestCase.assertTrue;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.powermock.api.mockito.PowerMockito.doNothing;
-import static org.powermock.api.mockito.PowerMockito.when;
+import static org.mockito.Mockito.when;
 
-@RunWith(PowerMockRunner.class)
+@RunWith(MockitoJUnitRunner.class)
 public class FormIdMapperTest {
 
     @Mock
@@ -75,7 +75,6 @@ public class FormIdMapperTest {
         FormIdMapper mapper = new FormIdMapper();
         when(mockCursor.getCount()).thenReturn(1);
         when(mockCursor.moveToFirst()).thenReturn(true, false);
-        doNothing().when(mockCursor).close();
         doThrow(IllegalArgumentException.class).when(mockCursor).getColumnIndexOrThrow(anyString());
 
         mapper.mapToFormId(mockCursor);

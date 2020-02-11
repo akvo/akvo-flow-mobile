@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2020 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -15,34 +15,16 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
+package org.akvo.flow.database.upgrade
 
-package org.akvo.flow.data.entity;
+import android.database.sqlite.SQLiteDatabase
+import org.akvo.flow.database.DatabaseHelper
 
-import android.database.Cursor;
-import androidx.annotation.NonNull;
+class AssignmentsUpgrader(private val helper: DatabaseHelper, private val db: SQLiteDatabase) :
+    DatabaseUpgrader {
 
-import org.akvo.flow.database.SyncTimeColumns;
-
-import javax.inject.Inject;
-
-public class SyncedTimeMapper {
-
-    @Inject
-    public SyncedTimeMapper() {
-    }
-
-    @NonNull
-    public String getTime(Cursor cursor) {
-        if (cursor == null) {
-            return "";
-        }
-        String time = "";
-        if (cursor.moveToFirst()) {
-            time = cursor.getString(cursor.getColumnIndexOrThrow(SyncTimeColumns.TIME));
-        }
-        cursor.close();
-        return time;
+    override fun upgrade() {
+        helper.upgradeFromAssignments(db)
     }
 }

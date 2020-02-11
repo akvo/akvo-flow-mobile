@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2019-2020 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -24,16 +24,13 @@ import org.akvo.flow.data.datasource.DataSourceFactory;
 import org.akvo.flow.data.datasource.DatabaseDataSource;
 import org.akvo.flow.data.entity.FilesResultMapper;
 import org.akvo.flow.data.net.RestApi;
-import org.akvo.flow.data.util.ApiUrls;
 import org.akvo.flow.domain.util.DeviceHelper;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.runners.MockitoJUnitRunner;
-import org.mockito.stubbing.Answer;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -77,26 +74,16 @@ public class MissingAndDeletedDataRepositoryTest {
         DataSourceFactory dataSourceFactory = new DataSourceFactory(null, null,
                 mockDatabaseDataSource, null, null, null);
 
-        RestApi restApi = new RestApi(mockDeviceHelper, new TestRestServiceFactory(), null,
-                "1.2.3", new ApiUrls(null, null), null, null, null);
+        RestApi restApi = new RestApi(mockDeviceHelper, new TestRestServiceFactory(), "1.2.3", "");
 
         missingAndDeletedDataRepository = spy(new MissingAndDeletedDataRepository(restApi,
                 new FilesResultMapper(), dataSourceFactory));
 
-        when(mockDeviceHelper.getPhoneNumber()).thenReturn("123");
-        when(mockDeviceHelper.getImei()).thenReturn("123");
-        when(mockDeviceHelper.getAndroidId()).thenReturn("123");
-
         when(mockDatabaseDataSource.saveMissingFiles(anySet())).thenReturn(Observable.just(true));
         when(mockDatabaseDataSource.updateFailedTransmissionsSurveyInstances(anySet()))
                 .thenReturn(Observable.just(true));
-        when(mockDatabaseDataSource.setDeletedForms(anySet())).thenAnswer(new Answer<Object>() {
-            @Override
-            public Object answer(InvocationOnMock invocation) {
-                Object[] args = invocation.getArguments();
-                return Observable.just((HashSet) args[0]);
-            }
-        });
+        when(mockDatabaseDataSource.setDeletedForms(anySet()))
+                .thenAnswer(invocation -> Observable.just((HashSet) invocation.getArguments()[0]));
     }
 
     @Test
@@ -173,7 +160,7 @@ public class MissingAndDeletedDataRepositoryTest {
         missingAndDeletedDataRepository.downloadMissingAndDeleted(forms, "123").subscribe(observer);
         verify(missingAndDeletedDataRepository, times(1)).getPendingFiles(forms, "123");
         verify(missingAndDeletedDataRepository, times(1))
-                .saveMissing(Collections.<String>emptySet());
+                .saveMissing(Collections.emptySet());
         Set<String> set = new HashSet<>();
         set.add("1234");
         set.add("12345");
@@ -206,7 +193,7 @@ public class MissingAndDeletedDataRepositoryTest {
         set.add("1234.jpg");
         verify(missingAndDeletedDataRepository, times(1)).saveMissing(set);
         verify(missingAndDeletedDataRepository, times(1))
-                .saveDeletedForms(Collections.<String>emptySet());
+                .saveDeletedForms(Collections.emptySet());
 
         observer.awaitTerminalEvent(2, TimeUnit.SECONDS);
 

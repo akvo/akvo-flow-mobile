@@ -253,6 +253,8 @@ dependencies {
     implementation "com.mapbox.mapboxsdk:mapbox-android-sdk:${rootProject.ext.mapboxVersion}"
     implementation "androidx.work:work-runtime:${rootProject.ext.workVersion}"
     implementation "com.halfhp.rxtracer:rxtracer:${rootProject.ext.rxTracerVersion}"
+    implementation "org.slf4j:slf4j-nop:${rootProject.ext.slf4JVersion}"
+    implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
 
     testImplementation "junit:junit:${rootProject.ext.jUnitVersion}"
     testImplementation "org.mockito:mockito-core:${rootProject.ext.mockitoCoreVersion}"

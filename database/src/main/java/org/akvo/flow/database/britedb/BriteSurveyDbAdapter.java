@@ -33,7 +33,6 @@ import org.akvo.flow.database.SurveyColumns;
 import org.akvo.flow.database.SurveyGroupColumns;
 import org.akvo.flow.database.SurveyInstanceColumns;
 import org.akvo.flow.database.SurveyInstanceStatus;
-import org.akvo.flow.database.SyncTimeColumns;
 import org.akvo.flow.database.Tables;
 import org.akvo.flow.database.TransmissionColumns;
 import org.akvo.flow.database.TransmissionStatus;
@@ -195,22 +194,25 @@ public class BriteSurveyDbAdapter {
         updateRecordModifiedDate(id, lastModified);
     }
 
-    /**
-     * Get the synchronization time for a particular survey group.
-     *
-     * @param surveyGroupId id of the SurveyGroup
-     * @return time if exists for this key, null otherwise
-     */
-    public Cursor getSyncTime(long surveyGroupId) {
-        String sql =
-                "SELECT " + SyncTimeColumns.SURVEY_GROUP_ID + "," + SyncTimeColumns.TIME + " FROM "
-                        + Tables.SYNC_TIME + " WHERE " + SyncTimeColumns.SURVEY_GROUP_ID
-                        + " = ?";
-        return briteDatabase.query(sql, String.valueOf(surveyGroupId));
-    }
+    public void deleteSubmittedRecordsForSurvey(long surveyId) {
+        String whereClause =
+                RecordColumns.RECORD_ID + " IN (SELECT " + RecordColumns.RECORD_ID + " FROM"
+                        + " (SELECT " + RecordColumns.RECORD_ID
+                        + ", MIN(r." + SurveyInstanceColumns.STATUS + ") as "
+                        + SurveyInstanceColumns.STATUS
+                        + " FROM " + Tables.RECORD
+                        + " AS sl LEFT JOIN " + Tables.SURVEY_INSTANCE + " AS r ON "
+                        + "sl." + RecordColumns.RECORD_ID + "=" + "r."
+                        + SurveyInstanceColumns.RECORD_ID
+                        + " WHERE sl." + RecordColumns.SURVEY_GROUP_ID + " = " + surveyId
+                        + " GROUP BY sl." + RecordColumns.RECORD_ID + ")"
+                        + " WHERE " + SurveyInstanceColumns.STATUS + " == "
+                        + SurveyInstanceStatus.UPLOADED
+                        +
+                        " OR " + SurveyInstanceColumns.STATUS + " == "
+                        + SurveyInstanceStatus.DOWNLOADED + ")";
 
-    public void insertSyncedTime(ContentValues values) {
-        briteDatabase.insert(Tables.SYNC_TIME, values);
+        briteDatabase.delete(Tables.RECORD, whereClause);
     }
 
     /**
@@ -681,7 +683,6 @@ public class BriteSurveyDbAdapter {
      */
     public void clearCollectedData() {
         deleteAllResponses();
-        briteDatabase.delete(Tables.SYNC_TIME, null);
         briteDatabase.delete(Tables.SURVEY_INSTANCE, null);
         briteDatabase.delete(Tables.RECORD, null);
         briteDatabase.delete(Tables.TRANSMISSION, null);

@@ -303,8 +303,8 @@
     <string name="unpublish_service_notification_ticker">Deleting</string>
     <string name="error_displaying_datapoint">This datapoint cannot be viewed on a map</string>
 
-    <string name="walkthrough_title">Offline maps</string>
-    <string name="walkthrough_subtitle">Collecting data offline? Simply download a map of your desired area and use it while you’re off-grid.</string>
+    <string name="walkthrough_title">Datapoint assignment</string>
+    <string name="walkthrough_subtitle">In monitoring surveys, when you press \'download\' only datapoints assigned to the device will be downloaded</string>
 
     <string name="offline_maps_dialog_title">Select map</string>
     <string name="offline_maps_dialog_online_label">Online</string>

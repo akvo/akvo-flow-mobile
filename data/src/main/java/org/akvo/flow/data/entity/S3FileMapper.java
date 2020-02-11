@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2019 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2018-2020 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -20,17 +20,18 @@
 
 package org.akvo.flow.data.entity;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import android.text.TextUtils;
 
-import org.akvo.flow.data.util.FlowFileBrowser;
 import org.akvo.flow.data.util.Constants;
 import org.akvo.flow.data.util.FileHelper;
+import org.akvo.flow.data.util.FlowFileBrowser;
 
 import java.io.File;
 
 import javax.inject.Inject;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 public class S3FileMapper {
 
@@ -95,7 +96,7 @@ public class S3FileMapper {
             folderName = FlowFileBrowser.DIR_DATA;
         } else {
             //unsupported file format found
-            folderName = null;
+            folderName = "";
         }
         return fileBrowser.getInternalFile(filename, folderName);
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010-2016,2018-2019 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2010-2016,2018-2020 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -19,7 +19,6 @@
 
 package org.akvo.flow.util;
 
-import androidx.annotation.NonNull;
 import android.util.Log;
 
 import org.akvo.flow.exception.HttpException;
@@ -29,9 +28,10 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+
+import androidx.annotation.NonNull;
 
 /**
  * Simple utility to make http calls and read the responses
@@ -41,7 +41,6 @@ import java.net.URL;
 public class HttpUtil {
 
     private static final String TAG = HttpUtil.class.getSimpleName();
-    private static final int BUFFER_SIZE = 8192;
 
     @NonNull
     public static String httpGet(String url) throws IOException {
@@ -92,12 +91,4 @@ public class HttpUtil {
         return builder.toString();
     }
 
-    public static void copyStream(@NonNull InputStream in, @NonNull OutputStream out)
-            throws IOException {
-        byte[] b = new byte[BUFFER_SIZE];
-        int read;
-        while ((read = in.read(b)) != -1) {
-            out.write(b, 0, read);
-        }
-    }
 }

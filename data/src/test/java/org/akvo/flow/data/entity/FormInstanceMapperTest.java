@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2019-2020 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -20,7 +20,6 @@
 package org.akvo.flow.data.entity;
 
 import android.database.Cursor;
-import android.text.TextUtils;
 
 import org.akvo.flow.data.util.FileHelper;
 import org.akvo.flow.domain.entity.InstanceIdUuid;
@@ -30,11 +29,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.List;
 import java.util.Set;
@@ -45,16 +40,14 @@ import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertNull;
 import static junit.framework.TestCase.assertTrue;
-import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.powermock.api.mockito.PowerMockito.when;
+import static org.mockito.Mockito.when;
 
-@RunWith(PowerMockRunner.class)
-@PrepareForTest(TextUtils.class)
+@RunWith(MockitoJUnitRunner.class)
 public class FormInstanceMapperTest {
 
     @Mock
@@ -76,15 +69,6 @@ public class FormInstanceMapperTest {
 
     @Before
     public void setUp() {
-        PowerMockito.mockStatic(TextUtils.class);
-        when(TextUtils.isEmpty(any(CharSequence.class))).thenAnswer(new Answer<Boolean>() {
-            @Override
-            public Boolean answer(InvocationOnMock invocation) {
-                CharSequence a = (CharSequence) invocation.getArguments()[0];
-                return !(a != null && a.length() > 0);
-            }
-        });
-
         doNothing().when(mockCursor).close();
         when(mockCursor.getColumnIndexOrThrow(anyString())).thenReturn(0);
         when(mockCursor.getString(anyInt())).thenReturn("uuid");
@@ -156,8 +140,6 @@ public class FormInstanceMapperTest {
 
     @Test
     public void getFormInstanceWithMediaShouldReturnEmptyIfNullCursor() {
-        when(mockCursor.moveToFirst()).thenReturn(false);
-
         Pair<FormInstance, Set<String>> results = mapper.getFormInstanceWithMedia("123", null);
 
         assertNull(results.first);
@@ -177,9 +159,7 @@ public class FormInstanceMapperTest {
     @Test
     public void getFormInstanceWithMediaShouldReturnEmptyResponsesIfEmptyValue() {
         when(mockCursor.moveToFirst()).thenReturn(true);
-        when(mockCursor.getCount()).thenReturn(1);
         when(mockCursor.moveToNext()).thenReturn(false);
-        when(mockTextValueCleaner.cleanVal(anyString())).thenReturn("");
 
         Pair<FormInstance, Set<String>> results = mapper.getFormInstanceWithMedia("12", mockCursor);
 
@@ -191,7 +171,6 @@ public class FormInstanceMapperTest {
     @Test
     public void getFormInstanceWithMediaShouldReturnEmptyFilenamesIfEmptyValue() {
         when(mockCursor.moveToFirst()).thenReturn(true);
-        when(mockCursor.getCount()).thenReturn(1);
         when(mockCursor.moveToNext()).thenReturn(false);
         when(mockTextValueCleaner.cleanVal(anyString())).thenReturn("abc1");
         when(mockTextValueCleaner.sanitizeValue(anyString())).thenReturn("abc");
@@ -208,9 +187,7 @@ public class FormInstanceMapperTest {
     @Test
     public void getFormInstanceWithMediaShouldReturnValidValues() {
         when(mockCursor.moveToFirst()).thenReturn(true);
-        when(mockCursor.getCount()).thenReturn(1);
         when(mockCursor.moveToNext()).thenReturn(false);
-        when(mockTextValueCleaner.cleanVal(anyString())).thenReturn("abc1");
         when(mockTextValueCleaner.sanitizeValue(anyString())).thenReturn("abc");
         when(mockFileHelper.getFilenameFromPath(anyString())).thenReturn("file");
         when(mockResponseMapper.extractResponse(mockCursor, "abc")).thenReturn(mockResponse);

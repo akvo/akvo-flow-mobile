@@ -21,6 +21,7 @@
 package org.akvo.flow.data.net.s3;
 
 import io.reactivex.Observable;
+import io.reactivex.Single;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import retrofit2.Response;
@@ -56,6 +57,12 @@ public interface AwsS3 {
 
     @GET(S3_FILE_PATH)
     Observable<ResponseBody> getSurvey(@Path("key") String key,
+            @Path("file") String file,
+            @Header("Date") String date,
+            @Header("Authorization") String authorization);
+
+    @GET(S3_FILE_PATH)
+    Single<ResponseBody> downloadImage(@Path("key") String key,
             @Path("file") String file,
             @Header("Date") String date,
             @Header("Authorization") String authorization);

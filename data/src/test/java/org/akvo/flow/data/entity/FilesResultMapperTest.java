@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2019 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2018-2020 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -22,7 +22,7 @@ package org.akvo.flow.data.entity;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.powermock.modules.junit4.PowerMockRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.Collections;
 import java.util.Iterator;
@@ -30,10 +30,10 @@ import java.util.Iterator;
 import static junit.framework.Assert.assertNull;
 import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertEquals;
-import static org.powermock.api.mockito.PowerMockito.spy;
-import static org.powermock.api.mockito.PowerMockito.when;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.when;
 
-@RunWith(PowerMockRunner.class)
+@RunWith(MockitoJUnitRunner.class)
 public class FilesResultMapperTest {
 
     @Test
@@ -51,7 +51,7 @@ public class FilesResultMapperTest {
     @Test
     public void transformShouldReturnEmptyDeletedFormsIfApiDeletedFormsEmpty() {
         ApiFilesResult apiFilesResult = spy(new ApiFilesResult());
-        when(apiFilesResult.getDeletedForms()).thenReturn(Collections.<String>emptyList());
+        when(apiFilesResult.getDeletedForms()).thenReturn(Collections.emptyList());
 
         FilteredFilesResult result = new FilesResultMapper().transform(apiFilesResult);
 
@@ -106,7 +106,7 @@ public class FilesResultMapperTest {
         ApiFilesResult apiFilesResult = spy(new ApiFilesResult());
         when(apiFilesResult.getMissingFiles()).thenReturn(Collections.singletonList("123"));
         when(apiFilesResult.getMissingUnknown()).thenReturn(Collections.singletonList("1234"));
-        when(apiFilesResult.getDeletedForms()).thenReturn(Collections.<String>emptyList());
+        when(apiFilesResult.getDeletedForms()).thenReturn(Collections.emptyList());
 
         FilteredFilesResult result = new FilesResultMapper().transform(apiFilesResult);
 
@@ -119,7 +119,7 @@ public class FilesResultMapperTest {
     @Test
     public void transformShouldReturnEmptyMissingFilesIfApiMissingUnKnownEmpty() {
         ApiFilesResult apiFilesResult = spy(new ApiFilesResult());
-        when(apiFilesResult.getMissingUnknown()).thenReturn(Collections.<String>emptyList());
+        when(apiFilesResult.getMissingUnknown()).thenReturn(Collections.emptyList());
         when(apiFilesResult.getMissingFiles()).thenReturn(null);
 
         FilteredFilesResult result = new FilesResultMapper().transform(apiFilesResult);

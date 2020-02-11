@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2019-2020 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -25,12 +25,13 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
+
 import org.akvo.flow.data.util.FileHelper;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.powermock.modules.junit4.PowerMockRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import java.io.Closeable;
 import java.io.FileNotFoundException;
@@ -42,13 +43,13 @@ import static org.junit.Assert.assertNull;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.powermock.api.mockito.PowerMockito.doNothing;
-import static org.powermock.api.mockito.PowerMockito.spy;
-import static org.powermock.api.mockito.PowerMockito.when;
+import static org.mockito.Mockito.when;
 
-@RunWith(PowerMockRunner.class)
+@RunWith(MockitoJUnitRunner.class)
 public class MediaResolverHelperTest {
 
     @Mock
@@ -95,7 +96,6 @@ public class MediaResolverHelperTest {
     public void openFileDescriptorShouldReturnNullWhenUriNotFound() throws FileNotFoundException {
         when(mockContentResolver.openFileDescriptor(any(Uri.class), anyString()))
                 .thenThrow(FileNotFoundException.class);
-        when(mockUri.toString()).thenReturn("");
 
         ParcelFileDescriptor fileDescriptor = helper.openFileDescriptor(mockUri);
         assertNull(fileDescriptor);
@@ -128,9 +128,7 @@ public class MediaResolverHelperTest {
     }
 
     @Test
-    public void removeDuplicateImageShouldNotCallRemoveDuplicatedExtraFileIfEmptyPath()
-            throws FileNotFoundException {
-        when(mockContentResolver.openInputStream(any(Uri.class))).thenReturn(mockInputStream);
+    public void removeDuplicateImageShouldNotCallRemoveDuplicatedExtraFileIfEmptyPath() {
         when(mockContentResolver.query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
                 new String[] {
                         MediaStore.Images.ImageColumns.DATA,

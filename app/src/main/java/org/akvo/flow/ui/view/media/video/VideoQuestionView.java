@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2019 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2014-2020 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -31,7 +31,6 @@ import android.widget.ProgressBar;
 
 import org.akvo.flow.R;
 import org.akvo.flow.activity.FormActivity;
-import org.akvo.flow.async.MediaSyncTask;
 import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionResponse;
 import org.akvo.flow.domain.response.value.Media;
@@ -39,10 +38,10 @@ import org.akvo.flow.event.QuestionInteractionEvent;
 import org.akvo.flow.event.SurveyListener;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
-import org.akvo.flow.uicomponents.SnackBarManager;
 import org.akvo.flow.serialization.response.value.MediaValue;
 import org.akvo.flow.ui.Navigator;
 import org.akvo.flow.ui.view.QuestionView;
+import org.akvo.flow.uicomponents.SnackBarManager;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.MediaFileHelper;
 import org.akvo.flow.util.StoragePermissionsHelper;
@@ -62,10 +61,8 @@ import butterknife.OnClick;
 /**
  * Question type that supports taking a video recording
  *
- * @author Christopher Fagiani
  */
-public class VideoQuestionView extends QuestionView
-        implements MediaSyncTask.DownloadListener, IVideoQuestionView {
+public class VideoQuestionView extends QuestionView implements IVideoQuestionView {
 
     @Inject
     SnackBarManager snackBarManager;
@@ -188,11 +185,7 @@ public class VideoQuestionView extends QuestionView
 
     @OnClick(R.id.media_download)
     void onVideoDownloadClick() {
-        mDownloadBtn.setVisibility(GONE);
-        mProgressBar.setVisibility(VISIBLE);
-
-        MediaSyncTask downloadTask = new MediaSyncTask(new File(filePath), this);
-        downloadTask.execute();
+        presenter.downloadMedia(filePath);
     }
 
     @Override
@@ -299,7 +292,8 @@ public class VideoQuestionView extends QuestionView
         setResponse(response);
     }
 
-    private void displayThumbnail() {
+    @Override
+    public void displayThumbnail() {
         hideDownloadOptions();
         File file = rebuildFilePath();
         if (file != null && file.exists()) {
@@ -315,14 +309,7 @@ public class VideoQuestionView extends QuestionView
     }
 
     @Override
-    public void onResourceDownload(boolean done) {
-        if (!done) {
-            showVideoLoadError();
-        }
-        displayThumbnail();
-    }
-
-    private void showVideoLoadError() {
+    public void showVideoLoadError() {
         snackBarManager.displaySnackBar(this, R.string.error_video_preview, getContext());
     }
 

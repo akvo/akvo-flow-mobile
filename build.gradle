@@ -56,12 +56,15 @@ ext {
     rxAndroidVersion = "2.1.1"
     rxJavaVersion = "2.2.8"
     rxTracerVersion = "0.1.2"
+    slf4JVersion = "1.7.30"
     sqlbriteVersion = "2.0.0"
     timberVersion = "4.7.1"
 
     jUnitVersion = "4.12"
     kotlintestVerion = "3.1.5"
     mockServerVersion = "3.12.1"
+    mockitoInlineVersion = "2.8.47"
+    mockitoKotlinVersion = "2.2.0"
 
     androidXJunit = "1.1.0"
     androidXCore = "1.1.0"

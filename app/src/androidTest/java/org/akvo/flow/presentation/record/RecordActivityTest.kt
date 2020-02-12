@@ -21,18 +21,13 @@ package org.akvo.flow.presentation.record
 
 import android.content.Context
 import android.content.Intent
-import androidx.test.espresso.Espresso.onView
-import androidx.test.espresso.assertion.ViewAssertions.matches
-import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
-import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import androidx.test.rule.ActivityTestRule
 import io.reactivex.Single
 import it.cosenonjaviste.daggermock.DaggerMock
 import org.akvo.flow.R
-import org.akvo.flow.activity.ToolBarTitleSubtitleMatcher.withToolbarTitle
 import org.akvo.flow.app.FlowApp
 import org.akvo.flow.domain.SurveyGroup
 import org.akvo.flow.domain.entity.DataPoint
@@ -40,12 +35,14 @@ import org.akvo.flow.domain.repository.SurveyRepository
 import org.akvo.flow.domain.repository.UserRepository
 import org.akvo.flow.injector.component.ApplicationComponent
 import org.akvo.flow.injector.module.ApplicationModule
+import org.akvo.flow.presentation.ScreenRobot
+import org.akvo.flow.presentation.ScreenRobot.Companion.withRobot
 import org.akvo.flow.util.ConstantUtil
-import org.hamcrest.CoreMatchers.`is`
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.Matchers
+import org.mockito.Matchers.anyString
 import org.mockito.Mockito.`when`
 import org.mockito.Mockito.mock
 
@@ -53,14 +50,15 @@ import org.mockito.Mockito.mock
 @RunWith(AndroidJUnit4::class)
 class RecordActivityTest {
 
-    @get:Rule val rule = espressoDaggerMockRule()
+    @get:Rule
+    val rule = espressoDaggerMockRule()
 
     @get:Rule
     var activityRule: ActivityTestRule<RecordActivity> = object : ActivityTestRule<RecordActivity>(
         RecordActivity::class.java, false, false
     ) {
         override fun getActivityIntent(): Intent {
-            val targetContext: Context = InstrumentationRegistry.getInstrumentation().targetContext
+            val targetContext: Context = getInstrumentation().targetContext
             val result = Intent(targetContext, RecordActivity::class.java)
             result.putExtra(ConstantUtil.SURVEY_GROUP_EXTRA, SurveyGroup(1L, "", "", true))
             result.putExtra(ConstantUtil.DATA_POINT_ID_EXTRA, "123")
@@ -72,29 +70,50 @@ class RecordActivityTest {
     val userRepository = mock(UserRepository::class.java)
     val dataPoint = mock(DataPoint::class.java)
 
+    @Before
+    fun beforeClass() {
+        `when`(surveyRepository.getDataPoint(anyString())).thenReturn(Single.just(dataPoint))
+    }
+
     @Test
     fun activityShouldDisplayCorrectDataPointTitle() {
-        `when`(surveyRepository.getDataPoint(Matchers.anyString())).thenReturn(Single.just(dataPoint))
         `when`(dataPoint.name).thenReturn("test datapoint")
 
         activityRule.launchActivity(null)
 
-        onView(withId(R.id.toolbar)).check(matches(withToolbarTitle(`is`<String>("test datapoint"))))
+        withRobot(RecordScreenRobot::class.java).checkTitleIs("test datapoint")
     }
 
     @Test
-    fun activityShouldDisplayDefaultDataPointTitleWhenNoName() {
-        `when`(surveyRepository.getDataPoint(Matchers.anyString())).thenReturn(Single.just(dataPoint))
+    fun activityShouldDisplayDefaultDataPointTitleWhenEmptyName() {
         `when`(dataPoint.name).thenReturn("")
 
         activityRule.launchActivity(null)
 
-        onView(withId(R.id.toolbar)).check(matches(withToolbarTitle(`is`<String>(app.getString(R.string.unknown)))))
+        withRobot(RecordScreenRobot::class.java)
+            .provideActivityContext(activityRule.activity)
+            .checkTitleIs(R.string.unknown)
     }
 
-    private fun espressoDaggerMockRule() = DaggerMock.rule<ApplicationComponent>(ApplicationModule(app)) {
-        set { component -> app.applicationComponent = component }
+    @Test
+    fun activityShouldDisplayDefaultDataPointTitleWhenNullName() {
+        `when`(dataPoint.name).thenReturn(null)
+
+        activityRule.launchActivity(null)
+
+        withRobot(RecordScreenRobot::class.java)
+            .provideActivityContext(activityRule.activity)
+            .checkTitleIs(R.string.unknown)
     }
+
+    private fun espressoDaggerMockRule() =
+        DaggerMock.rule<ApplicationComponent>(ApplicationModule(app)) {
+            set { component -> app.applicationComponent = component }
+        }
 
     val app: FlowApp get() = getInstrumentation().targetContext.applicationContext as FlowApp
+
+    class RecordScreenRobot : ScreenRobot<RecordScreenRobot>() {
+
+    }
 }

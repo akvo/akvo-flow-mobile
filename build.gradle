@@ -69,11 +69,11 @@ ext {
     androidXJunit = "1.1.0"
     androidXCore = "1.1.0"
     dexMakerVersion = "1.2"
-    espressoCoreVersion = "3.1.1"
-    espressoContribVersion = "3.1.1"
+    espressoVersion = "3.1.1"
     mockitoCoreVersion = "1.10.19"
     powerMockVersion = "1.6.2"
     rulesVersion = "1.1.1"
+    daggermockVersion = "0.8.5"
 }
 
 allprojects {

@@ -149,7 +149,7 @@ class RecordActivity : BackActivity(), FormListListener, ResponseListListener, R
         title = displayName
     }
 
-    override fun onDataPointError() {
+    override fun showDataPointError() {
         showErrorMessage(R.string.error_data_point_not_found)
     }
 }

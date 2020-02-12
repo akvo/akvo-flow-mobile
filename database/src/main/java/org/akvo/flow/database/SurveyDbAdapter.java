@@ -26,9 +26,6 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * Database class for the survey db. It can create/upgrade the database as well
  * as select/insert/update survey responses. TODO: break this up into separate
@@ -298,13 +295,6 @@ public class SurveyDbAdapter {
         return recordUid;
     }
 
-    public Cursor getSurveyedLocale(String surveyedLocaleId) {
-        return database.query(Tables.RECORD, RecordQuery.PROJECTION,
-                RecordColumns.RECORD_ID + " = ?",
-                new String[] { surveyedLocaleId },
-                null, null, null);
-    }
-
     public Cursor getFormInstance(long formInstanceId) {
         return database.query(SURVEY_INSTANCE_JOIN_SURVEY,
                 FormInstanceQuery.PROJECTION,
@@ -340,37 +330,6 @@ public class SurveyDbAdapter {
                 ResponseColumns.SURVEY_INSTANCE_ID, null,
                 "CASE WHEN survey.survey_id = survey_group.register_survey_id THEN 0 ELSE 1 END, "
                         + SurveyInstanceColumns.START_DATE + " DESC");
-    }
-
-    /**
-     * Get SurveyInstances with a particular status.
-     * If the recordId is not null, results will be filtered by Record.
-     */
-    public long[] getFormInstances(String recordId, String surveyId, int status) {
-        String where = Tables.SURVEY_INSTANCE + "." + SurveyInstanceColumns.SURVEY_ID + "= ?" +
-                " AND " + SurveyInstanceColumns.STATUS + "= ?" +
-                " AND " + SurveyInstanceColumns.RECORD_ID + "= ?";
-        List<String> args = new ArrayList<>();
-        args.add(surveyId);
-        args.add(String.valueOf(status));
-        args.add(recordId);
-
-        Cursor c = database.query(Tables.SURVEY_INSTANCE,
-                new String[] { SurveyInstanceColumns._ID },
-                where, args.toArray(new String[args.size()]),
-                null, null, SurveyInstanceColumns.START_DATE + " DESC");
-
-        long[] instances = new long[0];// Avoid null array
-        if (c != null) {
-            instances = new long[c.getCount()];
-            if (c.moveToFirst()) {
-                do {
-                    instances[c.getPosition()] = c.getLong(0);// Single column (ID)
-                } while (c.moveToNext());
-            }
-            c.close();
-        }
-        return instances;
     }
 
     /**

@@ -56,7 +56,6 @@ import org.mockito.Matchers.anyString
 import org.mockito.Mockito.`when`
 import org.mockito.Mockito.mock
 
-
 @LargeTest
 @RunWith(AndroidJUnit4::class)
 class RecordActivityTest {
@@ -161,14 +160,8 @@ class RecordActivityTest {
     @Test
     fun onFormClickShouldShowErrorMessageCascadeMissing() {
         `when`(dataPoint.name).thenReturn(DATAPOINT_NAME)
-        `when`(surveyRepository.getFormMeta(anyString())).thenReturn(
-            Single.just(
-                Pair(
-                    false,
-                    "1.0"
-                )
-            )
-        )
+        `when`(surveyRepository.getFormMeta(anyString()))
+            .thenReturn(Single.just(Pair(false, "1.0")))
 
         intentsTestRule.launchActivity(null)
 

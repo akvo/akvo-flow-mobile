@@ -35,7 +35,7 @@ import org.akvo.flow.uicomponents.SnackBarManager
 import org.akvo.flow.util.ConstantUtil
 import javax.inject.Inject
 
-class FormViewActivity : BackActivity() {
+class FormViewActivity : BackActivity(), IFormView {
 
     private lateinit var datapointId: String
     private var formInstanceId: Long = 0L
@@ -54,6 +54,7 @@ class FormViewActivity : BackActivity() {
         setContentView(R.layout.activity_form_view)
         initializeInjector()
         setupToolBar()
+        presenter.view = this
         val sectionsPagerAdapter = QuestionGroupsPagerAdapter(this, supportFragmentManager)
         val viewPager: ViewPager = findViewById(R.id.view_pager)
         viewPager.adapter = sectionsPagerAdapter

@@ -19,24 +19,5 @@
 
 package org.akvo.flow.presentation.form.view
 
-import org.akvo.flow.domain.SurveyGroup
-import org.akvo.flow.presentation.Presenter
-import javax.inject.Inject
-
-class FormViewPresenter @Inject constructor(): Presenter {
-
-    var view: IFormView? = null
-
-    override fun destroy() {
-        //TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    fun loadForm(
-        formId: String,
-        formInstanceId: Long,
-        surveyGroup: SurveyGroup,
-        recordId: String
-    ) {
-        //TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+interface IFormView {
 }

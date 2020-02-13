@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2019 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2020 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -24,7 +24,6 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
-import androidx.annotation.NonNull;
 import android.text.TextUtils;
 
 import com.squareup.sqlbrite2.BriteDatabase;
@@ -50,6 +49,8 @@ import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
+
+import androidx.annotation.NonNull;
 
 /**
  * Temporary class to access SurveyDb from the app without having to refactor the whole architecture
@@ -393,10 +394,6 @@ public class SurveyDbDataSource {
 
     public Cursor getFormInstances(String surveyedLocaleId) {
         return surveyDbAdapter.getFormInstances(surveyedLocaleId);
-    }
-
-    public long[] getFormInstances(String recordId, String surveyId, int saved) {
-        return surveyDbAdapter.getFormInstances(recordId, surveyId, saved);
     }
 
     public Long getLastSurveyInstance(String mRecordId, String id) {

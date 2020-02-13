@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2019 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2020 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -21,6 +21,7 @@
 package org.akvo.flow.data.repository;
 
 import android.database.Cursor;
+import android.util.Pair;
 
 import org.akvo.flow.data.datasource.DataSourceFactory;
 import org.akvo.flow.data.datasource.DatabaseDataSource;
@@ -46,6 +47,7 @@ import org.akvo.flow.domain.entity.InstanceIdUuid;
 import org.akvo.flow.domain.entity.Survey;
 import org.akvo.flow.domain.entity.User;
 import org.akvo.flow.domain.repository.SurveyRepository;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.HashSet;
 import java.util.List;
@@ -54,6 +56,7 @@ import java.util.Set;
 import javax.inject.Inject;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
 import io.reactivex.Completable;
 import io.reactivex.Observable;
@@ -230,6 +233,20 @@ public class SurveyDataRepository implements SurveyRepository {
                         return formIdMapper.mapToFormId(cursor);
                     }
                 });
+    }
+
+    @Override
+    @NotNull
+    public Single<Pair<Boolean, String>> getFormMeta(@NotNull String formId) {
+        return dataSourceFactory.getDataBaseDataSource().getFormMetaData(formId);
+    }
+
+    @Override
+    @NotNull
+    public Single<Long> fetchSurveyInstance(@NotNull String formId, @NotNull String datapointId,
+            @NotNull String formVersion, long userId, @Nullable String userName) {
+        return dataSourceFactory.getDataBaseDataSource()
+                .fetchSurveyInstance(formId, datapointId, formVersion, userId, userName);
     }
 
     @Override

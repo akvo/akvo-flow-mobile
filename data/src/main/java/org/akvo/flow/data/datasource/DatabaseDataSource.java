@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2019 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2020 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -23,6 +23,7 @@ package org.akvo.flow.data.datasource;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.text.TextUtils;
+import android.util.Pair;
 
 import com.squareup.sqlbrite2.BriteDatabase;
 
@@ -32,6 +33,7 @@ import org.akvo.flow.data.entity.ApiQuestionAnswer;
 import org.akvo.flow.data.entity.ApiSurveyInstance;
 import org.akvo.flow.data.entity.SurveyInstanceIdMapper;
 import org.akvo.flow.data.entity.form.Form;
+import org.akvo.flow.data.entity.form.FormMetadataMapper;
 import org.akvo.flow.data.util.FlowFileBrowser;
 import org.akvo.flow.database.Constants;
 import org.akvo.flow.database.RecordColumns;
@@ -67,11 +69,14 @@ public class DatabaseDataSource {
 
     private final BriteSurveyDbAdapter briteSurveyDbAdapter;
     private final SurveyInstanceIdMapper surveyInstanceIdMapper;
+    private final FormMetadataMapper formMetadataMapper;
 
     @Inject
-    public DatabaseDataSource(BriteDatabase db, SurveyInstanceIdMapper surveyInstanceIdMapper) {
+    public DatabaseDataSource(BriteDatabase db, SurveyInstanceIdMapper surveyInstanceIdMapper,
+            FormMetadataMapper formMetadataMapper) {
         this.briteSurveyDbAdapter = new BriteSurveyDbAdapter(db);
         this.surveyInstanceIdMapper = surveyInstanceIdMapper;
+        this.formMetadataMapper = formMetadataMapper;
     }
 
     public Observable<Cursor> getSurveys() {
@@ -384,7 +389,7 @@ public class DatabaseDataSource {
         updatedValues.put(SurveyColumns.NAME, formHeader.getName());
         updatedValues.put(SurveyColumns.LANGUAGE, getFormLanguage(formHeader));
         updatedValues.put(SurveyColumns.SURVEY_GROUP_ID, formHeader.getGroupId());
-        updatedValues.put(SurveyColumns.HELP_DOWNLOADED, cascadeResourcesDownloaded? 1: 0);
+        updatedValues.put(SurveyColumns.HELP_DOWNLOADED, cascadeResourcesDownloaded ? 1 : 0);
         briteSurveyDbAdapter.updateSurvey(updatedValues, formHeader.getId());
         return Observable.just(true);
     }
@@ -406,5 +411,14 @@ public class DatabaseDataSource {
         }
         briteSurveyDbAdapter.updateFailedTransmissions(missingFiles);
         return Observable.just(true);
+    }
+
+    public Single<Pair<Boolean, String>> getFormMetaData(String formId) {
+        return briteSurveyDbAdapter.getFormMetaData(formId).map(formMetadataMapper::mapForm);
+    }
+
+    public Single<Long> fetchSurveyInstance(String formId, String dataPointId, String formVersion, long userId,
+            String userName) {
+        return briteSurveyDbAdapter.fetchOrCreateFormInstance(formId, dataPointId, formVersion, userId, userName);
     }
 }

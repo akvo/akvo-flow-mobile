@@ -40,7 +40,6 @@ class GetFormInstanceId @Inject constructor(
     private val userRepository: UserRepository,
     private val threadExecutor: ThreadExecutor,
     private val postExecutionThread: PostExecutionThread
-
 ) {
 
     private val disposables = CompositeDisposable()

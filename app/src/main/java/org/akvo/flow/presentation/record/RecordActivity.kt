@@ -67,7 +67,7 @@ class RecordActivity : BackActivity(), FormListListener, ResponseListListener, R
             resources.getStringArray(R.array.record_tabs)
         )
         viewPager.adapter = recordTabsAdapter
-        surveyGroup = intent.getSerializableExtra(ConstantUtil.SURVEY_GROUP_EXTRA) as SurveyGroup
+        surveyGroup = intent.getSerializableExtra(ConstantUtil.SURVEY_EXTRA) as SurveyGroup
         rootLayout = findViewById(R.id.record_root_layout)
     }
 

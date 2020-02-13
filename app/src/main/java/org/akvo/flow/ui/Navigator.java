@@ -43,6 +43,7 @@ import org.akvo.flow.presentation.FullImageActivity;
 import org.akvo.flow.presentation.about.AboutActivity;
 import org.akvo.flow.presentation.datapoints.map.one.DataPointMapActivity;
 import org.akvo.flow.presentation.entity.ViewApkData;
+import org.akvo.flow.presentation.form.view.FormViewActivity;
 import org.akvo.flow.presentation.geoshape.ViewGeoShapeActivity;
 import org.akvo.flow.presentation.geoshape.create.CreateGeoShapeActivity;
 import org.akvo.flow.presentation.help.HelpActivity;
@@ -98,7 +99,7 @@ public class Navigator {
         // Display form list and history
         Intent intent = new Intent(context, RecordActivity.class);
         Bundle extras = new Bundle();
-        extras.putSerializable(ConstantUtil.SURVEY_GROUP_EXTRA, mSurveyGroup);
+        extras.putSerializable(ConstantUtil.SURVEY_EXTRA, mSurveyGroup);
         extras.putString(ConstantUtil.DATA_POINT_ID_EXTRA, surveyedLocaleId);
         intent.putExtras(extras);
         context.startActivity(intent);
@@ -106,14 +107,23 @@ public class Navigator {
 
     //TODO: confusing, too many params, use object
     public void navigateToFormActivity(Activity activity, String dataPointId, String formId,
-            long formInstanceId, boolean readOnly, SurveyGroup mSurveyGroup) {
-        Intent i = new Intent(activity, FormActivity.class);
-        i.putExtra(ConstantUtil.FORM_ID_EXTRA, formId);
-        i.putExtra(ConstantUtil.SURVEY_GROUP_EXTRA, mSurveyGroup);
-        i.putExtra(ConstantUtil.DATA_POINT_ID_EXTRA, dataPointId);
-        i.putExtra(ConstantUtil.RESPONDENT_ID_EXTRA, formInstanceId);
-        i.putExtra(ConstantUtil.READ_ONLY_EXTRA, readOnly);
-        activity.startActivityForResult(i, ConstantUtil.FORM_FILLING_REQUEST);
+            long formInstanceId, boolean readOnly, SurveyGroup survey) {
+        if (readOnly) {
+            Intent i = new Intent(activity, FormViewActivity.class);
+            i.putExtra(ConstantUtil.FORM_ID_EXTRA, formId);
+            i.putExtra(ConstantUtil.SURVEY_EXTRA, survey);
+            i.putExtra(ConstantUtil.DATA_POINT_ID_EXTRA, dataPointId);
+            i.putExtra(ConstantUtil.RESPONDENT_ID_EXTRA, formInstanceId);
+            activity.startActivity(i);
+        } else {
+            Intent i = new Intent(activity, FormActivity.class);
+            i.putExtra(ConstantUtil.FORM_ID_EXTRA, formId);
+            i.putExtra(ConstantUtil.SURVEY_EXTRA, survey);
+            i.putExtra(ConstantUtil.DATA_POINT_ID_EXTRA, dataPointId);
+            i.putExtra(ConstantUtil.RESPONDENT_ID_EXTRA, formInstanceId);
+            i.putExtra(ConstantUtil.READ_ONLY_EXTRA, readOnly);
+            activity.startActivityForResult(i, ConstantUtil.FORM_FILLING_REQUEST);
+        }
     }
 
     public void navigateToTakePhoto(@NonNull Activity activity, Uri uri) {

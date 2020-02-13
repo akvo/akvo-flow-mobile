@@ -231,7 +231,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
         surveyId = intent.getStringExtra(ConstantUtil.FORM_ID_EXTRA);
         mReadOnly = intent.getBooleanExtra(ConstantUtil.READ_ONLY_EXTRA, false);
         mSurveyInstanceId = intent.getLongExtra(ConstantUtil.RESPONDENT_ID_EXTRA, 0);
-        mSurveyGroup = (SurveyGroup) intent.getSerializableExtra(ConstantUtil.SURVEY_GROUP_EXTRA);
+        mSurveyGroup = (SurveyGroup) intent.getSerializableExtra(ConstantUtil.SURVEY_EXTRA);
         mRecordId = intent.getStringExtra(ConstantUtil.DATA_POINT_ID_EXTRA);
     }
 

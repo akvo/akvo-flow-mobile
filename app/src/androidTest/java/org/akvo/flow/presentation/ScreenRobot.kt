@@ -24,15 +24,11 @@ import androidx.annotation.IdRes
 import androidx.annotation.StringRes
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
-import androidx.test.espresso.action.ViewActions.typeText
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.intent.Intents.intended
 import androidx.test.espresso.intent.matcher.IntentMatchers.hasComponent
-import androidx.test.espresso.matcher.RootMatchers.withDecorView
 import androidx.test.espresso.matcher.ViewMatchers
-import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withEffectiveVisibility
-import androidx.test.espresso.matcher.ViewMatchers.withHint
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import org.akvo.flow.R
@@ -40,7 +36,6 @@ import org.akvo.flow.activity.ToolBarTitleSubtitleMatcher.withToolbarTitle
 import org.akvo.flow.activity.form.FormActivityTestUtil.addExecutionDelay
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.CoreMatchers.allOf
-import org.hamcrest.CoreMatchers.not
 
 abstract class ScreenRobot<T : ScreenRobot<T>> {
 
@@ -54,35 +49,6 @@ abstract class ScreenRobot<T : ScreenRobot<T>> {
         onView(withId(R.id.toolbar)).check(matches(withToolbarTitle(`is`<String>(text))))
     }
 
-    fun checkIsDisplayed(@IdRes vararg viewIds: Int): T {
-        for (viewId in viewIds) {
-            onView(withId(viewId)).check(matches(isDisplayed()))
-        }
-        return this as T
-    }
-
-    fun checkIsHidden(@IdRes vararg viewIds: Int): T {
-        for (viewId in viewIds) {
-            onView(withId(viewId)).check(matches(not(isDisplayed())))
-        }
-        return this as T
-    }
-
-    fun checkViewHasText(@IdRes viewId: Int, expected: String): T {
-        onView(withId(viewId)).check(matches(withText(expected)))
-        return this as T
-    }
-
-    fun checkViewHasText(@IdRes viewId: Int, @StringRes messageResId: Int): T {
-        onView(withId(viewId)).check(matches(withText(messageResId)))
-        return this as T
-    }
-
-    fun checkViewHasHint(@IdRes viewId: Int, @StringRes messageResId: Int): T {
-        onView(withId(viewId)).check(matches(withHint(messageResId)))
-        return this as T
-    }
-
     fun clickOnViewWithId(@IdRes viewId: Int): T {
         onView(withId(viewId)).perform(click())
         return this as T
@@ -93,19 +59,8 @@ abstract class ScreenRobot<T : ScreenRobot<T>> {
         return this as T
     }
 
-    fun enterTextIntoView(@IdRes viewId: Int, text: String): T {
-        onView(withId(viewId)).perform(typeText(text))
-        return this as T
-    }
-
     fun provideActivityContext(activityContext: Activity): T {
         this.activityContext = activityContext
-        return this as T
-    }
-
-    fun checkDialogWithTextIsDisplayed(@StringRes messageResId: Int): T {
-        onView(withText(messageResId)).inRoot(withDecorView(not(activityContext!!.window.decorView)))
-            .check(matches(isDisplayed()))
         return this as T
     }
 

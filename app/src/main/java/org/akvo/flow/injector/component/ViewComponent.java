@@ -35,6 +35,7 @@ import org.akvo.flow.presentation.datapoints.map.DataPointsMapFragment;
 import org.akvo.flow.presentation.datapoints.map.one.DataPointMapActivity;
 import org.akvo.flow.presentation.form.mobiledata.MobileDataSettingDialog;
 import org.akvo.flow.presentation.form.view.FormViewActivity;
+import org.akvo.flow.presentation.form.view.languages.LanguagesDialogFragment;
 import org.akvo.flow.presentation.geoshape.ViewGeoShapeActivity;
 import org.akvo.flow.presentation.geoshape.create.CreateGeoShapeActivity;
 import org.akvo.flow.presentation.geoshape.properties.PropertiesDialog;
@@ -55,6 +56,7 @@ import org.akvo.flow.ui.view.geolocation.GeoQuestionView;
 import org.akvo.flow.ui.view.media.photo.PhotoQuestionView;
 import org.akvo.flow.ui.view.media.video.VideoQuestionView;
 import org.akvo.flow.ui.view.signature.SignatureQuestionView;
+import org.jetbrains.annotations.NotNull;
 
 import dagger.Component;
 
@@ -127,4 +129,6 @@ public interface ViewComponent {
     void inject(ViewGeoShapeActivity viewGeoShapeActivity);
 
     void inject(PropertiesDialog propertiesDialog);
+
+    void inject(@NotNull LanguagesDialogFragment languagesDialogFragment);
 }

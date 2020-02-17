@@ -28,6 +28,7 @@ import org.akvo.flow.R
 import org.akvo.flow.app.FlowApp
 import org.akvo.flow.domain.SurveyGroup
 import org.akvo.flow.injector.component.DaggerViewComponent
+import org.akvo.flow.presentation.form.view.languages.LanguagesDialogFragment
 import org.akvo.flow.presentation.form.view.ui.main.QuestionGroupsPagerAdapter
 import org.akvo.flow.ui.Navigator
 import org.akvo.flow.uicomponents.BackActivity
@@ -92,7 +93,8 @@ class FormViewActivity : BackActivity(), IFormView {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.edit_lang -> {
-                //displayLanguagesDialog()
+                LanguagesDialogFragment.newInstance()
+                    .show(supportFragmentManager, LanguagesDialogFragment.TAG)
                 return true
             }
             R.id.view_map -> {

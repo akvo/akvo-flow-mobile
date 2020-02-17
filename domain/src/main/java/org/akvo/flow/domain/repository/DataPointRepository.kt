@@ -23,5 +23,5 @@ import io.reactivex.Single
 
 interface DataPointRepository {
     fun downloadDataPoints(surveyGroupId: Long): Single<Int>
-    fun cleanPathAndDownLoadMedia(filename: String): Completable
+    fun cleanPathAndDownLoadMedia(filePath: String): Completable
 }

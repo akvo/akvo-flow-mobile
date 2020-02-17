@@ -38,6 +38,7 @@ import javax.inject.Inject
 
 class FormViewActivity : BackActivity(), IFormView {
 
+    private lateinit var formId: String
     private lateinit var datapointId: String
     private var formInstanceId: Long = 0L
 
@@ -74,7 +75,7 @@ class FormViewActivity : BackActivity(), IFormView {
     override fun onResume() {
         super.onResume()
         val surveyGroup = intent.getSerializableExtra(ConstantUtil.SURVEY_EXTRA) as SurveyGroup
-        val formId = intent.getStringExtra(ConstantUtil.FORM_ID_EXTRA)
+        formId = intent.getStringExtra(ConstantUtil.FORM_ID_EXTRA)
         datapointId = intent.getStringExtra(ConstantUtil.DATA_POINT_ID_EXTRA)
         formInstanceId = intent.getLongExtra(ConstantUtil.RESPONDENT_ID_EXTRA, 0)
         presenter.loadForm(formId, formInstanceId, surveyGroup, datapointId)
@@ -93,7 +94,7 @@ class FormViewActivity : BackActivity(), IFormView {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.edit_lang -> {
-                LanguagesDialogFragment.newInstance()
+                LanguagesDialogFragment.newInstance(formId)
                     .show(supportFragmentManager, LanguagesDialogFragment.TAG)
                 return true
             }

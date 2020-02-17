@@ -53,6 +53,7 @@ import org.akvo.flow.database.LanguageTable;
 import org.akvo.flow.database.SurveyLanguagesDataSource;
 import org.akvo.flow.database.SurveyLanguagesDbDataSource;
 import org.akvo.flow.domain.executor.PostExecutionThread;
+import org.akvo.flow.domain.executor.SchedulerCreator;
 import org.akvo.flow.domain.executor.ThreadExecutor;
 import org.akvo.flow.domain.repository.ApkRepository;
 import org.akvo.flow.domain.repository.DataPointRepository;
@@ -223,6 +224,12 @@ public class ApplicationModule {
     @Singleton
     public ThreadExecutor provideThreadExecutor(JobExecutor jobExecutor) {
         return jobExecutor;
+    }
+
+    @Provides
+    @Singleton
+    public SchedulerCreator provideSchedulerCreator(ThreadExecutor threadExecutor) {
+        return new SchedulerCreator(threadExecutor);
     }
 
     @Provides

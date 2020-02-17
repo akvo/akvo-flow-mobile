@@ -28,6 +28,7 @@ import androidx.test.filters.LargeTest
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import io.reactivex.Observable
 import io.reactivex.Single
+import io.reactivex.internal.schedulers.TrampolineScheduler
 import it.cosenonjaviste.daggermock.DaggerMock
 import org.akvo.flow.R
 import org.akvo.flow.activity.FormActivity
@@ -37,6 +38,7 @@ import org.akvo.flow.app.FlowApp
 import org.akvo.flow.domain.SurveyGroup
 import org.akvo.flow.domain.entity.DataPoint
 import org.akvo.flow.domain.entity.User
+import org.akvo.flow.domain.executor.SchedulerCreator
 import org.akvo.flow.domain.repository.SurveyRepository
 import org.akvo.flow.domain.repository.UserRepository
 import org.akvo.flow.injector.component.ApplicationComponent
@@ -81,6 +83,7 @@ class RecordActivityTest {
     val surveyRepository = mock(SurveyRepository::class.java)
     val userRepository = mock(UserRepository::class.java)
     val dataPoint = mock(DataPoint::class.java)
+    val schedulerCreator = mock(SchedulerCreator::class.java)
 
     @Before
     fun beforeClass() {
@@ -99,6 +102,7 @@ class RecordActivityTest {
         ).thenReturn(Single.just(1L))
         `when`(dataPoint.latitude).thenReturn(41.3819219)
         `when`(dataPoint.longitude).thenReturn(2.148909)
+        `when`(schedulerCreator.obtainScheduler()).thenReturn(TrampolineScheduler.instance())
     }
 
     @Test

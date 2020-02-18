@@ -16,8 +16,10 @@
  * You should have received a copy of the GNU General Public License
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
+package org.akvo.flow.presentation.form.languages
 
-package org.akvo.flow.presentation.form.view.languages
-
-interface LanguagesView {
-}
+data class Language(
+    val languageCode: String,
+    val language: String,
+    var isSelected: Boolean
+)

@@ -36,7 +36,7 @@ import org.akvo.flow.data.loader.StatsLoader;
 
 import timber.log.Timber;
 
-import static org.akvo.flow.util.ConstantUtil.SURVEY_GROUP_ID_EXTRA;
+import static org.akvo.flow.util.ConstantUtil.SURVEY_ID_EXTRA;
 
 public class StatsDialogFragment extends DialogFragment implements LoaderCallbacks<Stats> {
 
@@ -47,7 +47,7 @@ public class StatsDialogFragment extends DialogFragment implements LoaderCallbac
     public static StatsDialogFragment newInstance(long surveyGroupId) {
         StatsDialogFragment f = new StatsDialogFragment();
         Bundle args = new Bundle();
-        args.putLong(SURVEY_GROUP_ID_EXTRA, surveyGroupId);
+        args.putLong(SURVEY_ID_EXTRA, surveyGroupId);
         f.setArguments(args);
         return f;
     }
@@ -55,7 +55,7 @@ public class StatsDialogFragment extends DialogFragment implements LoaderCallbac
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mSurveyGroupId = getArguments().getLong(SURVEY_GROUP_ID_EXTRA);
+        mSurveyGroupId = getArguments().getLong(SURVEY_ID_EXTRA);
     }
 
     @Override

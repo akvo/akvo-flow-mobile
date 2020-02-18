@@ -30,7 +30,7 @@ import androidx.fragment.app.DialogFragment;
 
 import org.akvo.flow.R;
 
-import static org.akvo.flow.util.ConstantUtil.SURVEY_GROUP_ID_EXTRA;
+import static org.akvo.flow.util.ConstantUtil.SURVEY_ID_EXTRA;
 
 public class SurveyDeleteConfirmationDialog extends DialogFragment {
 
@@ -45,7 +45,7 @@ public class SurveyDeleteConfirmationDialog extends DialogFragment {
     public static SurveyDeleteConfirmationDialog newInstance(ViewSurvey viewSurvey) {
         SurveyDeleteConfirmationDialog fragment = new SurveyDeleteConfirmationDialog();
         Bundle args = new Bundle();
-        args.putParcelable(SURVEY_GROUP_ID_EXTRA, viewSurvey);
+        args.putParcelable(SURVEY_ID_EXTRA, viewSurvey);
         fragment.setArguments(args);
         return fragment;
     }
@@ -53,7 +53,7 @@ public class SurveyDeleteConfirmationDialog extends DialogFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        viewSurvey = getArguments().getParcelable(SURVEY_GROUP_ID_EXTRA);
+        viewSurvey = getArguments().getParcelable(SURVEY_ID_EXTRA);
     }
 
     @Override

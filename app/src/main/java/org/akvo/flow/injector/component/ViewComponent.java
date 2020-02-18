@@ -35,7 +35,7 @@ import org.akvo.flow.presentation.datapoints.map.DataPointsMapFragment;
 import org.akvo.flow.presentation.datapoints.map.one.DataPointMapActivity;
 import org.akvo.flow.presentation.form.mobiledata.MobileDataSettingDialog;
 import org.akvo.flow.presentation.form.view.FormViewActivity;
-import org.akvo.flow.presentation.form.view.languages.LanguagesDialogFragment;
+import org.akvo.flow.presentation.form.languages.LanguagesDialogFragment;
 import org.akvo.flow.presentation.geoshape.ViewGeoShapeActivity;
 import org.akvo.flow.presentation.geoshape.create.CreateGeoShapeActivity;
 import org.akvo.flow.presentation.geoshape.properties.PropertiesDialog;

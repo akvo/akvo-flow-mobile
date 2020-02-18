@@ -17,7 +17,7 @@
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.akvo.flow.presentation.form.view.languages
+package org.akvo.flow.presentation.form.languages
 
 import android.app.AlertDialog
 import android.app.Dialog
@@ -40,17 +40,17 @@ class LanguagesDialogFragment : DialogFragment(), LanguagesView {
     @Inject
     lateinit var presenter: LanguagesPresenter
 
-    lateinit var formId: String
+    private var surveyId = -1L
 
     companion object {
 
         const val TAG = "LanguagesDialogFragment"
 
         @JvmStatic
-        fun newInstance(formId: String): LanguagesDialogFragment {
+        fun newInstance(surveyId: Long): LanguagesDialogFragment {
             return LanguagesDialogFragment().apply {
                 arguments = Bundle().apply {
-                    putString(ConstantUtil.FORM_ID_EXTRA, formId)
+                    putLong(ConstantUtil.SURVEY_ID_EXTRA, surveyId)
                 }
             }
         }
@@ -59,7 +59,8 @@ class LanguagesDialogFragment : DialogFragment(), LanguagesView {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         initializeInjector()
-        formId = arguments!!.getString(ConstantUtil.FORM_ID_EXTRA, "")
+        surveyId = arguments!!.getLong(ConstantUtil.SURVEY_ID_EXTRA, -1L)
+        presenter.setView(this)
     }
 
     private fun initializeInjector() {
@@ -74,12 +75,9 @@ class LanguagesDialogFragment : DialogFragment(), LanguagesView {
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-
         val languageAdapter = LanguageAdapter(activity, emptyList())
-
         val listView = LayoutInflater.from(activity)
             .inflate(R.layout.languages_list, null) as ListView
-        listView.choiceMode = ListView.CHOICE_MODE_MULTIPLE
         listView.adapter = languageAdapter
         listView.onItemClickListener =
             AdapterView.OnItemClickListener { _, _, position, _ ->
@@ -96,14 +94,13 @@ class LanguagesDialogFragment : DialogFragment(), LanguagesView {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        presenter.loadLanguages(formId)
+        presenter.loadLanguages(surveyId)
     }
 
     private fun useSelectedLanguages(languageAdapter: LanguageAdapter) {
-        val selectedLanguages =
-            languageAdapter.selectedLanguages
-        if (selectedLanguages != null && selectedLanguages.size > 0) {
-             presenter.saveLanguages(selectedLanguages)
+        val selectedLanguages = languageAdapter.selectedLanguages
+        if (selectedLanguages.isNotEmpty()) {
+             presenter.saveLanguages(selectedLanguages, surveyId)
         } else {
             displayError()
         }
@@ -111,17 +108,15 @@ class LanguagesDialogFragment : DialogFragment(), LanguagesView {
 
     private fun displayError() {
         activity?.let {
-            LanguagesErrorDialog.newInstance(formId)
+            LanguagesErrorDialog.newInstance(surveyId)
                 .show(it.supportFragmentManager, LanguagesErrorDialog.TAG)
         }
     }
 
-//    private fun saveLanguages(selectedLanguages: Set<String>) {
-//        surveyLanguagesDataSource.saveLanguagePreferences(
-//            mSurveyGroup.getId(),
-//            selectedLanguages
-//        )
-//        loadLanguages()
-//        mAdapter.notifyOptionsChanged()
-//    }
+    override fun onLanguagesSaved() {
+        //TODO("not implemented")
+        dismiss()
+        //notify to reload formUI?
+        //add listener
+    }
 }

@@ -17,7 +17,7 @@
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.akvo.flow.presentation.form.view.languages
+package org.akvo.flow.presentation.form.languages
 
 import android.app.AlertDialog
 import android.app.Dialog
@@ -28,17 +28,17 @@ import org.akvo.flow.util.ConstantUtil
 
 class LanguagesErrorDialog : DialogFragment() {
 
-    lateinit var formId: String
+    private var surveyId = -1L
 
     companion object {
 
         const val TAG = "LanguagesErrorDialog"
 
         @JvmStatic
-        fun newInstance(formId: String): LanguagesErrorDialog {
+        fun newInstance(surveyId: Long): LanguagesErrorDialog {
             return LanguagesErrorDialog().apply {
                 arguments = Bundle().apply {
-                    putString(ConstantUtil.FORM_ID_EXTRA, formId)
+                    putLong(ConstantUtil.SURVEY_ID_EXTRA, surveyId)
                 }
             }
         }
@@ -46,7 +46,7 @@ class LanguagesErrorDialog : DialogFragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        formId = arguments!!.getString(ConstantUtil.FORM_ID_EXTRA, "")
+        surveyId = arguments!!.getLong(ConstantUtil.SURVEY_ID_EXTRA, -1L)
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
@@ -56,7 +56,7 @@ class LanguagesErrorDialog : DialogFragment() {
             .setPositiveButton(R.string.okbutton) { dialog, _ ->
                 dialog?.dismiss()
                 activity?.let {
-                    LanguagesDialogFragment.newInstance(formId)
+                    LanguagesDialogFragment.newInstance(surveyId)
                         .show(it.supportFragmentManager, LanguagesDialogFragment.TAG)
                 }
             }

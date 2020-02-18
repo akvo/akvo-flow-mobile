@@ -20,4 +20,5 @@
 package org.akvo.flow.presentation.form.languages
 
 interface LanguagesView {
+    fun displayLanguages(transform: List<Language>)
 }

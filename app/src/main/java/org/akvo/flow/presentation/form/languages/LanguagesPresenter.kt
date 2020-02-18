@@ -19,10 +19,16 @@
 
 package org.akvo.flow.presentation.form.languages
 
+import io.reactivex.observers.DisposableSingleObserver
+import org.akvo.flow.domain.languages.LoadLanguages
+import org.akvo.flow.domain.languages.SaveLanguages
 import org.akvo.flow.presentation.Presenter
 import javax.inject.Inject
 
-class LanguagesPresenter @Inject constructor(private val languageMapper: LanguageMapper) :
+class LanguagesPresenter @Inject constructor(
+    private val languageMapper: LanguageMapper,
+    private val loadLanguages: LoadLanguages
+) :
     Presenter {
 
     private var view: LanguagesView? = null
@@ -32,12 +38,29 @@ class LanguagesPresenter @Inject constructor(private val languageMapper: Languag
     }
 
     override fun destroy() {
-        // EMPTY
+        loadLanguages.dispose()
     }
 
     fun loadLanguages(surveyId: Long) {
         //TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
         //        val languages: List<Language> = languageMapper
 //            .transform(mLanguages, mSurvey.getAvailableLanguageCodes())
+
+        val params: MutableMap<String, Any> = HashMap(2)
+        params[SaveLanguages.PARAM_SURVEY_ID] = surveyId
+        loadLanguages.execute(object : DisposableSingleObserver<Pair<Set<String>, Set<String>>>() {
+            override fun onSuccess(selectedAndAvailableLanguages: Pair<Set<String>, Set<String>>) {
+                view?.displayLanguages(
+                    languageMapper.transform(
+                        selectedAndAvailableLanguages.first.toTypedArray(),
+                        selectedAndAvailableLanguages.second
+                    )
+                )
+            }
+
+            override fun onError(e: Throwable) {
+                // TODO("not implemented")
+            }
+        }, params)
     }
 }

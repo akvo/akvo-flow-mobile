@@ -47,7 +47,6 @@ class LanguagesDialogFragment : DialogFragment(), LanguagesView {
 
     private var listener: LanguagesSelectionListener? = null
 
-    //TODO: should probably be formId
     private var surveyId = -1L
 
     companion object {
@@ -126,5 +125,12 @@ class LanguagesDialogFragment : DialogFragment(), LanguagesView {
 
     interface LanguagesSelectionListener {
         fun useSelectedLanguages(selectedLanguages: MutableSet<String>)
+    }
+
+    override fun displayLanguages(languages: List<Language>) {
+        //TODO("not implemented")
+        val listView = view?.findViewById(R.id.languages_list) as ListView
+        val adapter = listView.adapter as LanguageAdapter
+        adapter.setLanguages(languages)
     }
 }

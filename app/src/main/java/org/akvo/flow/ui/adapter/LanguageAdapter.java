@@ -29,6 +29,7 @@ import android.widget.CheckBox;
 
 import org.akvo.flow.R;
 import org.akvo.flow.presentation.form.languages.Language;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -89,6 +90,12 @@ public class LanguageAdapter extends ArrayAdapter<Language> {
     public void updateSelected(int position) {
         Language language = getItem(position);
         language.setSelected(!language.isSelected());
+        notifyDataSetChanged();
+    }
+
+    public void setLanguages(@NotNull List<Language> languages) {
+        this.languages.clear();
+        this.languages.addAll(languages);
         notifyDataSetChanged();
     }
 }

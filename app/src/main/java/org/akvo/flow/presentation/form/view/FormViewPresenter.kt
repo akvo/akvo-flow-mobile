@@ -19,16 +19,18 @@
 
 package org.akvo.flow.presentation.form.view
 
+import io.reactivex.observers.DisposableCompletableObserver
 import org.akvo.flow.domain.SurveyGroup
+import org.akvo.flow.domain.languages.SaveLanguages
 import org.akvo.flow.presentation.Presenter
 import javax.inject.Inject
 
-class FormViewPresenter @Inject constructor(): Presenter {
+class FormViewPresenter @Inject constructor(private val saveLanguagesUseCase: SaveLanguages): Presenter {
 
     var view: IFormView? = null
 
     override fun destroy() {
-        //TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        saveLanguagesUseCase.dispose()
     }
 
     fun loadForm(
@@ -38,5 +40,22 @@ class FormViewPresenter @Inject constructor(): Presenter {
         recordId: String
     ) {
         //TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    //language is saved per survey and not form???
+    fun saveLanguages(selectedLanguages: Set<String>, surveyId: Long) {
+        val params: MutableMap<String, Any> = HashMap(4)
+        params[SaveLanguages.PARAM_SURVEY_ID] = surveyId
+        params[SaveLanguages.PARAM_LANGUAGES_LIST] = selectedLanguages
+        saveLanguagesUseCase.execute(object : DisposableCompletableObserver() {
+            override fun onComplete() {
+                view?.onLanguagesSaved()
+            }
+
+            override fun onError(e: Throwable) {
+                view?.onLanguagesSavedError()
+            }
+
+        }, params)
     }
 }

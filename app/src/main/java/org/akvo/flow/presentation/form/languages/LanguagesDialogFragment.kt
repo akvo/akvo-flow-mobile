@@ -21,6 +21,7 @@ package org.akvo.flow.presentation.form.languages
 
 import android.app.AlertDialog
 import android.app.Dialog
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -32,6 +33,7 @@ import org.akvo.flow.app.FlowApp
 import org.akvo.flow.injector.component.ApplicationComponent
 import org.akvo.flow.injector.component.DaggerViewComponent
 import org.akvo.flow.ui.adapter.LanguageAdapter
+import org.akvo.flow.uicomponents.SnackBarManager
 import org.akvo.flow.util.ConstantUtil
 import javax.inject.Inject
 
@@ -40,6 +42,12 @@ class LanguagesDialogFragment : DialogFragment(), LanguagesView {
     @Inject
     lateinit var presenter: LanguagesPresenter
 
+    @Inject
+    lateinit var snackBarManager: SnackBarManager
+
+    private var listener: LanguagesSelectionListener? = null
+
+    //TODO: should probably be formId
     private var surveyId = -1L
 
     companion object {
@@ -61,6 +69,15 @@ class LanguagesDialogFragment : DialogFragment(), LanguagesView {
         initializeInjector()
         surveyId = arguments!!.getLong(ConstantUtil.SURVEY_ID_EXTRA, -1L)
         presenter.setView(this)
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        try {
+            listener = activity as LanguagesSelectionListener
+        } catch (e: ClassCastException) {
+            throw ClassCastException("${activity.toString()} must implement LanguagesSelectionListener")
+        }
     }
 
     private fun initializeInjector() {
@@ -86,9 +103,9 @@ class LanguagesDialogFragment : DialogFragment(), LanguagesView {
         return AlertDialog.Builder(activity)
             .setTitle(R.string.surveylanglabel)
             .setView(listView)
-            .setPositiveButton(R.string.okbutton) { dialog, _ ->
-                dialog?.dismiss()
-                useSelectedLanguages(listView.adapter as LanguageAdapter)
+            .setPositiveButton(R.string.okbutton) { _, _ ->
+                val selectedLanguages = (listView.adapter as LanguageAdapter).selectedLanguages
+                listener?.useSelectedLanguages(selectedLanguages)
             }.create()
     }
 
@@ -97,26 +114,17 @@ class LanguagesDialogFragment : DialogFragment(), LanguagesView {
         presenter.loadLanguages(surveyId)
     }
 
-    private fun useSelectedLanguages(languageAdapter: LanguageAdapter) {
-        val selectedLanguages = languageAdapter.selectedLanguages
-        if (selectedLanguages.isNotEmpty()) {
-             presenter.saveLanguages(selectedLanguages, surveyId)
-        } else {
-            displayError()
-        }
+    override fun onDestroyView() {
+        super.onDestroyView()
+        presenter.destroy()
     }
 
-    private fun displayError() {
-        activity?.let {
-            LanguagesErrorDialog.newInstance(surveyId)
-                .show(it.supportFragmentManager, LanguagesErrorDialog.TAG)
-        }
+    override fun onDetach() {
+        super.onDetach()
+        listener = null
     }
 
-    override fun onLanguagesSaved() {
-        //TODO("not implemented")
-        dismiss()
-        //notify to reload formUI?
-        //add listener
+    interface LanguagesSelectionListener {
+        fun useSelectedLanguages(selectedLanguages: MutableSet<String>)
     }
 }

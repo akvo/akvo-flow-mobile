@@ -20,5 +20,4 @@
 package org.akvo.flow.presentation.form.languages
 
 interface LanguagesView {
-    fun onLanguagesSaved()
 }

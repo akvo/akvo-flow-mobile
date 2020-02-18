@@ -19,15 +19,11 @@
 
 package org.akvo.flow.presentation.form.languages
 
-import io.reactivex.observers.DisposableCompletableObserver
-import org.akvo.flow.domain.languages.SaveLanguages
 import org.akvo.flow.presentation.Presenter
 import javax.inject.Inject
 
-class LanguagesPresenter @Inject constructor(
-    private val languageMapper: LanguageMapper,
-    private val saveLanguagesUseCase: SaveLanguages
-) : Presenter {
+class LanguagesPresenter @Inject constructor(private val languageMapper: LanguageMapper) :
+    Presenter {
 
     private var view: LanguagesView? = null
 
@@ -36,7 +32,7 @@ class LanguagesPresenter @Inject constructor(
     }
 
     override fun destroy() {
-        saveLanguagesUseCase.dispose()
+        // EMPTY
     }
 
     fun loadLanguages(surveyId: Long) {
@@ -44,21 +40,4 @@ class LanguagesPresenter @Inject constructor(
         //        val languages: List<Language> = languageMapper
 //            .transform(mLanguages, mSurvey.getAvailableLanguageCodes())
     }
-
-    fun saveLanguages(selectedLanguages: Set<String>, surveyId: Long) {
-        val params: MutableMap<String, Any> = HashMap(4)
-        params[SaveLanguages.PARAM_SURVEY_ID] = surveyId
-        params[SaveLanguages.PARAM_LANGUAGES_LIST] = selectedLanguages
-        saveLanguagesUseCase.execute(object : DisposableCompletableObserver() {
-            override fun onComplete() {
-               view?.onLanguagesSaved()
-            }
-
-            override fun onError(e: Throwable) {
-                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-            }
-
-        }, params)
-    }
-
 }

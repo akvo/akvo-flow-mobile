@@ -20,4 +20,6 @@
 package org.akvo.flow.presentation.form.view
 
 interface IFormView {
+    fun onLanguagesSaved()
+    fun onLanguagesSavedError()
 }

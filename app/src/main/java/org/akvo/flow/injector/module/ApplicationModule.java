@@ -106,25 +106,25 @@ public class ApplicationModule {
 
     @Provides
     @Singleton
-    Context provideContext() {
+    public Context provideContext() {
         return application;
     }
 
     @Provides
     @Singleton
-    ApkRepository provideApkRepository(ApkDataRepository apkDataRepository) {
+    public ApkRepository provideApkRepository(ApkDataRepository apkDataRepository) {
         return apkDataRepository;
     }
 
     @Provides
     @Singleton
-    FileRepository provideFileRepository(FileDataRepository fileDataRepository) {
+    public FileRepository provideFileRepository(FileDataRepository fileDataRepository) {
         return fileDataRepository;
     }
 
     @Provides
     @Singleton
-    LoggingHelper loggingHelper() {
+    public LoggingHelper loggingHelper() {
         if (BuildConfig.DEBUG) {
             return new DebugLoggingHelper();
         } else {
@@ -134,56 +134,56 @@ public class ApplicationModule {
 
     @Provides
     @Singleton
-    SurveyRepository provideSurveyRepository(SurveyDataRepository surveyDataRepository) {
+    public SurveyRepository provideSurveyRepository(SurveyDataRepository surveyDataRepository) {
         return surveyDataRepository;
     }
 
     @Provides
     @Singleton
-    MissingAndDeletedRepository provideMissingAndDeletedRepository(
+    public MissingAndDeletedRepository provideMissingAndDeletedRepository(
             MissingAndDeletedDataRepository repository) {
         return repository;
     }
 
     @Provides
     @Singleton
-    UserRepository provideUserRepository(UserDataRepository userDataRepository) {
+    public UserRepository provideUserRepository(UserDataRepository userDataRepository) {
         return userDataRepository;
     }
 
     @Provides
     @Singleton
-    SetupRepository provideSetupRepository(SetupDataRepository setupDataRepository) {
+    public SetupRepository provideSetupRepository(SetupDataRepository setupDataRepository) {
         return setupDataRepository;
     }
 
     @Provides
     @Singleton
-    FormRepository provideFormRepository(FormDataRepository formDataRepository) {
+    public FormRepository provideFormRepository(FormDataRepository formDataRepository) {
         return formDataRepository;
     }
 
     @Provides
     @Singleton
-    DataPointRepository provideDataPointRepository(DataPointDataRepository dataPointDataRepository) {
+    public DataPointRepository provideDataPointRepository(DataPointDataRepository dataPointDataRepository) {
         return dataPointDataRepository;
     }
 
     @Provides
     @Singleton
-    SQLiteOpenHelper provideOpenHelper() {
+    public SQLiteOpenHelper provideOpenHelper() {
         return new DatabaseHelper(application, new LanguageTable());
     }
 
     @Provides
     @Singleton
-    SqlBrite provideSqlBrite() {
+    public SqlBrite provideSqlBrite() {
         return new SqlBrite.Builder().build();
     }
 
     @Provides
     @Singleton
-    BriteDatabase provideDatabase(SqlBrite sqlBrite, SQLiteOpenHelper helper) {
+    public BriteDatabase provideDatabase(SqlBrite sqlBrite, SQLiteOpenHelper helper) {
         BriteDatabase db = sqlBrite.wrapDatabaseHelper(helper, Schedulers.io());
         db.setLoggingEnabled(BuildConfig.DEBUG);
         return db;
@@ -191,7 +191,7 @@ public class ApplicationModule {
 
     @Provides
     @Singleton
-    RestServiceFactory provideServiceFactory(Encoder encoder, SignatureHelper signatureHelper) {
+    public RestServiceFactory provideServiceFactory(Encoder encoder, SignatureHelper signatureHelper) {
         HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor();
         if (BuildConfig.DEBUG) {
             loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
@@ -214,26 +214,26 @@ public class ApplicationModule {
 
     @Provides
     @Singleton
-    SharedPreferencesDataSource provideSharedPreferences(GsonMapper mapper) {
+    public SharedPreferencesDataSource provideSharedPreferences(GsonMapper mapper) {
         return new SharedPreferencesDataSource(
                 application.getSharedPreferences(PREFS_NAME, PREFS_MODE), mapper);
     }
 
     @Provides
     @Singleton
-    ThreadExecutor provideThreadExecutor(JobExecutor jobExecutor) {
+    public ThreadExecutor provideThreadExecutor(JobExecutor jobExecutor) {
         return jobExecutor;
     }
 
     @Provides
     @Singleton
-    PostExecutionThread providePostExecutionThread(UIThread uiThread) {
+    public PostExecutionThread providePostExecutionThread(UIThread uiThread) {
         return uiThread;
     }
 
     @Provides
     @Singleton
-    AmazonAuthHelper provideAmazonAuthHelper(SignatureHelper signatureHelper) {
+    public AmazonAuthHelper provideAmazonAuthHelper(SignatureHelper signatureHelper) {
         S3User s3User = new S3User(BuildConfig.AWS_BUCKET, BuildConfig.AWS_ACCESS_KEY_ID,
                 BuildConfig.AWS_SECRET_KEY);
         return new AmazonAuthHelper(signatureHelper, s3User);
@@ -241,14 +241,14 @@ public class ApplicationModule {
 
     @Provides
     @Singleton
-    RestApi provideRestApi(DeviceHelper deviceHelper, RestServiceFactory serviceFactory) {
+    public RestApi provideRestApi(DeviceHelper deviceHelper, RestServiceFactory serviceFactory) {
         return new RestApi(deviceHelper, serviceFactory, BuildConfig.VERSION_NAME,
                 BuildConfig.SERVER_BASE);
     }
 
     @Provides
     @Singleton
-    S3RestApi provideS3RestApi(RestServiceFactory serviceFactory, AmazonAuthHelper amazonAuthHelper,
+    public S3RestApi provideS3RestApi(RestServiceFactory serviceFactory, AmazonAuthHelper amazonAuthHelper,
             BodyCreator bodyCreator) {
         final DateFormat df = new SimpleDateFormat(REST_API_DATE_PATTERN, Locale.US);
         df.setTimeZone(TimeZone.getTimeZone(TIMEZONE));
@@ -258,13 +258,13 @@ public class ApplicationModule {
 
     @Provides
     @Singleton
-    Gson provideGson() {
+    public Gson provideGson() {
         return new Gson();
     }
 
     @Provides
     @Singleton
-    SurveyLanguagesDataSource provideSurveyLanguageDataSource(Context context) {
+    public SurveyLanguagesDataSource provideSurveyLanguageDataSource(Context context) {
         return new SurveyLanguagesDbDataSource(context);
     }
 

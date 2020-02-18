@@ -128,7 +128,6 @@ class LanguagesDialogFragment : DialogFragment(), LanguagesView {
     }
 
     override fun displayLanguages(languages: List<Language>) {
-        //TODO("not implemented")
         val listView = view?.findViewById(R.id.languages_list) as ListView
         val adapter = listView.adapter as LanguageAdapter
         adapter.setLanguages(languages)

@@ -81,13 +81,12 @@ dependencies {
 
     testImplementation "junit:junit:${rootProject.ext.jUnitVersion}"
     testImplementation "org.mockito:mockito-core:${rootProject.ext.mockitoCoreVersion}"
-    testImplementation "org.powermock:powermock-module-junit4:${rootProject.ext.powerMockVersion}"
-    testImplementation "org.powermock:powermock-module-junit4-rule:${rootProject.ext.powerMockVersion}"
-    testImplementation "org.powermock:powermock-api-mockito:${rootProject.ext.powerMockVersion}"
-    testImplementation "org.powermock:powermock-classloading-xstream:${rootProject.ext.powerMockVersion}"
     testImplementation "com.squareup.okhttp3:mockwebserver:${rootProject.ext.mockServerVersion}"
     testImplementation "org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version"
+    testImplementation "org.mockito:mockito-inline:${rootProject.ext.mockitoInlineVersion}"
+    testImplementation "com.nhaarman.mockitokotlin2:mockito-kotlin:${rootProject.ext.mockitoKotlinVersion}"
 }
+
 repositories {
     mavenCentral()
 }

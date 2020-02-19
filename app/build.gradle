@@ -4,6 +4,7 @@ apply plugin: 'kotlin-android-extensions'
 apply plugin: 'com.getkeepsafe.dexcount'
 apply plugin: 'io.fabric'
 apply from: rootProject.file("jacoco.gradle")
+apply plugin: 'kotlin-kapt'
 
 dexcount {
     enabled = !project.hasProperty("nodexcount")
@@ -59,10 +60,12 @@ android {
         }
 
         flowRelease {
-            storeFile file(RELEASE_STORE_FILE)
-            storePassword RELEASE_STORE_PASSWORD
-            keyAlias RELEASE_KEY_ALIAS
-            keyPassword RELEASE_KEY_PASSWORD
+            if (project.hasProperty('RELEASE_STORE_FILE')) {
+                storeFile file(RELEASE_STORE_FILE)
+                storePassword RELEASE_STORE_PASSWORD
+                keyAlias RELEASE_KEY_ALIAS
+                keyPassword RELEASE_KEY_PASSWORD
+            }
         }
     }
 
@@ -230,11 +233,11 @@ dependencies {
     implementation "org.ocpsoft.prettytime:prettytime:${rootProject.ext.prettyTimeVersion}"
     implementation "com.jakewharton.timber:timber:${rootProject.ext.timberVersion}"
     implementation "com.google.dagger:dagger:${rootProject.ext.daggerVersion}"
-    annotationProcessor "com.google.dagger:dagger-compiler:${rootProject.ext.daggerVersion}"
+    kapt "com.google.dagger:dagger-compiler:${rootProject.ext.daggerVersion}"
     implementation "com.jakewharton:butterknife:${rootProject.ext.butterKnifeVersion}"
-    annotationProcessor "com.jakewharton:butterknife-compiler:${rootProject.ext.butterKnifeVersion}"
+    kapt "com.jakewharton:butterknife-compiler:${rootProject.ext.butterKnifeVersion}"
     implementation "com.github.bumptech.glide:glide:${rootProject.ext.glideVersion}"
-    annotationProcessor "com.github.bumptech.glide:compiler:${rootProject.ext.glideVersion}"
+    kapt "com.github.bumptech.glide:compiler:${rootProject.ext.glideVersion}"
     implementation "com.squareup.sqlbrite2:sqlbrite:${rootProject.ext.sqlbriteVersion}"
     implementation "io.reactivex.rxjava2:rxandroid:${rootProject.ext.rxAndroidVersion}"
     implementation "io.reactivex.rxjava2:rxjava:${rootProject.ext.rxJavaVersion}"
@@ -250,6 +253,8 @@ dependencies {
     implementation "com.mapbox.mapboxsdk:mapbox-android-sdk:${rootProject.ext.mapboxVersion}"
     implementation "androidx.work:work-runtime:${rootProject.ext.workVersion}"
     implementation "com.halfhp.rxtracer:rxtracer:${rootProject.ext.rxTracerVersion}"
+    implementation "org.slf4j:slf4j-nop:${rootProject.ext.slf4JVersion}"
+    implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
 
     testImplementation "junit:junit:${rootProject.ext.jUnitVersion}"
     testImplementation "org.mockito:mockito-core:${rootProject.ext.mockitoCoreVersion}"
@@ -264,8 +269,11 @@ dependencies {
     androidTestImplementation "com.google.dexmaker:dexmaker:${rootProject.ext.dexMakerVersion}"
     androidTestImplementation "com.google.dexmaker:dexmaker-mockito:${rootProject.ext.dexMakerVersion}"
     androidTestImplementation "androidx.test:rules:${rootProject.ext.rulesVersion}"
-    androidTestImplementation "androidx.test.espresso:espresso-core:${rootProject.ext.espressoCoreVersion}"
-    androidTestImplementation "androidx.test.espresso:espresso-contrib:${rootProject.ext.espressoContribVersion}"
+    androidTestImplementation "androidx.test.espresso:espresso-core:${rootProject.ext.espressoVersion}"
+    androidTestImplementation "androidx.test.espresso:espresso-contrib:${rootProject.ext.espressoVersion}"
+    androidTestImplementation "androidx.test.espresso:espresso-intents:${rootProject.ext.espressoVersion}"
+    androidTestImplementation "com.github.fabioCollini.daggermock:daggermock:${rootProject.ext.daggermockVersion}"
+    androidTestImplementation "com.github.fabioCollini.daggermock:daggermock-kotlin:${rootProject.ext.daggermockVersion}"
 
     implementation project(':domain')
     implementation project(':data')

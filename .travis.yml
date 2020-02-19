@@ -42,9 +42,6 @@ android:
 before_install:
   - openssl aes-256-cbc -K $encrypted_b2f5a33a8343_key -iv $encrypted_b2f5a33a8343_iv -in build_config.enc -out build_config -d
   - tar xvf build_config
-  - echo "android.useAndroidX=true" >> gradle.properties
-  - echo "android.enableJetifier=true" >> gradle.properties
-  - echo "android.enableR8=true" >> gradle.properties
   - PWD=echo pwd
   - echo "RELEASE_STORE_FILE="$PWD"/app/fieldsurvey-release.keystore" >> app/gradle.properties
   - chmod +x travis/deploy_release.sh
@@ -53,8 +50,7 @@ before_install:
   - "if [ \"$TRAVIS_PULL_REQUEST\" != \"false\" ]; then . ./travis/setup_gcloud.sh; fi"
 
 script:
-  - ./gradlew check --continue -Pnodexcount=true
-  - ./gradlew :app:assembleFlowDebugAndroidTest -Pnodexcount=true
+  - ./gradlew :app:assembleFlowDebug :app:assembleFlowDebugAndroidTest -Pnodexcount=true
   - "if [ \"$TRAVIS_PULL_REQUEST\" != \"false\" ]; then . ./travis/run_firebase_tests.sh; fi"
 
 notifications:

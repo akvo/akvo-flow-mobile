@@ -51,7 +51,7 @@
             android:name=".activity.SurveyActivity"
             android:label="@string/app_name" />
         <activity
-            android:name=".activity.RecordActivity"/>
+            android:name=".presentation.record.RecordActivity"/>
         <activity
             android:name=".activity.FormActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"

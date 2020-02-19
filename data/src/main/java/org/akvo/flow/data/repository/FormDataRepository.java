@@ -30,6 +30,7 @@ import org.akvo.flow.data.entity.form.FormHeaderParser;
 import org.akvo.flow.data.entity.form.FormIdMapper;
 import org.akvo.flow.data.entity.form.XmlFormParser;
 import org.akvo.flow.data.net.RestApi;
+import org.akvo.flow.data.net.s3.S3RestApi;
 import org.akvo.flow.data.util.FlowFileBrowser;
 import org.akvo.flow.domain.repository.FormRepository;
 
@@ -53,15 +54,18 @@ public class FormDataRepository implements FormRepository {
     private final RestApi restApi;
     private final DataSourceFactory dataSourceFactory;
     private final FormIdMapper formIdMapper;
+    private final S3RestApi s3RestApi;
 
     @Inject
     public FormDataRepository(FormHeaderParser formHeaderParser, XmlFormParser xmlParser,
-            RestApi restApi, DataSourceFactory dataSourceFactory, FormIdMapper formIdMapper) {
+            RestApi restApi, DataSourceFactory dataSourceFactory, FormIdMapper formIdMapper,
+            S3RestApi s3RestApi) {
         this.formHeaderParser = formHeaderParser;
         this.xmlParser = xmlParser;
         this.restApi = restApi;
         this.dataSourceFactory = dataSourceFactory;
         this.formIdMapper = formIdMapper;
+        this.s3RestApi = s3RestApi;
     }
 
     @Override
@@ -205,7 +209,7 @@ public class FormDataRepository implements FormRepository {
     }
 
     private Observable<Boolean> downloadAndExtractFile(final String fileName, final String folder) {
-        return restApi.downloadArchive(fileName)
+        return s3RestApi.downloadArchive(fileName)
                 .concatMap(new Function<ResponseBody, Observable<Boolean>>() {
                     @Override
                     public Observable<Boolean> apply(ResponseBody responseBody) {

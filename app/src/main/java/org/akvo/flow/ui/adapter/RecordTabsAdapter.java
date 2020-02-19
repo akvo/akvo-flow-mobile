@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017,2019 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017,2019-2020 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -20,12 +20,13 @@
 
 package org.akvo.flow.ui.adapter;
 
+import org.akvo.flow.ui.fragment.FormListFragment;
+import org.akvo.flow.ui.fragment.ResponseListFragment;
+
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
-
-import org.akvo.flow.ui.fragment.FormListFragment;
-import org.akvo.flow.ui.fragment.ResponseListFragment;
 
 public class RecordTabsAdapter extends FragmentPagerAdapter {
 
@@ -34,7 +35,7 @@ public class RecordTabsAdapter extends FragmentPagerAdapter {
     private String[] tabsTitles;
 
     public RecordTabsAdapter(FragmentManager fm, String[] tabTitles) {
-        super(fm);
+        super(fm, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
         this.tabsTitles = tabTitles;
     }
 
@@ -43,6 +44,7 @@ public class RecordTabsAdapter extends FragmentPagerAdapter {
         return tabsTitles.length;
     }
 
+    @NonNull
     @Override
     public Fragment getItem(int position) {
         if (position == POSITION_SURVEYS) {

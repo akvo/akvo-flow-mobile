@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2019 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2016-2020 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -23,7 +23,6 @@ package org.akvo.flow.injector.component;
 import org.akvo.flow.activity.AddUserActivity;
 import org.akvo.flow.activity.AppUpdateActivity;
 import org.akvo.flow.activity.FormActivity;
-import org.akvo.flow.activity.RecordActivity;
 import org.akvo.flow.activity.SurveyActivity;
 import org.akvo.flow.activity.TransmissionHistoryActivity;
 import org.akvo.flow.injector.PerActivity;
@@ -42,6 +41,7 @@ import org.akvo.flow.presentation.help.HelpActivity;
 import org.akvo.flow.presentation.legal.LegalNoticesActivity;
 import org.akvo.flow.presentation.main.MainActivity;
 import org.akvo.flow.presentation.navigation.FlowNavigationView;
+import org.akvo.flow.presentation.record.RecordActivity;
 import org.akvo.flow.presentation.settings.PreferenceActivity;
 import org.akvo.flow.presentation.settings.publish.PublishFilesPreferenceView;
 import org.akvo.flow.presentation.signature.SignatureActivity;

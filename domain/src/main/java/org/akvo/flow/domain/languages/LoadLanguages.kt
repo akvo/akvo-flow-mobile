@@ -25,11 +25,15 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.observers.DisposableSingleObserver
 import org.akvo.flow.domain.executor.PostExecutionThread
 import org.akvo.flow.domain.executor.SchedulerCreator
+import org.akvo.flow.domain.repository.FormRepository
+import org.akvo.flow.domain.repository.LanguagesRepository
 import javax.inject.Inject
 
 class LoadLanguages @Inject constructor(
     private val postExecutionThread: PostExecutionThread,
-    private val schedulerCreator: SchedulerCreator
+    private val schedulerCreator: SchedulerCreator,
+    private val formRepository: FormRepository,
+    private val languagesRepository: LanguagesRepository
 ) {
 
     private val disposables = CompositeDisposable()
@@ -47,12 +51,17 @@ class LoadLanguages @Inject constructor(
         }
     }
 
-    private fun <T> buildUseCaseObservable(parameters: Map<String, T>): Single<Pair<Set<String>,Set<String>>> {
+    private fun <T> buildUseCaseObservable(parameters: Map<String, T>): Single<Pair<Set<String>, Set<String>>> {
         if (!parameters.containsKey(PARAM_SURVEY_ID)) {
-            return Single.error(IllegalArgumentException("Missing survey id"))
+            return Single.error(IllegalArgumentException("Missing survey id or form id"))
         }
         val surveyId = parameters[PARAM_SURVEY_ID] as Long
-        return Single.just(Pair(emptySet(), emptySet()))//TODO
+        val formId = parameters[PARAM_FORM_ID] as String
+        return languagesRepository.getSavedLanguages(surveyId)
+            .flatMap { selectedLanguages: Set<String> ->
+                formRepository.loadFormLanguages(formId)
+                    .map { formLanguages -> Pair(selectedLanguages, formLanguages) }
+            }
     }
 
     private fun addDisposable(disposable: Disposable) {
@@ -61,5 +70,6 @@ class LoadLanguages @Inject constructor(
 
     companion object {
         const val PARAM_SURVEY_ID = "survey_id"
+        const val PARAM_FORM_ID = "form_id"
     }
 }

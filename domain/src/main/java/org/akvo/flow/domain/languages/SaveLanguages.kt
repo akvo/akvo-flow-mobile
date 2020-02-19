@@ -25,11 +25,13 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.observers.DisposableCompletableObserver
 import org.akvo.flow.domain.executor.PostExecutionThread
 import org.akvo.flow.domain.executor.SchedulerCreator
+import org.akvo.flow.domain.repository.LanguagesRepository
 import javax.inject.Inject
 
 class SaveLanguages @Inject constructor(
     private val postExecutionThread: PostExecutionThread,
-    private val schedulerCreator: SchedulerCreator
+    private val schedulerCreator: SchedulerCreator,
+    private val languagesRepository: LanguagesRepository
 ) {
 
     private val disposables = CompositeDisposable()
@@ -52,8 +54,8 @@ class SaveLanguages @Inject constructor(
             return Completable.error(IllegalArgumentException("Missing survey id or selected languages"))
         }
         val surveyId = parameters[PARAM_SURVEY_ID] as Long
-        val languages = parameters[PARAM_LANGUAGES_LIST] as Set<*>
-        return Completable.complete() //TODO
+        val languages = parameters[PARAM_LANGUAGES_LIST] as Set<String>
+        return languagesRepository.saveLanguages(surveyId, languages)
     }
 
     private fun addDisposable(disposable: Disposable) {

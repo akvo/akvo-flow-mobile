@@ -214,6 +214,7 @@ public class ConstantUtil {
     public static final int STORAGE_PERMISSION_CODE = 2;
     public static final int STORAGE_AND_PHONE_STATE_PERMISSION_CODE = 3;
 
+    public static final String LANGUAGES_EXTRA = "languages";
 
     /**
      * prevent instantiation

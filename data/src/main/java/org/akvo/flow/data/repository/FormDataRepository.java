@@ -33,13 +33,17 @@ import org.akvo.flow.data.net.RestApi;
 import org.akvo.flow.data.net.s3.S3RestApi;
 import org.akvo.flow.data.util.FlowFileBrowser;
 import org.akvo.flow.domain.repository.FormRepository;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.InputStream;
 import java.util.List;
+import java.util.Set;
 
 import javax.inject.Inject;
 
+import androidx.annotation.NonNull;
 import io.reactivex.Observable;
+import io.reactivex.Single;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 import okhttp3.ResponseBody;
@@ -117,6 +121,14 @@ public class FormDataRepository implements FormRepository {
                         return downloadForms(apiFormHeaders);
                     }
                 });
+    }
+
+    @NonNull
+    @Override
+    public Single<Set<String>> loadFormLanguages(@NotNull String formId) {
+        return dataSourceFactory.getFileDataSource().getFormFile(formId)
+                .firstOrError()
+                .map(xmlParser::parseLanguages);
     }
 
     private Observable<Boolean> downloadFormHeader(String formId, String deviceId) {

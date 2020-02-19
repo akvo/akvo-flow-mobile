@@ -20,12 +20,19 @@
 package org.akvo.flow.presentation.form.view
 
 import io.reactivex.observers.DisposableCompletableObserver
+import io.reactivex.observers.DisposableSingleObserver
 import org.akvo.flow.domain.SurveyGroup
+import org.akvo.flow.domain.languages.LoadLanguages
 import org.akvo.flow.domain.languages.SaveLanguages
 import org.akvo.flow.presentation.Presenter
+import org.akvo.flow.presentation.form.languages.LanguageMapper
 import javax.inject.Inject
 
-class FormViewPresenter @Inject constructor(private val saveLanguagesUseCase: SaveLanguages): Presenter {
+class FormViewPresenter @Inject constructor(
+    private val saveLanguagesUseCase: SaveLanguages,
+    private val languageMapper: LanguageMapper,
+    private val loadLanguages: LoadLanguages
+) : Presenter {
 
     var view: IFormView? = null
 
@@ -56,6 +63,26 @@ class FormViewPresenter @Inject constructor(private val saveLanguagesUseCase: Sa
                 view?.onLanguagesSavedError()
             }
 
+        }, params)
+    }
+
+    fun loadLanguages(surveyId: Long, formId: String) {
+        val params: MutableMap<String, Any> = HashMap(2)
+        params[LoadLanguages.PARAM_SURVEY_ID] = surveyId
+        params[LoadLanguages.PARAM_FORM_ID] = formId
+        loadLanguages.execute(object : DisposableSingleObserver<Pair<Set<String>, Set<String>>>() {
+            override fun onSuccess(selectedAndAvailableLanguages: Pair<Set<String>, Set<String>>) {
+                view?.displayLanguages(
+                    languageMapper.transform(
+                        selectedAndAvailableLanguages.first.toTypedArray(),
+                        selectedAndAvailableLanguages.second
+                    )
+                )
+            }
+
+            override fun onError(e: Throwable) {
+                view?.showLanguagesError()
+            }
         }, params)
     }
 }

@@ -41,6 +41,7 @@ import javax.inject.Inject
 class FormViewActivity : BackActivity(), IFormView,
     LanguagesDialogFragment.LanguagesSelectionListener {
 
+    private lateinit var sectionsPagerAdapter: QuestionGroupsPagerAdapter
     private lateinit var surveyGroup: SurveyGroup
     private lateinit var datapointId: String
     private lateinit var formId: String
@@ -61,7 +62,7 @@ class FormViewActivity : BackActivity(), IFormView,
         initializeInjector()
         setupToolBar()
         presenter.view = this
-        val sectionsPagerAdapter = QuestionGroupsPagerAdapter(this, supportFragmentManager)
+        sectionsPagerAdapter = QuestionGroupsPagerAdapter(this, supportFragmentManager)
         val viewPager: ViewPager = findViewById(R.id.view_pager)
         viewPager.adapter = sectionsPagerAdapter
         val tabs: TabLayout = findViewById(R.id.tabs)
@@ -83,6 +84,8 @@ class FormViewActivity : BackActivity(), IFormView,
         datapointId = intent.getStringExtra(ConstantUtil.DATA_POINT_ID_EXTRA)
         formInstanceId = intent.getLongExtra(ConstantUtil.RESPONDENT_ID_EXTRA, 0)
         presenter.loadForm(formId, formInstanceId, surveyGroup, datapointId)
+        sectionsPagerAdapter.groupTitles = mutableListOf("group 1", "group2")
+        sectionsPagerAdapter.notifyDataSetChanged()
     }
 
     override fun onDestroy() {

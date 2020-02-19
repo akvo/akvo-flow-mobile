@@ -23,14 +23,16 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.fragment.app.Fragment
 import org.akvo.flow.R
 
 class QuestionGroupFragmentFragment : Fragment() {
 
+    private lateinit var questionGroupTitle: String
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        questionGroupTitle = arguments!!.getString(QUESTION_GROUP_TITLE)
     }
 
     override fun onCreateView(
@@ -38,19 +40,18 @@ class QuestionGroupFragmentFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         val root = inflater.inflate(R.layout.question_group_fragment, container, false)
-        val textView: TextView = root.findViewById(R.id.section_label)
         return root
     }
 
     companion object {
 
-        private const val ARG_SECTION_NUMBER = "section_number"
+        private const val QUESTION_GROUP_TITLE = "group_title"
 
         @JvmStatic
-        fun newInstance(sectionNumber: Int): QuestionGroupFragmentFragment {
+        fun newInstance(questionGroupTitle: String): QuestionGroupFragmentFragment {
             return QuestionGroupFragmentFragment().apply {
                 arguments = Bundle().apply {
-                    putInt(ARG_SECTION_NUMBER, sectionNumber)
+                    putString(QUESTION_GROUP_TITLE, questionGroupTitle)
                 }
             }
         }

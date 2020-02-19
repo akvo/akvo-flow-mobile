@@ -27,18 +27,17 @@ import androidx.fragment.app.FragmentPagerAdapter
 class QuestionGroupsPagerAdapter(private val context: Context, fm: FragmentManager) :
     FragmentPagerAdapter(fm, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
 
+    var groupTitles = mutableListOf<String>()
+
     override fun getItem(position: Int): Fragment {
-        // getItem is called to instantiate the fragment for the given page.
-        // Return a PlaceholderFragment (defined as a static inner class below).
-        return QuestionGroupFragmentFragment.newInstance(position + 1)
+        return QuestionGroupFragmentFragment.newInstance(groupTitles[position])
     }
 
     override fun getPageTitle(position: Int): CharSequence? {
-        return "title $position"
+        return groupTitles[position]
     }
 
     override fun getCount(): Int {
-        // Show 2 total pages.
-        return 2
+        return groupTitles.size
     }
 }

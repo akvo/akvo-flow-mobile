@@ -101,13 +101,12 @@ public class DatabaseDataSource {
         return Single.just(briteSurveyDbAdapter.getDataPoint(dataPointId));
     }
 
-    public Completable syncDataPoints(List<ApiDataPoint> apiDataPoints, final long surveyId) {
+    public Completable syncDataPoints(List<ApiDataPoint> apiDataPoints) {
         if (apiDataPoints == null) {
             return Completable.complete();
         }
         BriteDatabase.Transaction transaction = briteSurveyDbAdapter.beginTransaction();
         try {
-            briteSurveyDbAdapter.deleteSubmittedRecordsForSurvey(surveyId);
             for (ApiDataPoint dataPoint : apiDataPoints) {
                 final String id = dataPoint.getId();
                 ContentValues values = new ContentValues();

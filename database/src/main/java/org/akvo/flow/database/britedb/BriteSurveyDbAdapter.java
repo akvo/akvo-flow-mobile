@@ -194,27 +194,6 @@ public class BriteSurveyDbAdapter {
         updateRecordModifiedDate(id, lastModified);
     }
 
-    public void deleteSubmittedRecordsForSurvey(long surveyId) {
-        String whereClause =
-                RecordColumns.RECORD_ID + " IN (SELECT " + RecordColumns.RECORD_ID + " FROM"
-                        + " (SELECT " + RecordColumns.RECORD_ID
-                        + ", MIN(r." + SurveyInstanceColumns.STATUS + ") as "
-                        + SurveyInstanceColumns.STATUS
-                        + " FROM " + Tables.RECORD
-                        + " AS sl LEFT JOIN " + Tables.SURVEY_INSTANCE + " AS r ON "
-                        + "sl." + RecordColumns.RECORD_ID + "=" + "r."
-                        + SurveyInstanceColumns.RECORD_ID
-                        + " WHERE sl." + RecordColumns.SURVEY_GROUP_ID + " = " + surveyId
-                        + " GROUP BY sl." + RecordColumns.RECORD_ID + ")"
-                        + " WHERE " + SurveyInstanceColumns.STATUS + " == "
-                        + SurveyInstanceStatus.UPLOADED
-                        +
-                        " OR " + SurveyInstanceColumns.STATUS + " == "
-                        + SurveyInstanceStatus.DOWNLOADED + ")";
-
-        briteDatabase.delete(Tables.RECORD, whereClause);
-    }
-
     /**
      * updates the status of a survey instance to the status passed in.
      * Status must be one of the 'SurveyInstanceStatus' one. The corresponding

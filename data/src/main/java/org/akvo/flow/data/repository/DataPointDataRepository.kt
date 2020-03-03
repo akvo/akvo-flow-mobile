@@ -64,12 +64,12 @@ class DataPointDataRepository @Inject constructor(
 
     private fun syncDataPoints(surveyGroupId: Long): Single<Int> {
         return restApi.downloadDataPoints(surveyGroupId)
-            .flatMap { apiLocaleResult -> syncDataPoints(apiLocaleResult, surveyGroupId) }
+            .flatMap { apiLocaleResult -> syncDataPoints(apiLocaleResult) }
     }
 
-    private fun syncDataPoints(apiLocaleResult: ApiLocaleResult, surveyGroupId: Long): Single<Int> {
+    private fun syncDataPoints(apiLocaleResult: ApiLocaleResult): Single<Int> {
         return dataSourceFactory.dataBaseDataSource
-            .syncDataPoints(apiLocaleResult.dataPoints, surveyGroupId)
+            .syncDataPoints(apiLocaleResult.dataPoints)
             .andThen(downLoadImages(apiLocaleResult.dataPoints))
             .andThen(Single.just(apiLocaleResult.dataPoints.size))
     }

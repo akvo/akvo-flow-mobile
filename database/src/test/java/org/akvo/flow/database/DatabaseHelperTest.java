@@ -61,6 +61,7 @@ public class DatabaseHelperTest {
 
         verify(helper, times(1)).upgradeFromResponses(mockDb);
         verify(helper, times(1)).upgradeFromTransmission(mockDb);
+        verify(helper, times(1)).upgradeFromAssignment(mockDb);
     }
 
     @Test
@@ -73,5 +74,18 @@ public class DatabaseHelperTest {
                 DatabaseHelper.DATABASE_VERSION);
 
         verify(helper, times(1)).upgradeFromTransmission(mockDb);
+        verify(helper, times(1)).upgradeFromAssignment(mockDb);
+    }
+
+    @Test
+    public void onUpgradeShouldUpgradeCorrectlyIfVersionAssignmentsMigrate() {
+        DatabaseHelper helper = spy(
+                new DatabaseHelper(mockContext, mockLanguageTable));
+        configureDatabaseHelper(helper);
+
+        helper.onUpgrade(mockDb, DatabaseHelper.VER_DATA_POINT_ASSIGNMENTS_ITERATION,
+                DatabaseHelper.DATABASE_VERSION);
+
+        verify(helper, times(1)).upgradeFromAssignment(mockDb);
     }
 }

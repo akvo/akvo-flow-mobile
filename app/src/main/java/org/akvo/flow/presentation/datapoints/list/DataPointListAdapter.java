@@ -147,20 +147,20 @@ class DataPointListAdapter extends BaseAdapter {
         final int res = PlatformUtil.getResource(context, attr);
         view.setBackgroundResource(res);
 
-        if (position == 1 || position == 2 || position == 3) {
-          statusNew.setVisibility(View.VISIBLE);
-            nameView.setTypeface(null, Typeface.BOLD);
-            idView.setTypeface(null, Typeface.BOLD);
-            dateView.setTypeface(null, Typeface.BOLD);
-            distanceView.setTypeface(null, Typeface.BOLD);
-            statusView.setTypeface(null, Typeface.BOLD);
-        } else {
+        if (dataPoint.wasViewed()) {
             statusNew.setVisibility(View.GONE);
             nameView.setTypeface(null, Typeface.NORMAL);
             idView.setTypeface(null, Typeface.NORMAL);
             dateView.setTypeface(null, Typeface.NORMAL);
             distanceView.setTypeface(null, Typeface.NORMAL);
             statusView.setTypeface(null, Typeface.NORMAL);
+        } else {
+            statusNew.setVisibility(View.VISIBLE);
+            nameView.setTypeface(null, Typeface.BOLD);
+            idView.setTypeface(null, Typeface.BOLD);
+            dateView.setTypeface(null, Typeface.BOLD);
+            distanceView.setTypeface(null, Typeface.BOLD);
+            statusView.setTypeface(null, Typeface.BOLD);
         }
         return view;
     }

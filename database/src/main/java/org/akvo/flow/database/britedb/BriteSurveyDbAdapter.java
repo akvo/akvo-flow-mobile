@@ -152,7 +152,8 @@ public class BriteSurveyDbAdapter {
                         + RecordColumns.NAME + ","
                         + RecordColumns.LATITUDE + ","
                         + RecordColumns.LONGITUDE + ","
-                        + RecordColumns.LAST_MODIFIED
+                        + RecordColumns.LAST_MODIFIED + ","
+                        + RecordColumns.VIEWED
                         + " FROM " + Tables.RECORD
                         + " WHERE " + RecordColumns.RECORD_ID + " = ?";
         return briteDatabase.query(sqlQuery, dataPointId);

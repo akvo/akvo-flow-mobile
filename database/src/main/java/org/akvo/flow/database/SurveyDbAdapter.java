@@ -481,6 +481,7 @@ public class SurveyDbAdapter {
         int LATITUDE = 4;
         int LONGITUDE = 5;
         int LAST_MODIFIED = 6;
+        int VIEWED = 7;
     }
 
     public interface FormInstanceQuery {

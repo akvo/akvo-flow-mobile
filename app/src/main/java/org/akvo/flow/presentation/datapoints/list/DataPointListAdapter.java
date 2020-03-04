@@ -106,7 +106,6 @@ class DataPointListAdapter extends BaseAdapter {
         TextView distanceView = view.findViewById(R.id.locale_distance);
         TextView statusView = view.findViewById(R.id.status);
         ImageView statusImage = view.findViewById(R.id.status_img);
-        ImageView statusNew = view.findViewById(R.id.new_status);
 
         final ListDataPoint dataPoint = getItem(position);
         Context context = parent.getContext();
@@ -148,14 +147,12 @@ class DataPointListAdapter extends BaseAdapter {
         view.setBackgroundResource(res);
 
         if (dataPoint.wasViewed()) {
-            statusNew.setVisibility(View.GONE);
             nameView.setTypeface(null, Typeface.NORMAL);
             idView.setTypeface(null, Typeface.NORMAL);
             dateView.setTypeface(null, Typeface.NORMAL);
             distanceView.setTypeface(null, Typeface.NORMAL);
             statusView.setTypeface(null, Typeface.NORMAL);
         } else {
-            statusNew.setVisibility(View.VISIBLE);
             nameView.setTypeface(null, Typeface.BOLD);
             idView.setTypeface(null, Typeface.BOLD);
             dateView.setTypeface(null, Typeface.BOLD);

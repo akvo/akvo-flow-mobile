@@ -56,17 +56,4 @@
             android:textColor="@color/text_primary"
             android:textSize="14sp" />
     </LinearLayout>
-
-    <ImageView
-        android:id="@+id/new_status"
-        android:layout_width="20dp"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="16dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginRight="16dp"
-        android:layout_marginBottom="16dp"
-        android:adjustViewBounds="true"
-        android:visibility="gone"
-        app:srcCompat="@drawable/ic_datapoint_new_dot_24dp"
-        tools:visibility="visible" />
 </LinearLayout>

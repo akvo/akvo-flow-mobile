@@ -189,10 +189,29 @@ public class BriteSurveyDbAdapter {
                 datapointId);
     }
 
-    public void updateRecord(String id, ContentValues values, long lastModified) {
+    public void updateRecord(String dataPointId, ContentValues values) {
+        String sql =
+                "SELECT " + RecordColumns.RECORD_ID + ", " + RecordColumns.VIEWED + " FROM "
+                        + Tables.RECORD + " WHERE " + RecordColumns.RECORD_ID + " = ?";
+        Cursor cursor = briteDatabase.query(sql, dataPointId);
+
+        long id = DOES_NOT_EXIST;
+        int viewed = 1;
+        if (cursor != null) {
+            if (cursor.moveToFirst()) {
+                id = cursor.getLong(0);
+                viewed = cursor.getInt(1);
+            }
+            cursor.close();
+        }
+        if (id == DOES_NOT_EXIST) {
+            values.put(RecordColumns.VIEWED, 0);
+        } else {
+            values.put(RecordColumns.VIEWED, viewed);
+        }
         briteDatabase.insert(Tables.RECORD, values);
         // Update the record last modification date, if necessary
-        updateRecordModifiedDate(id, lastModified);
+       // updateRecordModifiedDate(id, lastModified); no need since updated already
     }
 
     /**

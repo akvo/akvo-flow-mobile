@@ -60,7 +60,7 @@ public class DatabaseHelperTest {
                 DatabaseHelper.DATABASE_VERSION);
 
         verify(helper, times(1)).upgradeFromResponses(mockDb);
-        verify(helper, times(1)).upgradeFromAssignments(mockDb);
+        verify(helper, times(1)).upgradeFromTransmission(mockDb);
     }
 
     @Test
@@ -72,6 +72,6 @@ public class DatabaseHelperTest {
         helper.onUpgrade(mockDb, DatabaseHelper.VER_TRANSMISSION_ITERATION,
                 DatabaseHelper.DATABASE_VERSION);
 
-        verify(helper, times(1)).upgradeFromAssignments(mockDb);
+        verify(helper, times(1)).upgradeFromTransmission(mockDb);
     }
 }

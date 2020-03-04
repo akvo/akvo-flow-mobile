@@ -36,7 +36,9 @@ public class UpgraderFactory {
             case DatabaseHelper.VER_RESPONSE_ITERATION:
                 databaseUpgrader.addUpgrader(new ResponsesUpgrader(helper, db));
                 case DatabaseHelper.VER_TRANSMISSION_ITERATION:
-                    databaseUpgrader.addUpgrader(new AssignmentsUpgrader(helper, db));
+                    databaseUpgrader.addUpgrader(new TransmissionsUpgrader(helper, db));
+                    case DatabaseHelper.VER_DATA_POINT_ASSIGNMENTS_ITERATION:
+                        databaseUpgrader.addUpgrader(new AssignmentsUpgrader(helper, db));
             default:
                 break;
         }

@@ -45,6 +45,7 @@ import org.akvo.flow.database.SurveyInstanceStatus;
 import org.akvo.flow.database.TransmissionStatus;
 import org.akvo.flow.database.britedb.BriteSurveyDbAdapter;
 import org.akvo.flow.domain.entity.User;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -417,8 +418,15 @@ public class DatabaseDataSource {
         return briteSurveyDbAdapter.getFormMetaData(formId).map(formMetadataMapper::mapForm);
     }
 
-    public Single<Long> fetchSurveyInstance(String formId, String dataPointId, String formVersion, long userId,
-            String userName) {
-        return briteSurveyDbAdapter.fetchOrCreateFormInstance(formId, dataPointId, formVersion, userId, userName);
+    public Single<Long> fetchSurveyInstance(String formId, String dataPointId, String formVersion,
+            long userId, String userName) {
+        return briteSurveyDbAdapter
+                .fetchOrCreateFormInstance(formId, dataPointId, formVersion, userId, userName);
+    }
+
+    @NotNull
+    public Completable markDataPointAsViewed(@NotNull String dataPointId) {
+        briteSurveyDbAdapter.markDataPointAsViewed(dataPointId);
+        return Completable.complete();
     }
 }

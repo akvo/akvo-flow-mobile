@@ -20,9 +20,14 @@
 
 package org.akvo.flow.presentation.survey;
 
+import org.akvo.flow.domain.entity.User;
 import org.akvo.flow.presentation.entity.ViewApkData;
 
 public interface SurveyView {
 
     void showNewVersionAvailable(ViewApkData apkData);
+
+    void showMissingUserError();
+
+    void openDataPoint(String datapointId, User user);
 }

@@ -826,4 +826,11 @@ public class BriteSurveyDbAdapter {
         return briteDatabase
                 .query(sql, formId, String.valueOf(SurveyInstanceStatus.SAVED), dataPointId);
     }
+
+    public void markDataPointAsViewed(String dataPointId) {
+        ContentValues contentValues = new ContentValues(1);
+        contentValues.put(RecordColumns.VIEWED, 1);
+        String where = RecordColumns.RECORD_ID + " = ? ";
+        briteDatabase.update(Tables.RECORD, contentValues, where, dataPointId);
+    }
 }

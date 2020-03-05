@@ -57,6 +57,10 @@ class DataPointDataRepository @Inject constructor(
         return downLoadMedia(mediaHelper.cleanMediaFileName(filePath))
     }
 
+    override fun markDataPointAsViewed(dataPointId: String): Completable {
+        return dataSourceFactory.dataBaseDataSource.markDataPointAsViewed(dataPointId)
+    }
+
     private fun isErrorForbidden(throwable: Throwable): Boolean {
         return (throwable is HttpException
             && throwable.code() == HttpURLConnection.HTTP_FORBIDDEN)

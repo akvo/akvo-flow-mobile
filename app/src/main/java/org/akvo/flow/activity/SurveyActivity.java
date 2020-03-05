@@ -479,30 +479,21 @@ public class SurveyActivity extends LocaleAwareActivity implements RecordListLis
 
     @Override
     public void onRecordSelected(final String datapointId) {
-        getSelectedUser.execute(new DefaultObserver<User>() {
-            @Override
-            public void onError(Throwable e) {
-                Timber.e(e);
-                showMissingUserError();
-            }
-
-            @Override
-            public void onNext(User user) {
-                if (user.getName() == null) {
-                    showMissingUserError();
-                } else {
-                    if (mSurveyGroup != null && mSurveyGroup.isMonitored()) {
-                        displayRecord(datapointId);
-                    } else {
-                        displayForm(datapointId, user);
-                    }
-                }
-            }
-        }, null);
+        presenter.onDatapointSelected(datapointId);
     }
 
-    private void showMissingUserError() {
+    @Override
+    public void showMissingUserError() {
         Toast.makeText(this, R.string.mustselectuser, Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void openDataPoint(String datapointId, User user) {
+        if (mSurveyGroup != null && mSurveyGroup.isMonitored()) {
+            displayRecord(datapointId);
+        } else {
+            displayForm(datapointId, user);
+        }
     }
 
     private void displayRecord(String datapointId) {

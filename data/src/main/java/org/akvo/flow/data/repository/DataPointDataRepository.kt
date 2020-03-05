@@ -31,7 +31,6 @@ import org.akvo.flow.data.util.MediaHelper
 import org.akvo.flow.domain.exception.AssignmentRequiredException
 import org.akvo.flow.domain.repository.DataPointRepository
 import retrofit2.HttpException
-import timber.log.Timber
 import java.net.HttpURLConnection
 import javax.inject.Inject
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2019 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2018-2020 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -20,21 +20,26 @@
 
 package org.akvo.flow.presentation.survey;
 
-import androidx.core.util.Pair;
-
 import org.akvo.flow.BuildConfig;
 import org.akvo.flow.domain.entity.ApkData;
+import org.akvo.flow.domain.entity.User;
 import org.akvo.flow.domain.interactor.DefaultObserver;
 import org.akvo.flow.domain.interactor.UseCase;
+import org.akvo.flow.domain.interactor.datapoints.MarkDatapointViewed;
 import org.akvo.flow.domain.util.VersionHelper;
 import org.akvo.flow.presentation.Presenter;
 import org.akvo.flow.presentation.entity.ViewApkMapper;
 import org.akvo.flow.util.ConstantUtil;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import androidx.core.util.Pair;
 import io.reactivex.annotations.NonNull;
+import io.reactivex.observers.DisposableCompletableObserver;
 import timber.log.Timber;
 
 public class SurveyPresenter implements Presenter {
@@ -45,23 +50,30 @@ public class SurveyPresenter implements Presenter {
     private final UseCase saveApkUpdateNotified;
     private final VersionHelper versionHelper;
     private final ViewApkMapper viewApkMapper;
+    private final UseCase getSelectedUser;
+    private final MarkDatapointViewed markDatapointViewed;
 
     private SurveyView view;
 
     @Inject
     public SurveyPresenter(@Named("GetApkDataPreferences") UseCase getApkDataPreferences,
             @Named("SaveApkUpdateNotified") UseCase saveApkUpdateNotified,
-            VersionHelper versionHelper, ViewApkMapper viewApkMapper) {
+            VersionHelper versionHelper, ViewApkMapper viewApkMapper, @Named("getSelectedUser")
+            UseCase getSelectedUser, MarkDatapointViewed markDatapointViewed) {
         this.getApkDataPreferences = getApkDataPreferences;
         this.saveApkUpdateNotified = saveApkUpdateNotified;
         this.versionHelper = versionHelper;
         this.viewApkMapper = viewApkMapper;
+        this.getSelectedUser = getSelectedUser;
+        this.markDatapointViewed = markDatapointViewed;
     }
 
     @Override
     public void destroy() {
         getApkDataPreferences.dispose();
         saveApkUpdateNotified.dispose();
+        getSelectedUser.dispose();
+        markDatapointViewed.dispose();
     }
 
     public void setView(SurveyView view) {
@@ -105,5 +117,40 @@ public class SurveyPresenter implements Presenter {
         }
         return System.currentTimeMillis() - lastNotified
                 >= ConstantUtil.UPDATE_NOTIFICATION_DELAY_IN_MS;
+    }
+
+    public void onDatapointSelected(String datapointId) {
+        getSelectedUser.execute(new DefaultObserver<User>() {
+            @Override
+            public void onError(Throwable e) {
+                Timber.e(e);
+                view.showMissingUserError();
+            }
+
+            @Override
+            public void onNext(User user) {
+                if (user.getName() == null) {
+                    view.showMissingUserError();
+                } else {
+                   setDataPointAsViewed(datapointId, user);
+                }
+            }
+        }, null);
+    }
+
+    private void setDataPointAsViewed(String datapointId, User user) {
+        Map<String, Object> params = new HashMap<>(2);
+        params.put(MarkDatapointViewed.PARAM_DATAPOINT_ID, datapointId);
+        markDatapointViewed.execute(new DisposableCompletableObserver() {
+            @Override
+            public void onComplete() {
+                view.openDataPoint(datapointId, user);
+            }
+
+            @Override
+            public void onError(Throwable e) {
+                view.openDataPoint(datapointId, user);
+            }
+        }, params);
     }
 }

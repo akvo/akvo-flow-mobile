@@ -29,7 +29,7 @@ import org.akvo.flow.domain.executor.ThreadExecutor
 import org.akvo.flow.domain.repository.DataPointRepository
 import javax.inject.Inject
 
-class DownloadMedia @Inject constructor(
+class MarkDatapointViewed @Inject constructor(
     private val dataPointRepository: DataPointRepository,
     private val threadExecutor: ThreadExecutor,
     private val postExecutionThread: PostExecutionThread
@@ -52,11 +52,11 @@ class DownloadMedia @Inject constructor(
     }
 
     private fun <T> buildUseCaseObservable(parameters: Map<String?, T>?): Completable {
-        if (parameters == null || !parameters.containsKey(PARAM_FILE_PATH)) {
+        if (parameters == null || !parameters.containsKey(PARAM_DATAPOINT_ID)) {
             return Completable.error(IllegalArgumentException("Missing file name"))
         }
-        val filePath = parameters[PARAM_FILE_PATH] as String
-        return dataPointRepository.cleanPathAndDownLoadMedia(filePath)
+        val dataPointId = parameters[PARAM_DATAPOINT_ID] as String
+        return dataPointRepository.markDataPointAsViewed(dataPointId)
     }
 
     private fun addDisposable(disposable: Disposable) {
@@ -64,6 +64,6 @@ class DownloadMedia @Inject constructor(
     }
 
     companion object {
-        const val PARAM_FILE_PATH = "file_path"
+        const val PARAM_DATAPOINT_ID = "data_point_id"
     }
 }

@@ -152,7 +152,8 @@ public class BriteSurveyDbAdapter {
                         + RecordColumns.NAME + ","
                         + RecordColumns.LATITUDE + ","
                         + RecordColumns.LONGITUDE + ","
-                        + RecordColumns.LAST_MODIFIED
+                        + RecordColumns.LAST_MODIFIED + ","
+                        + RecordColumns.VIEWED
                         + " FROM " + Tables.RECORD
                         + " WHERE " + RecordColumns.RECORD_ID + " = ?";
         return briteDatabase.query(sqlQuery, dataPointId);
@@ -188,10 +189,27 @@ public class BriteSurveyDbAdapter {
                 datapointId);
     }
 
-    public void updateRecord(String id, ContentValues values, long lastModified) {
+    public void updateRecord(String dataPointId, ContentValues values) {
+        String sql =
+                "SELECT " + RecordColumns.RECORD_ID + ", " + RecordColumns.VIEWED + " FROM "
+                        + Tables.RECORD + " WHERE " + RecordColumns.RECORD_ID + " = ?";
+        Cursor cursor = briteDatabase.query(sql, dataPointId);
+
+        long id = DOES_NOT_EXIST;
+        int viewed = 1;
+        if (cursor != null) {
+            if (cursor.moveToFirst()) {
+                id = cursor.getLong(0);
+                viewed = cursor.getInt(1);
+            }
+            cursor.close();
+        }
+        if (id == DOES_NOT_EXIST) {
+            values.put(RecordColumns.VIEWED, 0);
+        } else {
+            values.put(RecordColumns.VIEWED, viewed);
+        }
         briteDatabase.insert(Tables.RECORD, values);
-        // Update the record last modification date, if necessary
-        updateRecordModifiedDate(id, lastModified);
     }
 
     /**
@@ -338,7 +356,6 @@ public class BriteSurveyDbAdapter {
                         + " DESC LIMIT 1";
         return briteDatabase.query(sql, String.valueOf(surveyInstanceId), questionId);
     }
-
 
     public void createTransmissions(Long instanceId, String formId, Set<String> filenames) {
         BriteDatabase.Transaction transaction = beginTransaction();
@@ -805,5 +822,12 @@ public class BriteSurveyDbAdapter {
 
         return briteDatabase
                 .query(sql, formId, String.valueOf(SurveyInstanceStatus.SAVED), dataPointId);
+    }
+
+    public void markDataPointAsViewed(String dataPointId) {
+        ContentValues contentValues = new ContentValues(1);
+        contentValues.put(RecordColumns.VIEWED, 1);
+        String where = RecordColumns.RECORD_ID + " = ? ";
+        briteDatabase.update(Tables.RECORD, contentValues, where, dataPointId);
     }
 }

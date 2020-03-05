@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2018,2020 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -36,7 +36,9 @@ public class UpgraderFactory {
             case DatabaseHelper.VER_RESPONSE_ITERATION:
                 databaseUpgrader.addUpgrader(new ResponsesUpgrader(helper, db));
                 case DatabaseHelper.VER_TRANSMISSION_ITERATION:
-                    databaseUpgrader.addUpgrader(new AssignmentsUpgrader(helper, db));
+                    databaseUpgrader.addUpgrader(new TransmissionsUpgrader(helper, db));
+                    case DatabaseHelper.VER_DATA_POINT_ASSIGNMENTS_ITERATION:
+                        databaseUpgrader.addUpgrader(new AssignmentsUpgrader(helper, db));
             default:
                 break;
         }

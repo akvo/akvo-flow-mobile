@@ -399,7 +399,7 @@ public class SurveyActivity extends LocaleAwareActivity implements RecordListLis
         setIntent(intent);
         if (Intent.ACTION_VIEW.equals(intent.getAction())) {
             String surveyedLocaleId = intent.getDataString();
-            onRecordSelected(surveyedLocaleId);
+            onDatapointSelected(surveyedLocaleId);
         }
     }
 
@@ -478,7 +478,7 @@ public class SurveyActivity extends LocaleAwareActivity implements RecordListLis
     }
 
     @Override
-    public void onRecordSelected(final String datapointId) {
+    public void onDatapointSelected(final String datapointId) {
         presenter.onDatapointSelected(datapointId);
     }
 
@@ -582,7 +582,7 @@ public class SurveyActivity extends LocaleAwareActivity implements RecordListLis
         if (mDatabase != null) {
             addDataPointFab.setEnabled(false);
             String newLocaleId = mDatabase.createSurveyedLocale(mSurveyGroup.getId());
-            onRecordSelected(newLocaleId);
+            onDatapointSelected(newLocaleId);
         }
     }
 
@@ -694,6 +694,6 @@ public class SurveyActivity extends LocaleAwareActivity implements RecordListLis
 
     @Override
     public void onWindowSelected(String id) {
-        onRecordSelected(id);
+        onDatapointSelected(id);
     }
 }

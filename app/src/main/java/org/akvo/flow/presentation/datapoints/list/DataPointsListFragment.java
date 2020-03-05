@@ -312,7 +312,7 @@ public class DataPointsListFragment extends Fragment implements LocationListener
         ListDataPoint surveyedLocale = mAdapter.getItem(position);
         final String localeId = surveyedLocale == null ? null : surveyedLocale.getId();
         if (localeId != null) {
-            mListener.onRecordSelected(localeId);
+            mListener.onDatapointSelected(localeId);
         }
     }
 

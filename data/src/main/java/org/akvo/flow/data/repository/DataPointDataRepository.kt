@@ -31,6 +31,7 @@ import org.akvo.flow.data.util.MediaHelper
 import org.akvo.flow.domain.exception.AssignmentRequiredException
 import org.akvo.flow.domain.repository.DataPointRepository
 import retrofit2.HttpException
+import timber.log.Timber
 import java.net.HttpURLConnection
 import javax.inject.Inject
 
@@ -80,8 +81,8 @@ class DataPointDataRepository @Inject constructor(
 
     private fun downLoadImages(dataPoints: List<ApiDataPoint>): Completable {
         val images: List<String> = mapper.getImagesList(dataPoints)
-        return Observable.fromIterable(images)
-            .flatMapCompletable { image -> downLoadMedia(image) }
+            .filter { image -> !dataSourceFactory.fileDataSource.fileExists(image) }
+        return Observable.fromIterable(images).flatMapCompletable { image -> downLoadMedia(image) }
     }
 
     private fun downLoadMedia(filename: String): Completable {

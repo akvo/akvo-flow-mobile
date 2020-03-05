@@ -1,5 +1,11 @@
 Akvo FLOW app release notes
 ===========================
+# ver 2.9.0.1
+Date: 5 March 2020
+
+* **Stop removing unassigned datapoints** - [#1590](https://github.com/akvo/akvo-flow-mobile/issues/1590)
+
+---------------
 # ver 2.9.0
 Date: 19 February 2020
 

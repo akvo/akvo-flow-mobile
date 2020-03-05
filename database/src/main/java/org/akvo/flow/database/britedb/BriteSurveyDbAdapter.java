@@ -210,8 +210,6 @@ public class BriteSurveyDbAdapter {
             values.put(RecordColumns.VIEWED, viewed);
         }
         briteDatabase.insert(Tables.RECORD, values);
-        // Update the record last modification date, if necessary
-       // updateRecordModifiedDate(id, lastModified); no need since updated already
     }
 
     /**
@@ -358,7 +356,6 @@ public class BriteSurveyDbAdapter {
                         + " DESC LIMIT 1";
         return briteDatabase.query(sql, String.valueOf(surveyInstanceId), questionId);
     }
-
 
     public void createTransmissions(Long instanceId, String formId, Set<String> filenames) {
         BriteDatabase.Transaction transaction = beginTransaction();

@@ -166,8 +166,7 @@ class DataPointDataRepositoryTest {
     fun downloadDataPointsShouldReturnCorrectResultIfSuccess() {
         doReturn(Single.just(mockApiResponse)).`when`(spyRestApi).downloadDataPoints(anyLong())
         doReturn(Completable.complete()).`when`(mockDatabaseDataSource)!!.syncDataPoints(
-            anyList(),
-            anyLong()
+            anyList()
         )
         doReturn(mockApiDataPoints).`when`(mockApiResponse)!!.dataPoints
         doReturn(1).`when`(mockApiDataPoints)!!.size

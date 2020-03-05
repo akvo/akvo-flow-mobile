@@ -478,7 +478,7 @@ public class SurveyActivity extends LocaleAwareActivity implements RecordListLis
     }
 
     @Override
-    public void onRecordSelected(final String surveyedLocaleId) {
+    public void onRecordSelected(final String datapointId) {
         getSelectedUser.execute(new DefaultObserver<User>() {
             @Override
             public void onError(Throwable e) {
@@ -492,9 +492,9 @@ public class SurveyActivity extends LocaleAwareActivity implements RecordListLis
                     showMissingUserError();
                 } else {
                     if (mSurveyGroup != null && mSurveyGroup.isMonitored()) {
-                        displayRecord(surveyedLocaleId);
+                        displayRecord(datapointId);
                     } else {
-                        displayForm(surveyedLocaleId, user);
+                        displayForm(datapointId, user);
                     }
                 }
             }
@@ -505,11 +505,11 @@ public class SurveyActivity extends LocaleAwareActivity implements RecordListLis
         Toast.makeText(this, R.string.mustselectuser, Toast.LENGTH_LONG).show();
     }
 
-    private void displayRecord(String surveyedLocaleId) {
-        navigator.navigateToRecordActivity(this, surveyedLocaleId, mSurveyGroup);
+    private void displayRecord(String datapointId) {
+        navigator.navigateToRecordActivity(this, datapointId, mSurveyGroup);
     }
 
-    private void displayForm(String surveyedLocaleId, User user) {
+    private void displayForm(String datapointId, User user) {
         Survey registrationForm =
                 mDatabase != null ? mDatabase.getRegistrationForm(mSurveyGroup) : null;
         if (registrationForm == null) {
@@ -523,7 +523,7 @@ public class SurveyActivity extends LocaleAwareActivity implements RecordListLis
         final String registrationFormId = registrationForm.getId();
         long formInstanceId;
         boolean readOnly;
-        Cursor c = mDatabase.getFormInstances(surveyedLocaleId);
+        Cursor c = mDatabase.getFormInstances(datapointId);
         if (c.moveToFirst()) {
             formInstanceId = c.getLong(SurveyDbAdapter.FormInstanceQuery._ID);
             int status = c.getInt(SurveyDbAdapter.FormInstanceQuery.STATUS);
@@ -531,12 +531,12 @@ public class SurveyActivity extends LocaleAwareActivity implements RecordListLis
         } else {
             formInstanceId = mDatabase
                     .createSurveyRespondent(registrationForm.getId(), registrationForm.getVersion(),
-                            user, surveyedLocaleId);
+                            user, datapointId);
             readOnly = false;
         }
         c.close();
 
-        navigator.navigateToFormActivity(this, surveyedLocaleId, registrationFormId,
+        navigator.navigateToFormActivity(this, datapointId, registrationFormId,
                 formInstanceId, readOnly, mSurveyGroup);
     }
 

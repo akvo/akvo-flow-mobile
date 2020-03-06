@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2019 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2020 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -312,7 +312,7 @@ public class DataPointsListFragment extends Fragment implements LocationListener
         ListDataPoint surveyedLocale = mAdapter.getItem(position);
         final String localeId = surveyedLocale == null ? null : surveyedLocale.getId();
         if (localeId != null) {
-            mListener.onRecordSelected(localeId);
+            mListener.onDatapointSelected(localeId);
         }
     }
 

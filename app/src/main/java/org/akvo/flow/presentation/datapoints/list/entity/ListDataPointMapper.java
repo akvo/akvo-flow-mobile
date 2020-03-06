@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017,2019 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017,2019-2020 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -20,9 +20,6 @@
 
 package org.akvo.flow.presentation.datapoints.list.entity;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-
 import org.akvo.flow.domain.entity.DataPoint;
 import org.akvo.flow.presentation.datapoints.DisplayNameMapper;
 
@@ -31,6 +28,9 @@ import java.util.Collections;
 import java.util.List;
 
 import javax.inject.Inject;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 public class ListDataPointMapper {
 
@@ -51,7 +51,7 @@ public class ListDataPointMapper {
         double longitude = dataPoint.getLongitude() == null? ListDataPoint.INVALID_COORDINATE: dataPoint.getLongitude();
         long lastModified = dataPoint.getLastModified();
         return new ListDataPoint(displayName, dataPoint.getStatus(), dataPoint.getId(),
-                latitude, longitude, lastModified);
+                latitude, longitude, lastModified, dataPoint.wasViewed());
     }
 
     @NonNull

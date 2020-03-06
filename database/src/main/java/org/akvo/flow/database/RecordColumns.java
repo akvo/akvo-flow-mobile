@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2010-2017,2020 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -28,4 +28,5 @@ public class RecordColumns {
     public static final String LATITUDE = "latitude";
     public static final String LONGITUDE = "longitude";
     public static final String LAST_MODIFIED = "last_modified";
+    public static final String VIEWED = "viewed";
 }

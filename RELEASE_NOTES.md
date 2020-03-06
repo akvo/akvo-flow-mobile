@@ -1,5 +1,23 @@
 Akvo FLOW app release notes
 ===========================
+# ver 2.9.0.1
+Date: 5 March 2020
+
+* **Stop removing unassigned datapoints** - [#1590](https://github.com/akvo/akvo-flow-mobile/issues/1590)
+
+---------------
+# ver 2.9.0
+Date: 19 February 2020
+
+* **Monitoring: Downloading data points should also download images to the device** - [#1167](https://github.com/akvo/akvo-flow-mobile/issues/1167)
+* **Retrieve datapoints along with assignments** - [#1470](https://github.com/akvo/akvo-flow-mobile/issues/1470)
+* **Create data logic to download image from s3** - [#1570](https://github.com/akvo/akvo-flow-mobile/issues/1570)
+* **Use the new image download logic** - [#1579](https://github.com/akvo/akvo-flow-mobile/issues/1579)
+* **Walkthrough for new datapoint changes** - [#1569](https://github.com/akvo/akvo-flow-mobile/issues/1569)
+* **Remove SurveyedLocale** - [#1472](https://github.com/akvo/akvo-flow-mobile/issues/1472)
+* **Improve gradle config** - [#1577](https://github.com/akvo/akvo-flow-mobile/issues/1577)
+
+---------------
 # ver 2.8.5
 Date: 29 January 2020
 

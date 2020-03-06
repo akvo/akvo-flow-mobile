@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010-2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2010-2018,2020 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -41,7 +41,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final int VER_RESPONSE_ITERATION = 85;
     public static final int VER_TRANSMISSION_ITERATION = 86;
     public static final int VER_DATA_POINT_ASSIGNMENTS_ITERATION = 87;
-    static final int DATABASE_VERSION = VER_DATA_POINT_ASSIGNMENTS_ITERATION;
+    public static final int VER_DATA_POINT_ASSIGNMENTS_ITERATION_2 = 88;
+    static final int DATABASE_VERSION = VER_DATA_POINT_ASSIGNMENTS_ITERATION_2;
 
     private static SQLiteDatabase database;
     private static final Object LOCK_OBJ = new Object();
@@ -118,6 +119,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 + RecordColumns.LATITUDE + " REAL,"// REFERENCES ...
                 + RecordColumns.LONGITUDE + " REAL,"// REFERENCES ...
                 + RecordColumns.LAST_MODIFIED + " INTEGER NOT NULL DEFAULT 0,"
+                + RecordColumns.VIEWED + " INTEGER NOT NULL DEFAULT 1,"
                 + "UNIQUE (" + RecordColumns.RECORD_ID + ") ON CONFLICT REPLACE)");
 
         db.execSQL("CREATE TABLE " + Tables.TRANSMISSION + " ("
@@ -145,8 +147,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         helper.migrateTransmissions(db);
     }
 
-    public void upgradeFromAssignments(SQLiteDatabase db) {
+    public void upgradeFromTransmission(SQLiteDatabase db) {
         db.execSQL("DROP TABLE IF EXISTS sync_time");
+    }
+
+    public void upgradeFromAssignment(SQLiteDatabase db) {
+        db.execSQL("ALTER TABLE " + Tables.RECORD + " ADD COLUMN " + RecordColumns.VIEWED
+                + " INTEGER NOT NULL DEFAULT 1");
     }
 
     /**

@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2013-2017 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2013-2017,2020 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -27,5 +27,5 @@ package org.akvo.flow.ui.fragment;
  */
 public interface RecordListListener {
     
-    void onRecordSelected(String surveyedLocaleId);
+    void onDatapointSelected(String surveyedLocaleId);
 }

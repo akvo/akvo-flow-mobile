@@ -25,6 +25,6 @@ class AssignmentsUpgrader(private val helper: DatabaseHelper, private val db: SQ
     DatabaseUpgrader {
 
     override fun upgrade() {
-        helper.upgradeFromAssignments(db)
+        helper.upgradeFromAssignment(db)
     }
 }

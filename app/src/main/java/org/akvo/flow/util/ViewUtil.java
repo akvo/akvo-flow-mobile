@@ -19,19 +19,26 @@
 
 package org.akvo.flow.util;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Point;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Handler;
-import androidx.annotation.NonNull;
 import android.view.Display;
+import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.WindowManager;
+import android.widget.FrameLayout;
+import android.widget.ListView;
 
 import org.akvo.flow.R;
 import org.akvo.flow.service.ServiceToastRunnable;
+
+import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 
 /**
  * Utility class to handle common features for the View tier
@@ -181,6 +188,22 @@ public class ViewUtil {
             return size.x;
         }
         return 0;
+    }
+
+    public static void setUpListViewDivider(ListView listView, Activity activity) {
+        Drawable drawable = ContextCompat.getDrawable(activity, R.drawable.preference_separator);
+        listView.setDivider(drawable);
+        listView.setDividerHeight(dpToPixels(1, activity));
+        listView.setFooterDividersEnabled(false);
+        ViewGroup.LayoutParams params = new FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.WRAP_CONTENT);
+        listView.setLayoutParams(params);
+        int margin = dpToPixels(8, activity);
+        listView.setPadding(margin, listView.getPaddingTop(), margin, listView.getPaddingBottom());
+    }
+
+    private static int dpToPixels(int i, Activity activity) {
+        return (int) (i * activity.getResources().getDisplayMetrics().density);
     }
 
     @SuppressWarnings("deprecation")

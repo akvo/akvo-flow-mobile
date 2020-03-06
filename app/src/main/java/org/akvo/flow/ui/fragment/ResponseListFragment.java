@@ -61,6 +61,7 @@ import static org.akvo.flow.util.ConstantUtil.READ_ONLY_TAG_KEY;
 import static org.akvo.flow.util.ConstantUtil.RESPONDENT_ID_TAG_KEY;
 import static org.akvo.flow.util.ConstantUtil.SURVEY_GROUP_EXTRA;
 import static org.akvo.flow.util.ConstantUtil.SURVEY_ID_TAG_KEY;
+import static org.akvo.flow.util.ViewUtil.setUpListViewDivider;
 
 public class ResponseListFragment extends ListFragment implements LoaderCallbacks<Cursor> {
 
@@ -99,12 +100,13 @@ public class ResponseListFragment extends ListFragment implements LoaderCallback
         Intent intent = getActivity().getIntent();
         mSurveyGroup = (SurveyGroup) intent.getSerializableExtra(SURVEY_GROUP_EXTRA);
         recordId = intent.getStringExtra(DATA_POINT_ID_EXTRA);
-
+        ListView listView = getListView();
+        setUpListViewDivider(listView, getActivity());
         if (mAdapter == null) {
             mAdapter = new ResponseListAdapter(getActivity());
             setListAdapter(mAdapter);
         }
-        registerForContextMenu(getListView());
+        registerForContextMenu(listView);
         setHasOptionsMenu(true);
         initializeInjector();
     }
@@ -241,7 +243,6 @@ public class ResponseListFragment extends ListFragment implements LoaderCallback
 
     /**
      * TODO: make a static inner class to avoid memory leaks
-     *
      * BroadcastReceiver to notify of data synchronisation. This should be
      * fired from DataFixWorker.
      */

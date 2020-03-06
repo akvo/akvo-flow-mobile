@@ -36,7 +36,6 @@ import org.akvo.flow.database.SurveyInstanceStatus;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.presentation.datapoints.list.entity.ListDataPoint;
 import org.akvo.flow.util.GeoUtil;
-import org.akvo.flow.util.PlatformUtil;
 import org.ocpsoft.prettytime.PrettyTime;
 
 import java.util.ArrayList;
@@ -140,11 +139,6 @@ class DataPointListAdapter extends BaseAdapter {
 
         statusImage.setImageResource(statusRes);
         statusView.setText(statusText);
-
-        // Alternate background
-        int attr = position % 2 == 0 ? R.attr.listitem_bg1 : R.attr.listitem_bg2;
-        final int res = PlatformUtil.getResource(context, attr);
-        view.setBackgroundResource(res);
 
         if (dataPoint.wasViewed()) {
             nameView.setTypeface(null, Typeface.NORMAL);

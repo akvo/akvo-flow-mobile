@@ -16,13 +16,15 @@
  * You should have received a copy of the GNU General Public License
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.akvo.flow.domain.repository
+package org.akvo.flow.database.upgrade
 
-import io.reactivex.Completable
-import io.reactivex.Single
+import android.database.sqlite.SQLiteDatabase
+import org.akvo.flow.database.DatabaseHelper
 
-interface DataPointRepository {
-    fun downloadDataPoints(surveyGroupId: Long): Single<Int>
-    fun cleanPathAndDownLoadMedia(filename: String): Completable
-    fun markDataPointAsViewed(dataPointId: String): Completable
+class TransmissionsUpgrader(private val helper: DatabaseHelper, private val db: SQLiteDatabase) :
+    DatabaseUpgrader {
+
+    override fun upgrade() {
+        helper.upgradeFromTransmission(db)
+    }
 }

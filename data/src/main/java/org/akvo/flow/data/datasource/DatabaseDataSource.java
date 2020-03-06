@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2019 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2020 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -45,6 +45,7 @@ import org.akvo.flow.database.SurveyInstanceStatus;
 import org.akvo.flow.database.TransmissionStatus;
 import org.akvo.flow.database.britedb.BriteSurveyDbAdapter;
 import org.akvo.flow.domain.entity.User;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -101,25 +102,25 @@ public class DatabaseDataSource {
         return Single.just(briteSurveyDbAdapter.getDataPoint(dataPointId));
     }
 
-    public Completable syncDataPoints(List<ApiDataPoint> apiDataPoints, final long surveyId) {
+    public Completable syncDataPoints(List<ApiDataPoint> apiDataPoints) {
         if (apiDataPoints == null) {
             return Completable.complete();
         }
         BriteDatabase.Transaction transaction = briteSurveyDbAdapter.beginTransaction();
         try {
-            briteSurveyDbAdapter.deleteSubmittedRecordsForSurvey(surveyId);
             for (ApiDataPoint dataPoint : apiDataPoints) {
-                final String id = dataPoint.getId();
+                final String dataPointId = dataPoint.getId();
                 ContentValues values = new ContentValues();
-                values.put(RecordColumns.RECORD_ID, id);
+                values.put(RecordColumns.RECORD_ID, dataPointId);
                 values.put(RecordColumns.SURVEY_GROUP_ID, dataPoint.getSurveyGroupId());
                 values.put(RecordColumns.NAME, dataPoint.getDisplayName());
                 values.put(RecordColumns.LATITUDE, dataPoint.getLatitude());
                 values.put(RecordColumns.LONGITUDE, dataPoint.getLongitude());
+                values.put(RecordColumns.LAST_MODIFIED, dataPoint.getLastModified());
 
-                syncSurveyInstances(dataPoint.getSurveyInstances(), id);
+                syncSurveyInstances(dataPoint.getSurveyInstances(), dataPointId);
 
-                briteSurveyDbAdapter.updateRecord(id, values, dataPoint.getLastModified());
+                briteSurveyDbAdapter.updateRecord(dataPointId, values);
             }
             transaction.markSuccessful();
         } finally {
@@ -417,8 +418,15 @@ public class DatabaseDataSource {
         return briteSurveyDbAdapter.getFormMetaData(formId).map(formMetadataMapper::mapForm);
     }
 
-    public Single<Long> fetchSurveyInstance(String formId, String dataPointId, String formVersion, long userId,
-            String userName) {
-        return briteSurveyDbAdapter.fetchOrCreateFormInstance(formId, dataPointId, formVersion, userId, userName);
+    public Single<Long> fetchSurveyInstance(String formId, String dataPointId, String formVersion,
+            long userId, String userName) {
+        return briteSurveyDbAdapter
+                .fetchOrCreateFormInstance(formId, dataPointId, formVersion, userId, userName);
+    }
+
+    @NotNull
+    public Completable markDataPointAsViewed(@NotNull String dataPointId) {
+        briteSurveyDbAdapter.markDataPointAsViewed(dataPointId);
+        return Completable.complete();
     }
 }

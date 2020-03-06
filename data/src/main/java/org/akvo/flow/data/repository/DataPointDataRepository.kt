@@ -57,6 +57,10 @@ class DataPointDataRepository @Inject constructor(
         return downLoadMedia(mediaHelper.cleanMediaFileName(filePath))
     }
 
+    override fun markDataPointAsViewed(dataPointId: String): Completable {
+        return dataSourceFactory.dataBaseDataSource.markDataPointAsViewed(dataPointId)
+    }
+
     private fun isErrorForbidden(throwable: Throwable): Boolean {
         return (throwable is HttpException
             && throwable.code() == HttpURLConnection.HTTP_FORBIDDEN)
@@ -64,12 +68,12 @@ class DataPointDataRepository @Inject constructor(
 
     private fun syncDataPoints(surveyGroupId: Long): Single<Int> {
         return restApi.downloadDataPoints(surveyGroupId)
-            .flatMap { apiLocaleResult -> syncDataPoints(apiLocaleResult, surveyGroupId) }
+            .flatMap { apiLocaleResult -> syncDataPoints(apiLocaleResult) }
     }
 
-    private fun syncDataPoints(apiLocaleResult: ApiLocaleResult, surveyGroupId: Long): Single<Int> {
+    private fun syncDataPoints(apiLocaleResult: ApiLocaleResult): Single<Int> {
         return dataSourceFactory.dataBaseDataSource
-            .syncDataPoints(apiLocaleResult.dataPoints, surveyGroupId)
+            .syncDataPoints(apiLocaleResult.dataPoints)
             .andThen(downLoadImages(apiLocaleResult.dataPoints))
             .andThen(Single.just(apiLocaleResult.dataPoints.size))
     }

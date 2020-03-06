@@ -24,12 +24,11 @@ import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.observers.DisposableSingleObserver
-import io.reactivex.schedulers.Schedulers
 import org.akvo.flow.domain.entity.User
 import org.akvo.flow.domain.exception.CascadeResourceMissing
 import org.akvo.flow.domain.exception.UserNotFound
 import org.akvo.flow.domain.executor.PostExecutionThread
-import org.akvo.flow.domain.executor.ThreadExecutor
+import org.akvo.flow.domain.executor.SchedulerCreator
 import org.akvo.flow.domain.repository.SurveyRepository
 import org.akvo.flow.domain.repository.UserRepository
 import org.akvo.flow.domain.util.Constants
@@ -38,16 +37,15 @@ import javax.inject.Inject
 class GetFormInstanceId @Inject constructor(
     private val surveyRepository: SurveyRepository,
     private val userRepository: UserRepository,
-    private val threadExecutor: ThreadExecutor,
-    private val postExecutionThread: PostExecutionThread
-
+    private val postExecutionThread: PostExecutionThread,
+    private val schedulerCreator: SchedulerCreator
 ) {
 
     private val disposables = CompositeDisposable()
 
     fun execute(observer: DisposableSingleObserver<Long>, parameters: Map<String, Any>) {
         val observable: Single<Long> = buildUseCaseObservable(parameters)
-            .subscribeOn(Schedulers.from(threadExecutor))
+            .subscribeOn(schedulerCreator.obtainScheduler())
             .observeOn(postExecutionThread.scheduler)
         addDisposable(observable.subscribeWith(observer))
     }

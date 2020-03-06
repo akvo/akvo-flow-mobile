@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017,2019 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017,2019-2020 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -53,6 +53,7 @@ public class DataPointMapper {
         long surveyGroupId = cursor.getLong(SurveyDbAdapter.RecordQuery.SURVEY_GROUP_ID);
         long lastModified = cursor.getLong(SurveyDbAdapter.RecordQuery.LAST_MODIFIED);
         String name = cursor.getString(SurveyDbAdapter.RecordQuery.NAME);
+        boolean viewed = cursor.getInt(SurveyDbAdapter.RecordQuery.VIEWED) == 1;
 
         // Location. Check for null values first
         Double latitude = null;
@@ -68,7 +69,7 @@ public class DataPointMapper {
             status = cursor.getInt(columnIndex);
         }
         return new DataPoint(id, name, lastModified, surveyGroupId, latitude, longitude,
-                status);
+                status, viewed);
     }
 
     @NonNull

@@ -16,13 +16,12 @@
  * You should have received a copy of the GNU General Public License
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.akvo.flow.domain.repository
 
-import io.reactivex.Completable
-import io.reactivex.Single
+package org.akvo.flow.domain.executor
 
-interface DataPointRepository {
-    fun downloadDataPoints(surveyGroupId: Long): Single<Int>
-    fun cleanPathAndDownLoadMedia(filename: String): Completable
-    fun markDataPointAsViewed(dataPointId: String): Completable
+import io.reactivex.schedulers.Schedulers
+
+open class SchedulerCreator (private val threadExecutor: ThreadExecutor) {
+
+    open fun obtainScheduler() = Schedulers.from(threadExecutor)
 }

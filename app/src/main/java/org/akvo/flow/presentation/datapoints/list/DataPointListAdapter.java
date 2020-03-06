@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2019 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2020 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -21,6 +21,7 @@
 package org.akvo.flow.presentation.datapoints.list;
 
 import android.content.Context;
+import android.graphics.Typeface;
 import android.location.Location;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -144,6 +145,20 @@ class DataPointListAdapter extends BaseAdapter {
         int attr = position % 2 == 0 ? R.attr.listitem_bg1 : R.attr.listitem_bg2;
         final int res = PlatformUtil.getResource(context, attr);
         view.setBackgroundResource(res);
+
+        if (dataPoint.wasViewed()) {
+            nameView.setTypeface(null, Typeface.NORMAL);
+            idView.setTypeface(null, Typeface.NORMAL);
+            dateView.setTypeface(null, Typeface.NORMAL);
+            distanceView.setTypeface(null, Typeface.NORMAL);
+            statusView.setTypeface(null, Typeface.NORMAL);
+        } else {
+            nameView.setTypeface(null, Typeface.BOLD);
+            idView.setTypeface(null, Typeface.BOLD);
+            dateView.setTypeface(null, Typeface.BOLD);
+            distanceView.setTypeface(null, Typeface.BOLD);
+            statusView.setTypeface(null, Typeface.BOLD);
+        }
         return view;
     }
 

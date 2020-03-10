@@ -36,7 +36,6 @@ import org.akvo.flow.database.SurveyInstanceStatus;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.presentation.datapoints.list.entity.ListDataPoint;
 import org.akvo.flow.util.GeoUtil;
-import org.akvo.flow.util.PlatformUtil;
 import org.ocpsoft.prettytime.PrettyTime;
 
 import java.util.ArrayList;
@@ -142,22 +141,29 @@ class DataPointListAdapter extends BaseAdapter {
         statusView.setText(statusText);
 
         // Alternate background
-        int attr = position % 2 == 0 ? R.attr.listitem_bg1 : R.attr.listitem_bg2;
-        final int res = PlatformUtil.getResource(context, attr);
-        view.setBackgroundResource(res);
+//        int attr = position % 2 == 0 ? R.attr.listitem_bg1 : R.attr.listitem_bg2;
+//        final int res = PlatformUtil.getResource(context, attr);
+//        view.setBackgroundResource(res);
 
         if (dataPoint.wasViewed()) {
+            //            nameView.setTypeface(null, Typeface.NORMAL);
+            //            idView.setTypeface(null, Typeface.NORMAL);
+            //            dateView.setTypeface(null, Typeface.NORMAL);
+            //            distanceView.setTypeface(null, Typeface.NORMAL);
+            //            statusView.setTypeface(null, Typeface.NORMAL);
+            //            nameView.setTextColor(Color.parseColor("#212121"));
+            //            idView.setTextColor(Color.parseColor("#7a7a7a"));
+            //            dateView.setTextColor(Color.parseColor("#7a7a7a"));
+            //            distanceView.setTextColor(Color.parseColor("#7a7a7a"));
+            //            statusView.setTextColor(Color.parseColor("#7a7a7a"));
             nameView.setTypeface(null, Typeface.NORMAL);
-            idView.setTypeface(null, Typeface.NORMAL);
-            dateView.setTypeface(null, Typeface.NORMAL);
-            distanceView.setTypeface(null, Typeface.NORMAL);
-            statusView.setTypeface(null, Typeface.NORMAL);
         } else {
             nameView.setTypeface(null, Typeface.BOLD);
-            idView.setTypeface(null, Typeface.BOLD);
-            dateView.setTypeface(null, Typeface.BOLD);
-            distanceView.setTypeface(null, Typeface.BOLD);
-            statusView.setTypeface(null, Typeface.BOLD);
+            //            nameView.setTextColor(Color.parseColor("#000000"));
+            //            idView.setTextColor(Color.parseColor("#504c4c"));
+            //            dateView.setTextColor(Color.parseColor("#504c4c"));
+            //            distanceView.setTextColor(Color.parseColor("#504c4c"));
+            //            statusView.setTextColor(Color.parseColor("#504c4c"));
         }
         return view;
     }

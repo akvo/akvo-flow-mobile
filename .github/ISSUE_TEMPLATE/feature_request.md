@@ -1,7 +1,7 @@
 ---
 name: Feature request
-about: Suggest an idea for this project
-title: ''
+about: Suggest an idea for the akvo-flow-mobile app
+title: 'Feature: '
 labels: ''
 assignees: ''
 

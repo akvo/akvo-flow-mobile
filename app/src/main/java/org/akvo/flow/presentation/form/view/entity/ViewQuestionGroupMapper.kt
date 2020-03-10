@@ -17,10 +17,22 @@
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.akvo.flow.domain.entity
+package org.akvo.flow.presentation.form.view.entity
 
-data class DomainForm(
-    val title: String,
-    val version: String,
-    val groups: List<DomainQuestionGroup>
-)
+import org.akvo.flow.domain.entity.DomainQuestionGroup
+import javax.inject.Inject
+
+class ViewQuestionGroupMapper @Inject constructor() {
+
+    fun transform(groups: List<DomainQuestionGroup>) : List<ViewQuestionGroup> {
+        val viewGroups: MutableList<ViewQuestionGroup> = mutableListOf()
+        for (g in groups) {
+            viewGroups.add(transform(g))
+        }
+        return viewGroups
+    }
+
+    fun transform(group: DomainQuestionGroup): ViewQuestionGroup {
+        return ViewQuestionGroup(group.heading, group.isRepeatable)
+    }
+}

@@ -19,4 +19,4 @@
 
 package org.akvo.flow.domain.entity
 
-data class DomainQuestionGroup(var heading: String, private val isRepeatable: Boolean)
+data class DomainQuestionGroup(var heading: String, val isRepeatable: Boolean)

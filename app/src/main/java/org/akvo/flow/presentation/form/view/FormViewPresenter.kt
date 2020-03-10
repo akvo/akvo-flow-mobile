@@ -22,22 +22,29 @@ package org.akvo.flow.presentation.form.view
 import io.reactivex.observers.DisposableCompletableObserver
 import io.reactivex.observers.DisposableSingleObserver
 import org.akvo.flow.domain.SurveyGroup
+import org.akvo.flow.domain.entity.DomainForm
+import org.akvo.flow.domain.interactor.forms.GetForm
+import org.akvo.flow.domain.interactor.forms.GetFormInstanceId
 import org.akvo.flow.domain.languages.LoadLanguages
 import org.akvo.flow.domain.languages.SaveLanguages
 import org.akvo.flow.presentation.Presenter
 import org.akvo.flow.presentation.form.languages.LanguageMapper
+import org.akvo.flow.presentation.form.view.entity.ViewFormMapper
 import javax.inject.Inject
 
 class FormViewPresenter @Inject constructor(
     private val saveLanguagesUseCase: SaveLanguages,
     private val languageMapper: LanguageMapper,
-    private val loadLanguages: LoadLanguages
+    private val loadLanguages: LoadLanguages,
+    private val getFormUseCase: GetForm,
+    private val viewFormMapper: ViewFormMapper
 ) : Presenter {
 
     var view: IFormView? = null
 
     override fun destroy() {
         saveLanguagesUseCase.dispose()
+        getFormUseCase.dispose()
     }
 
     fun loadForm(
@@ -46,7 +53,17 @@ class FormViewPresenter @Inject constructor(
         surveyGroup: SurveyGroup,
         recordId: String
     ) {
-        //TODO("not implemented")
+        val params: MutableMap<String, Any> = HashMap(2)
+        params[GetForm.PARAM_FORM_ID] = formId
+        getFormUseCase.execute(object: DisposableSingleObserver<DomainForm>() {
+            override fun onSuccess(domainForm: DomainForm) {
+                view?.displayForm(viewFormMapper.transform(domainForm))
+            }
+
+            override fun onError(e: Throwable) {
+                //TODO("not implemented")
+            }
+        }, params)
     }
 
     //language is saved per survey and not form???

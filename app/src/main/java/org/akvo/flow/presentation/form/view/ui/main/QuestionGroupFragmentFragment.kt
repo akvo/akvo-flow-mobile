@@ -32,7 +32,7 @@ class QuestionGroupFragmentFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        questionGroupTitle = arguments!!.getString(QUESTION_GROUP_TITLE)
+        questionGroupTitle = arguments!!.getString(QUESTION_GROUP_TITLE, "")
     }
 
     override fun onCreateView(

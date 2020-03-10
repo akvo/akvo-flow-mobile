@@ -19,4 +19,4 @@
 
 package org.akvo.flow.presentation.form.view.entity
 
-data class ViewQuestionGroup(private val heading: String, private val isRepeatable: Boolean)
+data class ViewQuestionGroup(val heading: String, val isRepeatable: Boolean)

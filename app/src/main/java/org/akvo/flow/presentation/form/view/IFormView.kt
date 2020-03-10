@@ -20,10 +20,12 @@
 package org.akvo.flow.presentation.form.view
 
 import org.akvo.flow.presentation.form.languages.Language
+import org.akvo.flow.presentation.form.view.entity.ViewForm
 
 interface IFormView {
     fun onLanguagesSaved()
     fun onLanguagesSavedError()
     fun displayLanguages(languages: List<Language>)
     fun showLanguagesError()
+    fun displayForm(viewForm: ViewForm)
 }

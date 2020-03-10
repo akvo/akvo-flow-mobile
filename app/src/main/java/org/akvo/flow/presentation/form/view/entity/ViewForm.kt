@@ -20,7 +20,7 @@
 package org.akvo.flow.presentation.form.view.entity
 
 data class ViewForm(
-    private val title: String,
-    private val version: String,
-    private val groups: List<ViewQuestionGroup>
+    val title: String,
+    val version: String,
+    val groups: List<ViewQuestionGroup>
 )

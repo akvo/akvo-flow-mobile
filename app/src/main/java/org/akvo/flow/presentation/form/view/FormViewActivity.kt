@@ -30,6 +30,7 @@ import org.akvo.flow.domain.SurveyGroup
 import org.akvo.flow.injector.component.DaggerViewComponent
 import org.akvo.flow.presentation.form.languages.Language
 import org.akvo.flow.presentation.form.languages.LanguagesDialogFragment
+import org.akvo.flow.presentation.form.view.entity.ViewForm
 import org.akvo.flow.presentation.form.view.ui.main.QuestionGroupsPagerAdapter
 import org.akvo.flow.ui.Navigator
 import org.akvo.flow.uicomponents.BackActivity
@@ -84,7 +85,7 @@ class FormViewActivity : BackActivity(), IFormView,
         datapointId = intent.getStringExtra(ConstantUtil.DATA_POINT_ID_EXTRA)
         formInstanceId = intent.getLongExtra(ConstantUtil.RESPONDENT_ID_EXTRA, 0)
         presenter.loadForm(formId, formInstanceId, surveyGroup, datapointId)
-        sectionsPagerAdapter.groupTitles = mutableListOf()
+        sectionsPagerAdapter.groups = mutableListOf()
         sectionsPagerAdapter.notifyDataSetChanged()
     }
 
@@ -150,6 +151,20 @@ class FormViewActivity : BackActivity(), IFormView,
             R.string.languages_load_error
         )
     }
+
+    override fun displayForm(viewForm: ViewForm) {
+        sectionsPagerAdapter.groups = viewForm.groups
+        sectionsPagerAdapter.notifyDataSetChanged()
+
+
+        // Set the survey name as Activity title
+        supportActionBar?.let { supportActionBar ->
+            supportActionBar.title = viewForm.title
+            supportActionBar.subtitle = "v ${viewForm.version}"
+        }
+    }
+
+
 
     override fun useSelectedLanguages(
         selectedLanguages: MutableSet<String>,

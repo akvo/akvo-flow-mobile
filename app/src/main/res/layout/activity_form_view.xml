@@ -32,7 +32,7 @@
                 app:tabTextAppearance="@style/TextAppearance.Tabs"
                 app:tabSelectedTextColor="@color/white"
                 app:tabMode="scrollable"
-                tools:showIn="@layout/form_activity">
+                tools:showIn="@layout/activity_form_view">
 
             </org.akvo.flow.ui.view.AdaptableTabLayout>
         </androidx.viewpager.widget.ViewPager>

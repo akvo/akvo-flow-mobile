@@ -84,7 +84,7 @@ class FormViewActivity : BackActivity(), IFormView,
         datapointId = intent.getStringExtra(ConstantUtil.DATA_POINT_ID_EXTRA)
         formInstanceId = intent.getLongExtra(ConstantUtil.RESPONDENT_ID_EXTRA, 0)
         presenter.loadForm(formId, formInstanceId, surveyGroup, datapointId)
-        sectionsPagerAdapter.groupTitles = mutableListOf("group 1", "group2")
+        sectionsPagerAdapter.groupTitles = mutableListOf()
         sectionsPagerAdapter.notifyDataSetChanged()
     }
 

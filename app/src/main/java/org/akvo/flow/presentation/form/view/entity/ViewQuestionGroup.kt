@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2019 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2020 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -15,31 +15,8 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 
-package org.akvo.flow.domain.repository;
+package org.akvo.flow.presentation.form.view.entity
 
-import org.akvo.flow.domain.entity.DomainForm;
-import org.jetbrains.annotations.NotNull;
-
-import java.util.Set;
-
-import androidx.annotation.NonNull;
-import io.reactivex.Observable;
-import io.reactivex.Single;
-
-public interface FormRepository {
-
-    Observable<Boolean> loadForm(String formId, String deviceId);
-
-    Observable<Integer> reloadForms(String deviceId);
-
-    Observable<Integer> downloadForms(String deviceId);
-
-    @NonNull
-    Single<Set<String>> loadFormLanguages(@NotNull String formId);
-
-    @NotNull
-    Single<DomainForm> parseForm(@NotNull String formId);
-}
+data class ViewQuestionGroup(private val heading: String, private val isRepeatable: Boolean)

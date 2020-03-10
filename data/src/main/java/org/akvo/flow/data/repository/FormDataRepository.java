@@ -32,6 +32,7 @@ import org.akvo.flow.data.entity.form.XmlFormParser;
 import org.akvo.flow.data.net.RestApi;
 import org.akvo.flow.data.net.s3.S3RestApi;
 import org.akvo.flow.data.util.FlowFileBrowser;
+import org.akvo.flow.domain.entity.DomainForm;
 import org.akvo.flow.domain.repository.FormRepository;
 import org.jetbrains.annotations.NotNull;
 
@@ -129,6 +130,13 @@ public class FormDataRepository implements FormRepository {
         return dataSourceFactory.getFileDataSource().getFormFile(formId)
                 .firstOrError()
                 .map(xmlParser::parseLanguages);
+    }
+
+    @Override
+    @NotNull
+    public Single<DomainForm> parseForm(@NotNull String formId) {
+        return dataSourceFactory.getFileDataSource().getFormFile(formId).firstOrError()
+                .map(xmlParser::parseToDomainForm);
     }
 
     private Observable<Boolean> downloadFormHeader(String formId, String deviceId) {

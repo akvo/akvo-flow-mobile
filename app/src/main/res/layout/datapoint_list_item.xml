@@ -22,7 +22,7 @@
             android:id="@+id/locale_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColor="#212121"
+            android:textColor="@color/text_primary"
             android:textSize="18sp"
             android:textStyle="normal" />
 
@@ -30,28 +30,28 @@
             android:id="@+id/locale_id"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColor="#7a7a7a"
+            android:textColor="@color/text_primary"
             android:textSize="16sp" />
 
         <TextView
             android:id="@+id/last_modified"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColor="#7a7a7a"
+            android:textColor="@color/text_primary"
             android:textSize="16sp" />
 
         <TextView
             android:id="@+id/locale_distance"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColor="#7a7a7a"
+            android:textColor="@color/text_primary"
             android:textSize="16sp" />
 
         <TextView
             android:id="@+id/status"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColor="#7a7a7a"
+            android:textColor="@color/text_primary"
             android:textSize="14sp" />
     </LinearLayout>
 </LinearLayout>

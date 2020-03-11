@@ -31,7 +31,6 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import org.akvo.flow.R;
@@ -52,7 +51,6 @@ import androidx.loader.content.Loader;
 
 import static android.text.Spanned.SPAN_INCLUSIVE_INCLUSIVE;
 import static org.akvo.flow.util.ConstantUtil.DATA_POINT_ID_EXTRA;
-import static org.akvo.flow.util.ViewUtil.setUpListViewDivider;
 
 public class FormListFragment extends ListFragment
         implements LoaderCallbacks<List<FormInfo>>, OnItemClickListener {
@@ -91,13 +89,11 @@ public class FormListFragment extends ListFragment
         mSurveyGroup = (SurveyGroup) intent.getSerializableExtra(ConstantUtil.SURVEY_GROUP_EXTRA);
         recordId = intent.getStringExtra(DATA_POINT_ID_EXTRA);
         setHasOptionsMenu(true);
-        ListView listView = getListView();
-        setUpListViewDivider(listView, getActivity());
         if (mAdapter == null) {
             mAdapter = new SurveyAdapter(getActivity());
             setListAdapter(mAdapter);
         }
-        listView.setOnItemClickListener(this);
+        getListView().setOnItemClickListener(this);
     }
 
     @Override

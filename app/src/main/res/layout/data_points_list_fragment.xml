@@ -13,10 +13,6 @@
             android:id="@+id/locales_lv"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:divider="@drawable/preference_separator"
-            android:dividerHeight="1dp"
-            android:layout_marginLeft="16dp"
-            android:layout_marginRight="16dp"
             android:footerDividersEnabled="false"
             tools:visibility="gone" />
 

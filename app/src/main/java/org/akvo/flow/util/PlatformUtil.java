@@ -19,8 +19,6 @@
 
 package org.akvo.flow.util;
 
-import android.content.Context;
-import android.content.res.TypedArray;
 import android.os.Build;
 
 import java.util.UUID;
@@ -29,11 +27,6 @@ import java.util.UUID;
  * Utilities class to provide Android related functionalities
  */
 public class PlatformUtil {
-
-    public static int getResource(Context context, int attr) {
-        TypedArray a = context.getTheme().obtainStyledAttributes(new int[] { attr });
-        return a.getResourceId(0, 0);
-    }
 
     public static String uuid() {
         return UUID.randomUUID().toString();

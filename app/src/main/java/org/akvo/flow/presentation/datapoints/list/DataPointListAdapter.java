@@ -142,16 +142,8 @@ class DataPointListAdapter extends BaseAdapter {
 
         if (dataPoint.wasViewed()) {
             nameView.setTypeface(null, Typeface.NORMAL);
-            idView.setTypeface(null, Typeface.NORMAL);
-            dateView.setTypeface(null, Typeface.NORMAL);
-            distanceView.setTypeface(null, Typeface.NORMAL);
-            statusView.setTypeface(null, Typeface.NORMAL);
         } else {
             nameView.setTypeface(null, Typeface.BOLD);
-            idView.setTypeface(null, Typeface.BOLD);
-            dateView.setTypeface(null, Typeface.BOLD);
-            distanceView.setTypeface(null, Typeface.BOLD);
-            statusView.setTypeface(null, Typeface.BOLD);
         }
         return view;
     }

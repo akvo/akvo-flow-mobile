@@ -123,17 +123,6 @@ public class FormListFragment extends ListFragment
                     .getDimensionPixelSize(R.dimen.survey_title_text_size);
         }
 
-        @Override
-        public boolean areAllItemsEnabled() {
-            return false;
-        }
-
-        @Override
-        public boolean isEnabled(int position) {
-            ViewForm viewForm = getItem(position);
-            return viewForm.isEnabled();
-        }
-
         @NonNull
         @Override
         public View getView(int position, View convertView, @NonNull ViewGroup parent) {
@@ -150,6 +139,13 @@ public class FormListFragment extends ListFragment
             final ViewForm viewForm = getItem(position);
 
             formViewHolder.updateViews(viewForm, versionTextSize, titleTextSize);
+            if (viewForm.isEnabled()) {
+                listItem.setClickable(false);
+                listItem.setAlpha(1f);
+            } else {
+                listItem.setClickable(true);
+                listItem.setAlpha(0.5f);
+            }
 
             return listItem;
         }

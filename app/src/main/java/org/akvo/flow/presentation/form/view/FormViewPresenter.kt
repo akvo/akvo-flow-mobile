@@ -28,7 +28,7 @@ class FormViewPresenter @Inject constructor(): Presenter {
     var view: IFormView? = null
 
     override fun destroy() {
-        //TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        //TODO("not implemented")
     }
 
     fun loadForm(
@@ -37,6 +37,6 @@ class FormViewPresenter @Inject constructor(): Presenter {
         surveyGroup: SurveyGroup,
         recordId: String
     ) {
-        //TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        //TODO("not implemented")
     }
 }

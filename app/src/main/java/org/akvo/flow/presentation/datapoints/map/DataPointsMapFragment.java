@@ -80,7 +80,7 @@ public class DataPointsMapFragment extends Fragment implements DataPointsMapView
     public static DataPointsMapFragment newInstance(SurveyGroup surveyGroup) {
         DataPointsMapFragment fragment = new DataPointsMapFragment();
         Bundle args = new Bundle();
-        args.putSerializable(ConstantUtil.SURVEY_GROUP_EXTRA, surveyGroup);
+        args.putSerializable(ConstantUtil.SURVEY_EXTRA, surveyGroup);
         fragment.setArguments(args);
         return fragment;
     }
@@ -126,7 +126,7 @@ public class DataPointsMapFragment extends Fragment implements DataPointsMapView
         super.onActivityCreated(savedInstanceState);
         presenter.setView(this);
         SurveyGroup surveyGroup = (SurveyGroup) getArguments()
-                .getSerializable(ConstantUtil.SURVEY_GROUP_EXTRA);
+                .getSerializable(ConstantUtil.SURVEY_EXTRA);
         presenter.onSurveyGroupReady(surveyGroup);
         activityJustCreated = true;
     }
@@ -209,7 +209,7 @@ public class DataPointsMapFragment extends Fragment implements DataPointsMapView
         if (arguments == null) {
             arguments = new Bundle();
         }
-        arguments.putSerializable(ConstantUtil.SURVEY_GROUP_EXTRA, surveyGroup);
+        arguments.putSerializable(ConstantUtil.SURVEY_EXTRA, surveyGroup);
         setArguments(arguments);
         presenter.onNewSurveySelected(surveyGroup);
     }

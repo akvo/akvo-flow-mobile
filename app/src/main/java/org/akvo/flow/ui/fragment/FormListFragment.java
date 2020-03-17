@@ -87,7 +87,7 @@ public class FormListFragment extends ListFragment
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         Intent intent = getActivity().getIntent();
-        mSurveyGroup = (SurveyGroup) intent.getSerializableExtra(ConstantUtil.SURVEY_GROUP_EXTRA);
+        mSurveyGroup = (SurveyGroup) intent.getSerializableExtra(ConstantUtil.SURVEY_EXTRA);
         recordId = intent.getStringExtra(DATA_POINT_ID_EXTRA);
         setHasOptionsMenu(true);
         if (mAdapter == null) {

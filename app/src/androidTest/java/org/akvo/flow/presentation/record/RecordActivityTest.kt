@@ -72,7 +72,7 @@ class RecordActivityTest {
         override fun getActivityIntent(): Intent {
             val targetContext: Context = getInstrumentation().targetContext
             val result = Intent(targetContext, RecordActivity::class.java)
-            result.putExtra(ConstantUtil.SURVEY_GROUP_EXTRA, SurveyGroup(155852013L, "", "", true))
+            result.putExtra(ConstantUtil.SURVEY_EXTRA, SurveyGroup(155852013L, "", "", true))
 
             val dataPointId = setUpFormData(targetContext)
             result.putExtra(ConstantUtil.DATA_POINT_ID_EXTRA, dataPointId.toString())

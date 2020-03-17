@@ -77,7 +77,7 @@ public class DatapointsFragment extends Fragment {
     public static DatapointsFragment newInstance(SurveyGroup surveyGroup) {
         DatapointsFragment fragment = new DatapointsFragment();
         Bundle args = new Bundle();
-        args.putSerializable(ConstantUtil.SURVEY_GROUP_EXTRA, surveyGroup);
+        args.putSerializable(ConstantUtil.SURVEY_EXTRA, surveyGroup);
         fragment.setArguments(args);
         return fragment;
     }
@@ -109,7 +109,7 @@ public class DatapointsFragment extends Fragment {
         super.onCreate(savedInstanceState);
         initializeInjector();
         mSurveyGroup = (SurveyGroup) getArguments()
-                .getSerializable(ConstantUtil.SURVEY_GROUP_EXTRA);
+                .getSerializable(ConstantUtil.SURVEY_EXTRA);
         tabNames = getResources().getStringArray(R.array.records_activity_tabs);
         setHasOptionsMenu(true);
     }
@@ -313,7 +313,7 @@ public class DatapointsFragment extends Fragment {
 
     public void refresh(SurveyGroup surveyGroup) {
         mSurveyGroup = surveyGroup;
-        getArguments().putSerializable(ConstantUtil.SURVEY_GROUP_EXTRA, surveyGroup);
+        getArguments().putSerializable(ConstantUtil.SURVEY_EXTRA, surveyGroup);
         refreshView();
     }
 

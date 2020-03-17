@@ -28,6 +28,9 @@
         android:theme="@style/FlowAppTheme"
         android:usesCleartextTraffic="true"
         tools:ignore="GoogleAppIndexingWarning">
+        <activity
+            android:name=".presentation.form.view.FormViewActivity"
+            android:theme="@style/FlowAppTheme"></activity>
 
         <uses-library
             android:name="org.apache.http.legacy"
@@ -46,12 +49,11 @@
         </activity>
         <activity
             android:name=".activity.AddUserActivity"
-            android:theme="@style/FlowAppTheme.NoTitle"/>
+            android:theme="@style/FlowAppTheme.NoTitle" />
         <activity
             android:name=".activity.SurveyActivity"
             android:label="@string/app_name" />
-        <activity
-            android:name=".presentation.record.RecordActivity"/>
+        <activity android:name=".presentation.record.RecordActivity" />
         <activity
             android:name=".activity.FormActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
@@ -72,7 +74,7 @@
         <activity
             android:name=".presentation.signature.SignatureActivity"
             android:screenOrientation="landscape"
-            android:theme="@style/FlowAppTheme.NoTitle"/>
+            android:theme="@style/FlowAppTheme.NoTitle" />
         <activity android:name=".presentation.datapoints.map.one.DataPointMapActivity" />
 
         <service android:name=".service.SurveyDownloadService" />
@@ -120,16 +122,19 @@
         <activity
             android:name=".presentation.FullImageActivity"
             android:label="" />
-        <activity android:name="org.akvo.flow.walkthrough.presentation.OfflineMapsWalkThroughActivity"
+        <activity
+            android:name=".walkthrough.presentation.OfflineMapsWalkThroughActivity"
             android:parentActivityName=".activity.SurveyActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".activity.SurveyActivity" />
         </activity>
-        <activity android:name=".presentation.geoshape.ViewGeoShapeActivity"
-            android:configChanges="orientation|screenSize"/>
-        <activity android:name=".presentation.geoshape.create.CreateGeoShapeActivity"
-            android:configChanges="orientation|screenSize"/>
+        <activity
+            android:name=".presentation.geoshape.ViewGeoShapeActivity"
+            android:configChanges="orientation|screenSize" />
+        <activity
+            android:name=".presentation.geoshape.create.CreateGeoShapeActivity"
+            android:configChanges="orientation|screenSize" />
 
         <provider
             android:name="androidx.core.content.FileProvider"

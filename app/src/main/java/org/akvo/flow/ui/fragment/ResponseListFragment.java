@@ -59,7 +59,7 @@ import timber.log.Timber;
 import static org.akvo.flow.util.ConstantUtil.DATA_POINT_ID_EXTRA;
 import static org.akvo.flow.util.ConstantUtil.READ_ONLY_TAG_KEY;
 import static org.akvo.flow.util.ConstantUtil.RESPONDENT_ID_TAG_KEY;
-import static org.akvo.flow.util.ConstantUtil.SURVEY_GROUP_EXTRA;
+import static org.akvo.flow.util.ConstantUtil.SURVEY_EXTRA;
 import static org.akvo.flow.util.ConstantUtil.SURVEY_ID_TAG_KEY;
 
 public class ResponseListFragment extends ListFragment implements LoaderCallbacks<Cursor> {
@@ -97,7 +97,7 @@ public class ResponseListFragment extends ListFragment implements LoaderCallback
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         Intent intent = getActivity().getIntent();
-        mSurveyGroup = (SurveyGroup) intent.getSerializableExtra(SURVEY_GROUP_EXTRA);
+        mSurveyGroup = (SurveyGroup) intent.getSerializableExtra(SURVEY_EXTRA);
         recordId = intent.getStringExtra(DATA_POINT_ID_EXTRA);
 
         if (mAdapter == null) {

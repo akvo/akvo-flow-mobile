@@ -42,10 +42,6 @@ class LanguagesPresenter @Inject constructor(
     }
 
     fun loadLanguages(surveyId: Long) {
-        //TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-        //        val languages: List<Language> = languageMapper
-//            .transform(mLanguages, mSurvey.getAvailableLanguageCodes())
-
         val params: MutableMap<String, Any> = HashMap(2)
         params[SaveLanguages.PARAM_SURVEY_ID] = surveyId
         loadLanguages.execute(object : DisposableSingleObserver<Pair<Set<String>, Set<String>>>() {

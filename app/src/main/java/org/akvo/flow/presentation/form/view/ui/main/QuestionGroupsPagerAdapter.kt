@@ -28,8 +28,6 @@ class QuestionGroupsPagerAdapter(private val context: Context, fm: FragmentManag
     FragmentPagerAdapter(fm, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
 
     override fun getItem(position: Int): Fragment {
-        // getItem is called to instantiate the fragment for the given page.
-        // Return a PlaceholderFragment (defined as a static inner class below).
         return QuestionGroupFragmentFragment.newInstance(position + 1)
     }
 
@@ -38,7 +36,6 @@ class QuestionGroupsPagerAdapter(private val context: Context, fm: FragmentManag
     }
 
     override fun getCount(): Int {
-        // Show 2 total pages.
         return 2
     }
 }

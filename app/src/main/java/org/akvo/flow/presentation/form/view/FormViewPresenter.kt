@@ -46,7 +46,7 @@ class FormViewPresenter @Inject constructor(
         surveyGroup: SurveyGroup,
         recordId: String
     ) {
-        //TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        //TODO("not implemented")
     }
 
     //language is saved per survey and not form???

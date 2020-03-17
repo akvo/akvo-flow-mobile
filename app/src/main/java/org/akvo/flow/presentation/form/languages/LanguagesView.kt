@@ -17,9 +17,8 @@
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.akvo.flow.presentation.form.view
+package org.akvo.flow.presentation.form.languages
 
-interface IFormView {
-    fun onLanguagesSaved()
-    fun onLanguagesSavedError()
+interface LanguagesView {
+    fun displayLanguages(transform: List<Language>)
 }

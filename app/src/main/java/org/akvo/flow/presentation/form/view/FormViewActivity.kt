@@ -28,6 +28,7 @@ import org.akvo.flow.R
 import org.akvo.flow.app.FlowApp
 import org.akvo.flow.domain.SurveyGroup
 import org.akvo.flow.injector.component.DaggerViewComponent
+import org.akvo.flow.presentation.form.languages.LanguagesDialogFragment
 import org.akvo.flow.presentation.form.view.ui.main.QuestionGroupsPagerAdapter
 import org.akvo.flow.ui.Navigator
 import org.akvo.flow.uicomponents.BackActivity
@@ -35,8 +36,10 @@ import org.akvo.flow.uicomponents.SnackBarManager
 import org.akvo.flow.util.ConstantUtil
 import javax.inject.Inject
 
-class FormViewActivity : BackActivity(), IFormView {
+class FormViewActivity : BackActivity(), IFormView,
+    LanguagesDialogFragment.LanguagesSelectionListener {
 
+    private lateinit var surveyGroup: SurveyGroup
     private lateinit var datapointId: String
     private var formInstanceId: Long = 0L
 
@@ -72,7 +75,7 @@ class FormViewActivity : BackActivity(), IFormView {
 
     override fun onResume() {
         super.onResume()
-        val surveyGroup = intent.getSerializableExtra(ConstantUtil.SURVEY_EXTRA) as SurveyGroup
+        surveyGroup = intent.getSerializableExtra(ConstantUtil.SURVEY_EXTRA) as SurveyGroup
         val formId = intent.getStringExtra(ConstantUtil.FORM_ID_EXTRA)
         datapointId = intent.getStringExtra(ConstantUtil.DATA_POINT_ID_EXTRA)
         formInstanceId = intent.getLongExtra(ConstantUtil.RESPONDENT_ID_EXTRA, 0)
@@ -92,7 +95,7 @@ class FormViewActivity : BackActivity(), IFormView {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.edit_lang -> {
-                //displayLanguagesDialog()
+                showLanguagesDialog()
                 return true
             }
             R.id.view_map -> {
@@ -105,5 +108,41 @@ class FormViewActivity : BackActivity(), IFormView {
             }
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    private fun showLanguagesDialog() {
+        LanguagesDialogFragment.newInstance(surveyGroup.id)
+            .show(supportFragmentManager, LanguagesDialogFragment.TAG)
+    }
+
+    override fun useSelectedLanguages(selectedLanguages: MutableSet<String>) {
+        if (selectedLanguages.isNotEmpty()) {
+            presenter.saveLanguages(selectedLanguages, surveyGroup.id)
+        } else {
+            displayError()
+        }
+    }
+
+    private fun displayError() {
+        snackBarManager.displaySnackBarWithAction(
+            findViewById(R.id.form_view_root),
+            R.string.langmandatorytext,
+            R.string.okbutton,
+            { showLanguagesDialog() },
+            this
+        )
+    }
+
+    override fun onLanguagesSaved() {
+        TODO("not implemented")
+        //notify to reload formUI?
+        //add listener
+    }
+
+    override fun onLanguagesSavedError() {
+        snackBarManager.displaySnackBar(
+            findViewById(R.id.form_view_root),
+            R.string.error_saving_languages
+        )
     }
 }

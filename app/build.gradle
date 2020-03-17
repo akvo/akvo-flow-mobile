@@ -227,6 +227,7 @@ dependencies {
     implementation "androidx.exifinterface:exifinterface:${rootProject.ext.exifVersion}"
     implementation "androidx.recyclerview:recyclerview:${rootProject.ext.recyclerVersion}"
     implementation "androidx.annotation:annotation:${rootProject.ext.annotationVersion}"
+    kapt "androidx.annotation:annotation:${rootProject.ext.annotationVersion}"
     implementation "com.google.android.material:material:${rootProject.ext.materialVersion}"
     implementation "androidx.constraintlayout:constraintlayout:${rootProject.ext.constraintLayoutVersion}"
     implementation "androidx.multidex:multidex:${rootProject.ext.multidexVersion}"

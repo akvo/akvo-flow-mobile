@@ -22,6 +22,7 @@ package org.akvo.flow.presentation.form.view
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.Toast
 import androidx.viewpager.widget.ViewPager
 import com.google.android.material.tabs.TabLayout
 import org.akvo.flow.R
@@ -164,7 +165,9 @@ class FormViewActivity : BackActivity(), IFormView,
         }
     }
 
-
+    override fun showErrorLoadingForm() {
+        Toast.makeText(this, R.string.error_loading_form, Toast.LENGTH_SHORT).show()
+    }
 
     override fun useSelectedLanguages(
         selectedLanguages: MutableSet<String>,

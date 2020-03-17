@@ -28,4 +28,5 @@ interface IFormView {
     fun displayLanguages(languages: List<Language>)
     fun showLanguagesError()
     fun displayForm(viewForm: ViewForm)
+    fun showErrorLoadingForm()
 }

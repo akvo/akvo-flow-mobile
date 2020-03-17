@@ -352,6 +352,7 @@
     <string name="error_data_point_not_found">Datapoint not found</string>
     <string name="error_saving_languages">Error saving languages</string>
     <string name="languages_load_error">Error loading form languages</string>
+    <string name="error_loading_form">Error loading form</string>
 
     <plurals name="download_forms_error">
         <item quantity="one">Error downloading form</item>

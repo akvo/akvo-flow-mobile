@@ -24,7 +24,6 @@ import io.reactivex.observers.DisposableSingleObserver
 import org.akvo.flow.domain.SurveyGroup
 import org.akvo.flow.domain.entity.DomainForm
 import org.akvo.flow.domain.interactor.forms.GetForm
-import org.akvo.flow.domain.interactor.forms.GetFormInstanceId
 import org.akvo.flow.domain.languages.LoadLanguages
 import org.akvo.flow.domain.languages.SaveLanguages
 import org.akvo.flow.presentation.Presenter
@@ -61,7 +60,7 @@ class FormViewPresenter @Inject constructor(
             }
 
             override fun onError(e: Throwable) {
-                //TODO("not implemented")
+                view?.showErrorLoadingForm()
             }
         }, params)
     }

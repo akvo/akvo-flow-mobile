@@ -49,7 +49,7 @@ class FormViewPresenter @Inject constructor(
         //TODO("not implemented")
     }
 
-    //language is saved per survey and not form???
+    //language is saved per survey and not form
     fun saveLanguages(selectedLanguages: Set<String>, surveyId: Long) {
         val params: MutableMap<String, Any> = HashMap(4)
         params[SaveLanguages.PARAM_SURVEY_ID] = surveyId

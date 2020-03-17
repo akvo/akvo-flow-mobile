@@ -276,4 +276,9 @@ public class FileDataSource {
         File file = new File(flowFileBrowser.getInternalFolder(FlowFileBrowser.DIR_DATA), name);
         return Single.just(file);
     }
+
+    public boolean fileExists(@NotNull String imageName) {
+        File folder = flowFileBrowser.getInternalFolder(FlowFileBrowser.DIR_MEDIA);
+        return folder.exists() && new File(folder, imageName).exists();
+    }
 }

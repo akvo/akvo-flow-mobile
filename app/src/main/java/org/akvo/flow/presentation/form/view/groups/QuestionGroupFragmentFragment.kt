@@ -24,7 +24,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.LinearLayoutManager
+import kotlinx.android.synthetic.main.question_group_fragment.questionsRv
 import org.akvo.flow.R
+import org.akvo.flow.presentation.form.view.groups.entity.Question
+import org.akvo.flow.presentation.form.view.groups.entity.QuestionAnswer
 
 class QuestionGroupFragmentFragment : Fragment() {
 
@@ -39,8 +43,59 @@ class QuestionGroupFragmentFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val root = inflater.inflate(R.layout.question_group_fragment, container, false)
-        return root
+        return inflater.inflate(R.layout.question_group_fragment, container, false)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        questionsRv.layoutManager = LinearLayoutManager(activity)
+        val questionAnswer1 = QuestionAnswer(
+            Question.FreeTextQuestion(
+                "123",
+                "1. text question",
+                false,
+                emptyList(),
+                true
+            ), "valeria"
+        )
+        val questionAnswer2 = QuestionAnswer(
+            Question.NumberQuestion(
+                "123", "2. number question", false, emptyList(),
+                requireDoubleEntry = true,
+                allowSign = true,
+                allowDecimalPoint = true,
+                minimumValue = 0.0,
+                maximumValue = 10.0
+            ), "2.0"
+        )
+
+        val barcodeAnswer = QuestionAnswer(
+            Question.BarcodeQuestion(
+                "123", "3. barcode question", false, emptyList()), "123456789"
+        )
+        val emptyQuestionAnswer = QuestionAnswer(
+            Question.FreeTextQuestion(
+                "123",
+                "4. empty question",
+                false,
+                emptyList(),
+                true
+            ), ""
+        )
+
+        val dateAnswer = QuestionAnswer(
+            Question.DateQuestion(
+                "123", "5. date question", false, emptyList()), "Oct 23, 2019"
+        )
+        questionsRv.adapter = GroupQuestionsAdapter(
+            mutableListOf(
+                questionAnswer1,
+                questionAnswer2,
+                barcodeAnswer,
+                emptyQuestionAnswer,
+                dateAnswer
+            )
+        )
     }
 
     companion object {

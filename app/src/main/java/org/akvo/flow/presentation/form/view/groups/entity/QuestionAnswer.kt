@@ -19,4 +19,5 @@
 
 package org.akvo.flow.presentation.form.view.groups.entity
 
+//TODO: answer can be empty
 data class QuestionAnswer(val question: Question, val answer: String)

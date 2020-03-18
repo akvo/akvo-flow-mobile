@@ -22,7 +22,7 @@ package org.akvo.flow.presentation.form.view.groups.entity
 sealed class Question {
 
     abstract val questionId: String
-    abstract val title: String
+    abstract val title: String // title is composed of order + . title ej: 1. Question one
     abstract val mandatory: Boolean
     abstract val translations: List<String>
     //TODO: add tooltip
@@ -90,6 +90,7 @@ sealed class Question {
         //TODO: do we need fileName?
     ) : Question()
 
+    //TODO: date answer has to be formatted correctly
     data class DateQuestion(
         override val questionId: String,
         override val title: String,
@@ -102,7 +103,7 @@ sealed class Question {
         override val title: String,
         override val mandatory: Boolean,
         override val translations: List<String>,
-        val enableMultiple: Boolean,
+        val enableMultiple: Boolean = false,
         val locked: Boolean = false
     ) : Question()
 

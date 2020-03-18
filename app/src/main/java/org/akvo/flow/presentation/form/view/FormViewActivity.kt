@@ -32,7 +32,7 @@ import org.akvo.flow.injector.component.DaggerViewComponent
 import org.akvo.flow.presentation.form.languages.Language
 import org.akvo.flow.presentation.form.languages.LanguagesDialogFragment
 import org.akvo.flow.presentation.form.view.entity.ViewForm
-import org.akvo.flow.presentation.form.view.ui.main.QuestionGroupsPagerAdapter
+import org.akvo.flow.presentation.form.view.groups.QuestionGroupsPagerAdapter
 import org.akvo.flow.ui.Navigator
 import org.akvo.flow.uicomponents.BackActivity
 import org.akvo.flow.uicomponents.SnackBarManager
@@ -64,7 +64,11 @@ class FormViewActivity : BackActivity(), IFormView,
         initializeInjector()
         setupToolBar()
         presenter.view = this
-        sectionsPagerAdapter = QuestionGroupsPagerAdapter(this, supportFragmentManager)
+        sectionsPagerAdapter =
+            QuestionGroupsPagerAdapter(
+                this,
+                supportFragmentManager
+            )
         val viewPager: ViewPager = findViewById(R.id.view_pager)
         viewPager.adapter = sectionsPagerAdapter
         val tabs: TabLayout = findViewById(R.id.tabs)

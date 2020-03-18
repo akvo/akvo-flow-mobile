@@ -17,7 +17,7 @@
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.akvo.flow.presentation.form.view.ui.main
+package org.akvo.flow.presentation.form.view.groups
 
 import android.content.Context
 import androidx.fragment.app.Fragment

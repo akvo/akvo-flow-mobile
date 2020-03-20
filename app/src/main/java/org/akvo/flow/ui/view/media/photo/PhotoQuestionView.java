@@ -103,7 +103,7 @@ public class PhotoQuestionView extends QuestionView implements IPhotoQuestionVie
     }
 
     private void init() {
-        setQuestionView(R.layout.media_question_view);
+        setQuestionView(R.layout.old_media_question_view);
         initialiseInjector();
         ButterKnife.bind(this);
 

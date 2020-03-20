@@ -19,7 +19,7 @@
 
 package org.akvo.flow.presentation.form.view.groups.entity
 
-sealed class Question {
+sealed class ViewQuestionAnswer {
 
     abstract val questionId: String
     abstract val title: String // title is composed of order + . title ej: 1. Question one
@@ -28,86 +28,95 @@ sealed class Question {
     //TODO: add tooltip
     //TODO: dependencies?
 
-    data class FreeTextQuestion(
+    data class FreeTextViewQuestionAnswer(
         override val questionId: String,
         override val title: String,
         override val mandatory: Boolean,
         override val translations: List<String>,
+        val answer: String,
         val requireDoubleEntry: Boolean
-    ) : Question()
+    ) : ViewQuestionAnswer()
 
-    data class NumberQuestion(
+    data class NumberViewQuestionAnswer(
         override val questionId: String,
         override val title: String,
         override val mandatory: Boolean,
         override val translations: List<String>,
+        val answer: String,
         val requireDoubleEntry: Boolean,
         val allowSign: Boolean,
         val allowDecimalPoint: Boolean,
         val minimumValue: Double,
         val maximumValue: Double
-    ) : Question()
+    ) : ViewQuestionAnswer()
 
-    data class OptionQuestion(
+    data class OptionViewQuestionAnswer(
         override val questionId: String,
         override val title: String,
         override val mandatory: Boolean,
         override val translations: List<String>,
+        val answer: String,
         val allowMultiple: Boolean,
         val allowOther: Boolean
     //TODO: add actual options
-    ) : Question()
+    ) : ViewQuestionAnswer()
 
-    data class CascadeQuestion(
+    data class CascadeViewQuestionAnswer(
         override val questionId: String,
         override val title: String,
         override val mandatory: Boolean,
         override val translations: List<String>,
+        val answer: String,
         val cascadeResource: String
-    ) : Question()
+    ) : ViewQuestionAnswer()
 
-    data class LocationQuestion(
+    data class LocationViewQuestionAnswer(
         override val questionId: String,
         override val title: String,
         override val mandatory: Boolean,
         override val translations: List<String>,
+        val answer: String,
         val locked: Boolean = false
-    ) : Question()
+    ) : ViewQuestionAnswer()
 
-    data class PhotoQuestion(
+    data class PhotoViewQuestionAnswer(
         override val questionId: String,
         override val title: String,
         override val mandatory: Boolean,
-        override val translations: List<String>
+        override val translations: List<String>,
+        val answer: String
         //TODO: do we need fileName?
-    ) : Question()
+    ) : ViewQuestionAnswer()
 
-    data class VideoQuestion(
+    data class VideoViewQuestionAnswer(
         override val questionId: String,
         override val title: String,
         override val mandatory: Boolean,
-        override val translations: List<String>
+        override val translations: List<String>,
+        val answer: String
         //TODO: do we need fileName?
-    ) : Question()
+    ) : ViewQuestionAnswer()
 
     //TODO: date answer has to be formatted correctly
-    data class DateQuestion(
+    data class DateViewQuestionAnswer(
         override val questionId: String,
         override val title: String,
         override val mandatory: Boolean,
-        override val translations: List<String>
-    ) : Question()
+        override val translations: List<String>,
+        val answer: String
+    ) : ViewQuestionAnswer()
 
-    data class BarcodeQuestion(
+    data class BarcodeViewQuestionAnswer(
         override val questionId: String,
         override val title: String,
         override val mandatory: Boolean,
         override val translations: List<String>,
         val enableMultiple: Boolean = false,
         val locked: Boolean = false
-    ) : Question()
+    //TODO: list of answers
+    ) : ViewQuestionAnswer()
 
-    data class GeoShapeQuestion(
+    data class GeoShapeViewQuestionAnswer(
         override val questionId: String,
         override val title: String,
         override val mandatory: Boolean,
@@ -116,22 +125,22 @@ sealed class Question {
         val enableLine: Boolean,
         val enableArea: Boolean,
         val locked: Boolean = false
-    ) : Question()
+    ) : ViewQuestionAnswer()
 
-    data class SignatureQuestion(
+    data class SignatureViewQuestionAnswer(
         override val questionId: String,
         override val title: String,
         override val mandatory: Boolean,
         override val translations: List<String>
-    ) : Question()
+    ) : ViewQuestionAnswer()
 
-    data class CaddisflyQuestion(
+    data class CaddisflyViewQuestionAnswer(
         override val questionId: String,
         override val title: String,
         override val mandatory: Boolean,
         override val translations: List<String>,
         val caddisflyResourceUuid: String
-    ) : Question()
+    ) : ViewQuestionAnswer()
 }
 
 val <T> T.exhaustive: T

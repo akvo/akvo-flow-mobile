@@ -100,7 +100,7 @@ public class VideoQuestionView extends QuestionView implements IVideoQuestionVie
     }
 
     private void init() {
-        setQuestionView(R.layout.media_question_view);
+        setQuestionView(R.layout.old_media_question_view);
         initialiseInjector();
         ButterKnife.bind(this);
         presenter.setView(this);

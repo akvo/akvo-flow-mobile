@@ -27,21 +27,27 @@ import androidx.annotation.LayoutRes
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.textfield.TextInputEditText
 import org.akvo.flow.R
-import org.akvo.flow.presentation.form.view.groups.entity.Question
-import org.akvo.flow.presentation.form.view.groups.entity.Question.NumberQuestion
-import org.akvo.flow.presentation.form.view.groups.entity.QuestionAnswer
+import org.akvo.flow.presentation.form.view.groups.entity.ViewQuestionAnswer
+import org.akvo.flow.presentation.form.view.groups.entity.ViewQuestionAnswer.NumberViewQuestionAnswer
 import org.akvo.flow.presentation.form.view.groups.entity.exhaustive
 
-class GroupQuestionsAdapter(val questionAnswers: MutableList<QuestionAnswer> = mutableListOf()) :
-    RecyclerView.Adapter<QuestionViewHolder>() {
+class GroupQuestionsAdapter<T: QuestionViewHolder<ViewQuestionAnswer>>(val questionAnswers: MutableList<ViewQuestionAnswer> = mutableListOf()) :
+    RecyclerView.Adapter<T>() {
 
     enum class ViewType {
         SINGLE_INPUT,
-        DOUBLE_INPUT
+        DOUBLE_INPUT,
+        OPTION, //options have subtypes,
+        CASCADE,
+        LOCATION,
+        PHOTO,
+        VIDEO,
+        SHAPE,
+        SIGNATURE,
+        CADDISFLY
     }
 
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): QuestionViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): T {
         return when (viewType) {
             ViewType.SINGLE_INPUT.ordinal -> {
                 QuestionViewHolder.SingleQuestionViewHolder(
@@ -49,15 +55,39 @@ class GroupQuestionsAdapter(val questionAnswers: MutableList<QuestionAnswer> = m
                         parent,
                         R.layout.single_input_field_question_view
                     )
-                )
+                ) as T
             }
-            else -> {
+            ViewType.DOUBLE_INPUT.ordinal -> {
                 QuestionViewHolder.DoubleQuestionViewHolder(
                     inflate(
                         parent,
                         R.layout.double_input_field_question_view
                     )
-                )
+                ) as T
+            }
+            ViewType.PHOTO.ordinal -> {
+                QuestionViewHolder.PhotoQuestionViewHolder(
+                    inflate(
+                        parent,
+                        R.layout.media_question_view
+                    )
+                ) as T
+            }
+            ViewType.VIDEO.ordinal -> {
+                QuestionViewHolder.VideoQuestionViewHolder(
+                    inflate(
+                        parent,
+                        R.layout.media_question_view
+                    )
+                ) as T
+            }
+            else -> {
+                QuestionViewHolder.PhotoQuestionViewHolder(
+                    inflate(
+                        parent,
+                        R.layout.single_input_field_question_view
+                    )
+                ) as T
             }
         }
     }
@@ -67,34 +97,39 @@ class GroupQuestionsAdapter(val questionAnswers: MutableList<QuestionAnswer> = m
 
     override fun getItemCount(): Int = questionAnswers.size
 
-    override fun onBindViewHolder(holder: QuestionViewHolder, position: Int) {
+
+    override fun onBindViewHolder(holder: T, position: Int) {
         holder.setUpView(questionAnswers[position])
     }
 
     override fun getItemViewType(position: Int): Int {
-        val question = questionAnswers[position].question
-        return when (question) {
-            is Question.FreeTextQuestion -> {
-                checkRepeatableType(question.requireDoubleEntry)
+        val questionAnswer = questionAnswers[position]
+        return when (questionAnswer) {
+            is ViewQuestionAnswer.FreeTextViewQuestionAnswer -> {
+                checkRepeatableType(questionAnswer.requireDoubleEntry)
             }
-            is NumberQuestion -> {
-                checkRepeatableType(question.requireDoubleEntry)
+            is NumberViewQuestionAnswer -> {
+                checkRepeatableType(questionAnswer.requireDoubleEntry)
             }
-            is Question.OptionQuestion -> TODO()
-            is Question.CascadeQuestion -> TODO()
-            is Question.LocationQuestion -> TODO()
-            is Question.PhotoQuestion -> TODO()
-            is Question.VideoQuestion -> TODO()
-            is Question.DateQuestion -> {
+            is ViewQuestionAnswer.OptionViewQuestionAnswer -> TODO()
+            is ViewQuestionAnswer.CascadeViewQuestionAnswer -> TODO()
+            is ViewQuestionAnswer.LocationViewQuestionAnswer -> TODO()
+            is ViewQuestionAnswer.PhotoViewQuestionAnswer -> {
+                ViewType.PHOTO.ordinal
+            }
+            is ViewQuestionAnswer.VideoViewQuestionAnswer -> {
+                ViewType.VIDEO.ordinal
+            }
+            is ViewQuestionAnswer.DateViewQuestionAnswer -> {
                 ViewType.SINGLE_INPUT.ordinal
             }
-            is Question.BarcodeQuestion -> {
+            is ViewQuestionAnswer.BarcodeViewQuestionAnswer -> {
                 //TODO: barcode can be multiple
                 ViewType.SINGLE_INPUT.ordinal
             }
-            is Question.GeoShapeQuestion -> TODO()
-            is Question.SignatureQuestion -> TODO()
-            is Question.CaddisflyQuestion -> TODO()
+            is ViewQuestionAnswer.GeoShapeViewQuestionAnswer -> TODO()
+            is ViewQuestionAnswer.SignatureViewQuestionAnswer -> TODO()
+            is ViewQuestionAnswer.CaddisflyViewQuestionAnswer -> TODO()
         }.exhaustive
     }
 
@@ -108,15 +143,16 @@ class GroupQuestionsAdapter(val questionAnswers: MutableList<QuestionAnswer> = m
             }
         }
     }
+
 }
 
-sealed class QuestionViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
+sealed class QuestionViewHolder<T: ViewQuestionAnswer>(val view: View) : RecyclerView.ViewHolder(view) {
 
-    abstract fun setUpView(questionAnswer: QuestionAnswer)
+    abstract fun setUpView(questionAnswer: T)
 
-    private fun mandatoryText(questionAnswer: QuestionAnswer): String {
+    private fun mandatoryText(mandatory: Boolean): String {
         return when {
-            questionAnswer.question.mandatory -> {
+            mandatory -> {
                 " *"
             }
             else -> {
@@ -125,9 +161,8 @@ sealed class QuestionViewHolder(val view: View) : RecyclerView.ViewHolder(view) 
         }
     }
 
-    fun setUpTitle(questionAnswer: QuestionAnswer) {
-        view.findViewById<TextView>(R.id.questionTitle).text =
-            "${questionAnswer.question.title}${mandatoryText(questionAnswer)}"
+    fun setUpTitle(title: String, mandatory: Boolean) {
+        view.findViewById<TextView>(R.id.questionTitle).text = "$title${mandatoryText(mandatory)}"
     }
 
     fun setUpInputText(answer: String, textInputEditText: TextInputEditText) {
@@ -139,20 +174,20 @@ sealed class QuestionViewHolder(val view: View) : RecyclerView.ViewHolder(view) 
         }
     }
 
-    class SingleQuestionViewHolder(singleView: View) : QuestionViewHolder(singleView) {
-        override fun setUpView(questionAnswer: QuestionAnswer) {
-            setUpTitle(questionAnswer)
-            val answer = questionAnswer.answer
+    class SingleQuestionViewHolder(singleView: View) : QuestionViewHolder<ViewQuestionAnswer>(singleView) {
+        override fun setUpView(questionAnswer: ViewQuestionAnswer) {
+            setUpTitle(questionAnswer.title, questionAnswer.mandatory)
             val textInputEditText = view.findViewById<TextInputEditText>(R.id.questionResponseInput)
+            val answer = "" //TODO: fix
             setUpInputText(answer, textInputEditText)
         }
     }
 
-    class DoubleQuestionViewHolder(singleView: View) : QuestionViewHolder(singleView) {
-        override fun setUpView(questionAnswer: QuestionAnswer) {
-            setUpTitle(questionAnswer)
-            val answer = questionAnswer.answer
+    class DoubleQuestionViewHolder(singleView: View) : QuestionViewHolder<ViewQuestionAnswer>(singleView) {
+        override fun setUpView(questionAnswer: ViewQuestionAnswer) {
+            setUpTitle(questionAnswer.title, questionAnswer.mandatory)
             val textInputEditText = view.findViewById<TextInputEditText>(R.id.questionResponseInput)
+            val answer = "" //TODO: fix
             setUpInputText(answer, textInputEditText)
             val repeatedInput = view.findViewById<TextInputEditText>(R.id.questionResponseRepeated)
             setUpInputText(answer, repeatedInput)
@@ -162,6 +197,20 @@ sealed class QuestionViewHolder(val view: View) : RecyclerView.ViewHolder(view) 
             } else {
                 repeatTitle.visibility = View.VISIBLE
             }
+        }
+    }
+
+    class PhotoQuestionViewHolder(mediaView: View) :
+        QuestionViewHolder<ViewQuestionAnswer.PhotoViewQuestionAnswer>(mediaView) {
+        override fun setUpView(questionAnswer: ViewQuestionAnswer.PhotoViewQuestionAnswer) {
+            setUpTitle(questionAnswer.title, questionAnswer.mandatory)
+        }
+    }
+
+    class VideoQuestionViewHolder(mediaView: View) :
+        QuestionViewHolder<ViewQuestionAnswer.VideoViewQuestionAnswer>(mediaView) {
+        override fun setUpView(questionAnswer: ViewQuestionAnswer.VideoViewQuestionAnswer) {
+            setUpTitle(questionAnswer.title, questionAnswer.mandatory)
         }
     }
 }

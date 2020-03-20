@@ -353,6 +353,8 @@
     <string name="error_saving_languages">Error saving languages</string>
     <string name="languages_load_error">Error loading form languages</string>
     <string name="error_loading_form">Error loading form</string>
+    <string name="download_image_content_description">Tap to download media</string>
+    <string name="media_content_description">Media question response</string>
 
     <plurals name="download_forms_error">
         <item quantity="one">Error downloading form</item>

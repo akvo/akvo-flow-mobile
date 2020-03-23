@@ -25,13 +25,14 @@ import android.content.DialogInterface;
 import android.graphics.Point;
 import android.os.Build;
 import android.os.Handler;
-import androidx.annotation.NonNull;
 import android.view.Display;
 import android.view.ViewTreeObserver;
 import android.view.WindowManager;
 
 import org.akvo.flow.R;
 import org.akvo.flow.service.ServiceToastRunnable;
+
+import androidx.annotation.NonNull;
 
 /**
  * Utility class to handle common features for the View tier

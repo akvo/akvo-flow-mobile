@@ -11,11 +11,7 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorPrimary</item>
         <item name="colorControlNormal">@color/colorControlNormal</item>
-
-        <item name="android:listViewStyle">@style/Flow.ListView</item>
-        <item name="listitem_bg1">@drawable/listitem_row_1</item>
-        <item name="listitem_bg2">@drawable/listitem_row_2</item>
-
+        <item name="android:windowBackground">@color/white</item>
         <item name="android:textColorPrimary">@color/text_color_primary</item>
         <item name="android:textColorSecondary">@color/text_color_primary</item>
         <item name="android:textColorTertiary">@color/text_color_primary</item>

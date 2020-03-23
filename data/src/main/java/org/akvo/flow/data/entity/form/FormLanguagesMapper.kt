@@ -27,17 +27,17 @@ class FormLanguagesMapper @Inject constructor() {
 
     fun transform(cursor: Cursor?): Set<String> {
         val languages = mutableSetOf<String>()
-        cursor?.let { cursor ->
-            if (cursor.moveToFirst()) {
+        cursor?.let { nonNullCursor ->
+            if (nonNullCursor.moveToFirst()) {
                 do {
-                    getLanguage(cursor)?.let { language ->
+                    getLanguage(nonNullCursor)?.let { language ->
                         if (language.isNotEmpty()) {
                             languages.add(language)
                         }
                     }
-                } while (cursor.moveToNext())
+                } while (nonNullCursor.moveToNext())
             }
-            cursor.close()
+            nonNullCursor.close()
         }
         return languages
     }

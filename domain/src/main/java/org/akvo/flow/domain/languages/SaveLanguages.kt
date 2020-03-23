@@ -54,6 +54,7 @@ class SaveLanguages @Inject constructor(
             return Completable.error(IllegalArgumentException("Missing survey id or selected languages"))
         }
         val surveyId = parameters[PARAM_SURVEY_ID] as Long
+        @Suppress("UNCHECKED_CAST")
         val languages = parameters[PARAM_LANGUAGES_LIST] as Set<String>
         return languagesRepository.saveLanguages(surveyId, languages)
     }

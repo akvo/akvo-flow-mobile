@@ -52,7 +52,7 @@ class LoadLanguages @Inject constructor(
     }
 
     private fun <T> buildUseCaseObservable(parameters: Map<String, T>): Single<Pair<Set<String>, Set<String>>> {
-        if (!parameters.containsKey(PARAM_SURVEY_ID)) {
+        if (!parameters.containsKey(PARAM_SURVEY_ID) || !parameters.containsKey(PARAM_FORM_ID)) {
             return Single.error(IllegalArgumentException("Missing survey id or form id"))
         }
         val surveyId = parameters[PARAM_SURVEY_ID] as Long

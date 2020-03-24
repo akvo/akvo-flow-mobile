@@ -17,8 +17,22 @@
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.akvo.flow.presentation.form.languages
+package org.akvo.flow.data.repository
 
-interface LanguagesView {
-    fun displayLanguages(transform: List<Language>)
+import io.reactivex.Completable
+import io.reactivex.Single
+import org.akvo.flow.data.datasource.DataSourceFactory
+import org.akvo.flow.domain.repository.LanguagesRepository
+import javax.inject.Inject
+
+class LanguagesDataRepository @Inject constructor(private val dataSourceFactory: DataSourceFactory) :
+    LanguagesRepository {
+
+    override fun getSavedLanguages(surveyId: Long): Single<Set<String>> {
+        return dataSourceFactory.dataBaseDataSource.getSavedLanguages(surveyId)
+    }
+
+    override fun saveLanguages(surveyId: Long, languages: Set<String>): Completable {
+        return dataSourceFactory.dataBaseDataSource.saveLanguages(surveyId, languages)
+    }
 }

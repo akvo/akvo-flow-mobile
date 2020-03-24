@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2019 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2016-2020 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -44,6 +44,7 @@ import org.akvo.flow.data.repository.ApkDataRepository;
 import org.akvo.flow.data.repository.DataPointDataRepository;
 import org.akvo.flow.data.repository.FileDataRepository;
 import org.akvo.flow.data.repository.FormDataRepository;
+import org.akvo.flow.data.repository.LanguagesDataRepository;
 import org.akvo.flow.data.repository.MissingAndDeletedDataRepository;
 import org.akvo.flow.data.repository.SetupDataRepository;
 import org.akvo.flow.data.repository.SurveyDataRepository;
@@ -59,6 +60,7 @@ import org.akvo.flow.domain.repository.ApkRepository;
 import org.akvo.flow.domain.repository.DataPointRepository;
 import org.akvo.flow.domain.repository.FileRepository;
 import org.akvo.flow.domain.repository.FormRepository;
+import org.akvo.flow.domain.repository.LanguagesRepository;
 import org.akvo.flow.domain.repository.MissingAndDeletedRepository;
 import org.akvo.flow.domain.repository.SetupRepository;
 import org.akvo.flow.domain.repository.SurveyRepository;
@@ -121,6 +123,12 @@ public class ApplicationModule {
     @Singleton
     public FileRepository provideFileRepository(FileDataRepository fileDataRepository) {
         return fileDataRepository;
+    }
+
+    @Provides
+    @Singleton
+    public LanguagesRepository provideLanguagesRepository(LanguagesDataRepository languagesRepo) {
+        return languagesRepo;
     }
 
     @Provides

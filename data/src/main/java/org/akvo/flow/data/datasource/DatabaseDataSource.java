@@ -33,6 +33,7 @@ import org.akvo.flow.data.entity.ApiQuestionAnswer;
 import org.akvo.flow.data.entity.ApiSurveyInstance;
 import org.akvo.flow.data.entity.SurveyInstanceIdMapper;
 import org.akvo.flow.data.entity.form.Form;
+import org.akvo.flow.data.entity.form.FormLanguagesMapper;
 import org.akvo.flow.data.entity.form.FormMetadataMapper;
 import org.akvo.flow.data.util.FlowFileBrowser;
 import org.akvo.flow.database.Constants;
@@ -71,13 +72,16 @@ public class DatabaseDataSource {
     private final BriteSurveyDbAdapter briteSurveyDbAdapter;
     private final SurveyInstanceIdMapper surveyInstanceIdMapper;
     private final FormMetadataMapper formMetadataMapper;
+    private final FormLanguagesMapper formLanguagesMapper;
 
     @Inject
     public DatabaseDataSource(BriteDatabase db, SurveyInstanceIdMapper surveyInstanceIdMapper,
-            FormMetadataMapper formMetadataMapper) {
+            FormMetadataMapper formMetadataMapper,
+            FormLanguagesMapper formLanguagesMapper) {
         this.briteSurveyDbAdapter = new BriteSurveyDbAdapter(db);
         this.surveyInstanceIdMapper = surveyInstanceIdMapper;
         this.formMetadataMapper = formMetadataMapper;
+        this.formLanguagesMapper = formLanguagesMapper;
     }
 
     public Observable<Cursor> getSurveys() {
@@ -427,6 +431,18 @@ public class DatabaseDataSource {
     @NotNull
     public Completable markDataPointAsViewed(@NotNull String dataPointId) {
         briteSurveyDbAdapter.markDataPointAsViewed(dataPointId);
+        return Completable.complete();
+    }
+
+    @NotNull
+    public Single<Set<String>> getSavedLanguages(long surveyId) {
+        return briteSurveyDbAdapter.getSavedLanguages(surveyId)
+                .map(formLanguagesMapper::transform);
+    }
+
+    @NotNull
+    public Completable saveLanguages(long surveyId, @NotNull Set<String> languages) {
+        briteSurveyDbAdapter.saveLanguagePreferences(surveyId, languages);
         return Completable.complete();
     }
 }

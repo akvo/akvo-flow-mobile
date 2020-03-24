@@ -17,13 +17,12 @@
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.akvo.flow.presentation.form.view
+package org.akvo.flow.domain.repository
 
-import org.akvo.flow.presentation.form.languages.Language
+import io.reactivex.Completable
+import io.reactivex.Single
 
-interface IFormView {
-    fun onLanguagesSaved()
-    fun onLanguagesSavedError()
-    fun displayLanguages(languages: List<Language>)
-    fun showLanguagesError()
+interface LanguagesRepository {
+    fun getSavedLanguages(surveyId: Long): Single<Set<String>>
+    fun saveLanguages(surveyId: Long, languages: Set<String>): Completable
 }

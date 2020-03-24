@@ -27,6 +27,7 @@ import android.text.TextUtils;
 import com.squareup.sqlbrite2.BriteDatabase;
 import com.squareup.sqlbrite2.SqlBrite;
 
+import org.akvo.flow.database.LanguageTable;
 import org.akvo.flow.database.RecordColumns;
 import org.akvo.flow.database.ResponseColumns;
 import org.akvo.flow.database.SurveyColumns;
@@ -829,5 +830,23 @@ public class BriteSurveyDbAdapter {
         contentValues.put(RecordColumns.VIEWED, 1);
         String where = RecordColumns.RECORD_ID + " = ? ";
         briteDatabase.update(Tables.RECORD, contentValues, where, dataPointId);
+    }
+
+    public Single<Cursor> getSavedLanguages(long surveyId) {
+        String sql = "SELECT " + LanguageTable.COLUMN_LANGUAGE_CODE
+                + " FROM " + LanguageTable.TABLE_NAME
+                + " WHERE " + LanguageTable.COLUMN_SURVEY_ID + " = ?";
+        return Single.just(briteDatabase.query(sql, surveyId + ""));
+    }
+
+    public void saveLanguagePreferences(long surveyId, @NonNull Set<String> languageCodes) {
+        ContentValues contentValues = new ContentValues(2);
+        briteDatabase.delete(LanguageTable.TABLE_NAME, LanguageTable.COLUMN_SURVEY_ID + " = ?",
+                surveyId + "");
+        for (String languageCode : languageCodes) {
+            contentValues.put(LanguageTable.COLUMN_SURVEY_ID, surveyId);
+            contentValues.put(LanguageTable.COLUMN_LANGUAGE_CODE, languageCode);
+            briteDatabase.insert(LanguageTable.TABLE_NAME, contentValues);
+        }
     }
 }

@@ -18,8 +18,37 @@
  */
 package org.akvo.flow.presentation.form.languages
 
+import android.os.Parcel
+import android.os.Parcelable
+
 data class Language(
     val languageCode: String,
     val language: String,
     var isSelected: Boolean
-)
+) : Parcelable {
+    constructor(parcel: Parcel) : this(
+        parcel.readString(),
+        parcel.readString(),
+        parcel.readByte() != 0.toByte()
+    )
+
+    override fun writeToParcel(parcel: Parcel, flags: Int) {
+        parcel.writeString(languageCode)
+        parcel.writeString(language)
+        parcel.writeByte(if (isSelected) 1 else 0)
+    }
+
+    override fun describeContents(): Int {
+        return 0
+    }
+
+    companion object CREATOR : Parcelable.Creator<Language> {
+        override fun createFromParcel(parcel: Parcel): Language {
+            return Language(parcel)
+        }
+
+        override fun newArray(size: Int): Array<Language?> {
+            return arrayOfNulls(size)
+        }
+    }
+}

@@ -24,7 +24,6 @@ import android.app.Dialog
 import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.View
 import android.widget.AdapterView
 import android.widget.ListView
 import androidx.fragment.app.DialogFragment
@@ -35,29 +34,27 @@ import org.akvo.flow.injector.component.DaggerViewComponent
 import org.akvo.flow.ui.adapter.LanguageAdapter
 import org.akvo.flow.uicomponents.SnackBarManager
 import org.akvo.flow.util.ConstantUtil
+import java.util.ArrayList
 import javax.inject.Inject
 
-class LanguagesDialogFragment : DialogFragment(), LanguagesView {
+class LanguagesDialogFragment : DialogFragment() {
 
-    @Inject
-    lateinit var presenter: LanguagesPresenter
+    private var listener: LanguagesSelectionListener? = null
 
     @Inject
     lateinit var snackBarManager: SnackBarManager
 
-    private var listener: LanguagesSelectionListener? = null
-
-    private var surveyId = -1L
+    private var languages = mutableListOf<Language>()
 
     companion object {
 
         const val TAG = "LanguagesDialogFragment"
 
         @JvmStatic
-        fun newInstance(surveyId: Long): LanguagesDialogFragment {
+        fun newInstance(languages: ArrayList<Language>): LanguagesDialogFragment {
             return LanguagesDialogFragment().apply {
                 arguments = Bundle().apply {
-                    putLong(ConstantUtil.SURVEY_ID_EXTRA, surveyId)
+                    putParcelableArrayList(ConstantUtil.LANGUAGES_EXTRA, languages)
                 }
             }
         }
@@ -66,8 +63,11 @@ class LanguagesDialogFragment : DialogFragment(), LanguagesView {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         initializeInjector()
-        surveyId = arguments!!.getLong(ConstantUtil.SURVEY_ID_EXTRA, -1L)
-        presenter.setView(this)
+        val parcelableArrayList =
+            arguments!!.getParcelableArrayList<Language>(ConstantUtil.LANGUAGES_EXTRA)
+        if (parcelableArrayList != null) {
+            languages = parcelableArrayList.toMutableList()
+        }
     }
 
     override fun onAttach(context: Context) {
@@ -91,7 +91,7 @@ class LanguagesDialogFragment : DialogFragment(), LanguagesView {
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val languageAdapter = LanguageAdapter(activity, emptyList())
+        val languageAdapter = LanguageAdapter(activity, languages)
         val listView = LayoutInflater.from(activity)
             .inflate(R.layout.languages_list, null) as ListView
         listView.adapter = languageAdapter
@@ -104,18 +104,8 @@ class LanguagesDialogFragment : DialogFragment(), LanguagesView {
             .setView(listView)
             .setPositiveButton(R.string.okbutton) { _, _ ->
                 val selectedLanguages = (listView.adapter as LanguageAdapter).selectedLanguages
-                listener?.useSelectedLanguages(selectedLanguages)
+                listener?.useSelectedLanguages(selectedLanguages, languages)
             }.create()
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        presenter.loadLanguages(surveyId)
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        presenter.destroy()
     }
 
     override fun onDetach() {
@@ -124,12 +114,6 @@ class LanguagesDialogFragment : DialogFragment(), LanguagesView {
     }
 
     interface LanguagesSelectionListener {
-        fun useSelectedLanguages(selectedLanguages: MutableSet<String>)
-    }
-
-    override fun displayLanguages(languages: List<Language>) {
-        val listView = view?.findViewById(R.id.languages_list) as ListView
-        val adapter = listView.adapter as LanguageAdapter
-        adapter.setLanguages(languages)
+        fun useSelectedLanguages(selectedLanguages: MutableSet<String>, languages: List<Language>)
     }
 }

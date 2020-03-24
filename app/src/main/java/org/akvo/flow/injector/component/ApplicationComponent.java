@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2019 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2016-2020 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -36,6 +36,7 @@ import org.akvo.flow.domain.repository.ApkRepository;
 import org.akvo.flow.domain.repository.DataPointRepository;
 import org.akvo.flow.domain.repository.FileRepository;
 import org.akvo.flow.domain.repository.FormRepository;
+import org.akvo.flow.domain.repository.LanguagesRepository;
 import org.akvo.flow.domain.repository.MissingAndDeletedRepository;
 import org.akvo.flow.domain.repository.SurveyRepository;
 import org.akvo.flow.domain.repository.UserRepository;
@@ -85,6 +86,8 @@ public interface ApplicationComponent {
     DataPointRepository dataPointRepository();
 
     MissingAndDeletedRepository missingAndDeletedRepository();
+
+    LanguagesRepository languagesRepository();
 
     Gson gson();
 

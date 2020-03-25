@@ -21,4 +21,5 @@ package org.akvo.flow.util.image
 
 interface DrawableLoadListener {
     fun onLoadFailed()
+    fun onLoadSucceeded()
 }

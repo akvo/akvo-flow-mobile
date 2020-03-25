@@ -61,12 +61,24 @@ class MediaQuestionViewLayout @JvmOverloads constructor(
     fun setUpImageDisplay(index: Int, filePath: String) {
         progressBar.visibility = View.GONE
         downloadButton.visibility = View.GONE
+        imageView.setOnClickListener(null)
         val file = File(filePath)
         if (file.exists() && file.canRead()) {
             imageLoader.loadFromFile(file, imageView,
                 object : DrawableLoadListener {
                     override fun onLoadFailed() {
                         showDownloadMedia(index, filePath)
+                    }
+
+                    override fun onLoadSucceeded() {
+                        imageView.setOnClickListener {
+                            val isVideo = ".mp4" == filePath.substring(filePath.lastIndexOf("."))
+                            if (isVideo) {
+                                listener.viewVideo(filePath)
+                            } else {
+                                listener.viewImage(filePath)
+                            }
+                        }
                     }
                 })
         } else {

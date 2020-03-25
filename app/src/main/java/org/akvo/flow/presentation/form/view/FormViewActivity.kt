@@ -23,6 +23,8 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
+import androidx.annotation.StringRes
+import androidx.core.content.FileProvider
 import androidx.viewpager.widget.ViewPager
 import com.google.android.material.tabs.TabLayout
 import org.akvo.flow.R
@@ -39,6 +41,7 @@ import org.akvo.flow.ui.Navigator
 import org.akvo.flow.uicomponents.BackActivity
 import org.akvo.flow.uicomponents.SnackBarManager
 import org.akvo.flow.util.ConstantUtil
+import java.io.File
 import java.util.ArrayList
 import javax.inject.Inject
 
@@ -142,10 +145,7 @@ class FormViewActivity : BackActivity(), IFormView,
     }
 
     override fun onLanguagesSavedError() {
-        snackBarManager.displaySnackBar(
-            findViewById(R.id.form_view_root),
-            R.string.error_saving_languages
-        )
+        showError(R.string.error_saving_languages)
     }
 
     override fun displayLanguages(languages: List<Language>) {
@@ -154,10 +154,7 @@ class FormViewActivity : BackActivity(), IFormView,
     }
 
     override fun showLanguagesError() {
-        snackBarManager.displaySnackBar(
-            findViewById(R.id.form_view_root),
-            R.string.languages_load_error
-        )
+        showError(R.string.languages_load_error)
     }
 
     override fun displayForm(viewForm: ViewForm) {
@@ -188,7 +185,32 @@ class FormViewActivity : BackActivity(), IFormView,
     }
 
     override fun downloadMedia(filename: String, index: Int) {
-        val groupFragment = supportFragmentManager.fragments[viewPager.currentItem] as QuestionGroupFragment
+        val groupFragment =
+            supportFragmentManager.fragments[viewPager.currentItem] as QuestionGroupFragment
         groupFragment.downloadMedia(filename, index)
+    }
+
+    override fun viewVideo(filePath: String) {
+        val file = File(filePath)
+        if (file.exists()) {
+            val fileUri = FileProvider
+                .getUriForFile(this, ConstantUtil.FILE_PROVIDER_AUTHORITY, file)
+            navigator.navigateToVideoView(this, fileUri)
+        } else {
+            showError(R.string.error_video_preview)
+        }
+    }
+
+    private fun showError(@StringRes errorString: Int) {
+        snackBarManager.displaySnackBar(findViewById(R.id.form_view_root), errorString)
+    }
+
+    override fun viewImage(filePath: String) {
+        val file = File(filePath)
+        if (file.exists()) {
+            navigator.navigateToLargeImage(this, filePath)
+        } else {
+            showError(R.string.error_img_preview)
+        }
     }
 }

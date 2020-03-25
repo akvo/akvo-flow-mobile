@@ -129,6 +129,7 @@ public class GlideImageLoader implements ImageLoader {
                         public boolean onResourceReady(Drawable resource, Object model,
                                 Target<Drawable> target, DataSource dataSource,
                                 boolean isFirstResource) {
+                            listener.onLoadSucceeded();
                             return false;
                         }
                     })

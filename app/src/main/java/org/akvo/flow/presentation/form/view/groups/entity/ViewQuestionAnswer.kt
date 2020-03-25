@@ -84,7 +84,8 @@ sealed class ViewQuestionAnswer {
         override val title: String,
         override val mandatory: Boolean,
         override val translations: List<String>,
-        val answer: String
+        val filePath: String,
+        val location: ImageLocation? // TODO use valid and invalid location object?
         //TODO: do we need fileName?
     ) : ViewQuestionAnswer()
 
@@ -93,8 +94,7 @@ sealed class ViewQuestionAnswer {
         override val title: String,
         override val mandatory: Boolean,
         override val translations: List<String>,
-        val answer: String
-        //TODO: do we need fileName?
+        val filePath: String
     ) : ViewQuestionAnswer()
 
     //TODO: date answer has to be formatted correctly
@@ -142,6 +142,8 @@ sealed class ViewQuestionAnswer {
         val caddisflyResourceUuid: String
     ) : ViewQuestionAnswer()
 }
+
+class ImageLocation(val latitude: String, val longitude: String)
 
 val <T> T.exhaustive: T
     get() = this

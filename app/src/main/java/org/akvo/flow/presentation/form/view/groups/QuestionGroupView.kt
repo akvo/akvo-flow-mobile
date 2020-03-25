@@ -19,26 +19,7 @@
 
 package org.akvo.flow.presentation.form.view.groups
 
-import android.content.Context
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager
-import androidx.fragment.app.FragmentPagerAdapter
-import org.akvo.flow.presentation.form.view.entity.ViewQuestionGroup
-
-class QuestionGroupsPagerAdapter(private val context: Context, fm: FragmentManager) :
-    FragmentPagerAdapter(fm, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
-
-    var groups: List<ViewQuestionGroup> = mutableListOf()
-
-    override fun getItem(position: Int): Fragment {
-        return QuestionGroupFragment.newInstance(groups[position].heading)
-    }
-
-    override fun getPageTitle(position: Int): CharSequence? {
-        return groups[position].heading
-    }
-
-    override fun getCount(): Int {
-        return groups.size
-    }
+interface QuestionGroupView {
+    fun showDownloadSuccess(viewIndex: Int)
+    fun showDownloadFailed(viewIndex: Int)
 }

@@ -53,8 +53,8 @@ class DataPointDataRepository @Inject constructor(
             })
     }
 
-    override fun cleanPathAndDownLoadMedia(filePath: String): Completable {
-        return downLoadMedia(mediaHelper.cleanMediaFileName(filePath))
+    override fun cleanPathAndDownLoadMedia(filename: String): Completable {
+        return downLoadMedia(mediaHelper.cleanMediaFileName(filename))
     }
 
     override fun markDataPointAsViewed(dataPointId: String): Completable {

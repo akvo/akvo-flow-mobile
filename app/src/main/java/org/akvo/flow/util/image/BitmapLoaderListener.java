@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017,2019-2020 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -20,24 +20,9 @@
 
 package org.akvo.flow.util.image;
 
-import android.widget.ImageView;
+import android.graphics.Bitmap;
 
-import org.akvo.flow.domain.util.ImageSize;
+public interface BitmapLoaderListener {
 
-import java.io.File;
-
-import androidx.annotation.NonNull;
-
-public interface ImageLoader {
-
-    void loadFromFile(File file, ImageView imageView);
-
-    void loadFromFile(File file, BitmapLoaderListener listener);
-
-    void loadFromFile(File file, ImageView imageView, DrawableLoadListener listener);
-
-    void loadFromBase64String(String image, ImageView imageView, BitmapLoaderListener listener);
-
-    void loadFromFile(ImageView imageView, File file, BitmapLoaderListener listener,
-            @NonNull ImageSize size);
+    void onImageReady(Bitmap bitmap);
 }

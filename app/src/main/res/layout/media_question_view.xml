@@ -21,43 +21,43 @@
         android:textStyle="bold"
         tools:text="Question 1" />
 
-    <FrameLayout
+    <org.akvo.flow.presentation.form.view.groups.MediaQuestionViewLayout
         android:id="@+id/preview_container"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:gravity="center">
 
-        <ImageView
-            android:id="@+id/image"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:adjustViewBounds="true"
-            android:src="@drawable/blurry_image"
-            android:layout_gravity="center"
-            android:maxHeight="150dp"
-            android:scaleType="centerInside"
-            android:contentDescription="@string/media_content_description" />
+<!--        <ImageView-->
+<!--            android:id="@+id/image"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:adjustViewBounds="true"-->
+<!--            android:src="@drawable/blurry_image"-->
+<!--            android:layout_gravity="center"-->
+<!--            android:maxHeight="150dp"-->
+<!--            android:scaleType="centerInside"-->
+<!--            android:contentDescription="@string/media_content_description" />-->
 
-        <ProgressBar
-            android:id="@+id/media_progress"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_gravity="center"
-            tools:visibility="visible"
-            android:visibility="gone" />
+<!--        <ProgressBar-->
+<!--            android:id="@+id/media_progress"-->
+<!--            android:layout_width="40dp"-->
+<!--            android:layout_height="40dp"-->
+<!--            android:layout_gravity="center"-->
+<!--            tools:visibility="visible"-->
+<!--            android:visibility="gone" />-->
 
-        <ImageButton
-            android:id="@+id/media_download"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_gravity="center"
-            android:background="@android:color/transparent"
-            android:src="@drawable/download"
-            tools:visibility="visible"
-            android:visibility="gone"
-            android:contentDescription="@string/download_image_content_description" />
-    </FrameLayout>
+<!--        <ImageButton-->
+<!--            android:id="@+id/media_download"-->
+<!--            android:layout_width="40dp"-->
+<!--            android:layout_height="40dp"-->
+<!--            android:layout_gravity="center"-->
+<!--            android:background="@android:color/transparent"-->
+<!--            android:src="@drawable/download"-->
+<!--            tools:visibility="visible"-->
+<!--            android:visibility="gone"-->
+<!--            android:contentDescription="@string/download_image_content_description" />-->
+    </org.akvo.flow.presentation.form.view.groups.MediaQuestionViewLayout>
 
     <TextView
         android:id="@+id/location_info"

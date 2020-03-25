@@ -32,6 +32,8 @@ import org.akvo.flow.injector.component.DaggerViewComponent
 import org.akvo.flow.presentation.form.languages.Language
 import org.akvo.flow.presentation.form.languages.LanguagesDialogFragment
 import org.akvo.flow.presentation.form.view.entity.ViewForm
+import org.akvo.flow.presentation.form.view.groups.MediaQuestionListener
+import org.akvo.flow.presentation.form.view.groups.QuestionGroupFragment
 import org.akvo.flow.presentation.form.view.groups.QuestionGroupsPagerAdapter
 import org.akvo.flow.ui.Navigator
 import org.akvo.flow.uicomponents.BackActivity
@@ -41,12 +43,13 @@ import java.util.ArrayList
 import javax.inject.Inject
 
 class FormViewActivity : BackActivity(), IFormView,
-    LanguagesDialogFragment.LanguagesSelectionListener {
+    LanguagesDialogFragment.LanguagesSelectionListener, MediaQuestionListener {
 
     private lateinit var sectionsPagerAdapter: QuestionGroupsPagerAdapter
     private lateinit var surveyGroup: SurveyGroup
     private lateinit var datapointId: String
     private lateinit var formId: String
+    private lateinit var viewPager: ViewPager
     private var formInstanceId: Long = 0L
 
     @Inject
@@ -69,7 +72,7 @@ class FormViewActivity : BackActivity(), IFormView,
                 this,
                 supportFragmentManager
             )
-        val viewPager: ViewPager = findViewById(R.id.view_pager)
+        viewPager = findViewById(R.id.view_pager)
         viewPager.adapter = sectionsPagerAdapter
         val tabs: TabLayout = findViewById(R.id.tabs)
         tabs.setupWithViewPager(viewPager)
@@ -182,5 +185,10 @@ class FormViewActivity : BackActivity(), IFormView,
         } else {
             displayError(availableLanguages)
         }
+    }
+
+    override fun downloadMedia(filename: String, index: Int) {
+        val groupFragment = supportFragmentManager.fragments[viewPager.currentItem] as QuestionGroupFragment
+        groupFragment.downloadMedia(filename, index)
     }
 }

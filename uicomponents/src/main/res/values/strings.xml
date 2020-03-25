@@ -355,6 +355,7 @@
     <string name="error_loading_form">Error loading form</string>
     <string name="download_image_content_description">Tap to download media</string>
     <string name="media_content_description">Media question response</string>
+    <string name="signature_content_description">Image to display the signature</string>
 
     <plurals name="download_forms_error">
         <item quantity="one">Error downloading form</item>

@@ -161,4 +161,13 @@ public class GlideImageLoader implements ImageLoader {
                 .diskCacheStrategy(DiskCacheStrategy.NONE)
                 .into(imageView);
     }
+
+    @Override
+    public void loadFromBase64String(String image, ImageView imageView) {
+        requestManager
+                .load(Base64.decode(image, Base64.DEFAULT))
+                .skipMemoryCache(true)
+                .diskCacheStrategy(DiskCacheStrategy.NONE)
+                .into(imageView);
+    }
 }

@@ -20,20 +20,15 @@
 package org.akvo.flow.presentation.form.view.groups
 
 import android.view.View
-import android.widget.ImageButton
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.core.content.ContextCompat
-import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.textfield.TextInputEditText
 import org.akvo.flow.R
 import org.akvo.flow.presentation.form.view.groups.entity.ViewQuestionAnswer
 import org.akvo.flow.util.image.GlideImageLoader
 import org.akvo.flow.util.image.ImageLoader
-import org.akvo.flow.util.image.DrawableLoadListener
-import timber.log.Timber
-import java.io.File
 
 sealed class QuestionViewHolder<T : ViewQuestionAnswer>(val view: View) :
     RecyclerView.ViewHolder(view) {
@@ -110,8 +105,13 @@ sealed class QuestionViewHolder<T : ViewQuestionAnswer>(val view: View) :
             index: Int
         ) {
             setUpTitle(questionAnswer.title, questionAnswer.mandatory)
-            mediaLayout.setUpImageDisplay(index, questionAnswer.filePath)
-            setupLocation(questionAnswer)
+            if (questionAnswer.filePath.isNotEmpty()) {
+                mediaLayout.visibility = View.VISIBLE
+                mediaLayout.setUpImageDisplay(index, questionAnswer.filePath)
+                setupLocation(questionAnswer)
+            } else {
+                mediaLayout.visibility = View.GONE
+            }
         }
 
         private fun setupLocation(questionAnswer: ViewQuestionAnswer.PhotoViewQuestionAnswer) {
@@ -142,7 +142,36 @@ sealed class QuestionViewHolder<T : ViewQuestionAnswer>(val view: View) :
             index: Int
         ) {
             setUpTitle(questionAnswer.title, questionAnswer.mandatory)
-            mediaLayout.setUpImageDisplay(index, questionAnswer.filePath)
+            if (questionAnswer.filePath.isNotEmpty()) {
+                mediaLayout.visibility = View.VISIBLE
+                mediaLayout.setUpImageDisplay(index, questionAnswer.filePath)
+            } else {
+                mediaLayout.visibility = View.GONE
+            }
+        }
+    }
+
+    class SignatureQuestionViewHolder(mediaView: View) :
+        QuestionViewHolder<ViewQuestionAnswer.SignatureViewQuestionAnswer>(mediaView) {
+
+        private val imageIv: ImageView = view.findViewById(R.id.signatureIv)
+        private val nameTv: TextView = view.findViewById(R.id.signatureTv)
+        private val questionLayout: LinearLayout = view.findViewById(R.id.questionContentLayout)
+        private var imageLoader: ImageLoader = GlideImageLoader(view.context)
+
+        override fun setUpView(
+            questionAnswer: ViewQuestionAnswer.SignatureViewQuestionAnswer,
+            index: Int
+        ) {
+            setUpTitle(questionAnswer.title, questionAnswer.mandatory)
+            if (questionAnswer.base64ImageString.isNotEmpty() && questionAnswer.name.isNotEmpty()) {
+                questionLayout.visibility = View.VISIBLE
+                imageIv.visibility = View.VISIBLE
+                imageLoader.loadFromBase64String(questionAnswer.base64ImageString, imageIv)
+                nameTv.text = questionAnswer.name
+            } else {
+                questionLayout.visibility = View.GONE
+            }
         }
     }
 }

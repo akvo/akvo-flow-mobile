@@ -71,17 +71,20 @@ class GroupQuestionsAdapter<T : QuestionViewHolder<ViewQuestionAnswer>>(val ques
                 ) as T
             }
             ViewType.VIDEO.ordinal -> {
-                val context = parent.context
-                if (context is MediaQuestionListener) {
                     QuestionViewHolder.VideoQuestionViewHolder(
                         inflate(
                             parent,
                             R.layout.media_question_view
                         )
                     ) as T
-                } else {
-                    throw IllegalArgumentException("Activity must extend MediaQuestionListener")
-                }
+            }
+            ViewType.SIGNATURE.ordinal -> {
+                QuestionViewHolder.SignatureQuestionViewHolder(
+                    inflate(
+                        parent,
+                        R.layout.signature_field_question_view
+                    )
+                ) as T
             }
             else -> {
                 QuestionViewHolder.PhotoQuestionViewHolder(
@@ -129,7 +132,9 @@ class GroupQuestionsAdapter<T : QuestionViewHolder<ViewQuestionAnswer>>(val ques
                 ViewType.SINGLE_INPUT.ordinal
             }
             is ViewQuestionAnswer.GeoShapeViewQuestionAnswer -> TODO()
-            is ViewQuestionAnswer.SignatureViewQuestionAnswer -> TODO()
+            is ViewQuestionAnswer.SignatureViewQuestionAnswer -> {
+                ViewType.SIGNATURE.ordinal
+            }
             is ViewQuestionAnswer.CaddisflyViewQuestionAnswer -> TODO()
         }.exhaustive
     }

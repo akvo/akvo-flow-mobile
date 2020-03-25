@@ -40,4 +40,6 @@ public interface ImageLoader {
 
     void loadFromFile(ImageView imageView, File file, BitmapLoaderListener listener,
             @NonNull ImageSize size);
+
+    void loadFromBase64String(String image, ImageView imageView);
 }

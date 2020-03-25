@@ -86,7 +86,6 @@ sealed class ViewQuestionAnswer {
         override val translations: List<String>,
         val filePath: String,
         val location: ImageLocation? // TODO use valid and invalid location object?
-        //TODO: do we need fileName?
     ) : ViewQuestionAnswer()
 
     data class VideoViewQuestionAnswer(
@@ -131,7 +130,9 @@ sealed class ViewQuestionAnswer {
         override val questionId: String,
         override val title: String,
         override val mandatory: Boolean,
-        override val translations: List<String>
+        override val translations: List<String>,
+        val base64ImageString: String,
+        val name: String
     ) : ViewQuestionAnswer()
 
     data class CaddisflyViewQuestionAnswer(

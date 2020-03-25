@@ -26,6 +26,7 @@ import android.view.View
 import android.widget.FrameLayout
 import android.widget.ImageButton
 import android.widget.ImageView
+import android.widget.ProgressBar
 import androidx.core.content.ContextCompat
 import org.akvo.flow.R
 import org.akvo.flow.util.image.DrawableLoadListener
@@ -40,15 +41,16 @@ class MediaQuestionViewLayout @JvmOverloads constructor(
     private var imageView: ImageView
     private var downloadButton: ImageButton
     private var errorPlaceHolder: Drawable
+    private var progressBar: ProgressBar
     private var listener: MediaQuestionListener
     private var imageLoader: ImageLoader = GlideImageLoader(context)
 
     init {
-        View.inflate(context, R.layout.media_question_preview, this)
+        inflate(context, R.layout.media_question_preview, this)
         imageView = findViewById(R.id.image)
         downloadButton = findViewById(R.id.media_download)
         errorPlaceHolder = ContextCompat.getDrawable(context, R.drawable.blurry_image)!!
-
+        progressBar = findViewById(R.id.media_progress)
         if (context is MediaQuestionListener) {
             listener = context
         } else {
@@ -57,6 +59,8 @@ class MediaQuestionViewLayout @JvmOverloads constructor(
     }
 
     fun setUpImageDisplay(index: Int, filePath: String) {
+        progressBar.visibility = View.GONE
+        downloadButton.visibility = View.GONE
         val file = File(filePath)
         if (file.exists() && file.canRead()) {
             imageLoader.loadFromFile(file, imageView,
@@ -74,8 +78,9 @@ class MediaQuestionViewLayout @JvmOverloads constructor(
         imageView.setImageDrawable(errorPlaceHolder)
         downloadButton.visibility = View.VISIBLE
         downloadButton.setOnClickListener {
+            progressBar.visibility = View.VISIBLE
+            downloadButton.visibility = View.GONE
             listener.downloadMedia(filePath, index)
         }
     }
-
 }

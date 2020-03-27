@@ -71,8 +71,7 @@ sealed class ViewQuestionAnswer {
         override val title: String,
         override val mandatory: Boolean,
         override val translations: List<String>,
-        val answer: String,
-        val locked: Boolean = false
+        val viewLocation: ViewLocation
     ) : ViewQuestionAnswer()
 
     data class PhotoViewQuestionAnswer(
@@ -81,7 +80,7 @@ sealed class ViewQuestionAnswer {
         override val mandatory: Boolean,
         override val translations: List<String>,
         val filePath: String,
-        val location: ImageLocation? // TODO use valid and invalid location object?
+        val location: ViewLocation? // TODO use valid and invalid location object?
     ) : ViewQuestionAnswer()
 
     data class VideoViewQuestionAnswer(
@@ -139,7 +138,17 @@ sealed class ViewQuestionAnswer {
     ) : ViewQuestionAnswer()
 }
 
-class ImageLocation(val latitude: String, val longitude: String)
+class ViewLocation(
+    val latitude: String,
+    val longitude: String,
+    val altitude: String = "",
+    val accuracy: String = "" //formatted accuracy for displaying
+) // check default value
+{
+    fun isValid(): Boolean {
+        return latitude.isNotEmpty() && longitude.isNotEmpty()
+    }
+}
 
 val <T> T.exhaustive: T
     get() = this

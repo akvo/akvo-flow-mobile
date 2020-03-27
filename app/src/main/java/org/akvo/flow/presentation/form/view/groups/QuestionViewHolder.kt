@@ -232,4 +232,30 @@ sealed class QuestionViewHolder<T : ViewQuestionAnswer>(val view: View) :
             setUpInputText(questionAnswer.answer, textInputEditText)
         }
     }
+
+    class LocationQuestionViewHolder(locationView: View) :
+        QuestionViewHolder<ViewQuestionAnswer.LocationViewQuestionAnswer>(locationView) {
+        override fun setUpView(
+            questionAnswer: ViewQuestionAnswer.LocationViewQuestionAnswer,
+            index: Int
+        ) {
+            setUpTitle(questionAnswer.title, questionAnswer.mandatory)
+            if (questionAnswer.viewLocation.isValid()) {
+                view.findViewById<TextInputEditText>(R.id.lat_et)
+                    .setText(questionAnswer.viewLocation.latitude)
+                view.findViewById<TextInputEditText>(R.id.lon_et)
+                    .setText(questionAnswer.viewLocation.longitude)
+                view.findViewById<TextInputEditText>(R.id.height_et)
+                    .setText(questionAnswer.viewLocation.altitude)
+                val accuracy = questionAnswer.viewLocation.accuracy
+                if (accuracy.isNotEmpty()) {
+                    view.findViewById<TextInputEditText>(R.id.height_et).setText(accuracy)
+                } else {
+                    view.findViewById<TextInputEditText>(R.id.height_et)
+                        .setText(R.string.geo_location_accuracy_default)
+                }
+            }
+        }
+
+    }
 }

@@ -30,7 +30,7 @@ import org.akvo.flow.R
 import org.akvo.flow.app.FlowApp
 import org.akvo.flow.injector.component.ApplicationComponent
 import org.akvo.flow.injector.component.DaggerViewComponent
-import org.akvo.flow.presentation.form.view.groups.entity.ImageLocation
+import org.akvo.flow.presentation.form.view.groups.entity.ViewLocation
 import org.akvo.flow.presentation.form.view.groups.entity.ViewQuestionAnswer
 import org.akvo.flow.util.MediaFileHelper
 import org.akvo.flow.util.files.FileBrowser
@@ -123,7 +123,7 @@ class QuestionGroupFragment : Fragment(),
                 false,
                 emptyList(),
                 filePath,
-                ImageLocation("42.0", "2.2")
+                ViewLocation("42.0", "2.2")
             )
 
         val filePathVideo =
@@ -147,6 +147,13 @@ class QuestionGroupFragment : Fragment(),
                 "valeria"
             )
 
+        val locationViewQuestionAnswer = ViewQuestionAnswer.LocationViewQuestionAnswer(
+        "123",
+        "10. location",
+        false,
+        emptyList(),
+            ViewLocation("42.2", "2.2", "10", "5.0")
+        )
         questionsRv.adapter = GroupQuestionsAdapter<QuestionViewHolder<ViewQuestionAnswer>>(
             mutableListOf(
                 questionAnswer1,
@@ -156,7 +163,8 @@ class QuestionGroupFragment : Fragment(),
                 dateAnswer,
                 photoAnswer,
                 videoAnswer,
-                signatureAnswer
+                signatureAnswer,
+                locationViewQuestionAnswer
             )
         )
     }

@@ -92,7 +92,7 @@ class GroupQuestionsAdapter<T : QuestionViewHolder<ViewQuestionAnswer>>(private 
                 QuestionViewHolder.DateQuestionViewHolder(
                     inflate(
                         parent,
-                        R.layout.text_input_field_question_view
+                        R.layout.date_input_field_question_view
                     )
                 ) as T
             }

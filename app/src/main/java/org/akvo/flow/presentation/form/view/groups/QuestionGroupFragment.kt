@@ -92,11 +92,11 @@ class QuestionGroupFragment : Fragment(),
                 requireDoubleEntry = true
             )
 
-        val barcodeAnswer =
+    /*    val barcodeAnswer =
             ViewQuestionAnswer.BarcodeViewQuestionAnswer(
                 "123", "3. barcode question", false, emptyList()
             ) //ADD list of answers
-
+*/
         val emptyQuestionAnswer =
             ViewQuestionAnswer.FreeTextViewQuestionAnswer(
                 "123",
@@ -151,7 +151,7 @@ class QuestionGroupFragment : Fragment(),
             mutableListOf(
                 questionAnswer1,
                 questionAnswer2,
-                barcodeAnswer,
+                //barcodeAnswer,
                 emptyQuestionAnswer,
                 dateAnswer,
                 photoAnswer,

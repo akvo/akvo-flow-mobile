@@ -66,19 +66,19 @@ sealed class QuestionViewHolder<T : ViewQuestionAnswer>(val view: View) :
             index: Int
         ) {
             setUpTitle(questionAnswer.title, questionAnswer.mandatory)
-            setUpAnswer(questionAnswer)
-            setUpRepetition(questionAnswer)
+            setUpAnswer(questionAnswer.answer)
+            setUpRepetition(questionAnswer.requireDoubleEntry, questionAnswer.answer)
         }
 
-        private fun setUpRepetition(questionAnswer: ViewQuestionAnswer.NumberViewQuestionAnswer) {
+        //TODO: repeated code from number/text... refactor
+        private fun setUpRepetition(repeated: Boolean, answer: String) {
             val repeatedInput = view.findViewById<TextInputEditText>(
                 R.id.questionResponseRepeated
             )
             val repeatTitle = view.findViewById<TextView>(
                 R.id.repeatTitle
             )
-            if (questionAnswer.requireDoubleEntry) {
-                val answer = questionAnswer.answer
+            if (repeated) {
                 setUpInputText(answer, repeatedInput)
                 if (answer.isEmpty()) {
                     repeatTitle.visibility = View.GONE
@@ -91,44 +91,51 @@ sealed class QuestionViewHolder<T : ViewQuestionAnswer>(val view: View) :
             }
         }
 
-        private fun setUpAnswer(questionAnswer: ViewQuestionAnswer.NumberViewQuestionAnswer) {
+        private fun setUpAnswer(answer: String) {
             val textInputEditText = view.findViewById<TextInputEditText>(
                 R.id.questionResponseInput
             )
-            val answer = questionAnswer.answer
             setUpInputText(answer, textInputEditText)
         }
     }
 
     class TextQuestionViewHolder(singleView: View) :
         QuestionViewHolder<ViewQuestionAnswer.FreeTextViewQuestionAnswer>(singleView) {
-        override fun setUpView(questionAnswer: ViewQuestionAnswer.FreeTextViewQuestionAnswer, index: Int) {
+
+        override fun setUpView(
+            questionAnswer: ViewQuestionAnswer.FreeTextViewQuestionAnswer,
+            index: Int
+        ) {
             setUpTitle(questionAnswer.title, questionAnswer.mandatory)
+            setUpAnswer(questionAnswer.answer)
+            setUpRepetition(questionAnswer.requireDoubleEntry, questionAnswer.answer)
+        }
+
+        private fun setUpAnswer(answer: String) {
             val textInputEditText = view.findViewById<TextInputEditText>(
                 R.id.questionResponseInput
             )
-            val answer = "" //TODO: fix
             setUpInputText(answer, textInputEditText)
+        }
+
+        private fun setUpRepetition(repeatable: Boolean, answer: String) {
             val repeatedInput = view.findViewById<TextInputEditText>(
                 R.id.questionResponseRepeated
             )
-            setUpInputText(answer, repeatedInput)
             val repeatTitle = view.findViewById<TextView>(
                 R.id.repeatTitle
             )
-            if (answer.isEmpty()) {
-                repeatTitle.visibility = View.GONE
+            if (repeatable) {
+                setUpInputText(answer, repeatedInput)
+                if (answer.isEmpty()) {
+                    repeatTitle.visibility = View.GONE
+                } else {
+                    repeatTitle.visibility = View.VISIBLE
+                }
             } else {
-                repeatTitle.visibility = View.VISIBLE
+                repeatTitle.visibility = View.GONE
+                repeatedInput.visibility = View.GONE
             }
-        }
-
-        private fun setUpAnswer(questionAnswer: ViewQuestionAnswer.FreeTextViewQuestionAnswer) {
-            val textInputEditText = view.findViewById<TextInputEditText>(
-                R.id.questionResponseInput
-            )
-            val answer = questionAnswer.answer
-            setUpInputText(answer, textInputEditText)
         }
     }
 
@@ -224,6 +231,5 @@ sealed class QuestionViewHolder<T : ViewQuestionAnswer>(val view: View) :
             )
             setUpInputText(questionAnswer.answer, textInputEditText)
         }
-
     }
 }

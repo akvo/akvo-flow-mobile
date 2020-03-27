@@ -43,11 +43,7 @@ sealed class ViewQuestionAnswer {
         override val mandatory: Boolean,
         override val translations: List<String>,
         val answer: String,
-        val requireDoubleEntry: Boolean,
-        val allowSign: Boolean,
-        val allowDecimalPoint: Boolean,
-        val minimumValue: Double,
-        val maximumValue: Double
+        val requireDoubleEntry: Boolean
     ) : ViewQuestionAnswer()
 
     data class OptionViewQuestionAnswer(
@@ -110,8 +106,7 @@ sealed class ViewQuestionAnswer {
         override val title: String,
         override val mandatory: Boolean,
         override val translations: List<String>,
-        val enableMultiple: Boolean = false,
-        val locked: Boolean = false
+        val enableMultiple: Boolean = false
     //TODO: list of answers
     ) : ViewQuestionAnswer()
 

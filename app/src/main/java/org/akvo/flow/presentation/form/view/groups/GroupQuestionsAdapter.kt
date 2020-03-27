@@ -28,37 +28,39 @@ import org.akvo.flow.presentation.form.view.groups.entity.ViewQuestionAnswer
 import org.akvo.flow.presentation.form.view.groups.entity.ViewQuestionAnswer.NumberViewQuestionAnswer
 import org.akvo.flow.presentation.form.view.groups.entity.exhaustive
 
-class GroupQuestionsAdapter<T : QuestionViewHolder<ViewQuestionAnswer>>(val questionAnswers: MutableList<ViewQuestionAnswer> = mutableListOf()) :
+class GroupQuestionsAdapter<T : QuestionViewHolder<ViewQuestionAnswer>>(private val questionAnswers: MutableList<ViewQuestionAnswer> = mutableListOf()) :
     RecyclerView.Adapter<T>() {
 
     enum class ViewType {
-        SINGLE_INPUT,
-        DOUBLE_INPUT,
+        TEXT,
+        NUMBER,
         OPTION, //options have subtypes,
         CASCADE,
         LOCATION,
+        DATE,
         PHOTO,
         VIDEO,
         SHAPE,
         SIGNATURE,
-        CADDISFLY
+        CADDISFLY,
+        BARCODE
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): T {
         return when (viewType) {
-            ViewType.SINGLE_INPUT.ordinal -> {
-                QuestionViewHolder.SingleQuestionViewHolder(
+            ViewType.NUMBER.ordinal -> {
+                QuestionViewHolder.NumberQuestionViewHolder(
                     inflate(
                         parent,
-                        R.layout.single_input_field_question_view
+                        R.layout.text_input_field_question_view
                     )
                 ) as T
             }
-            ViewType.DOUBLE_INPUT.ordinal -> {
-                QuestionViewHolder.DoubleQuestionViewHolder(
+            ViewType.TEXT.ordinal -> {
+                QuestionViewHolder.TextQuestionViewHolder(
                     inflate(
                         parent,
-                        R.layout.double_input_field_question_view
+                        R.layout.text_input_field_question_view
                     )
                 ) as T
             }
@@ -86,11 +88,19 @@ class GroupQuestionsAdapter<T : QuestionViewHolder<ViewQuestionAnswer>>(val ques
                     )
                 ) as T
             }
+            ViewType.DATE.ordinal -> {
+                QuestionViewHolder.DateQuestionViewHolder(
+                    inflate(
+                        parent,
+                        R.layout.text_input_field_question_view
+                    )
+                ) as T
+            }
             else -> {
                 QuestionViewHolder.PhotoQuestionViewHolder(
                     inflate(
                         parent,
-                        R.layout.single_input_field_question_view
+                        R.layout.media_question_view
                     )
                 ) as T
             }
@@ -110,10 +120,10 @@ class GroupQuestionsAdapter<T : QuestionViewHolder<ViewQuestionAnswer>>(val ques
         val questionAnswer = questionAnswers[position]
         return when (questionAnswer) {
             is ViewQuestionAnswer.FreeTextViewQuestionAnswer -> {
-                checkRepeatableType(questionAnswer.requireDoubleEntry)
+                ViewType.TEXT.ordinal
             }
             is NumberViewQuestionAnswer -> {
-                checkRepeatableType(questionAnswer.requireDoubleEntry)
+                ViewType.NUMBER.ordinal
             }
             is ViewQuestionAnswer.OptionViewQuestionAnswer -> TODO()
             is ViewQuestionAnswer.CascadeViewQuestionAnswer -> TODO()
@@ -125,11 +135,11 @@ class GroupQuestionsAdapter<T : QuestionViewHolder<ViewQuestionAnswer>>(val ques
                 ViewType.VIDEO.ordinal
             }
             is ViewQuestionAnswer.DateViewQuestionAnswer -> {
-                ViewType.SINGLE_INPUT.ordinal
+                ViewType.DATE.ordinal
             }
             is ViewQuestionAnswer.BarcodeViewQuestionAnswer -> {
                 //TODO: barcode can be multiple
-                ViewType.SINGLE_INPUT.ordinal
+                ViewType.BARCODE.ordinal
             }
             is ViewQuestionAnswer.GeoShapeViewQuestionAnswer -> TODO()
             is ViewQuestionAnswer.SignatureViewQuestionAnswer -> {
@@ -137,17 +147,6 @@ class GroupQuestionsAdapter<T : QuestionViewHolder<ViewQuestionAnswer>>(val ques
             }
             is ViewQuestionAnswer.CaddisflyViewQuestionAnswer -> TODO()
         }.exhaustive
-    }
-
-    private fun checkRepeatableType(repeatable: Boolean): Int {
-        return when {
-            repeatable -> {
-                ViewType.DOUBLE_INPUT.ordinal
-            }
-            else -> {
-                ViewType.SINGLE_INPUT.ordinal
-            }
-        }
     }
 
     fun showDownLoadSuccess(viewIndex: Int) {

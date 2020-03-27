@@ -59,21 +59,50 @@ sealed class QuestionViewHolder<T : ViewQuestionAnswer>(val view: View) :
         }
     }
 
-    class SingleQuestionViewHolder(singleView: View) :
-        QuestionViewHolder<ViewQuestionAnswer>(singleView) {
-        override fun setUpView(questionAnswer: ViewQuestionAnswer, index: Int) {
+    class NumberQuestionViewHolder(singleView: View) :
+        QuestionViewHolder<ViewQuestionAnswer.NumberViewQuestionAnswer>(singleView) {
+        override fun setUpView(
+            questionAnswer: ViewQuestionAnswer.NumberViewQuestionAnswer,
+            index: Int
+        ) {
             setUpTitle(questionAnswer.title, questionAnswer.mandatory)
+            setUpAnswer(questionAnswer)
+            setUpRepetition(questionAnswer)
+        }
+
+        private fun setUpRepetition(questionAnswer: ViewQuestionAnswer.NumberViewQuestionAnswer) {
+            val repeatedInput = view.findViewById<TextInputEditText>(
+                R.id.questionResponseRepeated
+            )
+            val repeatTitle = view.findViewById<TextView>(
+                R.id.repeatTitle
+            )
+            if (questionAnswer.requireDoubleEntry) {
+                val answer = questionAnswer.answer
+                setUpInputText(answer, repeatedInput)
+                if (answer.isEmpty()) {
+                    repeatTitle.visibility = View.GONE
+                } else {
+                    repeatTitle.visibility = View.VISIBLE
+                }
+            } else {
+                repeatTitle.visibility = View.GONE
+                repeatedInput.visibility = View.GONE
+            }
+        }
+
+        private fun setUpAnswer(questionAnswer: ViewQuestionAnswer.NumberViewQuestionAnswer) {
             val textInputEditText = view.findViewById<TextInputEditText>(
                 R.id.questionResponseInput
             )
-            val answer = "" //TODO: fix
+            val answer = questionAnswer.answer
             setUpInputText(answer, textInputEditText)
         }
     }
 
-    class DoubleQuestionViewHolder(singleView: View) :
-        QuestionViewHolder<ViewQuestionAnswer>(singleView) {
-        override fun setUpView(questionAnswer: ViewQuestionAnswer, index: Int) {
+    class TextQuestionViewHolder(singleView: View) :
+        QuestionViewHolder<ViewQuestionAnswer.FreeTextViewQuestionAnswer>(singleView) {
+        override fun setUpView(questionAnswer: ViewQuestionAnswer.FreeTextViewQuestionAnswer, index: Int) {
             setUpTitle(questionAnswer.title, questionAnswer.mandatory)
             val textInputEditText = view.findViewById<TextInputEditText>(
                 R.id.questionResponseInput
@@ -92,6 +121,14 @@ sealed class QuestionViewHolder<T : ViewQuestionAnswer>(val view: View) :
             } else {
                 repeatTitle.visibility = View.VISIBLE
             }
+        }
+
+        private fun setUpAnswer(questionAnswer: ViewQuestionAnswer.FreeTextViewQuestionAnswer) {
+            val textInputEditText = view.findViewById<TextInputEditText>(
+                R.id.questionResponseInput
+            )
+            val answer = questionAnswer.answer
+            setUpInputText(answer, textInputEditText)
         }
     }
 
@@ -151,8 +188,8 @@ sealed class QuestionViewHolder<T : ViewQuestionAnswer>(val view: View) :
         }
     }
 
-    class SignatureQuestionViewHolder(mediaView: View) :
-        QuestionViewHolder<ViewQuestionAnswer.SignatureViewQuestionAnswer>(mediaView) {
+    class SignatureQuestionViewHolder(signView: View) :
+        QuestionViewHolder<ViewQuestionAnswer.SignatureViewQuestionAnswer>(signView) {
 
         private val imageIv: ImageView = view.findViewById(R.id.signatureIv)
         private val nameTv: TextView = view.findViewById(R.id.signatureTv)
@@ -173,5 +210,20 @@ sealed class QuestionViewHolder<T : ViewQuestionAnswer>(val view: View) :
                 questionLayout.visibility = View.GONE
             }
         }
+    }
+
+    class DateQuestionViewHolder(dateView: View) :
+        QuestionViewHolder<ViewQuestionAnswer.DateViewQuestionAnswer>(dateView) {
+        override fun setUpView(
+            questionAnswer: ViewQuestionAnswer.DateViewQuestionAnswer,
+            index: Int
+        ) {
+            setUpTitle(questionAnswer.title, questionAnswer.mandatory)
+            val textInputEditText = view.findViewById<TextInputEditText>(
+                R.id.questionResponseInput
+            )
+            setUpInputText(questionAnswer.answer, textInputEditText)
+        }
+
     }
 }

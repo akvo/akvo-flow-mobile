@@ -89,17 +89,14 @@ class QuestionGroupFragment : Fragment(),
             ViewQuestionAnswer.NumberViewQuestionAnswer(
                 "123", "2. number question", false, emptyList(),
                 "2.0",
-                requireDoubleEntry = true,
-                allowSign = true,
-                allowDecimalPoint = true,
-                minimumValue = 0.0,
-                maximumValue = 10.0
+                requireDoubleEntry = true
             )
 
         val barcodeAnswer =
             ViewQuestionAnswer.BarcodeViewQuestionAnswer(
                 "123", "3. barcode question", false, emptyList()
             ) //ADD list of answers
+
         val emptyQuestionAnswer =
             ViewQuestionAnswer.FreeTextViewQuestionAnswer(
                 "123",

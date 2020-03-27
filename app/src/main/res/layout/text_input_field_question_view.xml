@@ -39,6 +39,7 @@
         android:layout_marginLeft="16dp"
         android:layout_marginRight="16dp"
         android:layout_marginEnd="16dp"
+        android:visibility="gone"
         android:text="@string/repeat_answer" />
 
     <com.google.android.material.textfield.TextInputEditText
@@ -50,6 +51,7 @@
         android:layout_marginRight="16dp"
         android:layout_marginEnd="16dp"
         android:enabled="false"
+        android:visibility="gone"
         tools:hint="hint"
         tools:text="Question 1 Response repeated" />
 </LinearLayout>

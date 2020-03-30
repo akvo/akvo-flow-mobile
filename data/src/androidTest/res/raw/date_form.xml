@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<survey
+    name="DateForm"
+    app="akvoflowsandbox"
+    defaultLanguageCode="en"
+    surveyGroupId="41713002"
+    surveyGroupName="DateForm"
+    surveyId="49803002"
+    version='1.0'>
+    <questionGroup repeatable="true">
+        <heading>DateFormGroup</heading>
+        <question
+            id="47343002"
+            localeNameFlag="false"
+            mandatory="true"
+            order="1"
+            type="date">
+            <text>DateFormQuestion</text>
+        </question>
+    </questionGroup>
+</survey>

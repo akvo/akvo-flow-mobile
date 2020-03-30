@@ -131,8 +131,14 @@ class XmlFormParser @Inject constructor(private val helper: FileHelper) {
                     XmlPullParser.START_TAG -> {
                         when (parser.name) {
                             SURVEY -> {
-                                version = parser.getAttributeValue(null, VERSION)
-                                name = parser.getAttributeValue(null, NAME)
+                                val attributeValue = parser.getAttributeValue(null, VERSION)
+                                if (attributeValue != null) {
+                                    version = attributeValue
+                                }
+                                val attributeValue1 = parser.getAttributeValue(null, NAME)
+                                if (attributeValue1 != null) {
+                                    name = attributeValue1
+                                }
                             }
                             QUESTION_GROUP -> {
                                 val repeatable = "true" == parser.getAttributeValue(null, REPEATABLE)

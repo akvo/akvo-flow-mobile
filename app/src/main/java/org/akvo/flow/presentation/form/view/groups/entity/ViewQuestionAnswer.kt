@@ -51,10 +51,10 @@ sealed class ViewQuestionAnswer {
         override val title: String,
         override val mandatory: Boolean,
         override val translations: List<String>,
-        val answer: String,
-        val allowMultiple: Boolean,
-        val allowOther: Boolean
-    //TODO: add actual options
+        val availableOptions: List<ViewOption>,
+        val selected: List<Int>, //TODO: separate multiple from single?
+        val allowMultiple: Boolean = false,
+        val allowOther: Boolean = false
     ) : ViewQuestionAnswer()
 
     data class CascadeViewQuestionAnswer(
@@ -135,7 +135,7 @@ sealed class ViewQuestionAnswer {
     ) : ViewQuestionAnswer()
 }
 
-class ViewLocation(
+data class ViewLocation(
     val latitude: String,
     val longitude: String,
     val altitude: String = "",
@@ -146,6 +146,8 @@ class ViewLocation(
         return latitude.isNotEmpty() && longitude.isNotEmpty()
     }
 }
+
+data class ViewOption(val name: String, val code: String = "", val isOther: Boolean = false)
 
 val <T> T.exhaustive: T
     get() = this

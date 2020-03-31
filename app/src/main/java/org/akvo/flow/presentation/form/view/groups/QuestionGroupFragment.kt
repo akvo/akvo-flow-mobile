@@ -76,6 +76,10 @@ class QuestionGroupFragment : Fragment(),
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         questionsRv.layoutManager = LinearLayoutManager(activity)
+        questionsRv.recycledViewPool.setMaxRecycledViews(
+            GroupQuestionsAdapter.ViewType.OPTION.ordinal,
+            0
+        )
         val questionAnswer1 = ViewQuestionAnswer.FreeTextViewQuestionAnswer(
             "123",
             "1. text question",
@@ -98,12 +102,13 @@ class QuestionGroupFragment : Fragment(),
             ) //ADD list of answers
 */
         val emptyQuestionAnswer =
-            ViewQuestionAnswer.GeoShapeViewQuestionAnswer(
+            ViewQuestionAnswer.OptionViewQuestionAnswer(
                 "123",
                 "4. empty question",
                 false,
                 emptyList(),
-                ""
+                emptyList(),
+                emptyList()
             )
 
         val dateAnswer =

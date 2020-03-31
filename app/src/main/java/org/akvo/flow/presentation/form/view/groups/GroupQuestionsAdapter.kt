@@ -112,6 +112,14 @@ class GroupQuestionsAdapter<T : QuestionViewHolder<ViewQuestionAnswer>>(private 
                     )
                 ) as T
             }
+            ViewType.OPTION.ordinal -> {
+                QuestionViewHolder.OptionsViewHolder(
+                    inflate(
+                        parent,
+                        R.layout.options_question_view
+                    )
+                ) as T
+            }
             else -> {
                 QuestionViewHolder.PhotoQuestionViewHolder(
                     inflate(
@@ -141,7 +149,9 @@ class GroupQuestionsAdapter<T : QuestionViewHolder<ViewQuestionAnswer>>(private 
             is NumberViewQuestionAnswer -> {
                 ViewType.NUMBER.ordinal
             }
-            is ViewQuestionAnswer.OptionViewQuestionAnswer -> TODO()
+            is ViewQuestionAnswer.OptionViewQuestionAnswer -> {
+                    ViewType.OPTION.ordinal
+            }
             is ViewQuestionAnswer.CascadeViewQuestionAnswer -> TODO()
             is ViewQuestionAnswer.LocationViewQuestionAnswer -> {
                 ViewType.LOCATION.ordinal

@@ -260,7 +260,7 @@ sealed class QuestionViewHolder<T : ViewQuestionAnswer>(val view: View) :
     }
 
     class ShapeQuestionViewHolder(geoshapeView: View) :
-    QuestionViewHolder<ViewQuestionAnswer.GeoShapeViewQuestionAnswer>(geoshapeView) {
+        QuestionViewHolder<ViewQuestionAnswer.GeoShapeViewQuestionAnswer>(geoshapeView) {
 
         private val viewShapeBt = view.findViewById<Button>(R.id.view_shape_btn)
         private val shapeTv = view.findViewById<TextView>(R.id.geo_shape_captured_text)
@@ -284,6 +284,23 @@ sealed class QuestionViewHolder<T : ViewQuestionAnswer>(val view: View) :
             } else {
                 viewShapeBt.visibility = View.GONE
                 shapeTv.visibility = View.GONE
+            }
+        }
+    }
+
+    class OptionsViewHolder(optionsView: View) :
+        QuestionViewHolder<ViewQuestionAnswer.OptionViewQuestionAnswer>(optionsView) {
+        override fun setUpView(
+            questionAnswer: ViewQuestionAnswer.OptionViewQuestionAnswer,
+            index: Int
+        ) {
+            setUpTitle(questionAnswer.title, questionAnswer.mandatory)
+            val optionsQuestionLayout = view.findViewById<OptionsQuestionLayout>(R.id.options_layout)
+            if (questionAnswer.selected.isNotEmpty()){
+                optionsQuestionLayout.visibility = View.VISIBLE
+                optionsQuestionLayout.setUpViews(questionAnswer)
+            } else {
+                optionsQuestionLayout.visibility = View.GONE
             }
         }
     }

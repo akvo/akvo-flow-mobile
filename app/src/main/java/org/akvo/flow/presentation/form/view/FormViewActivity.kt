@@ -20,6 +20,7 @@
 package org.akvo.flow.presentation.form.view
 
 import android.os.Bundle
+import android.text.TextUtils
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
@@ -34,6 +35,7 @@ import org.akvo.flow.injector.component.DaggerViewComponent
 import org.akvo.flow.presentation.form.languages.Language
 import org.akvo.flow.presentation.form.languages.LanguagesDialogFragment
 import org.akvo.flow.presentation.form.view.entity.ViewForm
+import org.akvo.flow.presentation.form.view.groups.GeoShapeListener
 import org.akvo.flow.presentation.form.view.groups.MediaQuestionListener
 import org.akvo.flow.presentation.form.view.groups.QuestionGroupFragment
 import org.akvo.flow.presentation.form.view.groups.QuestionGroupsPagerAdapter
@@ -46,7 +48,7 @@ import java.util.ArrayList
 import javax.inject.Inject
 
 class FormViewActivity : BackActivity(), IFormView,
-    LanguagesDialogFragment.LanguagesSelectionListener, MediaQuestionListener {
+    LanguagesDialogFragment.LanguagesSelectionListener, MediaQuestionListener, GeoShapeListener {
 
     private lateinit var sectionsPagerAdapter: QuestionGroupsPagerAdapter
     private lateinit var surveyGroup: SurveyGroup
@@ -210,5 +212,11 @@ class FormViewActivity : BackActivity(), IFormView,
         } else {
             showError(R.string.error_img_preview)
         }
+    }
+
+    override fun viewShape(geoJson: String) {
+        val data = Bundle()
+        data.putString(ConstantUtil.GEOSHAPE_RESULT, geoJson)
+        navigator.navigateToViewGeoShapeActivity(this, data)
     }
 }

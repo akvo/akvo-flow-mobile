@@ -114,10 +114,7 @@ sealed class ViewQuestionAnswer {
         override val title: String,
         override val mandatory: Boolean,
         override val translations: List<String>,
-        val enablePoint: Boolean,
-        val enableLine: Boolean,
-        val enableArea: Boolean,
-        val locked: Boolean = false
+        val geojsonAnswer: String
     ) : ViewQuestionAnswer()
 
     data class SignatureViewQuestionAnswer(

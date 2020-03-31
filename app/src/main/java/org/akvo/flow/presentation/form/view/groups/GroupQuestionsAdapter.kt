@@ -96,12 +96,19 @@ class GroupQuestionsAdapter<T : QuestionViewHolder<ViewQuestionAnswer>>(private 
                     )
                 ) as T
             }
-
             ViewType.LOCATION.ordinal -> {
                 QuestionViewHolder.LocationQuestionViewHolder(
                     inflate(
                         parent,
                         R.layout.location_question_view
+                    )
+                ) as T
+            }
+            ViewType.SHAPE.ordinal -> {
+                QuestionViewHolder.ShapeQuestionViewHolder(
+                    inflate(
+                        parent,
+                        R.layout.shape_question_view
                     )
                 ) as T
             }
@@ -113,7 +120,7 @@ class GroupQuestionsAdapter<T : QuestionViewHolder<ViewQuestionAnswer>>(private 
                     )
                 ) as T
             }
-        }
+        }.exhaustive
     }
 
     private fun inflate(parent: ViewGroup, @LayoutRes layoutResId: Int) =
@@ -152,7 +159,9 @@ class GroupQuestionsAdapter<T : QuestionViewHolder<ViewQuestionAnswer>>(private 
                 //TODO: barcode can be multiple
                 ViewType.BARCODE.ordinal
             }
-            is ViewQuestionAnswer.GeoShapeViewQuestionAnswer -> TODO()
+            is ViewQuestionAnswer.GeoShapeViewQuestionAnswer -> {
+                ViewType.SHAPE.ordinal
+            }
             is ViewQuestionAnswer.SignatureViewQuestionAnswer -> {
                 ViewType.SIGNATURE.ordinal
             }

@@ -20,6 +20,7 @@
 package org.akvo.flow.presentation.form.view.groups
 
 import android.view.View
+import android.widget.Button
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -256,6 +257,34 @@ sealed class QuestionViewHolder<T : ViewQuestionAnswer>(val view: View) :
                 }
             }
         }
+    }
 
+    class ShapeQuestionViewHolder(geoshapeView: View) :
+    QuestionViewHolder<ViewQuestionAnswer.GeoShapeViewQuestionAnswer>(geoshapeView) {
+
+        private val viewShapeBt = view.findViewById<Button>(R.id.view_shape_btn)
+        private val shapeTv = view.findViewById<TextView>(R.id.geo_shape_captured_text)
+
+        override fun setUpView(
+            questionAnswer: ViewQuestionAnswer.GeoShapeViewQuestionAnswer,
+            index: Int
+        ) {
+            setUpTitle(questionAnswer.title, questionAnswer.mandatory)
+            if (questionAnswer.geojsonAnswer.isNotEmpty()) {
+                viewShapeBt.visibility = View.VISIBLE
+                shapeTv.visibility = View.VISIBLE
+                viewShapeBt.setOnClickListener {
+                    val activityContext = view.context
+                    if (activityContext is GeoShapeListener) {
+                        activityContext.viewShape(questionAnswer.geojsonAnswer)
+                    } else {
+                        throw  throw IllegalArgumentException("Activity must implement GeoShapeListener")
+                    }
+                }
+            } else {
+                viewShapeBt.visibility = View.GONE
+                shapeTv.visibility = View.GONE
+            }
+        }
     }
 }

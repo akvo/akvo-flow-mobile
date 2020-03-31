@@ -98,13 +98,12 @@ class QuestionGroupFragment : Fragment(),
             ) //ADD list of answers
 */
         val emptyQuestionAnswer =
-            ViewQuestionAnswer.FreeTextViewQuestionAnswer(
+            ViewQuestionAnswer.GeoShapeViewQuestionAnswer(
                 "123",
                 "4. empty question",
                 false,
                 emptyList(),
-                "",
-                true
+                ""
             )
 
         val dateAnswer =

@@ -161,8 +161,6 @@ class FormViewActivity : BackActivity(), IFormView,
         sectionsPagerAdapter.groups = viewForm.groups
         sectionsPagerAdapter.notifyDataSetChanged()
 
-
-        // Set the survey name as Activity title
         supportActionBar?.let { supportActionBar ->
             supportActionBar.title = viewForm.title
             supportActionBar.subtitle = "v ${viewForm.version}"

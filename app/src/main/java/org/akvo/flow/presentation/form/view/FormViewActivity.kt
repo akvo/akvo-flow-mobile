@@ -22,6 +22,7 @@ package org.akvo.flow.presentation.form.view
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.Toast
 import androidx.viewpager.widget.ViewPager
 import com.google.android.material.tabs.TabLayout
 import org.akvo.flow.R
@@ -30,6 +31,7 @@ import org.akvo.flow.domain.SurveyGroup
 import org.akvo.flow.injector.component.DaggerViewComponent
 import org.akvo.flow.presentation.form.languages.Language
 import org.akvo.flow.presentation.form.languages.LanguagesDialogFragment
+import org.akvo.flow.presentation.form.view.entity.ViewForm
 import org.akvo.flow.presentation.form.view.ui.main.QuestionGroupsPagerAdapter
 import org.akvo.flow.ui.Navigator
 import org.akvo.flow.uicomponents.BackActivity
@@ -41,6 +43,7 @@ import javax.inject.Inject
 class FormViewActivity : BackActivity(), IFormView,
     LanguagesDialogFragment.LanguagesSelectionListener {
 
+    private lateinit var sectionsPagerAdapter: QuestionGroupsPagerAdapter
     private lateinit var surveyGroup: SurveyGroup
     private lateinit var datapointId: String
     private lateinit var formId: String
@@ -61,7 +64,7 @@ class FormViewActivity : BackActivity(), IFormView,
         initializeInjector()
         setupToolBar()
         presenter.view = this
-        val sectionsPagerAdapter = QuestionGroupsPagerAdapter(this, supportFragmentManager)
+        sectionsPagerAdapter = QuestionGroupsPagerAdapter(this, supportFragmentManager)
         val viewPager: ViewPager = findViewById(R.id.view_pager)
         viewPager.adapter = sectionsPagerAdapter
         val tabs: TabLayout = findViewById(R.id.tabs)
@@ -83,6 +86,8 @@ class FormViewActivity : BackActivity(), IFormView,
         datapointId = intent.getStringExtra(ConstantUtil.DATA_POINT_ID_EXTRA)
         formInstanceId = intent.getLongExtra(ConstantUtil.RESPONDENT_ID_EXTRA, 0)
         presenter.loadForm(formId, formInstanceId, surveyGroup, datapointId)
+        sectionsPagerAdapter.groups = mutableListOf()
+        sectionsPagerAdapter.notifyDataSetChanged()
     }
 
     override fun onDestroy() {
@@ -146,6 +151,20 @@ class FormViewActivity : BackActivity(), IFormView,
             findViewById(R.id.form_view_root),
             R.string.languages_load_error
         )
+    }
+
+    override fun displayForm(viewForm: ViewForm) {
+        sectionsPagerAdapter.groups = viewForm.groups
+        sectionsPagerAdapter.notifyDataSetChanged()
+
+        supportActionBar?.let { supportActionBar ->
+            supportActionBar.title = viewForm.title
+            supportActionBar.subtitle = "v ${viewForm.version}"
+        }
+    }
+
+    override fun showErrorLoadingForm() {
+        Toast.makeText(this, R.string.error_loading_form, Toast.LENGTH_SHORT).show()
     }
 
     override fun useSelectedLanguages(

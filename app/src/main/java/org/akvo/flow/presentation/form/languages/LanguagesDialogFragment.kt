@@ -114,6 +114,9 @@ class LanguagesDialogFragment : DialogFragment() {
     }
 
     interface LanguagesSelectionListener {
-        fun useSelectedLanguages(selectedLanguages: MutableSet<String>, languages: List<Language>)
+        fun useSelectedLanguages(
+            selectedLanguages: MutableSet<String>,
+            availableLanguages: List<Language>
+        )
     }
 }

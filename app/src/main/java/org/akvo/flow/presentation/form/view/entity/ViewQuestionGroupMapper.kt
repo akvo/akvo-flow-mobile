@@ -17,16 +17,22 @@
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.akvo.flow.presentation.form.view
+package org.akvo.flow.presentation.form.view.entity
 
-import org.akvo.flow.presentation.form.languages.Language
-import org.akvo.flow.presentation.form.view.entity.ViewForm
+import org.akvo.flow.domain.entity.DomainQuestionGroup
+import javax.inject.Inject
 
-interface IFormView {
-    fun onLanguagesSaved()
-    fun onLanguagesSavedError()
-    fun displayLanguages(languages: List<Language>)
-    fun showLanguagesError()
-    fun displayForm(viewForm: ViewForm)
-    fun showErrorLoadingForm()
+class ViewQuestionGroupMapper @Inject constructor() {
+
+    fun transform(groups: List<DomainQuestionGroup>) : List<ViewQuestionGroup> {
+        val viewGroups: MutableList<ViewQuestionGroup> = mutableListOf()
+        for (g in groups) {
+            viewGroups.add(transform(g))
+        }
+        return viewGroups
+    }
+
+    fun transform(group: DomainQuestionGroup): ViewQuestionGroup {
+        return ViewQuestionGroup(group.heading, group.isRepeatable)
+    }
 }

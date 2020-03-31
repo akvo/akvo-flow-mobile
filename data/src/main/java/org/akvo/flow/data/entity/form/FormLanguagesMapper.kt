@@ -20,6 +20,7 @@
 package org.akvo.flow.data.entity.form
 
 import android.database.Cursor
+import org.akvo.flow.database.Constants
 import org.akvo.flow.database.LanguageTable
 import javax.inject.Inject
 
@@ -38,6 +39,10 @@ class FormLanguagesMapper @Inject constructor() {
                 } while (nonNullCursor.moveToNext())
             }
             nonNullCursor.close()
+        }
+        if (languages.isEmpty()) {
+            //if nothing there, we add english
+            languages.add("en")
         }
         return languages
     }

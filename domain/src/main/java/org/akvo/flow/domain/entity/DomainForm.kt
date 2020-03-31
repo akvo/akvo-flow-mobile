@@ -17,16 +17,10 @@
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.akvo.flow.presentation.form.view
+package org.akvo.flow.domain.entity
 
-import org.akvo.flow.presentation.form.languages.Language
-import org.akvo.flow.presentation.form.view.entity.ViewForm
-
-interface IFormView {
-    fun onLanguagesSaved()
-    fun onLanguagesSavedError()
-    fun displayLanguages(languages: List<Language>)
-    fun showLanguagesError()
-    fun displayForm(viewForm: ViewForm)
-    fun showErrorLoadingForm()
-}
+data class DomainForm(
+    val title: String,
+    val version: String,
+    val groups: List<DomainQuestionGroup>
+)

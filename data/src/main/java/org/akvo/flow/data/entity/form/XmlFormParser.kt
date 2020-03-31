@@ -19,6 +19,8 @@
 package org.akvo.flow.data.entity.form
 
 import org.akvo.flow.data.util.FileHelper
+import org.akvo.flow.domain.entity.DomainForm
+import org.akvo.flow.domain.entity.DomainQuestionGroup
 import org.xmlpull.v1.XmlPullParser
 import org.xmlpull.v1.XmlPullParserException
 import org.xmlpull.v1.XmlPullParserFactory
@@ -85,7 +87,7 @@ class XmlFormParser @Inject constructor(private val helper: FileHelper) {
                         if (SURVEY == eltName) {
                             val parsedAttribute = parser.getAttributeValue(null, DEFAULT_LANG)
                             if (!parsedAttribute.isNullOrEmpty()) {
-                                defaultLanguage = parsedAttribute;
+                                defaultLanguage = parsedAttribute
                             }
                         } else if (ALT_TEXT == eltName) {
                             val language = parser.getAttributeValue(null, LANG)
@@ -112,13 +114,70 @@ class XmlFormParser @Inject constructor(private val helper: FileHelper) {
         return languageCodes
     }
 
+    fun parseToDomainForm(inputStream: InputStream): DomainForm {
+        val groups: MutableList<DomainQuestionGroup> = ArrayList()
+        var version = "0.0"
+        var name = ""
+        val parserFactory: XmlPullParserFactory
+        var questionGroup: DomainQuestionGroup? = null
+        try {
+            parserFactory = XmlPullParserFactory.newInstance()
+            val parser = parserFactory.newPullParser()
+            parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false)
+            parser.setInput(inputStream, null)
+            var eventType = parser.eventType
+            while (eventType != XmlPullParser.END_DOCUMENT) {
+                when (eventType) {
+                    XmlPullParser.START_TAG -> {
+                        when (parser.name) {
+                            SURVEY -> {
+                                val attributeValue = parser.getAttributeValue(null, VERSION)
+                                if (attributeValue != null) {
+                                    version = attributeValue
+                                }
+                                val attributeValue1 = parser.getAttributeValue(null, NAME)
+                                if (attributeValue1 != null) {
+                                    name = attributeValue1
+                                }
+                            }
+                            QUESTION_GROUP -> {
+                                val repeatable = "true" == parser.getAttributeValue(null, REPEATABLE)
+                                questionGroup = DomainQuestionGroup("", repeatable)
+                            }
+                            QUESTION_GROUP_HEADING -> {
+                                questionGroup?.heading = parser.nextText()
+                            }
+                        }
+                    }
+                    XmlPullParser.END_TAG -> {
+                        if (QUESTION_GROUP == parser.name && questionGroup != null) {
+                            groups.add(questionGroup)
+                        }
+                    }
+                }
+                eventType = parser.next()
+            }
+        } catch (e: XmlPullParserException) {
+            Timber.e(e)
+        } catch (e: IOException) {
+            Timber.e(e)
+        } finally {
+            helper.close(inputStream)
+        }
+        return DomainForm(name, version, groups)
+    }
+
     companion object {
         private const val QUESTION = "question"
+        private const val QUESTION_GROUP = "questionGroup"
+        private const val QUESTION_GROUP_HEADING = "heading"
         private const val SURVEY = "survey"
         private const val CASCADE_RESOURCE = "cascadeResource"
         private const val VERSION = "version"
         private const val DEFAULT_LANG = "defaultLanguageCode"
         private const val ALT_TEXT = "altText"
         private const val LANG = "language"
+        private const val NAME = "name"
+        private const val REPEATABLE = "repeatable"
     }
 }

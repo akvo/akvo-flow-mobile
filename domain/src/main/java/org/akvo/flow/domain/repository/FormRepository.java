@@ -20,6 +20,7 @@
 
 package org.akvo.flow.domain.repository;
 
+import org.akvo.flow.domain.entity.DomainForm;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Set;
@@ -38,4 +39,7 @@ public interface FormRepository {
 
     @NonNull
     Single<Set<String>> loadFormLanguages(@NotNull String formId);
+
+    @NotNull
+    Single<DomainForm> parseForm(@NotNull String formId);
 }

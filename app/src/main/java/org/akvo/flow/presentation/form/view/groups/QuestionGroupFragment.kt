@@ -31,6 +31,7 @@ import org.akvo.flow.app.FlowApp
 import org.akvo.flow.injector.component.ApplicationComponent
 import org.akvo.flow.injector.component.DaggerViewComponent
 import org.akvo.flow.presentation.form.view.groups.entity.ViewLocation
+import org.akvo.flow.presentation.form.view.groups.entity.ViewOption
 import org.akvo.flow.presentation.form.view.groups.entity.ViewQuestionAnswer
 import org.akvo.flow.util.MediaFileHelper
 import org.akvo.flow.util.files.FileBrowser
@@ -102,13 +103,12 @@ class QuestionGroupFragment : Fragment(),
             ) //ADD list of answers
 */
         val emptyQuestionAnswer =
-            ViewQuestionAnswer.OptionViewQuestionAnswer(
+            ViewQuestionAnswer.GeoShapeViewQuestionAnswer(
                 "123",
                 "4. empty question",
                 false,
                 emptyList(),
-                emptyList(),
-                emptyList()
+                "{\"type\":\"FeatureCollection\",\"features\":[{\"type\":\"Feature\",\"geometry\":{\"type\":\"Polygon\",\"coordinates\":[[[2.5812024,41.6582703],[2.5709778,41.6457495],[2.590007,41.6462801],[2.6000895,41.657952],[2.5812024,41.6582703]]]},\"properties\":{\"pointCount\":\"4\",\"length\":\"6335.313\",\"area\":\"2108656.982727051\"}},{\"type\":\"Feature\",\"geometry\":{\"type\":\"Polygon\",\"coordinates\":[[[2.6105982,41.6903038],[2.6146454,41.6799105],[2.6302663,41.6858497],[2.6105982,41.6903038]]]},\"properties\":{\"pointCount\":\"3\",\"length\":\"4371.4033\",\"area\":\"860523.2318115234\"}}]}"
             )
 
         val dateAnswer =

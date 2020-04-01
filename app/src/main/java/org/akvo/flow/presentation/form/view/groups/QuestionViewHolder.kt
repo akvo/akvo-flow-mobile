@@ -296,7 +296,7 @@ sealed class QuestionViewHolder<T : ViewQuestionAnswer>(val view: View) :
         ) {
             setUpTitle(questionAnswer.title, questionAnswer.mandatory)
             val optionsQuestionLayout = view.findViewById<OptionsQuestionLayout>(R.id.options_layout)
-            if (questionAnswer.selected.isNotEmpty()){
+            if (questionAnswer.options.isNotEmpty()){
                 optionsQuestionLayout.visibility = View.VISIBLE
                 optionsQuestionLayout.setUpViews(questionAnswer)
             } else {
@@ -314,6 +314,24 @@ sealed class QuestionViewHolder<T : ViewQuestionAnswer>(val view: View) :
             setUpTitle(questionAnswer.title, questionAnswer.mandatory)
             val barcodesQuestionLayout =
                 view.findViewById<BarcodesQuestionLayout>(R.id.barcodes_layout)
+            if (questionAnswer.answers.isNotEmpty()) {
+                barcodesQuestionLayout.visibility = View.VISIBLE
+                barcodesQuestionLayout.setUpViews(questionAnswer)
+            } else {
+                barcodesQuestionLayout.visibility = View.GONE
+            }
+        }
+    }
+
+    class CascadeViewHolder(barcodeView: View) :
+        QuestionViewHolder<ViewQuestionAnswer.CascadeViewQuestionAnswer>(barcodeView) {
+        override fun setUpView(
+            questionAnswer: ViewQuestionAnswer.CascadeViewQuestionAnswer,
+            index: Int
+        ) {
+            setUpTitle(questionAnswer.title, questionAnswer.mandatory)
+            val barcodesQuestionLayout =
+                view.findViewById<CascadeQuestionLayout>(R.id.barcodes_layout)
             if (questionAnswer.answers.isNotEmpty()) {
                 barcodesQuestionLayout.visibility = View.VISIBLE
                 barcodesQuestionLayout.setUpViews(questionAnswer)

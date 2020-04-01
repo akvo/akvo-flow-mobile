@@ -30,6 +30,7 @@ import org.akvo.flow.R
 import org.akvo.flow.app.FlowApp
 import org.akvo.flow.injector.component.ApplicationComponent
 import org.akvo.flow.injector.component.DaggerViewComponent
+import org.akvo.flow.presentation.form.view.groups.entity.ViewCascadeLevel
 import org.akvo.flow.presentation.form.view.groups.entity.ViewLocation
 import org.akvo.flow.presentation.form.view.groups.entity.ViewQuestionAnswer
 import org.akvo.flow.util.MediaFileHelper
@@ -84,6 +85,10 @@ class QuestionGroupFragment : Fragment(),
             GroupQuestionsAdapter.ViewType.BARCODE.ordinal,
             0
         )
+        questionsRv.recycledViewPool.setMaxRecycledViews(
+            GroupQuestionsAdapter.ViewType.CASCADE.ordinal,
+            0
+        )
         val questionAnswer1 = ViewQuestionAnswer.FreeTextViewQuestionAnswer(
             "123",
             "1. text question",
@@ -103,7 +108,7 @@ class QuestionGroupFragment : Fragment(),
         val barcodeAnswer =
             ViewQuestionAnswer.BarcodeViewQuestionAnswer(
                 "123", "3. barcode question", false, emptyList(), listOf("123", "12345dhfjdsakjfak")
-            ) //ADD list of answers
+            )
 
         val emptyQuestionAnswer =
             ViewQuestionAnswer.GeoShapeViewQuestionAnswer(
@@ -155,12 +160,22 @@ class QuestionGroupFragment : Fragment(),
             )
 
         val locationViewQuestionAnswer = ViewQuestionAnswer.LocationViewQuestionAnswer(
-        "123",
-        "10. location",
-        false,
-        emptyList(),
+            "123",
+            "10. location",
+            false,
+            emptyList(),
             ViewLocation("42.2", "2.2", "10", "5.0")
         )
+
+        val cascadeAnswer =
+            ViewQuestionAnswer.CascadeViewQuestionAnswer(
+                "123",
+                "3. barcode question",
+                false,
+                emptyList(),
+                listOf(ViewCascadeLevel("123", "12345dhfjdsakjfak"), ViewCascadeLevel("456", "12345dhfjdsakjfak"))
+            )
+
         questionsRv.adapter = GroupQuestionsAdapter<QuestionViewHolder<ViewQuestionAnswer>>(
             mutableListOf(
                 questionAnswer1,
@@ -171,7 +186,8 @@ class QuestionGroupFragment : Fragment(),
                 photoAnswer,
                 videoAnswer,
                 signatureAnswer,
-                locationViewQuestionAnswer
+                locationViewQuestionAnswer,
+                cascadeAnswer
             )
         )
     }
@@ -181,7 +197,8 @@ class QuestionGroupFragment : Fragment(),
     }
 
     override fun showDownloadFailed(viewIndex: Int) {
-        (questionsRv.adapter as GroupQuestionsAdapter).showDownLoadFailed(viewIndex)    }
+        (questionsRv.adapter as GroupQuestionsAdapter).showDownLoadFailed(viewIndex)
+    }
 
     fun downloadMedia(filename: String, index: Int) {
         presenter.downloadMedia(filename, index)

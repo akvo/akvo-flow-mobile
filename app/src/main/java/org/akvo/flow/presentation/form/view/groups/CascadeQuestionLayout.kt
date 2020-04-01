@@ -20,20 +20,27 @@
 package org.akvo.flow.presentation.form.view.groups
 
 import android.content.Context
+import android.graphics.Typeface
 import android.util.AttributeSet
 import android.widget.LinearLayout
+import android.widget.TextView
 import com.google.android.material.textfield.TextInputEditText
 import org.akvo.flow.presentation.form.view.groups.entity.ViewQuestionAnswer
 
-class BarcodesQuestionLayout @JvmOverloads constructor(
+class CascadeQuestionLayout @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 ) : LinearLayout(context, attrs, defStyleAttr) {
 
-    fun setUpViews(questionAnswer: ViewQuestionAnswer.BarcodeViewQuestionAnswer) {
-        for (barcode in questionAnswer.answers) {
+    fun setUpViews(questionAnswer: ViewQuestionAnswer.CascadeViewQuestionAnswer) {
+        for (cascadeLevel in questionAnswer.answers) {
+            val textView = TextView(context)
+            textView.text = cascadeLevel.level
+            textView.setTypeface(null, Typeface.BOLD)
+            textView.textSize = 18.0f
+            addView(textView)
             val textInputEditText = TextInputEditText(context)
             textInputEditText.isEnabled = false
-            textInputEditText.setText(barcode)
+            textInputEditText.setText(cascadeLevel.answer)
             addView(textInputEditText)
         }
     }

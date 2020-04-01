@@ -34,28 +34,31 @@ class OptionsQuestionLayout @JvmOverloads constructor(
 ) : LinearLayout(context, attrs, defStyleAttr) {
 
     fun setUpViews(questionAnswer: ViewQuestionAnswer.OptionViewQuestionAnswer) {
-        val selected = questionAnswer.selected
         if (questionAnswer.allowMultiple) {
             // checkboxes
-            for ((i, option) in questionAnswer.availableOptions.withIndex()) {
+            for ((i, option) in questionAnswer.options.withIndex()) {
                 val view = newCheckbox(option, i)
                 addView(view)
                 view.isEnabled = false
                 view.id = i // View ID will match option position within the array
-                view.isChecked = i in selected
+                view.isChecked = option.selected
 
             }
         } else {
             //radio button
             val radioGroup = RadioGroup(context)
             addView(radioGroup)
-            for ((i, option) in questionAnswer.availableOptions.withIndex()) {
+            var checkedIndex = 0
+            for ((i, option) in questionAnswer.options.withIndex()) {
                 val view = newRadioButton(option, i)
                 radioGroup.addView(view)
                 view.isEnabled = false
                 view.id = i // View ID will match option position within the array
+                if (option.selected) {
+                    checkedIndex = i
+                }
             }
-            radioGroup.check(selected[0]) // only one can be selected
+            radioGroup.check(checkedIndex) // only one can be selected
         }
     }
 

@@ -51,8 +51,7 @@ sealed class ViewQuestionAnswer {
         override val title: String,
         override val mandatory: Boolean,
         override val translations: List<String>,
-        val availableOptions: List<ViewOption>,
-        val selected: List<Int>, //TODO: separate multiple from single?
+        val options: List<ViewOption> = emptyList(), //set to empty if no answer
         val allowMultiple: Boolean = false,
         val allowOther: Boolean = false
     ) : ViewQuestionAnswer()
@@ -62,8 +61,7 @@ sealed class ViewQuestionAnswer {
         override val title: String,
         override val mandatory: Boolean,
         override val translations: List<String>,
-        val answer: String,
-        val cascadeResource: String
+        val answers: List<ViewCascadeLevel> = emptyList() //empty if no answer
     ) : ViewQuestionAnswer()
 
     data class LocationViewQuestionAnswer(
@@ -146,7 +144,9 @@ data class ViewLocation(
     }
 }
 
-data class ViewOption(val name: String, val code: String = "", val isOther: Boolean = false)
+data class ViewOption(val name: String, val code: String = "", val isOther: Boolean = false, val selected: Boolean)
+
+data class ViewCascadeLevel(val level: String, val answer: String)
 
 val <T> T.exhaustive: T
     get() = this

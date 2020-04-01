@@ -27,6 +27,7 @@ import org.akvo.flow.R
 import org.akvo.flow.presentation.form.view.groups.entity.ViewQuestionAnswer
 import org.akvo.flow.presentation.form.view.groups.entity.ViewQuestionAnswer.NumberViewQuestionAnswer
 import org.akvo.flow.presentation.form.view.groups.entity.exhaustive
+import java.lang.IllegalArgumentException
 
 class GroupQuestionsAdapter<T : QuestionViewHolder<ViewQuestionAnswer>>(private val questionAnswers: MutableList<ViewQuestionAnswer> = mutableListOf()) :
     RecyclerView.Adapter<T>() {
@@ -136,15 +137,18 @@ class GroupQuestionsAdapter<T : QuestionViewHolder<ViewQuestionAnswer>>(private 
                     )
                 ) as T
             }
-            else -> {
-                QuestionViewHolder.PhotoQuestionViewHolder(
+            ViewType.CADDISFLY.ordinal -> {
+                QuestionViewHolder.CaddisflyViewHolder(
                     inflate(
                         parent,
-                        R.layout.media_question_view
+                        R.layout.caddisflys_question_view
                     )
                 ) as T
             }
-        }.exhaustive
+            else -> {
+                throw IllegalArgumentException("Wrong view type")
+            }
+        }
     }
 
     private fun inflate(parent: ViewGroup, @LayoutRes layoutResId: Int) =
@@ -192,7 +196,9 @@ class GroupQuestionsAdapter<T : QuestionViewHolder<ViewQuestionAnswer>>(private 
             is ViewQuestionAnswer.SignatureViewQuestionAnswer -> {
                 ViewType.SIGNATURE.ordinal
             }
-            is ViewQuestionAnswer.CaddisflyViewQuestionAnswer -> TODO()
+            is ViewQuestionAnswer.CaddisflyViewQuestionAnswer -> {
+                ViewType.CADDISFLY.ordinal
+            }
         }.exhaustive
     }
 

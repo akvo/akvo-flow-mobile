@@ -340,4 +340,22 @@ sealed class QuestionViewHolder<T : ViewQuestionAnswer>(val view: View) :
             }
         }
     }
+
+    class CaddisflyViewHolder(barcodeView: View) :
+        QuestionViewHolder<ViewQuestionAnswer.CaddisflyViewQuestionAnswer>(barcodeView) {
+        override fun setUpView(
+            questionAnswer: ViewQuestionAnswer.CaddisflyViewQuestionAnswer,
+            index: Int
+        ) {
+            setUpTitle(questionAnswer.title, questionAnswer.mandatory)
+            val barcodesQuestionLayout =
+                view.findViewById<CaddisflyQuestionLayout>(R.id.caddisfly_layout)
+            if (questionAnswer.answers.isNotEmpty()) {
+                barcodesQuestionLayout.visibility = View.VISIBLE
+                barcodesQuestionLayout.setUpViews(questionAnswer)
+            } else {
+                barcodesQuestionLayout.visibility = View.GONE
+            }
+        }
+    }
 }

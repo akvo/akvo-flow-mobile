@@ -128,7 +128,7 @@ sealed class ViewQuestionAnswer {
         override val title: String,
         override val mandatory: Boolean,
         override val translations: List<String>,
-        val caddisflyResourceUuid: String
+        val answers: List<String> //name +": " +value +" " +unit;
     ) : ViewQuestionAnswer()
 }
 

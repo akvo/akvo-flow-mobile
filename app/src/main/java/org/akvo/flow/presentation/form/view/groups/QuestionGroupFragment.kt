@@ -176,6 +176,15 @@ class QuestionGroupFragment : Fragment(),
                 listOf(ViewCascadeLevel("123", "12345dhfjdsakjfak"), ViewCascadeLevel("456", "12345dhfjdsakjfak"))
             )
 
+        val caddisflyAnswer =
+            ViewQuestionAnswer.CaddisflyViewQuestionAnswer(
+                "123",
+                "3. barcode question",
+                false,
+                emptyList(),
+                listOf("Temperature: 18 ºC")
+            )
+
         questionsRv.adapter = GroupQuestionsAdapter<QuestionViewHolder<ViewQuestionAnswer>>(
             mutableListOf(
                 questionAnswer1,
@@ -187,7 +196,8 @@ class QuestionGroupFragment : Fragment(),
                 videoAnswer,
                 signatureAnswer,
                 locationViewQuestionAnswer,
-                cascadeAnswer
+                cascadeAnswer,
+                caddisflyAnswer
             )
         )
     }

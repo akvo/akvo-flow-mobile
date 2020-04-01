@@ -105,8 +105,7 @@ sealed class ViewQuestionAnswer {
         override val title: String,
         override val mandatory: Boolean,
         override val translations: List<String>,
-        val enableMultiple: Boolean = false
-    //TODO: list of answers
+        val answers: List<String>
     ) : ViewQuestionAnswer()
 
     data class GeoShapeViewQuestionAnswer(

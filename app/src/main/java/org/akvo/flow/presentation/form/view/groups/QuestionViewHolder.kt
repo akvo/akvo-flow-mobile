@@ -143,7 +143,7 @@ sealed class QuestionViewHolder<T : ViewQuestionAnswer>(val view: View) :
     class PhotoQuestionViewHolder(mediaView: View) :
         QuestionViewHolder<ViewQuestionAnswer.PhotoViewQuestionAnswer>(mediaView) {
 
-        private val mediaLayout: MediaQuestionViewLayout = view.findViewById(R.id.preview_container)
+        private val mediaLayout: MediaQuestionLayout = view.findViewById(R.id.preview_container)
 
         override fun setUpView(
             questionAnswer: ViewQuestionAnswer.PhotoViewQuestionAnswer,
@@ -180,7 +180,7 @@ sealed class QuestionViewHolder<T : ViewQuestionAnswer>(val view: View) :
     class VideoQuestionViewHolder(mediaView: View) :
         QuestionViewHolder<ViewQuestionAnswer.VideoViewQuestionAnswer>(mediaView) {
 
-        private val mediaLayout: MediaQuestionViewLayout = view.findViewById(R.id.preview_container)
+        private val mediaLayout: MediaQuestionLayout = view.findViewById(R.id.preview_container)
 
         override fun setUpView(
             questionAnswer: ViewQuestionAnswer.VideoViewQuestionAnswer,
@@ -301,6 +301,24 @@ sealed class QuestionViewHolder<T : ViewQuestionAnswer>(val view: View) :
                 optionsQuestionLayout.setUpViews(questionAnswer)
             } else {
                 optionsQuestionLayout.visibility = View.GONE
+            }
+        }
+    }
+
+    class BarcodeViewHolder(barcodeView: View) :
+        QuestionViewHolder<ViewQuestionAnswer.BarcodeViewQuestionAnswer>(barcodeView) {
+        override fun setUpView(
+            questionAnswer: ViewQuestionAnswer.BarcodeViewQuestionAnswer,
+            index: Int
+        ) {
+            setUpTitle(questionAnswer.title, questionAnswer.mandatory)
+            val barcodesQuestionLayout =
+                view.findViewById<BarcodesQuestionLayout>(R.id.barcodes_layout)
+            if (questionAnswer.answers.isNotEmpty()) {
+                barcodesQuestionLayout.visibility = View.VISIBLE
+                barcodesQuestionLayout.setUpViews(questionAnswer)
+            } else {
+                barcodesQuestionLayout.visibility = View.GONE
             }
         }
     }

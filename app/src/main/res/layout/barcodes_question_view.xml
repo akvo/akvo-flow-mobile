@@ -12,8 +12,8 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"
         android:layout_marginEnd="16dp"
+        android:layout_marginRight="16dp"
         android:layout_marginBottom="16dp"
         android:focusable="true"
         android:focusableInTouchMode="true"
@@ -21,25 +21,13 @@
         android:textStyle="bold"
         tools:text="Question 1" />
 
-    <org.akvo.flow.presentation.form.view.groups.MediaQuestionLayout
-        android:id="@+id/preview_container"
-        android:layout_width="wrap_content"
+    <org.akvo.flow.presentation.form.view.groups.BarcodesQuestionLayout
+        android:id="@+id/barcodes_layout"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:gravity="center">
-    </org.akvo.flow.presentation.form.view.groups.MediaQuestionLayout>
-
-    <TextView
-        android:id="@+id/location_info"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/image_location_unknown"
-        android:layout_marginTop="8dp"
         android:layout_marginStart="16dp"
         android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"
         android:layout_marginEnd="16dp"
-        android:layout_marginBottom="16dp"
-        tools:visibility="visible"
-        android:visibility="gone" />
+        android:layout_marginRight="16dp"
+        android:orientation="vertical" />
 </LinearLayout>

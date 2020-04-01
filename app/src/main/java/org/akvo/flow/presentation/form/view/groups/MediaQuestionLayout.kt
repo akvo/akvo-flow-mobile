@@ -34,7 +34,7 @@ import org.akvo.flow.util.image.GlideImageLoader
 import org.akvo.flow.util.image.ImageLoader
 import java.io.File
 
-class MediaQuestionViewLayout @JvmOverloads constructor(
+class MediaQuestionLayout @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 ) : FrameLayout(context, attrs, defStyleAttr) {
 

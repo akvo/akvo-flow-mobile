@@ -31,7 +31,6 @@ import org.akvo.flow.app.FlowApp
 import org.akvo.flow.injector.component.ApplicationComponent
 import org.akvo.flow.injector.component.DaggerViewComponent
 import org.akvo.flow.presentation.form.view.groups.entity.ViewLocation
-import org.akvo.flow.presentation.form.view.groups.entity.ViewOption
 import org.akvo.flow.presentation.form.view.groups.entity.ViewQuestionAnswer
 import org.akvo.flow.util.MediaFileHelper
 import org.akvo.flow.util.files.FileBrowser
@@ -81,6 +80,10 @@ class QuestionGroupFragment : Fragment(),
             GroupQuestionsAdapter.ViewType.OPTION.ordinal,
             0
         )
+        questionsRv.recycledViewPool.setMaxRecycledViews(
+            GroupQuestionsAdapter.ViewType.BARCODE.ordinal,
+            0
+        )
         val questionAnswer1 = ViewQuestionAnswer.FreeTextViewQuestionAnswer(
             "123",
             "1. text question",
@@ -97,11 +100,11 @@ class QuestionGroupFragment : Fragment(),
                 requireDoubleEntry = true
             )
 
-    /*    val barcodeAnswer =
+        val barcodeAnswer =
             ViewQuestionAnswer.BarcodeViewQuestionAnswer(
-                "123", "3. barcode question", false, emptyList()
+                "123", "3. barcode question", false, emptyList(), listOf("123", "12345dhfjdsakjfak")
             ) //ADD list of answers
-*/
+
         val emptyQuestionAnswer =
             ViewQuestionAnswer.GeoShapeViewQuestionAnswer(
                 "123",
@@ -162,7 +165,7 @@ class QuestionGroupFragment : Fragment(),
             mutableListOf(
                 questionAnswer1,
                 questionAnswer2,
-                //barcodeAnswer,
+                barcodeAnswer,
                 emptyQuestionAnswer,
                 dateAnswer,
                 photoAnswer,

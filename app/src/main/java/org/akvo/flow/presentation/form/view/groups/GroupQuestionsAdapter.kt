@@ -120,6 +120,14 @@ class GroupQuestionsAdapter<T : QuestionViewHolder<ViewQuestionAnswer>>(private 
                     )
                 ) as T
             }
+            ViewType.BARCODE.ordinal -> {
+                QuestionViewHolder.BarcodeViewHolder(
+                    inflate(
+                        parent,
+                        R.layout.barcodes_question_view
+                    )
+                ) as T
+            }
             else -> {
                 QuestionViewHolder.PhotoQuestionViewHolder(
                     inflate(
@@ -166,7 +174,6 @@ class GroupQuestionsAdapter<T : QuestionViewHolder<ViewQuestionAnswer>>(private 
                 ViewType.DATE.ordinal
             }
             is ViewQuestionAnswer.BarcodeViewQuestionAnswer -> {
-                //TODO: barcode can be multiple
                 ViewType.BARCODE.ordinal
             }
             is ViewQuestionAnswer.GeoShapeViewQuestionAnswer -> {

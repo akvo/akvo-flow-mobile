@@ -97,6 +97,14 @@ class QuestionGroupFragment : Fragment(),
             "valeria",
             true
         )
+        val caddisflyAnswer2 =
+            ViewQuestionAnswer.CaddisflyViewQuestionAnswer(
+                "123",
+                "3. barcode question",
+                false,
+                emptyList(),
+                listOf("Temperature: 18 ºC", "Temperature: 20 ºC", "Temperature: 45 ºC")
+            )
 
         val questionAnswer2 =
             ViewQuestionAnswer.NumberViewQuestionAnswer(
@@ -188,6 +196,7 @@ class QuestionGroupFragment : Fragment(),
         questionsRv.adapter = GroupQuestionsAdapter<QuestionViewHolder<ViewQuestionAnswer>>(
             mutableListOf(
                 questionAnswer1,
+                caddisflyAnswer2,
                 questionAnswer2,
                 barcodeAnswer,
                 emptyQuestionAnswer,

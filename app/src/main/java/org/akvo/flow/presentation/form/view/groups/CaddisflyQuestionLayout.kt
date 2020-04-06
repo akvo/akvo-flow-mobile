@@ -30,10 +30,22 @@ class CaddisflyQuestionLayout @JvmOverloads constructor(
 ) : LinearLayout(context, attrs, defStyleAttr) {
 
     fun setUpViews(questionAnswer: ViewQuestionAnswer.CaddisflyViewQuestionAnswer) {
-        for (cascadeAnswer in questionAnswer.answers) {
-            val textView = TextView(context)
-            textView.text = cascadeAnswer
-            addView(textView)
+        val answers = questionAnswer.answers
+        when (answers.size) {
+            childCount -> {
+                for ((i, cascadeAnswer) in answers.withIndex()) {
+                    val textView: TextView = getChildAt(i) as TextView
+                    textView.text = cascadeAnswer
+                }
+            }
+            else -> {
+                removeAllViews()
+                for (cascadeAnswer in answers) {
+                    val textView = TextView(context)
+                    textView.text = cascadeAnswer
+                    addView(textView)
+                }
+            }
         }
     }
 }

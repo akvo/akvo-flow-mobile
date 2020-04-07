@@ -78,7 +78,7 @@ public class MainActivity extends AppCompatActivity implements MainView {
 
     @Override
     public void navigateToWalkThrough() {
-        navigator.navigateToWalkThrough(this);
+        navigator.navigateToWalkThroughWithBackStack(this);
     }
 
     @Override

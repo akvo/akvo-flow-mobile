@@ -348,11 +348,15 @@ public class Navigator {
         context.startActivity(intent);
     }
 
-    public void navigateToWalkThrough(Context context) {
+    public void navigateToWalkThroughWithBackStack(Context context) {
         TaskStackBuilder.create(context)
                 .addParentStack(OfflineMapsWalkThroughActivity.class)
                 .addNextIntent(new Intent(context, OfflineMapsWalkThroughActivity.class))
                 .startActivities();
+    }
+
+    public void navigateToWalkThrough(Context context) {
+       context.startActivity(new Intent(context, OfflineMapsWalkThroughActivity.class));
     }
 
     public void navigateToGetPhoto(AppCompatActivity activity) {

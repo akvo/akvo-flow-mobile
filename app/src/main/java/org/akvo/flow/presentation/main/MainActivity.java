@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2019 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2020 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -78,7 +78,7 @@ public class MainActivity extends AppCompatActivity implements MainView {
 
     @Override
     public void navigateToWalkThrough() {
-        navigator.navigateToWalkThrough(this);
+        navigator.navigateToWalkThroughWithBackStack(this);
     }
 
     @Override

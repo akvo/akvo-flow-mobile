@@ -24,7 +24,10 @@ import org.akvo.flow.presentation.datapoints.DisplayNameMapper
 import java.util.ArrayList
 import javax.inject.Inject
 
-class ListDataPointMapper @Inject constructor(private val displayNameMapper: DisplayNameMapper, private val dateMapper: DateMapper) {
+class ListDataPointMapper @Inject constructor(
+    private val displayNameMapper: DisplayNameMapper,
+    private val dateMapper: DateMapper
+) {
     private fun transform(dataPoint: DataPoint?): ListDataPoint? {
         if (dataPoint == null) {
             return null

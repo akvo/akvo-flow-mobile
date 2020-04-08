@@ -33,7 +33,6 @@ import android.widget.TextView;
 
 import org.akvo.flow.R;
 import org.akvo.flow.database.SurveyInstanceStatus;
-import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.presentation.datapoints.list.entity.ListDataPoint;
 import org.akvo.flow.util.GeoUtil;
 
@@ -42,34 +41,21 @@ import java.util.List;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.StringRes;
 
 class DataPointListAdapter extends BaseAdapter {
 
     private Double latitude;
     private Double longitude;
     private final LayoutInflater inflater;
-    private final String dataLabel;
     private final List<ListDataPoint> dataPoints;
     private final GeoUtil geoUtil;
 
-    DataPointListAdapter(Context context, @Nullable Double latitude,
-            @Nullable Double longitude, SurveyGroup surveyGroup) {
+    DataPointListAdapter(Context context, @Nullable Double latitude, @Nullable Double longitude) {
         this.latitude = latitude;
         this.longitude = longitude;
         this.inflater = LayoutInflater.from(context);
-        this.dataLabel = context.getString(getDateLabel(surveyGroup));
-        dataPoints = new ArrayList<>();
-        geoUtil = new GeoUtil();
-    }
-
-    @StringRes
-    private int getDateLabel(SurveyGroup surveyGroup) {
-        if (surveyGroup != null && surveyGroup.isMonitored()) {
-            return R.string.last_modified_monitored;
-        } else {
-            return R.string.last_modified_regular;
-        }
+        this.dataPoints = new ArrayList<>();
+        this.geoUtil = new GeoUtil();
     }
 
     @Override

@@ -36,10 +36,8 @@ import org.akvo.flow.database.SurveyInstanceStatus;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.presentation.datapoints.list.entity.ListDataPoint;
 import org.akvo.flow.util.GeoUtil;
-import org.ocpsoft.prettytime.PrettyTime;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import androidx.annotation.NonNull;
@@ -113,7 +111,7 @@ class DataPointListAdapter extends BaseAdapter {
         idView.setText(dataPoint.getId());
 
         displayDistanceText(distanceView, getDistanceText(dataPoint, context));
-        displayDateText(dateView, dataPoint.getLastModified());
+        displayDateText(dateView, dataPoint.getDisplayDate());
 
         int statusRes = 0;
         String statusText = null;
@@ -140,7 +138,7 @@ class DataPointListAdapter extends BaseAdapter {
         statusImage.setImageResource(statusRes);
         statusView.setText(statusText);
 
-        if (dataPoint.wasViewed()) {
+        if (dataPoint.getViewed()) {
             nameView.setTypeface(null, Typeface.NORMAL);
         } else {
             nameView.setTypeface(null, Typeface.BOLD);
@@ -165,12 +163,12 @@ class DataPointListAdapter extends BaseAdapter {
         return null;
     }
 
-    private void displayDateText(TextView tv, Long time) {
-        if (time != null && time > 0) {
-            tv.setVisibility(View.VISIBLE);
-            tv.setText(dataLabel + " " + new PrettyTime().format(new Date(time)));
-        } else {
+    private void displayDateText(TextView tv, String date) {
+        if (date == null || date.isEmpty()) {
             tv.setVisibility(View.GONE);
+        } else {
+            tv.setVisibility(View.VISIBLE);
+            tv.setText(date);
         }
     }
 

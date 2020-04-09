@@ -38,18 +38,14 @@ import io.reactivex.Single;
 
 @Singleton
 public class RestApi {
-    private final String androidId;
-    private final String imei;
-    private final String phoneNumber;
+    private final DeviceHelper deviceHelper;
     private final RestServiceFactory serviceFactory;
     private final String version;
     private final String baseUrl;
 
     public RestApi(DeviceHelper deviceHelper, RestServiceFactory serviceFactory, String version,
             String baseUrl) {
-        this.androidId = deviceHelper.getAndroidId();
-        this.imei = deviceHelper.getImei();
-        this.phoneNumber = deviceHelper.getPhoneNumber();
+        this.deviceHelper = deviceHelper;
         this.serviceFactory = serviceFactory;
         this.version = version;
         this.baseUrl = baseUrl;
@@ -57,9 +53,8 @@ public class RestApi {
 
     @SuppressWarnings("unchecked")
     public Single<ApiLocaleResult> downloadDataPoints(long surveyId) {
-
         return serviceFactory.createRetrofitServiceWithInterceptor(DataPointDownloadService.class,
-                baseUrl).getAssignedDataPoints(androidId, surveyId + "")
+                baseUrl).getAssignedDataPoints(deviceHelper.getAndroidId(), surveyId + "")
                 .onErrorResumeNext(new ErrorLoggerFunction(
                         "Error downloading datapoints for survey: " + surveyId));
     }
@@ -67,7 +62,8 @@ public class RestApi {
     @SuppressWarnings("unchecked")
     public Observable<ApiFilesResult> getPendingFiles(List<String> formIds, String deviceId) {
         return serviceFactory.createRetrofitService(DeviceFilesService.class, baseUrl)
-                .getFilesLists(phoneNumber, androidId, imei, version, deviceId, formIds)
+                .getFilesLists(deviceHelper.getPhoneNumber(), deviceHelper.getAndroidId(),
+                        deviceHelper.getImei(), version, deviceId, formIds)
                 .onErrorResumeNext(new ErrorLoggerFunction(
                         "Error getting device pending files"));
     }
@@ -77,8 +73,8 @@ public class RestApi {
             String filename, String deviceId) {
         return serviceFactory
                 .createRetrofitService(ProcessingNotificationService.class, baseUrl)
-                .notifyFileAvailable(action, formId, filename, phoneNumber, androidId, imei,
-                        version, deviceId)
+                .notifyFileAvailable(action, formId, filename, deviceHelper.getPhoneNumber(),
+                        deviceHelper.getAndroidId(), deviceHelper.getImei(), version, deviceId)
                 .onErrorResumeNext(new ErrorLoggerFunction(
                         "Error notifying the file is available"));
     }
@@ -95,7 +91,8 @@ public class RestApi {
     public Observable<String> downloadFormHeader(String formId, String deviceId) {
         return serviceFactory
                 .createScalarsRetrofitService(FlowApiService.class, baseUrl)
-                .downloadFormHeader(formId, phoneNumber, androidId, imei, version, deviceId)
+                .downloadFormHeader(formId, deviceHelper.getPhoneNumber(),
+                        deviceHelper.getAndroidId(), deviceHelper.getImei(), version, deviceId)
                 .onErrorResumeNext(new ErrorLoggerFunction(
                         "Error downloading form " + formId + " header"));
     }
@@ -104,7 +101,8 @@ public class RestApi {
     public Observable<String> downloadFormsHeader(String deviceId) {
         return serviceFactory
                 .createScalarsRetrofitService(FlowApiService.class, baseUrl)
-                .downloadFormsHeader(phoneNumber, androidId, imei, version, deviceId)
+                .downloadFormsHeader(deviceHelper.getPhoneNumber(), deviceHelper.getAndroidId(),
+                        deviceHelper.getImei(), version, deviceId)
                 .onErrorResumeNext(new ErrorLoggerFunction("Error downloading all form headers"));
     }
 }

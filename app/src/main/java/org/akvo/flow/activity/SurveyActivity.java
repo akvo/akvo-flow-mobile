@@ -50,7 +50,6 @@ import org.akvo.flow.offlinemaps.domain.entity.DomainOfflineArea;
 import org.akvo.flow.offlinemaps.presentation.OfflineMapSelectedListener;
 import org.akvo.flow.offlinemaps.presentation.dialog.OfflineMapsDialog;
 import org.akvo.flow.offlinemaps.presentation.infowindow.InfoWindowLayout;
-import org.akvo.flow.uicomponents.SnackBarManager;
 import org.akvo.flow.presentation.UserDeleteConfirmationDialog;
 import org.akvo.flow.presentation.entity.ViewApkData;
 import org.akvo.flow.presentation.navigation.CreateUserDialog;
@@ -71,6 +70,7 @@ import org.akvo.flow.ui.Navigator;
 import org.akvo.flow.ui.fragment.DatapointsFragment;
 import org.akvo.flow.ui.fragment.RecordListListener;
 import org.akvo.flow.uicomponents.LocaleAwareActivity;
+import org.akvo.flow.uicomponents.SnackBarManager;
 import org.akvo.flow.util.AppPermissionsHelper;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.StatusUtil;
@@ -183,7 +183,6 @@ public class SurveyActivity extends LocaleAwareActivity implements RecordListLis
             }
             activityJustCreated = true;
             setNavigationView();
-            startService(new Intent(this, SurveyDownloadService.class));
         }
     }
 
@@ -382,6 +381,7 @@ public class SurveyActivity extends LocaleAwareActivity implements RecordListLis
     }
 
     private void startServices() {
+        startService(new Intent(this, SurveyDownloadService.class));
         startService(new Intent(this, BootstrapService.class));
         startService(new Intent(this, TimeCheckService.class));
     }

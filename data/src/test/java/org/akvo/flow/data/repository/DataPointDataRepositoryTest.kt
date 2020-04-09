@@ -91,9 +91,6 @@ class DataPointDataRepositoryTest {
 
     @Before
     fun setUp() {
-        `when`(mockDeviceHelper.androidId).thenReturn("")
-        `when`(mockDeviceHelper.imei).thenReturn("")
-        `when`(mockDeviceHelper.phoneNumber).thenReturn("")
         `when`(mapper.getImagesList(anyList())).thenReturn(emptyList())
         spyRestApi = spy(RestApi(mockDeviceHelper, null, null, ""))
         spyHttpException = spy(HttpException(retrofit2.Response.success("")))

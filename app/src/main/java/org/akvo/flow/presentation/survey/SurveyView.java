@@ -30,6 +30,4 @@ public interface SurveyView {
     void showMissingUserError();
 
     void openDataPoint(String datapointId, User user);
-
-    void navigateToWalkThrough();
 }

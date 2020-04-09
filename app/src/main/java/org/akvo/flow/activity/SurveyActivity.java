@@ -696,9 +696,4 @@ public class SurveyActivity extends LocaleAwareActivity implements RecordListLis
     public void onWindowSelected(String id) {
         onDatapointSelected(id);
     }
-
-    @Override
-    public void navigateToWalkThrough() {
-        navigator.navigateToWalkThrough(this);
-    }
 }

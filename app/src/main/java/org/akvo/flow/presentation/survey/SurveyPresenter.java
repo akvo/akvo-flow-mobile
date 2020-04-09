@@ -30,7 +30,6 @@ import org.akvo.flow.domain.util.VersionHelper;
 import org.akvo.flow.presentation.Presenter;
 import org.akvo.flow.presentation.entity.ViewApkMapper;
 import org.akvo.flow.util.ConstantUtil;
-import org.akvo.flow.walkthrough.domain.interactor.GetWalkThroughSeen;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -41,7 +40,6 @@ import javax.inject.Named;
 import androidx.core.util.Pair;
 import io.reactivex.annotations.NonNull;
 import io.reactivex.observers.DisposableCompletableObserver;
-import io.reactivex.observers.DisposableSingleObserver;
 import timber.log.Timber;
 
 public class SurveyPresenter implements Presenter {
@@ -54,7 +52,6 @@ public class SurveyPresenter implements Presenter {
     private final ViewApkMapper viewApkMapper;
     private final UseCase getSelectedUser;
     private final MarkDatapointViewed markDatapointViewed;
-    private final GetWalkThroughSeen wasWalkThroughSeen;
 
     private SurveyView view;
 
@@ -62,14 +59,13 @@ public class SurveyPresenter implements Presenter {
     public SurveyPresenter(@Named("GetApkDataPreferences") UseCase getApkDataPreferences,
             @Named("SaveApkUpdateNotified") UseCase saveApkUpdateNotified,
             VersionHelper versionHelper, ViewApkMapper viewApkMapper, @Named("getSelectedUser")
-            UseCase getSelectedUser, MarkDatapointViewed markDatapointViewed, GetWalkThroughSeen getWalkThroughSeen) {
+            UseCase getSelectedUser, MarkDatapointViewed markDatapointViewed) {
         this.getApkDataPreferences = getApkDataPreferences;
         this.saveApkUpdateNotified = saveApkUpdateNotified;
         this.versionHelper = versionHelper;
         this.viewApkMapper = viewApkMapper;
         this.getSelectedUser = getSelectedUser;
         this.markDatapointViewed = markDatapointViewed;
-        this.wasWalkThroughSeen = getWalkThroughSeen;
     }
 
     @Override
@@ -78,7 +74,6 @@ public class SurveyPresenter implements Presenter {
         saveApkUpdateNotified.dispose();
         getSelectedUser.dispose();
         markDatapointViewed.dispose();
-        wasWalkThroughSeen.dispose();
     }
 
     public void setView(SurveyView view) {
@@ -141,23 +136,6 @@ public class SurveyPresenter implements Presenter {
                 }
             }
         }, null);
-    }
-
-    public void checkWalkThroughDisplay() {
-        wasWalkThroughSeen.execute(new DisposableSingleObserver<Boolean>() {
-            @Override
-            public void onSuccess(Boolean seen) {
-                if (!seen) {
-                    view.navigateToWalkThrough();
-                }
-            }
-
-            @Override
-            public void onError(Throwable e) {
-                Timber.e(e);
-                view.navigateToWalkThrough();
-            }
-        });
     }
 
     private void setDataPointAsViewed(String datapointId, User user) {

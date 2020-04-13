@@ -136,10 +136,10 @@ public class DataPointsMapPresenter implements Presenter {
             public void onSuccess(DownloadResult result) {
                 view.hideProgress();
                 if (result.getResultCode() == SUCCESS) {
-                    if (result.getNumberOfSyncedItems() > 0) {
-                        view.showSyncedResults(result.getNumberOfSyncedItems());
+                    if (result.getNumberOfNewItems() > 0) {
+                        view.showDownloadedResults(result.getNumberOfNewItems());
                     } else {
-                        view.showNoDataPointsToSync();
+                        view.showNoDataPointsToDownload();
                     }
                 } else {
                     switch (result.getResultCode()) {

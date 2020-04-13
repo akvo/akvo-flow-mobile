@@ -102,11 +102,12 @@ public class DatabaseDataSource {
         return Single.just(briteSurveyDbAdapter.getDataPoint(dataPointId));
     }
 
-    public Completable syncDataPoints(List<ApiDataPoint> apiDataPoints) {
+    public Single<Integer> syncDataPoints(List<ApiDataPoint> apiDataPoints) {
         if (apiDataPoints == null) {
-            return Completable.complete();
+            return Single.just(0);
         }
         BriteDatabase.Transaction transaction = briteSurveyDbAdapter.beginTransaction();
+        int newDataPoints = 0;
         try {
             for (ApiDataPoint dataPoint : apiDataPoints) {
                 final String dataPointId = dataPoint.getId();
@@ -120,13 +121,16 @@ public class DatabaseDataSource {
 
                 syncSurveyInstances(dataPoint.getSurveyInstances(), dataPointId);
 
-                briteSurveyDbAdapter.updateRecord(dataPointId, values);
+                boolean insertedNewRecord = briteSurveyDbAdapter.insertOrUpdateRecord(dataPointId, values);
+                if (insertedNewRecord) {
+                    newDataPoints++;
+                }
             }
             transaction.markSuccessful();
         } finally {
             transaction.end();
         }
-        return Completable.complete();
+        return Single.just(newDataPoints);
     }
 
     private boolean isRequestFiltered(@Nullable Integer orderBy) {

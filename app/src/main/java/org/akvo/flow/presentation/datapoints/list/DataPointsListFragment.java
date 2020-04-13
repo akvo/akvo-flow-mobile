@@ -467,13 +467,13 @@ public class DataPointsListFragment extends Fragment implements LocationListener
     private void reloadMenu() {
         FragmentActivity activity = getActivity();
         if (activity != null) {
-            activity.supportInvalidateOptionsMenu();
+            activity.invalidateOptionsMenu();
         }
     }
 
     @Override
-    public void showSyncedResults(int numberOfSyncedItems) {
-        dataPointSyncSnackBarManager.showSyncedResults(numberOfSyncedItems, getView());
+    public void showDownloadedResults(int numberOfNewDataPoints) {
+        dataPointSyncSnackBarManager.showDownloadedResults(numberOfNewDataPoints, getView());
     }
 
     @Override
@@ -483,22 +483,13 @@ public class DataPointsListFragment extends Fragment implements LocationListener
 
     @Override
     public void showErrorNoNetwork() {
-        dataPointSyncSnackBarManager.showErrorNoNetwork(getView(), new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                presenter.onDownloadPressed();
-            }
-        });
+        dataPointSyncSnackBarManager.showErrorNoNetwork(getView(),
+                v -> presenter.onDownloadPressed());
     }
 
     @Override
     public void showErrorSync() {
-        dataPointSyncSnackBarManager.showErrorSync(getView(), new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                presenter.onDownloadPressed();
-            }
-        });
+        dataPointSyncSnackBarManager.showErrorSync(getView(), v -> presenter.onDownloadPressed());
     }
 
     @Override
@@ -516,7 +507,7 @@ public class DataPointsListFragment extends Fragment implements LocationListener
 
     @Override
     public void showNoDataPointsToSync() {
-        dataPointSyncSnackBarManager.showNoDataPointsToSync(getView());
+        dataPointSyncSnackBarManager.showNoDataPointsToDownload(getView());
     }
 
 //TODO: once we insert data using brite database this will no longer be necessary either

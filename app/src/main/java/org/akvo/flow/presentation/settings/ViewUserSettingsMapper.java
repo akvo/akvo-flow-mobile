@@ -28,9 +28,6 @@ import androidx.annotation.Nullable;
 
 public class ViewUserSettingsMapper {
 
-    public static final String DEFAULT_LANGUAGE = "en";
-    public static final int INVALID_LANGUAGE = -1;
-
     @Inject
     public ViewUserSettingsMapper() {
     }

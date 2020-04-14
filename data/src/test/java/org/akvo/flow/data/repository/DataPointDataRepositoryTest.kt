@@ -20,7 +20,6 @@
 package org.akvo.flow.data.repository
 
 import com.nhaarman.mockitokotlin2.spy
-import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.observers.TestObserver
 import org.akvo.flow.data.datasource.DataSourceFactory
@@ -162,11 +161,10 @@ class DataPointDataRepositoryTest {
     @Test
     fun downloadDataPointsShouldReturnCorrectResultIfSuccess() {
         doReturn(Single.just(mockApiResponse)).`when`(spyRestApi).downloadDataPoints(anyLong())
-        doReturn(Completable.complete()).`when`(mockDatabaseDataSource)!!.syncDataPoints(
+        doReturn(Single.just(1)).`when`(mockDatabaseDataSource)!!.syncDataPoints(
             anyList()
         )
         doReturn(mockApiDataPoints).`when`(mockApiResponse)!!.dataPoints
-        doReturn(1).`when`(mockApiDataPoints)!!.size
 
         val repository =
             DataPointDataRepository(

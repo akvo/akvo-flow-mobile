@@ -74,8 +74,10 @@ class DataPointDataRepository @Inject constructor(
     private fun syncDataPoints(apiLocaleResult: ApiLocaleResult): Single<Int> {
         return dataSourceFactory.dataBaseDataSource
             .syncDataPoints(apiLocaleResult.dataPoints)
-            .andThen(downLoadImages(apiLocaleResult.dataPoints))
-            .andThen(Single.just(apiLocaleResult.dataPoints.size))
+            .flatMap { newDownloadedDataPointsNumber ->
+                downLoadImages(apiLocaleResult.dataPoints)
+                    .andThen(Single.just(newDownloadedDataPointsNumber))
+            }
     }
 
     private fun downLoadImages(dataPoints: List<ApiDataPoint>): Completable {

@@ -189,7 +189,7 @@ public class BriteSurveyDbAdapter {
                 datapointId);
     }
 
-    public void updateRecord(String dataPointId, ContentValues values) {
+    public boolean insertOrUpdateRecord(String dataPointId, ContentValues values) {
         String sql =
                 "SELECT " + RecordColumns.RECORD_ID + ", " + RecordColumns.VIEWED + " FROM "
                         + Tables.RECORD + " WHERE " + RecordColumns.RECORD_ID + " = ?";
@@ -210,6 +210,7 @@ public class BriteSurveyDbAdapter {
             values.put(RecordColumns.VIEWED, viewed);
         }
         briteDatabase.insert(Tables.RECORD, values);
+        return id == DOES_NOT_EXIST;
     }
 
     /**

@@ -19,10 +19,10 @@
 
 package org.akvo.flow.presentation.datapoints.list.entity
 
+import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
-import java.util.Locale
 import javax.inject.Inject
 
 class DateMapper @Inject constructor() {
@@ -30,7 +30,7 @@ class DateMapper @Inject constructor() {
     fun formatDate(timeStamp: Long): String {
         val calendar = Calendar.getInstance()
         calendar.timeInMillis = timeStamp
-        val dateFormat = SimpleDateFormat("dd MMM yyyy - HH:mm", Locale.getDefault())
+        val dateFormat = SimpleDateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT)
         return dateFormat.format(Date(timeStamp))
     }
 }

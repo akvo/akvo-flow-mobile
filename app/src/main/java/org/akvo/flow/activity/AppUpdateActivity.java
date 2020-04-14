@@ -35,7 +35,6 @@ import org.akvo.flow.injector.component.ApplicationComponent;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
 import org.akvo.flow.ui.Navigator;
-import org.akvo.flow.uicomponents.LocaleAwareActivity;
 import org.akvo.flow.util.FileUtil;
 import org.akvo.flow.util.files.ApkFileBrowser;
 import org.akvo.flow.util.files.FileBrowser;
@@ -55,9 +54,10 @@ import java.util.List;
 import javax.inject.Inject;
 
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import timber.log.Timber;
 
-public class AppUpdateActivity extends LocaleAwareActivity {
+public class AppUpdateActivity extends AppCompatActivity {
     public static final String EXTRA_URL = "url";
     public static final String EXTRA_VERSION = "version";
     public static final String EXTRA_CHECKSUM = "md5Checksum";

@@ -69,7 +69,6 @@ import org.akvo.flow.tracking.TrackingListener;
 import org.akvo.flow.ui.Navigator;
 import org.akvo.flow.ui.fragment.DatapointsFragment;
 import org.akvo.flow.ui.fragment.RecordListListener;
-import org.akvo.flow.uicomponents.LocaleAwareActivity;
 import org.akvo.flow.uicomponents.SnackBarManager;
 import org.akvo.flow.util.AppPermissionsHelper;
 import org.akvo.flow.util.ConstantUtil;
@@ -85,6 +84,7 @@ import javax.inject.Named;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.view.GravityCompat;
@@ -96,7 +96,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import timber.log.Timber;
 
-public class SurveyActivity extends LocaleAwareActivity implements RecordListListener,
+public class SurveyActivity extends AppCompatActivity implements RecordListListener,
         FlowNavigationView.DrawerNavigationListener,
         SurveyDeleteConfirmationDialog.SurveyDeleteListener, UserOptionsDialog.UserOptionListener,
         UserDeleteConfirmationDialog.UserDeleteListener, EditUserDialog.EditUserListener,

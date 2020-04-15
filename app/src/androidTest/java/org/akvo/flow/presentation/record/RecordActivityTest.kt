@@ -32,6 +32,8 @@ import io.reactivex.internal.schedulers.TrampolineScheduler
 import it.cosenonjaviste.daggermock.DaggerMock
 import org.akvo.flow.R
 import org.akvo.flow.activity.FormActivity
+import org.akvo.flow.activity.form.FormActivityTestUtil
+import org.akvo.flow.activity.form.FormActivityTestUtil.addExecutionDelay
 import org.akvo.flow.activity.form.data.SurveyInstaller
 import org.akvo.flow.activity.form.data.SurveyRequisite
 import org.akvo.flow.app.FlowApp
@@ -80,10 +82,10 @@ class RecordActivityTest {
         }
     }
 
-    val surveyRepository = mock(SurveyRepository::class.java)
-    val userRepository = mock(UserRepository::class.java)
-    val dataPoint = mock(DataPoint::class.java)
-    val schedulerCreator = mock(SchedulerCreator::class.java)
+    private val surveyRepository: SurveyRepository = mock(SurveyRepository::class.java)
+    private val userRepository: UserRepository = mock(UserRepository::class.java)
+    private val dataPoint: DataPoint = mock(DataPoint::class.java)
+    private val schedulerCreator: SchedulerCreator = mock(SchedulerCreator::class.java)
 
     @Before
     fun beforeClass() {
@@ -227,6 +229,7 @@ class RecordActivityTest {
 
         fun clickMapMenuOption(): RecordScreenRobot {
             clickOnViewWithId(R.id.more_submenu)
+            addExecutionDelay(100)
             clickOnViewWithText(R.string.view_map)
             return this
         }

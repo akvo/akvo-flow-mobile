@@ -83,13 +83,13 @@ public class PreferencePresenter implements Presenter {
         this.view = view;
     }
 
-    public void loadPreferences(final List<String> languages, String selectedLanguage) {
+    public void loadPreferences() {
         view.showLoading();
         getUserSettings.execute(new DefaultObserver<UserSettings>() {
             @Override
             public void onNext(UserSettings userSettings) {
                 ViewUserSettings viewUserSettings = mapper
-                        .transform(userSettings, languages, selectedLanguage);
+                        .transform(userSettings);
                 view.hideLoading();
                 view.displaySettings(viewUserSettings);
             }

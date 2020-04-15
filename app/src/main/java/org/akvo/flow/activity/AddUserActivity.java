@@ -33,11 +33,11 @@ import org.akvo.flow.injector.component.ApplicationComponent;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
 import org.akvo.flow.ui.Navigator;
-import org.akvo.flow.uicomponents.LocaleAwareActivity;
 import org.akvo.flow.util.logging.LoggingHelper;
 
 import javax.inject.Inject;
 
+import androidx.appcompat.app.AppCompatActivity;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -46,7 +46,7 @@ import butterknife.OnTextChanged;
 
 import static butterknife.OnTextChanged.Callback.AFTER_TEXT_CHANGED;
 
-public class AddUserActivity extends LocaleAwareActivity {
+public class AddUserActivity extends AppCompatActivity {
 
     @BindView(R.id.login_btn)
     View nextBt;

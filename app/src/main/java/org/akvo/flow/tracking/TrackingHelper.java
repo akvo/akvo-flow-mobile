@@ -26,8 +26,6 @@ import com.google.firebase.analytics.FirebaseAnalytics;
 
 import org.akvo.flow.domain.util.ImageSize;
 
-import java.util.Locale;
-
 public class TrackingHelper {
 
     private final FirebaseAnalytics firebaseAnalytics;
@@ -88,13 +86,6 @@ public class TrackingHelper {
         Bundle params = new Bundle();
         params.putBoolean("status", checked);
         firebaseAnalytics.logEvent("setting_screen_on_changed", params);
-    }
-
-    public void logLanguageChanged(String language) {
-        Bundle params = new Bundle();
-        params.putString("app_language", language);
-        params.putString("previous_language", Locale.getDefault().getLanguage());
-        firebaseAnalytics.logEvent("setting_language_changed", params);
     }
 
     public void logImageSizeChanged(int imageSize) {

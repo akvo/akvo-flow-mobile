@@ -20,9 +20,10 @@
 package org.akvo.flow.uicomponents;
 
 import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
-public abstract class BackActivity extends LocaleAwareActivity {
+public abstract class BackActivity extends AppCompatActivity {
 
     protected void setupToolBar() {
         Toolbar toolbar = findViewById(R.id.toolbar);

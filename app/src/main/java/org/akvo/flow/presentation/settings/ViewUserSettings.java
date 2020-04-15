@@ -23,15 +23,13 @@ package org.akvo.flow.presentation.settings;
 public class ViewUserSettings {
     private final boolean screenOn;
     private final boolean dataEnabled;
-    private final int language;
     private final int imageSize;
     private final String identifier;
 
-    public ViewUserSettings(boolean screenOn, boolean dataEnabled, int language, int imageSize,
+    public ViewUserSettings(boolean screenOn, boolean dataEnabled, int imageSize,
             String identifier) {
         this.screenOn = screenOn;
         this.dataEnabled = dataEnabled;
-        this.language = language;
         this.imageSize = imageSize;
         this.identifier = identifier;
     }
@@ -42,10 +40,6 @@ public class ViewUserSettings {
 
     public boolean isDataEnabled() {
         return dataEnabled;
-    }
-
-    public int getLanguage() {
-        return language;
     }
 
     public int getImageSize() {

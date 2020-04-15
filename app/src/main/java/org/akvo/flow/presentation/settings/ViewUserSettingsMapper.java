@@ -20,56 +20,23 @@
 
 package org.akvo.flow.presentation.settings;
 
-import android.text.TextUtils;
-
 import org.akvo.flow.domain.entity.UserSettings;
-
-import java.util.List;
-import java.util.Locale;
 
 import javax.inject.Inject;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 public class ViewUserSettingsMapper {
-
-    public static final String DEFAULT_LANGUAGE = "en";
-    public static final int INVALID_LANGUAGE = -1;
 
     @Inject
     public ViewUserSettingsMapper() {
     }
 
-    public ViewUserSettings transform(@Nullable UserSettings userSettings,
-            @NonNull List<String> languages, @Nullable String language) {
+    public ViewUserSettings transform(@Nullable UserSettings userSettings) {
         if (userSettings == null) {
-            int englishPosition = getEnglishLanguagePosition(languages);
-            return new ViewUserSettings(false, false, englishPosition, 0, "");
+            return new ViewUserSettings(false, false, 0, "");
         }
-        if (TextUtils.isEmpty(language)) {
-            language = Locale.getDefault().getLanguage();
-        }
-        int languagePosition = getLanguagePosition(languages, language);
         return new ViewUserSettings(userSettings.isScreenOn(), userSettings.isDataEnabled(),
-                languagePosition, userSettings.getImageSize(), userSettings.getIdentifier());
-    }
-
-    private int getLanguagePosition(@NonNull List<String> languages, String language) {
-        int languagePosition = INVALID_LANGUAGE;
-        for (int i = 0; i < languages.size(); i++) {
-            if (language.equals(languages.get(i))) {
-                languagePosition = i;
-                break;
-            }
-        }
-        if (languagePosition == INVALID_LANGUAGE) {
-            languagePosition = getEnglishLanguagePosition(languages);
-        }
-        return languagePosition;
-    }
-
-    private int getEnglishLanguagePosition(@NonNull List<String> languages) {
-        return getLanguagePosition(languages, DEFAULT_LANGUAGE);
+                userSettings.getImageSize(), userSettings.getIdentifier());
     }
 }

@@ -18,32 +18,6 @@
         <item>@string/order_name</item>
     </string-array>
 
-    <!-- App languages -->
-    <string-array name="app_languages">
-        <item>Bahasa Indonesia</item>
-        <item>English</item>
-        <item>Español</item>
-        <item>Français</item>
-        <item>Hindi</item>
-        <item>Khmer</item>
-        <item>Nederlands</item>
-        <item>Nepali</item>
-        <item>Portuguese</item>
-        <item>Vietnamese</item>
-    </string-array>
-    <string-array name="app_language_codes">
-        <item>in</item>
-        <item>en</item>
-        <item>es</item>
-        <item>fr</item>
-        <item>hi</item>
-        <item>km</item>
-        <item>nl</item>
-        <item>ne</item>
-        <item>pt</item>
-        <item>vi</item>
-    </string-array>
-
     <!-- NOTE: Main color will suits the light theme. Must have enough colors for all languages -->
     <string-array name="colors">
         <item>black</item>

@@ -228,7 +228,6 @@
     <string name="error_mobile_data_sync">Mobile data sync disabled</string>
     <string name="preference_screen_on">Keep screen on during form input</string>
     <string name="preference_upload_mobile_data">Upload submissions over mobile data</string>
-    <string name="preference_app_language">App language</string>
     <string name="preference_image_size">Image size</string>
     <string name="preferences_data_section">Data</string>
     <string name="preference_sync_datapoints">Upload all submitted data points to Flow instance.</string>

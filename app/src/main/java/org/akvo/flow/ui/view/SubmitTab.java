@@ -20,8 +20,6 @@
 package org.akvo.flow.ui.view;
 
 import android.content.Context;
-import androidx.annotation.Nullable;
-import androidx.annotation.VisibleForTesting;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -37,6 +35,9 @@ import org.akvo.flow.event.SurveyListener;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import androidx.annotation.Nullable;
+import androidx.annotation.VisibleForTesting;
 
 public class SubmitTab extends ListView implements OnClickListener {
 
@@ -64,7 +65,8 @@ public class SubmitTab extends ListView implements OnClickListener {
 
         mSubmitButton = (Button) inflate(context, R.layout.submit_tab_footer);
         mSubmitButton.setOnClickListener(this);
-
+        setFooterDividersEnabled(false);
+        setHeaderDividersEnabled(false);
         addHeaderView(mHeaderView);
         addFooterView(mSubmitButton, FOOTER, true);
         adapter = new QuestionListAdapter();

@@ -172,7 +172,7 @@ public class DataPointsListFragment extends Fragment implements LocationListener
         emptyIv = view.findViewById(R.id.empty_iv);
         SurveyGroup surveyGroup = (SurveyGroup) getArguments()
                 .getSerializable(ConstantUtil.SURVEY_GROUP_EXTRA);
-        mAdapter = new DataPointListAdapter(getActivity(), mLatitude, mLongitude, surveyGroup);
+        mAdapter = new DataPointListAdapter(getActivity(), mLatitude, mLongitude);
         listView.setAdapter(mAdapter);
         listView.setOnItemClickListener(this);
         progressBar = view.findViewById(R.id.progress);

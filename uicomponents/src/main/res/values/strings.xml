@@ -126,8 +126,6 @@
     <string name="order_name">Name</string>
     <!--Record Activity-->
     <string name="unknown">Unnamed data point</string>
-    <string name="last_modified_monitored">Last Modified:</string>
-    <string name="last_modified_regular">Submitted:</string>
     <string name="last_response">Last Response:</string>
     <string name="error_missing_cascade">Cascade files are not downloaded</string>
     <string name="error_missing_form">Form not found. Please re-download all the forms</string>

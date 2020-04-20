@@ -17,6 +17,7 @@ buildscript {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath 'io.fabric.tools:gradle:1.31.2'
         classpath "org.jacoco:org.jacoco.core:$jacocoVersion"
+        classpath 'com.google.firebase:firebase-appdistribution-gradle:0.2.2'
     }
 }
 

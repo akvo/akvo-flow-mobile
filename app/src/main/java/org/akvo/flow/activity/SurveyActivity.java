@@ -153,6 +153,7 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     private boolean activityJustCreated;
     private boolean permissionsResults;
     private TrackingHelper trackingHelper;
+    private boolean servicesStarted = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -165,6 +166,7 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
         initializeToolBar();
         presenter.setView(this);
         trackingHelper = new TrackingHelper(this);
+        servicesStarted = false;
         if (!deviceSetUpCompleted()) {
             navigateToSetUp();
         } else {
@@ -374,16 +376,19 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
 
     private void startServicesIfPossible() {
         if (StatusUtil.hasExternalStorage()) {
-            startServices();
+            startServicesOnce();
         } else {
             displayExternalStorageMissing();
         }
     }
 
-    private void startServices() {
-        startService(new Intent(this, SurveyDownloadService.class));
-        startService(new Intent(this, BootstrapService.class));
-        startService(new Intent(this, TimeCheckService.class));
+    private void startServicesOnce() {
+        if (!servicesStarted) {
+            startService(new Intent(this, SurveyDownloadService.class));
+            startService(new Intent(this, BootstrapService.class));
+            startService(new Intent(this, TimeCheckService.class));
+            servicesStarted = true;
+        }
     }
 
     private void displayExternalStorageMissing() {

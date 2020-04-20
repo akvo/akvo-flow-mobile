@@ -30,8 +30,10 @@ import org.akvo.flow.broadcast.BootReceiver;
 import org.akvo.flow.broadcast.DataTimeoutReceiver;
 import org.akvo.flow.database.SurveyLanguagesDataSource;
 import org.akvo.flow.domain.executor.PostExecutionThread;
+import org.akvo.flow.domain.executor.SchedulerCreator;
 import org.akvo.flow.domain.executor.ThreadExecutor;
 import org.akvo.flow.domain.repository.ApkRepository;
+import org.akvo.flow.domain.repository.DataPointRepository;
 import org.akvo.flow.domain.repository.FileRepository;
 import org.akvo.flow.domain.repository.FormRepository;
 import org.akvo.flow.domain.repository.MissingAndDeletedRepository;
@@ -72,11 +74,15 @@ public interface ApplicationComponent {
 
     PostExecutionThread postExecutionThread();
 
+    SchedulerCreator schedulerCreator();
+
     FileRepository fileRepository();
 
     UserRepository userRepository();
 
     FormRepository formRepository();
+
+    DataPointRepository dataPointRepository();
 
     MissingAndDeletedRepository missingAndDeletedRepository();
 

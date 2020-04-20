@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2013-2017,2019 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2013-2017,2019-2020 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -19,7 +19,6 @@
 
 package org.akvo.flow.ui.fragment;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -41,7 +40,6 @@ import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.ui.model.ViewForm;
 import org.akvo.flow.ui.model.ViewFormMapper;
 import org.akvo.flow.util.ConstantUtil;
-import org.akvo.flow.util.PlatformUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,7 +48,6 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.ListFragment;
 import androidx.loader.app.LoaderManager.LoaderCallbacks;
 import androidx.loader.content.Loader;
-import timber.log.Timber;
 
 import static android.text.Spanned.SPAN_INCLUSIVE_INCLUSIVE;
 import static org.akvo.flow.util.ConstantUtil.DATA_POINT_ID_EXTRA;
@@ -60,7 +57,7 @@ public class FormListFragment extends ListFragment
 
     private SurveyGroup mSurveyGroup;
     private SurveyAdapter mAdapter;
-    private SurveyListListener mListener;
+    private FormListListener mListener;
     private final ViewFormMapper mapper = new ViewFormMapper();
     private String recordId;
 
@@ -68,21 +65,20 @@ public class FormListFragment extends ListFragment
     }
 
     public static FormListFragment newInstance() {
-        FormListFragment fragment = new FormListFragment();
-        return fragment;
+        return new FormListFragment();
     }
 
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
 
         // This makes sure that the container activity has implemented
         // the callback interface. If not, it throws an exception
         try {
-            mListener = (SurveyListListener) activity;
+            mListener = (FormListListener) context;
         } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
-                    + " must implement SurveyListListener");
+            throw new ClassCastException(context.toString()
+                    + " must implement FormListListener");
         }
     }
 
@@ -109,37 +105,22 @@ public class FormListFragment extends ListFragment
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         final String surveyId = mAdapter.getItem(position).getId();
-        mListener.onSurveyClick(surveyId);
+        mListener.onFormClick(surveyId);
     }
 
     static class SurveyAdapter extends ArrayAdapter<ViewForm> {
 
         private static final int LAYOUT_RES = R.layout.survey_item;
 
-        private final int[] backgrounds;
         private final int versionTextSize;
         private final int titleTextSize;
 
         SurveyAdapter(Context context) {
-            super(context, LAYOUT_RES, new ArrayList<ViewForm>());
-            this.backgrounds = new int[2];
-            backgrounds[0] = PlatformUtil.getResource(getContext(), R.attr.listitem_bg1);
-            backgrounds[1] = PlatformUtil.getResource(getContext(), R.attr.listitem_bg2);
+            super(context, LAYOUT_RES, new ArrayList<>());
             this.versionTextSize = context.getResources()
                     .getDimensionPixelSize(R.dimen.survey_version_text_size);
             this.titleTextSize = context.getResources()
                     .getDimensionPixelSize(R.dimen.survey_title_text_size);
-        }
-
-        @Override
-        public boolean areAllItemsEnabled() {
-            return false;
-        }
-
-        @Override
-        public boolean isEnabled(int position) {
-            ViewForm viewForm = getItem(position);
-            return viewForm.isEnabled();
         }
 
         @NonNull
@@ -158,9 +139,14 @@ public class FormListFragment extends ListFragment
             final ViewForm viewForm = getItem(position);
 
             formViewHolder.updateViews(viewForm, versionTextSize, titleTextSize);
+            if (viewForm.isEnabled()) {
+                listItem.setClickable(false);
+                listItem.setAlpha(1f);
+            } else {
+                listItem.setClickable(true);
+                listItem.setAlpha(0.5f);
+            }
 
-            // Alternate background
-            listItem.setBackgroundResource(backgrounds[position % 2 == 0 ? 0 : 1]);
             return listItem;
         }
 
@@ -171,18 +157,15 @@ public class FormListFragment extends ListFragment
         }
     }
 
+    @NonNull
     @Override
     public Loader<List<FormInfo>> onCreateLoader(int id, Bundle args) {
         return new FormInfoLoader(getActivity(), recordId, mSurveyGroup);
     }
 
     @Override
-    public void onLoadFinished(Loader<List<FormInfo>> loader,
+    public void onLoadFinished(@NonNull Loader<List<FormInfo>> loader,
             List<FormInfo> data) {
-        if (loader == null) {
-            Timber.e("onLoadFinished() - Loader returned no data");
-            return;
-        }
         mAdapter.clear();
         List<ViewForm> forms = mapper
                 .transform(data, mSurveyGroup, getString(R.string.form_deleted));
@@ -190,14 +173,14 @@ public class FormListFragment extends ListFragment
     }
 
     @Override
-    public void onLoaderReset(Loader<List<FormInfo>> loader) {
+    public void onLoaderReset(@NonNull Loader<List<FormInfo>> loader) {
         //EMPTY
     }
 
 
-    public interface SurveyListListener {
+    public interface FormListListener {
 
-        void onSurveyClick(String surveyId);
+        void onFormClick(String surveyId);
     }
 
     static class FormViewHolder {
@@ -209,9 +192,9 @@ public class FormListFragment extends ListFragment
 
         FormViewHolder(View view) {
             this.view = view;
-            this.formNameView = (TextView) view.findViewById(R.id.survey_name_tv);
-            this.lastSubmissionTitle = (TextView) view.findViewById(R.id.date_label);
-            this.lastSubmissionView = (TextView) view.findViewById(R.id.date);
+            this.formNameView = view.findViewById(R.id.survey_name_tv);
+            this.lastSubmissionTitle = view.findViewById(R.id.date_label);
+            this.lastSubmissionView = view.findViewById(R.id.date);
         }
 
         void updateViews(ViewForm surveyInfo, int versionTextSize, int titleTextSize) {

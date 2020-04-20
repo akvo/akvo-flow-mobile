@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2019 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2020 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -50,7 +50,6 @@ import org.akvo.flow.offlinemaps.domain.entity.DomainOfflineArea;
 import org.akvo.flow.offlinemaps.presentation.OfflineMapSelectedListener;
 import org.akvo.flow.offlinemaps.presentation.dialog.OfflineMapsDialog;
 import org.akvo.flow.offlinemaps.presentation.infowindow.InfoWindowLayout;
-import org.akvo.flow.uicomponents.SnackBarManager;
 import org.akvo.flow.presentation.UserDeleteConfirmationDialog;
 import org.akvo.flow.presentation.entity.ViewApkData;
 import org.akvo.flow.presentation.navigation.CreateUserDialog;
@@ -70,7 +69,7 @@ import org.akvo.flow.tracking.TrackingListener;
 import org.akvo.flow.ui.Navigator;
 import org.akvo.flow.ui.fragment.DatapointsFragment;
 import org.akvo.flow.ui.fragment.RecordListListener;
-import org.akvo.flow.uicomponents.LocaleAwareActivity;
+import org.akvo.flow.uicomponents.SnackBarManager;
 import org.akvo.flow.util.AppPermissionsHelper;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.StatusUtil;
@@ -85,6 +84,7 @@ import javax.inject.Named;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.view.GravityCompat;
@@ -96,7 +96,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import timber.log.Timber;
 
-public class SurveyActivity extends LocaleAwareActivity implements RecordListListener,
+public class SurveyActivity extends AppCompatActivity implements RecordListListener,
         FlowNavigationView.DrawerNavigationListener,
         SurveyDeleteConfirmationDialog.SurveyDeleteListener, UserOptionsDialog.UserOptionListener,
         UserDeleteConfirmationDialog.UserDeleteListener, EditUserDialog.EditUserListener,
@@ -153,6 +153,7 @@ public class SurveyActivity extends LocaleAwareActivity implements RecordListLis
     private boolean activityJustCreated;
     private boolean permissionsResults;
     private TrackingHelper trackingHelper;
+    private boolean servicesStarted = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -165,6 +166,7 @@ public class SurveyActivity extends LocaleAwareActivity implements RecordListLis
         initializeToolBar();
         presenter.setView(this);
         trackingHelper = new TrackingHelper(this);
+        servicesStarted = false;
         if (!deviceSetUpCompleted()) {
             navigateToSetUp();
         } else {
@@ -183,7 +185,6 @@ public class SurveyActivity extends LocaleAwareActivity implements RecordListLis
             }
             activityJustCreated = true;
             setNavigationView();
-            startService(new Intent(this, SurveyDownloadService.class));
         }
     }
 
@@ -375,15 +376,19 @@ public class SurveyActivity extends LocaleAwareActivity implements RecordListLis
 
     private void startServicesIfPossible() {
         if (StatusUtil.hasExternalStorage()) {
-            startServices();
+            startServicesOnce();
         } else {
             displayExternalStorageMissing();
         }
     }
 
-    private void startServices() {
-        startService(new Intent(this, BootstrapService.class));
-        startService(new Intent(this, TimeCheckService.class));
+    private void startServicesOnce() {
+        if (!servicesStarted) {
+            startService(new Intent(this, SurveyDownloadService.class));
+            startService(new Intent(this, BootstrapService.class));
+            startService(new Intent(this, TimeCheckService.class));
+            servicesStarted = true;
+        }
     }
 
     private void displayExternalStorageMissing() {
@@ -399,7 +404,7 @@ public class SurveyActivity extends LocaleAwareActivity implements RecordListLis
         setIntent(intent);
         if (Intent.ACTION_VIEW.equals(intent.getAction())) {
             String surveyedLocaleId = intent.getDataString();
-            onRecordSelected(surveyedLocaleId);
+            onDatapointSelected(surveyedLocaleId);
         }
     }
 
@@ -478,38 +483,29 @@ public class SurveyActivity extends LocaleAwareActivity implements RecordListLis
     }
 
     @Override
-    public void onRecordSelected(final String surveyedLocaleId) {
-        getSelectedUser.execute(new DefaultObserver<User>() {
-            @Override
-            public void onError(Throwable e) {
-                Timber.e(e);
-                showMissingUserError();
-            }
-
-            @Override
-            public void onNext(User user) {
-                if (user.getName() == null) {
-                    showMissingUserError();
-                } else {
-                    if (mSurveyGroup != null && mSurveyGroup.isMonitored()) {
-                        displayRecord(surveyedLocaleId);
-                    } else {
-                        displayForm(surveyedLocaleId, user);
-                    }
-                }
-            }
-        }, null);
+    public void onDatapointSelected(final String datapointId) {
+        presenter.onDatapointSelected(datapointId);
     }
 
-    private void showMissingUserError() {
+    @Override
+    public void showMissingUserError() {
         Toast.makeText(this, R.string.mustselectuser, Toast.LENGTH_LONG).show();
     }
 
-    private void displayRecord(String surveyedLocaleId) {
-        navigator.navigateToRecordActivity(this, surveyedLocaleId, mSurveyGroup);
+    @Override
+    public void openDataPoint(String datapointId, User user) {
+        if (mSurveyGroup != null && mSurveyGroup.isMonitored()) {
+            displayRecord(datapointId);
+        } else {
+            displayForm(datapointId, user);
+        }
     }
 
-    private void displayForm(String surveyedLocaleId, User user) {
+    private void displayRecord(String datapointId) {
+        navigator.navigateToRecordActivity(this, datapointId, mSurveyGroup);
+    }
+
+    private void displayForm(String datapointId, User user) {
         Survey registrationForm =
                 mDatabase != null ? mDatabase.getRegistrationForm(mSurveyGroup) : null;
         if (registrationForm == null) {
@@ -523,7 +519,7 @@ public class SurveyActivity extends LocaleAwareActivity implements RecordListLis
         final String registrationFormId = registrationForm.getId();
         long formInstanceId;
         boolean readOnly;
-        Cursor c = mDatabase.getFormInstances(surveyedLocaleId);
+        Cursor c = mDatabase.getFormInstances(datapointId);
         if (c.moveToFirst()) {
             formInstanceId = c.getLong(SurveyDbAdapter.FormInstanceQuery._ID);
             int status = c.getInt(SurveyDbAdapter.FormInstanceQuery.STATUS);
@@ -531,12 +527,12 @@ public class SurveyActivity extends LocaleAwareActivity implements RecordListLis
         } else {
             formInstanceId = mDatabase
                     .createSurveyRespondent(registrationForm.getId(), registrationForm.getVersion(),
-                            user, surveyedLocaleId);
+                            user, datapointId);
             readOnly = false;
         }
         c.close();
 
-        navigator.navigateToFormActivity(this, surveyedLocaleId, registrationFormId,
+        navigator.navigateToFormActivity(this, datapointId, registrationFormId,
                 formInstanceId, readOnly, mSurveyGroup);
     }
 
@@ -591,7 +587,7 @@ public class SurveyActivity extends LocaleAwareActivity implements RecordListLis
         if (mDatabase != null) {
             addDataPointFab.setEnabled(false);
             String newLocaleId = mDatabase.createSurveyedLocale(mSurveyGroup.getId());
-            onRecordSelected(newLocaleId);
+            onDatapointSelected(newLocaleId);
         }
     }
 
@@ -703,6 +699,6 @@ public class SurveyActivity extends LocaleAwareActivity implements RecordListLis
 
     @Override
     public void onWindowSelected(String id) {
-        onRecordSelected(id);
+        onDatapointSelected(id);
     }
 }

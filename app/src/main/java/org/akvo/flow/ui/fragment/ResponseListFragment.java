@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2013-2019 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2013-2020 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -99,7 +99,6 @@ public class ResponseListFragment extends ListFragment implements LoaderCallback
         Intent intent = getActivity().getIntent();
         mSurveyGroup = (SurveyGroup) intent.getSerializableExtra(SURVEY_GROUP_EXTRA);
         recordId = intent.getStringExtra(DATA_POINT_ID_EXTRA);
-
         if (mAdapter == null) {
             mAdapter = new ResponseListAdapter(getActivity());
             setListAdapter(mAdapter);
@@ -205,7 +204,7 @@ public class ResponseListFragment extends ListFragment implements LoaderCallback
         db.deleteSurveyInstance(String.valueOf(surveyInstanceId));
         db.close();
         if (nameResetNeeded && responseListListener != null) {
-            responseListListener.onNamedRecordDeleted();
+            responseListListener.onDataPointNameDeleted();
         }
         refresh();
     }
@@ -241,7 +240,6 @@ public class ResponseListFragment extends ListFragment implements LoaderCallback
 
     /**
      * TODO: make a static inner class to avoid memory leaks
-     *
      * BroadcastReceiver to notify of data synchronisation. This should be
      * fired from DataFixWorker.
      */
@@ -254,6 +252,6 @@ public class ResponseListFragment extends ListFragment implements LoaderCallback
     };
 
     public interface ResponseListListener {
-        void onNamedRecordDeleted();
+        void onDataPointNameDeleted();
     }
 }

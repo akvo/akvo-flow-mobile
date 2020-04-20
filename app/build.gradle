@@ -1,15 +1,11 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
-apply plugin: 'io.sentry.android.gradle'
 apply plugin: 'com.getkeepsafe.dexcount'
-
+apply plugin: 'io.fabric'
+apply from: rootProject.file("jacoco.gradle")
+apply plugin: 'kotlin-kapt'
 apply plugin: 'com.google.firebase.appdistribution'
-
-sentry {
-    autoProguardConfig false
-    autoUpload false
-}
 
 dexcount {
     enabled = !project.hasProperty("nodexcount")
@@ -19,10 +15,7 @@ loadProperties()
 
 def loadProperties() {
     def file = hasProperty('file') ? file : 'survey.properties'
-    println "Survey config file: " + file
-
-    Properties surveyProps = readProperties(file)
-    project.ext.surveyProps = surveyProps
+    project.ext.surveyProps = readProperties(file)
 }
 
 android {
@@ -68,10 +61,12 @@ android {
         }
 
         flowRelease {
-            storeFile file(RELEASE_STORE_FILE)
-            storePassword RELEASE_STORE_PASSWORD
-            keyAlias RELEASE_KEY_ALIAS
-            keyPassword RELEASE_KEY_PASSWORD
+            if (project.hasProperty('RELEASE_STORE_FILE')) {
+                storeFile file(RELEASE_STORE_FILE)
+                storePassword RELEASE_STORE_PASSWORD
+                keyAlias RELEASE_KEY_ALIAS
+                keyPassword RELEASE_KEY_PASSWORD
+            }
         }
     }
 
@@ -109,7 +104,6 @@ android {
             proguardFile 'proguard-files/proguard-gson.pro'
             proguardFile 'proguard-files/proguard-prettytime.pro'
             proguardFile 'proguard-files/proguard-rxjava.pro'
-            proguardFile 'proguard-files/proguard-sentry.pro'
             proguardFile 'proguard-files/proguard-square-retrofit.pro'
             proguardFile 'proguard-files/proguard-support-v7-appcompat.pro'
             proguardFile 'proguard-files/okhttp3.pro'
@@ -125,6 +119,7 @@ android {
         debug {
             minifyEnabled true
             multiDexEnabled true
+            testCoverageEnabled true
             proguardFile 'proguard-files/proguard-rules.pro'
             proguardFile 'proguard-files/proguard-butterknife.pro'
             proguardFile 'proguard-files/proguard-glide.pro'
@@ -132,7 +127,6 @@ android {
             proguardFile 'proguard-files/proguard-gson.pro'
             proguardFile 'proguard-files/proguard-prettytime.pro'
             proguardFile 'proguard-files/proguard-rxjava.pro'
-            proguardFile 'proguard-files/proguard-sentry.pro'
             proguardFile 'proguard-files/proguard-square-retrofit.pro'
             proguardFile 'proguard-files/proguard-support-v7-appcompat.pro'
             proguardFile 'proguard-files/okhttp3.pro'
@@ -155,7 +149,6 @@ android {
             testProguardFile 'proguard-files/leakcanary.pro'
             testProguardFile getDefaultProguardFile('proguard-android.txt')
         }
-
     }
 
     packagingOptions {
@@ -186,12 +179,18 @@ android {
     }
 
     testOptions {
-        unitTests.returnDefaultValues = true
-    }
-
-    testOptions.unitTests.all {
-        testLogging {
-            events 'passed', 'skipped', 'failed', 'standardOut', 'standardError'
+        animationsDisabled true
+        unitTests {
+            includeAndroidResources = true
+            returnDefaultValues = true
+            all {
+                testLogging {
+                    events 'passed', 'skipped', 'failed', 'standardOut', 'standardError'
+                }
+                jacoco {
+                    includeNoLocationClasses = true
+                }
+            }
         }
     }
 
@@ -239,13 +238,11 @@ dependencies {
     implementation "org.ocpsoft.prettytime:prettytime:${rootProject.ext.prettyTimeVersion}"
     implementation "com.jakewharton.timber:timber:${rootProject.ext.timberVersion}"
     implementation "com.google.dagger:dagger:${rootProject.ext.daggerVersion}"
-    annotationProcessor "com.google.dagger:dagger-compiler:${rootProject.ext.daggerVersion}"
+    kapt "com.google.dagger:dagger-compiler:${rootProject.ext.daggerVersion}"
     implementation "com.jakewharton:butterknife:${rootProject.ext.butterKnifeVersion}"
-    annotationProcessor "com.jakewharton:butterknife-compiler:${rootProject.ext.butterKnifeVersion}"
-    implementation "io.sentry:sentry-android:$sentryVersion"
-    implementation "org.slf4j:slf4j-nop:${rootProject.ext.slfVersion}"
+    kapt "com.jakewharton:butterknife-compiler:${rootProject.ext.butterKnifeVersion}"
     implementation "com.github.bumptech.glide:glide:${rootProject.ext.glideVersion}"
-    annotationProcessor "com.github.bumptech.glide:compiler:${rootProject.ext.glideVersion}"
+    kapt "com.github.bumptech.glide:compiler:${rootProject.ext.glideVersion}"
     implementation "com.squareup.sqlbrite2:sqlbrite:${rootProject.ext.sqlbriteVersion}"
     implementation "io.reactivex.rxjava2:rxandroid:${rootProject.ext.rxAndroidVersion}"
     implementation "io.reactivex.rxjava2:rxjava:${rootProject.ext.rxJavaVersion}"
@@ -254,12 +251,15 @@ dependencies {
 
     debugImplementation "com.squareup.leakcanary:leakcanary-android:${rootProject.ext.leakCanaryVersion}"
 
-    implementation "com.google.firebase:firebase-analytics:${rootProject.ext.firebaseVersion}"
+    implementation "com.google.firebase:firebase-analytics:${rootProject.ext.firebaseAnalyticsVersion}"
+    implementation "com.crashlytics.sdk.android:crashlytics:${rootProject.ext.crashlyticsVersion}"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
     implementation "androidx.core:core-ktx:${rootProject.ext.coreKtxVersion}"
     implementation "com.mapbox.mapboxsdk:mapbox-android-sdk:${rootProject.ext.mapboxVersion}"
     implementation "androidx.work:work-runtime:${rootProject.ext.workVersion}"
     implementation "com.halfhp.rxtracer:rxtracer:${rootProject.ext.rxTracerVersion}"
+    implementation "org.slf4j:slf4j-nop:${rootProject.ext.slf4JVersion}"
+    implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
 
     testImplementation "junit:junit:${rootProject.ext.jUnitVersion}"
     testImplementation "org.mockito:mockito-core:${rootProject.ext.mockitoCoreVersion}"
@@ -274,8 +274,11 @@ dependencies {
     androidTestImplementation "com.google.dexmaker:dexmaker:${rootProject.ext.dexMakerVersion}"
     androidTestImplementation "com.google.dexmaker:dexmaker-mockito:${rootProject.ext.dexMakerVersion}"
     androidTestImplementation "androidx.test:rules:${rootProject.ext.rulesVersion}"
-    androidTestImplementation "androidx.test.espresso:espresso-core:${rootProject.ext.espressoCoreVersion}"
-    androidTestImplementation "androidx.test.espresso:espresso-contrib:${rootProject.ext.espressoContribVersion}"
+    androidTestImplementation "androidx.test.espresso:espresso-core:${rootProject.ext.espressoVersion}"
+    androidTestImplementation "androidx.test.espresso:espresso-contrib:${rootProject.ext.espressoVersion}"
+    androidTestImplementation "androidx.test.espresso:espresso-intents:${rootProject.ext.espressoVersion}"
+    androidTestImplementation "com.github.fabioCollini.daggermock:daggermock:${rootProject.ext.daggermockVersion}"
+    androidTestImplementation "com.github.fabioCollini.daggermock:daggermock-kotlin:${rootProject.ext.daggermockVersion}"
 
     implementation project(':domain')
     implementation project(':data')

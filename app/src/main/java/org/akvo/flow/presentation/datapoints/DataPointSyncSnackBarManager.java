@@ -20,13 +20,14 @@
 
 package org.akvo.flow.presentation.datapoints;
 
-import androidx.annotation.StringRes;
 import android.view.View;
 
 import org.akvo.flow.R;
 import org.akvo.flow.uicomponents.SnackBarManager;
 
 import javax.inject.Inject;
+
+import androidx.annotation.StringRes;
 
 public class DataPointSyncSnackBarManager {
 
@@ -37,7 +38,7 @@ public class DataPointSyncSnackBarManager {
         this.snackBarManager = snackBarManager;
     }
 
-    public void showSyncedResults(int numberOfSyncedItems, View rootView) {
+    public void showDownloadedResults(int numberOfSyncedItems, View rootView) {
         if (rootView != null) {
             String message = rootView.getResources()
                     .getQuantityString(R.plurals.data_points_sync_success_message,
@@ -77,7 +78,7 @@ public class DataPointSyncSnackBarManager {
         }
     }
 
-    public void showNoDataPointsToSync(View rootView) {
+    public void showNoDataPointsToDownload(View rootView) {
         if (rootView != null) {
             displaySnackBar(rootView.getContext()
                     .getString(R.string.data_points_sync_no_data_points), rootView);

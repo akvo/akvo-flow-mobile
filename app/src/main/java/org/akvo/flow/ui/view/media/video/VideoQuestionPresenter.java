@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2019 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2018-2020 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -21,12 +21,12 @@
 package org.akvo.flow.ui.view.media.video;
 
 import android.net.Uri;
-import androidx.annotation.Nullable;
 import android.text.TextUtils;
 
 import org.akvo.flow.domain.interactor.CopyVideo;
 import org.akvo.flow.domain.interactor.DefaultObserver;
 import org.akvo.flow.domain.interactor.UseCase;
+import org.akvo.flow.domain.interactor.datapoints.DownloadMedia;
 import org.akvo.flow.presentation.Presenter;
 import org.akvo.flow.util.MediaFileHelper;
 
@@ -37,18 +37,24 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import androidx.annotation.Nullable;
+import io.reactivex.observers.DisposableCompletableObserver;
 import timber.log.Timber;
 
 public class VideoQuestionPresenter implements Presenter {
 
     private final UseCase copyVideo;
+    private final DownloadMedia downloadMediaUseCase;
     private final MediaFileHelper mediaFileHelper;
 
     private IVideoQuestionView view;
 
     @Inject
-    public VideoQuestionPresenter(@Named("copyVideo") UseCase copyVideo, MediaFileHelper mediaFileHelper) {
+    public VideoQuestionPresenter(@Named("copyVideo") UseCase copyVideo,
+            DownloadMedia downloadMediaUseCase,
+            MediaFileHelper mediaFileHelper) {
         this.copyVideo = copyVideo;
+        this.downloadMediaUseCase = downloadMediaUseCase;
         this.mediaFileHelper = mediaFileHelper;
     }
 
@@ -59,7 +65,29 @@ public class VideoQuestionPresenter implements Presenter {
     @Override
     public void destroy() {
         copyVideo.dispose();
+        downloadMediaUseCase.dispose();
     }
+
+    public void downloadMedia(String filename) {
+        view.showLoading();
+        Map<String, Object> params = new HashMap<>(2);
+        params.put(DownloadMedia.PARAM_FILE_PATH, filename);
+        downloadMediaUseCase.execute(new DisposableCompletableObserver() {
+            @Override
+            public void onComplete() {
+                view.hideLoading();
+                view.displayThumbnail();
+            }
+
+            @Override
+            public void onError(Throwable e) {
+                view.hideLoading();
+                view.displayThumbnail();
+                view.showVideoLoadError();
+            }
+        }, params);
+    }
+
 
     public void onVideoReady(@Nullable Uri uri, boolean removeOriginal) {
             view.showLoading();

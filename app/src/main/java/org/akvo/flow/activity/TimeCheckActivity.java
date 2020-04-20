@@ -28,12 +28,13 @@ import org.akvo.flow.R;
 import org.akvo.flow.service.DataPointUploadWorker;
 import org.akvo.flow.service.SurveyDownloadService;
 import org.akvo.flow.service.TimeCheckService;
-import org.akvo.flow.uicomponents.LocaleAwareActivity;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class TimeCheckActivity extends LocaleAwareActivity {
+import androidx.appcompat.app.AppCompatActivity;
+
+public class TimeCheckActivity extends AppCompatActivity {
     private static final String PATTERN = "HH:mm, yyyy-MM-dd (zzzz)";
 
     @Override

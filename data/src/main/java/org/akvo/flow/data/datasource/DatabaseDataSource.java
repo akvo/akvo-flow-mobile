@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2019 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2020 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -23,6 +23,7 @@ package org.akvo.flow.data.datasource;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.text.TextUtils;
+import android.util.Pair;
 
 import com.squareup.sqlbrite2.BriteDatabase;
 
@@ -32,6 +33,7 @@ import org.akvo.flow.data.entity.ApiQuestionAnswer;
 import org.akvo.flow.data.entity.ApiSurveyInstance;
 import org.akvo.flow.data.entity.SurveyInstanceIdMapper;
 import org.akvo.flow.data.entity.form.Form;
+import org.akvo.flow.data.entity.form.FormMetadataMapper;
 import org.akvo.flow.data.util.FlowFileBrowser;
 import org.akvo.flow.database.Constants;
 import org.akvo.flow.database.RecordColumns;
@@ -40,10 +42,10 @@ import org.akvo.flow.database.SurveyColumns;
 import org.akvo.flow.database.SurveyGroupColumns;
 import org.akvo.flow.database.SurveyInstanceColumns;
 import org.akvo.flow.database.SurveyInstanceStatus;
-import org.akvo.flow.database.SyncTimeColumns;
 import org.akvo.flow.database.TransmissionStatus;
 import org.akvo.flow.database.britedb.BriteSurveyDbAdapter;
 import org.akvo.flow.domain.entity.User;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -64,15 +66,18 @@ public class DatabaseDataSource {
 
     private static final String DEFAULTS_SURVEY_LANGUAGE = "en";
     private static final String DEFAULT_SURVEY_TYPE = "survey";
-    public static final String DEFAULT_SURVEY_LOCATION = "sdcard";
+    private static final String DEFAULT_SURVEY_LOCATION = "sdcard";
 
     private final BriteSurveyDbAdapter briteSurveyDbAdapter;
     private final SurveyInstanceIdMapper surveyInstanceIdMapper;
+    private final FormMetadataMapper formMetadataMapper;
 
     @Inject
-    public DatabaseDataSource(BriteDatabase db, SurveyInstanceIdMapper surveyInstanceIdMapper) {
+    public DatabaseDataSource(BriteDatabase db, SurveyInstanceIdMapper surveyInstanceIdMapper,
+            FormMetadataMapper formMetadataMapper) {
         this.briteSurveyDbAdapter = new BriteSurveyDbAdapter(db);
         this.surveyInstanceIdMapper = surveyInstanceIdMapper;
+        this.formMetadataMapper = formMetadataMapper;
     }
 
     public Observable<Cursor> getSurveys() {
@@ -97,34 +102,35 @@ public class DatabaseDataSource {
         return Single.just(briteSurveyDbAdapter.getDataPoint(dataPointId));
     }
 
-    public Cursor getSyncedTime(long surveyGroupId) {
-        return briteSurveyDbAdapter.getSyncTime(surveyGroupId);
-    }
-
-    public void syncDataPoints(List<ApiDataPoint> apiDataPoints) {
-        if (apiDataPoints == null || apiDataPoints.size() == 0) {
-            return;
+    public Single<Integer> syncDataPoints(List<ApiDataPoint> apiDataPoints) {
+        if (apiDataPoints == null) {
+            return Single.just(0);
         }
         BriteDatabase.Transaction transaction = briteSurveyDbAdapter.beginTransaction();
+        int newDataPoints = 0;
         try {
             for (ApiDataPoint dataPoint : apiDataPoints) {
-                final String id = dataPoint.getId();
+                final String dataPointId = dataPoint.getId();
                 ContentValues values = new ContentValues();
-                values.put(RecordColumns.RECORD_ID, id);
+                values.put(RecordColumns.RECORD_ID, dataPointId);
                 values.put(RecordColumns.SURVEY_GROUP_ID, dataPoint.getSurveyGroupId());
                 values.put(RecordColumns.NAME, dataPoint.getDisplayName());
                 values.put(RecordColumns.LATITUDE, dataPoint.getLatitude());
                 values.put(RecordColumns.LONGITUDE, dataPoint.getLongitude());
+                values.put(RecordColumns.LAST_MODIFIED, dataPoint.getLastModified());
 
-                syncSurveyInstances(dataPoint.getSurveyInstances(), id);
+                syncSurveyInstances(dataPoint.getSurveyInstances(), dataPointId);
 
-                briteSurveyDbAdapter.updateRecord(id, values, dataPoint.getLastModified());
+                boolean insertedNewRecord = briteSurveyDbAdapter.insertOrUpdateRecord(dataPointId, values);
+                if (insertedNewRecord) {
+                    newDataPoints++;
+                }
             }
-            updateLastUpdatedDateTime(apiDataPoints);
             transaction.markSuccessful();
         } finally {
             transaction.end();
         }
+        return Single.just(newDataPoints);
     }
 
     private boolean isRequestFiltered(@Nullable Integer orderBy) {
@@ -132,34 +138,6 @@ public class DatabaseDataSource {
                 orderBy == Constants.ORDER_BY_DATE ||
                 orderBy == Constants.ORDER_BY_STATUS ||
                 orderBy == Constants.ORDER_BY_NAME);
-    }
-
-    /**
-     * JSON array responses are ordered to have the latest updated datapoint last so
-     * we record it to make the next query using it
-     *
-     */
-    private void updateLastUpdatedDateTime(@NonNull List<ApiDataPoint> apiDataPoints) {
-        ApiDataPoint apiDataPoint = apiDataPoints.isEmpty() ?
-                null :
-                apiDataPoints.get(apiDataPoints.size() - 1);
-        if (apiDataPoint != null) {
-            String syncTime = String.valueOf(apiDataPoint.getLastModified());
-            setSyncTime(apiDataPoint.getSurveyGroupId(), syncTime);
-        }
-    }
-
-    /**
-     * Save the time of last synchronization for a particular SurveyGroup
-     *
-     * @param surveyGroupId id of the SurveyGroup
-     * @param time          String containing the timestamp
-     */
-    private void setSyncTime(long surveyGroupId, String time) {
-        ContentValues values = new ContentValues();
-        values.put(SyncTimeColumns.SURVEY_GROUP_ID, surveyGroupId);
-        values.put(SyncTimeColumns.TIME, time);
-        briteSurveyDbAdapter.insertSyncedTime(values);
     }
 
     private void syncSurveyInstances(List<ApiSurveyInstance> surveyInstances, String dataPointId) {
@@ -416,7 +394,7 @@ public class DatabaseDataSource {
         updatedValues.put(SurveyColumns.NAME, formHeader.getName());
         updatedValues.put(SurveyColumns.LANGUAGE, getFormLanguage(formHeader));
         updatedValues.put(SurveyColumns.SURVEY_GROUP_ID, formHeader.getGroupId());
-        updatedValues.put(SurveyColumns.HELP_DOWNLOADED, cascadeResourcesDownloaded? 1: 0);
+        updatedValues.put(SurveyColumns.HELP_DOWNLOADED, cascadeResourcesDownloaded ? 1 : 0);
         briteSurveyDbAdapter.updateSurvey(updatedValues, formHeader.getId());
         return Observable.just(true);
     }
@@ -438,5 +416,21 @@ public class DatabaseDataSource {
         }
         briteSurveyDbAdapter.updateFailedTransmissions(missingFiles);
         return Observable.just(true);
+    }
+
+    public Single<Pair<Boolean, String>> getFormMetaData(String formId) {
+        return briteSurveyDbAdapter.getFormMetaData(formId).map(formMetadataMapper::mapForm);
+    }
+
+    public Single<Long> fetchSurveyInstance(String formId, String dataPointId, String formVersion,
+            long userId, String userName) {
+        return briteSurveyDbAdapter
+                .fetchOrCreateFormInstance(formId, dataPointId, formVersion, userId, userName);
+    }
+
+    @NotNull
+    public Completable markDataPointAsViewed(@NotNull String dataPointId) {
+        briteSurveyDbAdapter.markDataPointAsViewed(dataPointId);
+        return Completable.complete();
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2019 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2018-2020 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -26,6 +26,7 @@ import org.akvo.flow.data.util.Constants;
 import org.akvo.flow.data.util.ExternalStorageHelper;
 import org.akvo.flow.data.util.FileHelper;
 import org.akvo.flow.data.util.FlowFileBrowser;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -82,6 +83,14 @@ public class FileDataSource {
             return Observable.error(new Exception("Error copying file: " + originFilePath));
         }
         return Observable.just(true);
+    }
+
+    @NotNull
+    public Completable saveRemoteMediaFile(@NotNull String filename,
+            @NotNull ResponseBody responseBody) {
+        File folder = flowFileBrowser.getExistingInternalFolder(FlowFileBrowser.DIR_MEDIA);
+        fileHelper.saveRemoteFile(responseBody, new File(folder, filename));
+        return Completable.complete();
     }
 
     @VisibleForTesting
@@ -266,5 +275,10 @@ public class FileDataSource {
         String name = uuid + Constants.ARCHIVE_SUFFIX;
         File file = new File(flowFileBrowser.getInternalFolder(FlowFileBrowser.DIR_DATA), name);
         return Single.just(file);
+    }
+
+    public boolean fileExists(@NotNull String imageName) {
+        File folder = flowFileBrowser.getInternalFolder(FlowFileBrowser.DIR_MEDIA);
+        return folder.exists() && new File(folder, imageName).exists();
     }
 }

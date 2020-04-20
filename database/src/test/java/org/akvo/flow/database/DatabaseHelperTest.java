@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2018,2020 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -56,8 +56,36 @@ public class DatabaseHelperTest {
                 new DatabaseHelper(mockContext, mockLanguageTable));
         configureDatabaseHelper(helper);
 
-        helper.onUpgrade(mockDb, DatabaseHelper.VER_RESPONSE_ITERATION, DatabaseHelper.DATABASE_VERSION);
+        helper.onUpgrade(mockDb, DatabaseHelper.VER_RESPONSE_ITERATION,
+                DatabaseHelper.DATABASE_VERSION);
 
         verify(helper, times(1)).upgradeFromResponses(mockDb);
+        verify(helper, times(1)).upgradeFromTransmission(mockDb);
+        verify(helper, times(1)).upgradeFromAssignment(mockDb);
+    }
+
+    @Test
+    public void onUpgradeShouldUpgradeCorrectlyIfVersionTransmissionMigrate() {
+        DatabaseHelper helper = spy(
+                new DatabaseHelper(mockContext, mockLanguageTable));
+        configureDatabaseHelper(helper);
+
+        helper.onUpgrade(mockDb, DatabaseHelper.VER_TRANSMISSION_ITERATION,
+                DatabaseHelper.DATABASE_VERSION);
+
+        verify(helper, times(1)).upgradeFromTransmission(mockDb);
+        verify(helper, times(1)).upgradeFromAssignment(mockDb);
+    }
+
+    @Test
+    public void onUpgradeShouldUpgradeCorrectlyIfVersionAssignmentsMigrate() {
+        DatabaseHelper helper = spy(
+                new DatabaseHelper(mockContext, mockLanguageTable));
+        configureDatabaseHelper(helper);
+
+        helper.onUpgrade(mockDb, DatabaseHelper.VER_DATA_POINT_ASSIGNMENTS_ITERATION,
+                DatabaseHelper.DATABASE_VERSION);
+
+        verify(helper, times(1)).upgradeFromAssignment(mockDb);
     }
 }

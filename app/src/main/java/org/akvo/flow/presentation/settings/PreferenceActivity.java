@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2019 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2020 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -28,6 +28,7 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.material.appbar.AppBarLayout;
 
@@ -35,17 +36,13 @@ import org.akvo.flow.BuildConfig;
 import org.akvo.flow.R;
 import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.injector.component.ApplicationComponent;
-import org.akvo.flow.uicomponents.BackActivity;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
-import org.akvo.flow.uicomponents.SnackBarManager;
-import org.akvo.flow.service.DataPointUploadWorker;
+import org.akvo.flow.service.DataFixWorker;
 import org.akvo.flow.tracking.TrackingHelper;
 import org.akvo.flow.ui.Navigator;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.Locale;
+import org.akvo.flow.uicomponents.BackActivity;
+import org.akvo.flow.uicomponents.SnackBarManager;
 
 import javax.inject.Inject;
 
@@ -88,9 +85,6 @@ public class PreferenceActivity extends BackActivity implements PreferenceView,
     @BindView(R.id.switch_enable_data)
     SwitchCompat enableDataSc;
 
-    @BindView(R.id.preference_language)
-    Spinner appLanguageSp;
-
     @BindView(R.id.preference_image_size)
     Spinner imageSizeSp;
 
@@ -100,7 +94,6 @@ public class PreferenceActivity extends BackActivity implements PreferenceView,
     @Inject
     SnackBarManager snackBarManager;
 
-    private List<String> languages;
     private boolean listenersEnabled = false;
     private TrackingHelper trackingHelper;
 
@@ -114,10 +107,9 @@ public class PreferenceActivity extends BackActivity implements PreferenceView,
         setupToolBar();
         setUpToolBarAnimationListener();
         updateProgressDrawable();
-        languages = Arrays.asList(getResources().getStringArray(R.array.app_language_codes));
         presenter.setView(this);
         trackingHelper = new TrackingHelper(this);
-        presenter.loadPreferences(languages, getLocale().getLanguage());
+        presenter.loadPreferences();
     }
 
     private void setUpToolBarAnimationListener() {
@@ -184,7 +176,9 @@ public class PreferenceActivity extends BackActivity implements PreferenceView,
         if (trackingHelper != null) {
             trackingHelper.logUploadDataEvent();
         }
-        DataPointUploadWorker.scheduleUpload(getApplicationContext(), enableDataSc.isChecked());
+        Toast.makeText(getApplicationContext(), R.string.data_upload_will_start_message,
+                Toast.LENGTH_LONG).show();
+        DataFixWorker.scheduleWork(getApplicationContext(), enableDataSc.isChecked());
         finish();
     }
 
@@ -266,17 +260,6 @@ public class PreferenceActivity extends BackActivity implements PreferenceView,
         }
     }
 
-    @OnItemSelected(R.id.preference_language)
-    void onLanguageSelected(int position) {
-        if (listenersEnabled) {
-            if (trackingHelper != null) {
-                trackingHelper.logLanguageChanged(languages.get(position));
-            }
-            final String language = languages.get(position);
-            updateLocale(new Locale(language));
-        }
-    }
-
     @OnItemSelected(R.id.preference_image_size)
     void onImageSizeSelected(int position) {
         if (listenersEnabled) {
@@ -303,7 +286,6 @@ public class PreferenceActivity extends BackActivity implements PreferenceView,
         deviceIdentifierTv.setText(viewUserSettings.getIdentifier());
         screenOnSc.setChecked(viewUserSettings.isScreenOn());
         enableDataSc.setChecked(viewUserSettings.isDataEnabled());
-        appLanguageSp.setSelection(viewUserSettings.getLanguage());
         imageSizeSp.setSelection(viewUserSettings.getImageSize());
         delayListeners();
     }
@@ -312,7 +294,7 @@ public class PreferenceActivity extends BackActivity implements PreferenceView,
      * Delay enabling listeners in order to give ui time to draw spinners
      */
     private void delayListeners() {
-        appLanguageSp.postDelayed(() -> listenersEnabled = true, 500);
+        imageSizeSp.postDelayed(() -> listenersEnabled = true, 500);
     }
 
     @Override

@@ -1,5 +1,48 @@
 Akvo FLOW app release notes
 ===========================
+# ver 2.9.1
+Date: 20 April 2020
+
+* **Visually indicate datapoints were downloaded recently** - [#1592](https://github.com/akvo/akvo-flow-mobile/issues/1592)
+* **Datapoint images download improvement** - [#1600](https://github.com/akvo/akvo-flow-mobile/issues/1600)
+* **Datapoint download message** - [#1599](https://github.com/akvo/akvo-flow-mobile/issues/1599)
+* **Datapoint list styling: date format** - [#1604](https://github.com/akvo/akvo-flow-mobile/issues/1604)
+* **Flow lists theme** - [#1593](https://github.com/akvo/akvo-flow-mobile/issues/1593)
+* **Fix form download does not start correctly on some devices** - [#1611](https://github.com/akvo/akvo-flow-mobile/issues/1611)
+* **Remove in app language setting** - [#1527](https://github.com/akvo/akvo-flow-mobile/issues/1527)
+
+---------------
+# ver 2.9.0.1
+Date: 5 March 2020
+
+* **Stop removing unassigned datapoints** - [#1590](https://github.com/akvo/akvo-flow-mobile/issues/1590)
+
+---------------
+# ver 2.9.0
+Date: 19 February 2020
+
+* **Monitoring: Downloading data points should also download images to the device** - [#1167](https://github.com/akvo/akvo-flow-mobile/issues/1167)
+* **Retrieve datapoints along with assignments** - [#1470](https://github.com/akvo/akvo-flow-mobile/issues/1470)
+* **Create data logic to download image from s3** - [#1570](https://github.com/akvo/akvo-flow-mobile/issues/1570)
+* **Use the new image download logic** - [#1579](https://github.com/akvo/akvo-flow-mobile/issues/1579)
+* **Walkthrough for new datapoint changes** - [#1569](https://github.com/akvo/akvo-flow-mobile/issues/1569)
+* **Remove SurveyedLocale** - [#1472](https://github.com/akvo/akvo-flow-mobile/issues/1472)
+* **Improve gradle config** - [#1577](https://github.com/akvo/akvo-flow-mobile/issues/1577)
+
+---------------
+# ver 2.8.5
+Date: 29 January 2020
+
+* **Add code coverage reports** - [#681](https://github.com/akvo/akvo-flow-mobile/issues/681)
+* **Use https for flow support url** - [#1463](https://github.com/akvo/akvo-flow-mobile/issues/1463)
+* **Move crashes to firebase crashlytics** - [#1531](https://github.com/akvo/akvo-flow-mobile/issues/1531)
+* **Remove the need for password on Flow app** - [#1532](https://github.com/akvo/akvo-flow-mobile/issues/1532)
+* **Make sure to close the cascade database** - [#1535](https://github.com/akvo/akvo-flow-mobile/issues/1535)
+* **Crash in WebView with android 5** - [#1551](https://github.com/akvo/akvo-flow-mobile/issues/1551)
+* **Optimize builds** - [#1553](https://github.com/akvo/akvo-flow-mobile/issues/1553)
+* **Datapoint submission stuck in Submitted state** - [#1572](https://github.com/akvo/akvo-flow-mobile/issues/1572)
+
+---------------
 # ver 2.8.4
 Date: 18 December 2019
 

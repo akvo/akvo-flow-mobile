@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2019 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2020 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -33,7 +33,6 @@ import org.akvo.flow.database.SurveyColumns;
 import org.akvo.flow.database.SurveyGroupColumns;
 import org.akvo.flow.database.SurveyInstanceColumns;
 import org.akvo.flow.database.SurveyInstanceStatus;
-import org.akvo.flow.database.SyncTimeColumns;
 import org.akvo.flow.database.Tables;
 import org.akvo.flow.database.TransmissionColumns;
 import org.akvo.flow.database.TransmissionStatus;
@@ -42,11 +41,13 @@ import org.akvo.flow.database.UserColumns;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
+import io.reactivex.Single;
 import io.reactivex.functions.Function;
 import timber.log.Timber;
 
@@ -151,7 +152,8 @@ public class BriteSurveyDbAdapter {
                         + RecordColumns.NAME + ","
                         + RecordColumns.LATITUDE + ","
                         + RecordColumns.LONGITUDE + ","
-                        + RecordColumns.LAST_MODIFIED
+                        + RecordColumns.LAST_MODIFIED + ","
+                        + RecordColumns.VIEWED
                         + " FROM " + Tables.RECORD
                         + " WHERE " + RecordColumns.RECORD_ID + " = ?";
         return briteDatabase.query(sqlQuery, dataPointId);
@@ -187,28 +189,28 @@ public class BriteSurveyDbAdapter {
                 datapointId);
     }
 
-    public void updateRecord(String id, ContentValues values, long lastModified) {
-        briteDatabase.insert(Tables.RECORD, values);
-        // Update the record last modification date, if necessary
-        updateRecordModifiedDate(id, lastModified);
-    }
-
-    /**
-     * Get the synchronization time for a particular survey group.
-     *
-     * @param surveyGroupId id of the SurveyGroup
-     * @return time if exists for this key, null otherwise
-     */
-    public Cursor getSyncTime(long surveyGroupId) {
+    public boolean insertOrUpdateRecord(String dataPointId, ContentValues values) {
         String sql =
-                "SELECT " + SyncTimeColumns.SURVEY_GROUP_ID + "," + SyncTimeColumns.TIME + " FROM "
-                        + Tables.SYNC_TIME + " WHERE " + SyncTimeColumns.SURVEY_GROUP_ID
-                        + " = ?";
-        return briteDatabase.query(sql, String.valueOf(surveyGroupId));
-    }
+                "SELECT " + RecordColumns.RECORD_ID + ", " + RecordColumns.VIEWED + " FROM "
+                        + Tables.RECORD + " WHERE " + RecordColumns.RECORD_ID + " = ?";
+        Cursor cursor = briteDatabase.query(sql, dataPointId);
 
-    public void insertSyncedTime(ContentValues values) {
-        briteDatabase.insert(Tables.SYNC_TIME, values);
+        long id = DOES_NOT_EXIST;
+        int viewed = 1;
+        if (cursor != null) {
+            if (cursor.moveToFirst()) {
+                id = cursor.getLong(0);
+                viewed = cursor.getInt(1);
+            }
+            cursor.close();
+        }
+        if (id == DOES_NOT_EXIST) {
+            values.put(RecordColumns.VIEWED, 0);
+        } else {
+            values.put(RecordColumns.VIEWED, viewed);
+        }
+        briteDatabase.insert(Tables.RECORD, values);
+        return id == DOES_NOT_EXIST;
     }
 
     /**
@@ -355,7 +357,6 @@ public class BriteSurveyDbAdapter {
                         + " DESC LIMIT 1";
         return briteDatabase.query(sql, String.valueOf(surveyInstanceId), questionId);
     }
-
 
     public void createTransmissions(Long instanceId, String formId, Set<String> filenames) {
         BriteDatabase.Transaction transaction = beginTransaction();
@@ -679,7 +680,6 @@ public class BriteSurveyDbAdapter {
      */
     public void clearCollectedData() {
         deleteAllResponses();
-        briteDatabase.delete(Tables.SYNC_TIME, null);
         briteDatabase.delete(Tables.SURVEY_INSTANCE, null);
         briteDatabase.delete(Tables.RECORD, null);
         briteDatabase.delete(Tables.TRANSMISSION, null);
@@ -772,5 +772,63 @@ public class BriteSurveyDbAdapter {
                 formId
         };
         return queryTransmissions(column, whereClause, selectionArgs);
+    }
+
+    public Single<Cursor> getFormMetaData(String formId) {
+        String sql =
+                "SELECT " + SurveyColumns.HELP_DOWNLOADED + ", " + SurveyColumns.VERSION + " FROM "
+                        + Tables.SURVEY + " WHERE " + SurveyColumns.SURVEY_ID + " = ?";
+        return Single.just(briteDatabase.query(sql, formId));
+    }
+
+    public Single<Long> fetchOrCreateFormInstance(String formId, String dataPointId,
+            String formVersion, long userId, String userName) {
+        long formInstanceId;
+        Cursor cursor = getLatestSavedFormInstance(formId, dataPointId);
+        if (cursor!= null && cursor.moveToFirst()) {
+            formInstanceId = cursor.getLong(cursor.getColumnIndexOrThrow(SurveyInstanceColumns._ID));
+        } else {
+            formInstanceId = createFormInstance(formId, dataPointId, formVersion, userId, userName);
+        }
+        if (cursor != null) {
+            cursor.close();
+        }
+        return Single.just(formInstanceId);
+    }
+
+    private long createFormInstance(String formId, String dataPointId, String formVersion,
+            long userId, String userName) {
+        final long time = System.currentTimeMillis();
+
+        ContentValues initialValues = new ContentValues();
+        initialValues.put(SurveyInstanceColumns.SURVEY_ID, formId);
+        initialValues.put(SurveyInstanceColumns.VERSION, formVersion);
+        initialValues.put(SurveyInstanceColumns.USER_ID, userId);
+        initialValues.put(SurveyInstanceColumns.STATUS, SurveyInstanceStatus.SAVED);
+        initialValues.put(SurveyInstanceColumns.UUID, UUID.randomUUID().toString());
+        initialValues.put(SurveyInstanceColumns.START_DATE, time);
+        initialValues.put(SurveyInstanceColumns.SAVED_DATE, time);// Default to START_TIME
+        initialValues.put(SurveyInstanceColumns.RECORD_ID, dataPointId);
+        // Make submitter field available before submission
+        initialValues.put(SurveyInstanceColumns.SUBMITTER, userName);
+        return briteDatabase.insert(Tables.SURVEY_INSTANCE, initialValues);
+    }
+
+    private Cursor getLatestSavedFormInstance(String formId, String dataPointId) {
+        String sql = "SELECT " + SurveyInstanceColumns._ID + " FROM " + Tables.SURVEY_INSTANCE +
+                " WHERE " + Tables.SURVEY_INSTANCE + "." + SurveyInstanceColumns.SURVEY_ID + "= ?" +
+                " AND " + SurveyInstanceColumns.STATUS + "= ?" +
+                " AND " + SurveyInstanceColumns.RECORD_ID + "= ?" +
+                " ORDER BY " + SurveyInstanceColumns.START_DATE + " DESC LIMIT 1";
+
+        return briteDatabase
+                .query(sql, formId, String.valueOf(SurveyInstanceStatus.SAVED), dataPointId);
+    }
+
+    public void markDataPointAsViewed(String dataPointId) {
+        ContentValues contentValues = new ContentValues(1);
+        contentValues.put(RecordColumns.VIEWED, 1);
+        String where = RecordColumns.RECORD_ID + " = ? ";
+        briteDatabase.update(Tables.RECORD, contentValues, where, dataPointId);
     }
 }

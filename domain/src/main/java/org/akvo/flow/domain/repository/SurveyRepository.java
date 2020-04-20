@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2019 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2020 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -20,19 +20,21 @@
 
 package org.akvo.flow.domain.repository;
 
-import androidx.annotation.NonNull;
+import android.util.Pair;
 
 import org.akvo.flow.domain.entity.DataPoint;
 import org.akvo.flow.domain.entity.FormInstanceMetadata;
 import org.akvo.flow.domain.entity.InstanceIdUuid;
 import org.akvo.flow.domain.entity.Survey;
 import org.akvo.flow.domain.entity.User;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Set;
 
+import androidx.annotation.NonNull;
 import io.reactivex.Completable;
-import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 
@@ -44,8 +46,6 @@ public interface SurveyRepository {
             Double longitude, Integer orderBy);
 
     Single<DataPoint> getDataPoint(String datapointId);
-
-    Flowable<Integer> downloadDataPoints(long surveyGroupId);
 
     Observable<Boolean> deleteSurvey(long surveyToDeleteId);
 
@@ -84,4 +84,11 @@ public interface SurveyRepository {
     Observable<List<String>> getFormIds(String surveyId);
 
     Observable<List<String>> getFormIds();
+
+    @NotNull
+    Single<Pair<Boolean, String>> getFormMeta(@NotNull String formId);
+
+    @NotNull
+    Single<Long> fetchSurveyInstance(@NotNull String formId, @NotNull String datapointId, @NotNull String formVersion,
+            long id, @Nullable String name);
 }

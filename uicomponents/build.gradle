@@ -1,6 +1,8 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
+apply from: rootProject.file("jacoco.gradle")
+
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
 
@@ -21,6 +23,27 @@ android {
         ignore 'InvalidPackage'
         xmlReport false
     }
+
+    testOptions {
+        unitTests {
+            returnDefaultValues = true
+            includeAndroidResources = true
+            all {
+                testLogging {
+                    events 'passed', 'skipped', 'failed', 'standardOut', 'standardError'
+                }
+            }
+        }
+    }
+
+    buildTypes {
+        debug {
+            testCoverageEnabled true
+        }
+        release {
+            minifyEnabled true
+        }
+    }
 }
 
 dependencies {
@@ -30,5 +53,4 @@ dependencies {
     implementation "androidx.core:core-ktx:${rootProject.ext.coreKtxVersion}"
     implementation "com.google.dagger:dagger:${rootProject.ext.daggerVersion}"
     annotationProcessor "com.google.dagger:dagger-compiler:${rootProject.ext.daggerVersion}"
-    implementation "com.zeugmasolutions.localehelper:locale-helper-android:${rootProject.ext.localeHelperVersion}"
 }

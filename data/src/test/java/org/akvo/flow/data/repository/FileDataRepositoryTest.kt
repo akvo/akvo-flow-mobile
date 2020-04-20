@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2019-2020 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -28,12 +28,12 @@ import org.akvo.flow.domain.entity.InstanceIdUuid
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.Matchers
+import org.mockito.ArgumentMatchers.anyString
 import org.mockito.Mock
+import org.mockito.Mockito.`when`
 import org.mockito.Mockito.times
 import org.mockito.Mockito.verify
-import org.mockito.runners.MockitoJUnitRunner
-import org.powermock.api.mockito.PowerMockito.`when`
+import org.mockito.junit.MockitoJUnitRunner
 import java.io.File
 
 @RunWith(MockitoJUnitRunner::class)
@@ -111,7 +111,7 @@ class FileDataRepositoryTest {
     @Test
     fun getInstancesWithIncorrectZipShouldFail() {
         val exception = Exception("test")
-        `when`(mockFileDataSource!!.getIncorrectZipFile(Matchers.anyString())).thenReturn(
+        `when`(mockFileDataSource!!.getIncorrectZipFile(anyString())).thenReturn(
             Maybe.error(
                 exception
             )
@@ -128,7 +128,7 @@ class FileDataRepositoryTest {
 
     @Test
     fun getInstancesWithIncorrectZipShouldReturnCorrectFile() {
-        `when`(mockFileDataSource!!.getIncorrectZipFile(Matchers.anyString())).thenReturn(
+        `when`(mockFileDataSource!!.getIncorrectZipFile(anyString())).thenReturn(
             Maybe.just(
                 mockFile
             )
@@ -149,8 +149,8 @@ class FileDataRepositoryTest {
         val exception = Exception("test")
         `when`(
             mockFileDataSource!!.writeDataToZipFile(
-                Matchers.anyString(),
-                Matchers.anyString()
+                anyString(),
+                anyString()
             )
         ).thenReturn(Completable.error(exception))
 
@@ -167,8 +167,8 @@ class FileDataRepositoryTest {
     fun createDataZipShouldCompleteSuccessfully() {
         `when`(
             mockFileDataSource!!.writeDataToZipFile(
-                Matchers.anyString(),
-                Matchers.anyString()
+                anyString(),
+                anyString()
             )
         ).thenReturn(Completable.complete())
 

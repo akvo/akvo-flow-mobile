@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2018,2020 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -35,4 +35,8 @@ public interface IPhotoQuestionView {
     void updateResponse(String localFilePath);
 
     void displayLocationInfo();
+
+    void displayThumbnail();
+
+    void showImageError();
 }

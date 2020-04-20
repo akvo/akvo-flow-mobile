@@ -30,7 +30,7 @@ interface DataPointsMapView {
 
     void displayDataPoints(FeatureCollection dataPoints);
 
-    void showSyncedResults(int numberOfSyncedItems);
+    void showDownloadedResults(int numberOfNewItems);
 
     void showErrorAssignmentMissing();
 
@@ -38,7 +38,7 @@ interface DataPointsMapView {
 
     void showErrorSync();
 
-    void showNoDataPointsToSync();
+    void showNoDataPointsToDownload();
 
     void hideMenu();
 

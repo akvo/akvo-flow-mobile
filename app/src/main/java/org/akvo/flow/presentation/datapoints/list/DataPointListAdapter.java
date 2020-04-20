@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2019 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2020 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -21,6 +21,7 @@
 package org.akvo.flow.presentation.datapoints.list;
 
 import android.content.Context;
+import android.graphics.Typeface;
 import android.location.Location;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -32,46 +33,29 @@ import android.widget.TextView;
 
 import org.akvo.flow.R;
 import org.akvo.flow.database.SurveyInstanceStatus;
-import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.presentation.datapoints.list.entity.ListDataPoint;
 import org.akvo.flow.util.GeoUtil;
-import org.akvo.flow.util.PlatformUtil;
-import org.ocpsoft.prettytime.PrettyTime;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.StringRes;
 
 class DataPointListAdapter extends BaseAdapter {
 
     private Double latitude;
     private Double longitude;
     private final LayoutInflater inflater;
-    private final String dataLabel;
     private final List<ListDataPoint> dataPoints;
     private final GeoUtil geoUtil;
 
-    DataPointListAdapter(Context context, @Nullable Double latitude,
-            @Nullable Double longitude, SurveyGroup surveyGroup) {
+    DataPointListAdapter(Context context, @Nullable Double latitude, @Nullable Double longitude) {
         this.latitude = latitude;
         this.longitude = longitude;
         this.inflater = LayoutInflater.from(context);
-        this.dataLabel = context.getString(getDateLabel(surveyGroup));
-        dataPoints = new ArrayList<>();
-        geoUtil = new GeoUtil();
-    }
-
-    @StringRes
-    private int getDateLabel(SurveyGroup surveyGroup) {
-        if (surveyGroup != null && surveyGroup.isMonitored()) {
-            return R.string.last_modified_monitored;
-        } else {
-            return R.string.last_modified_regular;
-        }
+        this.dataPoints = new ArrayList<>();
+        this.geoUtil = new GeoUtil();
     }
 
     @Override
@@ -113,7 +97,7 @@ class DataPointListAdapter extends BaseAdapter {
         idView.setText(dataPoint.getId());
 
         displayDistanceText(distanceView, getDistanceText(dataPoint, context));
-        displayDateText(dateView, dataPoint.getLastModified());
+        displayDateText(dateView, dataPoint.getDisplayDate());
 
         int statusRes = 0;
         String statusText = null;
@@ -140,10 +124,11 @@ class DataPointListAdapter extends BaseAdapter {
         statusImage.setImageResource(statusRes);
         statusView.setText(statusText);
 
-        // Alternate background
-        int attr = position % 2 == 0 ? R.attr.listitem_bg1 : R.attr.listitem_bg2;
-        final int res = PlatformUtil.getResource(context, attr);
-        view.setBackgroundResource(res);
+        if (dataPoint.getViewed()) {
+            nameView.setTypeface(null, Typeface.NORMAL);
+        } else {
+            nameView.setTypeface(null, Typeface.BOLD);
+        }
         return view;
     }
 
@@ -164,12 +149,12 @@ class DataPointListAdapter extends BaseAdapter {
         return null;
     }
 
-    private void displayDateText(TextView tv, Long time) {
-        if (time != null && time > 0) {
-            tv.setVisibility(View.VISIBLE);
-            tv.setText(dataLabel + " " + new PrettyTime().format(new Date(time)));
-        } else {
+    private void displayDateText(TextView tv, String date) {
+        if (date == null || date.isEmpty()) {
             tv.setVisibility(View.GONE);
+        } else {
+            tv.setVisibility(View.VISIBLE);
+            tv.setText(date);
         }
     }
 

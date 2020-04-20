@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2019 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2020 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -172,7 +172,7 @@ public class DataPointsListFragment extends Fragment implements LocationListener
         emptyIv = view.findViewById(R.id.empty_iv);
         SurveyGroup surveyGroup = (SurveyGroup) getArguments()
                 .getSerializable(ConstantUtil.SURVEY_GROUP_EXTRA);
-        mAdapter = new DataPointListAdapter(getActivity(), mLatitude, mLongitude, surveyGroup);
+        mAdapter = new DataPointListAdapter(getActivity(), mLatitude, mLongitude);
         listView.setAdapter(mAdapter);
         listView.setOnItemClickListener(this);
         progressBar = view.findViewById(R.id.progress);
@@ -312,7 +312,7 @@ public class DataPointsListFragment extends Fragment implements LocationListener
         ListDataPoint surveyedLocale = mAdapter.getItem(position);
         final String localeId = surveyedLocale == null ? null : surveyedLocale.getId();
         if (localeId != null) {
-            mListener.onRecordSelected(localeId);
+            mListener.onDatapointSelected(localeId);
         }
     }
 
@@ -467,13 +467,13 @@ public class DataPointsListFragment extends Fragment implements LocationListener
     private void reloadMenu() {
         FragmentActivity activity = getActivity();
         if (activity != null) {
-            activity.supportInvalidateOptionsMenu();
+            activity.invalidateOptionsMenu();
         }
     }
 
     @Override
-    public void showSyncedResults(int numberOfSyncedItems) {
-        dataPointSyncSnackBarManager.showSyncedResults(numberOfSyncedItems, getView());
+    public void showDownloadedResults(int numberOfNewDataPoints) {
+        dataPointSyncSnackBarManager.showDownloadedResults(numberOfNewDataPoints, getView());
     }
 
     @Override
@@ -483,22 +483,13 @@ public class DataPointsListFragment extends Fragment implements LocationListener
 
     @Override
     public void showErrorNoNetwork() {
-        dataPointSyncSnackBarManager.showErrorNoNetwork(getView(), new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                presenter.onDownloadPressed();
-            }
-        });
+        dataPointSyncSnackBarManager.showErrorNoNetwork(getView(),
+                v -> presenter.onDownloadPressed());
     }
 
     @Override
     public void showErrorSync() {
-        dataPointSyncSnackBarManager.showErrorSync(getView(), new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                presenter.onDownloadPressed();
-            }
-        });
+        dataPointSyncSnackBarManager.showErrorSync(getView(), v -> presenter.onDownloadPressed());
     }
 
     @Override
@@ -516,7 +507,7 @@ public class DataPointsListFragment extends Fragment implements LocationListener
 
     @Override
     public void showNoDataPointsToSync() {
-        dataPointSyncSnackBarManager.showNoDataPointsToSync(getView());
+        dataPointSyncSnackBarManager.showNoDataPointsToDownload(getView());
     }
 
 //TODO: once we insert data using brite database this will no longer be necessary either

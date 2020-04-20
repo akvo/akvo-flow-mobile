@@ -57,6 +57,10 @@ class DataPointDataRepository @Inject constructor(
         return downLoadMedia(mediaHelper.cleanMediaFileName(filePath))
     }
 
+    override fun markDataPointAsViewed(dataPointId: String): Completable {
+        return dataSourceFactory.dataBaseDataSource.markDataPointAsViewed(dataPointId)
+    }
+
     private fun isErrorForbidden(throwable: Throwable): Boolean {
         return (throwable is HttpException
             && throwable.code() == HttpURLConnection.HTTP_FORBIDDEN)
@@ -70,14 +74,16 @@ class DataPointDataRepository @Inject constructor(
     private fun syncDataPoints(apiLocaleResult: ApiLocaleResult): Single<Int> {
         return dataSourceFactory.dataBaseDataSource
             .syncDataPoints(apiLocaleResult.dataPoints)
-            .andThen(downLoadImages(apiLocaleResult.dataPoints))
-            .andThen(Single.just(apiLocaleResult.dataPoints.size))
+            .flatMap { newDownloadedDataPointsNumber ->
+                downLoadImages(apiLocaleResult.dataPoints)
+                    .andThen(Single.just(newDownloadedDataPointsNumber))
+            }
     }
 
     private fun downLoadImages(dataPoints: List<ApiDataPoint>): Completable {
         val images: List<String> = mapper.getImagesList(dataPoints)
-        return Observable.fromIterable(images)
-            .flatMapCompletable { image -> downLoadMedia(image) }
+            .filter { image -> !dataSourceFactory.fileDataSource.fileExists(image) }
+        return Observable.fromIterable(images).flatMapCompletable { image -> downLoadMedia(image) }
     }
 
     private fun downLoadMedia(filename: String): Completable {

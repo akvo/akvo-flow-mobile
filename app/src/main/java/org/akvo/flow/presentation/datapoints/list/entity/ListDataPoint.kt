@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017,2020 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -15,23 +15,24 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
+ *
  */
+package org.akvo.flow.presentation.datapoints.list.entity
 
-package org.akvo.flow.uicomponents;
+data class ListDataPoint(
+    val displayName: String,
+    val status: Int,
+    val id: String,
+    val latitude: Double,
+    val longitude: Double,
+    val displayDate: String,
+    val viewed: Boolean
+) {
 
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
+    val isLocationValid: Boolean
+        get() = latitude != INVALID_COORDINATE && longitude != INVALID_COORDINATE
 
-public abstract class BackActivity extends AppCompatActivity {
-
-    protected void setupToolBar() {
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        ActionBar supportActionBar = getSupportActionBar();
-        if (supportActionBar != null) {
-            supportActionBar.setDisplayHomeAsUpEnabled(true);
-        }
-        toolbar.setNavigationOnClickListener(v -> onBackPressed());
+    companion object {
+        const val INVALID_COORDINATE = -1.0
     }
 }

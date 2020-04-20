@@ -287,8 +287,8 @@ public class DataPointsMapFragment extends Fragment implements DataPointsMapView
     }
 
     @Override
-    public void showSyncedResults(int numberOfSyncedItems) {
-        dataPointSyncSnackBarManager.showSyncedResults(numberOfSyncedItems, getView());
+    public void showDownloadedResults(int numberOfNewItems) {
+        dataPointSyncSnackBarManager.showDownloadedResults(numberOfNewItems, getView());
     }
 
     @Override
@@ -309,8 +309,8 @@ public class DataPointsMapFragment extends Fragment implements DataPointsMapView
     }
 
     @Override
-    public void showNoDataPointsToSync() {
-        dataPointSyncSnackBarManager.showNoDataPointsToSync(getView());
+    public void showNoDataPointsToDownload() {
+        dataPointSyncSnackBarManager.showNoDataPointsToDownload(getView());
     }
 
     public void showFab() {

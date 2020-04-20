@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017,2020 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -29,9 +29,10 @@ public class DataPoint {
     private final Double latitude;
     private final Double longitude;
     private final int status;
+    private final boolean viewed;
 
     public DataPoint(String id, String name, long lastModified, long surveyGroupId, Double latitude,
-            Double longitude, int status) {
+            Double longitude, int status, boolean viewed) {
         this.id = id;
         this.name = name;
         this.lastModified = lastModified;
@@ -39,6 +40,7 @@ public class DataPoint {
         this.latitude = latitude;
         this.longitude = longitude;
         this.status = status;
+        this.viewed = viewed;
     }
 
     public String getId() {
@@ -67,5 +69,9 @@ public class DataPoint {
 
     public int getStatus() {
         return status;
+    }
+
+    public boolean wasViewed() {
+        return viewed;
     }
 }

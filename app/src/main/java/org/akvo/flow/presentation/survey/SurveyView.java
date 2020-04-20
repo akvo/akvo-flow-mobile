@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2018,2020 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -20,9 +20,14 @@
 
 package org.akvo.flow.presentation.survey;
 
+import org.akvo.flow.domain.entity.User;
 import org.akvo.flow.presentation.entity.ViewApkData;
 
 public interface SurveyView {
 
     void showNewVersionAvailable(ViewApkData apkData);
+
+    void showMissingUserError();
+
+    void openDataPoint(String datapointId, User user);
 }

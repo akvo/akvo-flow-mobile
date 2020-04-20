@@ -1,5 +1,17 @@
 Akvo FLOW app release notes
 ===========================
+# ver 2.9.1
+Date: 20 April 2020
+
+* **Visually indicate datapoints were downloaded recently** - [#1592](https://github.com/akvo/akvo-flow-mobile/issues/1592)
+* **Datapoint images download improvement** - [#1600](https://github.com/akvo/akvo-flow-mobile/issues/1600)
+* **Datapoint download message** - [#1599](https://github.com/akvo/akvo-flow-mobile/issues/1599)
+* **Datapoint list styling: date format** - [#1604](https://github.com/akvo/akvo-flow-mobile/issues/1604)
+* **Flow lists theme** - [#1593](https://github.com/akvo/akvo-flow-mobile/issues/1593)
+* **Fix form download does not start correctly on some devices** - [#1611](https://github.com/akvo/akvo-flow-mobile/issues/1611)
+* **Remove in app language setting** - [#1527](https://github.com/akvo/akvo-flow-mobile/issues/1527)
+
+---------------
 # ver 2.9.0.1
 Date: 5 March 2020
 

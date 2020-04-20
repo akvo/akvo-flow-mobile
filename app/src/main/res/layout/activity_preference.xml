@@ -55,19 +55,6 @@
                     style="@style/PreferenceItemSeparator"/>
 
             <TextView
-                    android:text="@string/preference_app_language"
-                    style="@style/PreferenceTitleStyle"
-                    android:paddingBottom="4dp"/>
-
-            <Spinner
-                    android:entries="@array/app_languages"
-                    android:id="@+id/preference_language"
-                    style="@style/PreferenceSpinnerStyle"/>
-
-            <View
-                    style="@style/PreferenceItemSeparator"/>
-
-            <TextView
                     android:text="@string/preference_image_size"
                     style="@style/PreferenceTitleStyle"
                     android:paddingBottom="4dp"/>

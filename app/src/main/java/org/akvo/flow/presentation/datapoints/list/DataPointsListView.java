@@ -32,7 +32,7 @@ interface DataPointsListView {
 
     void hideLoading();
 
-    void showSyncedResults(int numberOfSyncedItems);
+    void showDownloadedResults(int numberOfSyncedItems);
 
     void showErrorNoNetwork();
 

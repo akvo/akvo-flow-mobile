@@ -114,6 +114,9 @@ android {
 
             firebaseAppDistribution {
                 groups = "testers"
+                if (project.hasProperty('APP_ID')) {
+                    appId = APP_ID
+                }
             }
         }
         debug {

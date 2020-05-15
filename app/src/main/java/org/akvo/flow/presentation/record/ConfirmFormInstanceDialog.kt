@@ -30,14 +30,14 @@ import org.akvo.flow.domain.entity.DomainFormInstance
 
 class ConfirmFormInstanceDialog : DialogFragment() {
 
-    private var listener: InstanceConfirmationDialogListener? = null
+    private var listener: ConfirmFormInstanceDialogListener? = null
     private lateinit var formInstance: DomainFormInstance
     private lateinit var formName: String
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
         val activity: Activity? = activity
-        if (activity is InstanceConfirmationDialogListener) {
+        if (activity is ConfirmFormInstanceDialogListener) {
             listener = activity
         } else {
             throw IllegalArgumentException("Activity must implement InstanceConfirmationDialogListener")
@@ -68,7 +68,6 @@ class ConfirmFormInstanceDialog : DialogFragment() {
             .setNegativeButton(R.string.cancelbutton) { _, _ -> dismiss() }
             .create()
     }
-
 
     companion object {
 

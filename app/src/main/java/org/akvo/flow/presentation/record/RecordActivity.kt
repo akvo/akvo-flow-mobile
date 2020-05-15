@@ -41,7 +41,7 @@ import org.akvo.flow.util.ConstantUtil
 import javax.inject.Inject
 
 class RecordActivity : BackActivity(), FormListListener, ResponseListListener, RecordView,
-    InstanceConfirmationDialogListener {
+    ConfirmFormInstanceDialogListener {
 
     private lateinit var surveyGroup: SurveyGroup
     private var dataPointId: String? = null
@@ -123,10 +123,7 @@ class RecordActivity : BackActivity(), FormListListener, ResponseListListener, R
         showErrorMessage(R.string.error_missing_form)
     }
 
-    override fun displayWarningDialog(
-        domainFormInstance: DomainFormInstance,
-        formName: String
-    ) {
+    override fun displayWarningDialog(domainFormInstance: DomainFormInstance, formName: String) {
         ConfirmFormInstanceDialog.newInstance(domainFormInstance, formName)
             .show(supportFragmentManager, ConfirmFormInstanceDialog.TAG)
     }

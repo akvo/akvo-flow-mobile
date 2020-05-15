@@ -31,6 +31,6 @@ interface RecordView {
     fun showFormNotFound()
     fun displayWarningDialog(
         domainFormInstance: DomainFormInstance,
-        name: String
+        formName: String
     )
 }

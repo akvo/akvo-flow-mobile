@@ -37,10 +37,9 @@ import org.akvo.flow.presentation.Presenter
 import org.akvo.flow.presentation.datapoints.DisplayNameMapper
 import org.akvo.flow.service.BootstrapService
 import timber.log.Timber
-import java.util.*
+import java.util.UUID
 import javax.inject.Inject
 import javax.inject.Named
-import kotlin.collections.HashMap
 
 class RecordPresenter @Inject constructor(
     private val getDataPoint: GetDataPoint,
@@ -127,7 +126,6 @@ class RecordPresenter @Inject constructor(
             }
 
             override fun onError(e: Throwable) {
-                //registration form can only be submitted once
                 verifyAndCreateFormInstance(
                     formId,
                     datapointId,
@@ -151,7 +149,7 @@ class RecordPresenter @Inject constructor(
             formId,
             datapointId,
             form.version,
-            user.id .toString(),
+            user.id.toString(),
             user.name,
             SurveyInstanceStatus.SAVED,
             UUID.randomUUID().toString(),

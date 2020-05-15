@@ -20,21 +20,31 @@
 package org.akvo.flow.data.entity.form
 
 import android.database.Cursor
-import android.util.Pair
 import org.akvo.flow.database.SurveyColumns
+import org.akvo.flow.domain.entity.DomainForm
 import javax.inject.Inject
 
-class FormMetadataMapper @Inject constructor() {
+class DomainFormMapper @Inject constructor() {
 
-    fun mapForm(cursor: Cursor?): Pair<Boolean, String> {
-        var resourcesDownloaded = false
-        var formVersion = ""
-        if (cursor != null && cursor.moveToFirst()) {
-            resourcesDownloaded =
-                cursor.getInt(cursor.getColumnIndexOrThrow(SurveyColumns.HELP_DOWNLOADED)) == 1
-            formVersion = cursor.getString(cursor.getColumnIndexOrThrow(SurveyColumns.VERSION))
-        }
-        cursor?.close()
-        return Pair(resourcesDownloaded, formVersion)
+    fun mapForm(dataForm: DataForm): DomainForm {
+        return DomainForm(
+            dataForm.id,
+            dataForm.formId,
+            dataForm.surveyId,
+            dataForm.name,
+            dataForm.version,
+            dataForm.type,
+            dataForm.location,
+            dataForm.filename,
+            dataForm.language,
+            dataForm.cascadeDownloaded,
+            dataForm.deleted
+        )
     }
+
+    private fun getStringColumnValue(cursor: Cursor, columnName: String) =
+        cursor.getString(cursor.getColumnIndexOrThrow(columnName))
+
+    private fun getIntColumnValue(cursor: Cursor, columnName: String) =
+        cursor.getInt(cursor.getColumnIndexOrThrow(columnName))
 }

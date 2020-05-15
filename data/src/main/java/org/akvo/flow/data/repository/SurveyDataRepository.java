@@ -21,7 +21,9 @@
 package org.akvo.flow.data.repository;
 
 import android.database.Cursor;
-import android.util.Pair;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.VisibleForTesting;
 
 import org.akvo.flow.data.datasource.DataSourceFactory;
 import org.akvo.flow.data.datasource.DatabaseDataSource;
@@ -47,7 +49,6 @@ import org.akvo.flow.domain.entity.InstanceIdUuid;
 import org.akvo.flow.domain.entity.Survey;
 import org.akvo.flow.domain.entity.User;
 import org.akvo.flow.domain.repository.SurveyRepository;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.HashSet;
 import java.util.List;
@@ -55,9 +56,6 @@ import java.util.Set;
 
 import javax.inject.Inject;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.annotation.VisibleForTesting;
 import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.Single;
@@ -86,11 +84,11 @@ public class SurveyDataRepository implements SurveyRepository {
     //TODO: this needs to be split, too many methods and params
     @Inject
     public SurveyDataRepository(DataSourceFactory dataSourceFactory,
-            DataPointMapper dataPointMapper, RestApi restApi, SurveyMapper surveyMapper,
-            UserMapper userMapper, TransmissionFilenameMapper transmissionFilenameMapper,
-            TransmissionMapper transmissionMapper, FormInstanceMapper formInstanceMapper,
-            FormIdMapper formIdMapper, FormInstanceMetadataMapper formInstanceMetadataMapper,
-            S3RestApi s3RestApi) {
+                                DataPointMapper dataPointMapper, RestApi restApi, SurveyMapper surveyMapper,
+                                UserMapper userMapper, TransmissionFilenameMapper transmissionFilenameMapper,
+                                TransmissionMapper transmissionMapper, FormInstanceMapper formInstanceMapper,
+                                FormIdMapper formIdMapper, FormInstanceMetadataMapper formInstanceMetadataMapper,
+                                S3RestApi s3RestApi) {
         this.dataSourceFactory = dataSourceFactory;
         this.dataPointMapper = dataPointMapper;
         this.restApi = restApi;
@@ -233,20 +231,6 @@ public class SurveyDataRepository implements SurveyRepository {
                         return formIdMapper.mapToFormId(cursor);
                     }
                 });
-    }
-
-    @Override
-    @NotNull
-    public Single<Pair<Boolean, String>> getFormMeta(@NotNull String formId) {
-        return dataSourceFactory.getDataBaseDataSource().getFormMetaData(formId);
-    }
-
-    @Override
-    @NotNull
-    public Single<Long> fetchSurveyInstance(@NotNull String formId, @NotNull String datapointId,
-            @NotNull String formVersion, long userId, @Nullable String userName) {
-        return dataSourceFactory.getDataBaseDataSource()
-                .fetchSurveyInstance(formId, datapointId, formVersion, userId, userName);
     }
 
     @Override

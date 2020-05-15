@@ -20,51 +20,187 @@
 package org.akvo.flow.presentation.record
 
 import io.reactivex.observers.DisposableSingleObserver
+import org.akvo.flow.database.SurveyInstanceStatus
+import org.akvo.flow.domain.SurveyGroup
 import org.akvo.flow.domain.entity.DataPoint
-import org.akvo.flow.domain.exception.CascadeResourceMissing
+import org.akvo.flow.domain.entity.DomainForm
+import org.akvo.flow.domain.entity.DomainFormInstance
+import org.akvo.flow.domain.entity.User
+import org.akvo.flow.domain.interactor.DefaultObserver
+import org.akvo.flow.domain.interactor.UseCase
 import org.akvo.flow.domain.interactor.datapoints.GetDataPoint
-import org.akvo.flow.domain.interactor.forms.GetFormInstanceId
+import org.akvo.flow.domain.interactor.forms.CreateFormInstance
+import org.akvo.flow.domain.interactor.forms.GetForm
+import org.akvo.flow.domain.interactor.forms.GetRecentSubmittedFormInstance
+import org.akvo.flow.domain.interactor.forms.GetSavedFormInstance
 import org.akvo.flow.presentation.Presenter
 import org.akvo.flow.presentation.datapoints.DisplayNameMapper
 import org.akvo.flow.service.BootstrapService
 import timber.log.Timber
+import java.util.*
 import javax.inject.Inject
+import javax.inject.Named
+import kotlin.collections.HashMap
 
 class RecordPresenter @Inject constructor(
-    private val getFormInstanceIdUseCase: GetFormInstanceId,
     private val getDataPoint: GetDataPoint,
-    private val displayNameMapper: DisplayNameMapper
+    private val displayNameMapper: DisplayNameMapper,
+    @param:Named("getSelectedUser") private val getSelectedUserUseCase: UseCase,
+    private val getFormUseCase: GetForm,
+    private val getSavedFormInstanceUseCase: GetSavedFormInstance,
+    private val getRecentSubmittedFormInstanceUseCase: GetRecentSubmittedFormInstance,
+    private val createFormInstanceUseCase: CreateFormInstance
 ) : Presenter {
 
     var view: RecordView? = null
 
     override fun destroy() {
-        getFormInstanceIdUseCase.dispose()
+        getSelectedUserUseCase.dispose()
+        getFormUseCase.dispose()
+        getSavedFormInstanceUseCase.dispose()
+        getRecentSubmittedFormInstanceUseCase.dispose()
+        createFormInstanceUseCase.dispose()
     }
 
-    fun onFormClick(formId: String, datapointId: String) {
+    fun onFormClick(formId: String, datapointId: String, survey: SurveyGroup) {
+        //TODO: this in not correct as we don't know which form is being processed
         if (BootstrapService.isProcessing) {
             view?.showBootStrapPendingError()
             return
         }
 
+        //check user
+        getSelectedUserUseCase.execute(object : DefaultObserver<User>() {
+            override fun onError(e: Throwable) {
+                Timber.e(e)
+                view?.showMissingUserError()
+            }
+
+            override fun onNext(user: User) {
+                if (user.name == null) {
+                    view?.showMissingUserError()
+                } else {
+                    val params: MutableMap<String, Any> = HashMap(2)
+                    params[GetForm.PARAM_FORM_ID] = formId
+                    getFormUseCase.execute(object : DisposableSingleObserver<DomainForm>() {
+                        override fun onSuccess(domainForm: DomainForm) {
+                            if (!domainForm.cascadeDownloaded) {
+                                view?.showMissingCascadeError()
+                            } else {
+                                getSavedFormInstance(formId, datapointId, survey, domainForm, user)
+                            }
+                        }
+
+                        override fun onError(e: Throwable) {
+                            view?.showFormNotFound()
+                        }
+                    }, params)
+                }
+            }
+        }, null)
+    }
+
+    private fun getSavedFormInstance(
+        formId: String,
+        datapointId: String,
+        survey: SurveyGroup,
+        domainForm: DomainForm,
+        user: User
+    ) {
         val params: MutableMap<String, Any> = HashMap(4)
-        params[GetFormInstanceId.PARAM_FORM_ID] = formId
-        params[GetFormInstanceId.PARAM_DATAPOINT_ID] = datapointId
-        getFormInstanceIdUseCase.execute(object: DisposableSingleObserver<Long>() {
+        params[GetSavedFormInstance.PARAM_FORM_ID] = formId
+        params[GetSavedFormInstance.PARAM_DATAPOINT_ID] = datapointId
+        getSavedFormInstanceUseCase.execute(object :
+            DisposableSingleObserver<Long>() {
             override fun onSuccess(formInstanceId: Long) {
-                view?.navigateToForm(formId, formInstanceId)
+                if (formInstanceId != -1L) {
+                    view?.navigateToForm(formId, formInstanceId)
+                } else {
+                    verifyAndCreateFormInstance(
+                        formId,
+                        datapointId,
+                        domainForm,
+                        user,
+                        formId != survey.registerSurveyId
+                    )
+                }
             }
 
             override fun onError(e: Throwable) {
-                if (e is CascadeResourceMissing) {
-                    view?.showMissingCascadeError()
-                } else {
-                    Timber.e(e)
-                }
-                //TODO: add error messages
+                //registration form can only be submitted once
+                verifyAndCreateFormInstance(
+                    formId,
+                    datapointId,
+                    domainForm,
+                    user,
+                    formId != survey.registerSurveyId
+                )
+            }
+        }, params)
+    }
+
+    private fun verifyAndCreateFormInstance(
+        formId: String,
+        datapointId: String,
+        form: DomainForm,
+        user: User,
+        verifyLatestSubmitted: Boolean = false
+    ) {
+        val time = System.currentTimeMillis()
+        val domainFormInstance = DomainFormInstance(
+            formId,
+            datapointId,
+            form.version,
+            user.id .toString(),
+            user.name,
+            SurveyInstanceStatus.SAVED,
+            UUID.randomUUID().toString(),
+            time,
+            time // Default to START_TIME
+        )
+        if (verifyLatestSubmitted) {
+            verifyLatestSubmittedForm(domainFormInstance, form)
+        } else {
+            createNewFormInstance(domainFormInstance)
+        }
+    }
+
+    fun createNewFormInstance(domainFormInstance: DomainFormInstance) {
+        val params: MutableMap<String, Any> = HashMap(2)
+        params[CreateFormInstance.PARAM_FORM_INSTANCE] = domainFormInstance
+        createFormInstanceUseCase.execute(object :
+            DisposableSingleObserver<Long>() {
+            override fun onSuccess(createdInstanceId: Long) {
+                view?.navigateToForm(domainFormInstance.formId, createdInstanceId)
             }
 
+            override fun onError(e: Throwable) {
+                Timber.e(e)
+                //TODO: add error messages
+            }
+        }, params)
+    }
+
+    private fun verifyLatestSubmittedForm(
+        domainFormInstance: DomainFormInstance,
+        form: DomainForm
+    ) {
+        val params: MutableMap<String, Any> = HashMap(4)
+        params[GetRecentSubmittedFormInstance.PARAM_FORM_ID] = domainFormInstance.formId
+        params[GetRecentSubmittedFormInstance.PARAM_DATAPOINT_ID] = domainFormInstance.dataPointId
+        getRecentSubmittedFormInstanceUseCase.execute(object :
+            DisposableSingleObserver<Long>() {
+            override fun onSuccess(formInstanceId: Long) {
+                if (formInstanceId != -1L) {
+                    view?.displayWarningDialog(domainFormInstance, form.name)
+                } else {
+                    createNewFormInstance(domainFormInstance)
+                }
+            }
+
+            override fun onError(e: Throwable) {
+                createNewFormInstance(domainFormInstance)
+            }
         }, params)
     }
 

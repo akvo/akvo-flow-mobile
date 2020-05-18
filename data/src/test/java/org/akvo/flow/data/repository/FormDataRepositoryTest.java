@@ -116,7 +116,7 @@ public class FormDataRepositoryTest {
         DataSourceFactory dataSourceFactory = new DataSourceFactory(null, null,
                 mockDatabaseDataSource, null, mockFileDataSource, null);
         formDataRepository = new FormDataRepository(mockFormHeaderParser, mockXmlParser,
-                restApi, dataSourceFactory, mockFormIdMapper, s3RestApi);
+                restApi, dataSourceFactory, mockFormIdMapper, s3RestApi, null);
         ApiFormHeader apiFormHeader = new ApiFormHeader("123456", "", "", "", 1.0, "", true, "");
         when(mockFormHeaderParser.parseOne(anyString())).thenReturn(apiFormHeader);
         when(mockAmazonAuth.getAmazonAuthForGet(anyString(), anyString(), anyString()))

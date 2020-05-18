@@ -347,6 +347,9 @@
     <string name="data_upload_will_start_message">Data upload will start when an internet connection is available</string>
 
     <string name="error_data_point_not_found">Datapoint not found</string>
+    <string name="confirm_new_submission">New Submission</string>
+    <string name="confirm_new_submission_title">New Submission?</string>
+    <string name="confirm_new_submission_message">You\'ve submitted \"%1$s\" to this datapoint within the last 24 hours.\n\nDo you want to make another submission?</string>
 
     <plurals name="download_forms_error">
         <item quantity="one">Error downloading form</item>

@@ -19,24 +19,17 @@
 
 package org.akvo.flow.domain.interactor.forms
 
-import android.text.TextUtils
 import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.observers.DisposableSingleObserver
-import org.akvo.flow.domain.entity.User
-import org.akvo.flow.domain.exception.CascadeResourceMissing
-import org.akvo.flow.domain.exception.UserNotFound
 import org.akvo.flow.domain.executor.PostExecutionThread
 import org.akvo.flow.domain.executor.SchedulerCreator
-import org.akvo.flow.domain.repository.SurveyRepository
-import org.akvo.flow.domain.repository.UserRepository
-import org.akvo.flow.domain.util.Constants
+import org.akvo.flow.domain.repository.FormInstanceRepository
 import javax.inject.Inject
 
-class GetFormInstanceId @Inject constructor(
-    private val surveyRepository: SurveyRepository,
-    private val userRepository: UserRepository,
+class GetRecentSubmittedFormInstance @Inject constructor(
+    private val formInstanceRepository: FormInstanceRepository,
     private val postExecutionThread: PostExecutionThread,
     private val schedulerCreator: SchedulerCreator
 ) {
@@ -57,49 +50,12 @@ class GetFormInstanceId @Inject constructor(
     }
 
     private fun <T> buildUseCaseObservable(parameters: Map<String, T>): Single<Long> {
-        if (!parameters.containsKey(PARAM_FORM_ID)) {
+        if (!parameters.containsKey(PARAM_FORM_ID) || !parameters.containsKey(PARAM_DATAPOINT_ID)) {
             return Single.error(IllegalArgumentException("Missing form id"))
         }
         val formId = parameters[PARAM_FORM_ID] as String
         val datapointId = parameters[PARAM_DATAPOINT_ID] as String
-        return surveyRepository.getFormMeta(formId).flatMap {
-            when {
-                !it.first -> {
-                    Single.error(CascadeResourceMissing())
-                }
-                else -> {
-                    getUser(formId, datapointId, it.second)
-                }
-            }
-        }
-    }
-
-    private fun getUser(formId: String, datapointId: String, formVersion: String): Single<Long> {
-        return userRepository.selectedUser.firstOrError().flatMap { userId ->
-            when {
-                (userId == Constants.INVALID_USER_ID) -> {
-                    Single.error(UserNotFound())
-                }
-                else -> {
-                    surveyRepository.getUser(userId).firstOrError()
-                        .flatMap { user ->
-                            when {
-                                TextUtils.isEmpty(user.name) -> {
-                                    Single.error(UserNotFound())
-                                }
-                                else -> {
-                                    getFormInstance(formId, datapointId, formVersion, user)
-                                }
-                            }
-
-                        }
-                }
-            }
-        }
-    }
-
-    private fun getFormInstance(formId: String, datapointId: String, formVersion: String, user: User): Single<Long> {
-        return surveyRepository.fetchSurveyInstance(formId, datapointId, formVersion, user.id, user.name)
+        return formInstanceRepository.getLatestSubmittedFormInstance(formId, datapointId)
     }
 
     private fun addDisposable(disposable: Disposable) {

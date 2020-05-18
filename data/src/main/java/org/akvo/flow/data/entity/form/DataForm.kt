@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2019 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2020 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -15,25 +15,20 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 
-package org.akvo.flow.domain.repository;
+package org.akvo.flow.data.entity.form
 
-import org.akvo.flow.domain.entity.DomainForm;
-import org.jetbrains.annotations.NotNull;
-
-import io.reactivex.Observable;
-import io.reactivex.Single;
-
-public interface FormRepository {
-
-    Observable<Boolean> loadForm(String formId, String deviceId);
-
-    Observable<Integer> reloadForms(String deviceId);
-
-    Observable<Integer> downloadForms(String deviceId);
-
-    @NotNull
-    Single<DomainForm> getForm(@NotNull String formId);
-}
+data class DataForm(
+    val id: Int,
+    val formId: String,
+    val surveyId: Int,
+    val name: String,
+    val version: String,
+    val type: String,
+    val location: String,
+    val filename: String,
+    val language: String,
+    val cascadeDownloaded: Boolean,
+    val deleted: Boolean
+)

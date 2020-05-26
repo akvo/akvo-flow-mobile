@@ -66,3 +66,6 @@ hs_err_*
 #reports
 */jacoco.exec
 codacy-coverage-reporter
+
+#languages
+.tx

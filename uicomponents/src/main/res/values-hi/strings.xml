@@ -41,10 +41,6 @@
   <string name="nextbutton">अगला  / आगामी </string>
   <string name="cleartitle">सर्वे के उत्तरों को हटायें </string>
   <string name="cleardesc">क्या आप निशित तौर पे, सर्वे के उत्तरों को हटाना चाहते  हैं. </string>
-  <string name="authtitle">प्राधिकरण आवशक है </string>
-  <string name="authtext">कृपया अड्मिनिस्टर पासकोड डालें </string>
-  <string name="authfailed">प्राधिकरण अस्वीकृत</string>
-  <string name="invalidpassword">अमान्य  पासकोड </string>
   <string name="clearquestion">दिए गए उत्तर को हटाएं </string>
   <string name="clearquestiondesc">क्या आप  इस प्रशन का उत्तर हटाना चाहते हैं?</string>
   <string name="identlabel">डिवाइस आइडेंटिफायर </string>
@@ -73,8 +69,6 @@
   <string name="data_sync_synced">सिंक हुआ फॉर्म: %1$d</string>
   <string name="data_sync_error_form_deleted_title">फॉर्म निकाल दिया</string>
   <string name="data_sync_error_form_deleted_text">फॉर्म %1$sनिकाल दिया गया है </string>
-  <!--Localization-->
-  <string name="please_restart">कृपया ऐप को पुनर्प्रारंभ करें </string>
   <!--Empty Views-->
   <string name="no_datapoints_error_text">अभी कोई डाटा पॉइंट नहीं है</string>
   <string name="no_search_results_error_text">कोई परिणाम नहीं मिला</string>
@@ -103,7 +97,6 @@
   <string name="delete_point_title">पॉइंट हटाएँ ?</string>
   <string name="delete_shape_title">आकार हटाएँ ?</string>
   <string name="repeat_group">सवाल दोहराइए </string>
-  <string name="repetitions">दुहराव</string>
   <string name="view_map">मैप देखिये </string>
   <string name="delete_group_title">दोहराये सवाल मिटायें </string>
   <string name="delete_group_text">क्या आप दोहराये सवाल मिटाना चाहतें हैं ?</string>
@@ -127,8 +120,6 @@
   <string name="order_name">नाम </string>
   <!--Record Activity-->
   <string name="unknown">बेनाम डेटा पॉइंट </string>
-  <string name="last_modified_monitored">पिछ्ला परिवर्तन:</string>
-  <string name="last_modified_regular">जमा:</string>
   <string name="last_response">पिछला उत्तर </string>
   <string name="error_missing_cascade">कास्केड डाउनलोड नहीं हुआ है </string>
   <string name="error_missing_form">यह फॉर्म उपलब्ध नहीं है । कृपया सभी फॉर्म को पुनः डाउनलोड करें</string>
@@ -218,7 +209,6 @@
   <string name="error_loading_help">सहायता जानकारी लोड करने में त्रुटि</string>
   <string name="error_mobile_data_sync">मोबाईल डाटा सिंक की आज्ञा नहीं है</string>
   <string name="preference_screen_on">सर्वे के दौरान, स्क्रीन को बंद ना होने दें</string>
-  <string name="preference_app_language">ऐप की भाषा</string>
   <string name="preference_image_size">फोटो की लम्बाई - चौड़ाई</string>
   <string name="preferences_data_section">डाटा</string>
   <string name="preference_delete_collected_data">एकत्रित डाटा और फोटो को हटाएँ</string>

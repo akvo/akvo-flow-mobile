@@ -38,6 +38,7 @@ import org.akvo.flow.app.FlowApp
 import org.akvo.flow.domain.SurveyGroup
 import org.akvo.flow.domain.entity.DataPoint
 import org.akvo.flow.domain.entity.DomainForm
+import org.akvo.flow.domain.entity.DomainFormInstance
 import org.akvo.flow.domain.entity.User
 import org.akvo.flow.domain.executor.SchedulerCreator
 import org.akvo.flow.domain.repository.FormInstanceRepository
@@ -56,8 +57,10 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.Matchers.anyString
+import org.mockito.Mockito
 import org.mockito.Mockito.`when`
+import org.mockito.Mockito.anyLong
+import org.mockito.Mockito.anyString
 import org.mockito.Mockito.mock
 
 @LargeTest
@@ -74,7 +77,7 @@ class RecordActivityTest {
         override fun getActivityIntent(): Intent {
             val targetContext: Context = getInstrumentation().targetContext
             val result = Intent(targetContext, RecordActivity::class.java)
-            result.putExtra(ConstantUtil.SURVEY_GROUP_EXTRA, SurveyGroup(155852013L, "", "", true))
+            result.putExtra(ConstantUtil.SURVEY_GROUP_EXTRA, SurveyGroup(155852013L, "", FORM_ID, true))
 
             val dataPointId = setUpFormData(targetContext)
             result.putExtra(ConstantUtil.DATA_POINT_ID_EXTRA, dataPointId.toString())
@@ -96,7 +99,6 @@ class RecordActivityTest {
         `when`(surveyRepository.getDataPoint(anyString())).thenReturn(Single.just(dataPoint))
         `when`(userRepository.selectedUser).thenReturn(Observable.just(1L))
         `when`(surveyRepository.getUser(1L)).thenReturn(Observable.just(User(1L, "test_user")))
-        `when`(formInstanceRepository.getSavedFormInstance(anyString(), anyString())).thenReturn(Single.just(1L))
         `when`(dataPoint.latitude).thenReturn(41.3819219)
         `when`(dataPoint.longitude).thenReturn(2.148909)
         `when`(dataPoint.name).thenReturn(DATAPOINT_NAME)
@@ -130,15 +132,6 @@ class RecordActivityTest {
         withRobot(RecordScreenRobot::class.java)
             .provideActivityContext(intentsTestRule.activity)
             .checkTitleIs(R.string.unknown)
-    }
-
-    @Test
-    fun onFormClickShouldLaunchFormActivityWhenCorrectDataPoint() {
-        intentsTestRule.launchActivity(null)
-
-        intentsTestRule.activity.onFormClick(FORM_ID)
-
-        withRobot(RecordScreenRobot::class.java).checkFormActivityDisplayed()
     }
 
     @Test
@@ -202,6 +195,61 @@ class RecordActivityTest {
     }
 
     @Test
+    fun onFormClickShouldLaunchFormActivityWhenCorrectDataPointAndSavedInstance() {
+        `when`(formInstanceRepository.getSavedFormInstance(anyString(), anyString())).thenReturn(Single.just(1L))
+
+        intentsTestRule.launchActivity(null)
+
+        intentsTestRule.activity.onFormClick(FORM_ID)
+
+        withRobot(RecordScreenRobot::class.java).checkFormActivityDisplayed()
+    }
+
+    @Test
+    fun onFormClickShouldLaunchFormActivityWhenRegistrationForm() {
+        val form = DomainForm(1, FORM_ID, 1, "name", "1.0", "", "", "", "", cascadeDownloaded = true, deleted = false)
+        `when`(formRepository.getForm(anyString())).thenReturn(Single.just(form))
+        `when`(formInstanceRepository.getSavedFormInstance(anyString(), anyString())).thenReturn(Single.just(-1L))
+        `when`(formInstanceRepository.createFormInstance(any(DomainFormInstance::class.java))).thenReturn(Single.just(1L))
+
+        intentsTestRule.launchActivity(null)
+
+        intentsTestRule.activity.onFormClick(FORM_ID)
+
+        withRobot(RecordScreenRobot::class.java).checkFormActivityDisplayed()
+    }
+
+
+    @Test
+    fun onFormClickShouldLaunchFormActivityWhenRecentMoreThan24Hours() {
+        val form = DomainForm(1, "123", 1, "name", "1.0", "", "", "", "", cascadeDownloaded = true, deleted = false)
+        `when`(formRepository.getForm(anyString())).thenReturn(Single.just(form))
+        `when`(formInstanceRepository.getSavedFormInstance(anyString(), anyString())).thenReturn(Single.just(-1L))
+        `when`(formInstanceRepository.createFormInstance(any(DomainFormInstance::class.java))).thenReturn(Single.just(1L))
+        `when`(formInstanceRepository.getLatestSubmittedFormInstance(anyString(), anyString(), anyLong())).thenReturn(Single.just(-1L))
+
+        intentsTestRule.launchActivity(null)
+
+        intentsTestRule.activity.onFormClick(FORM_ID)
+
+        withRobot(RecordScreenRobot::class.java).checkFormActivityDisplayed()
+    }
+
+    @Test
+    fun onFormClickShouldDisplayDialogWhenRecentLessThan24Hours() {
+        val form = DomainForm(1, "123", 1, "name", "1.0", "", "", "", "", cascadeDownloaded = true, deleted = false)
+        `when`(formRepository.getForm(anyString())).thenReturn(Single.just(form))
+        `when`(formInstanceRepository.getSavedFormInstance(anyString(), anyString())).thenReturn(Single.just(-1L))
+        `when`(formInstanceRepository.getLatestSubmittedFormInstance(anyString(), anyString(), anyLong())).thenReturn(Single.just(1L))
+
+        intentsTestRule.launchActivity(null)
+
+        intentsTestRule.activity.onFormClick("1234")
+
+        withRobot(RecordScreenRobot::class.java).checkFormSubmissionDialogDisplayed()
+    }
+
+    @Test
     fun onViewMapShouldOpenMapActivityForCorrectDataPoint() {
         intentsTestRule.launchActivity(null)
 
@@ -251,9 +299,18 @@ class RecordActivityTest {
 
         fun clickMapMenuOption(): RecordScreenRobot {
             clickOnViewWithId(R.id.more_submenu)
-            addExecutionDelay(100)
+            addExecutionDelay(1000)
             clickOnViewWithText(R.string.view_map)
             return this
         }
+
+        fun checkFormSubmissionDialogDisplayed() : RecordScreenRobot {
+           /* onView(withText(R.string.confirm_new_submission_title))
+                .inRoot(isDialog())
+                .check(matches(isDisplayed()))*/
+            return checkDialogDisplayed(R.string.confirm_new_submission_title)
+        }
     }
+
+    private fun <T> any(type: Class<T>): T = Mockito.any<T>(type)
 }

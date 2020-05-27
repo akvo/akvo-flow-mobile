@@ -27,24 +27,23 @@ import org.akvo.flow.domain.entity.DomainForm
 import org.akvo.flow.domain.entity.DomainFormInstance
 import org.akvo.flow.domain.entity.User
 import org.akvo.flow.domain.interactor.DefaultObserver
-import org.akvo.flow.domain.interactor.UseCase
 import org.akvo.flow.domain.interactor.datapoints.GetDataPoint
 import org.akvo.flow.domain.interactor.forms.CreateFormInstance
 import org.akvo.flow.domain.interactor.forms.GetForm
 import org.akvo.flow.domain.interactor.forms.GetRecentSubmittedFormInstance
 import org.akvo.flow.domain.interactor.forms.GetSavedFormInstance
+import org.akvo.flow.domain.interactor.users.GetSelectedUser
 import org.akvo.flow.presentation.Presenter
 import org.akvo.flow.presentation.datapoints.DisplayNameMapper
 import org.akvo.flow.service.BootstrapService
 import timber.log.Timber
 import java.util.UUID
 import javax.inject.Inject
-import javax.inject.Named
 
 class RecordPresenter @Inject constructor(
     private val getDataPoint: GetDataPoint,
     private val displayNameMapper: DisplayNameMapper,
-    @param:Named("getSelectedUser") private val getSelectedUserUseCase: UseCase,
+    private val getSelectedUserUseCase: GetSelectedUser,
     private val getFormUseCase: GetForm,
     private val getSavedFormInstanceUseCase: GetSavedFormInstance,
     private val getRecentSubmittedFormInstanceUseCase: GetRecentSubmittedFormInstance,

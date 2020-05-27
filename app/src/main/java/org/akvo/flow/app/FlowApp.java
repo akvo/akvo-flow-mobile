@@ -19,6 +19,9 @@
 
 package org.akvo.flow.app;
 
+import androidx.annotation.VisibleForTesting;
+import androidx.multidex.MultiDexApplication;
+
 import com.halfhp.rxtracer.RxTracer;
 import com.mapbox.mapboxsdk.Mapbox;
 
@@ -30,6 +33,7 @@ import org.akvo.flow.domain.interactor.DefaultObserver;
 import org.akvo.flow.domain.interactor.UseCase;
 import org.akvo.flow.domain.interactor.setup.SaveSetup;
 import org.akvo.flow.domain.interactor.setup.SetUpParams;
+import org.akvo.flow.domain.interactor.users.GetSelectedUser;
 import org.akvo.flow.injector.component.ApplicationComponent;
 import org.akvo.flow.injector.component.DaggerApplicationComponent;
 import org.akvo.flow.injector.module.ApplicationModule;
@@ -43,8 +47,6 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import androidx.annotation.VisibleForTesting;
-import androidx.multidex.MultiDexApplication;
 import timber.log.Timber;
 
 public class FlowApp extends MultiDexApplication {
@@ -56,8 +58,7 @@ public class FlowApp extends MultiDexApplication {
     Prefs prefs;
 
     @Inject
-    @Named("getSelectedUser")
-    UseCase getSelectedUser;
+    GetSelectedUser getSelectedUser;
 
     @Inject
     @Named("saveSetup")

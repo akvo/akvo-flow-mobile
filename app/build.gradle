@@ -120,7 +120,7 @@ android {
             }
         }
         debug {
-            minifyEnabled true
+            minifyEnabled false
             multiDexEnabled true
             testCoverageEnabled true
             proguardFile 'proguard-files/proguard-rules.pro'

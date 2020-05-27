@@ -29,7 +29,6 @@ import org.akvo.flow.domain.interactor.DeleteSurvey;
 import org.akvo.flow.domain.interactor.GetAllSurveys;
 import org.akvo.flow.domain.interactor.GetIsDeviceSetUp;
 import org.akvo.flow.domain.interactor.GetPublishDataTime;
-import org.akvo.flow.domain.interactor.datapoints.GetSavedDataPoints;
 import org.akvo.flow.domain.interactor.GetUserSettings;
 import org.akvo.flow.domain.interactor.MobileUploadSet;
 import org.akvo.flow.domain.interactor.PublishData;
@@ -46,13 +45,13 @@ import org.akvo.flow.domain.interactor.UseCase;
 import org.akvo.flow.domain.interactor.apk.GetApkData;
 import org.akvo.flow.domain.interactor.apk.GetApkDataPreferences;
 import org.akvo.flow.domain.interactor.apk.SaveApkUpdateNotified;
+import org.akvo.flow.domain.interactor.datapoints.GetSavedDataPoints;
 import org.akvo.flow.domain.interactor.forms.DownloadForm;
 import org.akvo.flow.domain.interactor.forms.ReloadForms;
 import org.akvo.flow.domain.interactor.setup.SaveSetup;
 import org.akvo.flow.domain.interactor.users.CreateUser;
 import org.akvo.flow.domain.interactor.users.DeleteUser;
 import org.akvo.flow.domain.interactor.users.EditUser;
-import org.akvo.flow.domain.interactor.users.GetSelectedUser;
 import org.akvo.flow.domain.interactor.users.GetUsers;
 import org.akvo.flow.domain.interactor.users.SelectUser;
 
@@ -146,12 +145,6 @@ public class ViewModule {
     @Named("createUser")
     UseCase provideCreateUser(CreateUser createUser) {
         return createUser;
-    }
-
-    @Provides
-    @Named("getSelectedUser")
-    UseCase provideGetSelectedUser(GetSelectedUser getSelectedUser) {
-        return getSelectedUser;
     }
 
     @Provides

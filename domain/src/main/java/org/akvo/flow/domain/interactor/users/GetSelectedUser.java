@@ -22,8 +22,7 @@ package org.akvo.flow.domain.interactor.users;
 
 import org.akvo.flow.domain.entity.User;
 import org.akvo.flow.domain.executor.PostExecutionThread;
-import org.akvo.flow.domain.executor.ThreadExecutor;
-import org.akvo.flow.domain.interactor.UseCase;
+import org.akvo.flow.domain.executor.SchedulerCreator;
 import org.akvo.flow.domain.repository.SurveyRepository;
 import org.akvo.flow.domain.repository.UserRepository;
 import org.akvo.flow.domain.util.Constants;
@@ -33,35 +32,57 @@ import java.util.Map;
 import javax.inject.Inject;
 
 import io.reactivex.Observable;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Function;
+import io.reactivex.observers.DisposableObserver;
 
-public class GetSelectedUser extends UseCase {
+public class GetSelectedUser {
 
     private final UserRepository userRepository;
     private final SurveyRepository surveyRepository;
+    private final SchedulerCreator schedulerCreator;
+    private final PostExecutionThread postExecutionThread;
+    private final CompositeDisposable disposables;
 
     @Inject
-    protected GetSelectedUser(ThreadExecutor threadExecutor,
-            PostExecutionThread postExecutionThread,
-            UserRepository userRepository,
-            SurveyRepository surveyRepository) {
-        super(threadExecutor, postExecutionThread);
+    protected GetSelectedUser(SchedulerCreator schedulerCreator,
+                              PostExecutionThread postExecutionThread,
+                              UserRepository userRepository,
+                              SurveyRepository surveyRepository) {
         this.userRepository = userRepository;
         this.surveyRepository = surveyRepository;
+        this.schedulerCreator = schedulerCreator;
+        this.postExecutionThread = postExecutionThread;
+        this.disposables = new CompositeDisposable();
     }
 
-    @Override
     protected <T> Observable buildUseCaseObservable(Map<String, T> parameters) {
         return userRepository.getSelectedUser()
-                .concatMap(new Function<Long, Observable<User>>() {
-                    @Override
-                    public Observable<User> apply(Long userId) {
-                        if (Constants.INVALID_USER_ID.equals(userId)) {
-                            return Observable.just(new User(Constants.INVALID_USER_ID, null));
-                        } else {
-                            return surveyRepository.getUser(userId);
-                        }
+                .concatMap((Function<Long, Observable<User>>) userId -> {
+                    if (Constants.INVALID_USER_ID.equals(userId)) {
+                        return Observable.just(new User(Constants.INVALID_USER_ID, null));
+                    } else {
+                        return surveyRepository.getUser(userId);
                     }
                 });
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T> void execute(DisposableObserver<T> observer, Map<String, Object> parameters) {
+        final Observable<T> observable = buildUseCaseObservable(parameters)
+                .subscribeOn(schedulerCreator.obtainScheduler())
+                .observeOn(postExecutionThread.getScheduler());
+        addDisposable(observable.subscribeWith(observer));
+    }
+
+    public void dispose() {
+        if (!disposables.isDisposed()) {
+            disposables.clear();
+        }
+    }
+
+    private void addDisposable(Disposable disposable) {
+        disposables.add(disposable);
     }
 }

@@ -197,6 +197,7 @@ class RecordPresenter @Inject constructor(
             }
 
             override fun onError(e: Throwable) {
+                Timber.e(e)
                 createNewFormInstance(domainFormInstance)
             }
         }, params)

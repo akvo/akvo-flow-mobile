@@ -31,6 +31,7 @@ import org.akvo.flow.app.FlowApp
 import org.akvo.flow.domain.SurveyGroup
 import org.akvo.flow.domain.entity.DomainFormInstance
 import org.akvo.flow.injector.component.DaggerViewComponent
+import org.akvo.flow.tracking.TrackingHelper
 import org.akvo.flow.ui.Navigator
 import org.akvo.flow.ui.adapter.RecordTabsAdapter
 import org.akvo.flow.ui.fragment.FormListFragment.FormListListener
@@ -57,6 +58,8 @@ class RecordActivity : BackActivity(), FormListListener, ResponseListListener, R
     @Inject
     lateinit var presenter: RecordPresenter
 
+    private lateinit var trackingHelper: TrackingHelper
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.record_activity)
@@ -71,6 +74,7 @@ class RecordActivity : BackActivity(), FormListListener, ResponseListListener, R
         viewPager.adapter = recordTabsAdapter
         surveyGroup = intent.getSerializableExtra(ConstantUtil.SURVEY_GROUP_EXTRA) as SurveyGroup
         rootLayout = findViewById(R.id.record_root_layout)
+        trackingHelper = TrackingHelper(this)
     }
 
     private fun initializeInjector() {
@@ -124,6 +128,7 @@ class RecordActivity : BackActivity(), FormListListener, ResponseListListener, R
     }
 
     override fun displayWarningDialog(domainFormInstance: DomainFormInstance, formName: String) {
+        trackingHelper.logFormSubmissionRepeatConfirmationDialogEvent()
         ConfirmFormInstanceDialog.newInstance(domainFormInstance, formName)
             .show(supportFragmentManager, ConfirmFormInstanceDialog.TAG)
     }

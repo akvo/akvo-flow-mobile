@@ -32,10 +32,6 @@
   <string name="nextbutton">បន្ទាប់ </string>
   <string name="cleartitle">លុបចម្លើយអង្កេតចេញ</string>
   <string name="cleardesc">តើអ្នកប្រាកដទេថា អ្នកចង់លុបចម្លើយទាំងនេះចេញ?</string>
-  <string name="authtitle">ត្រូវការ ការអនុញ្ញាតិ  </string>
-  <string name="authtext">សូមវាយបញ្ចូលលេខកូដរដ្ឋបាលៈ  </string>
-  <string name="authfailed">ការអនុញ្ញាតិមិនសម្រេច </string>
-  <string name="invalidpassword">លេខកូដមិនត្រឹមត្រូវ </string>
   <string name="clearquestion">លុបចម្លើយអង្កេតចេញ</string>
   <string name="clearquestiondesc">តើអ្នកចង់លុបចម្លើយចំពោះសំណួរនេះចេញឬ? </string>
   <string name="identlabel">អត្តសញ្ញាណឧបករណ៍នេះ </string>
@@ -60,8 +56,6 @@
   <!--Data sync-->
   <string name="data_sync_all">ដាក់ទម្រង់ឲ្យចេញដំណាលគ្នាៈ %1$d - មិនសម្រេចៈ​ %2$d​ </string>
   <string name="data_sync_synced">បានដាក់ទំរង់ឲ្យចេញដំណាលគ្នា: %1$d </string>
-  <!--Localization-->
-  <string name="please_restart">សូមចាប់ផ្តើម Appឡើងវិញ </string>
   <!--Empty Views-->
   <string name="no_survey_selected_text">អ្នកបានជ្រើសរើសការអង្កេតឡើយ។ ចូរបើកម៉ឺនុយនៅចំហៀង ដើម្បីជ្រើសរើស។  </string>
   <!--ToolBar-->
@@ -84,7 +78,6 @@
   <string name="capture_shape">ចាប់ទ្រង់ទ្រាយ </string>
   <string name="view_shape">មើលទ្រង់ទ្រាយ</string>
   <string name="repeat_group">បន្ថែមមួយទៀត  </string>
-  <string name="repetitions">ចំនួនសំណួរដែលបានឆ្លើយ</string>
   <string name="view_map">​មើលផែនទី </string>
   <string name="delete_group_title">លុបក្រុម</string>
   <string name="delete_group_text">តើអ្នកចង់លុបក្រុមនេះឬទេ?</string>
@@ -107,8 +100,6 @@
   <string name="order_name">ឈ្មោះ</string>
   <!--Record Activity-->
   <string name="unknown">ចំណុចទិន្នន័យគ្មានឈ្មោះ</string>
-  <string name="last_modified_monitored">កែលើកចុងក្រោយៈ</string>
-  <string name="last_modified_regular">បានបញ្ជូនចេញៈ </string>
   <string name="last_response">ចម្លើយចុងក្រោយៈ </string>
   <string name="error_missing_cascade">ឯកសារ Cascade មិនបានដោនឡូតឡើយ </string>
   <string name="error_missing_form">មិនឃើញទម្រង់ឡើយ។ សូមដោនឡូតទម្រង់ទាំងអស់ឡើងវិញ</string>

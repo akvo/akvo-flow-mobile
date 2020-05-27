@@ -43,10 +43,6 @@ Sem espaço para armazenamento
   <string name="nextbutton">Próximo</string>
   <string name="cleartitle">Limpar respostas do inquérito</string>
   <string name="cleardesc">Tem certeza de que deseja limpar as suas respostas?</string>
-  <string name="authtitle">Requer autorização</string>
-  <string name="authtext">Por favor, digite a senha de administrador:</string>
-  <string name="authfailed">Falha na autorização</string>
-  <string name="invalidpassword">Senha inválida</string>
   <string name="clearquestion">Limpar Respostas</string>
   <string name="clearquestiondesc">Quer limpar a resposta desta pergunta?</string>
   <string name="identlabel">Identificador do dispositivo</string>
@@ -61,7 +57,7 @@ Sem espaço para armazenamento
   <string name="reset_responses_desc">Apagar permanentemente todas as respostas do inquérito (incluindo imagens e arquivos zip exportados)</string>
   <string name="checksd">Armazenamento disponível</string>
   <string name="sdmissing">Cartão de memória em falta ou desmontado. Certifique-se de que opção \"Cópia de Arquivo USB\" está desligada</string>
-  <string name="pickdate">Seleccionar dados</string>
+  <string name="pickdate">Seleccionar data</string>
   <string name="pleasewaitforbootstrap">Por favor, aguarde até que o arquivo de inicialização conclua o processamento.</string>
   <string name="clear_data_success">Dados apagados do dispositivo com sucesso </string>
   <string name="clear_data_error">Erro ao apagar os dados do dispositivo</string>
@@ -80,8 +76,6 @@ Sem espaço para armazenamento
   <string name="data_sync_synced">Formulários sincronizados:%1$d</string>
   <string name="data_sync_error_form_deleted_title">Formulário eliminado</string>
   <string name="data_sync_error_form_deleted_text">O formulário %1$s foi eliminado.</string>
-  <!--Localization-->
-  <string name="please_restart">Por favor, reinicie o aplicativo</string>
   <!--Empty Views-->
   <string name="no_datapoints_error_text">Não ha pontos de dados</string>
   <string name="no_search_results_error_text">Nenhum resultado encontrado</string>
@@ -110,7 +104,6 @@ Sem espaço para armazenamento
   <string name="delete_point_title">Apagar ponto?</string>
   <string name="delete_shape_title">Apagar forma?</string>
   <string name="repeat_group">Repetir grupo</string>
-  <string name="repetitions">Repetições:</string>
   <string name="view_map">Ver mapa</string>
   <string name="delete_group_title">Apagar grupo</string>
   <string name="delete_group_text">Deseja apagar este grupo?</string>
@@ -135,8 +128,6 @@ Sem espaço para armazenamento
   <string name="order_name">Nome</string>
   <!--Record Activity-->
   <string name="unknown">Ponto de dados sem nome </string>
-  <string name="last_modified_monitored">Última alteração:</string>
-  <string name="last_modified_regular">Submetido:</string>
   <string name="last_response">Última Resposta:</string>
   <string name="error_missing_cascade">Os arquivos em cascata não são descarregadosos</string>
   <string name="error_missing_form">Formulário não encontrado. Por favor, descarregue novamente todos os formulários</string>
@@ -235,7 +226,6 @@ Sem espaço para armazenamento
   <string name="error_mobile_data_sync">Sincronização de dados móveis desativada</string>
   <string name="preference_screen_on">Manter a tela do dispositivo ligada durante a inserção dos dados no inquérito de pesquisa</string>
   <string name="preference_upload_mobile_data">Envio de puntos de dados usando dados móveis</string>
-  <string name="preference_app_language">Idioma da Aplicação </string>
   <string name="preference_image_size">Tamanho das imagens</string>
   <string name="preferences_data_section">Dados</string>
   <string name="preference_sync_datapoints">Enviar pontos de dados submetidos para a instância de Flow</string>
@@ -279,11 +269,6 @@ Sem espaço para armazenamento
   <string name="preference_publish_data_error_no_data">Nenhum dado disponível para upload em massa.</string>
   <string name="preference_publish_data_error_generic">Erro ao publicar dados, tente novamente.</string>
   <string name="preference_publish_data_error_no_space">Erro ao publicar dados. Sem espaço de armazenamento. Por favor, apague os arquivos desnecessários e tente novamente.</string>
-  <string name="pass_code">Senha</string>
-  <string name="secure_data_walkthrough_title">Armazenamento de dados</string>
-  <string name="walthrough_next_button">Próximo</string>
-  <string name="secure_collected_walkthrough_page1_subtitle">Os dados coletados com o aplicativo Flow agora são armazenados de maneira privada no dispositivo</string>
-  <string name="secure_collected_walkthrough_page2_subtitle">Use a opção Publicar dados em Configurações para disponibilizar dados coletados off-line para upload em massa</string>
   <string name="submit_tab_description">Você pode visualizar, mas não editar respostas enviadas</string>
   <string name="snackbar_submitted">Enviado</string>
   <string name="form_id_hint">ID do formulário</string>

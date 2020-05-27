@@ -41,10 +41,6 @@
   <string name="nextbutton">Suivant</string>
   <string name="cleartitle">Effacer les réponses de l\'enquête</string>
   <string name="cleardesc">Etes-vous sûr de vouloir effacer les réponses?</string>
-  <string name="authtitle">Autorisation nécessaire</string>
-  <string name="authtext">Veuillez entrer le mot de passe de l\'administrateur: </string>
-  <string name="authfailed">L\'autorisation a échoué</string>
-  <string name="invalidpassword">Mot de passe invalide</string>
   <string name="clearquestion">Effacer les réponses</string>
   <string name="clearquestiondesc">Voulez-vous effacer la réponse à cette question?</string>
   <string name="identlabel">Identifiant de l\'appareil</string>
@@ -78,8 +74,6 @@
   <string name="data_sync_synced">Formulaires synchronisés: %1$d</string>
   <string name="data_sync_error_form_deleted_title">Ce formulaire a été supprimé.</string>
   <string name="data_sync_error_form_deleted_text">Le formulaire %1$s a été supprimé</string>
-  <!--Localization-->
-  <string name="please_restart">Veuillez redémarrer l\'application</string>
   <!--Empty Views-->
   <string name="no_datapoints_error_text">Vous n\'avez pas encore de points de données</string>
   <string name="no_search_results_error_text">Aucun résultat trouvé</string>
@@ -108,7 +102,6 @@
   <string name="delete_point_title">Supprimer le point?</string>
   <string name="delete_shape_title">Supprimer la surface?</string>
   <string name="repeat_group">Répéter le groupe</string>
-  <string name="repetitions">Répétitions:</string>
   <string name="view_map">Voir carte.</string>
   <string name="delete_group_title">Supprimer le groupe</string>
   <string name="delete_group_text">Voulez-vous supprimer ce groupe?</string>
@@ -132,8 +125,6 @@
   <string name="order_name">Nom</string>
   <!--Record Activity-->
   <string name="unknown">Donnée non nommée</string>
-  <string name="last_modified_monitored">Dernière modification</string>
-  <string name="last_modified_regular">Envoyé</string>
   <string name="last_response">Dernière réponse</string>
   <string name="error_missing_cascade">Les fichiers de cascade n\'ont pas été téléchargés</string>
   <string name="error_missing_form">Formulaire non trouvé. Re-télécharger tous les formulaires.</string>
@@ -232,7 +223,6 @@
   <string name="error_mobile_data_sync">Désactiver la synchronisation des données mobiles</string>
   <string name="preference_screen_on">Garder l\'ecran en marche pendant la collecte</string>
   <string name="preference_upload_mobile_data">Autoriser l\'utilisation les données mobiles pour l\'envoi des soumissions</string>
-  <string name="preference_app_language">Langage App</string>
   <string name="preference_image_size">Taille de l\'image</string>
   <string name="preferences_data_section">Données</string>
   <string name="preference_sync_datapoints">Envoyer les points de données à l\'intance Flow.</string>
@@ -276,16 +266,13 @@
   <string name="preference_publish_data_error_no_data">Pas de données disponibles pour le téléchargement en bloc</string>
   <string name="preference_publish_data_error_generic">Erreur de publication de données, veuillez réessayer.</string>
   <string name="preference_publish_data_error_no_space">Erreur de publication de données. Plus d\'espace de stockage. Veuillez supprimer les fichiers inutiles et réessayer.</string>
-  <string name="pass_code">Code d\'accès</string>
-  <string name="secure_data_walkthrough_title">Stockage de données</string>
-  <string name="walthrough_next_button">Suivant</string>
-  <string name="secure_collected_walkthrough_page1_subtitle">Les données collectées avec l\'application Flow sont désormais stockées en mode privé dans l\'appareil</string>
-  <string name="secure_collected_walkthrough_page2_subtitle">Utilisez l\'option Publier des données dans Paramètres pour rendre les données collectées hors connexion disponibles pour le transfert groupé</string>
   <string name="submit_tab_description">Les réponses envoyées peuvent être vues mais non modifiées</string>
   <string name="snackbar_submitted">Envoyé</string>
   <string name="form_id_hint">Identifiant du formulaire</string>
   <string name="sync_service_notification_title">Synchronisation des données en cours</string>
   <string name="sync_service_notification_ticker">Synchronisation en cours</string>
+  <string name="check_service_notification_title">Vérification des données soumises...</string>
+  <string name="check_service_notification_ticker">Vérification</string>
   <string name="form_submit_error">Erreur de soumission de formulaire, veuillez réessayer</string>
   <string name="media_from_camera">Appareil photo</string>
   <string name="media_from_gallery">Galerie</string>
@@ -301,6 +288,53 @@
   <string name="survey_permissions_missing">L\'accès aux fichiers et à la téléphonie sont nécessaires pour que l\'application fonctionne correctement.</string>
   <string name="unpublish_service_notification_title">Suppression des fichiers publiés en cours</string>
   <string name="unpublish_service_notification_ticker">Suppression en cours</string>
+  <string name="error_displaying_datapoint">Ce point de données ne peut pas être affiché sur une carte</string>
+  <string name="walkthrough_title">Affectation de points de données</string>
+  <string name="walkthrough_subtitle">Pour les enquêtes de suivi, lorsque vous appuyez sur \'télécharger\', seuls les points de données attribués à l\'appareil seront téléchargés.</string>
+  <string name="offline_maps_dialog_title">Sélectionner le plan</string>
+  <string name="offline_maps_dialog_online_label">En ligne</string>
+  <string name="offline_maps_dialog_live_section">Plan interactif</string>
+  <string name="offline_maps_dialog_offline_label">Hors connection</string>
+  <string name="offline_maps_dialog_empty_text">Pas de plans disponibles en mode hors connection. Téléchargez un plan pour le sélectionner.</string>
+  <string name="offline_maps_dialog_empty_button">Nouveau plan hors connection</string>
+  <string name="offline_map_activity_title">Nouveau plan</string>
+  <string name="offline_map_download_hint">Sélectionnez la zone à télécharger</string>
+  <string name="offline_map_download_name">Nom du plan</string>
+  <string name="offline_map_download_button">Télécharger le plan</string>
+  <string name="offline_map_create_error">Erreur lors de la création de la zone hors connection</string>
+  <string name="offline_map_rename_error">Erreur lors du changement de nom de la zone hors connection</string>
+  <string name="offline_map_delete_error">Erreur lors de la suppression de la zone hors connection</string>
+  <string name="offline_map_select_error">Erreur lors de la selection de la zone hors connection</string>
+  <string name="offline_maps_navigation_entry">Plans hors connection</string>
+  <string name="offline_maps_list_title">Plans hors connection</string>
+  <string name="no_offline_maps_title">Les plans téléchargés apparaîtront ici</string>
+  <string name="no_offline_maps_subtitle">Utilisez le bouton ci-dessous pour commencer</string>
+  <string name="view_offline_area">Voir</string>
+  <string name="rename_offline_area">Renommer</string>
+  <string name="delete_offline_area">Supprimer</string>
+  <string name="offline_areas_list_button">Utiliser</string>
+  <string name="offline_areas_list_button_deselect">Désélectionner</string>
+  <string name="offline_item_status">Téléchargement</string>
+  <string name="offline_item_rename_dialog_title">Renommer le plan</string>
+  <string name="offline_item_rename_error">Erreur lors du changement de nom</string>
+  <string name="offline_item_delete_dialog_title">Supprimer le plan?</string>
+  <string name="offline_item_delete_dialog_message">%1$s ne pourras plus être utilisé </string>
+  <string name="geoshape_bottom_item_info">Info</string>
+  <string name="geoshape_bottom_item_add_point">Ajouter un point</string>
+  <string name="geoshape_bottom_item_delete_point">Supprimer le point</string>
+  <string name="geoshape_bottom_item_delete_feature">Supprimer la forme</string>
+  <string name="geoshapes_error_manual_disabled">La saisie manuelle est désactivée pour cette question</string>
+  <string name="geoshapes_error_select_shape">Veuillez sélectionner au moins une forme dans le menu</string>
+  <string name="geoshape_properties_point_count">Nombre de points: %1$s</string>
+  <string name="geoshape_properties_length">Longueur: %1$s</string>
+  <string name="geoshape_properties_area">Aire: %1$s</string>
+  <string name="geoshape_properties_title">Propriétés</string>
+  <string name="image_location_coordinates">lat: %1$s\nlon: %2$s</string>
+  <string name="data_upload_will_start_message">Le téléchargement des données commencera lorsqu\'une connexion Internet sera disponible</string>
+  <string name="error_data_point_not_found">Point de données introuvable</string>
+  <string name="confirm_new_submission">Nouvelle soumission</string>
+  <string name="confirm_new_submission_title">Nouvelle soumission?</string>
+  <string name="confirm_new_submission_message">Vous avez déjà envoyé au moins une réponse à \"%1$s\" pour ce point de données au cours des dernières 24 heures.\n\nVoulez-vous en faire une autre?</string>
   <plurals name="download_forms_error">
     <item quantity="one">Error de téléchargement de formulaire</item>
     <item quantity="other">Error de téléchargement des formulaires</item>
@@ -308,5 +342,9 @@
   <plurals name="download_forms_success">
     <item quantity="one">Formulaire téléchargé</item>
     <item quantity="other">Formulaires téléchargés</item>
+  </plurals>
+  <plurals name="repetitions_number">
+    <item quantity="one">Répétition: %1$d</item>
+    <item quantity="other">Répétitions: %1$d</item>
   </plurals>
 </resources>

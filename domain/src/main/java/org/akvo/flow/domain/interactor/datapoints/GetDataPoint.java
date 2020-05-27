@@ -20,7 +20,7 @@
 package org.akvo.flow.domain.interactor.datapoints;
 
 import org.akvo.flow.domain.executor.PostExecutionThread;
-import org.akvo.flow.domain.executor.ThreadExecutor;
+import org.akvo.flow.domain.executor.SchedulerCreator;
 import org.akvo.flow.domain.repository.SurveyRepository;
 
 import java.util.Map;
@@ -31,23 +31,22 @@ import io.reactivex.Single;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.observers.DisposableSingleObserver;
-import io.reactivex.schedulers.Schedulers;
 
 public class GetDataPoint {
 
     public static final String PARAM_DATA_POINT_ID = "data_point_id";
 
     private final SurveyRepository surveyRepository;
-    private final ThreadExecutor threadExecutor;
+    private final SchedulerCreator schedulerCreator;
     private final PostExecutionThread postExecutionThread;
     private final CompositeDisposable disposables;
 
     @Inject
     public GetDataPoint(SurveyRepository surveyRepository,
-            ThreadExecutor threadExecutor,
+                        SchedulerCreator schedulerCreator,
             PostExecutionThread postExecutionThread) {
         this.surveyRepository = surveyRepository;
-        this.threadExecutor = threadExecutor;
+        this.schedulerCreator = schedulerCreator;
         this.postExecutionThread = postExecutionThread;
         this.disposables = new CompositeDisposable();
     }
@@ -63,7 +62,7 @@ public class GetDataPoint {
     @SuppressWarnings("unchecked")
     public <T> void execute(DisposableSingleObserver<T> observer, Map<String, Object> parameters) {
         final Single<T> observable = buildUseCaseObservable(parameters)
-                .subscribeOn(Schedulers.from(threadExecutor))
+                .subscribeOn(schedulerCreator.obtainScheduler())
                 .observeOn(postExecutionThread.getScheduler());
         addDisposable(observable.subscribeWith(observer));
     }

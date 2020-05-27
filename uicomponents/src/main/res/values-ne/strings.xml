@@ -40,10 +40,6 @@
   <string name="nextbutton">अर्को</string>
   <string name="cleartitle">सर्भे उतरहरु हटाउनुहोस्।</string>
   <string name="cleardesc">के तपाईं आफ्ना उतरहरु हटाउन चाहनुहुन्छ?</string>
-  <string name="authtitle">आधिकारिकताको आवश्यकता छ।</string>
-  <string name="authtext">कृपया आधिकारिक पासकोड् राख्नुहोस्।</string>
-  <string name="authfailed">आधिकारिकता सफल भएन।</string>
-  <string name="invalidpassword">गलत पासकोड्।</string>
   <string name="clearquestion">उतर हटाउनुहोस्।</string>
   <string name="clearquestiondesc">के तपाईं यो प्रश्नको उतर हटाउन चाहनुहुन्छ?</string>
   <string name="identlabel">उपकरण पहिचान</string>
@@ -71,8 +67,6 @@
   <string name="data_sync_synced">सिँक भएका फारमहरु %1$d</string>
   <string name="data_sync_error_form_deleted_title">फारम हटाइयो।</string>
   <string name="data_sync_error_form_deleted_text">फारम %1$s हटाइयो।</string>
-  <!--Localization-->
-  <string name="please_restart">कृपया एप्पलाई पुन: शुरु गर्नुहोस्।</string>
   <!--Empty Views-->
   <string name="no_survey_selected_text">तपाईंको कुनै सर्भे छानिएको छैन। कुनै एक सर्भे छान्नको लागि साइडको मेनु खोल्नुहोस्।</string>
   <!--ToolBar-->
@@ -95,7 +89,6 @@
   <string name="capture_shape">आकार कब्जा गर्नुहोस्।</string>
   <string name="view_shape">आकार हेर्नुहोस्</string>
   <string name="repeat_group">समुह दोहोर्याउनुहोस्</string>
-  <string name="repetitions">दोहोरिएको</string>
   <string name="view_map">नक्सा/मानचित्र हेर्नुहोस्</string>
   <string name="delete_group_title">समुह हटाउनुहोस्</string>
   <string name="delete_group_text">के तपाईं यो समुह हटाउन चाहनुहुन्छ?</string>
@@ -118,8 +111,6 @@
   <string name="order_name">नाम</string>
   <!--Record Activity-->
   <string name="unknown">बेनाम डाटा प्वाइन्ट</string>
-  <string name="last_modified_monitored">अन्तिम पटक फेरिएको</string>
-  <string name="last_modified_regular">बुझाईयो</string>
   <string name="last_response">अन्तिम उत्तर</string>
   <string name="error_missing_cascade">क्यास्केड फाइलहरु डाउन्लोड भएनन्</string>
   <string name="error_missing_form">फारम भेटिएन। कृपया सबै फारमहरु फेरि डाउन्लोड गर्नुहोस्।</string>
@@ -203,7 +194,6 @@
   <string name="error_loading_help">सहयोग सामग्री लोड् हुँदा त्रुटी भयो </string>
   <string name="error_mobile_data_sync">मोबाइल डाटाको सिन्क बन्द गरिएको छ</string>
   <string name="preference_screen_on">फारम भरि राख्दा मोबाइलको स्क्रिन \'अन\' नै राख्नुहोस् </string>
-  <string name="preference_app_language">एप्पको भाषा</string>
   <string name="preference_image_size">फोटोको साइज</string>
   <string name="preferences_data_section">डाटा</string>
   <string name="preference_delete_collected_data">सन्कलन गरिएका डाटा र फोटोहरु हटाउनुहोस्</string>

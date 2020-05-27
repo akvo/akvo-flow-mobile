@@ -41,10 +41,6 @@
   <string name="nextbutton">Siguiente</string>
   <string name="cleartitle">Borrar respuestas</string>
   <string name="cleardesc">¿Está seguro de querer borrar las respuestas?</string>
-  <string name="authtitle">Autorización necesaria</string>
-  <string name="authtext">Por favor, introduzca el código de administrador: </string>
-  <string name="authfailed">Autorización fallida</string>
-  <string name="invalidpassword">Código no válido</string>
   <string name="clearquestion">Borrar respuesta</string>
   <string name="clearquestiondesc">¿Quiere borrar la respuesta de esta pregunta?</string>
   <string name="identlabel">Identificador de dispositivo</string>
@@ -78,8 +74,6 @@
   <string name="data_sync_synced">Formularios sincronizados: %1$d</string>
   <string name="data_sync_error_form_deleted_title">Formulario borrado</string>
   <string name="data_sync_error_form_deleted_text">El formulario %1$s ha sido borrado</string>
-  <!--Localization-->
-  <string name="please_restart">Por favor, reinicie la aplicación</string>
   <!--Empty Views-->
   <string name="no_datapoints_error_text">No hay puntos de datos.</string>
   <string name="no_search_results_error_text">No se han encontrado resultados</string>
@@ -108,7 +102,6 @@
   <string name="delete_point_title">Borrar punto?</string>
   <string name="delete_shape_title">Borrar figura?</string>
   <string name="repeat_group">Repetir grupo</string>
-  <string name="repetitions">Repeticiones:</string>
   <string name="view_map">Ver mapa</string>
   <string name="delete_group_title">Eliminar grupo</string>
   <string name="delete_group_text">¿Está seguro de que desea eliminar este grupo?</string>
@@ -132,8 +125,6 @@
   <string name="order_name">Nombre</string>
   <!--Record Activity-->
   <string name="unknown">Punto sin nombre</string>
-  <string name="last_modified_monitored">Última modificación:</string>
-  <string name="last_modified_regular">Enviado:</string>
   <string name="last_response">Última respuesta:</string>
   <string name="error_missing_cascade">Los recursos cascada no han sido descargados</string>
   <string name="error_missing_form">Formulario no encontrado. Por favor, vuelva a descargar todos los formularios.</string>
@@ -232,7 +223,6 @@
   <string name="error_mobile_data_sync">Sincronización vía datos móviles deshabilitada</string>
   <string name="preference_screen_on">Mantener la pantalla activa durante la recopilación de datos</string>
   <string name="preference_upload_mobile_data">Habilitar el uso de datos móviles para el envio de puntos de datos</string>
-  <string name="preference_app_language">Idioma de la aplicación</string>
   <string name="preference_image_size">Tamaño de las imágenes</string>
   <string name="preferences_data_section">Datos</string>
   <string name="preference_sync_datapoints">Enviar puntos de datos a instancia de Flow.</string>
@@ -276,16 +266,13 @@
   <string name="preference_publish_data_error_no_data">No hay datos disponibles para la carga masiva.</string>
   <string name="preference_publish_data_error_generic">Error al publicar datos, por favor intente de nuevo.</string>
   <string name="preference_publish_data_error_no_space">Error al publicar datos por falta de espacio de almacenamiento. Por favor, elimine los archivos innecesarios y vuelva a intentarlo.</string>
-  <string name="pass_code">Código de acceso</string>
-  <string name="secure_data_walkthrough_title">Almacenamiento de datos</string>
-  <string name="walthrough_next_button">Siguiente</string>
-  <string name="secure_collected_walkthrough_page1_subtitle">A partir de ahora, los datos colectados con la aplicación Flow, se almacenan de forma privada en el dispositivo.</string>
-  <string name="secure_collected_walkthrough_page2_subtitle">Use la opción Publicar datos en Ajustes para que los datos recolectados sin conexión estén disponibles para la carga masiva.</string>
   <string name="submit_tab_description">Las respuestas enviadas pueden ser consultadas pero no modificadas.</string>
   <string name="snackbar_submitted">Enviado</string>
   <string name="form_id_hint">ID de formulario</string>
   <string name="sync_service_notification_title">Sincronizando datos</string>
   <string name="sync_service_notification_ticker">Sincronizando</string>
+  <string name="check_service_notification_title">Comprobando los datos enviados...</string>
+  <string name="check_service_notification_ticker">Verificando...</string>
   <string name="form_submit_error">Error al enviar el formulario, por favor intente de nuevo.</string>
   <string name="media_from_camera">Camera</string>
   <string name="media_from_gallery">Galeria</string>
@@ -301,6 +288,53 @@
   <string name="survey_permissions_missing">Los permisos de almacenamiento y telefonia permiten el correcto funcionamiento de la aplicación.</string>
   <string name="unpublish_service_notification_title">Borrando ficheros publicados</string>
   <string name="unpublish_service_notification_ticker">Borrando</string>
+  <string name="error_displaying_datapoint">Este punto de datos no se puede ver en un mapa</string>
+  <string name="walkthrough_title">Asignación de punto de datos</string>
+  <string name="walkthrough_subtitle">En las encuestas de monitoreo, cuando presiona \'descargar\' solo se descargarán los puntos de datos asignados al dispositivo</string>
+  <string name="offline_maps_dialog_title">Seleccionar mapa</string>
+  <string name="offline_maps_dialog_online_label">En línea</string>
+  <string name="offline_maps_dialog_live_section">Mapa automático</string>
+  <string name="offline_maps_dialog_offline_label">Sin conexión</string>
+  <string name="offline_maps_dialog_empty_text">No hay mapas sin conexión. Descargar un mapa para seleccionarlo</string>
+  <string name="offline_maps_dialog_empty_button">Nuevo mapa sin conexión</string>
+  <string name="offline_map_activity_title">Nuevo mapa</string>
+  <string name="offline_map_download_hint">Seleccione área para descargar</string>
+  <string name="offline_map_download_name">Nombre del mapa</string>
+  <string name="offline_map_download_button">Descargar mapa</string>
+  <string name="offline_map_create_error">Error al modificar al crear área sin conexión</string>
+  <string name="offline_map_rename_error">Error al cambiar el nombre del área sin conexión</string>
+  <string name="offline_map_delete_error">Error al eliminar el área sin conexión</string>
+  <string name="offline_map_select_error">Error al seleccionar el área sin conexión</string>
+  <string name="offline_maps_navigation_entry">Mapas sin conexión</string>
+  <string name="offline_maps_list_title">Mapas sin conexión</string>
+  <string name="no_offline_maps_title">Los mapas descargados aparecerán aquí</string>
+  <string name="no_offline_maps_subtitle">Use el botón de abajo para comenzar</string>
+  <string name="view_offline_area">Ver</string>
+  <string name="rename_offline_area">Renombrar</string>
+  <string name="delete_offline_area">Borrar</string>
+  <string name="offline_areas_list_button">Usar</string>
+  <string name="offline_areas_list_button_deselect">Deseleccionar</string>
+  <string name="offline_item_status">Descargando</string>
+  <string name="offline_item_rename_dialog_title">Renombrar mapa</string>
+  <string name="offline_item_rename_error">Error al renombrar</string>
+  <string name="offline_item_delete_dialog_title">¿Borrar mapa?</string>
+  <string name="offline_item_delete_dialog_message">%1$s ya no podrá ser utilizado</string>
+  <string name="geoshape_bottom_item_info">Información</string>
+  <string name="geoshape_bottom_item_add_point">Añadir punto</string>
+  <string name="geoshape_bottom_item_delete_point">Borrar punto</string>
+  <string name="geoshape_bottom_item_delete_feature">Eliminar forma</string>
+  <string name="geoshapes_error_manual_disabled">La entrada manual está deshabilitada para esta pregunta</string>
+  <string name="geoshapes_error_select_shape">Seleccione al menos una forma en el menú.</string>
+  <string name="geoshape_properties_point_count">Número de puntos: %1$s</string>
+  <string name="geoshape_properties_length">Longitud: %1$s</string>
+  <string name="geoshape_properties_area">Area: %1$s</string>
+  <string name="geoshape_properties_title">Propiedades</string>
+  <string name="image_location_coordinates">lat: %1$s\nlon: %2$s</string>
+  <string name="data_upload_will_start_message">El envio de datos comenzará cuando haya una conexión a Internet.</string>
+  <string name="error_data_point_not_found">Punto de dato no encontrado</string>
+  <string name="confirm_new_submission">Nueva respuesta</string>
+  <string name="confirm_new_submission_title">Nueva respuesta?</string>
+  <string name="confirm_new_submission_message">Ya has enviado al menos una respuesta a \"%1$s\" para este punto de dato en las últimas 24 horas.\n\nQuieres enviar otra?</string>
   <plurals name="download_forms_error">
     <item quantity="one">Error de descarga de formulario</item>
     <item quantity="other">Error de descarga de formularios</item>
@@ -308,5 +342,9 @@
   <plurals name="download_forms_success">
     <item quantity="one">Formulario descargado</item>
     <item quantity="other">Formularios descargados</item>
+  </plurals>
+  <plurals name="repetitions_number">
+    <item quantity="one">Repetición: %1$d</item>
+    <item quantity="other">Repeticiones: %1$d</item>
   </plurals>
 </resources>

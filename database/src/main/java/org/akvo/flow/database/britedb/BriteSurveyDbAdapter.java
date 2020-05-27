@@ -798,13 +798,14 @@ public class BriteSurveyDbAdapter {
         long dateParam = System.currentTimeMillis() - maxDate;
         String sql = "SELECT * FROM " + Tables.SURVEY_INSTANCE +
                 " WHERE " + Tables.SURVEY_INSTANCE + "." + SurveyInstanceColumns.SURVEY_ID + "= ?" +
-                " AND " + SurveyInstanceColumns.STATUS + "= ?" +
+                " AND (" + SurveyInstanceColumns.STATUS + " = " + SurveyInstanceStatus.SUBMITTED +
+                " OR " + SurveyInstanceColumns.STATUS + " = " + SurveyInstanceStatus.UPLOADED + ")" +
                 " AND " + SurveyInstanceColumns.RECORD_ID + "= ?" +
                 " AND " + SurveyInstanceColumns.SUBMITTED_DATE + " > ?" +
-                " ORDER BY " + SurveyInstanceColumns.START_DATE + " DESC LIMIT 1";
+                " ORDER BY " + SurveyInstanceColumns.SUBMITTED_DATE + " DESC LIMIT 1";
 
         return Single.just(briteDatabase
-                .query(sql, formId, String.valueOf(SurveyInstanceStatus.SUBMITTED), dataPointId, String.valueOf(dateParam)));
+                .query(sql, formId, dataPointId, String.valueOf(dateParam)));
     }
 
     public void markDataPointAsViewed(String dataPointId) {

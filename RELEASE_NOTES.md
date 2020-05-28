@@ -1,5 +1,12 @@
 Akvo FLOW app release notes
 ===========================
+# ver 2.9.2
+Date: 28 May 2020
+
+* **Monitoring: Inform/Warn about submitting another monitoring form for the same data point** - [#1519](https://github.com/akvo/akvo-flow-mobile/issues/1519)
+* **Update French and Spanish translations** - [#1626](https://github.com/akvo/akvo-flow-mobile/issues/1626)
+
+---------------
 # ver 2.9.1
 Date: 20 April 2020
 

@@ -5,6 +5,7 @@ apply plugin: 'com.getkeepsafe.dexcount'
 apply plugin: 'io.fabric'
 apply from: rootProject.file("jacoco.gradle")
 apply plugin: 'kotlin-kapt'
+apply plugin: 'com.google.firebase.appdistribution'
 
 dexcount {
     enabled = !project.hasProperty("nodexcount")
@@ -110,9 +111,16 @@ android {
             proguardFile 'proguard-files/leakcanary.pro'
             proguardFile getDefaultProguardFile('proguard-android.txt')
             signingConfig signingConfigs.flowRelease
+
+            firebaseAppDistribution {
+                groups = "testers"
+                if (project.hasProperty('APP_ID')) {
+                    appId = APP_ID
+                }
+            }
         }
         debug {
-            minifyEnabled true
+            minifyEnabled false
             multiDexEnabled true
             testCoverageEnabled true
             proguardFile 'proguard-files/proguard-rules.pro'

@@ -24,6 +24,9 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.text.TextUtils;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 import com.squareup.sqlbrite2.BriteDatabase;
 import com.squareup.sqlbrite2.SqlBrite;
 
@@ -41,10 +44,7 @@ import org.akvo.flow.database.UserColumns;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
 import io.reactivex.Single;
@@ -74,7 +74,7 @@ public class BriteSurveyDbAdapter {
      * Filters surveyed locales based on the parameters passed in.
      */
     public Observable<Cursor> getFilteredDataPoints(long surveyGroupId, Double latitude,
-            Double longitude, int orderBy) {
+                                                    Double longitude, int orderBy) {
         String queryString = "SELECT sl.*,"
                 + " MIN(r." + SurveyInstanceColumns.STATUS + ") as " + SurveyInstanceColumns.STATUS
                 + " FROM "
@@ -110,11 +110,11 @@ public class BriteSurveyDbAdapter {
                 .createQuery(tables, queryString + whereClause + groupBy + orderByStr,
                         String.valueOf(surveyGroupId))
                 .concatMap(new Function<SqlBrite.Query, Observable<Cursor>>() {
-                            @Override
-                            public Observable<Cursor> apply(SqlBrite.Query query) {
-                                return Observable.just(query.run());
-                            }
-                        });
+                    @Override
+                    public Observable<Cursor> apply(SqlBrite.Query query) {
+                        return Observable.just(query.run());
+                    }
+                });
     }
 
     /**
@@ -371,7 +371,7 @@ public class BriteSurveyDbAdapter {
     }
 
     private void createTransmission(long surveyInstanceId, String formID, String filename,
-            int status) {
+                                    int status) {
         ContentValues values = new ContentValues();
         values.put(TransmissionColumns.SURVEY_INSTANCE_ID, surveyInstanceId);
         values.put(TransmissionColumns.SURVEY_ID, formID);
@@ -476,7 +476,7 @@ public class BriteSurveyDbAdapter {
         String[] whereParams = new String[0];
         if (surveyId > 0) {
             whereClause += " AND " + SurveyColumns.SURVEY_GROUP_ID + " = ?";
-            whereParams = new String[] {
+            whereParams = new String[]{
                     String.valueOf(surveyId)
             };
         }
@@ -628,7 +628,6 @@ public class BriteSurveyDbAdapter {
 
     /**
      * marks a survey record identified by the ID passed in as deleted.
-     *
      */
     public void setFormsDeleted(Set<String> formIds) {
         BriteDatabase.Transaction transaction = beginTransaction();
@@ -693,7 +692,7 @@ public class BriteSurveyDbAdapter {
         boolean transmissionsExist = false;
         String column = TransmissionColumns._ID;
         String whereClause = TransmissionColumns.STATUS + " IN (?, ?, ?) LIMIT 1";
-        String[] selectionArgs = new String[] {
+        String[] selectionArgs = new String[]{
                 String.valueOf(TransmissionStatus.FAILED),
                 String.valueOf(TransmissionStatus.IN_PROGRESS),
                 String.valueOf(TransmissionStatus.QUEUED)
@@ -711,7 +710,7 @@ public class BriteSurveyDbAdapter {
     public Cursor getAllTransmissions() {
         String column = TransmissionColumns.FILENAME;
         String whereClause = TransmissionColumns.STATUS + " IN (?, ?, ?, ?)";
-        String[] selectionArgs = new String[] {
+        String[] selectionArgs = new String[]{
                 String.valueOf(TransmissionStatus.QUEUED),
                 String.valueOf(TransmissionStatus.IN_PROGRESS),
                 String.valueOf(TransmissionStatus.SYNCED),
@@ -724,7 +723,7 @@ public class BriteSurveyDbAdapter {
         String column = TransmissionColumns.SURVEY_INSTANCE_ID;
         String whereClause = TransmissionColumns.FILENAME + " = ? ";
         whereClause += "GROUP BY " + column;
-        return queryTransmissions(column, whereClause, new String[] {filename});
+        return queryTransmissions(column, whereClause, new String[]{filename});
     }
 
     private Cursor queryTransmissions(String column, String whereClause, String[] selectionArgs) {
@@ -748,7 +747,7 @@ public class BriteSurveyDbAdapter {
         String whereClause =
                 TransmissionColumns.STATUS + " IN (?, ?, ?) AND " + TransmissionColumns.FILENAME
                         + " LIKE '%.%'";
-        String[] selectionArgs = new String[] {
+        String[] selectionArgs = new String[]{
                 String.valueOf(TransmissionStatus.QUEUED),
                 String.valueOf(TransmissionStatus.IN_PROGRESS),
                 String.valueOf(TransmissionStatus.FAILED),
@@ -765,7 +764,7 @@ public class BriteSurveyDbAdapter {
         String whereClause =
                 TransmissionColumns.STATUS + " IN (?, ?, ?) AND " + TransmissionColumns.FILENAME
                         + " LIKE '%.%' AND " + TransmissionColumns.SURVEY_ID + " = ?";
-        String[] selectionArgs = new String[] {
+        String[] selectionArgs = new String[]{
                 String.valueOf(TransmissionStatus.QUEUED),
                 String.valueOf(TransmissionStatus.IN_PROGRESS),
                 String.valueOf(TransmissionStatus.FAILED),
@@ -774,55 +773,39 @@ public class BriteSurveyDbAdapter {
         return queryTransmissions(column, whereClause, selectionArgs);
     }
 
-    public Single<Cursor> getFormMetaData(String formId) {
+    public Single<Cursor> getForm(String formId) {
         String sql =
-                "SELECT " + SurveyColumns.HELP_DOWNLOADED + ", " + SurveyColumns.VERSION + " FROM "
-                        + Tables.SURVEY + " WHERE " + SurveyColumns.SURVEY_ID + " = ?";
+                "SELECT * FROM " + Tables.SURVEY + " WHERE " + SurveyColumns.SURVEY_ID + " = ?";
         return Single.just(briteDatabase.query(sql, formId));
     }
 
-    public Single<Long> fetchOrCreateFormInstance(String formId, String dataPointId,
-            String formVersion, long userId, String userName) {
-        long formInstanceId;
-        Cursor cursor = getLatestSavedFormInstance(formId, dataPointId);
-        if (cursor!= null && cursor.moveToFirst()) {
-            formInstanceId = cursor.getLong(cursor.getColumnIndexOrThrow(SurveyInstanceColumns._ID));
-        } else {
-            formInstanceId = createFormInstance(formId, dataPointId, formVersion, userId, userName);
-        }
-        if (cursor != null) {
-            cursor.close();
-        }
-        return Single.just(formInstanceId);
-    }
-
-    private long createFormInstance(String formId, String dataPointId, String formVersion,
-            long userId, String userName) {
-        final long time = System.currentTimeMillis();
-
-        ContentValues initialValues = new ContentValues();
-        initialValues.put(SurveyInstanceColumns.SURVEY_ID, formId);
-        initialValues.put(SurveyInstanceColumns.VERSION, formVersion);
-        initialValues.put(SurveyInstanceColumns.USER_ID, userId);
-        initialValues.put(SurveyInstanceColumns.STATUS, SurveyInstanceStatus.SAVED);
-        initialValues.put(SurveyInstanceColumns.UUID, UUID.randomUUID().toString());
-        initialValues.put(SurveyInstanceColumns.START_DATE, time);
-        initialValues.put(SurveyInstanceColumns.SAVED_DATE, time);// Default to START_TIME
-        initialValues.put(SurveyInstanceColumns.RECORD_ID, dataPointId);
-        // Make submitter field available before submission
-        initialValues.put(SurveyInstanceColumns.SUBMITTER, userName);
-        return briteDatabase.insert(Tables.SURVEY_INSTANCE, initialValues);
-    }
-
-    private Cursor getLatestSavedFormInstance(String formId, String dataPointId) {
+    public Single<Cursor> getSavedFormInstance(String formId, String datapointId) {
         String sql = "SELECT " + SurveyInstanceColumns._ID + " FROM " + Tables.SURVEY_INSTANCE +
                 " WHERE " + Tables.SURVEY_INSTANCE + "." + SurveyInstanceColumns.SURVEY_ID + "= ?" +
                 " AND " + SurveyInstanceColumns.STATUS + "= ?" +
                 " AND " + SurveyInstanceColumns.RECORD_ID + "= ?" +
                 " ORDER BY " + SurveyInstanceColumns.START_DATE + " DESC LIMIT 1";
 
-        return briteDatabase
-                .query(sql, formId, String.valueOf(SurveyInstanceStatus.SAVED), dataPointId);
+        return Single.just(briteDatabase
+                .query(sql, formId, String.valueOf(SurveyInstanceStatus.SAVED), datapointId));
+    }
+
+    public Single<Long> createFormInstance(ContentValues initialValues) {
+        return Single.just(briteDatabase.insert(Tables.SURVEY_INSTANCE, initialValues));
+    }
+
+    public Single<Cursor> getRecentSubmittedFormInstance(String formId, String dataPointId, long maxDate) {
+        long dateParam = System.currentTimeMillis() - maxDate;
+        String sql = "SELECT * FROM " + Tables.SURVEY_INSTANCE +
+                " WHERE " + Tables.SURVEY_INSTANCE + "." + SurveyInstanceColumns.SURVEY_ID + "= ?" +
+                " AND (" + SurveyInstanceColumns.STATUS + " = " + SurveyInstanceStatus.SUBMITTED +
+                " OR " + SurveyInstanceColumns.STATUS + " = " + SurveyInstanceStatus.UPLOADED + ")" +
+                " AND " + SurveyInstanceColumns.RECORD_ID + "= ?" +
+                " AND " + SurveyInstanceColumns.SUBMITTED_DATE + " > ?" +
+                " ORDER BY " + SurveyInstanceColumns.SUBMITTED_DATE + " DESC LIMIT 1";
+
+        return Single.just(briteDatabase
+                .query(sql, formId, dataPointId, String.valueOf(dateParam)));
     }
 
     public void markDataPointAsViewed(String dataPointId) {

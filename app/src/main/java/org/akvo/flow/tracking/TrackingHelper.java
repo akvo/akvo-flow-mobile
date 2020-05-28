@@ -161,4 +161,8 @@ public class TrackingHelper {
     public void logViewTermsPressed() {
         firebaseAnalytics.logEvent("about_view_terms_pressed", null);
     }
+
+    public void logFormSubmissionRepeatConfirmationDialogEvent() {
+        firebaseAnalytics.logEvent("monitoring_form_repeat_dialog_shown", null);
+    }
 }

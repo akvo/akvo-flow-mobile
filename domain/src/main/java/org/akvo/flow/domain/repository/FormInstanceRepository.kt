@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2019 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2020 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -15,25 +15,23 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 
-package org.akvo.flow.domain.repository;
+package org.akvo.flow.domain.repository
 
-import org.akvo.flow.domain.entity.DomainForm;
-import org.jetbrains.annotations.NotNull;
+import io.reactivex.Single
+import org.akvo.flow.domain.entity.DomainFormInstance
+import java.util.concurrent.TimeUnit
 
-import io.reactivex.Observable;
-import io.reactivex.Single;
+interface FormInstanceRepository {
 
-public interface FormRepository {
+    fun getSavedFormInstance(formId: String, datapointId: String): Single<Long>
 
-    Observable<Boolean> loadForm(String formId, String deviceId);
+    fun getLatestSubmittedFormInstance(
+        formId: String,
+        datapointId: String,
+        maxDate: Long = TimeUnit.DAYS.toMillis(1)
+    ): Single<Long>
 
-    Observable<Integer> reloadForms(String deviceId);
-
-    Observable<Integer> downloadForms(String deviceId);
-
-    @NotNull
-    Single<DomainForm> getForm(@NotNull String formId);
+    fun createFormInstance(domainFormInstance: DomainFormInstance): Single<Long>
 }

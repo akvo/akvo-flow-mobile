@@ -19,7 +19,10 @@
 
 package org.akvo.flow.presentation.geoshape.create;
 
+import androidx.annotation.Nullable;
+
 import com.mapbox.geojson.Feature;
+import com.mapbox.geojson.Point;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 
 import org.akvo.flow.offlinemaps.presentation.geoshapes.GeoShapeConstants;
@@ -28,6 +31,7 @@ import org.akvo.flow.presentation.geoshape.entities.AreaShape;
 import org.akvo.flow.presentation.geoshape.entities.FeatureMapper;
 import org.akvo.flow.presentation.geoshape.entities.LineShape;
 import org.akvo.flow.presentation.geoshape.entities.PointShape;
+import org.akvo.flow.presentation.geoshape.entities.PointsLatLngMapper;
 import org.akvo.flow.presentation.geoshape.entities.Shape;
 import org.akvo.flow.presentation.geoshape.entities.ShapePoint;
 import org.akvo.flow.presentation.geoshape.entities.ViewFeatures;
@@ -38,11 +42,10 @@ import java.util.UUID;
 
 import javax.inject.Inject;
 
-import androidx.annotation.Nullable;
-
 public class CreateGeoShapePresenter implements Presenter {
 
     private final FeatureMapper featureMapper;
+    private final PointsLatLngMapper pointsLatLngMapper;
 
     private ViewFeatures viewFeatures = new ViewFeatures(new ArrayList<>(), new ArrayList<>(),
             new ArrayList<>());
@@ -50,8 +53,9 @@ public class CreateGeoShapePresenter implements Presenter {
     private CreateGeoShapeView view;
 
     @Inject
-    public CreateGeoShapePresenter(FeatureMapper featureMapper) {
+    public CreateGeoShapePresenter(FeatureMapper featureMapper, PointsLatLngMapper pointsLatLngMapper) {
         this.featureMapper = featureMapper;
+        this.pointsLatLngMapper = pointsLatLngMapper;
     }
 
     @Override
@@ -92,7 +96,7 @@ public class CreateGeoShapePresenter implements Presenter {
         view.displayMapItems(viewFeatures);
     }
 
-    public boolean onMapClick(Feature feature) {
+    public boolean onGeoshapeSelected(Feature feature) {
         Shape selected = selectFeatureFromPoint(feature);
         if (selected instanceof PointShape) {
             view.enablePointDrawMode();
@@ -211,9 +215,34 @@ public class CreateGeoShapePresenter implements Presenter {
         }
     }
 
+    public boolean onGeoshapeMoved(Point point) {
+        Shape shape = getSelectedShape();
+        if (shape != null) {
+            ShapePoint shapePoint = shape.getSelectedPoint();
+            if (shapePoint != null) {
+                shapePoint.setLatitude(point.latitude());
+                shapePoint.setLongitude(point.longitude());
+                updateSources();
+            }
+        }
+        return false;
+    }
+
     private void updateSources() {
         viewFeatures = featureMapper.toViewFeatures(shapes);
         view.updateSources(viewFeatures);
+
+        Shape selectedShape = getSelectedShape();
+        if (selectedShape != null) {
+            ShapePoint selectedPoint = selectedShape.getSelectedPoint();
+            if (selectedPoint != null) {
+                view.updateSelected(pointsLatLngMapper.transform(selectedPoint));
+            } else {
+                view.clearSelected();
+            }
+        } else {
+            view.clearSelected();
+        }
     }
 
     private Shape selectFeatureFromPoint(Feature feature) {

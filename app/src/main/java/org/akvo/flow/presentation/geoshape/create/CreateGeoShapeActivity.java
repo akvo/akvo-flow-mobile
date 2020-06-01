@@ -29,30 +29,33 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
+import androidx.annotation.StringRes;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.PermissionChecker;
+
 import com.google.android.material.bottomappbar.BottomAppBar;
+import com.mapbox.geojson.Feature;
+import com.mapbox.geojson.Point;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.Style;
 
 import org.akvo.flow.R;
 import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.injector.component.ApplicationComponent;
-import org.akvo.flow.uicomponents.BackActivity;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
+import org.akvo.flow.offlinemaps.presentation.geoshapes.GeoShapesClickListener;
 import org.akvo.flow.offlinemaps.presentation.geoshapes.GeoShapesMapViewImpl;
-import org.akvo.flow.uicomponents.SnackBarManager;
 import org.akvo.flow.presentation.geoshape.DeletePointDialog;
 import org.akvo.flow.presentation.geoshape.DeleteShapeDialog;
 import org.akvo.flow.presentation.geoshape.entities.Shape;
 import org.akvo.flow.presentation.geoshape.entities.ViewFeatures;
 import org.akvo.flow.presentation.geoshape.properties.PropertiesDialog;
+import org.akvo.flow.uicomponents.BackActivity;
+import org.akvo.flow.uicomponents.SnackBarManager;
 import org.akvo.flow.util.ConstantUtil;
 
 import javax.inject.Inject;
-
-import androidx.annotation.StringRes;
-import androidx.core.content.ContextCompat;
-import androidx.core.content.PermissionChecker;
 
 import static org.akvo.flow.offlinemaps.presentation.geoshapes.GeoShapeConstants.ACCURACY_THRESHOLD;
 import static org.akvo.flow.offlinemaps.presentation.geoshapes.GeoShapeConstants.CIRCLE_SOURCE_ID;
@@ -231,7 +234,17 @@ public class CreateGeoShapeActivity extends BackActivity implements
     }
 
     private void setMapClicks() {
-        mapView.setMapClicks(this::onMapLongClick, presenter::onMapClick);
+        mapView.setMapClicks(this::onMapLongClick, new GeoShapesClickListener() {
+            @Override
+            public boolean onGeoShapeSelected(Feature feature) {
+                return presenter.onGeoshapeSelected(feature);
+            }
+
+            @Override
+            public boolean onGeoShapeMoved(Point point) {
+                return presenter.onGeoshapeMoved(point);
+            }
+        });
     }
 
     @Override
@@ -250,16 +263,19 @@ public class CreateGeoShapeActivity extends BackActivity implements
     }
 
     private boolean onMapLongClick(LatLng point) {
-        if (!manualInputEnabled) {
-            showMessage(R.string.geoshapes_error_manual_disabled);
-            return false;
+        if (mapView.clicksAllowed()) {
+            if (!manualInputEnabled) {
+                showMessage(R.string.geoshapes_error_manual_disabled);
+                return false;
+            }
+            if (drawMode != DrawMode.NONE) {
+                presenter.onAddPointRequested(point, drawMode);
+            } else {
+                showMessage(R.string.geoshapes_error_select_shape);
+            }
+            return true;
         }
-        if (drawMode != DrawMode.NONE) {
-            presenter.onAddPointRequested(point, drawMode);
-        } else {
-            showMessage(R.string.geoshapes_error_select_shape);
-        }
-        return true;
+        return false;
     }
 
     private void showMessage(@StringRes int messageResId) {
@@ -278,6 +294,17 @@ public class CreateGeoShapeActivity extends BackActivity implements
         mapView.setSource(viewFeatures.getPointFeatures(), CIRCLE_SOURCE_ID_LABEL);
         mapView.setSource(viewFeatures.getFeatures(), LINE_SOURCE_ID);
         mapView.setSource(viewFeatures.getFeatures(), FILL_SOURCE_ID);
+    }
+
+    @Override
+    public void updateSelected(LatLng coordinates) {
+        mapView.displaySelectedPoint(coordinates);
+
+    }
+
+    @Override
+    public void clearSelected() {
+        mapView.clearSelected();
     }
 
     @Override

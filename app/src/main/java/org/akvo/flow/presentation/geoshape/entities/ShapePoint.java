@@ -26,10 +26,10 @@ public class ShapePoint implements Parcelable {
 
     private final String pointId;
     private final String featureId;
-    private final double latitude;
-    private final double longitude;
 
     private boolean isSelected = false;
+    private double latitude;
+    private double longitude;
 
     public ShapePoint(String pointId, String featureId, double latitude, double longitude) {
         this.pointId = pointId;
@@ -80,6 +80,14 @@ public class ShapePoint implements Parcelable {
 
     public void setSelected(boolean selected) {
         isSelected = selected;
+    }
+
+    public void setLatitude(double latitude) {
+        this.latitude = latitude;
+    }
+
+    public void setLongitude(double longitude) {
+        this.longitude = longitude;
     }
 
     @Override

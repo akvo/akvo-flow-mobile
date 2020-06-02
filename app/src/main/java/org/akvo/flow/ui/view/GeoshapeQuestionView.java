@@ -72,7 +72,9 @@ public class GeoshapeQuestionView extends QuestionView implements OnClickListene
     }
 
     private void displayResponseView() {
-        mResponseView.setVisibility(TextUtils.isEmpty(mValue) ? GONE : VISIBLE);
+        boolean empty = TextUtils.isEmpty(mValue);
+        mResponseView.setVisibility(empty ? GONE : VISIBLE);
+        mMapBtn.setText(empty ? R.string.capture_shape: R.string.edit_shape);
     }
 
     @Override

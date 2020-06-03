@@ -259,7 +259,7 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
     implementation "androidx.core:core-ktx:${rootProject.ext.coreKtxVersion}"
     implementation "com.mapbox.mapboxsdk:mapbox-android-sdk:${rootProject.ext.mapboxVersion}"
-    implementation "com.mapbox.mapboxsdk:mapbox-android-plugin-annotation-v9:0.8.0"
+    implementation "com.mapbox.mapboxsdk:mapbox-android-plugin-annotation-v9:${rootProject.ext.mapboxAnnotationsVersion}"
     implementation "androidx.work:work-runtime:${rootProject.ext.workVersion}"
     implementation "com.halfhp.rxtracer:rxtracer:${rootProject.ext.rxTracerVersion}"
     implementation "org.slf4j:slf4j-nop:${rootProject.ext.slf4JVersion}"

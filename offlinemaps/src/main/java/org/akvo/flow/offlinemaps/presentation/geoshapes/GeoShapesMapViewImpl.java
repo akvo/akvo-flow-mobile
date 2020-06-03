@@ -72,8 +72,6 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import timber.log.Timber;
-
 import static com.mapbox.mapboxsdk.style.expressions.Expression.all;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.any;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.get;
@@ -292,13 +290,12 @@ public class GeoShapesMapViewImpl extends MapView implements OnMapReadyCallback,
         return locationUnavailable ? null : mapboxMap.getLocationComponent().getLastKnownLocation();
     }
 
-    //TODO: this is not right! either both clicks processed here or not
     public void setMapClicks(MapboxMap.OnMapLongClickListener longClickListener,
                              GeoShapesClickListener clickListener) {
         if (mapboxMap != null) {
             mapboxMap.addOnMapLongClickListener(longClickListener);
             mapboxMap.addOnMapClickListener(point -> {
-                if (mapboxMap != null && clicksAllowed()) {
+                if (mapboxMap != null && clicksAllowed) {
                     Projection projection = mapboxMap.getProjection();
                     List<Feature> features = mapboxMap
                             .queryRenderedFeatures(projection.toScreenLocation(point),
@@ -316,7 +313,6 @@ public class GeoShapesMapViewImpl extends MapView implements OnMapReadyCallback,
                 @Override
                 public void onAnnotationDragStarted(Circle annotation) {
                     clicksAllowed = false;
-                    Timber.d("Drag started: " + annotation.getGeometry().latitude() + annotation.getGeometry().longitude());
                 }
 
                 @Override
@@ -326,7 +322,6 @@ public class GeoShapesMapViewImpl extends MapView implements OnMapReadyCallback,
 
                 @Override
                 public void onAnnotationDragFinished(Circle annotation) {
-                    Timber.d("Drag ended: " + annotation.getGeometry().latitude() + annotation.getGeometry().longitude());
                     clickListener.onGeoShapeMoved(annotation.getGeometry());
                     clicksAllowed = true;
                 }

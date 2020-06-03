@@ -48,6 +48,7 @@ ext {
     gsonVersion = "2.8.2"
     leakCanaryVersion = "2.0"
     loggingInterceptorVersion = "3.12.1"
+    mapboxAnnotationsVersion = "0.8.0"
     mapboxMarkerVersion = "0.3.0"
     mapboxOfflineRxVersion = "1.2.0-alpha04"
     mapboxVersion = "9.2.0"

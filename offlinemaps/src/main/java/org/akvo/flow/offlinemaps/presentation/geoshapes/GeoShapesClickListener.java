@@ -20,8 +20,11 @@
 package org.akvo.flow.offlinemaps.presentation.geoshapes;
 
 import com.mapbox.geojson.Feature;
+import com.mapbox.geojson.Point;
 
 public interface GeoShapesClickListener {
 
     boolean onGeoShapeSelected(Feature feature);
+
+    boolean onGeoShapeMoved(Point point);
 }

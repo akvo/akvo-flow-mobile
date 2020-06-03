@@ -26,6 +26,13 @@ import android.graphics.Color;
 import android.location.Location;
 import android.util.AttributeSet;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.PermissionChecker;
+import androidx.fragment.app.FragmentActivity;
+
 import com.mapbox.geojson.Feature;
 import com.mapbox.geojson.FeatureCollection;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
@@ -45,6 +52,10 @@ import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.maps.Projection;
 import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.maps.UiSettings;
+import com.mapbox.mapboxsdk.plugins.annotation.Circle;
+import com.mapbox.mapboxsdk.plugins.annotation.CircleManager;
+import com.mapbox.mapboxsdk.plugins.annotation.CircleOptions;
+import com.mapbox.mapboxsdk.plugins.annotation.OnCircleDragListener;
 import com.mapbox.mapboxsdk.style.expressions.Expression;
 import com.mapbox.mapboxsdk.style.layers.CircleLayer;
 import com.mapbox.mapboxsdk.style.layers.FillLayer;
@@ -60,13 +71,6 @@ import org.akvo.flow.offlinemaps.presentation.MapReadyCallback;
 import java.util.List;
 
 import javax.inject.Inject;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
-import androidx.core.content.PermissionChecker;
-import androidx.fragment.app.FragmentActivity;
 
 import static com.mapbox.mapboxsdk.style.expressions.Expression.all;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.any;
@@ -104,7 +108,7 @@ import static org.akvo.flow.offlinemaps.presentation.geoshapes.GeoShapeConstants
 import static org.akvo.flow.offlinemaps.presentation.geoshapes.GeoShapeConstants.SELECTED_FEATURE_POINT_LAYER_ID;
 import static org.akvo.flow.offlinemaps.presentation.geoshapes.GeoShapeConstants.SELECTED_POINT_BORDER_COLOR;
 import static org.akvo.flow.offlinemaps.presentation.geoshapes.GeoShapeConstants.SELECTED_POINT_COLOR;
-import static org.akvo.flow.offlinemaps.presentation.geoshapes.GeoShapeConstants.SELECTED_POINT_LAYER_ID;
+import static org.akvo.flow.offlinemaps.presentation.geoshapes.GeoShapeConstants.SELECTED_POINT_FILL_COLOR;
 import static org.akvo.flow.offlinemaps.presentation.geoshapes.GeoShapeConstants.SELECTED_POINT_TEXT_LAYER_ID;
 import static org.akvo.flow.offlinemaps.presentation.geoshapes.GeoShapeConstants.SELECTED_SHAPE_BORDER_COLOR;
 import static org.akvo.flow.offlinemaps.presentation.geoshapes.GeoShapeConstants.SELECTED_SHAPE_COLOR;
@@ -113,9 +117,12 @@ public class GeoShapesMapViewImpl extends MapView implements OnMapReadyCallback,
 
     private MapboxMap mapboxMap;
     private MapReadyCallback mapReadyCallback;
+    private CircleManager circleManager;
 
     @Inject
     GeoShapesMapPresenter presenter;
+    private boolean clicksAllowed = true;
+    private Circle circle;
 
     public GeoShapesMapViewImpl(@NonNull Context context) {
         super(context);
@@ -123,19 +130,19 @@ public class GeoShapesMapViewImpl extends MapView implements OnMapReadyCallback,
     }
 
     public GeoShapesMapViewImpl(@NonNull Context context,
-            @Nullable AttributeSet attrs) {
+                                @Nullable AttributeSet attrs) {
         super(context, attrs);
         init(context);
     }
 
     public GeoShapesMapViewImpl(@NonNull Context context, @Nullable AttributeSet attrs,
-            int defStyleAttr) {
+                                int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         init(context);
     }
 
     public GeoShapesMapViewImpl(@NonNull Context context,
-            @Nullable MapboxMapOptions options) {
+                                @Nullable MapboxMapOptions options) {
         super(context, options);
         init(context);
     }
@@ -179,14 +186,14 @@ public class GeoShapesMapViewImpl extends MapView implements OnMapReadyCallback,
     public void initSources(List<Feature> features, List<Feature> pointFeatures) {
         Style style = mapboxMap.getStyle();
         if (style != null) {
+            initFillLayer(style);
+            initLineLayer(style);
+            initCircleLayer(style);
+
             initCircleSource(style, pointFeatures);
             initCircleTextSource(style, pointFeatures);
             initLineSource(style, features);
             initFillSource(style, features);
-
-            initCircleLayer(style);
-            initLineLayer(style);
-            initFillLayer(style);
         }
     }
 
@@ -194,8 +201,8 @@ public class GeoShapesMapViewImpl extends MapView implements OnMapReadyCallback,
         Style style = mapboxMap.getStyle();
         if (style != null) {
             initShapeSelectedCircleLayer(style);
-            initPointSelectedCircleLayer(style);
             initPointSelectedTextLayer(style);
+            circleManager = new CircleManager(this, mapboxMap, style);
         }
     }
 
@@ -284,11 +291,11 @@ public class GeoShapesMapViewImpl extends MapView implements OnMapReadyCallback,
     }
 
     public void setMapClicks(MapboxMap.OnMapLongClickListener longClickListener,
-            GeoShapesClickListener clickListener) {
+                             GeoShapesClickListener clickListener) {
         if (mapboxMap != null) {
             mapboxMap.addOnMapLongClickListener(longClickListener);
             mapboxMap.addOnMapClickListener(point -> {
-                if (mapboxMap != null) {
+                if (mapboxMap != null && clicksAllowed) {
                     Projection projection = mapboxMap.getProjection();
                     List<Feature> features = mapboxMap
                             .queryRenderedFeatures(projection.toScreenLocation(point),
@@ -299,6 +306,54 @@ public class GeoShapesMapViewImpl extends MapView implements OnMapReadyCallback,
                     return false;
                 }
             });
+        }
+
+        if (circleManager != null) {
+            circleManager.addDragListener(new OnCircleDragListener() {
+                @Override
+                public void onAnnotationDragStarted(Circle annotation) {
+                    clicksAllowed = false;
+                }
+
+                @Override
+                public void onAnnotationDrag(Circle annotation) {
+                    //EMPTY
+                }
+
+                @Override
+                public void onAnnotationDragFinished(Circle annotation) {
+                    clickListener.onGeoShapeMoved(annotation.getGeometry());
+                    clicksAllowed = true;
+                }
+            });
+        }
+    }
+
+    public boolean clicksAllowed() {
+        return clicksAllowed;
+    }
+
+    public void displaySelectedPoint(LatLng point) {
+        if (circle == null) {
+            circle = circleManager.create(
+                    new CircleOptions()
+                            .withLatLng(point)
+                            .withCircleRadius(8f)
+                            .withCircleStrokeColor(SELECTED_POINT_BORDER_COLOR)
+                            .withCircleStrokeWidth(1f)
+                            .withDraggable(true)
+                            .withCircleColor(SELECTED_POINT_FILL_COLOR)
+            );
+        } else if (!circle.getLatLng().equals(point)) {
+            circle.setLatLng(point);
+            circleManager.update(circle);
+        }
+    }
+
+    public void clearSelected() {
+        if (circle != null) {
+            circleManager.delete(circle);
+            circle = null;
         }
     }
 
@@ -314,7 +369,7 @@ public class GeoShapesMapViewImpl extends MapView implements OnMapReadyCallback,
                 fillColor(FILL_COLOR)
         );
         fillLayer.setFilter(has(FEATURE_POLYGON));
-        style.addLayerBelow(fillLayer, LINE_LAYER_ID);
+        style.addLayer(fillLayer);
     }
 
     private void initLineLayer(@NonNull Style style) {
@@ -324,7 +379,7 @@ public class GeoShapesMapViewImpl extends MapView implements OnMapReadyCallback,
                 lineWidth(4f)
         );
         lineLayer.setFilter(any(has(FEATURE_POLYGON), has(FEATURE_LINE)));
-        style.addLayerBelow(lineLayer, CIRCLE_LAYER_ID);
+        style.addLayerAbove(lineLayer, FILL_LAYER_ID);
     }
 
     private void initCircleLayer(@NonNull Style style) {
@@ -338,7 +393,7 @@ public class GeoShapesMapViewImpl extends MapView implements OnMapReadyCallback,
         circleLayer.setFilter(
                 all(not(has(GeoShapeConstants.POINT_SELECTED_PROPERTY)),
                         not(has(GeoShapeConstants.SHAPE_SELECTED_PROPERTY))));
-        style.addLayer(circleLayer);
+        style.addLayerAbove(circleLayer, LINE_LAYER_ID);
     }
 
     private void initLineSource(@NonNull Style style, @NonNull List<Feature> features) {
@@ -358,7 +413,7 @@ public class GeoShapesMapViewImpl extends MapView implements OnMapReadyCallback,
     }
 
     private void addJsonSourceToStyle(@NonNull Style style, @NonNull List<Feature> features,
-            @NonNull String sourceId) {
+                                      @NonNull String sourceId) {
         FeatureCollection featureCollection = FeatureCollection.fromFeatures(features);
         GeoJsonSource geoJsonSource = new GeoJsonSource(sourceId, featureCollection);
         style.addSource(geoJsonSource);
@@ -383,22 +438,6 @@ public class GeoShapesMapViewImpl extends MapView implements OnMapReadyCallback,
     }
 
     /**
-     * A selected point will be drawn in a greenish color
-     */
-    private void initPointSelectedCircleLayer(@NonNull Style style) {
-        CircleLayer circleLayer = new CircleLayer(SELECTED_POINT_LAYER_ID, CIRCLE_SOURCE_ID);
-        circleLayer.setProperties(
-                circleRadius(8f),
-                circleColor(SELECTED_POINT_COLOR),
-                circleStrokeWidth(1f),
-                circleStrokeColor(SELECTED_POINT_BORDER_COLOR)
-        );
-        circleLayer.setFilter(all(has(GeoShapeConstants.POINT_SELECTED_PROPERTY),
-                not(has(GeoShapeConstants.SHAPE_SELECTED_PROPERTY))));
-        style.addLayerAbove(circleLayer, SELECTED_FEATURE_POINT_LAYER_ID);
-    }
-
-    /**
      * A selected point location will be drawn in a greenish color
      */
     private void initPointSelectedTextLayer(@NonNull Style style) {
@@ -407,13 +446,13 @@ public class GeoShapesMapViewImpl extends MapView implements OnMapReadyCallback,
         symbolLayer.setProperties(
                 textField(Expression.toString(get(GeoShapeConstants.LAT_LNG_PROPERTY))),
                 textSize(12f),
-                textOffset(new Float[] { 0f, -2.0f }),
+                textOffset(new Float[]{0f, -2.0f}),
                 textColor(SELECTED_POINT_COLOR),
                 textAllowOverlap(true),
                 textIgnorePlacement(true)
         );
         symbolLayer.setFilter(all(has(GeoShapeConstants.POINT_SELECTED_PROPERTY),
                 not(has(GeoShapeConstants.SHAPE_SELECTED_PROPERTY))));
-        style.addLayerAbove(symbolLayer, SELECTED_POINT_LAYER_ID);
+        style.addLayer(symbolLayer);
     }
 }

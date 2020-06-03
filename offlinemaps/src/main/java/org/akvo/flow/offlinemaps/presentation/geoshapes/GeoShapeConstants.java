@@ -25,7 +25,6 @@ public class GeoShapeConstants {
     public static final String FILL_SOURCE_ID = "fill-source-id";
     public static final String LINE_SOURCE_ID = "line-source-id";
     public static final String CIRCLE_LAYER_ID = "unselected-point-layer-id";
-    public static final String SELECTED_POINT_LAYER_ID = "selected-point-layer-id";
     public static final String SELECTED_POINT_TEXT_LAYER_ID = "selected-point-text-layer-id";
     public static final String SELECTED_FEATURE_POINT_LAYER_ID = "selected-feature-point-layer-id";
     public static final String FILL_LAYER_ID = "fill-layer-polygon-id";
@@ -40,7 +39,8 @@ public class GeoShapeConstants {
     public static final int SELECTED_SHAPE_COLOR = 0xFFE27C00;
     public static final int SELECTED_SHAPE_BORDER_COLOR = 0xFFA65E07;
     public static final int SELECTED_POINT_COLOR = 0xFF00A79D;
-    public static final int SELECTED_POINT_BORDER_COLOR = 0xFF027A73;
+    public static final String SELECTED_POINT_BORDER_COLOR = "#027a73";
+    public static final String SELECTED_POINT_FILL_COLOR = "#00a79d";
     public static final String FEATURE_LINE = "is-line";
     public static final String FEATURE_POINT = "is-point";
     public static final String FEATURE_POLYGON = "is-polygon";

@@ -98,6 +98,7 @@
     <string name="type_code">type code</string>
     <string name="or">or</string>
     <string name="capture_shape">capture shape</string>
+    <string name="edit_shape">edit shape</string>
     <string name="view_shape">view shape</string>
     <string name="delete_point_title">Delete point?</string>
     <string name="delete_shape_title">Delete shape?</string>

@@ -19,6 +19,9 @@
 
 package org.akvo.flow.presentation.geoshape.entities;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 import com.mapbox.geojson.Feature;
 import com.mapbox.geojson.FeatureCollection;
 import com.mapbox.geojson.Geometry;
@@ -35,9 +38,6 @@ import java.util.List;
 import java.util.UUID;
 
 import javax.inject.Inject;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 
 public class FeatureMapper {
 
@@ -88,10 +88,12 @@ public class FeatureMapper {
                     es.add(points);
                     feature = Feature.fromGeometry(Polygon.fromLngLats(es));
                     feature.addBooleanProperty(GeoShapeConstants.FEATURE_POLYGON, true);
+                    feature.addStringProperty(GeoShapeConstants.FEATURE_ID, shape.getFeatureId());
                     features.add(feature);
                 } else if (shape instanceof LineShape) {
                     feature = Feature.fromGeometry(LineString.fromLngLats(points));
                     feature.addBooleanProperty(GeoShapeConstants.FEATURE_LINE, true);
+                    feature.addStringProperty(GeoShapeConstants.FEATURE_ID, shape.getFeatureId());
                     features.add(feature);
                 } else if (shape instanceof PointShape) {
                     feature = Feature.fromGeometry(MultiPoint.fromLngLats(points));

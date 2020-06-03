@@ -19,6 +19,8 @@
 
 package org.akvo.flow.presentation.geoshape.create;
 
+import android.text.TextUtils;
+
 import androidx.annotation.Nullable;
 
 import com.mapbox.geojson.Feature;
@@ -97,7 +99,7 @@ public class CreateGeoShapePresenter implements Presenter {
     }
 
     public boolean onGeoshapeSelected(Feature feature) {
-        Shape selected = selectFeatureFromPoint(feature);
+        Shape selected = selectFeature(feature);
         if (selected instanceof PointShape) {
             view.enablePointDrawMode();
         } else if (selected instanceof LineShape) {
@@ -133,7 +135,7 @@ public class CreateGeoShapePresenter implements Presenter {
         Shape createdShape = null;
         switch (drawMode) {
             case POINT:
-               createdShape = new PointShape(featureId, points);
+                createdShape = new PointShape(featureId, points);
                 break;
             case LINE:
                 createdShape = new LineShape(featureId, points);
@@ -245,13 +247,17 @@ public class CreateGeoShapePresenter implements Presenter {
         }
     }
 
-    private Shape selectFeatureFromPoint(Feature feature) {
+    private Shape selectFeature(Feature feature) {
         String selectedFeatureId = feature.getStringProperty(GeoShapeConstants.FEATURE_ID);
-        String selectedPointId = feature.getStringProperty(GeoShapeConstants.POINT_ID);
         Shape selectedShape = null;
+        String selectedPointId = feature.getStringProperty(GeoShapeConstants.POINT_ID);
         for (Shape shape : shapes) {
             if (shape.getFeatureId().equals(selectedFeatureId)) {
-                shape.select(selectedPointId);
+                if (!TextUtils.isEmpty(selectedPointId)) {
+                    shape.select(selectedPointId);
+                } else {
+                    shape.setSelected(true);
+                }
                 selectedShape = shape;
             } else {
                 shape.unSelect();

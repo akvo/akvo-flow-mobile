@@ -299,7 +299,8 @@ public class GeoShapesMapViewImpl extends MapView implements OnMapReadyCallback,
                     Projection projection = mapboxMap.getProjection();
                     List<Feature> features = mapboxMap
                             .queryRenderedFeatures(projection.toScreenLocation(point),
-                                    CIRCLE_LAYER_ID, SELECTED_FEATURE_POINT_LAYER_ID);
+                                    CIRCLE_LAYER_ID, SELECTED_FEATURE_POINT_LAYER_ID,
+                                    LINE_LAYER_ID, FILL_LAYER_ID);
                     Feature selected = features.isEmpty() ? null : features.get(0);
                     return selected != null && clickListener.onGeoShapeSelected(selected);
                 } else {

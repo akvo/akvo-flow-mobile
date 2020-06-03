@@ -375,9 +375,7 @@ public class CreateGeoShapeActivity extends BackActivity implements
     }
 
     private void updateMapStyle(String style) {
-        mapView.updateMapStyle(style, callback -> {
-            presenter.onMapStyleUpdated();
-        });
+        mapView.updateMapStyle(style, callback -> presenter.onMapStyleUpdated());
     }
 
     @Override

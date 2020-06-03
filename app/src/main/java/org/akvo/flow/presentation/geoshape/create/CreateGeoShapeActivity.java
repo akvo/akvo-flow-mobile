@@ -299,7 +299,6 @@ public class CreateGeoShapeActivity extends BackActivity implements
     @Override
     public void updateSelected(LatLng coordinates) {
         mapView.displaySelectedPoint(coordinates);
-
     }
 
     @Override

@@ -172,7 +172,6 @@ public class GeoShapesMapViewImpl extends MapView implements OnMapReadyCallback,
     public void onMapReady(@NonNull MapboxMap mapboxMap) {
         this.mapboxMap = mapboxMap;
         updateMapStyle(Style.MAPBOX_STREETS, style -> {
-            circleManager = new CircleManager(this, mapboxMap, style);
             if (mapReadyCallback != null) {
                 mapReadyCallback.onMapReady();
                 mapReadyCallback = null;
@@ -197,7 +196,6 @@ public class GeoShapesMapViewImpl extends MapView implements OnMapReadyCallback,
             initCircleTextSource(style, pointFeatures);
             initLineSource(style, features);
             initFillSource(style, features);
-
         }
     }
 
@@ -205,8 +203,8 @@ public class GeoShapesMapViewImpl extends MapView implements OnMapReadyCallback,
         Style style = mapboxMap.getStyle();
         if (style != null) {
             initShapeSelectedCircleLayer(style);
-//            initPointSelectedCircleLayer(style);
             initPointSelectedTextLayer(style);
+            circleManager = new CircleManager(this, mapboxMap, style);
         }
     }
 
@@ -323,7 +321,7 @@ public class GeoShapesMapViewImpl extends MapView implements OnMapReadyCallback,
 
                 @Override
                 public void onAnnotationDrag(Circle annotation) {
-
+                    //EMPTY
                 }
 
                 @Override
@@ -360,6 +358,7 @@ public class GeoShapesMapViewImpl extends MapView implements OnMapReadyCallback,
     public void clearSelected() {
         if (circle != null) {
             circleManager.delete(circle);
+            circle = null;
         }
     }
 
@@ -442,22 +441,6 @@ public class GeoShapesMapViewImpl extends MapView implements OnMapReadyCallback,
                 not(has(GeoShapeConstants.POINT_SELECTED_PROPERTY))));
         style.addLayerAbove(circleLayer, CIRCLE_LAYER_ID);
     }
-
-    /**
-     * A selected point will be drawn in a greenish color
-     */
-//    private void initPointSelectedCircleLayer(@NonNull Style style) {
-//        CircleLayer circleLayer = new CircleLayer(SELECTED_POINT_LAYER_ID, CIRCLE_SOURCE_ID);
-//        circleLayer.setProperties(
-//                circleRadius(8f),
-//                circleColor(SELECTED_POINT_COLOR),
-//                circleStrokeWidth(1f),
-//                circleStrokeColor(SELECTED_POINT_BORDER_COLOR)
-//        );
-//        circleLayer.setFilter(all(has(GeoShapeConstants.POINT_SELECTED_PROPERTY),
-//                not(has(GeoShapeConstants.SHAPE_SELECTED_PROPERTY))));
-//        style.addLayerAbove(circleLayer, SELECTED_FEATURE_POINT_LAYER_ID);
-//    }
 
     /**
      * A selected point location will be drawn in a greenish color

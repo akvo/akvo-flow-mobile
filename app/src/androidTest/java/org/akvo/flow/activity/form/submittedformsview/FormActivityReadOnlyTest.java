@@ -25,6 +25,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.text.TextUtils;
 
+import androidx.core.util.Pair;
+import androidx.test.espresso.ViewInteraction;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
+import androidx.test.filters.LargeTest;
+import androidx.test.platform.app.InstrumentationRegistry;
+import androidx.test.rule.ActivityTestRule;
+import androidx.test.rule.GrantPermissionRule;
+
 import com.google.gson.Gson;
 
 import org.akvo.flow.R;
@@ -63,14 +71,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
-
-import androidx.core.util.Pair;
-import androidx.test.espresso.ViewInteraction;
-import androidx.test.ext.junit.runners.AndroidJUnit4;
-import androidx.test.filters.LargeTest;
-import androidx.test.platform.app.InstrumentationRegistry;
-import androidx.test.rule.ActivityTestRule;
-import androidx.test.rule.GrantPermissionRule;
 
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.scrollTo;
@@ -298,7 +298,7 @@ public class FormActivityReadOnlyTest {
                     withQuestionViewParent(question, GeoshapeQuestionView.class)))
                     .perform(scrollTo());
             captureShapeButton.check(matches(
-                    allOf(isDisplayed(), isEnabled(), withText(R.string.view_shape))));
+                    allOf(isDisplayed(), isEnabled(), withText(R.string.edit_shape))));
         }
     }
 

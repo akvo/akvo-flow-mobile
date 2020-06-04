@@ -169,7 +169,15 @@ public class CreateGeoShapePresenter implements Presenter {
         view.displayNewMapStyle(viewFeatures);
     }
 
+    public void onBackPressed(boolean changed) {
+        saveShape(changed);
+    }
+
     public void onSavePressed(boolean changed) {
+        saveShape(changed);
+    }
+
+    private void saveShape(boolean changed) {
         if (isValidShape() && changed) {
             String featureString = featureMapper.createFeaturesToSave(shapes);
             view.setShapeResult(featureString);

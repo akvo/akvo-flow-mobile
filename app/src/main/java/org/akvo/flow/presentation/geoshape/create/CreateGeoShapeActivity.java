@@ -362,6 +362,11 @@ public class CreateGeoShapeActivity extends BackActivity implements
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void onBackPressed() {
+        presenter.onBackPressed(changed);
+    }
+
     private void enableNewShapeType(DrawMode drawMode) {
         if (this.drawMode != drawMode) {
             presenter.onNewDrawModePressed(drawMode);

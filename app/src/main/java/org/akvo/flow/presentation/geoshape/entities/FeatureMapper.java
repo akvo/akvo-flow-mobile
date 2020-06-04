@@ -19,6 +19,9 @@
 
 package org.akvo.flow.presentation.geoshape.entities;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 import com.mapbox.geojson.Feature;
 import com.mapbox.geojson.FeatureCollection;
 import com.mapbox.geojson.Geometry;
@@ -35,9 +38,6 @@ import java.util.List;
 import java.util.UUID;
 
 import javax.inject.Inject;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 
 public class FeatureMapper {
 

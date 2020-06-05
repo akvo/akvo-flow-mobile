@@ -53,4 +53,8 @@ public interface CreateGeoShapeView {
     void updateSelected(LatLng transform);
 
     void clearSelected();
+
+    void displayNoPointSelectedError();
+
+    void displayNoShapeSelectedError();
 }

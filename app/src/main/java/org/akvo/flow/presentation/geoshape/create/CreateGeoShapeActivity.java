@@ -29,6 +29,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.StringRes;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.PermissionChecker;
@@ -307,6 +308,16 @@ public class CreateGeoShapeActivity extends BackActivity implements
     }
 
     @Override
+    public void displayNoPointSelectedError() {
+        showMessage(R.string.geoshapes_error_no_point_to_delete);
+    }
+
+    @Override
+    public void displayNoShapeSelectedError() {
+        showMessage(R.string.geoshapes_error_no_shape_to_delete);
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.create_geoshape_activity, menu);
         if (!allowPoints) {
@@ -442,7 +453,7 @@ public class CreateGeoShapeActivity extends BackActivity implements
     }
 
     @Override
-    protected void onSaveInstanceState(Bundle outState) {
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         mapView.onSaveInstanceState(outState);
     }

@@ -74,6 +74,35 @@ public class FeatureMapper {
         return shapes;
     }
 
+    public List<Shape> toEditableShapes(@Nullable String gson) {
+        List<Shape> shapes = new ArrayList<>();
+        List<Feature> features = createFeatureList(gson);
+        if (!features.isEmpty()) {
+            int size = features.size();
+            for (int i = 0; i < size; i++) {
+                Feature feature = features.get(i);
+                String featureId = UUID.randomUUID().toString();
+                Geometry geometry = feature.geometry();
+                Shape shape = null;
+                if (geometry instanceof Polygon) {
+                    shape = createArea(featureId, (Polygon) geometry);
+                } else if (geometry instanceof LineString) {
+                    shape = createLine(featureId, (LineString) geometry);
+                } else if (geometry instanceof MultiPoint) {
+                    shape = createPoint(featureId, (MultiPoint) geometry);
+                }
+                if (shape != null) {
+                    if (i == size - 1) {
+                        shape.setSelected(true);
+                        shape.selectLastPoint();
+                    }
+                    shapes.add(shape);
+                }
+            }
+        }
+        return shapes;
+    }
+
     public ViewFeatures toViewFeatures(@NonNull List<Shape> shapes) {
         final List<Feature> features = new ArrayList<>(shapes.size());
         final List<Feature> pointFeatures = new ArrayList<>();

@@ -79,6 +79,7 @@ public class CreateGeoShapeActivity extends BackActivity implements
 
     private DrawMode drawMode = DrawMode.NONE;
 
+    private boolean allowShapeSelection = true;
     private boolean manualInputEnabled;
     private TextView bottomBarTitle;
     private BottomAppBar bottomAppBar;
@@ -308,6 +309,12 @@ public class CreateGeoShapeActivity extends BackActivity implements
     }
 
     @Override
+    public void hideShapeSelection() {
+        allowShapeSelection = false;
+        invalidateOptionsMenu();
+    }
+
+    @Override
     public void displayNoPointSelectedError() {
         showMessage(R.string.geoshapes_error_no_point_to_delete);
     }
@@ -328,6 +335,9 @@ public class CreateGeoShapeActivity extends BackActivity implements
         }
         if (!allowPolygon) {
             hideMenuItem(menu, R.id.add_polygon);
+        }
+        if (!allowShapeSelection) {
+            hideMenuItem(menu, R.id.add_feature);
         }
         MenuItem item = menu.findItem(R.id.save);
         if (item != null) {

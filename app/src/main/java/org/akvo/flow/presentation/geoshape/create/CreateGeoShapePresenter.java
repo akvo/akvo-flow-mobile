@@ -71,7 +71,7 @@ public class CreateGeoShapePresenter implements Presenter {
 
     public void setUpFeatures(String geoJSON) {
         shapes.clear();
-        shapes.addAll(featureMapper.toShapes(geoJSON));
+        shapes.addAll(featureMapper.toEditableShapes(geoJSON));
         viewFeatures = featureMapper.toViewFeatures(shapes);
     }
 
@@ -96,6 +96,23 @@ public class CreateGeoShapePresenter implements Presenter {
 
     public void onMapReady() {
         view.displayMapItems(viewFeatures);
+        Shape selectedShape = getSelectedShape();
+        if (selectedShape != null) {
+            ShapePoint selectedPoint = selectedShape.getSelectedPoint();
+            if (selectedPoint != null) {
+                view.updateSelected(pointsLatLngMapper.transform(selectedPoint));
+            }
+            if (selectedShape instanceof PointShape) {
+                view.enablePointDrawMode();
+                view.hideShapeSelection();
+            } else if (selectedShape instanceof LineShape) {
+                view.enableLineDrawMode();
+                view.hideShapeSelection();
+            } else if (selectedShape instanceof AreaShape) {
+                view.enableAreaDrawMode();
+                view.hideShapeSelection();
+            }
+        }
     }
 
     public boolean onGeoshapeSelected(Feature feature) {
@@ -233,6 +250,7 @@ public class CreateGeoShapePresenter implements Presenter {
                 shapePoint.setLatitude(point.latitude());
                 shapePoint.setLongitude(point.longitude());
                 updateSources();
+                view.updateMenu();
             }
         }
         return false;

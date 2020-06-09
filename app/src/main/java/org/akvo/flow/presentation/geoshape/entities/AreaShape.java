@@ -76,4 +76,14 @@ public class AreaShape extends Shape {
             points.add(size - 1, shapePoint);
         }
     }
+
+    protected ShapePoint getLastPoint() {
+        List<ShapePoint> points = getPoints();
+        int size = points.size();
+        if (size < 3) {
+            return points.get(points.size() - 1);
+        } else {
+            return points.get(points.size() - 2); // last point is the same as first to close shape
+        }
+    }
 }

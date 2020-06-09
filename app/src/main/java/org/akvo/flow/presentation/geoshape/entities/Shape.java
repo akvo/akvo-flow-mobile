@@ -135,4 +135,17 @@ public abstract class Shape implements Parcelable {
         }
         return null;
     }
+
+    public void selectLastPoint() {
+        if (points != null && !points.isEmpty()) {
+            ShapePoint shapePoint = getLastPoint();
+            if (shapePoint != null) {
+                shapePoint.setSelected(true);
+            }
+        }
+    }
+
+    protected ShapePoint getLastPoint() {
+        return points.get(points.size() - 1);
+    }
 }

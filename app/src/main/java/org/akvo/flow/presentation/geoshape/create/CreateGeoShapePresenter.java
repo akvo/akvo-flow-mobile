@@ -83,14 +83,18 @@ public class CreateGeoShapePresenter implements Presenter {
     }
 
     public void onDeletePointPressed() {
-        if (getSelectedShape() != null) {
+        if (getSelectedPoint()!= null) {
             view.displayDeletePointDialog();
+        } else {
+            view.displayNoPointSelectedError();
         }
     }
 
     public void onDeleteShapePressed() {
         if (getSelectedShape() != null) {
             view.displayDeleteShapeDialog();
+        } else {
+            view.displayNoShapeSelectedError();
         }
     }
 
@@ -210,6 +214,16 @@ public class CreateGeoShapePresenter implements Presenter {
         for (Shape shape : shapes) {
             if (shape.isSelected()) {
                 return shape;
+            }
+        }
+        return null;
+    }
+
+    @Nullable
+    private ShapePoint getSelectedPoint() {
+        for (Shape shape : shapes) {
+            if (shape.isSelected()) {
+                return shape.getSelectedPoint();
             }
         }
         return null;

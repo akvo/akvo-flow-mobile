@@ -54,5 +54,9 @@ public interface CreateGeoShapeView {
 
     void clearSelected();
 
+    void displayNoPointSelectedError();
+
+    void displayNoShapeSelectedError();
+
     void hideShapeSelection();
 }

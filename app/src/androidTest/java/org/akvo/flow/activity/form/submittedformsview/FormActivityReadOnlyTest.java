@@ -298,7 +298,7 @@ public class FormActivityReadOnlyTest {
                     withQuestionViewParent(question, GeoshapeQuestionView.class)))
                     .perform(scrollTo());
             captureShapeButton.check(matches(
-                    allOf(isDisplayed(), isEnabled(), withText(R.string.edit_shape))));
+                    allOf(isDisplayed(), isEnabled(), withText(R.string.view_shape))));
         }
     }
 

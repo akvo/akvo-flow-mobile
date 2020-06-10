@@ -19,12 +19,14 @@
 
 package org.akvo.flow.offlinemaps.presentation.geoshapes;
 
+import androidx.annotation.NonNull;
+
 import com.mapbox.geojson.Feature;
 import com.mapbox.geojson.Point;
 
 public interface GeoShapesClickListener {
 
-    boolean onGeoShapeSelected(Feature feature);
+    void onGeoShapeSelected(@NonNull Feature feature);
 
-    boolean onGeoShapeMoved(Point point);
+    void onGeoShapeMoved(Point point);
 }

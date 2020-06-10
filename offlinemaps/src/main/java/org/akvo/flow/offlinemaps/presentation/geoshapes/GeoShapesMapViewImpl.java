@@ -122,7 +122,6 @@ public class GeoShapesMapViewImpl extends MapView implements OnMapReadyCallback,
     @Inject
     GeoShapesMapPresenter presenter;
     private boolean clicksAllowed = true;
-    private Circle circle;
 
     public GeoShapesMapViewImpl(@NonNull Context context) {
         super(context);
@@ -292,41 +291,64 @@ public class GeoShapesMapViewImpl extends MapView implements OnMapReadyCallback,
 
     public void setMapClicks(MapboxMap.OnMapLongClickListener longClickListener,
                              GeoShapesClickListener clickListener) {
+        OnCircleDragListener onCircleDragListener = new OnCircleDragListener() {
+            @Override
+            public void onAnnotationDragStarted(Circle annotation) {
+                clicksAllowed = false;
+            }
+
+            @Override
+            public void onAnnotationDrag(Circle annotation) {
+                //EMPTY
+            }
+
+            @Override
+            public void onAnnotationDragFinished(Circle annotation) {
+                circleManager.removeDragListener(this);
+                clickListener.onGeoShapeMoved(annotation.getGeometry());
+                clicksAllowed = true;
+                circleManager.addDragListener(this);
+            }
+        };
         if (mapboxMap != null) {
             mapboxMap.addOnMapLongClickListener(longClickListener);
             mapboxMap.addOnMapClickListener(point -> {
                 if (mapboxMap != null && clicksAllowed) {
-                    Projection projection = mapboxMap.getProjection();
-                    List<Feature> features = mapboxMap
-                            .queryRenderedFeatures(projection.toScreenLocation(point),
-                                    CIRCLE_LAYER_ID, SELECTED_FEATURE_POINT_LAYER_ID,
-                                    LINE_LAYER_ID, FILL_LAYER_ID);
-                    Feature selected = features.isEmpty() ? null : features.get(0);
-                    return selected != null && clickListener.onGeoShapeSelected(selected);
+                    clicksAllowed = false;
+                    removeDragListener(onCircleDragListener);
+                    Feature selected = findSelectedFeature(point);
+                    if (selected != null) {
+                        clickListener.onGeoShapeSelected(selected);
+                    }
+                    clicksAllowed = true;
+                    addDragListener(onCircleDragListener);
+                    return true;
                 } else {
                     return false;
                 }
             });
         }
+        addDragListener(onCircleDragListener);
+    }
 
+    @org.jetbrains.annotations.Nullable
+    private Feature findSelectedFeature(LatLng point) {
+        Projection projection = mapboxMap.getProjection();
+        List<Feature> features = mapboxMap.queryRenderedFeatures(projection.toScreenLocation(point),
+                CIRCLE_LAYER_ID, SELECTED_FEATURE_POINT_LAYER_ID,
+                LINE_LAYER_ID, FILL_LAYER_ID);
+        return features.isEmpty() ? null : features.get(0);
+    }
+
+    private void removeDragListener(OnCircleDragListener onCircleDragListener) {
+        if (circleManager != null){
+            circleManager.removeDragListener(onCircleDragListener);
+        }
+    }
+
+    private void addDragListener(OnCircleDragListener onCircleDragListener) {
         if (circleManager != null) {
-            circleManager.addDragListener(new OnCircleDragListener() {
-                @Override
-                public void onAnnotationDragStarted(Circle annotation) {
-                    clicksAllowed = false;
-                }
-
-                @Override
-                public void onAnnotationDrag(Circle annotation) {
-                    //EMPTY
-                }
-
-                @Override
-                public void onAnnotationDragFinished(Circle annotation) {
-                    clickListener.onGeoShapeMoved(annotation.getGeometry());
-                    clicksAllowed = true;
-                }
-            });
+            circleManager.addDragListener(onCircleDragListener);
         }
     }
 
@@ -335,27 +357,19 @@ public class GeoShapesMapViewImpl extends MapView implements OnMapReadyCallback,
     }
 
     public void displaySelectedPoint(LatLng point) {
-        if (circle == null) {
-            circle = circleManager.create(
+        circleManager.deleteAll();
+        circleManager.create(
                     new CircleOptions()
                             .withLatLng(point)
                             .withCircleRadius(8f)
                             .withCircleStrokeColor(SELECTED_POINT_BORDER_COLOR)
                             .withCircleStrokeWidth(1f)
                             .withDraggable(true)
-                            .withCircleColor(SELECTED_POINT_FILL_COLOR)
-            );
-        } else if (!circle.getLatLng().equals(point)) {
-            circle.setLatLng(point);
-            circleManager.update(circle);
-        }
+                            .withCircleColor(SELECTED_POINT_FILL_COLOR));
     }
 
     public void clearSelected() {
-        if (circle != null) {
-            circleManager.delete(circle);
-            circle = null;
-        }
+        circleManager.deleteAll();
     }
 
     private boolean isLocationAllowed() {

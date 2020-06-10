@@ -238,13 +238,13 @@ public class CreateGeoShapeActivity extends BackActivity implements
     private void setMapClicks() {
         mapView.setMapClicks(this::onMapLongClick, new GeoShapesClickListener() {
             @Override
-            public boolean onGeoShapeSelected(Feature feature) {
-                return presenter.onGeoshapeSelected(feature);
+            public void onGeoShapeSelected(@NonNull Feature feature) {
+                presenter.onGeoshapeSelected(feature);
             }
 
             @Override
-            public boolean onGeoShapeMoved(Point point) {
-                return presenter.onGeoshapeMoved(point);
+            public void onGeoShapeMoved(Point point) {
+                presenter.onGeoshapeMoved(point);
             }
         });
     }

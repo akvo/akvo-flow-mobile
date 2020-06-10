@@ -83,7 +83,7 @@ public class CreateGeoShapePresenter implements Presenter {
     }
 
     public void onDeletePointPressed() {
-        if (getSelectedPoint()!= null) {
+        if (getSelectedPoint() != null) {
             view.displayDeletePointDialog();
         } else {
             view.displayNoPointSelectedError();
@@ -119,7 +119,7 @@ public class CreateGeoShapePresenter implements Presenter {
         }
     }
 
-    public boolean onGeoshapeSelected(Feature feature) {
+    public void onGeoshapeSelected(Feature feature) {
         Shape selected = selectFeature(feature);
         if (selected instanceof PointShape) {
             view.enablePointDrawMode();
@@ -129,7 +129,6 @@ public class CreateGeoShapePresenter implements Presenter {
             view.enableAreaDrawMode();
         }
         updateSources();
-        return true;
     }
 
     public void onAddPointRequested(LatLng latLng, DrawMode drawMode) {
@@ -256,7 +255,7 @@ public class CreateGeoShapePresenter implements Presenter {
         }
     }
 
-    public boolean onGeoshapeMoved(Point point) {
+    public void onGeoshapeMoved(Point point) {
         Shape shape = getSelectedShape();
         if (shape != null) {
             ShapePoint shapePoint = shape.getSelectedPoint();
@@ -267,7 +266,6 @@ public class CreateGeoShapePresenter implements Presenter {
                 view.updateMenu();
             }
         }
-        return false;
     }
 
     private void updateSources() {

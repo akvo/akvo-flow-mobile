@@ -48,7 +48,7 @@ public class FeatureMapper {
 
     @Inject
     public FeatureMapper(CoordinatesMapper coordinatesMapper, PointsLatLngMapper pointsLatLngMapper,
-            LengthCounter lengthCounter, AreaCounter areaCounter) {
+                         LengthCounter lengthCounter, AreaCounter areaCounter) {
         this.coordinatesMapper = coordinatesMapper;
         this.pointsLatLngMapper = pointsLatLngMapper;
         this.lengthCounter = lengthCounter;
@@ -93,8 +93,10 @@ public class FeatureMapper {
                 }
                 if (shape != null) {
                     if (i == size - 1) {
-                        shape.setSelected(true);
-                        shape.selectLastPoint();
+                        ShapePoint lastPoint = shape.getLastPoint();
+                        if (lastPoint != null) {
+                            shape.select(lastPoint.getPointId());
+                        }
                     }
                     shapes.add(shape);
                 }
@@ -153,7 +155,7 @@ public class FeatureMapper {
             LatLng lastPoint = latLngs.get(size - 1);
             if (firstPoint.getLatitude() == lastPoint.getLatitude()
                     && firstPoint.getLongitude() == lastPoint.getLongitude()) {
-                latLngs.remove(lastPoint);
+                latLngs.remove(size - 1);
             }
         }
         for (LatLng latLng : latLngs) {

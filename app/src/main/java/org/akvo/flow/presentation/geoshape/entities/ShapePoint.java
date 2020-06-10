@@ -103,4 +103,15 @@ public class ShapePoint implements Parcelable {
         dest.writeDouble(longitude);
         dest.writeByte((byte) (isSelected ? 1 : 0));
     }
+
+    @Override
+    public String toString() {
+        return "ShapePoint{" +
+                "pointId='" + pointId + '\'' +
+                ", featureId='" + featureId + '\'' +
+                ", isSelected=" + isSelected +
+                ", latitude=" + latitude +
+                ", longitude=" + longitude +
+                '}';
+    }
 }

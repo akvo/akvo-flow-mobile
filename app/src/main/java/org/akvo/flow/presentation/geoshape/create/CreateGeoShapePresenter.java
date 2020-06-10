@@ -44,8 +44,6 @@ import java.util.UUID;
 
 import javax.inject.Inject;
 
-import timber.log.Timber;
-
 public class CreateGeoShapePresenter implements Presenter {
 
     private final FeatureMapper featureMapper;
@@ -72,7 +70,6 @@ public class CreateGeoShapePresenter implements Presenter {
     }
 
     public void setUpFeatures(String geoJSON) {
-        Timber.d(geoJSON);
         shapes.clear();
         shapes.addAll(featureMapper.toEditableShapes(geoJSON));
         viewFeatures = featureMapper.toViewFeatures(shapes);

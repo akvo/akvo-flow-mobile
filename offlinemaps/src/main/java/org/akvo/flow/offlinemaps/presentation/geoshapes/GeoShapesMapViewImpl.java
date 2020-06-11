@@ -361,7 +361,7 @@ public class GeoShapesMapViewImpl extends MapView implements OnMapReadyCallback,
         circleManager.create(
                     new CircleOptions()
                             .withLatLng(point)
-                            .withCircleRadius(8f)
+                            .withCircleRadius(10f)
                             .withCircleStrokeColor(SELECTED_POINT_BORDER_COLOR)
                             .withCircleStrokeWidth(1f)
                             .withDraggable(true)
@@ -442,7 +442,7 @@ public class GeoShapesMapViewImpl extends MapView implements OnMapReadyCallback,
         CircleLayer circleLayer = new CircleLayer(SELECTED_FEATURE_POINT_LAYER_ID,
                 CIRCLE_SOURCE_ID);
         circleLayer.setProperties(
-                circleRadius(6f),
+                circleRadius(8f),
                 circleColor(SELECTED_SHAPE_COLOR),
                 circleStrokeWidth(1f),
                 circleStrokeColor(SELECTED_SHAPE_BORDER_COLOR)

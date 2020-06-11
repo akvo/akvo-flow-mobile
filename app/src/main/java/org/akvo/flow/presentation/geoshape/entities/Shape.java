@@ -23,6 +23,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.mapbox.mapboxsdk.geometry.LatLng;
 
@@ -134,5 +135,13 @@ public abstract class Shape implements Parcelable {
             }
         }
         return null;
+    }
+
+    @Nullable
+    public ShapePoint getLastPoint() {
+        if (points.isEmpty()) {
+            return null;
+        }
+        return points.get(points.size() - 1);
     }
 }

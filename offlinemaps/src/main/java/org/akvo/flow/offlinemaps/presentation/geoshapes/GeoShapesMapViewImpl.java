@@ -178,6 +178,9 @@ public class GeoShapesMapViewImpl extends MapView implements OnMapReadyCallback,
 
     public void updateMapStyle(String style, Style.OnStyleLoaded callback) {
         if (mapboxMap != null) {
+            if (circleManager != null) {
+                circleManager.deleteAll();
+            }
             mapboxMap.setStyle(style, callback);
         }
     }

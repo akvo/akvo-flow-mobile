@@ -189,6 +189,13 @@ public class CreateGeoShapePresenter implements Presenter {
 
     public void onMapStyleUpdated() {
         view.displayNewMapStyle(viewFeatures);
+        Shape selectedShape = getSelectedShape();
+        if (selectedShape != null) {
+            ShapePoint selectedPoint = selectedShape.getSelectedPoint();
+            if (selectedPoint != null) {
+                view.updateSelected(pointsLatLngMapper.transform(selectedPoint));
+            }
+        }
     }
 
     public void onBackPressed(boolean changed) {

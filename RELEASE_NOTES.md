@@ -1,5 +1,18 @@
 Akvo FLOW app release notes
 ===========================
+# ver 2.9.2.2
+Date: 11 June 2020
+
+* **Auto Save for geoshapes** - [#1199](https://github.com/akvo/akvo-flow-mobile/issues/1199)
+* **Crash while creating geoshapes** - [#1632](https://github.com/akvo/akvo-flow-mobile/issues/1632)
+* **Geoshapes: allow point drag/move** - [#1634](https://github.com/akvo/akvo-flow-mobile/issues/1634)
+* **Geoshapes button improvement** - [#1637](https://github.com/akvo/akvo-flow-mobile/issues/1637)
+* **Make whole geoshape selectable** - [#1640](https://github.com/akvo/akvo-flow-mobile/issues/1640)
+* **Autoselect the last created shape** - [#1645](https://github.com/akvo/akvo-flow-mobile/issues/1645)
+* **Delete shape does nothing when no shape/point selected** - [#1647](https://github.com/akvo/akvo-flow-mobile/issues/1647)
+* **Map switching style error** - [#1655](https://github.com/akvo/akvo-flow-mobile/issues/1655)
+
+---------------
 # ver 2.9.2
 Date: 28 May 2020
 

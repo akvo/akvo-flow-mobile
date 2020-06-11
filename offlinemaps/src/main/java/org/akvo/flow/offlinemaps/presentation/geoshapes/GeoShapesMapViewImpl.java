@@ -204,7 +204,9 @@ public class GeoShapesMapViewImpl extends MapView implements OnMapReadyCallback,
         if (style != null) {
             initShapeSelectedCircleLayer(style);
             initPointSelectedTextLayer(style);
-            circleManager = new CircleManager(this, mapboxMap, style);
+            if (circleManager == null) {
+                circleManager = new CircleManager(this, mapboxMap, style);
+            }
         }
     }
 

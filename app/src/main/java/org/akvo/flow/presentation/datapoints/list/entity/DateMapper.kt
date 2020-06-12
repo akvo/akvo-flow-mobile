@@ -30,7 +30,7 @@ class DateMapper @Inject constructor() {
     fun formatDate(timeStamp: Long): String {
         val calendar = Calendar.getInstance()
         calendar.timeInMillis = timeStamp
-        val dateFormat = SimpleDateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT)
+        val dateFormat = SimpleDateFormat.getDateInstance(DateFormat.SHORT)
         return dateFormat.format(Date(timeStamp))
     }
 }

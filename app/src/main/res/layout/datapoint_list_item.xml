@@ -8,15 +8,15 @@
 
     <ImageView
         android:id="@+id/status_img"
-        android:layout_width="50dp"
+        android:layout_width="20dp"
         android:layout_height="0dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginLeft="8dp"
         android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginBottom="8dp"
         android:adjustViewBounds="true"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/last_modified"
         tools:src="@drawable/record_synced_icn" />
 
     <TextView
@@ -27,13 +27,14 @@
         android:layout_marginLeft="8dp"
         android:layout_marginTop="8dp"
         android:layout_marginRight="8dp"
+        android:ellipsize="end"
+        android:maxLines="2"
         android:textColor="@color/text_primary"
-        android:textSize="18sp"
         android:textStyle="normal"
-        app:layout_constraintLeft_toRightOf="@+id/status_img"
         app:layout_constraintRight_toLeftOf="@+id/last_modified"
+        app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:text="Data point name" />
+        tools:text="Data point nameData point nameData point nameData point nameData point namevData point name" />
 
     <TextView
         android:id="@+id/locale_id"
@@ -44,8 +45,8 @@
         android:layout_marginTop="8dp"
         android:layout_marginRight="8dp"
         android:textColor="@color/text_primary"
-        android:textSize="16sp"
-        app:layout_constraintLeft_toRightOf="@+id/status_img"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/locale_name"
         tools:text="1234-5689-4567" />
 
@@ -57,8 +58,7 @@
         android:layout_marginLeft="8dp"
         android:layout_marginTop="8dp"
         android:textColor="@color/text_primary"
-        android:textSize="16sp"
-        app:layout_constraintLeft_toRightOf="@+id/status_img"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/locale_id"
         tools:text="123 km" />
 
@@ -70,8 +70,8 @@
         android:layout_marginLeft="8dp"
         android:layout_marginTop="8dp"
         android:textColor="@color/text_primary"
-        android:textSize="14sp"
-        app:layout_constraintLeft_toRightOf="@+id/status_img"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/locale_distance"
         tools:text="Uploaded" />
 

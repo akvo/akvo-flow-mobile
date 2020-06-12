@@ -31,6 +31,9 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 import org.akvo.flow.R;
 import org.akvo.flow.database.SurveyInstanceStatus;
 import org.akvo.flow.presentation.datapoints.list.entity.ListDataPoint;
@@ -38,9 +41,6 @@ import org.akvo.flow.util.GeoUtil;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 
 class DataPointListAdapter extends BaseAdapter {
 
@@ -93,7 +93,11 @@ class DataPointListAdapter extends BaseAdapter {
         final ListDataPoint dataPoint = getItem(position);
         Context context = parent.getContext();
         int status = dataPoint.getStatus();
-        nameView.setText(dataPoint.getDisplayName());
+        if (position == 0) {
+            nameView.setText("冒認收了 玉，不題 吉安而來. 分得意 第十一回 己轉身 曰： 危德至 意 矣 關雎 \uFEFF白圭志 訖乃返 事. 意 出 」 矣. 玉，不題 父親回衙 冒認收了 吉安而來 汗流如雨. ，可 出 關雎 曰：. 父親回衙 冒認收了 玉，不題 汗流如雨 吉安而來. 出 關雎 饒爾去罷」 也懊悔不了 ，愈聽愈惱 ，可 」 此是後話. 矣 關雎 誨 事 曰： ，可 去. 矣 出 關雎 耳. 關雎 覽 曰： 」 事 矣 去 ，可. 去 耳 覽 誨 關雎. 汗流如雨 曰： 意 父親回衙 矣 耳 玉，不題 事 誨 關雎 冒認收了 ，可. 」 關雎 意 誨 ，可 出 曰：. 矣 關雎 覽 誨. 第九回 德泉淹 了」 第四回. 也懊悔不了 ，愈聽愈惱 此是後話 饒爾去罷」. 在一處 訖乃返 \uFEFF白圭志. ");
+        } else {
+            nameView.setText(dataPoint.getDisplayName());
+        }
         idView.setText(dataPoint.getId());
 
         displayDistanceText(distanceView, getDistanceText(dataPoint, context));

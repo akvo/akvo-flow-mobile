@@ -25,6 +25,8 @@ import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 
+import androidx.appcompat.app.AppCompatActivity;
+
 import org.akvo.flow.R;
 import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.data.database.SurveyDbDataSource;
@@ -37,7 +39,6 @@ import org.akvo.flow.util.logging.LoggingHelper;
 
 import javax.inject.Inject;
 
-import androidx.appcompat.app.AppCompatActivity;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -143,7 +144,7 @@ public class AddUserActivity extends AppCompatActivity {
 
             // Select the newly created user, and exit the Activity
             prefs.setLong(Prefs.KEY_USER_ID, userId);
-            helper.initLoginData(username, deviceId);
+            helper.initLoginData(deviceId);
             navigateToSurvey();
         }
     }

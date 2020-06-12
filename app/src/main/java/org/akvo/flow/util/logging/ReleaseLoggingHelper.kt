@@ -19,28 +19,26 @@
 package org.akvo.flow.util.logging
 
 import android.text.TextUtils
-import com.crashlytics.android.Crashlytics
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import org.akvo.flow.BuildConfig
 import timber.log.Timber
 
 class ReleaseLoggingHelper : LoggingHelper {
 
     override fun init() {
-        Crashlytics.setString(GAE_INSTANCE_ID_TAG_KEY, BuildConfig.AWS_BUCKET)
+        FirebaseCrashlytics.getInstance()
+            .setCustomKey(GAE_INSTANCE_ID_TAG_KEY, BuildConfig.AWS_BUCKET)
         Timber.plant(CrashlyticsTree())
     }
 
-    override fun initLoginData(username: String?, deviceId: String?) {
-        if (!TextUtils.isEmpty(username)) {
-            Crashlytics.setString("user", username)
-        }
+    override fun initLoginData(deviceId: String?) {
         if (!TextUtils.isEmpty(deviceId)) {
-            Crashlytics.setString(DEVICE_ID_TAG_KEY, deviceId)
+            FirebaseCrashlytics.getInstance().setCustomKey(DEVICE_ID_TAG_KEY, deviceId!!)
         }
     }
 
     override fun clearUser() {
-        Crashlytics.setString("user", "")
+        FirebaseCrashlytics.getInstance().setCustomKey(DEVICE_ID_TAG_KEY, "")
     }
 
     companion object {

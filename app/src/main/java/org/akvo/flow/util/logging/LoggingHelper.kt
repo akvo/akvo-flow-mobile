@@ -21,6 +21,6 @@ package org.akvo.flow.util.logging
 
 interface LoggingHelper {
     fun init()
-    fun initLoginData(username: String?, deviceId: String?)
+    fun initLoginData(deviceId: String?)
     fun clearUser()
 }

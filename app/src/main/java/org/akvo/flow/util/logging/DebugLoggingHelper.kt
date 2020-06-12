@@ -28,7 +28,7 @@ class DebugLoggingHelper : LoggingHelper {
         Timber.plant(DebugTree())
     }
 
-    override fun initLoginData(username: String?, deviceId: String?) {
+    override fun initLoginData(deviceId: String?) {
         // ignored
     }
 

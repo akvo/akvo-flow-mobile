@@ -131,7 +131,7 @@ public class FlowApp extends MultiDexApplication {
             @Override
             public void onNext(User user) {
                 String deviceId = prefs.getString(Prefs.KEY_DEVICE_IDENTIFIER, null);
-                loggingHelper.initLoginData(user.getName(), deviceId);
+                loggingHelper.initLoginData(deviceId);
             }
         }, null);
 

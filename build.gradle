@@ -1,5 +1,5 @@
 buildscript {
-    ext.kotlin_version = '1.3.71'
+    ext.kotlin_version = '1.3.72'
     ext.jacocoVersion = '0.8.5'
     repositories {
         google()
@@ -8,59 +8,57 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.6.2'
+        classpath 'com.android.tools.build:gradle:4.0.0'
         classpath 'com.getkeepsafe.dexcount:dexcount-gradle-plugin:1.0.2'
         classpath 'com.google.gms:google-services:4.3.3'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath 'com.google.firebase:firebase-crashlytics-gradle:2.1.1'
         classpath "org.jacoco:org.jacoco.core:$jacocoVersion"
-        classpath 'com.google.firebase:firebase-appdistribution-gradle:0.2.2'
+        classpath 'com.google.firebase:firebase-appdistribution-gradle:2.0.0'
     }
 }
 
 ext {
-    compileSdkVersion = 28
+    compileSdkVersion = 29
     minSdkVersion = 16
-    targetSdkVersion = 28
+    targetSdkVersion = 29
 
     annotationVersion = "1.1.0"
     appCompatVersion = "1.1.0"
     crashlyticsVersion = "17.0.1"
     constraintLayoutVersion = "1.1.3"
-    coreKtxVersion = "1.1.0"
-    exifVersion = "1.1.0"
+    coreKtxVersion = "1.3.0"
+    exifVersion = "1.2.0"
     firebaseAnalyticsVersion = "17.4.3"
-    materialVersion = "1.0.0"
+    materialVersion = "1.1.0"
     multidexVersion = '2.0.1'
     recyclerVersion = "1.1.0"
-    workVersion = "2.2.0"
+    workVersion = "2.3.4"
 
     adapterRxJava2Version = "2.3.0"
     butterKnifeVersion = "10.2.1"
     converterGsonVersion = "2.3.0"
     converterScalarsVersion = "2.3.0"
-    daggerVersion = "2.21"
-    glideVersion = "4.9.0"
+    daggerVersion = "2.28"
+    glideVersion = "4.11.0"
     gmsVersion = "15.0.1"
     gsonVersion = "2.8.2"
     leakCanaryVersion = "2.0"
-    loggingInterceptorVersion = "3.12.1"
+    loggingInterceptorVersion = "3.12.12"
     mapboxAnnotationsVersion = "0.8.0"
     mapboxMarkerVersion = "0.3.0"
     mapboxOfflineRxVersion = "1.2.0-alpha04"
     mapboxVersion = "9.2.0"
-    mapUtilsVersion = "0.5"
-    prettyTimeVersion = "4.0.2.Final"
+    prettyTimeVersion = "4.0.5.Final"
     rxAndroidVersion = "2.1.1"
     rxJavaVersion = "2.2.8"
-    rxTracerVersion = "0.1.2"
     slf4JVersion = "1.7.30"
     sqlbriteVersion = "2.0.0"
     timberVersion = "4.7.1"
 
     jUnitVersion = "4.12"
     kotlintestVerion = "3.1.5"
-    mockServerVersion = "3.12.1"
+    mockServerVersion = "3.12.12"
     mockitoInlineVersion = "2.8.47"
     mockitoKotlinVersion = "2.2.0"
 
@@ -79,9 +77,6 @@ allprojects {
         google()
         jcenter()
         maven { url "https://jitpack.io" }
-        maven {
-            url  "https://dl.bintray.com/halfhp/rxtracer"
-        }
     }
 }
 

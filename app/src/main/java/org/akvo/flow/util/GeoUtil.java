@@ -42,24 +42,8 @@ public class GeoUtil {
             factor = 1.0;
             unit = "m";
         }
-        DecimalFormat df = new DecimalFormat("###,###.## " + unit);
+        DecimalFormat df = new DecimalFormat("### " + unit);
         double dist = distance * factor;
         return df.format(dist);
     }
-
-    public String getDisplayArea(double area) {
-        // default: square km
-        String unit = "km²";
-        double factor = 0.000001; // convert from m² to km²
-
-        // for distances smaller than 1 km², use m² as unit
-        if (area < 1000000.0) {
-            factor = 1.0;
-            unit = "m²";
-        }
-        DecimalFormat df = new DecimalFormat("###,###.## " + unit);
-        double dist = area * factor;
-        return df.format(dist);
-    }
-
 }

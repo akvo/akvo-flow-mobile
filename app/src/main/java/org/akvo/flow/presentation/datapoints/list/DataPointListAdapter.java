@@ -93,14 +93,10 @@ class DataPointListAdapter extends BaseAdapter {
         final ListDataPoint dataPoint = getItem(position);
         Context context = parent.getContext();
         int status = dataPoint.getStatus();
-        if (position == 0) {
-            nameView.setText("冒認收了 玉，不題 吉安而來. 分得意 第十一回 己轉身 曰： 危德至 意 矣 關雎 \uFEFF白圭志 訖乃返 事. 意 出 」 矣. 玉，不題 父親回衙 冒認收了 吉安而來 汗流如雨. ，可 出 關雎 曰：. 父親回衙 冒認收了 玉，不題 汗流如雨 吉安而來. 出 關雎 饒爾去罷」 也懊悔不了 ，愈聽愈惱 ，可 」 此是後話. 矣 關雎 誨 事 曰： ，可 去. 矣 出 關雎 耳. 關雎 覽 曰： 」 事 矣 去 ，可. 去 耳 覽 誨 關雎. 汗流如雨 曰： 意 父親回衙 矣 耳 玉，不題 事 誨 關雎 冒認收了 ，可. 」 關雎 意 誨 ，可 出 曰：. 矣 關雎 覽 誨. 第九回 德泉淹 了」 第四回. 也懊悔不了 ，愈聽愈惱 此是後話 饒爾去罷」. 在一處 訖乃返 \uFEFF白圭志. ");
-        } else {
-            nameView.setText(dataPoint.getDisplayName());
-        }
+        nameView.setText(dataPoint.getDisplayName());
         idView.setText(dataPoint.getId());
 
-        displayDistanceText(distanceView, getDistanceText(dataPoint, context));
+        displayDistanceText(distanceView, getDistanceText(dataPoint));
         displayDateText(dateView, dataPoint.getDisplayDate());
 
         int statusRes = 0;
@@ -108,16 +104,16 @@ class DataPointListAdapter extends BaseAdapter {
         switch (status) {
             case SurveyInstanceStatus.SAVED:
             case SurveyInstanceStatus.SUBMIT_REQUESTED:
-                statusRes = R.drawable.record_saved_icn;
+                statusRes = R.drawable.ic_edit_black_18dp;
                 statusText = context.getString(R.string.status_saved);
                 break;
             case SurveyInstanceStatus.SUBMITTED:
-                statusRes = R.drawable.record_submitted_icn;
+                statusRes = R.drawable.ic_schedule_black_18dp;
                 statusText = context.getString(R.string.status_submitted);
                 break;
             case SurveyInstanceStatus.UPLOADED:
             case SurveyInstanceStatus.DOWNLOADED:
-                statusRes = R.drawable.record_synced_icn;
+                statusRes = R.drawable.ic_check_circle_outline_black_18dp;
                 statusText = context.getString(R.string.status_uploaded);
                 break;
             default:
@@ -136,20 +132,14 @@ class DataPointListAdapter extends BaseAdapter {
         return view;
     }
 
-    private String getDistanceText(@NonNull ListDataPoint dataPoint, Context context) {
-        StringBuilder builder = new StringBuilder(
-                context.getString(R.string.distance_label) + " ");
-
+    private String getDistanceText(@NonNull ListDataPoint dataPoint) {
         if (latitude != null && longitude != null && dataPoint.isLocationValid()) {
             float[] results = new float[1];
             Location.distanceBetween(latitude, longitude, dataPoint.getLatitude(),
                     dataPoint.getLongitude(), results);
             final double distance = results[0];
-
-            builder.append(geoUtil.getDisplayLength(distance));
-            return builder.toString();
+            return geoUtil.getDisplayLength(distance);
         }
-
         return null;
     }
 

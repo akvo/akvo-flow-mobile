@@ -118,7 +118,6 @@
     <string name="stats_total">Total Data Points:</string>
     <string name="stats_week">Last 7 days:</string>
     <string name="stats_today">Today:</string>
-    <string name="distance_label">Distance:</string>
     <string name="tab_datapoints">DATA POINTS</string>
     <string name="tab_map">MAP</string>
     <string name="order_date">Date</string>
@@ -353,6 +352,7 @@
     <string name="confirm_new_submission">New Submission</string>
     <string name="confirm_new_submission_title">New Submission?</string>
     <string name="confirm_new_submission_message">You\'ve submitted \"%1$s\" to this datapoint within the last 24 hours.\n\nDo you want to make another submission?</string>
+    <string name="content_description_data_point_status">Datapoint status image</string>
 
     <plurals name="download_forms_error">
         <item quantity="one">Error downloading form</item>

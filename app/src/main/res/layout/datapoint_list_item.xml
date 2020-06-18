@@ -8,16 +8,16 @@
 
     <ImageView
         android:id="@+id/status_img"
-        android:layout_width="20dp"
+        android:layout_width="wrap_content"
         android:layout_height="0dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginRight="8dp"
-        android:layout_marginBottom="8dp"
         android:adjustViewBounds="true"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/last_modified"
-        tools:src="@drawable/record_synced_icn" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        tools:src="@drawable/ic_edit_black_18dp"
+        android:contentDescription="@string/content_description_data_point_status" />
 
     <TextView
         android:id="@+id/locale_name"
@@ -84,7 +84,6 @@
         android:layout_marginRight="8dp"
         android:layout_marginBottom="8dp"
         android:textColor="@color/text_primary"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="March 16 2020 10:12" />

@@ -84,17 +84,17 @@ class DataPointListAdapter extends BaseAdapter {
             view = convertView;
         }
         TextView nameView = view.findViewById(R.id.locale_name);
-        TextView idView = view.findViewById(R.id.locale_id);
+//        TextView idView = view.findViewById(R.id.locale_id);
         TextView dateView = view.findViewById(R.id.last_modified);
         TextView distanceView = view.findViewById(R.id.locale_distance);
-        TextView statusView = view.findViewById(R.id.status);
+//        TextView statusView = view.findViewById(R.id.status);
         ImageView statusImage = view.findViewById(R.id.status_img);
 
         final ListDataPoint dataPoint = getItem(position);
         Context context = parent.getContext();
         int status = dataPoint.getStatus();
         nameView.setText(dataPoint.getDisplayName());
-        idView.setText(dataPoint.getId());
+//        idView.setText(dataPoint.getId());
 
         displayDistanceText(distanceView, getDistanceText(dataPoint));
         displayDateText(dateView, dataPoint.getDisplayDate());
@@ -122,7 +122,7 @@ class DataPointListAdapter extends BaseAdapter {
         }
 
         statusImage.setImageResource(statusRes);
-        statusView.setText(statusText);
+//        statusView.setText(statusText);
 
         if (dataPoint.getViewed()) {
             nameView.setTypeface(null, Typeface.NORMAL);

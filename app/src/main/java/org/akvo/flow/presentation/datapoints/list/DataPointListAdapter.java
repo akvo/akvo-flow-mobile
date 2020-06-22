@@ -84,37 +84,29 @@ class DataPointListAdapter extends BaseAdapter {
             view = convertView;
         }
         TextView nameView = view.findViewById(R.id.locale_name);
-//        TextView idView = view.findViewById(R.id.locale_id);
         TextView dateView = view.findViewById(R.id.last_modified);
         TextView distanceView = view.findViewById(R.id.locale_distance);
-//        TextView statusView = view.findViewById(R.id.status);
         ImageView statusImage = view.findViewById(R.id.status_img);
 
         final ListDataPoint dataPoint = getItem(position);
-        Context context = parent.getContext();
         int status = dataPoint.getStatus();
         nameView.setText(dataPoint.getDisplayName());
-//        idView.setText(dataPoint.getId());
 
         displayDistanceText(distanceView, getDistanceText(dataPoint));
         displayDateText(dateView, dataPoint.getDisplayDate());
 
         int statusRes = 0;
-        String statusText = null;
         switch (status) {
             case SurveyInstanceStatus.SAVED:
             case SurveyInstanceStatus.SUBMIT_REQUESTED:
                 statusRes = R.drawable.ic_edit_black_18dp;
-                statusText = context.getString(R.string.status_saved);
                 break;
             case SurveyInstanceStatus.SUBMITTED:
                 statusRes = R.drawable.ic_schedule_black_18dp;
-                statusText = context.getString(R.string.status_submitted);
                 break;
             case SurveyInstanceStatus.UPLOADED:
             case SurveyInstanceStatus.DOWNLOADED:
                 statusRes = R.drawable.ic_check_circle_outline_black_18dp;
-                statusText = context.getString(R.string.status_uploaded);
                 break;
             default:
                 //wrong state
@@ -122,7 +114,6 @@ class DataPointListAdapter extends BaseAdapter {
         }
 
         statusImage.setImageResource(statusRes);
-//        statusView.setText(statusText);
 
         if (dataPoint.getViewed()) {
             nameView.setTypeface(null, Typeface.NORMAL);

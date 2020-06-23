@@ -6,7 +6,7 @@
         android:id="@+id/mapmode"
         android:orderInCategory="99"
         android:title="MAP"
-        android:icon="@drawable/ic_menu_map"
+        android:icon="@drawable/ic_map_mode_switcher"
         flowapp:showAsAction="always">
         <menu>
             <item android:id="@+id/map_normal"

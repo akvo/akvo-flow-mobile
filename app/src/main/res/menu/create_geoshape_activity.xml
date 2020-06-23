@@ -6,7 +6,7 @@
         android:id="@+id/mapmode"
         android:orderInCategory="99"
         android:title="MAP"
-        android:icon="@drawable/ic_map_mode_switcher"
+        android:icon="@drawable/ic_menu_map"
         flowapp:showAsAction="always">
         <menu>
             <item android:id="@+id/map_normal"
@@ -38,7 +38,7 @@
         android:id="@+id/save"
         android:orderInCategory="101"
         android:title="SAVE"
-        android:icon="@drawable/ic_baseline_save_24"
+        android:icon="@drawable/ic_save"
         flowapp:showAsAction="always"/>
 
 </menu>

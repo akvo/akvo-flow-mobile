@@ -33,6 +33,6 @@
         android:clickable="true"
         android:visibility="gone"
         app:backgroundTint="@color/white"
-        app:srcCompat="@drawable/ic_offline_maps" />
+        app:srcCompat="@drawable/ic_map_mode_switcher" />
 
 </FrameLayout>

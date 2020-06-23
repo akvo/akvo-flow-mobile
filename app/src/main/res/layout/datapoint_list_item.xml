@@ -6,48 +6,49 @@
     android:layout_height="wrap_content"
     android:paddingBottom="8dp">
 
-    <TextView
-        android:id="@+id/last_modified"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginRight="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginTop="8dp"
-        android:gravity="end"
-        android:textColor="#8A000000"
-        android:textSize="12sp"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintBottom_toBottomOf="@+id/locale_name"
-        tools:text="March 16 2020" />
-
     <ImageView
         android:id="@+id/status_img"
         android:layout_width="18dp"
         android:layout_height="18dp"
+        android:layout_marginTop="3dp"
         android:layout_marginStart="8dp"
         android:layout_marginLeft="8dp"
         android:contentDescription="@string/content_description_data_point_status"
-        app:layout_constraintBottom_toBottomOf="@+id/locale_name"
+        app:layout_constraintTop_toTopOf="@+id/locale_name"
         app:layout_constraintLeft_toLeftOf="parent"
         tools:src="@drawable/ic_edit_black_18dp" />
+
+    <TextView
+        android:id="@+id/last_modified"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
+        android:gravity="end"
+        android:textColor="#8A000000"
+        android:textSize="12sp"
+        app:layout_constraintTop_toTopOf="@+id/locale_name"
+        app:layout_constraintRight_toRightOf="parent"
+        tools:text="March 16 2020" />
 
     <TextView
         android:id="@+id/locale_name"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp"
         android:layout_marginTop="8dp"
+        android:layout_marginRight="8dp"
         android:ellipsize="end"
         android:gravity="start"
         android:maxLines="2"
         android:textColor="#DE000000"
         android:textSize="16sp"
         android:textStyle="normal"
-        app:layout_constraintRight_toLeftOf="@+id/last_modified"
         app:layout_constraintLeft_toRightOf="@+id/status_img"
+        app:layout_constraintRight_toLeftOf="@+id/last_modified"
         app:layout_constraintTop_toTopOf="parent"
-        tools:text="Data point " />
+        tools:text="Data point Data point Data point Data point Data point Data point Data point " />
 
     <TextView
         android:id="@+id/locale_distance"
@@ -59,5 +60,12 @@
         app:layout_constraintLeft_toLeftOf="@+id/locale_name"
         app:layout_constraintTop_toBottomOf="@+id/locale_name"
         tools:text="123 km" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_begin="20dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

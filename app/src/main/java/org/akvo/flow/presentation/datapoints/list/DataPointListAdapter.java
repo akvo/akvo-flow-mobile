@@ -22,7 +22,6 @@ package org.akvo.flow.presentation.datapoints.list;
 
 import android.content.Context;
 import android.graphics.Typeface;
-import android.location.Location;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -32,30 +31,22 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 
 import org.akvo.flow.R;
 import org.akvo.flow.database.SurveyInstanceStatus;
 import org.akvo.flow.presentation.datapoints.list.entity.ListDataPoint;
-import org.akvo.flow.util.GeoUtil;
 
 import java.util.ArrayList;
 import java.util.List;
 
 class DataPointListAdapter extends BaseAdapter {
 
-    private Double latitude;
-    private Double longitude;
     private final LayoutInflater inflater;
     private final List<ListDataPoint> dataPoints;
-    private final GeoUtil geoUtil;
 
-    DataPointListAdapter(Context context, @Nullable Double latitude, @Nullable Double longitude) {
-        this.latitude = latitude;
-        this.longitude = longitude;
+    DataPointListAdapter(Context context) {
         this.inflater = LayoutInflater.from(context);
         this.dataPoints = new ArrayList<>();
-        this.geoUtil = new GeoUtil();
     }
 
     @Override
@@ -92,7 +83,7 @@ class DataPointListAdapter extends BaseAdapter {
         int status = dataPoint.getStatus();
         nameView.setText(dataPoint.getDisplayName());
 
-        displayDistanceText(distanceView, getDistanceText(dataPoint));
+        displayDistanceText(distanceView, dataPoint.getDistanceText());
         displayDateText(dateView, dataPoint.getDisplayDate());
 
         int statusRes = 0;
@@ -123,17 +114,6 @@ class DataPointListAdapter extends BaseAdapter {
         return view;
     }
 
-    private String getDistanceText(@NonNull ListDataPoint dataPoint) {
-        if (latitude != null && longitude != null && dataPoint.isLocationValid()) {
-            float[] results = new float[1];
-            Location.distanceBetween(latitude, longitude, dataPoint.getLatitude(),
-                    dataPoint.getLongitude(), results);
-            final double distance = results[0];
-            return geoUtil.getDisplayLength(distance);
-        }
-        return null;
-    }
-
     private void displayDateText(TextView tv, String date) {
         if (date == null || date.isEmpty()) {
             tv.setVisibility(View.GONE);
@@ -156,10 +136,5 @@ class DataPointListAdapter extends BaseAdapter {
         this.dataPoints.clear();
         this.dataPoints.addAll(dataPoints);
         notifyDataSetChanged();
-    }
-
-    void updateLocation(double latitude, double longitude) {
-        this.latitude = latitude;
-        this.longitude = longitude;
     }
 }

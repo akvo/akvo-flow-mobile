@@ -20,6 +20,8 @@
 
 package org.akvo.flow.presentation.datapoints.list;
 
+import androidx.annotation.NonNull;
+
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.entity.DataPoint;
 import org.akvo.flow.domain.entity.DownloadResult;
@@ -42,7 +44,6 @@ import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import androidx.annotation.NonNull;
 import io.reactivex.observers.DisposableSingleObserver;
 import timber.log.Timber;
 
@@ -62,10 +63,11 @@ public class DataPointsListPresenter implements Presenter {
     private Double latitude;
     private Double longitude;
 
-    @Inject DataPointsListPresenter(@Named("getSavedDataPoints") UseCase getSavedDataPoints,
-            ListDataPointMapper mapper, DownloadDataPoints downloadDataPoints,
-            @Named("checkDeviceNotification") UseCase checkDeviceNotification,
-            @Named("uploadSync") UseCase upload) {
+    @Inject
+    DataPointsListPresenter(@Named("getSavedDataPoints") UseCase getSavedDataPoints,
+                            ListDataPointMapper mapper, DownloadDataPoints downloadDataPoints,
+                            @Named("checkDeviceNotification") UseCase checkDeviceNotification,
+                            @Named("uploadSync") UseCase upload) {
         this.getSavedDataPoints = getSavedDataPoints;
         this.mapper = mapper;
         this.downloadDataPoints = downloadDataPoints;
@@ -90,7 +92,9 @@ public class DataPointsListPresenter implements Presenter {
         }
     }
 
-    void loadDataPoints() {
+    void loadDataPoints(Double latitude, Double longitude) {
+        this.latitude = latitude;
+        this.longitude = longitude;
         getSavedDataPoints.dispose();
         if (surveyGroup != null) {
             Map<String, Object> params = new HashMap<>(8);
@@ -109,7 +113,7 @@ public class DataPointsListPresenter implements Presenter {
 
                 @Override
                 public void onNext(List<DataPoint> dataPoints) {
-                    List<ListDataPoint> mapDataPoints = mapper.transform(dataPoints);
+                    List<ListDataPoint> mapDataPoints = mapper.transform(dataPoints, latitude, longitude);
                     view.displayData(mapDataPoints);
                     if (mapDataPoints.isEmpty()) {
                         view.showNoDataPoints(surveyGroup.isMonitored());
@@ -141,7 +145,7 @@ public class DataPointsListPresenter implements Presenter {
 
                 @Override
                 public void onNext(List<DataPoint> dataPoints) {
-                    List<ListDataPoint> listDataPoints = mapper.transform(dataPoints);
+                    List<ListDataPoint> listDataPoints = mapper.transform(dataPoints, latitude, longitude);
                     view.displayData(listDataPoints);
                     if (listDataPoints.isEmpty()) {
                         view.displayNoSearchResultsFound();
@@ -214,13 +218,8 @@ public class DataPointsListPresenter implements Presenter {
                 return;
             }
             this.orderBy = order;
-            loadDataPoints();
+            loadDataPoints(latitude, longitude);
         }
-    }
-
-    void onLocationReady(Double latitude, Double longitude) {
-        this.latitude = latitude;
-        this.longitude = longitude;
     }
 
     void onOrderByClicked() {
@@ -232,7 +231,7 @@ public class DataPointsListPresenter implements Presenter {
         downloadDataPoints.dispose();
         view.hideLoading();
         onDataReady(surveyGroup);
-        loadDataPoints();
+        loadDataPoints(latitude, longitude);
     }
 
     private void noSurveySelected() {

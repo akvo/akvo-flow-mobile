@@ -16,7 +16,7 @@
         android:contentDescription="@string/content_description_data_point_status"
         app:layout_constraintTop_toTopOf="@+id/locale_name"
         app:layout_constraintLeft_toLeftOf="parent"
-        tools:src="@drawable/ic_edit_black_18dp" />
+        tools:src="@drawable/ic_status_saved_18dp" />
 
     <TextView
         android:id="@+id/last_modified"

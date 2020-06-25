@@ -67,10 +67,10 @@ internal class DataPointListAdapter(context: Context?) : BaseAdapter() {
         var statusRes = 0
         when (status) {
             SurveyInstanceStatus.SAVED, SurveyInstanceStatus.SUBMIT_REQUESTED -> statusRes =
-                R.drawable.ic_edit_black_18dp
-            SurveyInstanceStatus.SUBMITTED -> statusRes = R.drawable.ic_schedule_black_18dp
+                R.drawable.ic_status_saved_18dp
+            SurveyInstanceStatus.SUBMITTED -> statusRes = R.drawable.ic_status_submitted_18dp
             SurveyInstanceStatus.UPLOADED, SurveyInstanceStatus.DOWNLOADED -> statusRes =
-                R.drawable.ic_check_circle_outline_black_18dp
+                R.drawable.ic_status_synced_18dp
         }
         statusImage.setImageResource(statusRes)
         if (viewed) {

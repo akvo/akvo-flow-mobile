@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_marginTop="?actionBarSize"
+    tools:context="org.akvo.flow.activity.SurveyActivity">
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_marginTop="@dimen/tabs_height"
+        android:layout_height="6dp"
+        android:background="@drawable/shadow_background" />
+
+    <androidx.viewpager.widget.ViewPager
+        android:id="@+id/pager"
+        android:layout_marginTop="@dimen/tabs_height"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+</FrameLayout>

@@ -91,7 +91,7 @@ class DataPointDataRepositoryTest {
     @Before
     fun setUp() {
         `when`(mapper.getImagesList(anyList())).thenReturn(emptyList())
-        spyRestApi = spy(RestApi(mockDeviceHelper, null, null, ""))
+        spyRestApi = spy(RestApi(mockDeviceHelper, TestRestServiceFactory(), "", ""))
         spyHttpException = spy(HttpException(retrofit2.Response.success("")))
         `when`(mockDataSourceFactory.dataBaseDataSource).thenReturn(mockDatabaseDataSource)
     }

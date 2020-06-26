@@ -28,11 +28,12 @@ import retrofit2.http.Query;
 
 import static org.akvo.flow.data.util.ApiUrls.ANDROID_ID;
 import static org.akvo.flow.data.util.ApiUrls.DATA_POINTS;
+import static org.akvo.flow.data.util.ApiUrls.LAST_UPDATED;
 import static org.akvo.flow.data.util.ApiUrls.SURVEY_ID;
 
 public interface DataPointDownloadService {
 
     @GET(DATA_POINTS)
     Single<ApiLocaleResult> getAssignedDataPoints(@Query(ANDROID_ID) String androidId,
-            @Query(SURVEY_ID) String surveyId);
+            @Query(SURVEY_ID) String surveyId, @Query(LAST_UPDATED) String lastUpdated);
 }

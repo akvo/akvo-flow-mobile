@@ -26,7 +26,8 @@ data class ListDataPoint(
     val latitude: Double,
     val longitude: Double,
     val displayDate: String,
-    val viewed: Boolean
+    val viewed: Boolean,
+    val distanceText: String
 ) {
 
     val isLocationValid: Boolean

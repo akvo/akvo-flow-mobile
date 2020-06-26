@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2019-2020 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -18,16 +18,16 @@
  */
 package org.akvo.flow.util.logging
 
-import com.crashlytics.android.Crashlytics
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import timber.log.Timber
 
 class CrashlyticsTree : Timber.Tree() {
 
     override fun log(priority: Int, tag: String?, message: String, t: Throwable?) {
         if (t != null) {
-            Crashlytics.logException(t)
+            FirebaseCrashlytics.getInstance().recordException(t)
         } else {
-            Crashlytics.log(priority, tag, message)
+            FirebaseCrashlytics.getInstance().log("tag: + message")
         }
     }
 }

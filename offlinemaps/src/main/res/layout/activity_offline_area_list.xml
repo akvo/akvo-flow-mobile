@@ -17,6 +17,6 @@
         android:layout_gravity="bottom|end"
         android:layout_margin="16dp"
         android:tint="@color/white"
-        app:srcCompat="@drawable/ic_offline_maps" />
+        app:srcCompat="@drawable/ic_add_map_icon" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

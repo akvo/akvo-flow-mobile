@@ -26,9 +26,10 @@ import javax.inject.Inject
 
 class ListDataPointMapper @Inject constructor(
     private val displayNameMapper: DisplayNameMapper,
-    private val dateMapper: DateMapper
+    private val dateMapper: DateMapper,
+    private val distanceMapper: DistanceMapper
 ) {
-    private fun transform(dataPoint: DataPoint?): ListDataPoint? {
+    private fun transform(dataPoint: DataPoint?, latitude: Double?, longitude: Double?): ListDataPoint? {
         if (dataPoint == null) {
             return null
         }
@@ -39,7 +40,8 @@ class ListDataPointMapper @Inject constructor(
             formatCoordinate(dataPoint.latitude),
             formatCoordinate(dataPoint.longitude),
             dateMapper.formatDate(dataPoint.lastModified),
-            dataPoint.wasViewed()
+            dataPoint.wasViewed(),
+            distanceMapper.mapDistance(latitude, longitude, dataPoint)
         )
     }
 
@@ -47,13 +49,13 @@ class ListDataPointMapper @Inject constructor(
         return coordinate ?: ListDataPoint.INVALID_COORDINATE
     }
 
-    fun transform(dataPoints: List<DataPoint?>?): List<ListDataPoint> {
+    fun transform(dataPoints: List<DataPoint?>?, latitude: Double?, longitude: Double?): List<ListDataPoint> {
         if (dataPoints == null) {
             return emptyList()
         }
         val listDataPoints: MutableList<ListDataPoint> = ArrayList(dataPoints.size)
         for (dataPoint in dataPoints) {
-            transform(dataPoint)?.let { listDataPoint ->
+            transform(dataPoint, latitude, longitude)?.let { listDataPoint ->
                 listDataPoints.add(listDataPoint)
             }
         }

@@ -32,14 +32,6 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.fragment.app.DialogFragment;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
-import androidx.core.content.ContextCompat;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
-import androidx.appcompat.widget.SearchView;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -54,6 +46,14 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.widget.SearchView;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import org.akvo.flow.R;
 import org.akvo.flow.app.FlowApp;
@@ -172,7 +172,7 @@ public class DataPointsListFragment extends Fragment implements LocationListener
         emptyIv = view.findViewById(R.id.empty_iv);
         SurveyGroup surveyGroup = (SurveyGroup) getArguments()
                 .getSerializable(ConstantUtil.SURVEY_GROUP_EXTRA);
-        mAdapter = new DataPointListAdapter(getActivity(), mLatitude, mLongitude);
+        mAdapter = new DataPointListAdapter(getActivity());
         listView.setAdapter(mAdapter);
         listView.setOnItemClickListener(this);
         progressBar = view.findViewById(R.id.progress);
@@ -218,7 +218,7 @@ public class DataPointsListFragment extends Fragment implements LocationListener
 
         if (searchView == null || searchView.isIconified()) {
             updateLocation();
-            presenter.loadDataPoints();
+            presenter.loadDataPoints(mLatitude, mLongitude);
         }
     }
 
@@ -226,15 +226,17 @@ public class DataPointsListFragment extends Fragment implements LocationListener
         Criteria criteria = new Criteria();
         criteria.setAccuracy(Criteria.ACCURACY_FINE);
         String provider = mLocationManager.getBestProvider(criteria, true);
-        if (provider != null) {
-            Location loc = mLocationManager.getLastKnownLocation(provider);
-            if (loc != null) {
-                mLatitude = loc.getLatitude();
-                mLongitude = loc.getLongitude();
-                mAdapter.updateLocation(mLatitude, mLongitude);
-                presenter.onLocationReady(mLatitude, mLongitude);
+        try {
+            if (provider != null) {
+                Location loc = mLocationManager.getLastKnownLocation(provider);
+                if (loc != null) {
+                    mLatitude = loc.getLatitude();
+                    mLongitude = loc.getLongitude();
+                }
+                mLocationManager.requestLocationUpdates(provider, 1000, 0, weakLocationListener);
             }
-            mLocationManager.requestLocationUpdates(provider, 1000, 0, weakLocationListener);
+        } catch (SecurityException e) {
+            Timber.e("Missing permission");
         }
     }
 
@@ -342,7 +344,7 @@ public class DataPointsListFragment extends Fragment implements LocationListener
                 if (!TextUtils.isEmpty(newText)) {
                     presenter.getFilteredDataPoints(newText);
                 } else {
-                    presenter.loadDataPoints();
+                    presenter.loadDataPoints(mLatitude, mLongitude);
                 }
                 return false;
             }
@@ -360,7 +362,7 @@ public class DataPointsListFragment extends Fragment implements LocationListener
 
                     @Override
                     public boolean onMenuItemActionCollapse(MenuItem item) {
-                        presenter.loadDataPoints();
+                        presenter.loadDataPoints(mLatitude, mLongitude);
                         return true;
                     }
                 });
@@ -410,7 +412,7 @@ public class DataPointsListFragment extends Fragment implements LocationListener
         mLocationManager.removeUpdates(weakLocationListener);
         mLatitude = location.getLatitude();
         mLongitude = location.getLongitude();
-        presenter.onLocationReady(mLatitude, mLongitude);
+        presenter.loadDataPoints(mLatitude, mLongitude);
     }
 
     @Override
@@ -429,7 +431,7 @@ public class DataPointsListFragment extends Fragment implements LocationListener
     }
 
     private void refreshLocalData() {
-        presenter.loadDataPoints();
+        presenter.loadDataPoints(mLatitude, mLongitude);
     }
 
     @Override

@@ -8,85 +8,64 @@
 
     <ImageView
         android:id="@+id/status_img"
-        android:layout_width="50dp"
-        android:layout_height="0dp"
+        android:layout_width="18dp"
+        android:layout_height="18dp"
+        android:layout_marginTop="3dp"
         android:layout_marginStart="8dp"
         android:layout_marginLeft="8dp"
-        android:layout_marginTop="8dp"
-        android:adjustViewBounds="true"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:src="@drawable/record_synced_icn" />
-
-    <TextView
-        android:id="@+id/locale_name"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginRight="8dp"
-        android:textColor="@color/text_primary"
-        android:textSize="18sp"
-        android:textStyle="normal"
-        app:layout_constraintLeft_toRightOf="@+id/status_img"
-        app:layout_constraintRight_toLeftOf="@+id/last_modified"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:text="Data point name" />
-
-    <TextView
-        android:id="@+id/locale_id"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginRight="8dp"
-        android:textColor="@color/text_primary"
-        android:textSize="16sp"
-        app:layout_constraintLeft_toRightOf="@+id/status_img"
-        app:layout_constraintTop_toBottomOf="@+id/locale_name"
-        tools:text="1234-5689-4567" />
-
-    <TextView
-        android:id="@+id/locale_distance"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginTop="8dp"
-        android:textColor="@color/text_primary"
-        android:textSize="16sp"
-        app:layout_constraintLeft_toRightOf="@+id/status_img"
-        app:layout_constraintTop_toBottomOf="@+id/locale_id"
-        tools:text="123 km" />
-
-    <TextView
-        android:id="@+id/status"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginTop="8dp"
-        android:textColor="@color/text_primary"
-        android:textSize="14sp"
-        app:layout_constraintLeft_toRightOf="@+id/status_img"
-        app:layout_constraintTop_toBottomOf="@+id/locale_distance"
-        tools:text="Uploaded" />
+        android:contentDescription="@string/content_description_data_point_status"
+        app:layout_constraintTop_toTopOf="@+id/locale_name"
+        app:layout_constraintLeft_toLeftOf="parent"
+        tools:src="@drawable/ic_status_saved_18dp" />
 
     <TextView
         android:id="@+id/last_modified"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="4dp"
         android:layout_marginEnd="8dp"
         android:layout_marginRight="8dp"
-        android:layout_marginBottom="8dp"
-        android:textColor="@color/text_primary"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:gravity="end"
+        android:textColor="#8A000000"
+        android:textSize="12sp"
+        app:layout_constraintTop_toTopOf="@+id/locale_name"
+        app:layout_constraintRight_toRightOf="parent"
+        tools:text="March 16 2020" />
+
+    <TextView
+        android:id="@+id/locale_name"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginRight="8dp"
+        android:ellipsize="end"
+        android:gravity="start"
+        android:maxLines="2"
+        android:textColor="#DE000000"
+        android:textSize="16sp"
+        android:textStyle="normal"
+        app:layout_constraintLeft_toRightOf="@+id/status_img"
+        app:layout_constraintRight_toLeftOf="@+id/last_modified"
         app:layout_constraintTop_toTopOf="parent"
-        tools:text="March 16 2020 10:12" />
+        tools:text="Data point Data point Data point Data point Data point Data point Data point " />
+
+    <TextView
+        android:id="@+id/locale_distance"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:textColor="#8A000000"
+        android:textSize="14sp"
+        app:layout_constraintLeft_toLeftOf="@+id/locale_name"
+        app:layout_constraintTop_toBottomOf="@+id/locale_name"
+        tools:text="123 km" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_begin="20dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

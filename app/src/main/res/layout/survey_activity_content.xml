@@ -7,8 +7,8 @@
     android:layout_height="match_parent"
     tools:context="org.akvo.flow.activity.SurveyActivity">
 
-    <include layout="@layout/datapoint_content" />
     <include layout="@layout/app_bar_layout_tabs" />
+    <include layout="@layout/datapoint_content" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/add_data_point_fab"

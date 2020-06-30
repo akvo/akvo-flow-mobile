@@ -26,6 +26,7 @@ import android.view.MenuItem
 import android.view.View
 import androidx.annotation.StringRes
 import androidx.viewpager.widget.ViewPager
+import com.google.android.material.tabs.TabLayout
 import org.akvo.flow.R
 import org.akvo.flow.app.FlowApp
 import org.akvo.flow.domain.SurveyGroup
@@ -40,6 +41,7 @@ import org.akvo.flow.uicomponents.BackActivity
 import org.akvo.flow.uicomponents.SnackBarManager
 import org.akvo.flow.util.ConstantUtil
 import javax.inject.Inject
+
 
 class RecordActivity : BackActivity(), FormListListener, ResponseListListener, RecordView,
     ConfirmFormInstanceDialogListener {
@@ -72,6 +74,9 @@ class RecordActivity : BackActivity(), FormListListener, ResponseListListener, R
             resources.getStringArray(R.array.record_tabs)
         )
         viewPager.adapter = recordTabsAdapter
+        val tabLayout = findViewById<View>(R.id.tabs) as TabLayout
+        tabLayout.setupWithViewPager(viewPager)
+
         surveyGroup = intent.getSerializableExtra(ConstantUtil.SURVEY_GROUP_EXTRA) as SurveyGroup
         rootLayout = findViewById(R.id.record_root_layout)
         trackingHelper = TrackingHelper(this)

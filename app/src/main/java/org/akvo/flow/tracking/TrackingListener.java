@@ -21,8 +21,6 @@ package org.akvo.flow.tracking;
 
 public interface TrackingListener {
 
-    void logStatsEvent(int selectedTab);
-
     void logSortEvent();
 
     void logDownloadEvent(int selectedTab);

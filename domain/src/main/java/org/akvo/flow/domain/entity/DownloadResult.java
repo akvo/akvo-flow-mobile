@@ -41,6 +41,7 @@ public class DownloadResult {
     public enum ResultCode {
         SUCCESS,
         ERROR_NO_NETWORK,
-        ERROR_ASSIGNMENT_MISSING
+        ERROR_ASSIGNMENT_MISSING,
+        ERROR_OTHER
     }
 }

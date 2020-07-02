@@ -107,9 +107,9 @@ public class DatabaseDataSource {
         return Single.just(briteSurveyDbAdapter.getDataPoint(dataPointId));
     }
 
-    public Single<Integer> syncDataPoints(List<ApiDataPoint> apiDataPoints) {
+    public Integer syncDataPoints(List<ApiDataPoint> apiDataPoints) {
         if (apiDataPoints == null) {
-            return Single.just(0);
+            return 0;
         }
         BriteDatabase.Transaction transaction = briteSurveyDbAdapter.beginTransaction();
         int newDataPoints = 0;
@@ -135,7 +135,7 @@ public class DatabaseDataSource {
         } finally {
             transaction.end();
         }
-        return Single.just(newDataPoints);
+        return newDataPoints;
     }
 
     private boolean isRequestFiltered(@Nullable Integer orderBy) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2019 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2020 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -17,34 +17,21 @@
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
+package org.akvo.flow.presentation.datapoints.map
 
-package org.akvo.flow.presentation.datapoints.map;
-
-import com.mapbox.geojson.FeatureCollection;
+import com.mapbox.geojson.FeatureCollection
 
 interface DataPointsMapView {
-
-    void showProgress();
-
-    void hideProgress();
-
-    void displayDataPoints(FeatureCollection dataPoints);
-
-    void showDownloadedResults(int numberOfNewItems);
-
-    void showErrorAssignmentMissing();
-
-    void showErrorNoNetwork();
-
-    void showErrorSync();
-
-    void showNoDataPointsToDownload();
-
-    void hideMenu();
-
-    void showMonitoredMenu();
-
-    void showNonMonitoredMenu();
-
-    void showFab();
+    fun showProgress()
+    fun hideProgress()
+    fun displayDataPoints(dataPoints: FeatureCollection?)
+    fun showDownloadedResults(numberOfNewItems: Int)
+    fun showErrorAssignmentMissing()
+    fun showErrorNoNetwork()
+    fun showErrorSync()
+    fun showNoDataPointsToDownload()
+    fun hideMenu()
+    fun showMonitoredMenu()
+    fun showNonMonitoredMenu()
+    fun showFab()
 }

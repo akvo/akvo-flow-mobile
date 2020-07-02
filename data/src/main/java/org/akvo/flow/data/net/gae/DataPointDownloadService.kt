@@ -17,23 +17,25 @@
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
+package org.akvo.flow.data.net.gae
 
-package org.akvo.flow.data.net.gae;
+import io.reactivex.Single
+import org.akvo.flow.data.entity.ApiLocaleResult
+import org.akvo.flow.data.util.ApiUrls
+import retrofit2.http.GET
+import retrofit2.http.Query
 
-import org.akvo.flow.data.entity.ApiLocaleResult;
+interface DataPointDownloadService {
+    @GET(ApiUrls.DATA_POINTS)
+    fun getAssignedDataPoints(
+        @Query(ApiUrls.ANDROID_ID) androidId: String?,
+        @Query(ApiUrls.SURVEY_ID) surveyId: String?,
+        @Query(ApiUrls.LAST_UPDATED) lastUpdated: String?
+    ): Single<ApiLocaleResult?>?
 
-import io.reactivex.Single;
-import retrofit2.http.GET;
-import retrofit2.http.Query;
-
-import static org.akvo.flow.data.util.ApiUrls.ANDROID_ID;
-import static org.akvo.flow.data.util.ApiUrls.DATA_POINTS;
-import static org.akvo.flow.data.util.ApiUrls.LAST_UPDATED;
-import static org.akvo.flow.data.util.ApiUrls.SURVEY_ID;
-
-public interface DataPointDownloadService {
-
-    @GET(DATA_POINTS)
-    Single<ApiLocaleResult> getAssignedDataPoints(@Query(ANDROID_ID) String androidId,
-            @Query(SURVEY_ID) String surveyId, @Query(LAST_UPDATED) String lastUpdated);
+    @GET(ApiUrls.DATA_POINTS)
+    suspend fun getAssignedDataPoints(
+        @Query(ApiUrls.ANDROID_ID) androidId: String,
+        @Query(ApiUrls.SURVEY_ID) surveyId: String
+    ): ApiLocaleResult
 }

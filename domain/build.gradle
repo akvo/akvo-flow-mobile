@@ -68,14 +68,16 @@ dependencies {
     implementation "androidx.appcompat:appcompat:${rootProject.ext.appCompatVersion}"
     implementation "com.jakewharton.timber:timber:${rootProject.ext.timberVersion}"
     implementation "com.google.code.gson:gson:${rootProject.ext.gsonVersion}"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+    implementation "androidx.core:core-ktx:${rootProject.ext.coreKtxVersion}"
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.6'
+
     testImplementation "junit:junit:${rootProject.ext.jUnitVersion}"
     testImplementation "org.mockito:mockito-core:${rootProject.ext.mockitoCoreVersion}"
     testImplementation "org.powermock:powermock-module-junit4:${rootProject.ext.powerMockVersion}"
     testImplementation "org.powermock:powermock-module-junit4-rule:${rootProject.ext.powerMockVersion}"
     testImplementation "org.powermock:powermock-api-mockito:${rootProject.ext.powerMockVersion}"
     testImplementation "org.powermock:powermock-classloading-xstream:${rootProject.ext.powerMockVersion}"
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
-    implementation "androidx.core:core-ktx:${rootProject.ext.coreKtxVersion}"
 }
 repositories {
     mavenCentral()

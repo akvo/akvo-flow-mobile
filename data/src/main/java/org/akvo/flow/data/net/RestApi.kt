@@ -21,7 +21,6 @@ package org.akvo.flow.data.net
 
 import android.text.TextUtils
 import io.reactivex.Observable
-import io.reactivex.Single
 import org.akvo.flow.data.entity.ApiApkData
 import org.akvo.flow.data.entity.ApiFilesResult
 import org.akvo.flow.data.entity.ApiLocaleResult
@@ -40,16 +39,13 @@ class RestApi(
     private val version: String,
     private val baseUrl: String
 ) {
-    fun downloadDataPoints(surveyId: Long, timestamp: String = "0"): Single<ApiLocaleResult> {
+    suspend fun downloadDataPoints(surveyId: Long, timestamp: String = "0"): ApiLocaleResult {
         val lastUpdated = if (!TextUtils.isEmpty(timestamp)) timestamp else "0"
         return serviceFactory.createRetrofitServiceWithInterceptor(
             DataPointDownloadService::class.java,
             baseUrl
         )
-            .getAssignedDataPoints(deviceHelper.androidId, surveyId.toString() + "", lastUpdated)
-            .doOnError { t ->
-                Timber.e(Exception(t), "Error downloading datapoints for survey: $surveyId")
-            }
+            .getAssignedDataPoints(deviceHelper.androidId, surveyId.toString() + "")
     }
 
     fun getPendingFiles(formIds: List<String?>?, deviceId: String?): Observable<ApiFilesResult> {

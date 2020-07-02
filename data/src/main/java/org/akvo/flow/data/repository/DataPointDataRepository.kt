@@ -19,8 +19,6 @@
 package org.akvo.flow.data.repository
 
 import io.reactivex.Completable
-import io.reactivex.Observable
-import io.reactivex.Single
 import org.akvo.flow.data.datasource.DataSourceFactory
 import org.akvo.flow.data.entity.ApiDataPoint
 import org.akvo.flow.data.entity.ApiLocaleResult
@@ -28,10 +26,7 @@ import org.akvo.flow.data.entity.images.DataPointImageMapper
 import org.akvo.flow.data.net.RestApi
 import org.akvo.flow.data.net.s3.S3RestApi
 import org.akvo.flow.data.util.MediaHelper
-import org.akvo.flow.domain.exception.AssignmentRequiredException
 import org.akvo.flow.domain.repository.DataPointRepository
-import retrofit2.HttpException
-import java.net.HttpURLConnection
 import javax.inject.Inject
 
 class DataPointDataRepository @Inject constructor(
@@ -42,15 +37,8 @@ class DataPointDataRepository @Inject constructor(
     private val mediaHelper: MediaHelper
 ) : DataPointRepository {
 
-    override fun downloadDataPoints(surveyGroupId: Long): Single<Int> {
-        return syncDataPoints(surveyGroupId)
-            .onErrorResumeNext(fun(throwable: Throwable): Single<Int> {
-                return if (isErrorForbidden(throwable)) {
-                    Single.error(AssignmentRequiredException("Dashboard Assignment missing"))
-                } else {
-                    Single.error(throwable)
-                }
-            })
+    override suspend fun downloadDataPoints(surveyGroupId: Long): Int {
+        return syncDataPoints(restApi.downloadDataPoints(surveyGroupId))
     }
 
     override fun cleanPathAndDownLoadMedia(filePath: String): Completable {
@@ -61,29 +49,24 @@ class DataPointDataRepository @Inject constructor(
         return dataSourceFactory.dataBaseDataSource.markDataPointAsViewed(dataPointId)
     }
 
-    private fun isErrorForbidden(throwable: Throwable): Boolean {
-        return (throwable is HttpException
-            && throwable.code() == HttpURLConnection.HTTP_FORBIDDEN)
+    private suspend fun syncDataPoints(apiLocaleResult: ApiLocaleResult): Int {
+        //TODO: download all images a posteriori
+        val syncDataPoints =
+            dataSourceFactory.dataBaseDataSource.syncDataPoints(apiLocaleResult.dataPoints)
+        downLoadImages(apiLocaleResult.dataPoints)
+        return syncDataPoints
     }
 
-    private fun syncDataPoints(surveyGroupId: Long): Single<Int> {
-        return restApi.downloadDataPoints(surveyGroupId)
-            .flatMap { apiLocaleResult -> syncDataPoints(apiLocaleResult) }
-    }
 
-    private fun syncDataPoints(apiLocaleResult: ApiLocaleResult): Single<Int> {
-        return dataSourceFactory.dataBaseDataSource
-            .syncDataPoints(apiLocaleResult.dataPoints)
-            .flatMap { newDownloadedDataPointsNumber ->
-                downLoadImages(apiLocaleResult.dataPoints)
-                    .andThen(Single.just(newDownloadedDataPointsNumber))
-            }
-    }
-
-    private fun downLoadImages(dataPoints: List<ApiDataPoint>): Completable {
-        val images: List<String> = mapper.getImagesList(dataPoints)
+    private suspend fun downLoadImages(dataPoints: List<ApiDataPoint>) {
+       mapper.getImagesList(dataPoints)
             .filter { image -> !dataSourceFactory.fileDataSource.fileExists(image) }
-        return Observable.fromIterable(images).flatMapCompletable { image -> downLoadMedia(image) }
+            .map { image -> downLoadImage(image) }
+    }
+
+    private suspend fun downLoadImage(filename: String) {
+        val responseBody = s3RestApi.downloadImage(filename)
+        dataSourceFactory.fileDataSource.saveRemoteMediaFile(filename, responseBody)
     }
 
     private fun downLoadMedia(filename: String): Completable {

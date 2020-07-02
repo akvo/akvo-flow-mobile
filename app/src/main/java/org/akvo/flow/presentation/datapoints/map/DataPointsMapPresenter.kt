@@ -21,6 +21,8 @@ package org.akvo.flow.presentation.datapoints.map
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.launch
 import org.akvo.flow.domain.SurveyGroup
 import org.akvo.flow.domain.entity.DataPoint
@@ -47,7 +49,8 @@ class DataPointsMapPresenter @Inject internal constructor(
 ) : Presenter {
     private var view: DataPointsMapView? = null
     private var surveyGroup: SurveyGroup? = null
-    private val uiScope = CoroutineScope(Dispatchers.Main)
+    private var job = SupervisorJob()
+    private val uiScope = CoroutineScope(Dispatchers.Main + job)
 
     fun setView(view: DataPointsMapView) {
         this.view = view
@@ -90,14 +93,14 @@ class DataPointsMapPresenter @Inject internal constructor(
 
     override fun destroy() {
         getSavedDataPoints.dispose()
-        downloadDataPoints.dispose()
         checkDeviceNotification.dispose()
         upload.dispose()
+        uiScope.coroutineContext.cancelChildren()
     }
 
     fun onNewSurveySelected(surveyGroup: SurveyGroup?) {
         getSavedDataPoints.dispose()
-        downloadDataPoints.dispose()
+        uiScope.coroutineContext.cancelChildren()
         view!!.hideProgress()
         onSurveyGroupReady(surveyGroup)
         loadDataPoints()

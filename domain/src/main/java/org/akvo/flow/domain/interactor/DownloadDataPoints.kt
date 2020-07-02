@@ -19,7 +19,6 @@
  */
 package org.akvo.flow.domain.interactor
 
-import io.reactivex.disposables.CompositeDisposable
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.akvo.flow.domain.entity.DownloadResult
@@ -31,8 +30,6 @@ class DownloadDataPoints @Inject constructor(
     private val dataPointRepository: DataPointRepository,
     private val connectivityStateManager: ConnectivityStateManager
 ) {
-    private val disposables: CompositeDisposable = CompositeDisposable()
-
     suspend fun execute(parameters: Map<String, Any>): DownloadResult {
         if (parameters[KEY_SURVEY_ID] == null) {
             return DownloadResult(
@@ -47,12 +44,6 @@ class DownloadDataPoints @Inject constructor(
             )
         } else {
             syncDataPoints(parameters)
-        }
-    }
-
-    fun dispose() {
-        if (!disposables.isDisposed) {
-            disposables.clear()
         }
     }
 

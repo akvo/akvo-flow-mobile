@@ -155,7 +155,7 @@ class DataPointsListFragment : Fragment(), LocationListener, AdapterView.OnItemC
         progressBar = view.findViewById(R.id.progress)
         updateProgressDrawable()
 
-        presenter.view = this
+        presenter.setView(this)
         presenter.onDataReady(surveyGroup)
     }
 

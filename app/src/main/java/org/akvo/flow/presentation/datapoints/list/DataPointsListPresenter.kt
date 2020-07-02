@@ -21,6 +21,8 @@ package org.akvo.flow.presentation.datapoints.list
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.launch
 import org.akvo.flow.domain.SurveyGroup
 import org.akvo.flow.domain.entity.DataPoint
@@ -45,13 +47,17 @@ class DataPointsListPresenter @Inject internal constructor(
     @param:Named("uploadSync") private val upload: UseCase
 ) : Presenter {
 
-    var view: DataPointsListView? = null
-
+    private var view: DataPointsListView? = null
     private var surveyGroup: SurveyGroup? = null
     private var orderBy = ConstantUtil.ORDER_BY_DATE
     private var latitude: Double? = null
     private var longitude: Double? = null
-    private val uiScope = CoroutineScope(Dispatchers.Main)
+    private var job = SupervisorJob()
+    private val uiScope = CoroutineScope(Dispatchers.Main + job)
+
+    fun setView(view: DataPointsListView) {
+        this.view = view
+    }
 
     fun onDataReady(surveyGroup: SurveyGroup?) {
         this.surveyGroup = surveyGroup
@@ -135,9 +141,9 @@ class DataPointsListPresenter @Inject internal constructor(
 
     override fun destroy() {
         getSavedDataPoints.dispose()
-        downloadDataPoints.dispose()
         checkDeviceNotification.dispose()
         upload.dispose()
+        uiScope.coroutineContext.cancelChildren()
     }
 
     fun onDownloadPressed() {
@@ -187,7 +193,7 @@ class DataPointsListPresenter @Inject internal constructor(
 
     fun onNewSurveySelected(surveyGroup: SurveyGroup?) {
         getSavedDataPoints.dispose()
-        downloadDataPoints.dispose()
+        uiScope.coroutineContext.cancelChildren()
         view!!.hideLoading()
         onDataReady(surveyGroup)
         loadDataPoints(latitude, longitude)

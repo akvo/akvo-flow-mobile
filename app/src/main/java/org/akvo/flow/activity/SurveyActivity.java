@@ -203,10 +203,7 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
                 @Override
                 public void onPageSelected(int position) {
                     if (position == TabsAdapter.POSITION_MAP && mSurveyGroup != null) {
-                        DataPointsMapFragment mapFragment = mTabsAdapter.getMapFragment();
-                        if (mapFragment != null) {
-                            mapFragment.showFab();
-                        }
+                        displayMapFab();
                     }
                 }
 
@@ -231,10 +228,14 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
             addDataPointFab.hide();
         }
         if (mSurveyGroup != null) {
-            DataPointsMapFragment mapFragment = mTabsAdapter.getMapFragment();
-            if (mapFragment != null) {
-                mapFragment.hideFab();
-            }
+            hideMapsFab();
+        }
+    }
+
+    private void hideMapsFab() {
+        DataPointsMapFragment mapFragment = mTabsAdapter.getMapFragment();
+        if (mapFragment != null) {
+            mapFragment.hideFab();
         }
     }
 
@@ -245,10 +246,14 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
         }
 
         if (mPager.getCurrentItem() == TabsAdapter.POSITION_MAP && mSurveyGroup != null) {
-            DataPointsMapFragment mapFragment = mTabsAdapter.getMapFragment();
-            if (mapFragment != null) {
-                mapFragment.showFab();
-            }
+            displayMapFab();
+        }
+    }
+
+    private void displayMapFab() {
+        DataPointsMapFragment mapFragment = mTabsAdapter.getMapFragment();
+        if (mapFragment != null) {
+            mapFragment.showFab();
         }
     }
 
@@ -339,7 +344,6 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     @Override
     public void onResume() {
         super.onResume();
-        mDatabase.deleteEmptyRecords(); //TODO: this should be removed
         if (isFinishing()) {
             return;
         }
@@ -485,7 +489,7 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
 
         selectedSurveyId = mSurveyGroup != null ? mSurveyGroup.getId() : SurveyGroup.ID_NONE;
 
-       refresh(mSurveyGroup);
+        refresh(mSurveyGroup);
 
         mDrawerLayout.closeDrawers();
         invalidateOptionsMenu();

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.appbar.AppBarLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:theme="@style/FlowAppTheme.AppBarOverlay">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+        app:popupTheme="@style/FlowAppTheme.PopupOverlay" />
+
+    <org.akvo.flow.ui.view.AdaptableTabLayout
+        android:id="@+id/tabs"
+        android:layout_gravity="top"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorPrimary"
+        app:tabIndicatorColor="@color/tabIndicatorColor"
+        app:tabIndicatorHeight="4dp"
+        app:tabTextColor="@color/white"
+        app:tabTextAppearance="@style/TextAppearance.Tabs"
+        app:tabSelectedTextColor="@color/white"
+        app:tabMode="scrollable"
+        tools:showIn="@layout/form_activity"/>
+
+</com.google.android.material.appbar.AppBarLayout>

@@ -203,7 +203,7 @@ class DataPointsListPresenter @Inject internal constructor(
         if (surveyGroup != null) {
             view?.showLoading()
             val params: MutableMap<String, Any> = HashMap(2)
-            params[Constants.KEY_SURVEY_ID] = surveyGroup!!.id.toString() + ""
+            params[Constants.KEY_SURVEY_ID] = surveyGroup!!.id.toString()
             checkDeviceNotification.execute<Set<String>>(object :
                 DefaultObserver<Set<String>>() {
                 override fun onError(e: Throwable) {

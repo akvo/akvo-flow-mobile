@@ -19,20 +19,12 @@
  */
 package org.akvo.flow.data.net.gae
 
-import io.reactivex.Single
 import org.akvo.flow.data.entity.ApiLocaleResult
 import org.akvo.flow.data.util.ApiUrls
 import retrofit2.http.GET
 import retrofit2.http.Query
 
 interface DataPointDownloadService {
-    @GET(ApiUrls.DATA_POINTS)
-    fun getAssignedDataPoints(
-        @Query(ApiUrls.ANDROID_ID) androidId: String?,
-        @Query(ApiUrls.SURVEY_ID) surveyId: String?,
-        @Query(ApiUrls.LAST_UPDATED) lastUpdated: String?
-    ): Single<ApiLocaleResult?>?
-
     @GET(ApiUrls.DATA_POINTS)
     suspend fun getAssignedDataPoints(
         @Query(ApiUrls.ANDROID_ID) androidId: String,

@@ -176,11 +176,6 @@ class DataPointsListFragment : Fragment(), LocationListener, AdapterView.OnItemC
         viewComponent.inject(this)
     }
 
-    /**
-     * Get the Main Application component for dependency injection.
-     *
-     * @return [ApplicationComponent]
-     */
     private val applicationComponent: ApplicationComponent
         get() = (activity!!.application as FlowApp).getApplicationComponent()
 
@@ -432,7 +427,6 @@ class DataPointsListFragment : Fragment(), LocationListener, AdapterView.OnItemC
         dataPointSyncSnackBarManager.showNoDataPointsToDownload(view)
     }
 
-    //TODO: once we insert data using brite database this will no longer be necessary either
     class DataSyncBroadcastReceiver(fragment: DataPointsListFragment) :
         BroadcastReceiver() {
 
@@ -446,6 +440,7 @@ class DataPointsListFragment : Fragment(), LocationListener, AdapterView.OnItemC
 
     companion object {
         private const val LIST_TAB = 0
+
         @JvmStatic
         fun newInstance(surveyGroup: SurveyGroup?): DataPointsListFragment {
             val fragment = DataPointsListFragment()

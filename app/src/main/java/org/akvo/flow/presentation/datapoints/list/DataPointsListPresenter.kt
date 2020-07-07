@@ -62,12 +62,12 @@ class DataPointsListPresenter @Inject internal constructor(
     fun onDataReady(surveyGroup: SurveyGroup?) {
         this.surveyGroup = surveyGroup
         if (surveyGroup == null) {
-            view!!.hideMenu()
+            view?.hideMenu()
         } else {
             if (surveyGroup.isMonitored) {
-                view!!.showMonitoredMenu()
+                view?.showMonitoredMenu()
             } else {
-                view!!.showNonMonitoredMenu()
+                view?.showNonMonitoredMenu()
             }
         }
     }
@@ -86,16 +86,16 @@ class DataPointsListPresenter @Inject internal constructor(
                 object : DefaultObserver<List<DataPoint>>() {
                     override fun onError(e: Throwable) {
                         Timber.e(e, "Error loading saved datapoints")
-                        view!!.displayData(emptyList())
-                        view!!.showNoDataPoints(surveyGroup!!.isMonitored)
+                        view?.displayData(emptyList())
+                        view?.showNoDataPoints(surveyGroup!!.isMonitored)
                     }
 
                     override fun onNext(dataPoints: List<DataPoint>) {
                         val mapDataPoints =
                             mapper.transform(dataPoints, latitude, longitude)
-                        view!!.displayData(mapDataPoints)
+                        view?.displayData(mapDataPoints)
                         if (mapDataPoints.isEmpty()) {
-                            view!!.showNoDataPoints(surveyGroup!!.isMonitored)
+                            view?.showNoDataPoints(surveyGroup!!.isMonitored)
                         }
                     }
                 },
@@ -120,15 +120,15 @@ class DataPointsListPresenter @Inject internal constructor(
                     DefaultObserver<List<DataPoint>>() {
                     override fun onError(e: Throwable) {
                         Timber.e(e, "Error loading saved datapoints")
-                        view!!.displayData(emptyList())
-                        view!!.displayNoSearchResultsFound()
+                        view?.displayData(emptyList())
+                        view?.displayNoSearchResultsFound()
                     }
 
                     override fun onNext(dataPoints: List<DataPoint>) {
                         val listDataPoints = mapper.transform(dataPoints, latitude, longitude)
-                        view!!.displayData(listDataPoints)
+                        view?.displayData(listDataPoints)
                         if (listDataPoints.isEmpty()) {
-                            view!!.displayNoSearchResultsFound()
+                            view?.displayNoSearchResultsFound()
                         }
                     }
                 },
@@ -148,23 +148,23 @@ class DataPointsListPresenter @Inject internal constructor(
 
     fun onDownloadPressed() {
         if (surveyGroup != null) {
-            view!!.showLoading()
+            view?.showLoading()
             uiScope.launch {
                 val params: MutableMap<String, Any> = HashMap(2)
                 params[DownloadDataPoints.KEY_SURVEY_ID] = surveyGroup!!.id
                 val result: DownloadResult = downloadDataPoints.execute(params)
-                view!!.hideLoading()
+                view?.hideLoading()
                 if (result.resultCode == DownloadResult.ResultCode.SUCCESS) {
                     if (result.numberOfNewItems > 0) {
-                        view!!.showDownloadedResults(result.numberOfNewItems)
+                        view?.showDownloadedResults(result.numberOfNewItems)
                     } else {
-                        view!!.showNoDataPointsToSync()
+                        view?.showNoDataPointsToSync()
                     }
                 } else {
                     when (result.resultCode) {
-                        DownloadResult.ResultCode.ERROR_NO_NETWORK -> view!!.showErrorNoNetwork()
-                        DownloadResult.ResultCode.ERROR_ASSIGNMENT_MISSING -> view!!.showErrorAssignmentMissing()
-                        else -> view!!.showErrorSync()
+                        DownloadResult.ResultCode.ERROR_NO_NETWORK -> view?.showErrorNoNetwork()
+                        DownloadResult.ResultCode.ERROR_ASSIGNMENT_MISSING -> view?.showErrorAssignmentMissing()
+                        else -> view?.showErrorSync()
                     }
                 }
             }
@@ -176,7 +176,7 @@ class DataPointsListPresenter @Inject internal constructor(
             when {
                 order == ConstantUtil.ORDER_BY_DISTANCE && (latitude == null || longitude == null) -> {
                     // Warn user that the location is unknown
-                    view!!.showErrorMissingLocation()
+                    view?.showErrorMissingLocation()
                     return
                 }
                 else -> {
@@ -188,20 +188,20 @@ class DataPointsListPresenter @Inject internal constructor(
     }
 
     fun onOrderByClicked() {
-        view!!.showOrderByDialog(orderBy)
+        view?.showOrderByDialog(orderBy)
     }
 
     fun onNewSurveySelected(surveyGroup: SurveyGroup?) {
         getSavedDataPoints.dispose()
         uiScope.coroutineContext.cancelChildren()
-        view!!.hideLoading()
+        view?.hideLoading()
         onDataReady(surveyGroup)
         loadDataPoints(latitude, longitude)
     }
 
     fun onUploadPressed() {
         if (surveyGroup != null) {
-            view!!.showLoading()
+            view?.showLoading()
             val params: MutableMap<String, Any> = HashMap(2)
             params[Constants.KEY_SURVEY_ID] = surveyGroup!!.id.toString() + ""
             checkDeviceNotification.execute<Set<String>>(object :
@@ -222,18 +222,18 @@ class DataPointsListPresenter @Inject internal constructor(
         upload.execute<Set<String>>(object :
             DefaultObserver<Set<String>>() {
             override fun onError(e: Throwable) {
-                view!!.hideLoading()
+                view?.hideLoading()
                 Timber.e(e)
             }
 
             override fun onComplete() {
-                view!!.hideLoading()
+                view?.hideLoading()
             }
         }, params)
     }
 
     private fun noSurveySelected() {
-        view!!.displayData(emptyList())
-        view!!.showNoSurveySelected()
+        view?.displayData(emptyList())
+        view?.showNoSurveySelected()
     }
 }

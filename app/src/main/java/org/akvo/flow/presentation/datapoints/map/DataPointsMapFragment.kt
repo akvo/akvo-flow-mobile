@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2019 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2020 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -87,10 +87,7 @@ class DataPointsMapFragment : Fragment(), DataPointsMapView, MapReadyCallback {
         return view
     }
 
-    override fun onViewCreated(
-        view: View,
-        savedInstanceState: Bundle?
-    ) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         mapView = view.findViewById(R.id.mapView)
         mapView.onCreate(savedInstanceState)
@@ -113,11 +110,6 @@ class DataPointsMapFragment : Fragment(), DataPointsMapView, MapReadyCallback {
         viewComponent.inject(this)
     }
 
-    /**
-     * Get the Main Application component for dependency injection.
-     *
-     * @return [ApplicationComponent]
-     */
     private val applicationComponent: ApplicationComponent
         get() = (activity!!.application as FlowApp).getApplicationComponent()
 
@@ -175,10 +167,7 @@ class DataPointsMapFragment : Fragment(), DataPointsMapView, MapReadyCallback {
         presenter.onNewSurveySelected(surveyGroup)
     }
 
-    override fun onCreateOptionsMenu(
-        menu: Menu,
-        inflater: MenuInflater
-    ) {
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         if (menuRes != null) {
             inflater.inflate(menuRes!!, menu)
         }
@@ -275,6 +264,7 @@ class DataPointsMapFragment : Fragment(), DataPointsMapView, MapReadyCallback {
 
     companion object {
         private const val MAP_TAB = 1
+
         @JvmStatic
         fun newInstance(surveyGroup: SurveyGroup?): DataPointsMapFragment {
             val fragment = DataPointsMapFragment()

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2019 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2020 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -59,14 +59,14 @@ class DataPointsMapPresenter @Inject internal constructor(
     fun onSurveyGroupReady(surveyGroup: SurveyGroup?) {
         this.surveyGroup = surveyGroup
         if (surveyGroup == null) {
-            view!!.hideMenu()
+            view?.hideMenu()
         } else {
             if (surveyGroup.isMonitored) {
-                view!!.showMonitoredMenu()
+                view?.showMonitoredMenu()
             } else {
-                view!!.showNonMonitoredMenu()
+                view?.showNonMonitoredMenu()
             }
-            view!!.showFab()
+            view?.showFab()
         }
     }
 
@@ -79,11 +79,11 @@ class DataPointsMapPresenter @Inject internal constructor(
                 object : DefaultObserver<List<DataPoint>>() {
                     override fun onError(e: Throwable) {
                         Timber.e(e, "Error loading saved datapoints")
-                        view!!.displayDataPoints(featureMapper.getFeatureCollection(ArrayList()))
+                        view?.displayDataPoints(featureMapper.getFeatureCollection(ArrayList()))
                     }
 
                     override fun onNext(dataPoints: List<DataPoint>) {
-                        view!!.displayDataPoints(featureMapper.getFeatureCollection(dataPoints))
+                        view?.displayDataPoints(featureMapper.getFeatureCollection(dataPoints))
                     }
                 },
                 params
@@ -101,30 +101,30 @@ class DataPointsMapPresenter @Inject internal constructor(
     fun onNewSurveySelected(surveyGroup: SurveyGroup?) {
         getSavedDataPoints.dispose()
         uiScope.coroutineContext.cancelChildren()
-        view!!.hideProgress()
+        view?.hideProgress()
         onSurveyGroupReady(surveyGroup)
         loadDataPoints()
     }
 
     fun onSyncRecordsPressed() {
         surveyGroup?.let { surveyGroup ->
-            view!!.showProgress()
+            view?.showProgress()
             uiScope.launch {
                 val params: MutableMap<String, Any> = HashMap(2)
                 params[DownloadDataPoints.KEY_SURVEY_ID] = surveyGroup.id
                 val result: DownloadResult = downloadDataPoints.execute(params)
-                view!!.hideProgress()
+                view?.hideProgress()
                 if (result.resultCode == ResultCode.SUCCESS) {
                     if (result.numberOfNewItems > 0) {
-                        view!!.showDownloadedResults(result.numberOfNewItems)
+                        view?.showDownloadedResults(result.numberOfNewItems)
                     } else {
-                        view!!.showNoDataPointsToDownload()
+                        view?.showNoDataPointsToDownload()
                     }
                 } else {
                     when (result.resultCode) {
-                        ResultCode.ERROR_NO_NETWORK -> view!!.showErrorNoNetwork()
-                        ResultCode.ERROR_ASSIGNMENT_MISSING -> view!!.showErrorAssignmentMissing()
-                        else -> view!!.showErrorSync()
+                        ResultCode.ERROR_NO_NETWORK -> view?.showErrorNoNetwork()
+                        ResultCode.ERROR_ASSIGNMENT_MISSING -> view?.showErrorAssignmentMissing()
+                        else -> view?.showErrorSync()
                     }
                 }
             }
@@ -133,7 +133,7 @@ class DataPointsMapPresenter @Inject internal constructor(
 
     fun onUploadPressed() {
         if (surveyGroup != null) {
-            view!!.showProgress()
+            view?.showProgress()
             val params: MutableMap<String, Any> = HashMap(2)
             params[Constants.KEY_SURVEY_ID] = surveyGroup!!.id.toString() + ""
             checkDeviceNotification.execute<Set<String>>(object : DefaultObserver<Set<String>>() {
@@ -152,12 +152,12 @@ class DataPointsMapPresenter @Inject internal constructor(
     private fun uploadDataPoints(params: Map<String, Any>) {
         upload.execute<Set<String>>(object : DefaultObserver<Set<String>>() {
             override fun onError(e: Throwable) {
-                view!!.hideProgress()
+                view?.hideProgress()
                 Timber.e(e)
             }
 
             override fun onComplete() {
-                view!!.hideProgress()
+                view?.hideProgress()
             }
         }, params)
     }

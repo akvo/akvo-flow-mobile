@@ -26,7 +26,10 @@ import org.akvo.flow.data.entity.images.DataPointImageMapper
 import org.akvo.flow.data.net.RestApi
 import org.akvo.flow.data.net.s3.S3RestApi
 import org.akvo.flow.data.util.MediaHelper
+import org.akvo.flow.domain.exception.AssignmentRequiredException
 import org.akvo.flow.domain.repository.DataPointRepository
+import retrofit2.HttpException
+import java.net.HttpURLConnection
 import javax.inject.Inject
 
 class DataPointDataRepository @Inject constructor(
@@ -38,11 +41,19 @@ class DataPointDataRepository @Inject constructor(
 ) : DataPointRepository {
 
     override suspend fun downloadDataPoints(surveyGroupId: Long): Int {
-        return syncDataPoints(restApi.downloadDataPoints(surveyGroupId))
+        try {
+            return syncDataPoints(restApi.downloadDataPoints(surveyGroupId))
+        } catch (e: HttpException) {
+            if ((e.code() == HttpURLConnection.HTTP_FORBIDDEN)) {
+                throw AssignmentRequiredException("Dashboard Assignment missing")
+            } else {
+                throw e
+            }
+        }
     }
 
-    override fun cleanPathAndDownLoadMedia(filePath: String): Completable {
-        return downLoadMedia(mediaHelper.cleanMediaFileName(filePath))
+    override fun cleanPathAndDownLoadMedia(filename: String): Completable {
+        return downLoadMedia(mediaHelper.cleanMediaFileName(filename))
     }
 
     override fun markDataPointAsViewed(dataPointId: String): Completable {
@@ -61,12 +72,11 @@ class DataPointDataRepository @Inject constructor(
     private suspend fun downLoadImages(dataPoints: List<ApiDataPoint>) {
        mapper.getImagesList(dataPoints)
             .filter { image -> !dataSourceFactory.fileDataSource.fileExists(image) }
-            .map { image -> downLoadImage(image) }
-    }
-
-    private suspend fun downLoadImage(filename: String) {
-        val responseBody = s3RestApi.downloadImage(filename)
-        dataSourceFactory.fileDataSource.saveRemoteMediaFile(filename, responseBody)
+            .map { image ->
+                val responseBody = s3RestApi.downloadImage(image)
+                dataSourceFactory.fileDataSource.saveRemoteMediaFile(image, responseBody)
+                Unit
+            }
     }
 
     private fun downLoadMedia(filename: String): Completable {

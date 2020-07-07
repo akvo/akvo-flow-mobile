@@ -19,7 +19,6 @@
  */
 package org.akvo.flow.data.net
 
-import android.text.TextUtils
 import io.reactivex.Observable
 import org.akvo.flow.data.entity.ApiApkData
 import org.akvo.flow.data.entity.ApiFilesResult
@@ -39,8 +38,7 @@ class RestApi(
     private val version: String,
     private val baseUrl: String
 ) {
-    suspend fun downloadDataPoints(surveyId: Long, timestamp: String = "0"): ApiLocaleResult {
-        val lastUpdated = if (!TextUtils.isEmpty(timestamp)) timestamp else "0"
+    suspend fun downloadDataPoints(surveyId: Long): ApiLocaleResult {
         return serviceFactory.createRetrofitServiceWithInterceptor(
             DataPointDownloadService::class.java,
             baseUrl

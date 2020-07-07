@@ -194,11 +194,10 @@ class DataPointsListFragment : Fragment(), LocationListener, AdapterView.OnItemC
     private fun updateLocation() {
         val criteria = Criteria()
         criteria.accuracy = Criteria.ACCURACY_FINE
-        val provider = mLocationManager!!.getBestProvider(criteria, true)
+        val provider = mLocationManager?.getBestProvider(criteria, true)
         try {
             if (provider != null) {
-                val loc =
-                    mLocationManager!!.getLastKnownLocation(provider)
+                val loc = mLocationManager!!.getLastKnownLocation(provider)
                 if (loc != null) {
                     mLatitude = loc.latitude
                     mLongitude = loc.longitude
@@ -213,12 +212,12 @@ class DataPointsListFragment : Fragment(), LocationListener, AdapterView.OnItemC
     override fun onPause() {
         super.onPause()
         LocalBroadcastManager.getInstance(activity!!).unregisterReceiver(dataSyncReceiver)
-        mLocationManager!!.removeUpdates(weakLocationListener)
+        mLocationManager?.removeUpdates(weakLocationListener)
     }
 
     override fun onStop() {
         super.onStop()
-        mLocationManager!!.removeUpdates(weakLocationListener)
+        mLocationManager?.removeUpdates(weakLocationListener)
     }
 
     override fun onDetach() {
@@ -270,8 +269,8 @@ class DataPointsListFragment : Fragment(), LocationListener, AdapterView.OnItemC
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        if (menuRes != null) {
-            inflater.inflate(menuRes!!, menu)
+        menuRes?.let { menuRes ->
+            inflater.inflate(menuRes, menu)
             setUpSearchView(menu)
         }
         super.onCreateOptionsMenu(menu, inflater)
@@ -280,31 +279,31 @@ class DataPointsListFragment : Fragment(), LocationListener, AdapterView.OnItemC
     private fun setUpSearchView(menu: Menu) {
         val searchMenuItem = menu.findItem(R.id.search)
         searchView = searchMenuItem.actionView as SearchView
-        searchView!!.setIconifiedByDefault(true)
-        searchView!!.queryHint = getString(R.string.search_hint)
-        searchView!!.setOnQueryTextListener(object :
-            SearchView.OnQueryTextListener {
-            override fun onQueryTextSubmit(query: String): Boolean {
-                // Empty
-                return false
-            }
-
-            override fun onQueryTextChange(newText: String): Boolean {
-                if (!TextUtils.isEmpty(newText)) {
-                    presenter.getFilteredDataPoints(newText)
-                } else {
-                    presenter.loadDataPoints(mLatitude, mLongitude)
+        searchView?.let { searchView ->
+            searchView.setIconifiedByDefault(true)
+            searchView.queryHint = getString(R.string.search_hint)
+            searchView.setOnQueryTextListener(object :
+                SearchView.OnQueryTextListener {
+                override fun onQueryTextSubmit(query: String): Boolean {
+                    // Empty
+                    return false
                 }
-                return false
-            }
-        })
+
+                override fun onQueryTextChange(newText: String): Boolean {
+                    if (!TextUtils.isEmpty(newText)) {
+                        presenter.getFilteredDataPoints(newText)
+                    } else {
+                        presenter.loadDataPoints(mLatitude, mLongitude)
+                    }
+                    return false
+                }
+            })
+        }
+
         searchMenuItem.setOnActionExpandListener(
             object : MenuItem.OnActionExpandListener {
                 override fun onMenuItemActionExpand(item: MenuItem): Boolean {
-                    if (trackingListener != null) {
-                        trackingListener!!.logSearchEvent()
-                    }
-                    // EMPTY
+                    trackingListener?.logSearchEvent()
                     return true
                 }
 
@@ -319,23 +318,17 @@ class DataPointsListFragment : Fragment(), LocationListener, AdapterView.OnItemC
         return when (item.itemId) {
             R.id.order_by -> {
                 presenter.onOrderByClicked()
-                if (trackingListener != null) {
-                    trackingListener!!.logSortEvent()
-                }
+                trackingListener?.logSortEvent()
                 true
             }
             R.id.download -> {
                 presenter.onDownloadPressed()
-                if (trackingListener != null) {
-                    trackingListener!!.logDownloadEvent(LIST_TAB)
-                }
+                trackingListener?.logDownloadEvent(LIST_TAB)
                 true
             }
             R.id.upload -> {
                 presenter.onUploadPressed()
-                if (trackingListener != null) {
-                    trackingListener!!.logUploadEvent(LIST_TAB)
-                }
+                trackingListener?.logUploadEvent(LIST_TAB)
                 true
             }
             else -> false
@@ -344,9 +337,7 @@ class DataPointsListFragment : Fragment(), LocationListener, AdapterView.OnItemC
 
     override fun onOrderByClick(order: Int) {
         presenter.onOrderByClick(order)
-        if (trackingListener != null) {
-            trackingListener!!.logOrderEvent(order)
-        }
+        trackingListener?.logOrderEvent(order)
     }
 
     override fun onLocationChanged(location: Location) {
@@ -379,7 +370,8 @@ class DataPointsListFragment : Fragment(), LocationListener, AdapterView.OnItemC
 
     override fun showErrorMissingLocation() {
         //TODO: should we prompt the user to enable location?
-        Toast.makeText(activity, R.string.locale_list_error_unknown_location, Toast.LENGTH_SHORT).show()
+        Toast.makeText(activity, R.string.locale_list_error_unknown_location, Toast.LENGTH_SHORT)
+            .show()
     }
 
     override fun showNonMonitoredMenu() {

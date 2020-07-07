@@ -178,16 +178,12 @@ class DataPointsMapFragment : Fragment(), DataPointsMapView, MapReadyCallback {
         return when (item.itemId) {
             R.id.download -> {
                 presenter.onSyncRecordsPressed()
-                if (trackingListener != null) {
-                    trackingListener!!.logDownloadEvent(MAP_TAB)
-                }
+                trackingListener?.logDownloadEvent(MAP_TAB)
                 true
             }
             R.id.upload -> {
                 presenter.onUploadPressed()
-                if (trackingListener != null) {
-                    trackingListener!!.logUploadEvent(MAP_TAB)
-                }
+                trackingListener?.logUploadEvent(MAP_TAB)
                 true
             }
             else -> false

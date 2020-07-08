@@ -39,7 +39,7 @@ public class SurveyLanguagesDbDataSource implements SurveyLanguagesDataSource {
     private final DatabaseHelper databaseHelper;
 
     public SurveyLanguagesDbDataSource(Context context) {
-        this.databaseHelper = new DatabaseHelper(context, new LanguageTable());
+        this.databaseHelper = new DatabaseHelper(context, new LanguageTable(), new DataPointDownloadTable());
     }
 
     @Override

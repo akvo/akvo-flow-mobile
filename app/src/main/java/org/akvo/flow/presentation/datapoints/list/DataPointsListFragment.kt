@@ -148,7 +148,7 @@ class DataPointsListFragment : Fragment(), LocationListener, AdapterView.OnItemC
         emptySubTitleTv = view.findViewById(R.id.empty_subtitle_tv)
         emptyIv = view.findViewById(R.id.empty_iv)
         val surveyGroup = arguments
-            ?.getSerializable(ConstantUtil.SURVEY_GROUP_EXTRA) as SurveyGroup
+            ?.getSerializable(ConstantUtil.SURVEY_GROUP_EXTRA) as SurveyGroup?
         mAdapter = DataPointListAdapter(activity)
         listView.adapter = mAdapter
         listView.onItemClickListener = this

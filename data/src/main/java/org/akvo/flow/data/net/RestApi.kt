@@ -38,12 +38,12 @@ class RestApi(
     private val version: String,
     private val baseUrl: String
 ) {
-    suspend fun downloadDataPoints(surveyId: Long): ApiLocaleResult {
+    suspend fun downloadDataPoints(surveyId: Long, cursor: String? = null): ApiLocaleResult {
         return serviceFactory.createRetrofitServiceWithInterceptor(
             DataPointDownloadService::class.java,
             baseUrl
         )
-            .getAssignedDataPoints(deviceHelper.androidId, surveyId.toString() + "")
+            .getAssignedDataPoints(deviceHelper.androidId, surveyId.toString() + "", cursor)
     }
 
     fun getPendingFiles(formIds: List<String?>?, deviceId: String?): Observable<ApiFilesResult> {

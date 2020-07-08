@@ -22,11 +22,13 @@ package org.akvo.flow.data.net;
 
 import android.util.Base64;
 
+import androidx.annotation.NonNull;
+
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Objects;
 
-import androidx.annotation.NonNull;
 import okhttp3.HttpUrl;
 import okhttp3.Interceptor;
 import okhttp3.Request;
@@ -50,6 +52,7 @@ public class HmacInterceptor implements Interceptor {
         this.signatureHelper = signatureHelper;
     }
 
+    @NonNull
     @Override
     public Response intercept(Chain chain) throws IOException {
         Request request = chain.request();
@@ -64,7 +67,7 @@ public class HmacInterceptor implements Interceptor {
         query = appendQueryParam(query, HMAC, auth);
 
         String reconstructedUrl = urlBeginning + query;
-        request = request.newBuilder().url(HttpUrl.parse(reconstructedUrl)).build();
+        request = request.newBuilder().url(Objects.requireNonNull(HttpUrl.parse(reconstructedUrl))).build();
         return chain.proceed(request);
     }
 

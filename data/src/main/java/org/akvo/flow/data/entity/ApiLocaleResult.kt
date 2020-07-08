@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017,2020 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -17,18 +17,16 @@
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package org.akvo.flow.data.net.gae
+package org.akvo.flow.data.entity
 
-import org.akvo.flow.data.entity.ApiLocaleResult
-import org.akvo.flow.data.util.ApiUrls
-import retrofit2.http.GET
-import retrofit2.http.Query
+import com.google.gson.annotations.SerializedName
 
-interface DataPointDownloadService {
-    @GET(ApiUrls.DATA_POINTS)
-    suspend fun getAssignedDataPoints(
-        @Query(ApiUrls.ANDROID_ID) androidId: String,
-        @Query(ApiUrls.SURVEY_ID) surveyId: String,
-        @Query(ApiUrls.CURSOR) cursor: String? = null
-    ): ApiLocaleResult
-}
+data class ApiLocaleResult(
+    @SerializedName("dataPointData")
+    var dataPoints: List<ApiDataPoint> = emptyList(),
+    var message: String? = null,
+    var offset: Int = 0,
+    var code: Int = 0,
+    var resultCount: Int = 0,
+    val cursor: String
+)

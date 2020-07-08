@@ -38,11 +38,20 @@ class DataPointDataRepository @Inject constructor(
     private val s3RestApi: S3RestApi,
     private val mapper: DataPointImageMapper,
     private val mediaHelper: MediaHelper
-) : DataPointRepository {
+    ) : DataPointRepository {
 
-    override suspend fun downloadDataPoints(surveyGroupId: Long): Int {
+    override suspend fun downloadDataPoints(surveyId: Long): Int {
+        var responseCode = 200
+        var syncedDataPoints = 0
+        var cursor = dataSourceFactory.dataBaseDataSource.getDataPointCursor(surveyId)
         try {
-            return syncDataPoints(restApi.downloadDataPoints(surveyGroupId))
+            while (responseCode == 200) {
+                val apiLocaleResult = restApi.downloadDataPoints(surveyId, cursor)
+                responseCode = apiLocaleResult.code
+                syncedDataPoints += syncDataPoints(apiLocaleResult)
+                cursor = apiLocaleResult.cursor
+            }
+            return syncedDataPoints
         } catch (e: HttpException) {
             if ((e.code() == HttpURLConnection.HTTP_FORBIDDEN)) {
                 throw AssignmentRequiredException("Dashboard Assignment missing")
@@ -70,7 +79,7 @@ class DataPointDataRepository @Inject constructor(
 
 
     private suspend fun downLoadImages(dataPoints: List<ApiDataPoint>) {
-       mapper.getImagesList(dataPoints)
+        mapper.getImagesList(dataPoints)
             .filter { image -> !dataSourceFactory.fileDataSource.fileExists(image) }
             .map { image ->
                 val responseBody = s3RestApi.downloadImage(image)

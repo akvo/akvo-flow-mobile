@@ -16,12 +16,26 @@
  * You should have received a copy of the GNU General Public License
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.akvo.flow.domain.repository
 
-import io.reactivex.Completable
+package org.akvo.flow.data.entity
 
-interface DataPointRepository {
-    suspend fun downloadDataPoints(surveyId: Long): Int
-    fun cleanPathAndDownLoadMedia(filename: String): Completable
-    fun markDataPointAsViewed(dataPointId: String): Completable
+import android.database.Cursor
+import org.akvo.flow.database.DataPointDownloadTable
+import javax.inject.Inject
+
+class CursorMapper @Inject constructor() {
+
+    fun transform(cursor: Cursor?): String? {
+        cursor?.let { c ->
+            if (c.moveToFirst()) {
+                return getCursor(c)
+            }
+            c.close()
+        }
+        return null
+    }
+
+    private fun getCursor(cursor: Cursor): String {
+        return cursor.getString(cursor.getColumnIndexOrThrow(DataPointDownloadTable.COLUMN_CURSOR))
+    }
 }

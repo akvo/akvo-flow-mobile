@@ -61,7 +61,6 @@ class DataPointDataRepository @Inject constructor(
     }
 
     private suspend fun syncDataPoints(apiLocaleResult: ApiLocaleResult): Int {
-        //TODO: download all images a posteriori
         val syncDataPoints =
             dataSourceFactory.dataBaseDataSource.syncDataPoints(apiLocaleResult.dataPoints)
         downLoadImages(apiLocaleResult.dataPoints)

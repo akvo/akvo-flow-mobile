@@ -41,6 +41,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.ArgumentMatchers.anyList
 import org.mockito.ArgumentMatchers.anyLong
+import org.mockito.ArgumentMatchers.anyString
 import org.mockito.Mock
 import org.mockito.Mockito.`when`
 import org.mockito.Mockito.doReturn
@@ -99,7 +100,7 @@ class DataPointDataRepositoryTest {
 
     @Test(expected = AssignmentRequiredException::class)
     fun downloadDataPointsShouldReturnExpectedErrorWhenAssignmentMissing() = runBlockingTest {
-        doThrow(spyHttpException).`when`(spyRestApi).downloadDataPoints(anyLong())
+        doThrow(spyHttpException).`when`(spyRestApi).downloadDataPoints(anyLong(), anyString())
         doReturn(HttpURLConnection.HTTP_FORBIDDEN).`when`(spyHttpException).code()
 
         val repository =
@@ -116,7 +117,7 @@ class DataPointDataRepositoryTest {
 
     @Test(expected = HttpException::class)
     fun downloadDataPointsShouldReturnExpectedErrorWhenNotAssignmentMissing() = runBlockingTest {
-        doThrow(spyHttpException).`when`(spyRestApi).downloadDataPoints(anyLong())
+        doThrow(spyHttpException).`when`(spyRestApi).downloadDataPoints(anyLong(), anyString())
         doReturn(HttpURLConnection.HTTP_BAD_GATEWAY).`when`(spyHttpException).code()
 
         val repository =
@@ -133,7 +134,7 @@ class DataPointDataRepositoryTest {
 
     @Test(expected = Exception::class)
     fun downloadDataPointsShouldReturnAnyErrorWhenNotAssignmentMissing()  = runBlockingTest {
-        doThrow(Exception()).`when`(spyRestApi).downloadDataPoints(anyLong())
+        doThrow(Exception()).`when`(spyRestApi).downloadDataPoints(anyLong(), anyString())
 
         val repository =
             DataPointDataRepository(
@@ -149,7 +150,7 @@ class DataPointDataRepositoryTest {
 
     @Test
     fun downloadDataPointsShouldReturnCorrectResultIfSuccess()  = runBlockingTest {
-        doReturn(mockApiResponse).`when`(spyRestApi).downloadDataPoints(anyLong())
+        doReturn(mockApiResponse).`when`(spyRestApi).downloadDataPoints(anyLong(), anyString())
         doReturn(1).`when`(mockDatabaseDataSource)!!.syncDataPoints(
             anyList()
         )

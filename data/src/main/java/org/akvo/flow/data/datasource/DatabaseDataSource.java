@@ -467,4 +467,12 @@ public class DatabaseDataSource {
     public String getDataPointCursor(long surveyId) {
         return cursorMapper.transform(briteSurveyDbAdapter.getCursor(surveyId));
     }
+
+    public void saveDataPointCursor(long surveyId, @Nullable String cursor) {
+        if (cursor != null) {
+            briteSurveyDbAdapter.saveCursor(surveyId, cursor);
+        } else {
+            briteSurveyDbAdapter.clearCursor(surveyId);
+        }
+    }
 }

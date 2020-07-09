@@ -62,7 +62,7 @@ public class HmacInterceptor implements Interceptor {
         String query = uriString.substring(separator);
         String urlBeginning = uriString.substring(0, separator);
 
-        query = appendQueryParam(query, TIMESTAMP, getTimestamp());
+        query = appendQueryParam(query, TIMESTAMP, getEncodedTimeStamp());
         String auth = signatureHelper.getAuthorization(query, key, Base64.DEFAULT);
         query = appendQueryParam(query, HMAC, auth);
 
@@ -76,7 +76,7 @@ public class HmacInterceptor implements Interceptor {
         return query + "&" + name + "=" + value;
     }
 
-    private String getTimestamp() {
+    private String getEncodedTimeStamp() {
         return encoder.encodeParam(dateFormat.format(new Date()));
     }
 }

@@ -828,4 +828,8 @@ public class BriteSurveyDbAdapter {
         contentValues.put(DataPointDownloadTable.COLUMN_CURSOR, cursor);
         briteDatabase.insert(DataPointDownloadTable.COLUMN_CURSOR, contentValues);
     }
+
+    public void clearCursor(long surveyId) {
+        briteDatabase.delete(DataPointDownloadTable.TABLE_NAME, " WHERE " + DataPointDownloadTable.COLUMN_SURVEY_ID + " = ?", surveyId + "");
+    }
 }

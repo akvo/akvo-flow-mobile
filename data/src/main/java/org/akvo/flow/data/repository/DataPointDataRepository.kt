@@ -41,16 +41,19 @@ class DataPointDataRepository @Inject constructor(
     ) : DataPointRepository {
 
     override suspend fun downloadDataPoints(surveyId: Long): Int {
-        var responseCode = 200
         var syncedDataPoints = 0
         var cursor = dataSourceFactory.dataBaseDataSource.getDataPointCursor(surveyId)
+        var moreToLoad = true
         try {
-            while (responseCode == 200) {
+            while (moreToLoad) {
                 val apiLocaleResult = restApi.downloadDataPoints(surveyId, cursor)
-                responseCode = apiLocaleResult.code
                 syncedDataPoints += syncDataPoints(apiLocaleResult)
-                cursor = apiLocaleResult.cursor
+                if (apiLocaleResult.dataPoints.isNotEmpty()) {
+                    cursor = apiLocaleResult.cursor
+                }
+                moreToLoad = apiLocaleResult.dataPoints.isNotEmpty()
             }
+            dataSourceFactory.dataBaseDataSource.saveDataPointCursor(surveyId, cursor)
             return syncedDataPoints
         } catch (e: HttpException) {
             if ((e.code() == HttpURLConnection.HTTP_FORBIDDEN)) {

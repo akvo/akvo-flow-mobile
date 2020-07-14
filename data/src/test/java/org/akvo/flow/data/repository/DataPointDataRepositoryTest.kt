@@ -19,10 +19,16 @@
 
 package org.akvo.flow.data.repository
 
+import com.nhaarman.mockitokotlin2.doReturn
 import com.nhaarman.mockitokotlin2.doThrow
 import com.nhaarman.mockitokotlin2.spy
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.TestCoroutineDispatcher
+import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.setMain
 import org.akvo.flow.data.datasource.DataSourceFactory
 import org.akvo.flow.data.datasource.DatabaseDataSource
 import org.akvo.flow.data.entity.ApiDataPoint
@@ -37,14 +43,17 @@ import org.akvo.flow.data.util.MediaHelper
 import org.akvo.flow.domain.exception.AssignmentRequiredException
 import org.akvo.flow.domain.util.DeviceHelper
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
+import org.junit.rules.TestWatcher
+import org.junit.runner.Description
 import org.junit.runner.RunWith
 import org.mockito.ArgumentMatchers.anyList
 import org.mockito.ArgumentMatchers.anyLong
 import org.mockito.ArgumentMatchers.anyString
 import org.mockito.Mock
 import org.mockito.Mockito.`when`
-import org.mockito.Mockito.doReturn
+import org.mockito.Mockito.mock
 import org.mockito.junit.MockitoJUnitRunner
 import retrofit2.HttpException
 import java.net.HttpURLConnection
@@ -55,11 +64,14 @@ import kotlin.test.assertEquals
 @RunWith(MockitoJUnitRunner::class)
 class DataPointDataRepositoryTest {
 
-    @Mock
-    internal var mockDatabaseDataSource: DatabaseDataSource? = null
+    @get:Rule
+    var mainCoroutineRule = MainCoroutineRule()
 
     @Mock
-    internal var mockApiResponse: ApiLocaleResult? = null
+    internal var mockDatabaseDataSource: DatabaseDataSource = mock(DatabaseDataSource::class.java)
+
+    @Mock
+    var mockApiResponse: ApiLocaleResult = mock(ApiLocaleResult::class.java)
 
     @Mock
     internal var mockApiDataPoints: List<ApiDataPoint> = emptyList()
@@ -68,8 +80,7 @@ class DataPointDataRepositoryTest {
     internal var mockDeviceHelper = DeviceHelper(null)
 
     @Mock
-    internal var mockDataSourceFactory: DataSourceFactory =
-        DataSourceFactory(null, null, null, null, null, null)
+    var mockDataSourceFactory: DataSourceFactory = mock(DataSourceFactory::class.java)
 
     @Mock
     internal var mediaHelper = MediaHelper()
@@ -86,27 +97,37 @@ class DataPointDataRepositoryTest {
         ""
     )
 
-    private lateinit var spyHttpException: HttpException
+    lateinit var spyHttpException: HttpException
 
-    private lateinit var spyRestApi: RestApi
+    @Mock
+    val mockRestApi: RestApi = mock(RestApi::class.java)
 
     @Before
     fun setUp() {
         `when`(mapper.getImagesList(anyList())).thenReturn(emptyList())
-        spyRestApi = spy(RestApi(mockDeviceHelper, TestRestServiceFactory(), "", ""))
+        `when`(mockDeviceHelper.androidId).thenReturn("123")
         spyHttpException = spy(HttpException(retrofit2.Response.success("")))
         `when`(mockDataSourceFactory.dataBaseDataSource).thenReturn(mockDatabaseDataSource)
+        //doReturn(mockApiResponse).`when`(mockRestApi).downloadDataPoints(anyLong(), anyString())
+    /*    mockRestApi.stub {
+            onBlocking {
+                downloadDataPoints(
+                    anyLong(),
+                    anyString()
+                )
+            }.doReturn(ApiLocaleResult(emptyList(), "", 0, 0, 0, cursor = ""))
+        }*/
     }
 
     @Test(expected = AssignmentRequiredException::class)
     fun downloadDataPointsShouldReturnExpectedErrorWhenAssignmentMissing() = runBlockingTest {
-        doThrow(spyHttpException).`when`(spyRestApi).downloadDataPoints(anyLong(), anyString())
+        doThrow(spyHttpException).`when`(mockRestApi).downloadDataPoints(anyLong(), anyString())
         doReturn(HttpURLConnection.HTTP_FORBIDDEN).`when`(spyHttpException).code()
 
         val repository =
             DataPointDataRepository(
                 mockDataSourceFactory,
-                spyRestApi,
+                mockRestApi,
                 mockS3RestApi,
                 mapper,
                 mediaHelper
@@ -117,13 +138,13 @@ class DataPointDataRepositoryTest {
 
     @Test(expected = HttpException::class)
     fun downloadDataPointsShouldReturnExpectedErrorWhenNotAssignmentMissing() = runBlockingTest {
-        doThrow(spyHttpException).`when`(spyRestApi).downloadDataPoints(anyLong(), anyString())
+        doThrow(spyHttpException).`when`(mockRestApi).downloadDataPoints(anyLong(), anyString())
         doReturn(HttpURLConnection.HTTP_BAD_GATEWAY).`when`(spyHttpException).code()
 
         val repository =
             DataPointDataRepository(
                 mockDataSourceFactory,
-                spyRestApi,
+                mockRestApi,
                 mockS3RestApi,
                 mapper,
                 mediaHelper
@@ -133,33 +154,49 @@ class DataPointDataRepositoryTest {
     }
 
     @Test(expected = Exception::class)
-    fun downloadDataPointsShouldReturnAnyErrorWhenNotAssignmentMissing()  = runBlockingTest {
-        doThrow(Exception()).`when`(spyRestApi).downloadDataPoints(anyLong(), anyString())
+    fun downloadDataPointsShouldReturnAnyErrorWhenNotAssignmentMissing() {
+        runBlocking {
+            doThrow(Exception()).`when`(mockRestApi).downloadDataPoints(anyLong(), anyString())
 
-        val repository =
-            DataPointDataRepository(
-                mockDataSourceFactory,
-                spyRestApi,
-                mockS3RestApi,
-                mapper,
-                mediaHelper
-            )
+            val repository =
+                DataPointDataRepository(
+                    mockDataSourceFactory,
+                    mockRestApi,
+                    mockS3RestApi,
+                    mapper,
+                    mediaHelper
+                )
 
-        repository.downloadDataPoints(123L)
+            repository.downloadDataPoints(123L)
+        }
     }
 
     @Test
-    fun downloadDataPointsShouldReturnCorrectResultIfSuccess()  = runBlockingTest {
-        doReturn(mockApiResponse).`when`(spyRestApi).downloadDataPoints(anyLong(), anyString())
+    fun downloadDataPointsShouldReturnCorrectResultIfSuccess() = mainCoroutineRule.runBlockingTest {
         doReturn(1).`when`(mockDatabaseDataSource)!!.syncDataPoints(
             anyList()
         )
-        doReturn(mockApiDataPoints).`when`(mockApiResponse)!!.dataPoints
+        doReturn(null).`when`(mockDatabaseDataSource)!!.getDataPointCursor(anyLong())
+        //doReturn(mockApiDataPoints).`when`(mockApiResponse)!!.dataPoints
 
+ /*      mockRestApi.stub {
+            onBlocking {
+                downloadDataPoints(
+                    anyLong(),
+                    anyString()
+                )
+            }.doReturn(mockApiResponse)
+        }*/
+
+        //doReturn(mockApiResponse).`when`(mockRestApi).downloadDataPoints(anyLong(), anyString())
+   /*    `when`(mockRestApi.downloadDataPoints(anyLong(), anyString())).thenReturn(
+            ApiLocaleResult(emptyList(), "", 0, 0, 0, cursor = "")
+        )*/
+       // doReturn(mockApiResponse).`when`(mockRestApi).downloadDataPoints(anyLong(), anyString())
         val repository =
             DataPointDataRepository(
                 mockDataSourceFactory,
-                spyRestApi,
+                mockRestApi,
                 mockS3RestApi,
                 mapper,
                 mediaHelper
@@ -168,5 +205,28 @@ class DataPointDataRepositoryTest {
         val result: Int = repository.downloadDataPoints(123L)
 
         assertEquals(1, result)
+    }
+}
+
+@ExperimentalCoroutinesApi
+private fun MainCoroutineRule.runBlockingTest(block: suspend () -> Unit) =
+    this.testDispatcher.runBlockingTest {
+        block()
+    }
+
+@ExperimentalCoroutinesApi
+class MainCoroutineRule(
+    val testDispatcher: TestCoroutineDispatcher = TestCoroutineDispatcher()
+) : TestWatcher() {
+
+    override fun starting(description: Description?) {
+        super.starting(description)
+        Dispatchers.setMain(testDispatcher)
+    }
+
+    override fun finished(description: Description?) {
+        super.finished(description)
+        Dispatchers.resetMain()
+        testDispatcher.cleanupTestCoroutines()
     }
 }

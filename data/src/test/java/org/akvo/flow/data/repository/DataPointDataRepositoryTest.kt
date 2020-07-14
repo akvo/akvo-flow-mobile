@@ -19,9 +19,10 @@
 
 package org.akvo.flow.data.repository
 
+import com.nhaarman.mockitokotlin2.doThrow
 import com.nhaarman.mockitokotlin2.spy
-import io.reactivex.Single
-import io.reactivex.observers.TestObserver
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.runBlockingTest
 import org.akvo.flow.data.datasource.DataSourceFactory
 import org.akvo.flow.data.datasource.DatabaseDataSource
 import org.akvo.flow.data.entity.ApiDataPoint
@@ -41,7 +42,6 @@ import org.junit.runner.RunWith
 import org.mockito.ArgumentMatchers.anyList
 import org.mockito.ArgumentMatchers.anyLong
 import org.mockito.Mock
-import org.mockito.Mockito
 import org.mockito.Mockito.`when`
 import org.mockito.Mockito.doReturn
 import org.mockito.junit.MockitoJUnitRunner
@@ -50,6 +50,7 @@ import java.net.HttpURLConnection
 import java.text.DateFormat
 import kotlin.test.assertEquals
 
+@ExperimentalCoroutinesApi
 @RunWith(MockitoJUnitRunner::class)
 class DataPointDataRepositoryTest {
 
@@ -91,15 +92,14 @@ class DataPointDataRepositoryTest {
     @Before
     fun setUp() {
         `when`(mapper.getImagesList(anyList())).thenReturn(emptyList())
-        spyRestApi = spy(RestApi(mockDeviceHelper, null, null, ""))
+        spyRestApi = spy(RestApi(mockDeviceHelper, TestRestServiceFactory(), "", ""))
         spyHttpException = spy(HttpException(retrofit2.Response.success("")))
         `when`(mockDataSourceFactory.dataBaseDataSource).thenReturn(mockDatabaseDataSource)
     }
 
-    @Test
-    fun downloadDataPointsShouldReturnExpectedErrorWhenAssignmentMissing() {
-        doReturn(Single.error<ApiLocaleResult>(spyHttpException)).`when`(spyRestApi)
-            .downloadDataPoints(anyLong())
+    @Test(expected = AssignmentRequiredException::class)
+    fun downloadDataPointsShouldReturnExpectedErrorWhenAssignmentMissing() = runBlockingTest {
+        doThrow(spyHttpException).`when`(spyRestApi).downloadDataPoints(anyLong())
         doReturn(HttpURLConnection.HTTP_FORBIDDEN).`when`(spyHttpException).code()
 
         val repository =
@@ -110,17 +110,13 @@ class DataPointDataRepositoryTest {
                 mapper,
                 mediaHelper
             )
-        val observer = TestObserver<Int>()
 
-        repository.downloadDataPoints(123L).subscribe(observer)
-
-        observer.assertError(AssignmentRequiredException::class.java)
+        repository.downloadDataPoints(123L)
     }
 
-    @Test
-    fun downloadDataPointsShouldReturnExpectedErrorWhenNotAssignmentMissing() {
-        doReturn(Single.error<ApiLocaleResult>(spyHttpException)).`when`(spyRestApi)
-            .downloadDataPoints(anyLong())
+    @Test(expected = HttpException::class)
+    fun downloadDataPointsShouldReturnExpectedErrorWhenNotAssignmentMissing() = runBlockingTest {
+        doThrow(spyHttpException).`when`(spyRestApi).downloadDataPoints(anyLong())
         doReturn(HttpURLConnection.HTTP_BAD_GATEWAY).`when`(spyHttpException).code()
 
         val repository =
@@ -131,17 +127,13 @@ class DataPointDataRepositoryTest {
                 mapper,
                 mediaHelper
             )
-        val observer = TestObserver<Int>()
 
-        repository.downloadDataPoints(123L).subscribe(observer)
-
-        observer.assertError(HttpException::class.java)
+        repository.downloadDataPoints(123L)
     }
 
-    @Test
-    fun downloadDataPointsShouldReturnAnyErrorWhenNotAssignmentMissing() {
-        doReturn(Single.error<ApiLocaleResult>(Exception())).`when`(spyRestApi)
-            .downloadDataPoints(anyLong())
+    @Test(expected = Exception::class)
+    fun downloadDataPointsShouldReturnAnyErrorWhenNotAssignmentMissing()  = runBlockingTest {
+        doThrow(Exception()).`when`(spyRestApi).downloadDataPoints(anyLong())
 
         val repository =
             DataPointDataRepository(
@@ -151,17 +143,14 @@ class DataPointDataRepositoryTest {
                 mapper,
                 mediaHelper
             )
-        val observer = TestObserver<Int>()
 
-        repository.downloadDataPoints(123L).subscribe(observer)
-
-        observer.assertError(Exception::class.java)
+        repository.downloadDataPoints(123L)
     }
 
     @Test
-    fun downloadDataPointsShouldReturnCorrectResultIfSuccess() {
-        doReturn(Single.just(mockApiResponse)).`when`(spyRestApi).downloadDataPoints(anyLong())
-        doReturn(Single.just(1)).`when`(mockDatabaseDataSource)!!.syncDataPoints(
+    fun downloadDataPointsShouldReturnCorrectResultIfSuccess()  = runBlockingTest {
+        doReturn(mockApiResponse).`when`(spyRestApi).downloadDataPoints(anyLong())
+        doReturn(1).`when`(mockDatabaseDataSource)!!.syncDataPoints(
             anyList()
         )
         doReturn(mockApiDataPoints).`when`(mockApiResponse)!!.dataPoints
@@ -174,13 +163,9 @@ class DataPointDataRepositoryTest {
                 mapper,
                 mediaHelper
             )
-        val observer = TestObserver<Int>()
 
-        repository.downloadDataPoints(123L).subscribe(observer)
+        val result: Int = repository.downloadDataPoints(123L)
 
-        observer.assertNoErrors()
-        assertEquals(1, observer.values()[0])
+        assertEquals(1, result)
     }
-
-    private fun <T> any(type: Class<T>): T = Mockito.any<T>(type)
 }

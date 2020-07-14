@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -15,18 +15,19 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
+ *
  */
+package org.akvo.flow.data.net.gae
 
-package org.akvo.flow.data.net
+import org.akvo.flow.data.entity.ApiLocaleResult
+import org.akvo.flow.data.util.ApiUrls
+import retrofit2.http.GET
+import retrofit2.http.Query
 
-import io.reactivex.Observable
-import io.reactivex.functions.Function
-import timber.log.Timber
-
-class ErrorLoggerFunction<T>(private val message: String) : Function<Throwable, Observable<*>> {
-
-    override fun apply(throwable: Throwable): Observable<T> {
-        Timber.e(Exception(throwable), message)
-        return Observable.error(throwable)
-    }
+interface DataPointDownloadService {
+    @GET(ApiUrls.DATA_POINTS)
+    suspend fun getAssignedDataPoints(
+        @Query(ApiUrls.ANDROID_ID) androidId: String,
+        @Query(ApiUrls.SURVEY_ID) surveyId: String
+    ): ApiLocaleResult
 }

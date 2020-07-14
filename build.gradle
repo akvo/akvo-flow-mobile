@@ -62,6 +62,7 @@ ext {
     mockServerVersion = "3.12.1"
     mockitoInlineVersion = "2.8.47"
     mockitoKotlinVersion = "2.2.0"
+    mockkVersion = "1.10.0"
 
     androidXJunit = "1.1.0"
     androidXCore = "1.1.0"

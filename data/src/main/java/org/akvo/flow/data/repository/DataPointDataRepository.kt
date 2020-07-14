@@ -73,10 +73,8 @@ class DataPointDataRepository @Inject constructor(
     }
 
     private suspend fun syncDataPoints(apiLocaleResult: ApiLocaleResult): Int {
-        val dataBaseDataSource = dataSourceFactory.dataBaseDataSource
         val dataPoints = apiLocaleResult.dataPoints
-        val syncDataPoints =
-            dataBaseDataSource.syncDataPoints(dataPoints)
+        val syncDataPoints = dataSourceFactory.dataBaseDataSource.syncDataPoints(dataPoints)
         downLoadImages(apiLocaleResult.dataPoints)
         return syncDataPoints
     }

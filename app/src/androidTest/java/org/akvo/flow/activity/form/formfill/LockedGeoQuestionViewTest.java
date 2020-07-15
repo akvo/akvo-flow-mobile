@@ -32,6 +32,17 @@ import android.os.SystemClock;
 import android.view.View;
 import android.widget.TextView;
 
+import androidx.test.espresso.UiController;
+import androidx.test.espresso.ViewAction;
+import androidx.test.espresso.ViewInteraction;
+import androidx.test.espresso.matcher.BoundedMatcher;
+import androidx.test.espresso.matcher.ViewMatchers;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
+import androidx.test.filters.MediumTest;
+import androidx.test.platform.app.InstrumentationRegistry;
+import androidx.test.rule.ActivityTestRule;
+import androidx.test.rule.GrantPermissionRule;
+
 import org.akvo.flow.R;
 import org.akvo.flow.activity.FormActivity;
 import org.akvo.flow.activity.form.data.SurveyInstaller;
@@ -47,17 +58,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.text.DecimalFormat;
-
-import androidx.test.platform.app.InstrumentationRegistry;
-import androidx.test.espresso.UiController;
-import androidx.test.espresso.ViewAction;
-import androidx.test.espresso.ViewInteraction;
-import androidx.test.espresso.matcher.BoundedMatcher;
-import androidx.test.espresso.matcher.ViewMatchers;
-import androidx.test.filters.MediumTest;
-import androidx.test.rule.ActivityTestRule;
-import androidx.test.rule.GrantPermissionRule;
-import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import static androidx.test.espresso.Espresso.closeSoftKeyboard;
 import static androidx.test.espresso.Espresso.onView;
@@ -111,7 +111,7 @@ public class LockedGeoQuestionViewTest {
             FormActivity.class) {
         @Override
         protected Intent getActivityIntent() {
-            return getFormActivityIntent(155852013L, "156792013", "LockedGeoForm", 0L, false);
+            return getFormActivityIntent(155852019L, "156792019", "LockedGeoForm", 0L, false);
         }
     };
 

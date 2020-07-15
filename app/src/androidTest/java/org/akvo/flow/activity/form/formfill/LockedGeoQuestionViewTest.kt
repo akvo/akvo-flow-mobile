@@ -53,6 +53,7 @@ import androidx.test.filters.MediumTest
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.ActivityTestRule
 import androidx.test.rule.GrantPermissionRule
+import it.cosenonjaviste.daggermock.DaggerMock
 import org.akvo.flow.R
 import org.akvo.flow.activity.FormActivity
 import org.akvo.flow.activity.form.FormActivityTestUtil.addExecutionDelay
@@ -60,18 +61,23 @@ import org.akvo.flow.activity.form.FormActivityTestUtil.getFormActivityIntent
 import org.akvo.flow.activity.form.FormActivityTestUtil.getString
 import org.akvo.flow.activity.form.data.SurveyInstaller
 import org.akvo.flow.activity.form.data.SurveyRequisite
+import org.akvo.flow.app.FlowApp
 import org.akvo.flow.event.TimedLocationListener
+import org.akvo.flow.injector.component.ApplicationComponent
+import org.akvo.flow.injector.module.ApplicationModule
 import org.akvo.flow.tests.R.raw
 import org.hamcrest.Description
 import org.hamcrest.Matcher
 import org.hamcrest.core.AllOf.allOf
 import org.hamcrest.core.IsNot.not
 import org.junit.AfterClass
+import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.text.DecimalFormat
 
+@Ignore("Ignore tests until we make changes to geo questions")
 @MediumTest
 @RunWith(AndroidJUnit4::class)
 class LockedGeoQuestionViewTest {
@@ -85,7 +91,7 @@ class LockedGeoQuestionViewTest {
     )
 
     @get:Rule
-    var rule: ActivityTestRule<FormActivity> = object : ActivityTestRule<FormActivity>(
+    var activityTestRule: ActivityTestRule<FormActivity> = object : ActivityTestRule<FormActivity>(
         FormActivity::class.java
     ) {
         override fun getActivityIntent(): Intent {
@@ -110,7 +116,7 @@ class LockedGeoQuestionViewTest {
         resetFields()
         onView(withId(R.id.acc_tv))
             .perform(
-                replaceTextInTextView(getString(R.string.geo_location_accuracy_default, rule))
+                replaceTextInTextView(getString(R.string.geo_location_accuracy_default, activityTestRule))
             )
         closeSoftKeyboard()
         clickGeoButton()
@@ -167,7 +173,7 @@ class LockedGeoQuestionViewTest {
         onView(withId(R.id.acc_tv)).perform(
             replaceTextInTextView(
                 getString(
-                    R.string.geo_location_accuracy, rule,
+                    R.string.geo_location_accuracy, activityTestRule,
                     accuracyFormat.format(MOCK_ACCURACY_ACCURATE.toDouble())
                 )
             )
@@ -207,7 +213,7 @@ class LockedGeoQuestionViewTest {
     private fun verifyAccuracy(accuracy: String, textColor: Int) {
         val input = onView(withId(R.id.acc_tv))
         input.check(matches(isDisplayed()))
-        input.check(matches(withText(getString(R.string.geo_location_accuracy, rule, accuracy))))
+        input.check(matches(withText(getString(R.string.geo_location_accuracy, activityTestRule, accuracy))))
         input.check(matches(hasTextColor(textColor)))
     }
 
@@ -268,7 +274,7 @@ class LockedGeoQuestionViewTest {
 
     private fun simulateLocationTimeout() {
         val geoQuestion =
-            rule.activity.findViewById<View>(R.id.geo_question_view)
+            activityTestRule.activity.findViewById<View>(R.id.geo_question_view)
         geoQuestion.post { (geoQuestion as TimedLocationListener.Listener).onTimeout() }
     }
 
@@ -333,4 +339,11 @@ class LockedGeoQuestionViewTest {
             installer.clearSurveys()
         }
     }
+
+    private fun espressoDaggerMockRule() =
+        DaggerMock.rule<ApplicationComponent>(ApplicationModule(app)) {
+            set { component -> app.applicationComponent = component }
+        }
+
+    val app: FlowApp get() = InstrumentationRegistry.getInstrumentation().targetContext.applicationContext as FlowApp
 }

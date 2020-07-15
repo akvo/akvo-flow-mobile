@@ -40,6 +40,10 @@ class DataPointDataRepository @Inject constructor(
     private val mediaHelper: MediaHelper
     ) : DataPointRepository {
 
+    companion object {
+        private const val MAX_DATAPOINT_BATCH = 30
+    }
+
     override suspend fun downloadDataPoints(surveyId: Long): Int {
         var syncedDataPoints = 0
         var cursor = dataSourceFactory.dataBaseDataSource.getDataPointCursor(surveyId)
@@ -52,6 +56,9 @@ class DataPointDataRepository @Inject constructor(
                     cursor = apiLocaleResult.cursor
                 }
                 moreToLoad = apiLocaleResult.dataPoints.isNotEmpty()
+                        && apiLocaleResult.dataPoints.size >= MAX_DATAPOINT_BATCH
+                        && cursor != null
+
             }
             dataSourceFactory.dataBaseDataSource.saveDataPointCursor(surveyId, cursor)
             return syncedDataPoints
@@ -78,7 +85,6 @@ class DataPointDataRepository @Inject constructor(
         downLoadImages(apiLocaleResult.dataPoints)
         return syncDataPoints
     }
-
 
     private suspend fun downLoadImages(dataPoints: List<ApiDataPoint>) {
         mapper.getImagesList(dataPoints)

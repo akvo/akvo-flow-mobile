@@ -40,30 +40,24 @@ class DataPointDataRepository @Inject constructor(
     private val mediaHelper: MediaHelper
     ) : DataPointRepository {
 
-    companion object {
-        private const val MAX_DATAPOINT_BATCH = 30
-    }
-
     override suspend fun downloadDataPoints(surveyId: Long): Int {
         var syncedDataPoints = 0
-        var cursor = dataSourceFactory.dataBaseDataSource.getDataPointCursor(surveyId)
+        var backendDataPointsCursor = dataSourceFactory.dataBaseDataSource.getDataPointCursor(surveyId)
         var moreToLoad = true
         try {
             while (moreToLoad) {
-                val apiLocaleResult = restApi.downloadDataPoints(surveyId, cursor)
+                val apiLocaleResult = restApi.downloadDataPoints(surveyId, backendDataPointsCursor)
                 syncedDataPoints += syncDataPoints(apiLocaleResult)
                 if (apiLocaleResult.dataPoints.isNotEmpty()) {
-                    cursor = apiLocaleResult.cursor
+                    backendDataPointsCursor = apiLocaleResult.cursor
                 }
                 moreToLoad = apiLocaleResult.dataPoints.isNotEmpty()
-                        && apiLocaleResult.dataPoints.size >= MAX_DATAPOINT_BATCH
-                        && cursor != null
-
+                        && backendDataPointsCursor != null // cursor is null with old datapoint api
             }
-            dataSourceFactory.dataBaseDataSource.saveDataPointCursor(surveyId, cursor)
+            dataSourceFactory.dataBaseDataSource.saveDataPointCursor(surveyId, backendDataPointsCursor)
             return syncedDataPoints
         } catch (e: HttpException) {
-            if ((e.code() == HttpURLConnection.HTTP_FORBIDDEN)) {
+            if ((e.code() == HttpURLConnection.HTTP_NOT_FOUND)) {
                 throw AssignmentRequiredException("Dashboard Assignment missing")
             } else {
                 throw e

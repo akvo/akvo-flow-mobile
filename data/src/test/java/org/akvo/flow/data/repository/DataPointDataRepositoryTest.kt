@@ -91,7 +91,7 @@ class DataPointDataRepositoryTest {
                 any()
             )
         } coAnswers { throw spyHttpException }
-        every { spyHttpException.code() } returns HttpURLConnection.HTTP_FORBIDDEN
+        every { spyHttpException.code() } returns HttpURLConnection.HTTP_NOT_FOUND
 
         try {
             val result = repository.downloadDataPoints(123L)
@@ -101,7 +101,7 @@ class DataPointDataRepositoryTest {
     }
 
     @Test
-    fun downloadDataPointsShouldReturnExpectedErrorWhenNotAssignmentMissing() = runBlocking {
+    fun downloadDataPointsShouldReturnExpectedHttpError() = runBlocking {
         coEvery {
             mockRestApi.downloadDataPoints(
                 any(),
@@ -114,22 +114,6 @@ class DataPointDataRepositoryTest {
             val result: Int = repository.downloadDataPoints(123L)
         } catch (e: Exception) {
             assert(e is HttpException)
-        }
-    }
-
-    @Test
-    fun downloadDataPointsShouldReturnAnyErrorWhenNotAssignmentMissing() = runBlocking {
-        coEvery {
-            mockRestApi.downloadDataPoints(
-                any(),
-                any()
-            )
-        } coAnswers { throw Exception("error") }
-
-        try {
-            val result: Int = repository.downloadDataPoints(123L)
-        } catch (e: Throwable) {
-            assert(e is Exception && e.message == "error")
         }
     }
 

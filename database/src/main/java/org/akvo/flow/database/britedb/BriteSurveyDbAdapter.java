@@ -830,6 +830,6 @@ public class BriteSurveyDbAdapter {
     }
 
     public void clearCursor(long surveyId) {
-        briteDatabase.delete(DataPointDownloadTable.TABLE_NAME, " WHERE " + DataPointDownloadTable.COLUMN_SURVEY_ID + " = ?", surveyId + "");
+        briteDatabase.delete(DataPointDownloadTable.TABLE_NAME, DataPointDownloadTable.COLUMN_SURVEY_ID + " = ?", surveyId + "");
     }
 }

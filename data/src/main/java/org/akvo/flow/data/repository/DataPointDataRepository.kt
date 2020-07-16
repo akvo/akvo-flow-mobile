@@ -42,21 +42,22 @@ class DataPointDataRepository @Inject constructor(
 
     override suspend fun downloadDataPoints(surveyId: Long): Int {
         var syncedDataPoints = 0
-        var cursor = dataSourceFactory.dataBaseDataSource.getDataPointCursor(surveyId)
+        var backendDataPointsCursor = dataSourceFactory.dataBaseDataSource.getDataPointCursor(surveyId)
         var moreToLoad = true
         try {
             while (moreToLoad) {
-                val apiLocaleResult = restApi.downloadDataPoints(surveyId, cursor)
+                val apiLocaleResult = restApi.downloadDataPoints(surveyId, backendDataPointsCursor)
                 syncedDataPoints += syncDataPoints(apiLocaleResult)
                 if (apiLocaleResult.dataPoints.isNotEmpty()) {
-                    cursor = apiLocaleResult.cursor
+                    backendDataPointsCursor = apiLocaleResult.cursor
                 }
                 moreToLoad = apiLocaleResult.dataPoints.isNotEmpty()
+                        && backendDataPointsCursor != null // cursor is null with old datapoint api
             }
-            dataSourceFactory.dataBaseDataSource.saveDataPointCursor(surveyId, cursor)
+            dataSourceFactory.dataBaseDataSource.saveDataPointCursor(surveyId, backendDataPointsCursor)
             return syncedDataPoints
         } catch (e: HttpException) {
-            if ((e.code() == HttpURLConnection.HTTP_FORBIDDEN)) {
+            if ((e.code() == HttpURLConnection.HTTP_NOT_FOUND)) {
                 throw AssignmentRequiredException("Dashboard Assignment missing")
             } else {
                 throw e
@@ -78,7 +79,6 @@ class DataPointDataRepository @Inject constructor(
         downLoadImages(apiLocaleResult.dataPoints)
         return syncDataPoints
     }
-
 
     private suspend fun downLoadImages(dataPoints: List<ApiDataPoint>) {
         mapper.getImagesList(dataPoints)

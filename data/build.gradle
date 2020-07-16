@@ -88,6 +88,7 @@ dependencies {
     testImplementation "org.mockito:mockito-inline:${rootProject.ext.mockitoInlineVersion}"
     testImplementation "com.nhaarman.mockitokotlin2:mockito-kotlin:${rootProject.ext.mockitoKotlinVersion}"
     testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:${rootProject.ext.coroutinesVersion}"
+    testImplementation "io.mockk:mockk:${rootProject.ext.mockkVersion}"
 }
 
 repositories {

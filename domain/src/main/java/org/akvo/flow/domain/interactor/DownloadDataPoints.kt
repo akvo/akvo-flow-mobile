@@ -22,6 +22,7 @@ package org.akvo.flow.domain.interactor
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.akvo.flow.domain.entity.DownloadResult
+import org.akvo.flow.domain.exception.AssignmentRequiredException
 import org.akvo.flow.domain.repository.DataPointRepository
 import org.akvo.flow.domain.util.ConnectivityStateManager
 import javax.inject.Inject
@@ -32,10 +33,7 @@ class DownloadDataPoints @Inject constructor(
 ) {
     suspend fun execute(parameters: Map<String, Any>): DownloadResult {
         if (parameters[KEY_SURVEY_ID] == null) {
-            return DownloadResult(
-                DownloadResult.ResultCode.ERROR_OTHER,
-                0
-            )
+           throw IllegalArgumentException("Missing surveyId")
         }
         return if (!connectivityStateManager.isConnectionAvailable) {
             DownloadResult(
@@ -53,6 +51,11 @@ class DownloadDataPoints @Inject constructor(
                 val downloadDataPoints =
                     dataPointRepository.downloadDataPoints((parameters[KEY_SURVEY_ID] as Long?)!!)
                 DownloadResult(DownloadResult.ResultCode.SUCCESS, downloadDataPoints)
+            } catch (ex: AssignmentRequiredException) {
+                DownloadResult(
+                    DownloadResult.ResultCode.ERROR_ASSIGNMENT_MISSING,
+                    0
+                )
             } catch (ex: Exception) {
                 DownloadResult(
                     DownloadResult.ResultCode.ERROR_OTHER,

@@ -33,6 +33,7 @@ import org.akvo.flow.data.entity.ApiDataPoint;
 import org.akvo.flow.data.entity.ApiFormHeader;
 import org.akvo.flow.data.entity.ApiQuestionAnswer;
 import org.akvo.flow.data.entity.ApiSurveyInstance;
+import org.akvo.flow.data.entity.CursorMapper;
 import org.akvo.flow.data.entity.FormInstanceMapper;
 import org.akvo.flow.data.entity.SurveyInstanceIdMapper;
 import org.akvo.flow.data.entity.form.DataForm;
@@ -75,14 +76,16 @@ public class DatabaseDataSource {
     private final SurveyInstanceIdMapper surveyInstanceIdMapper;
     private final FormMapper formMapper;
     private final FormInstanceMapper formInstanceMapper;
+    private final CursorMapper cursorMapper;
 
     @Inject
     public DatabaseDataSource(BriteDatabase db, SurveyInstanceIdMapper surveyInstanceIdMapper,
-                              FormMapper formMapper, FormInstanceMapper formInstanceMapper) {
+                              FormMapper formMapper, FormInstanceMapper formInstanceMapper, CursorMapper cursorMapper) {
         this.briteSurveyDbAdapter = new BriteSurveyDbAdapter(db);
         this.surveyInstanceIdMapper = surveyInstanceIdMapper;
         this.formMapper = formMapper;
         this.formInstanceMapper = formInstanceMapper;
+        this.cursorMapper = cursorMapper;
     }
 
     public Observable<Cursor> getSurveys() {
@@ -458,5 +461,18 @@ public class DatabaseDataSource {
         initialValues.put(SurveyInstanceColumns.RECORD_ID, domainFormInstance.getDataPointId());
         initialValues.put(SurveyInstanceColumns.SUBMITTER, domainFormInstance.getUserName());
         return briteSurveyDbAdapter.createFormInstance(initialValues);
+    }
+
+    @Nullable
+    public String getDataPointCursor(long surveyId) {
+        return cursorMapper.transform(briteSurveyDbAdapter.getCursor(surveyId));
+    }
+
+    public void saveDataPointCursor(long surveyId, @Nullable String cursor) {
+        if (cursor != null) {
+            briteSurveyDbAdapter.saveCursor(surveyId, cursor);
+        } else {
+            briteSurveyDbAdapter.clearCursor(surveyId);
+        }
     }
 }

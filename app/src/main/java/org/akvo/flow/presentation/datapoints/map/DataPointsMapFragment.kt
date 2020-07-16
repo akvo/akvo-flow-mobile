@@ -98,7 +98,7 @@ class DataPointsMapFragment : Fragment(), DataPointsMapView, MapReadyCallback {
         super.onActivityCreated(savedInstanceState)
         presenter.setView(this)
         val surveyGroup =
-            arguments!!.getSerializable(ConstantUtil.SURVEY_GROUP_EXTRA) as SurveyGroup
+            arguments?.getSerializable(ConstantUtil.SURVEY_GROUP_EXTRA) as SurveyGroup?
         presenter.onSurveyGroupReady(surveyGroup)
         activityJustCreated = true
     }

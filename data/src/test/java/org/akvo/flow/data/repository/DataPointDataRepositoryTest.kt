@@ -19,150 +19,110 @@
 
 package org.akvo.flow.data.repository
 
-import com.nhaarman.mockitokotlin2.doThrow
-import com.nhaarman.mockitokotlin2.spy
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.runBlockingTest
+import io.mockk.MockKAnnotations
+import io.mockk.coEvery
+import io.mockk.every
+import io.mockk.impl.annotations.MockK
+import io.mockk.impl.annotations.RelaxedMockK
+import kotlinx.coroutines.runBlocking
 import org.akvo.flow.data.datasource.DataSourceFactory
 import org.akvo.flow.data.datasource.DatabaseDataSource
-import org.akvo.flow.data.entity.ApiDataPoint
 import org.akvo.flow.data.entity.ApiLocaleResult
 import org.akvo.flow.data.entity.images.DataPointImageMapper
 import org.akvo.flow.data.net.RestApi
-import org.akvo.flow.data.net.RestServiceFactory
-import org.akvo.flow.data.net.s3.AmazonAuthHelper
-import org.akvo.flow.data.net.s3.BodyCreator
 import org.akvo.flow.data.net.s3.S3RestApi
 import org.akvo.flow.data.util.MediaHelper
 import org.akvo.flow.domain.exception.AssignmentRequiredException
-import org.akvo.flow.domain.util.DeviceHelper
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.ArgumentMatchers.anyList
-import org.mockito.ArgumentMatchers.anyLong
-import org.mockito.Mock
-import org.mockito.Mockito.`when`
-import org.mockito.Mockito.doReturn
-import org.mockito.junit.MockitoJUnitRunner
+import org.junit.runners.JUnit4
 import retrofit2.HttpException
 import java.net.HttpURLConnection
-import java.text.DateFormat
 import kotlin.test.assertEquals
 
-@ExperimentalCoroutinesApi
-@RunWith(MockitoJUnitRunner::class)
+@RunWith(JUnit4::class)
 class DataPointDataRepositoryTest {
 
-    @Mock
-    internal var mockDatabaseDataSource: DatabaseDataSource? = null
+    @MockK
+    lateinit var mockDataSourceFactory: DataSourceFactory
 
-    @Mock
-    internal var mockApiResponse: ApiLocaleResult? = null
+    @RelaxedMockK
+    lateinit var mockRestApi: RestApi
 
-    @Mock
-    internal var mockApiDataPoints: List<ApiDataPoint> = emptyList()
+    @MockK
+    lateinit var mockS3RestApi: S3RestApi
 
-    @Mock
-    internal var mockDeviceHelper = DeviceHelper(null)
+    @MockK
+    lateinit var mockMapper: DataPointImageMapper
 
-    @Mock
-    internal var mockDataSourceFactory: DataSourceFactory =
-        DataSourceFactory(null, null, null, null, null, null)
+    @MockK
+    lateinit var mediaHelper: MediaHelper
 
-    @Mock
-    internal var mediaHelper = MediaHelper()
+    @RelaxedMockK
+    lateinit var mockDatabaseDataSource: DatabaseDataSource
 
-    @Mock
-    internal var mapper = DataPointImageMapper(mediaHelper)
+    @MockK
+    lateinit var spyHttpException: HttpException
 
-    @Mock
-    internal var mockS3RestApi: S3RestApi = S3RestApi(
-        RestServiceFactory(null, null),
-        AmazonAuthHelper(null, null),
-        DateFormat.getDateInstance(),
-        BodyCreator(),
-        ""
-    )
-
-    private lateinit var spyHttpException: HttpException
-
-    private lateinit var spyRestApi: RestApi
+    lateinit var repository: DataPointDataRepository
 
     @Before
     fun setUp() {
-        `when`(mapper.getImagesList(anyList())).thenReturn(emptyList())
-        spyRestApi = spy(RestApi(mockDeviceHelper, TestRestServiceFactory(), "", ""))
-        spyHttpException = spy(HttpException(retrofit2.Response.success("")))
-        `when`(mockDataSourceFactory.dataBaseDataSource).thenReturn(mockDatabaseDataSource)
-    }
-
-    @Test(expected = AssignmentRequiredException::class)
-    fun downloadDataPointsShouldReturnExpectedErrorWhenAssignmentMissing() = runBlockingTest {
-        doThrow(spyHttpException).`when`(spyRestApi).downloadDataPoints(anyLong())
-        doReturn(HttpURLConnection.HTTP_FORBIDDEN).`when`(spyHttpException).code()
-
-        val repository =
+        MockKAnnotations.init(this)
+        every { mockMapper.getImagesList(any()) } returns emptyList()
+        every { mockDataSourceFactory.dataBaseDataSource } returns mockDatabaseDataSource
+        every { mockDatabaseDataSource.getDataPointCursor(any()) } returns null
+        repository =
             DataPointDataRepository(
                 mockDataSourceFactory,
-                spyRestApi,
+                mockRestApi,
                 mockS3RestApi,
-                mapper,
+                mockMapper,
                 mediaHelper
             )
-
-        repository.downloadDataPoints(123L)
-    }
-
-    @Test(expected = HttpException::class)
-    fun downloadDataPointsShouldReturnExpectedErrorWhenNotAssignmentMissing() = runBlockingTest {
-        doThrow(spyHttpException).`when`(spyRestApi).downloadDataPoints(anyLong())
-        doReturn(HttpURLConnection.HTTP_BAD_GATEWAY).`when`(spyHttpException).code()
-
-        val repository =
-            DataPointDataRepository(
-                mockDataSourceFactory,
-                spyRestApi,
-                mockS3RestApi,
-                mapper,
-                mediaHelper
-            )
-
-        repository.downloadDataPoints(123L)
-    }
-
-    @Test(expected = Exception::class)
-    fun downloadDataPointsShouldReturnAnyErrorWhenNotAssignmentMissing()  = runBlockingTest {
-        doThrow(Exception()).`when`(spyRestApi).downloadDataPoints(anyLong())
-
-        val repository =
-            DataPointDataRepository(
-                mockDataSourceFactory,
-                spyRestApi,
-                mockS3RestApi,
-                mapper,
-                mediaHelper
-            )
-
-        repository.downloadDataPoints(123L)
     }
 
     @Test
-    fun downloadDataPointsShouldReturnCorrectResultIfSuccess()  = runBlockingTest {
-        doReturn(mockApiResponse).`when`(spyRestApi).downloadDataPoints(anyLong())
-        doReturn(1).`when`(mockDatabaseDataSource)!!.syncDataPoints(
-            anyList()
-        )
-        doReturn(mockApiDataPoints).`when`(mockApiResponse)!!.dataPoints
-
-        val repository =
-            DataPointDataRepository(
-                mockDataSourceFactory,
-                spyRestApi,
-                mockS3RestApi,
-                mapper,
-                mediaHelper
+    fun downloadDataPointsShouldReturnExpectedErrorWhenAssignmentMissing() = runBlocking {
+        coEvery {
+            mockRestApi.downloadDataPoints(
+                any(),
+                any()
             )
+        } coAnswers { throw spyHttpException }
+        every { spyHttpException.code() } returns HttpURLConnection.HTTP_NOT_FOUND
+
+        try {
+            val result = repository.downloadDataPoints(123L)
+        } catch (e: Exception) {
+            assert(e is AssignmentRequiredException)
+        }
+    }
+
+    @Test
+    fun downloadDataPointsShouldReturnExpectedHttpError() = runBlocking {
+        coEvery {
+            mockRestApi.downloadDataPoints(
+                any(),
+                any()
+            )
+        } coAnswers { throw spyHttpException }
+        every { spyHttpException.code() } returns HttpURLConnection.HTTP_BAD_GATEWAY
+
+        try {
+            val result: Int = repository.downloadDataPoints(123L)
+        } catch (e: Exception) {
+            assert(e is HttpException)
+        }
+    }
+
+    @Test
+    fun downloadDataPointsShouldReturnCorrectResultIfSuccess() = runBlocking {
+        coEvery { mockRestApi.downloadDataPoints(any(), any()) } returns ApiLocaleResult(
+            emptyList(), "", 0, 0, 0, ""
+        )
+        every { mockDatabaseDataSource.syncDataPoints(any()) } returns 1
 
         val result: Int = repository.downloadDataPoints(123L)
 

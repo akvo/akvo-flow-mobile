@@ -38,13 +38,26 @@ class DataPointDataRepository @Inject constructor(
     private val s3RestApi: S3RestApi,
     private val mapper: DataPointImageMapper,
     private val mediaHelper: MediaHelper
-) : DataPointRepository {
+    ) : DataPointRepository {
 
-    override suspend fun downloadDataPoints(surveyGroupId: Long): Int {
+    override suspend fun downloadDataPoints(surveyId: Long): Int {
+        var syncedDataPoints = 0
+        var backendDataPointsCursor = dataSourceFactory.dataBaseDataSource.getDataPointCursor(surveyId)
+        var moreToLoad = true
         try {
-            return syncDataPoints(restApi.downloadDataPoints(surveyGroupId))
+            while (moreToLoad) {
+                val apiLocaleResult = restApi.downloadDataPoints(surveyId, backendDataPointsCursor)
+                syncedDataPoints += syncDataPoints(apiLocaleResult)
+                if (apiLocaleResult.dataPoints.isNotEmpty()) {
+                    backendDataPointsCursor = apiLocaleResult.cursor
+                }
+                moreToLoad = apiLocaleResult.dataPoints.isNotEmpty()
+                        && backendDataPointsCursor != null // cursor is null with old datapoint api
+            }
+            dataSourceFactory.dataBaseDataSource.saveDataPointCursor(surveyId, backendDataPointsCursor)
+            return syncedDataPoints
         } catch (e: HttpException) {
-            if ((e.code() == HttpURLConnection.HTTP_FORBIDDEN)) {
+            if ((e.code() == HttpURLConnection.HTTP_NOT_FOUND)) {
                 throw AssignmentRequiredException("Dashboard Assignment missing")
             } else {
                 throw e
@@ -61,15 +74,14 @@ class DataPointDataRepository @Inject constructor(
     }
 
     private suspend fun syncDataPoints(apiLocaleResult: ApiLocaleResult): Int {
-        val syncDataPoints =
-            dataSourceFactory.dataBaseDataSource.syncDataPoints(apiLocaleResult.dataPoints)
+        val dataPoints = apiLocaleResult.dataPoints
+        val syncDataPoints = dataSourceFactory.dataBaseDataSource.syncDataPoints(dataPoints)
         downLoadImages(apiLocaleResult.dataPoints)
         return syncDataPoints
     }
 
-
     private suspend fun downLoadImages(dataPoints: List<ApiDataPoint>) {
-       mapper.getImagesList(dataPoints)
+        mapper.getImagesList(dataPoints)
             .filter { image -> !dataSourceFactory.fileDataSource.fileExists(image) }
             .map { image ->
                 val responseBody = s3RestApi.downloadImage(image)

@@ -21,7 +21,7 @@ package org.akvo.flow.domain.repository
 import io.reactivex.Completable
 
 interface DataPointRepository {
-    suspend fun downloadDataPoints(surveyGroupId: Long): Int
+    suspend fun downloadDataPoints(surveyId: Long): Int
     fun cleanPathAndDownLoadMedia(filename: String): Completable
     fun markDataPointAsViewed(dataPointId: String): Completable
 }

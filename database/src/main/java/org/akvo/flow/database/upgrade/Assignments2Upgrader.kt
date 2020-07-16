@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2020 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -15,21 +15,18 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
-package org.akvo.flow.data.net.gae
+package org.akvo.flow.database.upgrade
 
-import org.akvo.flow.data.entity.ApiLocaleResult
-import org.akvo.flow.data.util.ApiUrls
-import retrofit2.http.GET
-import retrofit2.http.Query
+import android.database.sqlite.SQLiteDatabase
+import org.akvo.flow.database.DataPointDownloadTable
 
-interface DataPointDownloadService {
+class Assignments2Upgrader(
+    private val db: SQLiteDatabase,
+    private val dataPointDownloadTable: DataPointDownloadTable
+) : DatabaseUpgrader {
 
-    @GET(ApiUrls.DATA_POINTS)
-    suspend fun getAssignedDataPoints(
-        @Query(ApiUrls.ANDROID_ID) androidId: String,
-        @Query(ApiUrls.SURVEY_ID) surveyId: String,
-        @Query(ApiUrls.CURSOR) cursor: String? = null
-    ): ApiLocaleResult
+    override fun upgrade() {
+        dataPointDownloadTable.onCreate(db)
+    }
 }

@@ -22,11 +22,13 @@ package org.akvo.flow.data.net;
 
 import android.util.Base64;
 
+import androidx.annotation.NonNull;
+
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Objects;
 
-import androidx.annotation.NonNull;
 import okhttp3.HttpUrl;
 import okhttp3.Interceptor;
 import okhttp3.Request;
@@ -50,6 +52,7 @@ public class HmacInterceptor implements Interceptor {
         this.signatureHelper = signatureHelper;
     }
 
+    @NonNull
     @Override
     public Response intercept(Chain chain) throws IOException {
         Request request = chain.request();
@@ -59,12 +62,12 @@ public class HmacInterceptor implements Interceptor {
         String query = uriString.substring(separator);
         String urlBeginning = uriString.substring(0, separator);
 
-        query = appendQueryParam(query, TIMESTAMP, getTimestamp());
+        query = appendQueryParam(query, TIMESTAMP, getEncodedTimeStamp());
         String auth = signatureHelper.getAuthorization(query, key, Base64.DEFAULT);
         query = appendQueryParam(query, HMAC, auth);
 
         String reconstructedUrl = urlBeginning + query;
-        request = request.newBuilder().url(HttpUrl.parse(reconstructedUrl)).build();
+        request = request.newBuilder().url(Objects.requireNonNull(HttpUrl.parse(reconstructedUrl))).build();
         return chain.proceed(request);
     }
 
@@ -73,7 +76,7 @@ public class HmacInterceptor implements Interceptor {
         return query + "&" + name + "=" + value;
     }
 
-    private String getTimestamp() {
+    private String getEncodedTimeStamp() {
         return encoder.encodeParam(dateFormat.format(new Date()));
     }
 }

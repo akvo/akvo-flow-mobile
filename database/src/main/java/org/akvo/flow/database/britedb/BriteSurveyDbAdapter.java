@@ -30,6 +30,7 @@ import androidx.annotation.Nullable;
 import com.squareup.sqlbrite2.BriteDatabase;
 import com.squareup.sqlbrite2.SqlBrite;
 
+import org.akvo.flow.database.DataPointDownloadTable;
 import org.akvo.flow.database.RecordColumns;
 import org.akvo.flow.database.ResponseColumns;
 import org.akvo.flow.database.SurveyColumns;
@@ -813,5 +814,22 @@ public class BriteSurveyDbAdapter {
         contentValues.put(RecordColumns.VIEWED, 1);
         String where = RecordColumns.RECORD_ID + " = ? ";
         briteDatabase.update(Tables.RECORD, contentValues, where, dataPointId);
+    }
+
+    public Cursor getCursor(long surveyId) {
+        return briteDatabase.query("SELECT " + DataPointDownloadTable.COLUMN_CURSOR
+                + " FROM " + DataPointDownloadTable.TABLE_NAME
+                + " WHERE " + DataPointDownloadTable.COLUMN_SURVEY_ID + " = ? ", surveyId + "");
+    }
+
+    public void saveCursor(long surveyId, String cursor) {
+        ContentValues contentValues = new ContentValues(2);
+        contentValues.put(DataPointDownloadTable.COLUMN_SURVEY_ID, surveyId);
+        contentValues.put(DataPointDownloadTable.COLUMN_CURSOR, cursor);
+        briteDatabase.insert(DataPointDownloadTable.COLUMN_CURSOR, contentValues);
+    }
+
+    public void clearCursor(long surveyId) {
+        briteDatabase.delete(DataPointDownloadTable.TABLE_NAME, DataPointDownloadTable.COLUMN_SURVEY_ID + " = ?", surveyId + "");
     }
 }

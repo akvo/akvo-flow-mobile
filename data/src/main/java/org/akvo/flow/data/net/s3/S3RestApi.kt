@@ -75,6 +75,13 @@ open class S3RestApi(
             })
     }
 
+    suspend fun downloadImage(fileName: String): ResponseBody {
+        val date = formattedDate()
+        val authorization = amazonAuthHelper
+            .getAmazonAuthForGet(date, PAYLOAD_GET, "$IMAGES_FOLDER/$fileName")
+        return createRetrofitService().downloadImageNew(IMAGES_FOLDER, fileName, date, authorization)
+    }
+
     private fun uploadPublicFile(date: String, s3File: S3File): Observable<Response<ResponseBody>> {
         val authorization = amazonAuthHelper.getAmazonAuthForPut(date, PAYLOAD_PUT_PUBLIC, s3File)
         return createRetrofitService()

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2020 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -16,17 +16,17 @@
  * You should have received a copy of the GNU General Public License
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
+package org.akvo.flow.database.upgrade
 
-package org.akvo.flow.data.net
+import android.database.sqlite.SQLiteDatabase
+import org.akvo.flow.database.DataPointDownloadTable
 
-import io.reactivex.Observable
-import io.reactivex.functions.Function
-import timber.log.Timber
+class Assignments2Upgrader(
+    private val db: SQLiteDatabase,
+    private val dataPointDownloadTable: DataPointDownloadTable
+) : DatabaseUpgrader {
 
-class ErrorLoggerFunction<T>(private val message: String) : Function<Throwable, Observable<*>> {
-
-    override fun apply(throwable: Throwable): Observable<T> {
-        Timber.e(Exception(throwable), message)
-        return Observable.error(throwable)
+    override fun upgrade() {
+        dataPointDownloadTable.onCreate(db)
     }
 }

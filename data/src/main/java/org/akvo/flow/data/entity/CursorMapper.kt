@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2020 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -15,24 +15,27 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 
-package org.akvo.flow.data.net.gae;
+package org.akvo.flow.data.entity
 
-import org.akvo.flow.data.entity.ApiLocaleResult;
+import android.database.Cursor
+import org.akvo.flow.database.DataPointDownloadTable
+import javax.inject.Inject
 
-import io.reactivex.Single;
-import retrofit2.http.GET;
-import retrofit2.http.Query;
+class CursorMapper @Inject constructor() {
 
-import static org.akvo.flow.data.util.ApiUrls.ANDROID_ID;
-import static org.akvo.flow.data.util.ApiUrls.DATA_POINTS;
-import static org.akvo.flow.data.util.ApiUrls.SURVEY_ID;
+    fun transform(cursor: Cursor?): String? {
+        cursor?.let { c ->
+            if (c.moveToFirst()) {
+                return getCursor(c)
+            }
+            c.close()
+        }
+        return null
+    }
 
-public interface DataPointDownloadService {
-
-    @GET(DATA_POINTS)
-    Single<ApiLocaleResult> getAssignedDataPoints(@Query(ANDROID_ID) String androidId,
-            @Query(SURVEY_ID) String surveyId);
+    private fun getCursor(cursor: Cursor): String {
+        return cursor.getString(cursor.getColumnIndexOrThrow(DataPointDownloadTable.COLUMN_CURSOR))
+    }
 }

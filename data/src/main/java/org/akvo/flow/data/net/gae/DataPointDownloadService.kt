@@ -17,31 +17,19 @@
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
+package org.akvo.flow.data.net.gae
 
-package org.akvo.flow.domain.entity;
+import org.akvo.flow.data.entity.ApiLocaleResult
+import org.akvo.flow.data.util.ApiUrls
+import retrofit2.http.GET
+import retrofit2.http.Query
 
-public class DownloadResult {
+interface DataPointDownloadService {
 
-    private final ResultCode resultCode;
-    private final int numberOfNewItems;
-
-    public DownloadResult(ResultCode resultCode, int numberOfNewItems) {
-        this.resultCode = resultCode;
-        this.numberOfNewItems = numberOfNewItems;
-    }
-
-    public ResultCode getResultCode() {
-        return resultCode;
-    }
-
-    public int getNumberOfNewItems() {
-        return numberOfNewItems;
-    }
-
-    public enum ResultCode {
-        SUCCESS,
-        ERROR_NO_NETWORK,
-        ERROR_ASSIGNMENT_MISSING,
-        ERROR_OTHER
-    }
+    @GET(ApiUrls.DATA_POINTS)
+    suspend fun getAssignedDataPoints(
+        @Query(ApiUrls.ANDROID_ID) androidId: String,
+        @Query(ApiUrls.SURVEY_ID) surveyId: String,
+        @Query(ApiUrls.CURSOR) cursor: String? = null
+    ): ApiLocaleResult
 }

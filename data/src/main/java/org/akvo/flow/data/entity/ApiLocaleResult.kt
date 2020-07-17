@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017,2020 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -17,31 +17,16 @@
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
+package org.akvo.flow.data.entity
 
-package org.akvo.flow.domain.entity;
+import com.google.gson.annotations.SerializedName
 
-public class DownloadResult {
-
-    private final ResultCode resultCode;
-    private final int numberOfNewItems;
-
-    public DownloadResult(ResultCode resultCode, int numberOfNewItems) {
-        this.resultCode = resultCode;
-        this.numberOfNewItems = numberOfNewItems;
-    }
-
-    public ResultCode getResultCode() {
-        return resultCode;
-    }
-
-    public int getNumberOfNewItems() {
-        return numberOfNewItems;
-    }
-
-    public enum ResultCode {
-        SUCCESS,
-        ERROR_NO_NETWORK,
-        ERROR_ASSIGNMENT_MISSING,
-        ERROR_OTHER
-    }
-}
+data class ApiLocaleResult(
+    @SerializedName("dataPointData")
+    var dataPoints: List<ApiDataPoint> = emptyList(),
+    var message: String? = null,
+    var offset: Int = 0,
+    var code: Int = 0,
+    var resultCount: Int = 0,
+    val cursor: String
+)

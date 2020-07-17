@@ -12,7 +12,7 @@ buildscript {
         classpath 'com.getkeepsafe.dexcount:dexcount-gradle-plugin:1.0.2'
         classpath 'com.google.gms:google-services:4.3.3'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-        classpath 'com.google.firebase:firebase-crashlytics-gradle:2.1.1'
+        classpath 'com.google.firebase:firebase-crashlytics-gradle:2.2.0'
         classpath "org.jacoco:org.jacoco.core:$jacocoVersion"
         classpath 'com.google.firebase:firebase-appdistribution-gradle:2.0.0'
     }
@@ -28,6 +28,7 @@ ext {
     crashlyticsVersion = "17.0.1"
     constraintLayoutVersion = "1.1.3"
     coreKtxVersion = "1.3.0"
+    coroutinesVersion = "1.3.7"
     exifVersion = "1.2.0"
     firebaseAnalyticsVersion = "17.4.3"
     materialVersion = "1.1.0"
@@ -35,10 +36,8 @@ ext {
     recyclerVersion = "1.1.0"
     workVersion = "2.3.4"
 
-    adapterRxJava2Version = "2.3.0"
+    retrofitVersion = "2.6.0"
     butterKnifeVersion = "10.2.1"
-    converterGsonVersion = "2.3.0"
-    converterScalarsVersion = "2.3.0"
     daggerVersion = "2.28"
     glideVersion = "4.11.0"
     gmsVersion = "15.0.1"
@@ -61,6 +60,7 @@ ext {
     mockServerVersion = "3.12.12"
     mockitoInlineVersion = "2.8.47"
     mockitoKotlinVersion = "2.2.0"
+    mockkVersion = "1.10.0"
 
     androidXJunit = "1.1.0"
     androidXCore = "1.1.0"

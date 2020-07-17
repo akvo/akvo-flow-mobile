@@ -23,24 +23,25 @@ package org.akvo.flow.domain.entity;
 public class DownloadResult {
 
     private final ResultCode resultCode;
-    private final int numberOfSyncedItems;
+    private final int numberOfNewItems;
 
-    public DownloadResult(ResultCode resultCode, int numberOfSyncedItems) {
+    public DownloadResult(ResultCode resultCode, int numberOfNewItems) {
         this.resultCode = resultCode;
-        this.numberOfSyncedItems = numberOfSyncedItems;
+        this.numberOfNewItems = numberOfNewItems;
     }
 
     public ResultCode getResultCode() {
         return resultCode;
     }
 
-    public int getNumberOfSyncedItems() {
-        return numberOfSyncedItems;
+    public int getNumberOfNewItems() {
+        return numberOfNewItems;
     }
 
     public enum ResultCode {
         SUCCESS,
         ERROR_NO_NETWORK,
-        ERROR_ASSIGNMENT_MISSING
+        ERROR_ASSIGNMENT_MISSING,
+        ERROR_OTHER
     }
 }

@@ -22,9 +22,12 @@ package org.akvo.flow.data.repository;
 
 import android.database.Cursor;
 
+import androidx.annotation.NonNull;
+
 import org.akvo.flow.data.datasource.DataSourceFactory;
 import org.akvo.flow.data.datasource.DatabaseDataSource;
 import org.akvo.flow.data.entity.ApiFormHeader;
+import org.akvo.flow.data.entity.form.DomainFormMapper;
 import org.akvo.flow.data.entity.form.Form;
 import org.akvo.flow.data.entity.form.FormHeaderParser;
 import org.akvo.flow.data.entity.form.FormIdMapper;
@@ -42,7 +45,6 @@ import java.util.Set;
 
 import javax.inject.Inject;
 
-import androidx.annotation.NonNull;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.functions.Consumer;
@@ -60,17 +62,19 @@ public class FormDataRepository implements FormRepository {
     private final DataSourceFactory dataSourceFactory;
     private final FormIdMapper formIdMapper;
     private final S3RestApi s3RestApi;
+    private final DomainFormMapper domainFormMapper;
 
     @Inject
     public FormDataRepository(FormHeaderParser formHeaderParser, XmlFormParser xmlParser,
-            RestApi restApi, DataSourceFactory dataSourceFactory, FormIdMapper formIdMapper,
-            S3RestApi s3RestApi) {
+                              RestApi restApi, DataSourceFactory dataSourceFactory, FormIdMapper formIdMapper,
+                              S3RestApi s3RestApi, DomainFormMapper domainFormMapper) {
         this.formHeaderParser = formHeaderParser;
         this.xmlParser = xmlParser;
         this.restApi = restApi;
         this.dataSourceFactory = dataSourceFactory;
         this.formIdMapper = formIdMapper;
         this.s3RestApi = s3RestApi;
+        this.domainFormMapper = domainFormMapper;
     }
 
     @Override
@@ -137,6 +141,12 @@ public class FormDataRepository implements FormRepository {
     public Single<DomainForm> parseForm(@NotNull String formId) {
         return dataSourceFactory.getFileDataSource().getFormFile(formId).firstOrError()
                 .map(xmlParser::parseToDomainForm);
+    }
+
+    @Override
+    @NotNull
+    public Single<DomainForm> getForm(@NotNull String formId) {
+        return dataSourceFactory.getDataBaseDataSource().getForm(formId).map(domainFormMapper::mapForm);
     }
 
     private Observable<Boolean> downloadFormHeader(String formId, String deviceId) {

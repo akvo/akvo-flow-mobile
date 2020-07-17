@@ -23,7 +23,9 @@ package org.akvo.flow.data.datasource;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.text.TextUtils;
-import android.util.Pair;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.squareup.sqlbrite2.BriteDatabase;
 
@@ -31,10 +33,13 @@ import org.akvo.flow.data.entity.ApiDataPoint;
 import org.akvo.flow.data.entity.ApiFormHeader;
 import org.akvo.flow.data.entity.ApiQuestionAnswer;
 import org.akvo.flow.data.entity.ApiSurveyInstance;
+import org.akvo.flow.data.entity.CursorMapper;
+import org.akvo.flow.data.entity.FormInstanceMapper;
 import org.akvo.flow.data.entity.SurveyInstanceIdMapper;
+import org.akvo.flow.data.entity.form.DataForm;
 import org.akvo.flow.data.entity.form.Form;
 import org.akvo.flow.data.entity.form.FormLanguagesMapper;
-import org.akvo.flow.data.entity.form.FormMetadataMapper;
+import org.akvo.flow.data.entity.form.FormMapper;
 import org.akvo.flow.data.util.FlowFileBrowser;
 import org.akvo.flow.database.Constants;
 import org.akvo.flow.database.RecordColumns;
@@ -45,6 +50,7 @@ import org.akvo.flow.database.SurveyInstanceColumns;
 import org.akvo.flow.database.SurveyInstanceStatus;
 import org.akvo.flow.database.TransmissionStatus;
 import org.akvo.flow.database.britedb.BriteSurveyDbAdapter;
+import org.akvo.flow.domain.entity.DomainFormInstance;
 import org.akvo.flow.domain.entity.User;
 import org.jetbrains.annotations.NotNull;
 
@@ -55,8 +61,6 @@ import java.util.Set;
 
 import javax.inject.Inject;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.Single;
@@ -71,16 +75,20 @@ public class DatabaseDataSource {
 
     private final BriteSurveyDbAdapter briteSurveyDbAdapter;
     private final SurveyInstanceIdMapper surveyInstanceIdMapper;
-    private final FormMetadataMapper formMetadataMapper;
+    private final FormMapper formMapper;
+    private final FormInstanceMapper formInstanceMapper;
+    private final CursorMapper cursorMapper;
     private final FormLanguagesMapper formLanguagesMapper;
 
     @Inject
     public DatabaseDataSource(BriteDatabase db, SurveyInstanceIdMapper surveyInstanceIdMapper,
-            FormMetadataMapper formMetadataMapper,
-            FormLanguagesMapper formLanguagesMapper) {
+                              FormMapper formMapper, FormInstanceMapper formInstanceMapper,
+                              CursorMapper cursorMapper, FormLanguagesMapper formLanguagesMapper) {
         this.briteSurveyDbAdapter = new BriteSurveyDbAdapter(db);
         this.surveyInstanceIdMapper = surveyInstanceIdMapper;
-        this.formMetadataMapper = formMetadataMapper;
+        this.formMapper = formMapper;
+        this.formInstanceMapper = formInstanceMapper;
+        this.cursorMapper = cursorMapper;
         this.formLanguagesMapper = formLanguagesMapper;
     }
 
@@ -93,7 +101,7 @@ public class DatabaseDataSource {
     }
 
     public Observable<Cursor> getDataPoints(@NonNull Long surveyGroupId, @Nullable Double latitude,
-            @Nullable Double longitude, @Nullable Integer orderBy) {
+                                            @Nullable Double longitude, @Nullable Integer orderBy) {
         if (isRequestFiltered(orderBy)) {
             return briteSurveyDbAdapter
                     .getFilteredDataPoints(surveyGroupId, latitude, longitude, orderBy);
@@ -106,11 +114,12 @@ public class DatabaseDataSource {
         return Single.just(briteSurveyDbAdapter.getDataPoint(dataPointId));
     }
 
-    public Completable syncDataPoints(List<ApiDataPoint> apiDataPoints) {
+    public Integer syncDataPoints(List<ApiDataPoint> apiDataPoints) {
         if (apiDataPoints == null) {
-            return Completable.complete();
+            return 0;
         }
         BriteDatabase.Transaction transaction = briteSurveyDbAdapter.beginTransaction();
+        int newDataPoints = 0;
         try {
             for (ApiDataPoint dataPoint : apiDataPoints) {
                 final String dataPointId = dataPoint.getId();
@@ -124,13 +133,16 @@ public class DatabaseDataSource {
 
                 syncSurveyInstances(dataPoint.getSurveyInstances(), dataPointId);
 
-                briteSurveyDbAdapter.updateRecord(dataPointId, values);
+                boolean insertedNewRecord = briteSurveyDbAdapter.insertOrUpdateRecord(dataPointId, values);
+                if (insertedNewRecord) {
+                    newDataPoints++;
+                }
             }
             transaction.markSuccessful();
         } finally {
             transaction.end();
         }
-        return Completable.complete();
+        return newDataPoints;
     }
 
     private boolean isRequestFiltered(@Nullable Integer orderBy) {
@@ -351,7 +363,7 @@ public class DatabaseDataSource {
     }
 
     public Completable createTransmissions(final Long instanceId, final String formId,
-            Set<String> filenames) {
+                                           Set<String> filenames) {
         if (filenames == null || filenames.isEmpty()) {
             return Completable.complete();
         }
@@ -381,7 +393,7 @@ public class DatabaseDataSource {
     }
 
     public Observable<Boolean> insertSurvey(ApiFormHeader formHeader,
-            boolean cascadeResourcesDownloaded, Form form) {
+                                            boolean cascadeResourcesDownloaded, Form form) {
         ContentValues updatedValues = new ContentValues();
         updatedValues.put(SurveyColumns.SURVEY_ID, formHeader.getId());
         String versionValue = form.getVersion() != null && !"0.0".equals(form.getVersion()) ?
@@ -418,20 +430,54 @@ public class DatabaseDataSource {
         return Observable.just(true);
     }
 
-    public Single<Pair<Boolean, String>> getFormMetaData(String formId) {
-        return briteSurveyDbAdapter.getFormMetaData(formId).map(formMetadataMapper::mapForm);
-    }
-
-    public Single<Long> fetchSurveyInstance(String formId, String dataPointId, String formVersion,
-            long userId, String userName) {
-        return briteSurveyDbAdapter
-                .fetchOrCreateFormInstance(formId, dataPointId, formVersion, userId, userName);
+    @NotNull
+    public Single<DataForm> getForm(String formId) {
+        return briteSurveyDbAdapter.getForm(formId).map(formMapper::mapForm);
     }
 
     @NotNull
     public Completable markDataPointAsViewed(@NotNull String dataPointId) {
         briteSurveyDbAdapter.markDataPointAsViewed(dataPointId);
         return Completable.complete();
+    }
+
+    public Single<Long> getSavedFormInstance(@NotNull String formId, @NotNull String datapointId) {
+        return briteSurveyDbAdapter.getSavedFormInstance(formId, datapointId)
+                .map(formInstanceMapper::getFormInstanceId);
+    }
+
+    public Single<Long> getRecentSubmittedFormInstance(@NotNull String formId,
+                                                       @NotNull String datapointId, long maxDate) {
+        return briteSurveyDbAdapter.getRecentSubmittedFormInstance(formId, datapointId, maxDate)
+                .map(formInstanceMapper::getFormInstanceId);
+    }
+
+    @NotNull
+    public Single<Long> createFormInstance(DomainFormInstance domainFormInstance) {
+        ContentValues initialValues = new ContentValues();
+        initialValues.put(SurveyInstanceColumns.SURVEY_ID, domainFormInstance.getFormId());
+        initialValues.put(SurveyInstanceColumns.VERSION, domainFormInstance.getFormVersion());
+        initialValues.put(SurveyInstanceColumns.USER_ID, domainFormInstance.getUserId());
+        initialValues.put(SurveyInstanceColumns.STATUS, domainFormInstance.getStatus());
+        initialValues.put(SurveyInstanceColumns.UUID, domainFormInstance.getUuid());
+        initialValues.put(SurveyInstanceColumns.START_DATE, domainFormInstance.getStartDate());
+        initialValues.put(SurveyInstanceColumns.SAVED_DATE, domainFormInstance.getSavedDate());
+        initialValues.put(SurveyInstanceColumns.RECORD_ID, domainFormInstance.getDataPointId());
+        initialValues.put(SurveyInstanceColumns.SUBMITTER, domainFormInstance.getUserName());
+        return briteSurveyDbAdapter.createFormInstance(initialValues);
+    }
+
+    @Nullable
+    public String getDataPointCursor(long surveyId) {
+        return cursorMapper.transform(briteSurveyDbAdapter.getCursor(surveyId));
+    }
+
+    public void saveDataPointCursor(long surveyId, @Nullable String cursor) {
+        if (cursor != null) {
+            briteSurveyDbAdapter.saveCursor(surveyId, cursor);
+        } else {
+            briteSurveyDbAdapter.clearCursor(surveyId);
+        }
     }
 
     @NotNull

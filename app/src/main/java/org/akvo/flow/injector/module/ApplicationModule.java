@@ -23,6 +23,8 @@ package org.akvo.flow.injector.module;
 import android.content.Context;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import androidx.annotation.NonNull;
+
 import com.google.gson.Gson;
 import com.squareup.sqlbrite2.BriteDatabase;
 import com.squareup.sqlbrite2.SqlBrite;
@@ -44,11 +46,13 @@ import org.akvo.flow.data.repository.ApkDataRepository;
 import org.akvo.flow.data.repository.DataPointDataRepository;
 import org.akvo.flow.data.repository.FileDataRepository;
 import org.akvo.flow.data.repository.FormDataRepository;
+import org.akvo.flow.data.repository.FormInstanceDataRepository;
 import org.akvo.flow.data.repository.LanguagesDataRepository;
 import org.akvo.flow.data.repository.MissingAndDeletedDataRepository;
 import org.akvo.flow.data.repository.SetupDataRepository;
 import org.akvo.flow.data.repository.SurveyDataRepository;
 import org.akvo.flow.data.repository.UserDataRepository;
+import org.akvo.flow.database.DataPointDownloadTable;
 import org.akvo.flow.database.DatabaseHelper;
 import org.akvo.flow.database.LanguageTable;
 import org.akvo.flow.database.SurveyLanguagesDataSource;
@@ -59,6 +63,7 @@ import org.akvo.flow.domain.executor.ThreadExecutor;
 import org.akvo.flow.domain.repository.ApkRepository;
 import org.akvo.flow.domain.repository.DataPointRepository;
 import org.akvo.flow.domain.repository.FileRepository;
+import org.akvo.flow.domain.repository.FormInstanceRepository;
 import org.akvo.flow.domain.repository.FormRepository;
 import org.akvo.flow.domain.repository.LanguagesRepository;
 import org.akvo.flow.domain.repository.MissingAndDeletedRepository;
@@ -80,7 +85,6 @@ import java.util.concurrent.TimeUnit;
 
 import javax.inject.Singleton;
 
-import androidx.annotation.NonNull;
 import dagger.Module;
 import dagger.Provides;
 import io.reactivex.schedulers.Schedulers;
@@ -149,6 +153,12 @@ public class ApplicationModule {
 
     @Provides
     @Singleton
+    public FormInstanceRepository provideFormInstanceRepository(FormInstanceDataRepository repository) {
+        return repository;
+    }
+
+    @Provides
+    @Singleton
     public MissingAndDeletedRepository provideMissingAndDeletedRepository(
             MissingAndDeletedDataRepository repository) {
         return repository;
@@ -181,7 +191,7 @@ public class ApplicationModule {
     @Provides
     @Singleton
     public SQLiteOpenHelper provideOpenHelper() {
-        return new DatabaseHelper(application, new LanguageTable());
+        return new DatabaseHelper(application, new LanguageTable(), new DataPointDownloadTable());
     }
 
     @Provides

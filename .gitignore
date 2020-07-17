@@ -62,7 +62,11 @@ gradle.deps
 #errors
 hs_err_*
 .attach_pid*
+*.hprof
 
 #reports
 */jacoco.exec
 codacy-coverage-reporter
+
+#languages
+.tx

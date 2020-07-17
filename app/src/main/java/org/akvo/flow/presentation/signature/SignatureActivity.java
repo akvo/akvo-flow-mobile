@@ -34,7 +34,6 @@ import org.akvo.flow.injector.component.ApplicationComponent;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
 import org.akvo.flow.ui.view.signature.SignatureDrawView;
-import org.akvo.flow.uicomponents.LocaleAwareActivity;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.ViewUtil;
 import org.akvo.flow.util.image.GlideImageLoader;
@@ -44,6 +43,7 @@ import java.io.File;
 
 import javax.inject.Inject;
 
+import androidx.appcompat.app.AppCompatActivity;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -51,7 +51,7 @@ import butterknife.OnTextChanged;
 
 import static org.akvo.flow.R.id.signature;
 
-public class SignatureActivity extends LocaleAwareActivity
+public class SignatureActivity extends AppCompatActivity
         implements SignatureDrawView.SignatureViewListener,
         SignatureView {
 

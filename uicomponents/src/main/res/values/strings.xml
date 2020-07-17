@@ -98,6 +98,7 @@
     <string name="type_code">type code</string>
     <string name="or">or</string>
     <string name="capture_shape">capture shape</string>
+    <string name="edit_shape">edit shape</string>
     <string name="view_shape">view shape</string>
     <string name="delete_point_title">Delete point?</string>
     <string name="delete_shape_title">Delete shape?</string>
@@ -117,7 +118,6 @@
     <string name="stats_total">Total Data Points:</string>
     <string name="stats_week">Last 7 days:</string>
     <string name="stats_today">Today:</string>
-    <string name="distance_label">Distance:</string>
     <string name="tab_datapoints">DATA POINTS</string>
     <string name="tab_map">MAP</string>
     <string name="order_date">Date</string>
@@ -126,8 +126,6 @@
     <string name="order_name">Name</string>
     <!--Record Activity-->
     <string name="unknown">Unnamed data point</string>
-    <string name="last_modified_monitored">Last Modified:</string>
-    <string name="last_modified_regular">Submitted:</string>
     <string name="last_response">Last Response:</string>
     <string name="error_missing_cascade">Cascade files are not downloaded</string>
     <string name="error_missing_form">Form not found. Please re-download all the forms</string>
@@ -228,7 +226,6 @@
     <string name="error_mobile_data_sync">Mobile data sync disabled</string>
     <string name="preference_screen_on">Keep screen on during form input</string>
     <string name="preference_upload_mobile_data">Upload submissions over mobile data</string>
-    <string name="preference_app_language">App language</string>
     <string name="preference_image_size">Image size</string>
     <string name="preferences_data_section">Data</string>
     <string name="preference_sync_datapoints">Upload all submitted data points to Flow instance.</string>
@@ -348,8 +345,14 @@
     <string name="geoshape_properties_title">Properties</string>
     <string name="image_location_coordinates">lat: %1$s\nlon: %2$s</string>
     <string name="data_upload_will_start_message">Data upload will start when an internet connection is available</string>
+    <string name="geoshapes_error_no_point_to_delete">Please select the point to delete first</string>
+    <string name="geoshapes_error_no_shape_to_delete">Please select the shape to delete first</string>
 
     <string name="error_data_point_not_found">Datapoint not found</string>
+    <string name="confirm_new_submission">New Submission</string>
+    <string name="confirm_new_submission_title">New Submission?</string>
+    <string name="confirm_new_submission_message">You\'ve submitted \"%1$s\" to this datapoint within the last 24 hours.\n\nDo you want to make another submission?</string>
+    <string name="content_description_data_point_status">Datapoint status image</string>
     <string name="error_saving_languages">Error saving languages</string>
     <string name="languages_load_error">Error loading form languages</string>
     <string name="error_loading_form">Error loading form</string>

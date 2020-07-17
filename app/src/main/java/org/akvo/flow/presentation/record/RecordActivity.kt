@@ -26,10 +26,13 @@ import android.view.MenuItem
 import android.view.View
 import androidx.annotation.StringRes
 import androidx.viewpager.widget.ViewPager
+import com.google.android.material.tabs.TabLayout
 import org.akvo.flow.R
 import org.akvo.flow.app.FlowApp
 import org.akvo.flow.domain.SurveyGroup
+import org.akvo.flow.domain.entity.DomainFormInstance
 import org.akvo.flow.injector.component.DaggerViewComponent
+import org.akvo.flow.tracking.TrackingHelper
 import org.akvo.flow.ui.Navigator
 import org.akvo.flow.ui.adapter.RecordTabsAdapter
 import org.akvo.flow.ui.fragment.FormListFragment.FormListListener
@@ -39,9 +42,11 @@ import org.akvo.flow.uicomponents.SnackBarManager
 import org.akvo.flow.util.ConstantUtil
 import javax.inject.Inject
 
-class RecordActivity : BackActivity(), FormListListener, ResponseListListener, RecordView {
 
-    private var surveyGroup: SurveyGroup? = null
+class RecordActivity : BackActivity(), FormListListener, ResponseListListener, RecordView,
+    ConfirmFormInstanceDialogListener {
+
+    private lateinit var surveyGroup: SurveyGroup
     private var dataPointId: String? = null
 
     private lateinit var rootLayout: View
@@ -55,6 +60,8 @@ class RecordActivity : BackActivity(), FormListListener, ResponseListListener, R
     @Inject
     lateinit var presenter: RecordPresenter
 
+    private lateinit var trackingHelper: TrackingHelper
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.record_activity)
@@ -67,8 +74,12 @@ class RecordActivity : BackActivity(), FormListListener, ResponseListListener, R
             resources.getStringArray(R.array.record_tabs)
         )
         viewPager.adapter = recordTabsAdapter
+        val tabLayout = findViewById<View>(R.id.tabs) as TabLayout
+        tabLayout.setupWithViewPager(viewPager)
+
         surveyGroup = intent.getSerializableExtra(ConstantUtil.SURVEY_EXTRA) as SurveyGroup
         rootLayout = findViewById(R.id.record_root_layout)
+        trackingHelper = TrackingHelper(this)
     }
 
     private fun initializeInjector() {
@@ -101,16 +112,34 @@ class RecordActivity : BackActivity(), FormListListener, ResponseListListener, R
 
     override fun onFormClick(formId: String) {
         dataPointId?.let { datapointId ->
-            presenter.onFormClick(formId, datapointId)
+            presenter.onFormClick(formId, datapointId, surveyGroup)
         }
     }
 
     private fun showErrorMessage(@StringRes stringResId: Int) {
-        snackBarManager.displaySnackBar(rootLayout,  stringResId, this)
+        snackBarManager.displaySnackBar(rootLayout, stringResId, this)
     }
 
     override fun onDataPointNameDeleted() {
         setTitle(R.string.unknown)
+    }
+
+    override fun showMissingUserError() {
+        showErrorMessage(R.string.mustselectuser)
+    }
+
+    override fun showFormNotFound() {
+        showErrorMessage(R.string.error_missing_form)
+    }
+
+    override fun displayWarningDialog(domainFormInstance: DomainFormInstance, formName: String) {
+        trackingHelper.logFormSubmissionRepeatConfirmationDialogEvent()
+        ConfirmFormInstanceDialog.newInstance(domainFormInstance, formName)
+            .show(supportFragmentManager, ConfirmFormInstanceDialog.TAG)
+    }
+
+    override fun onUserConfirmed(formInstance: DomainFormInstance) {
+        presenter.createNewFormInstance(formInstance)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

@@ -22,23 +22,26 @@ package org.akvo.flow.database.upgrade;
 
 import android.database.sqlite.SQLiteDatabase;
 
-import org.akvo.flow.database.DatabaseHelper;
-
 import androidx.annotation.Nullable;
+
+import org.akvo.flow.database.DataPointDownloadTable;
+import org.akvo.flow.database.DatabaseHelper;
 
 public class UpgraderFactory {
 
     @Nullable
     public DatabaseUpgrader createUpgrader(int upgradingFromVersion, DatabaseHelper helper,
-            SQLiteDatabase db) {
+                                           SQLiteDatabase db) {
         UpgraderVisitor databaseUpgrader = new UpgraderVisitor();
         switch (upgradingFromVersion) {
             case DatabaseHelper.VER_RESPONSE_ITERATION:
                 databaseUpgrader.addUpgrader(new ResponsesUpgrader(helper, db));
-                case DatabaseHelper.VER_TRANSMISSION_ITERATION:
-                    databaseUpgrader.addUpgrader(new TransmissionsUpgrader(helper, db));
-                    case DatabaseHelper.VER_DATA_POINT_ASSIGNMENTS_ITERATION:
-                        databaseUpgrader.addUpgrader(new AssignmentsUpgrader(helper, db));
+            case DatabaseHelper.VER_TRANSMISSION_ITERATION:
+                databaseUpgrader.addUpgrader(new TransmissionsUpgrader(helper, db));
+            case DatabaseHelper.VER_DATA_POINT_ASSIGNMENTS_ITERATION:
+                databaseUpgrader.addUpgrader(new AssignmentsUpgrader(helper, db));
+            case DatabaseHelper.VER_DATA_POINT_ASSIGNMENTS_ITERATION_2:
+                databaseUpgrader.addUpgrader(new Assignments2Upgrader(db, new DataPointDownloadTable()));
             default:
                 break;
         }

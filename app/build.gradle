@@ -2,9 +2,10 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'com.getkeepsafe.dexcount'
-apply plugin: 'io.fabric'
+apply plugin: 'com.google.firebase.crashlytics'
 apply from: rootProject.file("jacoco.gradle")
 apply plugin: 'kotlin-kapt'
+apply plugin: 'com.google.firebase.appdistribution'
 
 dexcount {
     enabled = !project.hasProperty("nodexcount")
@@ -110,9 +111,16 @@ android {
             proguardFile 'proguard-files/leakcanary.pro'
             proguardFile getDefaultProguardFile('proguard-android.txt')
             signingConfig signingConfigs.flowRelease
+
+            firebaseAppDistribution {
+                groups = "testers"
+                if (project.hasProperty('APP_ID')) {
+                    appId = APP_ID
+                }
+            }
         }
         debug {
-            minifyEnabled true
+            minifyEnabled false
             multiDexEnabled true
             testCoverageEnabled true
             proguardFile 'proguard-files/proguard-rules.pro'
@@ -244,14 +252,16 @@ dependencies {
     implementation "io.reactivex.rxjava2:rxjava:${rootProject.ext.rxJavaVersion}"
     implementation "com.squareup.okhttp3:logging-interceptor:${rootProject.ext.loggingInterceptorVersion}"
     implementation "com.google.code.gson:gson:${rootProject.ext.gsonVersion}"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:${rootProject.ext.coroutinesVersion}"
 
     debugImplementation "com.squareup.leakcanary:leakcanary-android:${rootProject.ext.leakCanaryVersion}"
 
     implementation "com.google.firebase:firebase-analytics:${rootProject.ext.firebaseAnalyticsVersion}"
-    implementation "com.crashlytics.sdk.android:crashlytics:${rootProject.ext.crashlyticsVersion}"
+    implementation "com.google.firebase:firebase-crashlytics:${rootProject.ext.crashlyticsVersion}"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
     implementation "androidx.core:core-ktx:${rootProject.ext.coreKtxVersion}"
     implementation "com.mapbox.mapboxsdk:mapbox-android-sdk:${rootProject.ext.mapboxVersion}"
+    implementation "com.mapbox.mapboxsdk:mapbox-android-plugin-annotation-v9:${rootProject.ext.mapboxAnnotationsVersion}"
     implementation "androidx.work:work-runtime:${rootProject.ext.workVersion}"
     implementation "com.halfhp.rxtracer:rxtracer:${rootProject.ext.rxTracerVersion}"
     implementation "org.slf4j:slf4j-nop:${rootProject.ext.slf4JVersion}"

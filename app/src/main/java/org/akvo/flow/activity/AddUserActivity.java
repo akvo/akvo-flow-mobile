@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015-2018 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2015-2018,2020 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -25,6 +25,8 @@ import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 
+import androidx.appcompat.app.AppCompatActivity;
+
 import org.akvo.flow.R;
 import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.data.database.SurveyDbDataSource;
@@ -33,7 +35,6 @@ import org.akvo.flow.injector.component.ApplicationComponent;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
 import org.akvo.flow.ui.Navigator;
-import org.akvo.flow.uicomponents.LocaleAwareActivity;
 import org.akvo.flow.util.logging.LoggingHelper;
 
 import javax.inject.Inject;
@@ -46,7 +47,7 @@ import butterknife.OnTextChanged;
 
 import static butterknife.OnTextChanged.Callback.AFTER_TEXT_CHANGED;
 
-public class AddUserActivity extends LocaleAwareActivity {
+public class AddUserActivity extends AppCompatActivity {
 
     @BindView(R.id.login_btn)
     View nextBt;
@@ -143,7 +144,7 @@ public class AddUserActivity extends LocaleAwareActivity {
 
             // Select the newly created user, and exit the Activity
             prefs.setLong(Prefs.KEY_USER_ID, userId);
-            helper.initLoginData(username, deviceId);
+            helper.initLoginData(deviceId);
             navigateToSurvey();
         }
     }

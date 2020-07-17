@@ -38,10 +38,6 @@
   <string name="nextbutton">Kế tiếp</string>
   <string name="cleartitle">Xóa những câu trả lời khảo sát</string>
   <string name="cleardesc">Bạn có chắc rằng bạn muốn xóa những câu trả lời của mình?</string>
-  <string name="authtitle">Yêu cầu có sự cho phép</string>
-  <string name="authtext">Vui lòng nhập mã quản trị: </string>
-  <string name="authfailed">Chưa được cấp phép</string>
-  <string name="invalidpassword">Sai mật khẩu</string>
   <string name="clearquestion">Xóa dữ liệu</string>
   <string name="clearquestiondesc">Bạn có muốn xóa câu trả lời của câu hỏi này?</string>
   <string name="identlabel">Nhận dạng thiết bị</string>
@@ -70,8 +66,6 @@
   <string name="data_sync_synced">Dữ liệu đã được đồng bộ hóa: %1$d</string>
   <string name="data_sync_error_form_deleted_title">Đã xóa mẫu biểu</string>
   <string name="data_sync_error_form_deleted_text">Mẫu biểu đã bị xóa %1$s</string>
-  <!--Localization-->
-  <string name="please_restart">Vui lòng, khởi động lại ứng dụng</string>
   <!--Empty Views-->
   <string name="no_datapoints_error_text">Bạn chưa có điễm dữ liệu nào.</string>
   <string name="no_survey_selected_text">You have no Survey selected. Open the side menu to select one.</string>
@@ -95,7 +89,6 @@
   <string name="capture_shape">Chụp hình</string>
   <string name="view_shape">Xem hình dạng</string>
   <string name="repeat_group">Lặp lại nhóm câu hỏi này</string>
-  <string name="repetitions">Sự lặp lại:</string>
   <string name="view_map">View map</string>
   <string name="delete_group_title">Xóa nhóm câu hỏi</string>
   <string name="delete_group_text">Bạn có muốn xóa nhóm câu hỏi này?</string>
@@ -119,8 +112,6 @@
   <string name="order_name">Tên</string>
   <!--Record Activity-->
   <string name="unknown">Điểm dữ liệu chưa có tên</string>
-  <string name="last_modified_monitored">Lần thay đổi trước:</string>
-  <string name="last_modified_regular">Đã đệ trình:</string>
   <string name="last_response">Câu trả lời cuối cùng:</string>
   <string name="error_missing_cascade">Những file danh sách chưa được tải xuống</string>
   <string name="error_missing_form">Không tìm thấy mẫu biểu. Xin vui lòng tải lại tất cả các mẫu biểu</string>
@@ -213,7 +204,6 @@
   <string name="error_loading_help">Lỗi tải </string>
   <string name="error_mobile_data_sync">Vô hiệu hóa đồng bộ dữ liệu qua mạng di động</string>
   <string name="preference_screen_on">Giữ màn hình bật sáng trong quá trình nhập dữ liệu</string>
-  <string name="preference_app_language">Ngôn ngữ ứng dụng</string>
   <string name="preference_image_size">Kích thước ảnh</string>
   <string name="preferences_data_section">Dữ liệu</string>
   <string name="preference_delete_collected_data">Xóa những hình ảnh và dữ liệu đã thu thập</string>

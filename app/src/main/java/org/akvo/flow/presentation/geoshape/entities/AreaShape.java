@@ -21,8 +21,6 @@ package org.akvo.flow.presentation.geoshape.entities;
 
 import android.os.Parcel;
 
-import com.mapbox.mapboxsdk.geometry.LatLng;
-
 import java.util.List;
 
 public class AreaShape extends Shape {
@@ -46,34 +44,4 @@ public class AreaShape extends Shape {
             return new AreaShape[size];
         }
     };
-
-    @Override
-    public void removeSelectedPoint() {
-        super.removeSelectedPoint();
-        List<ShapePoint> points = getPoints();
-        //Remove the extra point we added to create a valid shape since at this point the shape ceases to be valid
-        if (points.size() == 3) {
-            points.remove(points.size() - 1);
-        }
-    }
-
-    /**
-     * When adding a point to an area (polygon) we need to add an extra point to "close" the shape.
-     * The closing point is the same as the first point added
-     */
-    @Override
-    public void addPoint(LatLng latLng) {
-        unSelectAllPoints();
-        ShapePoint shapePoint = createSelectedShapePoint(latLng, getFeatureId());
-        List<ShapePoint> points = getPoints();
-        int size = points.size();
-        if (size < 2) {
-            points.add(shapePoint);
-        } else if (size == 2) {
-            points.add(shapePoint);
-            points.add(points.get(0));
-        } else {
-            points.add(size - 1, shapePoint);
-        }
-    }
 }

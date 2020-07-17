@@ -41,10 +41,6 @@
   <string name="nextbutton">Selanjutnya</string>
   <string name="cleartitle">Hapus Semua Jawaban</string>
   <string name="cleardesc">Apakah Anda Yakin Untuk Menghapus Semua Jawaban?</string>
-  <string name="authtitle">Dibutuhkan Otorisasi</string>
-  <string name="authtext">Mohon masukkan password administrator:</string>
-  <string name="authfailed">Otorisasi Gagal</string>
-  <string name="invalidpassword">Passcode salah</string>
   <string name="clearquestion">Hapus Respon</string>
   <string name="clearquestiondesc">Apakah anda ingin menghapus jawaban untuk pertanyaan ini?</string>
   <string name="identlabel">Identitas Perangkat</string>
@@ -73,8 +69,6 @@
   <string name="data_sync_synced">Sinkronisasi Formulir: %1$d</string>
   <string name="data_sync_error_form_deleted_title">Form terhapus</string>
   <string name="data_sync_error_form_deleted_text">Form %1$s telah dihapus</string>
-  <!--Localization-->
-  <string name="please_restart">Mohon memulai ulang aplikasi</string>
   <!--Empty Views-->
   <string name="no_datapoints_error_text">Anda belum mempunyai titik data.</string>
   <string name="no_search_results_error_text">Tidak menemukan hasil.</string>
@@ -102,7 +96,6 @@
   <string name="delete_point_title">Hapus poin?</string>
   <string name="delete_shape_title">Hapus gambar?</string>
   <string name="repeat_group">Ulang grup</string>
-  <string name="repetitions">Pengulangan:</string>
   <string name="view_map">Lihat peta</string>
   <string name="delete_group_title">Hapus grup</string>
   <string name="delete_group_text">Apakah Anda ingin menghapus grup ini?</string>
@@ -126,8 +119,6 @@
   <string name="order_name">Nama</string>
   <!--Record Activity-->
   <string name="unknown">Data tidak bernama</string>
-  <string name="last_modified_monitored">Perubahan terakhir:</string>
-  <string name="last_modified_regular">Terkirim:</string>
   <string name="last_response">Respon Terakhir:</string>
   <string name="error_missing_cascade">Arsip bertingkat tidak terunduh</string>
   <string name="error_missing_form">Formulir tidak ditemukan. Mohon mengunduh kembali semua formulir</string>
@@ -221,7 +212,6 @@
   <string name="error_loading_help">Kesalahan dalam memuat bantuan konten</string>
   <string name="error_mobile_data_sync">Sinkronisasi data perangkat dimatikan</string>
   <string name="preference_screen_on">Jaga layar agar tetap menyala selama mengisi formulir</string>
-  <string name="preference_app_language">Bahasa aplikasi</string>
   <string name="preference_image_size">Ukuran gambar</string>
   <string name="preferences_data_section">Data</string>
   <string name="preference_delete_collected_data">Hapus data dan gambar yang telah dikumpulkan</string>

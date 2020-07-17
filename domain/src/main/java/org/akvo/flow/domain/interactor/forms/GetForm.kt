@@ -54,8 +54,7 @@ class GetForm @Inject constructor(
         if (!parameters.containsKey(PARAM_FORM_ID)) {
             return Single.error(IllegalArgumentException("Missing form id"))
         }
-        val formId = parameters[PARAM_FORM_ID] as String
-        return formRepository.parseForm(formId);
+        return formRepository.getForm(parameters[PARAM_FORM_ID] as String)
     }
 
     private fun addDisposable(disposable: Disposable) {

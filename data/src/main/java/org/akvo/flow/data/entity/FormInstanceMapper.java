@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2019 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2018-2020 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -21,9 +21,10 @@
 package org.akvo.flow.data.entity;
 
 import android.database.Cursor;
+import android.text.TextUtils;
+
 import androidx.annotation.NonNull;
 import androidx.core.util.Pair;
-import android.text.TextUtils;
 
 import org.akvo.flow.data.util.FileHelper;
 import org.akvo.flow.database.ResponseColumns;
@@ -146,7 +147,7 @@ public class FormInstanceMapper {
     }
 
     @NonNull
-    private FormInstance getFormInstance(@NonNull String deviceId, Cursor data) {
+    public FormInstance getFormInstance(@NonNull String deviceId, Cursor data) {
         int surveyIdColumn = data.getColumnIndexOrThrow(SurveyInstanceColumns.SURVEY_ID);
         int emailColumn = data.getColumnIndexOrThrow(UserColumns.EMAIL);
         int submittedDateColumn = data.getColumnIndexOrThrow(SurveyInstanceColumns.SUBMITTED_DATE);
@@ -166,5 +167,16 @@ public class FormInstanceMapper {
         double formVersion = data.getDouble(versionColumn);
         return new FormInstance(uuid, dataPointId, deviceId, username, email,
                 formId, submittedDate, duration, formVersion);
+    }
+
+    public Long getFormInstanceId(Cursor cursor) {
+        long formInstanceId = -1L;
+        if (cursor!= null && cursor.moveToFirst()) {
+            formInstanceId = getInstanceId(cursor);
+        }
+        if (cursor != null) {
+            cursor.close();
+        }
+        return formInstanceId;
     }
 }

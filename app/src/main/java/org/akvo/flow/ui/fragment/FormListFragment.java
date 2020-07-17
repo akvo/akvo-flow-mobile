@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2013-2017,2019 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2013-2017,2019-2020 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -40,7 +40,6 @@ import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.ui.model.ViewForm;
 import org.akvo.flow.ui.model.ViewFormMapper;
 import org.akvo.flow.util.ConstantUtil;
-import org.akvo.flow.util.PlatformUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -113,30 +112,15 @@ public class FormListFragment extends ListFragment
 
         private static final int LAYOUT_RES = R.layout.survey_item;
 
-        private final int[] backgrounds;
         private final int versionTextSize;
         private final int titleTextSize;
 
         SurveyAdapter(Context context) {
             super(context, LAYOUT_RES, new ArrayList<>());
-            this.backgrounds = new int[2];
-            backgrounds[0] = PlatformUtil.getResource(getContext(), R.attr.listitem_bg1);
-            backgrounds[1] = PlatformUtil.getResource(getContext(), R.attr.listitem_bg2);
             this.versionTextSize = context.getResources()
                     .getDimensionPixelSize(R.dimen.survey_version_text_size);
             this.titleTextSize = context.getResources()
                     .getDimensionPixelSize(R.dimen.survey_title_text_size);
-        }
-
-        @Override
-        public boolean areAllItemsEnabled() {
-            return false;
-        }
-
-        @Override
-        public boolean isEnabled(int position) {
-            ViewForm viewForm = getItem(position);
-            return viewForm.isEnabled();
         }
 
         @NonNull
@@ -155,9 +139,14 @@ public class FormListFragment extends ListFragment
             final ViewForm viewForm = getItem(position);
 
             formViewHolder.updateViews(viewForm, versionTextSize, titleTextSize);
+            if (viewForm.isEnabled()) {
+                listItem.setClickable(false);
+                listItem.setAlpha(1f);
+            } else {
+                listItem.setClickable(true);
+                listItem.setAlpha(0.5f);
+            }
 
-            // Alternate background
-            listItem.setBackgroundResource(backgrounds[position % 2 == 0 ? 0 : 1]);
             return listItem;
         }
 

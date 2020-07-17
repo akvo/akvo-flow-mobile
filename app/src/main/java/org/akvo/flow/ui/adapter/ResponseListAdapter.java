@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015-2019 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2015-2020 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -20,7 +20,6 @@ package org.akvo.flow.ui.adapter;
 
 import android.content.Context;
 import android.database.Cursor;
-import androidx.cursoradapter.widget.CursorAdapter;
 import android.text.TextUtils;
 import android.text.format.DateFormat;
 import android.view.LayoutInflater;
@@ -33,20 +32,17 @@ import org.akvo.flow.R;
 import org.akvo.flow.database.SurveyDbAdapter;
 import org.akvo.flow.database.SurveyInstanceStatus;
 import org.akvo.flow.util.ConstantUtil;
-import org.akvo.flow.util.PlatformUtil;
 
 import java.util.Date;
+
+import androidx.cursoradapter.widget.CursorAdapter;
 
 public class ResponseListAdapter extends CursorAdapter {
 
     private static final String DEFAULT_USERNAME = "IMPORTER";
 
-    private final int[] backgrounds = new int[2];
-
     public ResponseListAdapter(Context activityContext) {
         super(activityContext.getApplicationContext(), null, false);
-        backgrounds[0] = PlatformUtil.getResource(activityContext, R.attr.listitem_bg1);
-        backgrounds[1] = PlatformUtil.getResource(activityContext, R.attr.listitem_bg2);
     }
 
     @Override
@@ -100,10 +96,6 @@ public class ResponseListAdapter extends CursorAdapter {
         view.setTag(ConstantUtil.READ_ONLY_TAG_KEY, status != SurveyInstanceStatus.SAVED);
         ImageView stsIcon = (ImageView) view.findViewById(R.id.status_img);
         stsIcon.setImageResource(icon);
-
-        // Alternate background
-        int backgroundIndex = cursor.getPosition() % 2 == 0 ? 0 : 1;
-        view.setBackgroundResource(backgrounds[backgroundIndex]);
     }
 
     @Override

@@ -19,7 +19,12 @@
 
 package org.akvo.flow.presentation.geoshape.create;
 
+import android.text.TextUtils;
+
+import androidx.annotation.Nullable;
+
 import com.mapbox.geojson.Feature;
+import com.mapbox.geojson.Point;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 
 import org.akvo.flow.offlinemaps.presentation.geoshapes.GeoShapeConstants;
@@ -28,6 +33,7 @@ import org.akvo.flow.presentation.geoshape.entities.AreaShape;
 import org.akvo.flow.presentation.geoshape.entities.FeatureMapper;
 import org.akvo.flow.presentation.geoshape.entities.LineShape;
 import org.akvo.flow.presentation.geoshape.entities.PointShape;
+import org.akvo.flow.presentation.geoshape.entities.PointsLatLngMapper;
 import org.akvo.flow.presentation.geoshape.entities.Shape;
 import org.akvo.flow.presentation.geoshape.entities.ShapePoint;
 import org.akvo.flow.presentation.geoshape.entities.ViewFeatures;
@@ -38,11 +44,10 @@ import java.util.UUID;
 
 import javax.inject.Inject;
 
-import androidx.annotation.Nullable;
-
 public class CreateGeoShapePresenter implements Presenter {
 
     private final FeatureMapper featureMapper;
+    private final PointsLatLngMapper pointsLatLngMapper;
 
     private ViewFeatures viewFeatures = new ViewFeatures(new ArrayList<>(), new ArrayList<>(),
             new ArrayList<>());
@@ -50,8 +55,9 @@ public class CreateGeoShapePresenter implements Presenter {
     private CreateGeoShapeView view;
 
     @Inject
-    public CreateGeoShapePresenter(FeatureMapper featureMapper) {
+    public CreateGeoShapePresenter(FeatureMapper featureMapper, PointsLatLngMapper pointsLatLngMapper) {
         this.featureMapper = featureMapper;
+        this.pointsLatLngMapper = pointsLatLngMapper;
     }
 
     @Override
@@ -65,7 +71,7 @@ public class CreateGeoShapePresenter implements Presenter {
 
     public void setUpFeatures(String geoJSON) {
         shapes.clear();
-        shapes.addAll(featureMapper.toShapes(geoJSON));
+        shapes.addAll(featureMapper.toEditableShapes(geoJSON));
         viewFeatures = featureMapper.toViewFeatures(shapes);
     }
 
@@ -77,23 +83,44 @@ public class CreateGeoShapePresenter implements Presenter {
     }
 
     public void onDeletePointPressed() {
-        if (getSelectedShape() != null) {
+        if (getSelectedPoint() != null) {
             view.displayDeletePointDialog();
+        } else {
+            view.displayNoPointSelectedError();
         }
     }
 
     public void onDeleteShapePressed() {
         if (getSelectedShape() != null) {
             view.displayDeleteShapeDialog();
+        } else {
+            view.displayNoShapeSelectedError();
         }
     }
 
     public void onMapReady() {
         view.displayMapItems(viewFeatures);
+        Shape selectedShape = getSelectedShape();
+        if (selectedShape != null) {
+            ShapePoint selectedPoint = selectedShape.getSelectedPoint();
+            if (selectedPoint != null) {
+                view.updateSelected(pointsLatLngMapper.transform(selectedPoint));
+            }
+            if (selectedShape instanceof PointShape) {
+                view.enablePointDrawMode();
+                view.hideShapeSelection();
+            } else if (selectedShape instanceof LineShape) {
+                view.enableLineDrawMode();
+                view.hideShapeSelection();
+            } else if (selectedShape instanceof AreaShape) {
+                view.enableAreaDrawMode();
+                view.hideShapeSelection();
+            }
+        }
     }
 
-    public boolean onMapClick(Feature feature) {
-        Shape selected = selectFeatureFromPoint(feature);
+    public void onGeoshapeSelected(Feature feature) {
+        Shape selected = selectFeature(feature);
         if (selected instanceof PointShape) {
             view.enablePointDrawMode();
         } else if (selected instanceof LineShape) {
@@ -102,7 +129,6 @@ public class CreateGeoShapePresenter implements Presenter {
             view.enableAreaDrawMode();
         }
         updateSources();
-        return true;
     }
 
     public void onAddPointRequested(LatLng latLng, DrawMode drawMode) {
@@ -129,7 +155,7 @@ public class CreateGeoShapePresenter implements Presenter {
         Shape createdShape = null;
         switch (drawMode) {
             case POINT:
-               createdShape = new PointShape(featureId, points);
+                createdShape = new PointShape(featureId, points);
                 break;
             case LINE:
                 createdShape = new LineShape(featureId, points);
@@ -163,9 +189,24 @@ public class CreateGeoShapePresenter implements Presenter {
 
     public void onMapStyleUpdated() {
         view.displayNewMapStyle(viewFeatures);
+        Shape selectedShape = getSelectedShape();
+        if (selectedShape != null) {
+            ShapePoint selectedPoint = selectedShape.getSelectedPoint();
+            if (selectedPoint != null) {
+                view.updateSelected(pointsLatLngMapper.transform(selectedPoint));
+            }
+        }
+    }
+
+    public void onBackPressed(boolean changed) {
+        saveShape(changed);
     }
 
     public void onSavePressed(boolean changed) {
+        saveShape(changed);
+    }
+
+    private void saveShape(boolean changed) {
         if (isValidShape() && changed) {
             String featureString = featureMapper.createFeaturesToSave(shapes);
             view.setShapeResult(featureString);
@@ -179,6 +220,16 @@ public class CreateGeoShapePresenter implements Presenter {
         for (Shape shape : shapes) {
             if (shape.isSelected()) {
                 return shape;
+            }
+        }
+        return null;
+    }
+
+    @Nullable
+    private ShapePoint getSelectedPoint() {
+        for (Shape shape : shapes) {
+            if (shape.isSelected()) {
+                return shape.getSelectedPoint();
             }
         }
         return null;
@@ -211,18 +262,47 @@ public class CreateGeoShapePresenter implements Presenter {
         }
     }
 
+    public void onGeoshapeMoved(Point point) {
+        Shape shape = getSelectedShape();
+        if (shape != null) {
+            ShapePoint shapePoint = shape.getSelectedPoint();
+            if (shapePoint != null) {
+                shapePoint.setLatitude(point.latitude());
+                shapePoint.setLongitude(point.longitude());
+                updateSources();
+                view.updateMenu();
+            }
+        }
+    }
+
     private void updateSources() {
         viewFeatures = featureMapper.toViewFeatures(shapes);
         view.updateSources(viewFeatures);
+
+        Shape selectedShape = getSelectedShape();
+        if (selectedShape != null) {
+            ShapePoint selectedPoint = selectedShape.getSelectedPoint();
+            if (selectedPoint != null) {
+                view.updateSelected(pointsLatLngMapper.transform(selectedPoint));
+            } else {
+                view.clearSelected();
+            }
+        } else {
+            view.clearSelected();
+        }
     }
 
-    private Shape selectFeatureFromPoint(Feature feature) {
+    private Shape selectFeature(Feature feature) {
         String selectedFeatureId = feature.getStringProperty(GeoShapeConstants.FEATURE_ID);
-        String selectedPointId = feature.getStringProperty(GeoShapeConstants.POINT_ID);
         Shape selectedShape = null;
+        String selectedPointId = feature.getStringProperty(GeoShapeConstants.POINT_ID);
         for (Shape shape : shapes) {
             if (shape.getFeatureId().equals(selectedFeatureId)) {
-                shape.select(selectedPointId);
+                if (!TextUtils.isEmpty(selectedPointId)) {
+                    shape.select(selectedPointId);
+                } else {
+                    shape.setSelected(true);
+                }
                 selectedShape = shape;
             } else {
                 shape.unSelect();

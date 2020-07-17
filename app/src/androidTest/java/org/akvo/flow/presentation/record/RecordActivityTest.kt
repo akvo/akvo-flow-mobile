@@ -21,7 +21,6 @@ package org.akvo.flow.presentation.record
 
 import android.content.Context
 import android.content.Intent
-import android.util.Pair
 import androidx.test.espresso.intent.rule.IntentsTestRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
@@ -32,13 +31,18 @@ import io.reactivex.internal.schedulers.TrampolineScheduler
 import it.cosenonjaviste.daggermock.DaggerMock
 import org.akvo.flow.R
 import org.akvo.flow.activity.FormActivity
+import org.akvo.flow.activity.form.FormActivityTestUtil.addExecutionDelay
 import org.akvo.flow.activity.form.data.SurveyInstaller
 import org.akvo.flow.activity.form.data.SurveyRequisite
 import org.akvo.flow.app.FlowApp
 import org.akvo.flow.domain.SurveyGroup
 import org.akvo.flow.domain.entity.DataPoint
+import org.akvo.flow.domain.entity.DomainForm
+import org.akvo.flow.domain.entity.DomainFormInstance
 import org.akvo.flow.domain.entity.User
 import org.akvo.flow.domain.executor.SchedulerCreator
+import org.akvo.flow.domain.repository.FormInstanceRepository
+import org.akvo.flow.domain.repository.FormRepository
 import org.akvo.flow.domain.repository.SurveyRepository
 import org.akvo.flow.domain.repository.UserRepository
 import org.akvo.flow.injector.component.ApplicationComponent
@@ -53,9 +57,10 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.Matchers.anyLong
-import org.mockito.Matchers.anyString
+import org.mockito.Mockito
 import org.mockito.Mockito.`when`
+import org.mockito.Mockito.anyLong
+import org.mockito.Mockito.anyString
 import org.mockito.Mockito.mock
 
 @LargeTest
@@ -72,7 +77,7 @@ class RecordActivityTest {
         override fun getActivityIntent(): Intent {
             val targetContext: Context = getInstrumentation().targetContext
             val result = Intent(targetContext, RecordActivity::class.java)
-            result.putExtra(ConstantUtil.SURVEY_EXTRA, SurveyGroup(155852013L, "", "", true))
+            result.putExtra(ConstantUtil.SURVEY_EXTRA, SurveyGroup(155852013L, "", FORM_ID, true))
 
             val dataPointId = setUpFormData(targetContext)
             result.putExtra(ConstantUtil.DATA_POINT_ID_EXTRA, dataPointId.toString())
@@ -80,35 +85,28 @@ class RecordActivityTest {
         }
     }
 
-    val surveyRepository = mock(SurveyRepository::class.java)
-    val userRepository = mock(UserRepository::class.java)
-    val dataPoint = mock(DataPoint::class.java)
-    val schedulerCreator = mock(SchedulerCreator::class.java)
+    private val surveyRepository: SurveyRepository = mock(SurveyRepository::class.java)
+    private val formRepository: FormRepository = mock(FormRepository::class.java)
+    private val formInstanceRepository: FormInstanceRepository = mock(FormInstanceRepository::class.java)
+    private val userRepository: UserRepository = mock(UserRepository::class.java)
+    private val dataPoint: DataPoint = mock(DataPoint::class.java)
+    private val schedulerCreator: SchedulerCreator = mock(SchedulerCreator::class.java)
 
     @Before
     fun beforeClass() {
-        `when`(surveyRepository.getFormMeta(anyString())).thenReturn(Single.just(Pair(true, "1.0")))
+        val form = DomainForm(1, "1", 1, "name", "1.0", "", "", "", "", cascadeDownloaded = true, deleted = false)
+        `when`(formRepository.getForm(anyString())).thenReturn(Single.just(form))
         `when`(surveyRepository.getDataPoint(anyString())).thenReturn(Single.just(dataPoint))
         `when`(userRepository.selectedUser).thenReturn(Observable.just(1L))
         `when`(surveyRepository.getUser(1L)).thenReturn(Observable.just(User(1L, "test_user")))
-        `when`(
-            surveyRepository.fetchSurveyInstance(
-                anyString(),
-                anyString(),
-                anyString(),
-                anyLong(),
-                anyString()
-            )
-        ).thenReturn(Single.just(1L))
         `when`(dataPoint.latitude).thenReturn(41.3819219)
         `when`(dataPoint.longitude).thenReturn(2.148909)
+        `when`(dataPoint.name).thenReturn(DATAPOINT_NAME)
         `when`(schedulerCreator.obtainScheduler()).thenReturn(TrampolineScheduler.instance())
     }
 
     @Test
     fun activityShouldDisplayCorrectDataPointTitle() {
-        `when`(dataPoint.name).thenReturn(DATAPOINT_NAME)
-
         intentsTestRule.launchActivity(null)
 
         withRobot(RecordScreenRobot::class.java).checkTitleIs("test datapoint")
@@ -137,20 +135,8 @@ class RecordActivityTest {
     }
 
     @Test
-    fun onFormClickShouldLaunchFormActivityWhenCorrectDataPoint() {
-        `when`(dataPoint.name).thenReturn(DATAPOINT_NAME)
-
-        intentsTestRule.launchActivity(null)
-
-        intentsTestRule.activity.onFormClick(FORM_ID)
-
-        withRobot(RecordScreenRobot::class.java).checkFormActivityDisplayed()
-    }
-
-    @Test
     fun onFormClickShouldShowErrorMessageWhenBootstrapPending() {
         BootstrapService.isProcessing = true
-        `when`(dataPoint.name).thenReturn(DATAPOINT_NAME)
 
         intentsTestRule.launchActivity(null)
 
@@ -162,11 +148,33 @@ class RecordActivityTest {
     }
 
     @Test
-    fun onFormClickShouldShowErrorMessageCascadeMissing() {
-        `when`(dataPoint.name).thenReturn(DATAPOINT_NAME)
-        `when`(surveyRepository.getFormMeta(anyString()))
-            .thenReturn(Single.just(Pair(false, "1.0")))
+    fun onFormClickShouldShowErrorMessageUserError() {
+        `when`(userRepository.selectedUser).thenReturn(Observable.error(Exception("user not found")))
 
+        intentsTestRule.launchActivity(null)
+
+        intentsTestRule.activity.onFormClick(FORM_ID)
+
+        withRobot(RecordScreenRobot::class.java)
+            .checkSnackBarDisplayedWithText(R.string.mustselectuser)
+    }
+
+    @Test
+    fun onFormClickShouldShowErrorMessageUserMissing() {
+        `when`(userRepository.selectedUser).thenReturn(Observable.just(-1L))
+
+        intentsTestRule.launchActivity(null)
+
+        intentsTestRule.activity.onFormClick(FORM_ID)
+
+        withRobot(RecordScreenRobot::class.java)
+            .checkSnackBarDisplayedWithText(R.string.mustselectuser)
+    }
+
+    @Test
+    fun onFormClickShouldShowErrorMessageCascadeMissing() {
+        val form = DomainForm(1, "1", 1, "name", "1.0", "", "", "", "", cascadeDownloaded = false, deleted = false)
+        `when`(formRepository.getForm(anyString())).thenReturn(Single.just(form))
         intentsTestRule.launchActivity(null)
 
         intentsTestRule.activity.onFormClick(FORM_ID)
@@ -176,9 +184,73 @@ class RecordActivityTest {
     }
 
     @Test
-    fun onViewMapShouldOpenMapActivityForCorrectDataPoint() {
-        `when`(dataPoint.name).thenReturn(DATAPOINT_NAME)
+    fun onFormClickShouldShowErrorMessageFormNotFound() {
+        `when`(formRepository.getForm(anyString())).thenReturn(Single.error(Exception("form not found")))
+        intentsTestRule.launchActivity(null)
 
+        intentsTestRule.activity.onFormClick(FORM_ID)
+
+        withRobot(RecordScreenRobot::class.java)
+            .checkSnackBarDisplayedWithText(R.string.error_missing_form)
+    }
+
+    @Test
+    fun onFormClickShouldLaunchFormActivityWhenCorrectDataPointAndSavedInstance() {
+        `when`(formInstanceRepository.getSavedFormInstance(anyString(), anyString())).thenReturn(Single.just(1L))
+
+        intentsTestRule.launchActivity(null)
+
+        intentsTestRule.activity.onFormClick(FORM_ID)
+
+        withRobot(RecordScreenRobot::class.java).checkFormActivityDisplayed()
+    }
+
+    @Test
+    fun onFormClickShouldLaunchFormActivityWhenRegistrationForm() {
+        val form = DomainForm(1, FORM_ID, 1, "name", "1.0", "", "", "", "", cascadeDownloaded = true, deleted = false)
+        `when`(formRepository.getForm(anyString())).thenReturn(Single.just(form))
+        `when`(formInstanceRepository.getSavedFormInstance(anyString(), anyString())).thenReturn(Single.just(-1L))
+        `when`(formInstanceRepository.createFormInstance(any(DomainFormInstance::class.java))).thenReturn(Single.just(1L))
+
+        intentsTestRule.launchActivity(null)
+
+        intentsTestRule.activity.onFormClick(FORM_ID)
+
+        withRobot(RecordScreenRobot::class.java).checkFormActivityDisplayed()
+    }
+
+
+    @Test
+    fun onFormClickShouldLaunchFormActivityWhenRecentMoreThan24Hours() {
+        val form = DomainForm(1, "123", 1, "name", "1.0", "", "", "", "", cascadeDownloaded = true, deleted = false)
+        `when`(formRepository.getForm(anyString())).thenReturn(Single.just(form))
+        `when`(formInstanceRepository.getSavedFormInstance(anyString(), anyString())).thenReturn(Single.just(-1L))
+        `when`(formInstanceRepository.createFormInstance(any(DomainFormInstance::class.java))).thenReturn(Single.just(1L))
+        `when`(formInstanceRepository.getLatestSubmittedFormInstance(anyString(), anyString(), anyLong())).thenReturn(Single.just(-1L))
+
+        intentsTestRule.launchActivity(null)
+
+        intentsTestRule.activity.onFormClick(FORM_ID)
+
+        withRobot(RecordScreenRobot::class.java).checkFormActivityDisplayed()
+    }
+
+    @Test
+    fun onFormClickShouldDisplayDialogWhenRecentLessThan24Hours() {
+        val form = DomainForm(1, "123", 1, "name", "1.0", "", "", "", "", cascadeDownloaded = true, deleted = false)
+        `when`(formRepository.getForm(anyString())).thenReturn(Single.just(form))
+        `when`(formInstanceRepository.getSavedFormInstance(anyString(), anyString())).thenReturn(Single.just(-1L))
+        `when`(formInstanceRepository.getLatestSubmittedFormInstance(anyString(), anyString(), anyLong())).thenReturn(Single.just(1L))
+
+        intentsTestRule.launchActivity(null)
+
+        intentsTestRule.activity.onFormClick("1234")
+
+        withRobot(RecordScreenRobot::class.java).checkFormSubmissionDialogDisplayed()
+    }
+
+    @Test
+    fun onViewMapShouldOpenMapActivityForCorrectDataPoint() {
         intentsTestRule.launchActivity(null)
 
         withRobot(RecordScreenRobot::class.java).clickMapMenuOption().checkMapActivityDisplayed()
@@ -227,8 +299,18 @@ class RecordActivityTest {
 
         fun clickMapMenuOption(): RecordScreenRobot {
             clickOnViewWithId(R.id.more_submenu)
+            addExecutionDelay(1000)
             clickOnViewWithText(R.string.view_map)
             return this
         }
+
+        fun checkFormSubmissionDialogDisplayed() : RecordScreenRobot {
+           /* onView(withText(R.string.confirm_new_submission_title))
+                .inRoot(isDialog())
+                .check(matches(isDisplayed()))*/
+            return checkDialogDisplayed(R.string.confirm_new_submission_title)
+        }
     }
+
+    private fun <T> any(type: Class<T>): T = Mockito.any<T>(type)
 }

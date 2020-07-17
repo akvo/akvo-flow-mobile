@@ -164,7 +164,7 @@ class XmlFormParser @Inject constructor(private val helper: FileHelper) {
         } finally {
             helper.close(inputStream)
         }
-        return DomainForm(name, version, groups)
+        return DomainForm(name = name, version = version, groups = groups)
     }
 
     companion object {

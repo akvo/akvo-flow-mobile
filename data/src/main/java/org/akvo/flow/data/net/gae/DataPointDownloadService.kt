@@ -26,10 +26,13 @@ import retrofit2.http.Query
 
 interface DataPointDownloadService {
 
+    /**
+     * params need to be in alphabetic order
+     */
     @GET(ApiUrls.DATA_POINTS)
     suspend fun getAssignedDataPoints(
         @Query(ApiUrls.ANDROID_ID) androidId: String,
-        @Query(ApiUrls.SURVEY_ID) surveyId: String,
-        @Query(ApiUrls.CURSOR) cursor: String? = null
+        @Query(ApiUrls.CURSOR) cursor: String? = null,
+        @Query(ApiUrls.SURVEY_ID) surveyId: String
     ): ApiLocaleResult
 }

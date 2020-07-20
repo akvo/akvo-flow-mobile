@@ -304,11 +304,13 @@ class DataPointsListFragment : Fragment(), LocationListener, AdapterView.OnItemC
             object : MenuItem.OnActionExpandListener {
                 override fun onMenuItemActionExpand(item: MenuItem): Boolean {
                     trackingListener?.logSearchEvent()
+                    mAdapter.displayIds(true)
                     return true
                 }
 
                 override fun onMenuItemActionCollapse(item: MenuItem): Boolean {
                     presenter.loadDataPoints(mLatitude, mLongitude)
+                    mAdapter.displayIds(false)
                     return true
                 }
             })

@@ -684,6 +684,7 @@ public class BriteSurveyDbAdapter {
         briteDatabase.delete(Tables.SURVEY_INSTANCE, null);
         briteDatabase.delete(Tables.RECORD, null);
         briteDatabase.delete(Tables.TRANSMISSION, null);
+        briteDatabase.delete(DataPointDownloadTable.TABLE_NAME, null);
     }
 
     private void deleteAllResponses() {
@@ -827,7 +828,7 @@ public class BriteSurveyDbAdapter {
         ContentValues contentValues = new ContentValues(2);
         contentValues.put(DataPointDownloadTable.COLUMN_SURVEY_ID, surveyId);
         contentValues.put(DataPointDownloadTable.COLUMN_CURSOR, cursor);
-        briteDatabase.insert(DataPointDownloadTable.COLUMN_CURSOR, contentValues);
+        briteDatabase.insert(DataPointDownloadTable.TABLE_NAME, contentValues);
     }
 
     public void clearCursor(long surveyId) {

@@ -3,10 +3,10 @@
         name="LockedGeoForm"
         defaultLanguageCode="en"
         version='2.0'
-        app="akvoflow-dev2"
-        surveyGroupId="155852013"
+        app="akvoflow-uat1"
+        surveyGroupId="155852019"
         surveyGroupName="New survey"
-        surveyId="156792013">
+        surveyId="156792019">
     <questionGroup>
         <heading>group1</heading>
         <question

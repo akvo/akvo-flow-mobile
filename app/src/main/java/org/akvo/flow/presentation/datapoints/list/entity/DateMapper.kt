@@ -23,6 +23,7 @@ import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
+import java.util.Locale
 import javax.inject.Inject
 
 class DateMapper @Inject constructor() {
@@ -30,7 +31,17 @@ class DateMapper @Inject constructor() {
     fun formatDate(timeStamp: Long): String {
         val calendar = Calendar.getInstance()
         calendar.timeInMillis = timeStamp
-        val dateFormat = SimpleDateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT)
+        val dateFormat = generateDateFormat(calendar)
         return dateFormat.format(Date(timeStamp))
+    }
+
+    private fun generateDateFormat(calendar: Calendar): DateFormat {
+        val calendarToday = Calendar.getInstance()
+        calendarToday.timeInMillis = System.currentTimeMillis()
+        if (calendar.get(Calendar.DAY_OF_MONTH) == calendarToday.get(Calendar.DAY_OF_MONTH)) {
+            return SimpleDateFormat("HH:mm", Locale.getDefault())
+        } else {
+            return SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
+        }
     }
 }

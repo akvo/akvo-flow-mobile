@@ -44,6 +44,9 @@ public class DatabaseHelperTest {
     private LanguageTable mockLanguageTable;
 
     @Mock
+    private DataPointDownloadTable mockDataPointDownloadTable;
+
+    @Mock
     private SQLiteDatabase mockDb;
 
     private void configureDatabaseHelper(DatabaseHelper helper) {
@@ -53,7 +56,7 @@ public class DatabaseHelperTest {
     @Test
     public void onUpgradeShouldUpgradeCorrectlyIfVersionResponseMigrate() {
         DatabaseHelper helper = spy(
-                new DatabaseHelper(mockContext, mockLanguageTable));
+                new DatabaseHelper(mockContext, mockLanguageTable, mockDataPointDownloadTable));
         configureDatabaseHelper(helper);
 
         helper.onUpgrade(mockDb, DatabaseHelper.VER_RESPONSE_ITERATION,
@@ -67,7 +70,7 @@ public class DatabaseHelperTest {
     @Test
     public void onUpgradeShouldUpgradeCorrectlyIfVersionTransmissionMigrate() {
         DatabaseHelper helper = spy(
-                new DatabaseHelper(mockContext, mockLanguageTable));
+                new DatabaseHelper(mockContext, mockLanguageTable, mockDataPointDownloadTable));
         configureDatabaseHelper(helper);
 
         helper.onUpgrade(mockDb, DatabaseHelper.VER_TRANSMISSION_ITERATION,
@@ -80,7 +83,7 @@ public class DatabaseHelperTest {
     @Test
     public void onUpgradeShouldUpgradeCorrectlyIfVersionAssignmentsMigrate() {
         DatabaseHelper helper = spy(
-                new DatabaseHelper(mockContext, mockLanguageTable));
+                new DatabaseHelper(mockContext, mockLanguageTable, mockDataPointDownloadTable));
         configureDatabaseHelper(helper);
 
         helper.onUpgrade(mockDb, DatabaseHelper.VER_DATA_POINT_ASSIGNMENTS_ITERATION,

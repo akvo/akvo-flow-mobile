@@ -24,12 +24,17 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.util.SparseArray;
 
+import androidx.annotation.NonNull;
+import androidx.core.util.Pair;
+import androidx.test.platform.app.InstrumentationRegistry;
+
 import com.google.gson.GsonBuilder;
 import com.squareup.sqlbrite2.BriteDatabase;
 import com.squareup.sqlbrite2.SqlBrite;
 
 import org.akvo.flow.data.database.SurveyDbDataSource;
 import org.akvo.flow.data.database.cascade.CascadeDB;
+import org.akvo.flow.database.DataPointDownloadTable;
 import org.akvo.flow.database.DatabaseHelper;
 import org.akvo.flow.database.LanguageTable;
 import org.akvo.flow.domain.Node;
@@ -63,9 +68,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 
-import androidx.annotation.NonNull;
-import androidx.core.util.Pair;
-import androidx.test.platform.app.InstrumentationRegistry;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import timber.log.Timber;
 
@@ -78,7 +80,7 @@ public class SurveyInstaller {
 
     public SurveyInstaller(Context context) {
         SqlBrite sqlBrite = new SqlBrite.Builder().build();
-        DatabaseHelper databaseHelper = new DatabaseHelper(context, new LanguageTable());
+        DatabaseHelper databaseHelper = new DatabaseHelper(context, new LanguageTable(), new DataPointDownloadTable());
         BriteDatabase db = sqlBrite
                 .wrapDatabaseHelper(databaseHelper, AndroidSchedulers.mainThread());
         this.adapter = new SurveyDbDataSource(context, db);

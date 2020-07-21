@@ -2,4 +2,5 @@
 <resources>
     <dimen name="button_corner">2dp</dimen>
     <dimen name="button_border_width">1dp</dimen>
+    <dimen name="tabs_height">48dp</dimen>
 </resources>

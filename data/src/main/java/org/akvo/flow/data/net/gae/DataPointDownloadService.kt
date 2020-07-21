@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2019 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -17,34 +17,22 @@
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
+package org.akvo.flow.data.net.gae
 
-package org.akvo.flow.presentation.datapoints.map;
+import org.akvo.flow.data.entity.ApiLocaleResult
+import org.akvo.flow.data.util.ApiUrls
+import retrofit2.http.GET
+import retrofit2.http.Query
 
-import com.mapbox.geojson.FeatureCollection;
+interface DataPointDownloadService {
 
-interface DataPointsMapView {
-
-    void showProgress();
-
-    void hideProgress();
-
-    void displayDataPoints(FeatureCollection dataPoints);
-
-    void showDownloadedResults(int numberOfNewItems);
-
-    void showErrorAssignmentMissing();
-
-    void showErrorNoNetwork();
-
-    void showErrorSync();
-
-    void showNoDataPointsToDownload();
-
-    void hideMenu();
-
-    void showMonitoredMenu();
-
-    void showNonMonitoredMenu();
-
-    void showFab();
+    /**
+     * params need to be in alphabetic order
+     */
+    @GET(ApiUrls.DATA_POINTS)
+    suspend fun getAssignedDataPoints(
+        @Query(ApiUrls.ANDROID_ID) androidId: String,
+        @Query(ApiUrls.CURSOR) cursor: String? = null,
+        @Query(ApiUrls.SURVEY_ID) surveyId: String
+    ): ApiLocaleResult
 }

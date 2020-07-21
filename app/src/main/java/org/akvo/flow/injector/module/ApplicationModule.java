@@ -51,6 +51,7 @@ import org.akvo.flow.data.repository.MissingAndDeletedDataRepository;
 import org.akvo.flow.data.repository.SetupDataRepository;
 import org.akvo.flow.data.repository.SurveyDataRepository;
 import org.akvo.flow.data.repository.UserDataRepository;
+import org.akvo.flow.database.DataPointDownloadTable;
 import org.akvo.flow.database.DatabaseHelper;
 import org.akvo.flow.database.LanguageTable;
 import org.akvo.flow.database.SurveyLanguagesDataSource;
@@ -182,7 +183,7 @@ public class ApplicationModule {
     @Provides
     @Singleton
     public SQLiteOpenHelper provideOpenHelper() {
-        return new DatabaseHelper(application, new LanguageTable());
+        return new DatabaseHelper(application, new LanguageTable(), new DataPointDownloadTable());
     }
 
     @Provides

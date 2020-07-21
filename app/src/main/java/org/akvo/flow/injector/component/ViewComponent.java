@@ -45,7 +45,6 @@ import org.akvo.flow.presentation.record.RecordActivity;
 import org.akvo.flow.presentation.settings.PreferenceActivity;
 import org.akvo.flow.presentation.settings.publish.PublishFilesPreferenceView;
 import org.akvo.flow.presentation.signature.SignatureActivity;
-import org.akvo.flow.ui.fragment.DatapointsFragment;
 import org.akvo.flow.ui.fragment.ResponseListFragment;
 import org.akvo.flow.ui.view.CaddisflyQuestionView;
 import org.akvo.flow.ui.view.CascadeQuestionView;
@@ -62,8 +61,6 @@ import dagger.Component;
         WalkThroughModule.class
 })
 public interface ViewComponent {
-
-    void inject(DatapointsFragment datapointsFragment);
 
     void inject(FormActivity formActivity);
 

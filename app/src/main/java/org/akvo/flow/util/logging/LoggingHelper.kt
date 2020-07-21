@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017,2019 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017,2019-2020 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -21,6 +21,6 @@ package org.akvo.flow.util.logging
 
 interface LoggingHelper {
     fun init()
-    fun initLoginData(username: String?, deviceId: String?)
+    fun initLoginData(deviceId: String?)
     fun clearUser()
 }

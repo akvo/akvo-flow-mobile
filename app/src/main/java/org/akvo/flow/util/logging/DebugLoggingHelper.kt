@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017,2019 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017,2019-2020 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -28,7 +28,7 @@ class DebugLoggingHelper : LoggingHelper {
         Timber.plant(DebugTree())
     }
 
-    override fun initLoginData(username: String?, deviceId: String?) {
+    override fun initLoginData(deviceId: String?) {
         // ignored
     }
 

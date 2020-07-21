@@ -29,30 +29,34 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.StringRes;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.PermissionChecker;
+
 import com.google.android.material.bottomappbar.BottomAppBar;
+import com.mapbox.geojson.Feature;
+import com.mapbox.geojson.Point;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.Style;
 
 import org.akvo.flow.R;
 import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.injector.component.ApplicationComponent;
-import org.akvo.flow.uicomponents.BackActivity;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
+import org.akvo.flow.offlinemaps.presentation.geoshapes.GeoShapesClickListener;
 import org.akvo.flow.offlinemaps.presentation.geoshapes.GeoShapesMapViewImpl;
-import org.akvo.flow.uicomponents.SnackBarManager;
 import org.akvo.flow.presentation.geoshape.DeletePointDialog;
 import org.akvo.flow.presentation.geoshape.DeleteShapeDialog;
 import org.akvo.flow.presentation.geoshape.entities.Shape;
 import org.akvo.flow.presentation.geoshape.entities.ViewFeatures;
 import org.akvo.flow.presentation.geoshape.properties.PropertiesDialog;
+import org.akvo.flow.uicomponents.BackActivity;
+import org.akvo.flow.uicomponents.SnackBarManager;
 import org.akvo.flow.util.ConstantUtil;
 
 import javax.inject.Inject;
-
-import androidx.annotation.StringRes;
-import androidx.core.content.ContextCompat;
-import androidx.core.content.PermissionChecker;
 
 import static org.akvo.flow.offlinemaps.presentation.geoshapes.GeoShapeConstants.ACCURACY_THRESHOLD;
 import static org.akvo.flow.offlinemaps.presentation.geoshapes.GeoShapeConstants.CIRCLE_SOURCE_ID;
@@ -75,6 +79,7 @@ public class CreateGeoShapeActivity extends BackActivity implements
 
     private DrawMode drawMode = DrawMode.NONE;
 
+    private boolean allowShapeSelection = true;
     private boolean manualInputEnabled;
     private TextView bottomBarTitle;
     private BottomAppBar bottomAppBar;
@@ -231,7 +236,17 @@ public class CreateGeoShapeActivity extends BackActivity implements
     }
 
     private void setMapClicks() {
-        mapView.setMapClicks(this::onMapLongClick, presenter::onMapClick);
+        mapView.setMapClicks(this::onMapLongClick, new GeoShapesClickListener() {
+            @Override
+            public void onGeoShapeSelected(@NonNull Feature feature) {
+                presenter.onGeoshapeSelected(feature);
+            }
+
+            @Override
+            public void onGeoShapeMoved(Point point) {
+                presenter.onGeoshapeMoved(point);
+            }
+        });
     }
 
     @Override
@@ -250,16 +265,19 @@ public class CreateGeoShapeActivity extends BackActivity implements
     }
 
     private boolean onMapLongClick(LatLng point) {
-        if (!manualInputEnabled) {
-            showMessage(R.string.geoshapes_error_manual_disabled);
-            return false;
+        if (mapView.clicksAllowed()) {
+            if (!manualInputEnabled) {
+                showMessage(R.string.geoshapes_error_manual_disabled);
+                return false;
+            }
+            if (drawMode != DrawMode.NONE) {
+                presenter.onAddPointRequested(point, drawMode);
+            } else {
+                showMessage(R.string.geoshapes_error_select_shape);
+            }
+            return true;
         }
-        if (drawMode != DrawMode.NONE) {
-            presenter.onAddPointRequested(point, drawMode);
-        } else {
-            showMessage(R.string.geoshapes_error_select_shape);
-        }
-        return true;
+        return false;
     }
 
     private void showMessage(@StringRes int messageResId) {
@@ -281,6 +299,32 @@ public class CreateGeoShapeActivity extends BackActivity implements
     }
 
     @Override
+    public void updateSelected(LatLng coordinates) {
+        mapView.displaySelectedPoint(coordinates);
+    }
+
+    @Override
+    public void clearSelected() {
+        mapView.clearSelected();
+    }
+
+    @Override
+    public void hideShapeSelection() {
+        allowShapeSelection = false;
+        invalidateOptionsMenu();
+    }
+
+    @Override
+    public void displayNoPointSelectedError() {
+        showMessage(R.string.geoshapes_error_no_point_to_delete);
+    }
+
+    @Override
+    public void displayNoShapeSelectedError() {
+        showMessage(R.string.geoshapes_error_no_shape_to_delete);
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.create_geoshape_activity, menu);
         if (!allowPoints) {
@@ -291,6 +335,9 @@ public class CreateGeoShapeActivity extends BackActivity implements
         }
         if (!allowPolygon) {
             hideMenuItem(menu, R.id.add_polygon);
+        }
+        if (!allowShapeSelection) {
+            hideMenuItem(menu, R.id.add_feature);
         }
         MenuItem item = menu.findItem(R.id.save);
         if (item != null) {
@@ -336,6 +383,11 @@ public class CreateGeoShapeActivity extends BackActivity implements
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void onBackPressed() {
+        presenter.onBackPressed(changed);
+    }
+
     private void enableNewShapeType(DrawMode drawMode) {
         if (this.drawMode != drawMode) {
             presenter.onNewDrawModePressed(drawMode);
@@ -349,9 +401,7 @@ public class CreateGeoShapeActivity extends BackActivity implements
     }
 
     private void updateMapStyle(String style) {
-        mapView.updateMapStyle(style, callback -> {
-            presenter.onMapStyleUpdated();
-        });
+        mapView.updateMapStyle(style, callback -> presenter.onMapStyleUpdated());
     }
 
     @Override
@@ -413,7 +463,7 @@ public class CreateGeoShapeActivity extends BackActivity implements
     }
 
     @Override
-    protected void onSaveInstanceState(Bundle outState) {
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         mapView.onSaveInstanceState(outState);
     }

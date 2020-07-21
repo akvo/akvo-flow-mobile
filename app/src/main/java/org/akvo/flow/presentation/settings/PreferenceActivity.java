@@ -44,10 +44,6 @@ import org.akvo.flow.ui.Navigator;
 import org.akvo.flow.uicomponents.BackActivity;
 import org.akvo.flow.uicomponents.SnackBarManager;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Locale;
-
 import javax.inject.Inject;
 
 import androidx.annotation.StringRes;
@@ -89,9 +85,6 @@ public class PreferenceActivity extends BackActivity implements PreferenceView,
     @BindView(R.id.switch_enable_data)
     SwitchCompat enableDataSc;
 
-    @BindView(R.id.preference_language)
-    Spinner appLanguageSp;
-
     @BindView(R.id.preference_image_size)
     Spinner imageSizeSp;
 
@@ -101,7 +94,6 @@ public class PreferenceActivity extends BackActivity implements PreferenceView,
     @Inject
     SnackBarManager snackBarManager;
 
-    private List<String> languages;
     private boolean listenersEnabled = false;
     private TrackingHelper trackingHelper;
 
@@ -115,10 +107,9 @@ public class PreferenceActivity extends BackActivity implements PreferenceView,
         setupToolBar();
         setUpToolBarAnimationListener();
         updateProgressDrawable();
-        languages = Arrays.asList(getResources().getStringArray(R.array.app_language_codes));
         presenter.setView(this);
         trackingHelper = new TrackingHelper(this);
-        presenter.loadPreferences(languages, getLocale().getLanguage());
+        presenter.loadPreferences();
     }
 
     private void setUpToolBarAnimationListener() {
@@ -269,17 +260,6 @@ public class PreferenceActivity extends BackActivity implements PreferenceView,
         }
     }
 
-    @OnItemSelected(R.id.preference_language)
-    void onLanguageSelected(int position) {
-        if (listenersEnabled) {
-            if (trackingHelper != null) {
-                trackingHelper.logLanguageChanged(languages.get(position));
-            }
-            final String language = languages.get(position);
-            updateLocale(new Locale(language));
-        }
-    }
-
     @OnItemSelected(R.id.preference_image_size)
     void onImageSizeSelected(int position) {
         if (listenersEnabled) {
@@ -306,7 +286,6 @@ public class PreferenceActivity extends BackActivity implements PreferenceView,
         deviceIdentifierTv.setText(viewUserSettings.getIdentifier());
         screenOnSc.setChecked(viewUserSettings.isScreenOn());
         enableDataSc.setChecked(viewUserSettings.isDataEnabled());
-        appLanguageSp.setSelection(viewUserSettings.getLanguage());
         imageSizeSp.setSelection(viewUserSettings.getImageSize());
         delayListeners();
     }
@@ -315,7 +294,7 @@ public class PreferenceActivity extends BackActivity implements PreferenceView,
      * Delay enabling listeners in order to give ui time to draw spinners
      */
     private void delayListeners() {
-        appLanguageSp.postDelayed(() -> listenersEnabled = true, 500);
+        imageSizeSp.postDelayed(() -> listenersEnabled = true, 500);
     }
 
     @Override

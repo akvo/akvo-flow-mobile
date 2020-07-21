@@ -19,10 +19,18 @@
 
 package org.akvo.flow.presentation.record
 
+import org.akvo.flow.domain.entity.DomainFormInstance
+
 interface RecordView {
     fun showBootStrapPendingError()
     fun showMissingCascadeError()
     fun navigateToForm(formId: String, formInstanceId: Long)
     fun showDataPointTitle(displayName: String)
     fun showDataPointError()
+    fun showMissingUserError()
+    fun showFormNotFound()
+    fun displayWarningDialog(
+        domainFormInstance: DomainFormInstance,
+        formName: String
+    )
 }

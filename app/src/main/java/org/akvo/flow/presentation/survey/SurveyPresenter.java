@@ -20,12 +20,15 @@
 
 package org.akvo.flow.presentation.survey;
 
+import androidx.core.util.Pair;
+
 import org.akvo.flow.BuildConfig;
 import org.akvo.flow.domain.entity.ApkData;
 import org.akvo.flow.domain.entity.User;
 import org.akvo.flow.domain.interactor.DefaultObserver;
 import org.akvo.flow.domain.interactor.UseCase;
 import org.akvo.flow.domain.interactor.datapoints.MarkDatapointViewed;
+import org.akvo.flow.domain.interactor.users.GetSelectedUser;
 import org.akvo.flow.domain.util.VersionHelper;
 import org.akvo.flow.presentation.Presenter;
 import org.akvo.flow.presentation.entity.ViewApkMapper;
@@ -37,7 +40,6 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import androidx.core.util.Pair;
 import io.reactivex.annotations.NonNull;
 import io.reactivex.observers.DisposableCompletableObserver;
 import timber.log.Timber;
@@ -50,16 +52,16 @@ public class SurveyPresenter implements Presenter {
     private final UseCase saveApkUpdateNotified;
     private final VersionHelper versionHelper;
     private final ViewApkMapper viewApkMapper;
-    private final UseCase getSelectedUser;
+    private final GetSelectedUser getSelectedUser;
     private final MarkDatapointViewed markDatapointViewed;
 
     private SurveyView view;
 
     @Inject
     public SurveyPresenter(@Named("GetApkDataPreferences") UseCase getApkDataPreferences,
-            @Named("SaveApkUpdateNotified") UseCase saveApkUpdateNotified,
-            VersionHelper versionHelper, ViewApkMapper viewApkMapper, @Named("getSelectedUser")
-            UseCase getSelectedUser, MarkDatapointViewed markDatapointViewed) {
+                           @Named("SaveApkUpdateNotified") UseCase saveApkUpdateNotified,
+                           VersionHelper versionHelper, ViewApkMapper viewApkMapper,
+                           GetSelectedUser getSelectedUser, MarkDatapointViewed markDatapointViewed) {
         this.getApkDataPreferences = getApkDataPreferences;
         this.saveApkUpdateNotified = saveApkUpdateNotified;
         this.versionHelper = versionHelper;
@@ -102,7 +104,7 @@ public class SurveyPresenter implements Presenter {
     }
 
     private void notifyNewVersionAvailable(ApkData apkData) {
-        saveApkUpdateNotified.execute(new DefaultObserver<Boolean>(){
+        saveApkUpdateNotified.execute(new DefaultObserver<Boolean>() {
             @Override
             public void onError(Throwable e) {
                 Timber.e(e);
@@ -132,7 +134,7 @@ public class SurveyPresenter implements Presenter {
                 if (user.getName() == null) {
                     view.showMissingUserError();
                 } else {
-                   setDataPointAsViewed(datapointId, user);
+                    setDataPointAsViewed(datapointId, user);
                 }
             }
         }, null);

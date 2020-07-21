@@ -27,6 +27,7 @@ import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.intent.Intents.intended
 import androidx.test.espresso.intent.matcher.IntentMatchers.hasComponent
+import androidx.test.espresso.matcher.RootMatchers
 import androidx.test.espresso.matcher.ViewMatchers
 import androidx.test.espresso.matcher.ViewMatchers.withEffectiveVisibility
 import androidx.test.espresso.matcher.ViewMatchers.withId
@@ -77,6 +78,14 @@ abstract class ScreenRobot<T : ScreenRobot<T>> {
     fun checkActivityDisplayed(name: String): T {
         addExecutionDelay(100)
         intended(hasComponent(name))
+        return this as T
+    }
+
+    fun checkDialogDisplayed(@StringRes stringResId: Int) : T {
+        addExecutionDelay(100)
+        onView(withText(stringResId))
+            .inRoot(RootMatchers.isDialog())
+            .check(matches(ViewMatchers.isDisplayed()))
         return this as T
     }
 

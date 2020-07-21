@@ -29,7 +29,19 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.DialogFragment;
+import androidx.viewpager.widget.ViewPager;
+
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.tabs.TabLayout;
 
 import org.akvo.flow.R;
 import org.akvo.flow.app.FlowApp;
@@ -41,7 +53,7 @@ import org.akvo.flow.domain.Survey;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.entity.User;
 import org.akvo.flow.domain.interactor.DefaultObserver;
-import org.akvo.flow.domain.interactor.UseCase;
+import org.akvo.flow.domain.interactor.users.GetSelectedUser;
 import org.akvo.flow.domain.util.VersionHelper;
 import org.akvo.flow.injector.component.ApplicationComponent;
 import org.akvo.flow.injector.component.DaggerViewComponent;
@@ -50,8 +62,8 @@ import org.akvo.flow.offlinemaps.domain.entity.DomainOfflineArea;
 import org.akvo.flow.offlinemaps.presentation.OfflineMapSelectedListener;
 import org.akvo.flow.offlinemaps.presentation.dialog.OfflineMapsDialog;
 import org.akvo.flow.offlinemaps.presentation.infowindow.InfoWindowLayout;
-import org.akvo.flow.uicomponents.SnackBarManager;
 import org.akvo.flow.presentation.UserDeleteConfirmationDialog;
+import org.akvo.flow.presentation.datapoints.map.DataPointsMapFragment;
 import org.akvo.flow.presentation.entity.ViewApkData;
 import org.akvo.flow.presentation.navigation.CreateUserDialog;
 import org.akvo.flow.presentation.navigation.EditUserDialog;
@@ -59,7 +71,6 @@ import org.akvo.flow.presentation.navigation.FlowNavigationView;
 import org.akvo.flow.presentation.navigation.SurveyDeleteConfirmationDialog;
 import org.akvo.flow.presentation.navigation.UserOptionsDialog;
 import org.akvo.flow.presentation.navigation.ViewUser;
-import org.akvo.flow.presentation.survey.FABListener;
 import org.akvo.flow.presentation.survey.SurveyPresenter;
 import org.akvo.flow.presentation.survey.SurveyView;
 import org.akvo.flow.service.BootstrapService;
@@ -68,9 +79,10 @@ import org.akvo.flow.service.TimeCheckService;
 import org.akvo.flow.tracking.TrackingHelper;
 import org.akvo.flow.tracking.TrackingListener;
 import org.akvo.flow.ui.Navigator;
-import org.akvo.flow.ui.fragment.DatapointsFragment;
 import org.akvo.flow.ui.fragment.RecordListListener;
-import org.akvo.flow.uicomponents.LocaleAwareActivity;
+import org.akvo.flow.ui.fragment.StatsDialogFragment;
+import org.akvo.flow.ui.fragment.TabsAdapter;
+import org.akvo.flow.uicomponents.SnackBarManager;
 import org.akvo.flow.util.AppPermissionsHelper;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.StatusUtil;
@@ -80,31 +92,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.ActionBarDrawerToggle;
-import androidx.appcompat.widget.Toolbar;
-import androidx.core.app.ActivityCompat;
-import androidx.core.view.GravityCompat;
-import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.fragment.app.DialogFragment;
-import androidx.fragment.app.FragmentManager;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import timber.log.Timber;
 
-public class SurveyActivity extends LocaleAwareActivity implements RecordListListener,
+public class SurveyActivity extends AppCompatActivity implements RecordListListener,
         FlowNavigationView.DrawerNavigationListener,
         SurveyDeleteConfirmationDialog.SurveyDeleteListener, UserOptionsDialog.UserOptionListener,
         UserDeleteConfirmationDialog.UserDeleteListener, EditUserDialog.EditUserListener,
-        CreateUserDialog.CreateUserListener, SurveyView, TrackingListener, FABListener,
+        CreateUserDialog.CreateUserListener, SurveyView, TrackingListener,
         OfflineMapSelectedListener, InfoWindowLayout.InfoWindowSelectionListener {
 
     public static final int NAVIGATION_DRAWER_DELAY_MILLIS = 250;
-    private static final String DATA_POINTS_FRAGMENT_TAG = "datapoints_fragment";
+    private static final String STATS_DIALOG_FRAGMENT_TAG = "stats";
 
     @BindView(R.id.toolbar)
     Toolbar toolbar;
@@ -134,8 +136,7 @@ public class SurveyActivity extends LocaleAwareActivity implements RecordListLis
     SnackBarManager snackBarManager;
 
     @Inject
-    @Named("getSelectedUser")
-    UseCase getSelectedUser;
+    GetSelectedUser getSelectedUser;
 
     @Inject
     AppPermissionsHelper appPermissionsHelper;
@@ -148,11 +149,14 @@ public class SurveyActivity extends LocaleAwareActivity implements RecordListLis
 
     private SurveyGroup mSurveyGroup;
 
+    private TabsAdapter mTabsAdapter;
+    private ViewPager mPager;
     private ActionBarDrawerToggle mDrawerToggle;
     private long selectedSurveyId;
     private boolean activityJustCreated;
     private boolean permissionsResults;
     private TrackingHelper trackingHelper;
+    private boolean servicesStarted = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -165,6 +169,7 @@ public class SurveyActivity extends LocaleAwareActivity implements RecordListLis
         initializeToolBar();
         presenter.setView(this);
         trackingHelper = new TrackingHelper(this);
+        servicesStarted = false;
         if (!deviceSetUpCompleted()) {
             navigateToSetUp();
         } else {
@@ -175,7 +180,6 @@ public class SurveyActivity extends LocaleAwareActivity implements RecordListLis
 
             initNavigationDrawer();
             selectSurvey();
-            initDataPointsFragment(savedInstanceState);
 
             //When the app is restarted we need to display the current user
             if (savedInstanceState == null) {
@@ -183,7 +187,88 @@ public class SurveyActivity extends LocaleAwareActivity implements RecordListLis
             }
             activityJustCreated = true;
             setNavigationView();
-            startService(new Intent(this, SurveyDownloadService.class));
+            mPager = findViewById(R.id.pager);
+            TabLayout tabs = findViewById(R.id.tabs);
+
+            mTabsAdapter = new TabsAdapter(getSupportFragmentManager(), getResources().getStringArray(R.array.records_activity_tabs), mSurveyGroup);
+            mPager.setAdapter(mTabsAdapter);
+            tabs.setupWithViewPager(mPager);
+            mPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+                @Override
+                public void onPageScrolled(int position, float positionOffset,
+                                           int positionOffsetPixels) {
+                    //EMPTY
+                }
+
+                @Override
+                public void onPageSelected(int position) {
+                    if (position == TabsAdapter.POSITION_MAP && mSurveyGroup != null) {
+                        displayMapFab();
+                    }
+                }
+
+                @Override
+                public void onPageScrollStateChanged(int state) {
+                    switch (state) {
+                        case ViewPager.SCROLL_STATE_SETTLING:
+                        case ViewPager.SCROLL_STATE_IDLE:
+                            showFabs();
+                            break;
+                        default:
+                            hideFabs();
+                            break;
+                    }
+                }
+            });
+        }
+    }
+
+    private void hideFabs() {
+        if (mSurveyGroup != null) {
+            addDataPointFab.hide();
+        }
+        if (mSurveyGroup != null) {
+            hideMapsFab();
+        }
+    }
+
+    private void hideMapsFab() {
+        DataPointsMapFragment mapFragment = mTabsAdapter.getMapFragment();
+        if (mapFragment != null) {
+            mapFragment.hideFab();
+        }
+    }
+
+    private void showFabs() {
+        if (mSurveyGroup != null) {
+            addDataPointFab.show();
+            addDataPointFab.setEnabled(true);
+        }
+
+        if (mPager.getCurrentItem() == TabsAdapter.POSITION_MAP && mSurveyGroup != null) {
+            displayMapFab();
+        }
+    }
+
+    private void displayMapFab() {
+        DataPointsMapFragment mapFragment = mTabsAdapter.getMapFragment();
+        if (mapFragment != null) {
+            mapFragment.showFab();
+        }
+    }
+
+    public void refreshMap() {
+        mTabsAdapter.refreshMap();
+    }
+
+    public void refresh(SurveyGroup surveyGroup) {
+        mSurveyGroup = surveyGroup;
+        refreshView();
+    }
+
+    private void refreshView() {
+        if (mTabsAdapter != null) {
+            mTabsAdapter.refreshFragments(mSurveyGroup);
         }
     }
 
@@ -248,17 +333,6 @@ public class SurveyActivity extends LocaleAwareActivity implements RecordListLis
         }
     }
 
-    private void initDataPointsFragment(Bundle savedInstanceState) {
-        FragmentManager supportFragmentManager = getSupportFragmentManager();
-        if (savedInstanceState == null
-                || supportFragmentManager.findFragmentByTag(DATA_POINTS_FRAGMENT_TAG) == null) {
-            DatapointsFragment datapointsFragment = DatapointsFragment.newInstance(mSurveyGroup);
-            supportFragmentManager.beginTransaction()
-                    .replace(R.id.content_frame, datapointsFragment, DATA_POINTS_FRAGMENT_TAG)
-                    .commit();
-        }
-    }
-
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -313,7 +387,7 @@ public class SurveyActivity extends LocaleAwareActivity implements RecordListLis
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
-            @NonNull int[] grantResults) {
+                                           @NonNull int[] grantResults) {
         permissionsResults = true;
         if (requestCode == ConstantUtil.STORAGE_AND_PHONE_STATE_PERMISSION_CODE) {
             if (appPermissionsHelper.allPermissionsGranted(permissions, grantResults)) {
@@ -375,15 +449,19 @@ public class SurveyActivity extends LocaleAwareActivity implements RecordListLis
 
     private void startServicesIfPossible() {
         if (StatusUtil.hasExternalStorage()) {
-            startServices();
+            startServicesOnce();
         } else {
             displayExternalStorageMissing();
         }
     }
 
-    private void startServices() {
-        startService(new Intent(this, BootstrapService.class));
-        startService(new Intent(this, TimeCheckService.class));
+    private void startServicesOnce() {
+        if (!servicesStarted) {
+            startService(new Intent(this, SurveyDownloadService.class));
+            startService(new Intent(this, BootstrapService.class));
+            startService(new Intent(this, TimeCheckService.class));
+            servicesStarted = true;
+        }
     }
 
     private void displayExternalStorageMissing() {
@@ -411,10 +489,8 @@ public class SurveyActivity extends LocaleAwareActivity implements RecordListLis
 
         selectedSurveyId = mSurveyGroup != null ? mSurveyGroup.getId() : SurveyGroup.ID_NONE;
 
-        DatapointsFragment f = getDataPointsFragment();
-        if (f != null) {
-            f.refresh(mSurveyGroup);
-        }
+        refresh(mSurveyGroup);
+
         mDrawerLayout.closeDrawers();
         invalidateOptionsMenu();
 
@@ -467,13 +543,25 @@ public class SurveyActivity extends LocaleAwareActivity implements RecordListLis
     }
 
     @Override
-    public void onConfigurationChanged(Configuration newConfig) {
+    public void onConfigurationChanged(@NonNull Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         mDrawerToggle.onConfigurationChanged(newConfig);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.stats) {
+            StatsDialogFragment dialogFragment = StatsDialogFragment
+                    .newInstance(mSurveyGroup.getId());
+            dialogFragment.show(getSupportFragmentManager(), STATS_DIALOG_FRAGMENT_TAG);
+            int selectedTab = mPager.getCurrentItem();
+
+            if (trackingHelper != null) {
+                String fromTab = selectedTab == 0 ? "list" : "map";
+                trackingHelper.logStatsEvent(fromTab);
+            }
+            return true;
+        }
         return mDrawerToggle.onOptionsItemSelected(item) || super.onOptionsItemSelected(item);
     }
 
@@ -592,10 +680,9 @@ public class SurveyActivity extends LocaleAwareActivity implements RecordListLis
     }
 
     @Override
-    public void logStatsEvent(int selectedTab) {
+    public void logSearchEvent() {
         if (trackingHelper != null) {
-            String fromTab = selectedTab == 0 ? "list" : "map";
-            trackingHelper.logStatsEvent(fromTab);
+            trackingHelper.logSearchEvent();
         }
     }
 
@@ -639,34 +726,12 @@ public class SurveyActivity extends LocaleAwareActivity implements RecordListLis
                 case ConstantUtil.ORDER_BY_NAME:
                     orderSuffix = "name";
                     break;
-                    default:
-                        break;
+                default:
+                    break;
             }
             if (orderSuffix != null) {
                 trackingHelper.logSortEventChosen(orderSuffix);
             }
-        }
-    }
-
-    @Override
-    public void logSearchEvent() {
-        if (trackingHelper != null) {
-            trackingHelper.logSearchEvent();
-        }
-    }
-
-    @Override
-    public void showFab() {
-        if (mSurveyGroup != null) {
-            addDataPointFab.show();
-            addDataPointFab.setEnabled(true);
-        }
-    }
-
-    @Override
-    public void hideFab() {
-        if (mSurveyGroup != null) {
-            addDataPointFab.hide();
         }
     }
 
@@ -681,15 +746,7 @@ public class SurveyActivity extends LocaleAwareActivity implements RecordListLis
 
     @Override
     public void onNewMapAreaSaved() {
-        DatapointsFragment fragment = getDataPointsFragment();
-        if (fragment != null) {
-            fragment.refreshMap();
-        }
-    }
-
-    private DatapointsFragment getDataPointsFragment() {
-        return (DatapointsFragment) getSupportFragmentManager().findFragmentByTag(
-                DATA_POINTS_FRAGMENT_TAG);
+        refreshMap();
     }
 
     @Override

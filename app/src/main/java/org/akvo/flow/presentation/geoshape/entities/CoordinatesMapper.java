@@ -19,6 +19,8 @@
 
 package org.akvo.flow.presentation.geoshape.entities;
 
+import androidx.annotation.NonNull;
+
 import com.mapbox.geojson.Point;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 
@@ -27,14 +29,13 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import androidx.annotation.NonNull;
-
 public class CoordinatesMapper {
 
     @Inject
     public CoordinatesMapper() {
     }
 
+    @NonNull
     List<LatLng> toLatLng(List<Point> coordinates) {
         List<LatLng> latLngs = new ArrayList<>();
         for (Point p : coordinates) {

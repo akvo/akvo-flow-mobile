@@ -20,12 +20,13 @@
 
 package org.akvo.flow.domain.repository;
 
+import androidx.annotation.NonNull;
+
 import org.akvo.flow.domain.entity.DomainForm;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Set;
 
-import androidx.annotation.NonNull;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 
@@ -36,6 +37,9 @@ public interface FormRepository {
     Observable<Integer> reloadForms(String deviceId);
 
     Observable<Integer> downloadForms(String deviceId);
+
+    @NotNull
+    Single<DomainForm> getForm(@NotNull String formId);
 
     @NonNull
     Single<Set<String>> loadFormLanguages(@NotNull String formId);

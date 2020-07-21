@@ -31,6 +31,7 @@ public class ApiUrls {
     public static final String HMAC = "h";
     public static final String VERSION = "ver";
     public static final String ANDROID_ID = "androidId";
+    public static final String LAST_UPDATED = "lastUpdateTime";
     public static final String DEVICE_ID = "devId";
     public static final String FORM_IDS = "formID[]";
     public static final String ACTION = "action";
@@ -39,6 +40,7 @@ public class ApiUrls {
     public static final String APK_VERSION_SERVICE_PATH =
             "/deviceapprest?action=getLatestVersion&deviceType=androidPhone&appCode=flowapp";
     public static final String SURVEY_ID = "surveyId";
+    public static final String CURSOR = "cursor";
     public static final String ANDROID_BUILD_VERSION = "androidBuildVersion";
 
     public static final String FORM_HEADER_PATH = "/surveymanager?action=getSurveyHeader";

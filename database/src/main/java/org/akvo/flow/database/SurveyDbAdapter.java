@@ -74,7 +74,7 @@ public class SurveyDbAdapter {
      * @throws SQLException if the database could be neither opened or created
      */
     public SurveyDbAdapter open() throws SQLException {
-        databaseHelper = new DatabaseHelper(context, new LanguageTable());
+        databaseHelper = new DatabaseHelper(context, new LanguageTable(), new DataPointDownloadTable());
         database = databaseHelper.getWritableDatabase();
         return this;
     }

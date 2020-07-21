@@ -42,16 +42,19 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final int VER_TRANSMISSION_ITERATION = 86;
     public static final int VER_DATA_POINT_ASSIGNMENTS_ITERATION = 87;
     public static final int VER_DATA_POINT_ASSIGNMENTS_ITERATION_2 = 88;
-    static final int DATABASE_VERSION = VER_DATA_POINT_ASSIGNMENTS_ITERATION_2;
+    public static final int VER_CURSOR_ITERATION = 89;
+    static final int DATABASE_VERSION = VER_CURSOR_ITERATION;
 
     private static SQLiteDatabase database;
     private static final Object LOCK_OBJ = new Object();
     private volatile static int instanceCount = 0;
     private final LanguageTable languageTable;
+    private final DataPointDownloadTable dataPointDownloadTable;
 
-    public DatabaseHelper(Context context, LanguageTable languageTable) {
+    public DatabaseHelper(Context context, LanguageTable languageTable, DataPointDownloadTable dataPointDownloadTable) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
         this.languageTable = languageTable;
+        this.dataPointDownloadTable = dataPointDownloadTable;
     }
 
     @Override
@@ -131,8 +134,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 + TransmissionColumns.START_DATE + " INTEGER,"
                 + TransmissionColumns.END_DATE + " INTEGER,"
                 + "UNIQUE (" + TransmissionColumns.FILENAME + ") ON CONFLICT REPLACE)");
-
         languageTable.onCreate(db);
+        dataPointDownloadTable.onCreate(db);
         createIndexes(db);
     }
 
@@ -159,6 +162,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     /**
      * This is not ideal but due to our setup, using something other than getWritableDatabase
      * produces errors.
+     *
      * @return
      */
     @Override

@@ -22,12 +22,13 @@ package org.akvo.flow.presentation.geoshape.entities;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 import com.mapbox.mapboxsdk.geometry.LatLng;
 
 import java.util.List;
 import java.util.UUID;
-
-import androidx.annotation.NonNull;
 
 public abstract class Shape implements Parcelable {
 
@@ -125,5 +126,22 @@ public abstract class Shape implements Parcelable {
         for (ShapePoint point : points) {
             point.setSelected(false);
         }
+    }
+
+    public ShapePoint getSelectedPoint() {
+        for (ShapePoint point : points) {
+            if (point.isSelected()) {
+                return point;
+            }
+        }
+        return null;
+    }
+
+    @Nullable
+    public ShapePoint getLastPoint() {
+        if (points.isEmpty()) {
+            return null;
+        }
+        return points.get(points.size() - 1);
     }
 }

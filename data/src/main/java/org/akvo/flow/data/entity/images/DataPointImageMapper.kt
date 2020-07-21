@@ -23,7 +23,7 @@ import org.akvo.flow.data.entity.ApiDataPoint
 import org.akvo.flow.data.util.MediaHelper
 import javax.inject.Inject
 
-open class DataPointImageMapper @Inject constructor(private val mediaHelper: MediaHelper) {
+class DataPointImageMapper @Inject constructor(private val mediaHelper: MediaHelper) {
 
     fun getImagesList(dataPoints: List<ApiDataPoint>): List<String> {
         val images = mutableListOf<String>()

@@ -35,6 +35,7 @@ import org.akvo.flow.domain.executor.ThreadExecutor;
 import org.akvo.flow.domain.repository.ApkRepository;
 import org.akvo.flow.domain.repository.DataPointRepository;
 import org.akvo.flow.domain.repository.FileRepository;
+import org.akvo.flow.domain.repository.FormInstanceRepository;
 import org.akvo.flow.domain.repository.FormRepository;
 import org.akvo.flow.domain.repository.LanguagesRepository;
 import org.akvo.flow.domain.repository.MissingAndDeletedRepository;
@@ -62,6 +63,8 @@ import dagger.Component;
 public interface ApplicationComponent {
 
     SurveyRepository surveyRepository();
+
+    FormInstanceRepository formInstanceRepository();
 
     BriteDatabase provideDatabase();
 

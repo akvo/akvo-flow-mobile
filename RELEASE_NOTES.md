@@ -1,5 +1,37 @@
 Akvo FLOW app release notes
 ===========================
+# ver 2.9.2.2
+Date: 11 June 2020
+
+* **Auto Save for geoshapes** - [#1199](https://github.com/akvo/akvo-flow-mobile/issues/1199)
+* **Crash while creating geoshapes** - [#1632](https://github.com/akvo/akvo-flow-mobile/issues/1632)
+* **Geoshapes: allow point drag/move** - [#1634](https://github.com/akvo/akvo-flow-mobile/issues/1634)
+* **Geoshapes button improvement** - [#1637](https://github.com/akvo/akvo-flow-mobile/issues/1637)
+* **Make whole geoshape selectable** - [#1640](https://github.com/akvo/akvo-flow-mobile/issues/1640)
+* **Autoselect the last created shape** - [#1645](https://github.com/akvo/akvo-flow-mobile/issues/1645)
+* **Delete shape does nothing when no shape/point selected** - [#1647](https://github.com/akvo/akvo-flow-mobile/issues/1647)
+* **Map switching style error** - [#1655](https://github.com/akvo/akvo-flow-mobile/issues/1655)
+
+---------------
+# ver 2.9.2
+Date: 28 May 2020
+
+* **Monitoring: Inform/Warn about submitting another monitoring form for the same data point** - [#1519](https://github.com/akvo/akvo-flow-mobile/issues/1519)
+* **Update French and Spanish translations** - [#1626](https://github.com/akvo/akvo-flow-mobile/issues/1626)
+
+---------------
+# ver 2.9.1
+Date: 20 April 2020
+
+* **Visually indicate datapoints were downloaded recently** - [#1592](https://github.com/akvo/akvo-flow-mobile/issues/1592)
+* **Datapoint images download improvement** - [#1600](https://github.com/akvo/akvo-flow-mobile/issues/1600)
+* **Datapoint download message** - [#1599](https://github.com/akvo/akvo-flow-mobile/issues/1599)
+* **Datapoint list styling: date format** - [#1604](https://github.com/akvo/akvo-flow-mobile/issues/1604)
+* **Flow lists theme** - [#1593](https://github.com/akvo/akvo-flow-mobile/issues/1593)
+* **Fix form download does not start correctly on some devices** - [#1611](https://github.com/akvo/akvo-flow-mobile/issues/1611)
+* **Remove in app language setting** - [#1527](https://github.com/akvo/akvo-flow-mobile/issues/1527)
+
+---------------
 # ver 2.9.0.1
 Date: 5 March 2020
 

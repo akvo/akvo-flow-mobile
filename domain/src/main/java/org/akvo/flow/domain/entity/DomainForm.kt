@@ -18,9 +18,19 @@
  */
 
 package org.akvo.flow.domain.entity
-
+//TODO: this is not right separate between 2 different objects: Form from database, form from xml??
 data class DomainForm(
-    val title: String,
+    val id: Int = 0,
+    val formId: String = "",
+    val surveyId: Int = 0,
+    val name: String,
     val version: String,
-    val groups: List<DomainQuestionGroup>
+    val type: String = "",
+    val location: String = "",
+    val filename: String = "",
+    val language: String = "en",
+    val cascadeDownloaded: Boolean = true,
+    val deleted: Boolean = false,
+    val title: String = "",
+    val groups: List<DomainQuestionGroup> = emptyList()
 )

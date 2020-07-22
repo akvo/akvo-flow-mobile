@@ -1,5 +1,17 @@
 Akvo FLOW app release notes
 ===========================
+# ver 2.9.3
+Date: 21 July 2020
+
+* **Data point list styling: date** - [#1604](https://github.com/akvo/akvo-flow-mobile/issues/1604)
+* **Replace deprecated crashlytics SDK** - [#1654](https://github.com/akvo/akvo-flow-mobile/issues/1654)
+* **Increase minimum api to 16** - [#1658](https://github.com/akvo/akvo-flow-mobile/issues/1658)
+* **Update the offline map FAB** - [#1663](https://github.com/akvo/akvo-flow-mobile/issues/1663)
+* **New switch map type icon** - [#1668](https://github.com/akvo/akvo-flow-mobile/issues/1668)
+* **Cannot download many data points to the device** - [#1670](https://github.com/akvo/akvo-flow-mobile/issues/1670)
+* **Remove separator between toolbar and tabs** - [#1675](https://github.com/akvo/akvo-flow-mobile/issues/1675)
+
+---------------
 # ver 2.9.2.2
 Date: 11 June 2020
 

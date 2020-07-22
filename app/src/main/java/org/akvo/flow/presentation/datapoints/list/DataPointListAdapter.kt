@@ -35,6 +35,7 @@ import org.akvo.flow.presentation.datapoints.list.entity.ListDataPoint
 internal class DataPointListAdapter(context: Context?) : BaseAdapter() {
     private val inflater: LayoutInflater = LayoutInflater.from(context)
     private val dataPoints: MutableList<ListDataPoint> = mutableListOf()
+    private var displayIds: Boolean = false
 
     override fun getCount(): Int {
         return dataPoints.size
@@ -57,13 +58,20 @@ internal class DataPointListAdapter(context: Context?) : BaseAdapter() {
             convertView ?: inflater.inflate(R.layout.datapoint_list_item, parent, false)
         val nameView = view.findViewById<TextView>(R.id.locale_name)
         val dateView = view.findViewById<TextView>(R.id.last_modified)
+        val idView = view.findViewById<TextView>(R.id.locale_id)
         val distanceView = view.findViewById<TextView>(R.id.locale_distance)
         val statusImage = view.findViewById<ImageView>(R.id.status_img)
 
-        val (displayName, status, _, _, _, displayDate, viewed, distanceText) = getItem(position)
+        val (displayName, status, id, _, _, displayDate, viewed, distanceText) = getItem(position)
         nameView.text = displayName
         displayDistanceText(distanceView, distanceText)
         displayDateText(dateView, displayDate)
+        idView.text = id
+        if (displayIds) {
+            idView.visibility = View.VISIBLE
+        } else {
+            idView.visibility = View.GONE
+        }
         var statusRes = 0
         when (status) {
             SurveyInstanceStatus.SAVED, SurveyInstanceStatus.SUBMIT_REQUESTED -> statusRes =
@@ -102,6 +110,11 @@ internal class DataPointListAdapter(context: Context?) : BaseAdapter() {
     fun setDataPoints(dataPoints: List<ListDataPoint>?) {
         this.dataPoints.clear()
         this.dataPoints.addAll(dataPoints!!)
+        notifyDataSetChanged()
+    }
+
+    fun displayIds(display: Boolean) {
+        this.displayIds = display
         notifyDataSetChanged()
     }
 }

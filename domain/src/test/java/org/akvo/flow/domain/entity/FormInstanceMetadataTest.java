@@ -19,44 +19,22 @@
 
 package org.akvo.flow.domain.entity;
 
-import android.text.TextUtils;
-
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.Collections;
 
-import static junit.framework.Assert.assertFalse;
-import static junit.framework.TestCase.assertTrue;
-import static org.mockito.Matchers.any;
-import static org.powermock.api.mockito.PowerMockito.when;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
-@RunWith(PowerMockRunner.class)
-@PrepareForTest(TextUtils.class)
+@RunWith(MockitoJUnitRunner.class)
 public class FormInstanceMetadataTest {
-
-    @Before
-    public void setUp() {
-        PowerMockito.mockStatic(TextUtils.class);
-        when(TextUtils.isEmpty(any(CharSequence.class))).thenAnswer(new Answer<Boolean>() {
-            @Override
-            public Boolean answer(InvocationOnMock invocation) {
-                CharSequence a = (CharSequence) invocation.getArguments()[0];
-                return !(a != null && a.length() > 0);
-            }
-        });
-    }
 
     @Test
     public void isValidShouldReturnFalseIfAllFieldsNull() {
         FormInstanceMetadata formInstanceMetadata = new FormInstanceMetadata(null, null, null,
-                Collections.<String>emptySet());
+                Collections.emptySet());
 
         assertFalse(formInstanceMetadata.isValid());
     }
@@ -64,7 +42,7 @@ public class FormInstanceMetadataTest {
     @Test
     public void isValidShouldReturnFalseIfAllFieldsEmpty() {
         FormInstanceMetadata formInstanceMetadata = new FormInstanceMetadata("", "", "",
-                Collections.<String>emptySet());
+                Collections.emptySet());
 
         assertFalse(formInstanceMetadata.isValid());
     }
@@ -73,7 +51,7 @@ public class FormInstanceMetadataTest {
     @Test
     public void isValidShouldReturnFalseZipFileNameNull() {
         FormInstanceMetadata formInstanceMetadata = new FormInstanceMetadata(null, "test", "test",
-                Collections.<String>emptySet());
+                Collections.emptySet());
 
         assertFalse(formInstanceMetadata.isValid());
     }
@@ -81,7 +59,7 @@ public class FormInstanceMetadataTest {
     @Test
     public void isValidShouldReturnFalseFormInstanceDataNull() {
         FormInstanceMetadata formInstanceMetadata = new FormInstanceMetadata("test", null, "test",
-                Collections.<String>emptySet());
+                Collections.emptySet());
 
         assertFalse(formInstanceMetadata.isValid());
     }
@@ -89,7 +67,7 @@ public class FormInstanceMetadataTest {
     @Test
     public void isValidShouldReturnFalseFormIdNull() {
         FormInstanceMetadata formInstanceMetadata = new FormInstanceMetadata("test", "test", null,
-                Collections.<String>emptySet());
+                Collections.emptySet());
 
         assertFalse(formInstanceMetadata.isValid());
     }
@@ -97,7 +75,7 @@ public class FormInstanceMetadataTest {
     @Test
     public void isValidShouldReturnTrueIfAllValuesValid() {
         FormInstanceMetadata formInstanceMetadata = new FormInstanceMetadata("test", "test", "test",
-                Collections.<String>emptySet());
+                Collections.emptySet());
 
         assertTrue(formInstanceMetadata.isValid());
     }

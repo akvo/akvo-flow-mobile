@@ -31,14 +31,15 @@ import org.akvo.flow.domain.util.TextValueCleaner
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.Matchers.anyLong
-import org.mockito.Matchers.anySetOf
-import org.mockito.Matchers.anyString
+import org.mockito.ArgumentMatchers.any
+import org.mockito.ArgumentMatchers.anyLong
+import org.mockito.ArgumentMatchers.anySet
+import org.mockito.ArgumentMatchers.anyString
 import org.mockito.Mock
 import org.mockito.Mockito.`when`
 import org.mockito.Mockito.times
 import org.mockito.Mockito.verify
-import org.mockito.runners.MockitoJUnitRunner
+import org.mockito.junit.MockitoJUnitRunner
 
 @RunWith(MockitoJUnitRunner::class)
 class ExportSurveyInstancesTest {
@@ -62,20 +63,31 @@ class ExportSurveyInstancesTest {
     fun setUp() {
         `when`(mockUserRepository!!.deviceId).thenReturn(Observable.just("123"))
         `when`(mockValueCleaner!!.cleanVal("123")).thenReturn("123")
-        `when`(mockSurveyRepository!!.setInstanceStatusToRequested(anyLong())).thenReturn(Completable.complete())
+        `when`(mockSurveyRepository!!.setInstanceStatusToRequested(anyLong())).thenReturn(
+            Completable.complete()
+        )
         `when`(mockSurveyRepository!!.getFormInstanceData(anyLong(), anyString())).thenReturn(
             Single.just(
                 mockFormInstanceMetadata
             )
         )
-        `when`(mockFileRepository!!.createDataZip(anyString(), anyString())).thenReturn(Completable.complete())
+        `when`(
+            mockFileRepository!!.createDataZip(
+                any(),
+                any()
+            )
+        ).thenReturn(Completable.complete())
         `when`(
             mockSurveyRepository!!.createTransmissions(
                 anyLong(),
                 anyString(),
-                anySetOf(String::class.java)
+                anySet<String>()
             )
         ).thenReturn(Completable.complete())
+
+        `when`(mockFormInstanceMetadata!!.zipFileName).thenReturn("")
+        `when`(mockFormInstanceMetadata!!.formInstanceData).thenReturn("")
+        `when`(mockFormInstanceMetadata!!.formId).thenReturn("")
     }
 
     @Test
@@ -87,7 +99,12 @@ class ExportSurveyInstancesTest {
         val observer = TestObserver<Void>()
 
         val exportSurveyInstances =
-            ExportSurveyInstances(mockUserRepository, mockValueCleaner, mockSurveyRepository, mockFileRepository)
+            ExportSurveyInstances(
+                mockUserRepository,
+                mockValueCleaner,
+                mockSurveyRepository,
+                mockFileRepository
+            )
 
         exportSurveyInstances.buildUseCaseObservable().subscribe(observer)
 
@@ -97,7 +114,7 @@ class ExportSurveyInstancesTest {
         verify(mockSurveyRepository, times(7))!!.createTransmissions(
             anyLong(),
             anyString(),
-            anySetOf(String::class.java)
+            anySet<String>()
         )
         observer.assertNoErrors()
     }
@@ -111,7 +128,12 @@ class ExportSurveyInstancesTest {
         val observer = TestObserver<Void>()
 
         val exportSurveyInstances =
-            ExportSurveyInstances(mockUserRepository, mockValueCleaner, mockSurveyRepository, mockFileRepository)
+            ExportSurveyInstances(
+                mockUserRepository,
+                mockValueCleaner,
+                mockSurveyRepository,
+                mockFileRepository
+            )
 
         exportSurveyInstances.buildUseCaseObservable().subscribe(observer)
 
@@ -121,7 +143,7 @@ class ExportSurveyInstancesTest {
         verify(mockSurveyRepository, times(0))!!.createTransmissions(
             anyLong(),
             anyString(),
-            anySetOf(String::class.java)
+            anySet<String>()
         )
         observer.assertNoErrors()
     }

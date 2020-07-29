@@ -48,11 +48,12 @@ class DataPointDataRepository @Inject constructor(
             while (moreToLoad) {
                 val apiLocaleResult = restApi.downloadDataPoints(surveyId, backendDataPointsCursor)
                 syncedDataPoints += syncDataPoints(apiLocaleResult)
-                if (apiLocaleResult.dataPoints.isNotEmpty()) {
+                val dataPointsPresent =
+                    apiLocaleResult.dataPoints != null && apiLocaleResult.dataPoints.isNotEmpty()
+                if (dataPointsPresent) {
                     backendDataPointsCursor = apiLocaleResult.cursor
                 }
-                moreToLoad = apiLocaleResult.dataPoints.isNotEmpty()
-                        && backendDataPointsCursor != null // cursor is null with old datapoint api
+                moreToLoad = dataPointsPresent && backendDataPointsCursor != null // cursor is null with old datapoint api
             }
             dataSourceFactory.dataBaseDataSource.saveDataPointCursor(surveyId, backendDataPointsCursor)
             return syncedDataPoints
@@ -76,7 +77,7 @@ class DataPointDataRepository @Inject constructor(
     private suspend fun syncDataPoints(apiLocaleResult: ApiLocaleResult): Int {
         val dataPoints = apiLocaleResult.dataPoints
         val syncDataPoints = dataSourceFactory.dataBaseDataSource.syncDataPoints(dataPoints)
-        downLoadImages(apiLocaleResult.dataPoints)
+        apiLocaleResult.dataPoints?.let { points-> downLoadImages(points)}
         return syncDataPoints
     }
 

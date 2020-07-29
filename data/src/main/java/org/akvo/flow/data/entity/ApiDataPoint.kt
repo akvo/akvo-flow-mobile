@@ -21,11 +21,13 @@ package org.akvo.flow.data.entity
 
 import com.squareup.moshi.Json
 
-data class ApiLocaleResult(
-    @Json(name = "dataPointData") val dataPoints: List<ApiDataPoint>?,
-    @Json(name = "message") val message: String?,
-    @Json(name = "offset") val offset: Int = 0,
-    @Json(name = "code") val code: Int = 0,
-    @Json(name = "resultCount") val resultCount: Int = 0,
-    @Json(name = "cursor") val cursor: String?
+data class ApiDataPoint(
+    @Json(name = "displayName") @JvmField val displayName: String = "",
+    @Json(name = "id") @JvmField val id: String? = null,
+    @Json(name = "lat") @JvmField val latitude: Double? = null,
+    @Json(name = "lon") @JvmField val longitude: Double? = null,
+    @Json(name = "surveyGroupId") @JvmField val surveyGroupId: Long = 0,
+    @Json(name = "lastUpdateDateTime") @JvmField val lastModified: Long = 0,
+    @Json(name = "surveyInstances") @JvmField val surveyInstances: List<ApiSurveyInstance> = emptyList()
 )
+        

@@ -17,43 +17,15 @@
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
+package org.akvo.flow.data.entity
 
-package org.akvo.flow.data.entity;
+import com.squareup.moshi.Json
 
-import com.google.gson.annotations.SerializedName;
-
-public class ApiQuestionAnswer {
-
-    @SerializedName("q")
-    private String questionId;
-
-    @SerializedName("a")
-    private String answer;
-
-    @SerializedName("t")
-    private String type;
-
-    public String getQuestionId() {
-        return questionId;
-    }
-
-    public void setQuestionId(String questionId) {
-        this.questionId = questionId;
-    }
-
-    public String getAnswer() {
-        return answer;
-    }
-
-    public void setAnswer(String answer) {
-        this.answer = answer;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-}
+data class ApiSurveyInstance(
+    @Json(name = "surveyId") @JvmField val surveyId: Long = 0,
+    @Json(name = "submitter") @JvmField val submitter: String? = null,
+    @Json(name = "collectionDate") @JvmField val collectionDate: Long = 0,
+    @Json(name = "uuid") @JvmField val uuid: String? = null,
+    @Json(name = "qasList") @JvmField val qasList: List<ApiQuestionAnswer> = emptyList()
+)
+        

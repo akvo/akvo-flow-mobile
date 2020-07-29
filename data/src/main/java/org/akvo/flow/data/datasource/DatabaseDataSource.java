@@ -118,16 +118,16 @@ public class DatabaseDataSource {
         int newDataPoints = 0;
         try {
             for (ApiDataPoint dataPoint : apiDataPoints) {
-                final String dataPointId = dataPoint.getId();
+                final String dataPointId = dataPoint.id;
                 ContentValues values = new ContentValues();
                 values.put(RecordColumns.RECORD_ID, dataPointId);
-                values.put(RecordColumns.SURVEY_GROUP_ID, dataPoint.getSurveyGroupId());
-                values.put(RecordColumns.NAME, dataPoint.getDisplayName());
-                values.put(RecordColumns.LATITUDE, dataPoint.getLatitude());
-                values.put(RecordColumns.LONGITUDE, dataPoint.getLongitude());
-                values.put(RecordColumns.LAST_MODIFIED, dataPoint.getLastModified());
+                values.put(RecordColumns.SURVEY_GROUP_ID, dataPoint.surveyGroupId);
+                values.put(RecordColumns.NAME, dataPoint.displayName);
+                values.put(RecordColumns.LATITUDE, dataPoint.latitude);
+                values.put(RecordColumns.LONGITUDE, dataPoint.longitude);
+                values.put(RecordColumns.LAST_MODIFIED, dataPoint.lastModified);
 
-                syncSurveyInstances(dataPoint.getSurveyInstances(), dataPointId);
+                syncSurveyInstances(dataPoint.surveyInstances, dataPointId);
 
                 boolean insertedNewRecord = briteSurveyDbAdapter.insertOrUpdateRecord(dataPointId, values);
                 if (insertedNewRecord) {
@@ -152,16 +152,16 @@ public class DatabaseDataSource {
         for (ApiSurveyInstance surveyInstance : surveyInstances) {
 
             ContentValues values = new ContentValues();
-            values.put(SurveyInstanceColumns.SURVEY_ID, surveyInstance.getSurveyId());
-            values.put(SurveyInstanceColumns.SUBMITTED_DATE, surveyInstance.getCollectionDate());
+            values.put(SurveyInstanceColumns.SURVEY_ID, surveyInstance.surveyId);
+            values.put(SurveyInstanceColumns.SUBMITTED_DATE, surveyInstance.collectionDate);
             values.put(SurveyInstanceColumns.RECORD_ID, dataPointId);
             values.put(SurveyInstanceColumns.STATUS, SurveyInstanceStatus.DOWNLOADED);
             values.put(SurveyInstanceColumns.SYNC_DATE, System.currentTimeMillis());
-            values.put(SurveyInstanceColumns.SUBMITTER, surveyInstance.getSubmitter());
+            values.put(SurveyInstanceColumns.SUBMITTER, surveyInstance.submitter);
 
-            long id = briteSurveyDbAdapter.syncSurveyInstance(values, surveyInstance.getUuid());
+            long id = briteSurveyDbAdapter.syncSurveyInstance(values, surveyInstance.uuid);
 
-            syncResponses(surveyInstance.getQasList(), id);
+            syncResponses(surveyInstance.qasList, id);
         }
         briteSurveyDbAdapter.deleteEmptyRecords();
     }
@@ -173,7 +173,7 @@ public class DatabaseDataSource {
 
     private void deleteResponses(List<ApiQuestionAnswer> responses, long surveyInstanceId) {
         for (ApiQuestionAnswer response : responses) {
-            briteSurveyDbAdapter.deleteResponses(surveyInstanceId, response.getQuestionId());
+            briteSurveyDbAdapter.deleteResponses(surveyInstanceId, response.questionId);
         }
     }
 
@@ -181,9 +181,9 @@ public class DatabaseDataSource {
         for (ApiQuestionAnswer response : responses) {
 
             ContentValues values = new ContentValues();
-            values.put(ResponseColumns.ANSWER, response.getAnswer());
-            values.put(ResponseColumns.TYPE, response.getType());
-            values.put(ResponseColumns.QUESTION_ID, response.getQuestionId());
+            values.put(ResponseColumns.ANSWER, response.answer);
+            values.put(ResponseColumns.TYPE, response.type);
+            values.put(ResponseColumns.QUESTION_ID, response.questionId);
             /*
              * true by default when parsing api response
              * Not sure what this fields is used for ??
@@ -191,7 +191,7 @@ public class DatabaseDataSource {
             values.put(ResponseColumns.INCLUDE, true);
             values.put(ResponseColumns.SURVEY_INSTANCE_ID, surveyInstanceId);
 
-            briteSurveyDbAdapter.syncResponse(surveyInstanceId, values, response.getQuestionId());
+            briteSurveyDbAdapter.syncResponse(surveyInstanceId, values, response.questionId);
         }
     }
 

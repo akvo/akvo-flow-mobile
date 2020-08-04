@@ -43,7 +43,12 @@ public class RestServiceFactory {
     }
 
     public <T> T createRetrofitServiceWithInterceptor(final Class<T> clazz, String baseUrl) {
-        return createRetrofit(clazz, baseUrl, okHttpClientWithHmac, GsonConverterFactory.create());
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(baseUrl)
+                .addConverterFactory(GsonConverterFactory.create())
+                .client(okHttpClientWithHmac)
+                .build();
+        return retrofit.create(clazz);
     }
 
     public <T> T createRetrofitService(final Class<T> clazz, String baseUrl) {

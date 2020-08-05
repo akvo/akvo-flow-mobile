@@ -22,18 +22,18 @@ package org.akvo.flow.ui.view.geolocation;
 
 import android.content.Context;
 import android.graphics.Color;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.annotation.StringRes;
 import android.text.Editable;
 import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
-import android.view.View;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.StringRes;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
 
 import org.akvo.flow.R;
 import org.akvo.flow.ui.view.ErrorMessageFormatter;
@@ -42,7 +42,7 @@ import org.akvo.flow.util.LocationValidator;
 
 import java.text.DecimalFormat;
 
-public class GeoInputContainer extends LinearLayout {
+public class GeoInputContainer extends CoordinatorLayout {
 
     private static final float ALPHA_OPAQUE = 1f;
     private static final float ALPHA_TRANSPARENT = 0.1f;
@@ -67,8 +67,8 @@ public class GeoInputContainer extends LinearLayout {
     }
 
     private void init() {
-        View view = inflate(getContext(), R.layout.geo_manual_info_layout, null);
-        addView(view);
+        inflate(getContext(), R.layout.geo_manual_info_layout, this);
+        //addView(view);
         latitudeInput = (EditText) findViewById(R.id.lat_et);
         longitudeInput = (EditText) findViewById(R.id.lon_et);
         elevationInput = (EditText) findViewById(R.id.height_et);
@@ -78,46 +78,37 @@ public class GeoInputContainer extends LinearLayout {
 
     private void setTextWatchers() {
         latitudeInput.addTextChangedListener(new GeoInputTextWatcher(
-                new GeoInputTextWatcherListener() {
-                    @Override
-                    public void validateCoordinate() {
-                        String latitude = latitudeInput.getText().toString();
-                        boolean skipCheckIfEmpty = TextUtils.isEmpty(latitude);
-                        if (skipCheckIfEmpty) {
-                            return;
-                        }
-                        if (!locationValidator.isValidLatitude(latitude)) {
-                            setTextInputError(latitudeInput, R.string.invalid_latitude);
-                        }
+                () -> {
+                    String latitude = latitudeInput.getText().toString();
+                    boolean skipCheckIfEmpty = TextUtils.isEmpty(latitude);
+                    if (skipCheckIfEmpty) {
+                        return;
+                    }
+                    if (!locationValidator.isValidLatitude(latitude)) {
+                        setTextInputError(latitudeInput, R.string.invalid_latitude);
                     }
                 }));
 
         longitudeInput.addTextChangedListener(new GeoInputTextWatcher(
-                new GeoInputTextWatcherListener() {
-                    @Override
-                    public void validateCoordinate() {
-                        String longitude = longitudeInput.getText().toString();
-                        boolean skipCheckIfEmpty = TextUtils.isEmpty(longitude);
-                        if (skipCheckIfEmpty) {
-                            return;
-                        }
-                        if (!locationValidator.isValidLongitude(longitude)) {
-                            setTextInputError(longitudeInput, R.string.invalid_longitude);
-                        }
+                () -> {
+                    String longitude = longitudeInput.getText().toString();
+                    boolean skipCheckIfEmpty = TextUtils.isEmpty(longitude);
+                    if (skipCheckIfEmpty) {
+                        return;
+                    }
+                    if (!locationValidator.isValidLongitude(longitude)) {
+                        setTextInputError(longitudeInput, R.string.invalid_longitude);
                     }
                 }));
         elevationInput.addTextChangedListener(new GeoInputTextWatcher(
-                new GeoInputTextWatcherListener() {
-                    @Override
-                    public void validateCoordinate() {
-                        String elevation = elevationInput.getText().toString();
-                        boolean skipCheckIfEmpty = TextUtils.isEmpty(elevation);
-                        if (skipCheckIfEmpty) {
-                            return;
-                        }
-                        if (!locationValidator.isValidElevation(elevation)) {
-                            setTextInputError(elevationInput, R.string.invalid_elevation);
-                        }
+                () -> {
+                    String elevation = elevationInput.getText().toString();
+                    boolean skipCheckIfEmpty = TextUtils.isEmpty(elevation);
+                    if (skipCheckIfEmpty) {
+                        return;
+                    }
+                    if (!locationValidator.isValidElevation(elevation)) {
+                        setTextInputError(elevationInput, R.string.invalid_elevation);
                     }
                 }));
     }
@@ -164,14 +155,14 @@ public class GeoInputContainer extends LinearLayout {
     }
 
     void displayCoordinates(@NonNull String latitude, @NonNull String longitude,
-            @Nullable String altitude, float accuracy) {
+                            @Nullable String altitude, float accuracy) {
         statusIndicator.setText(getContext()
                 .getString(R.string.geo_location_accuracy, accuracyFormat.format(accuracy)));
         displayCoordinates(latitude, longitude, altitude);
     }
 
     void displayCoordinates(@NonNull String latitude, @NonNull String longitude,
-            @Nullable String altitude) {
+                            @Nullable String altitude) {
         disableWatchers = true;
         latitudeInput.setText(latitude);
         longitudeInput.setText(longitude);
@@ -185,6 +176,10 @@ public class GeoInputContainer extends LinearLayout {
 
     void showCoordinatesAccurate() {
         statusIndicator.setTextColor(Color.GREEN);
+    }
+
+    void showCoordinatesInaccurate() {
+        statusIndicator.setTextColor(Color.RED);
     }
 
     void showLocationListenerStopped() {
@@ -211,10 +206,6 @@ public class GeoInputContainer extends LinearLayout {
         elevationInput.setEnabled(false);
     }
 
-    private void showCoordinatesInaccurate() {
-        statusIndicator.setTextColor(Color.RED);
-    }
-
     String getLatitudeText() {
         return latitudeInput.getText().toString();
     }
@@ -227,6 +218,11 @@ public class GeoInputContainer extends LinearLayout {
         return elevationInput.getText().toString();
     }
 
+    public boolean hasLocation() {
+        return !TextUtils.isEmpty(latitudeInput.getText().toString()) &&
+                !TextUtils.isEmpty(longitudeInput.getText().toString());
+    }
+
     private static class GeoInputTextWatcher implements TextWatcher {
 
         private final GeoInputTextWatcherListener geoInputTextWatcherListener;
@@ -237,7 +233,7 @@ public class GeoInputContainer extends LinearLayout {
 
         @Override
         public void beforeTextChanged(CharSequence s, int start, int count,
-                int after) {
+                                      int after) {
             //EMPTY
         }
 

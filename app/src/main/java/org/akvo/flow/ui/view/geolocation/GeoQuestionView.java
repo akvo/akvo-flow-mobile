@@ -21,15 +21,16 @@
 package org.akvo.flow.ui.view.geolocation;
 
 import android.content.Context;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.DialogFragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.appcompat.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.FragmentManager;
 
 import org.akvo.flow.R;
 import org.akvo.flow.domain.Question;
@@ -58,7 +59,6 @@ public class GeoQuestionView extends QuestionView
         implements OnClickListener, TimedLocationListener.Listener,
         PermissionAwareLocationListener.PermissionListener {
 
-    private static final float UNKNOWN_ACCURACY = 99999999f;
     private static final String RESPONSE_DELIMITER = "|";
     private static final int POSITION_LATITUDE = 0;
     private static final int POSITION_LONGITUDE = 1;
@@ -78,8 +78,6 @@ public class GeoQuestionView extends QuestionView
     private Button mGeoButton;
     private View geoLoading;
     private GeoInputContainer geoInputContainer;
-
-    private float mLastAccuracy;
 
     public GeoQuestionView(Context context, Question q, SurveyListener surveyListener) {
         super(context, q, surveyListener);
@@ -168,7 +166,11 @@ public class GeoQuestionView extends QuestionView
     }
 
     private void updateButtonTextToGetGeo() {
-        mGeoButton.setText(R.string.getgeo);
+        if (geoInputContainer.hasLocation()) {
+            mGeoButton.setText(R.string.updategeo);
+        } else {
+            mGeoButton.setText(R.string.getgeo);
+        }
     }
 
     private void updateButtonTextToCancel() {
@@ -176,7 +178,6 @@ public class GeoQuestionView extends QuestionView
     }
 
     private void resetAccuracy() {
-        mLastAccuracy = UNKNOWN_ACCURACY;
     }
 
     @Override
@@ -189,12 +190,9 @@ public class GeoQuestionView extends QuestionView
         stopLocationListener();
         View coordinatorLayout = getRootView().findViewById(R.id.coordinator_layout);
         locationSnackBarManager
-                .displayPermissionMissingSnackBar(coordinatorLayout, new OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                       startListeningToLocation();
-                    }
-                }, getContext());
+                .displayPermissionMissingSnackBar(coordinatorLayout,
+                        v -> startListeningToLocation(),
+                        getContext());
     }
 
     @Override
@@ -245,23 +243,18 @@ public class GeoQuestionView extends QuestionView
 
     @Override
     public void onLocationReady(double latitude, double longitude, double altitude,
-            float accuracy) {
-        boolean areNewCoordinatesMoreAccurate = accuracy < mLastAccuracy;
-        if (areNewCoordinatesMoreAccurate) {
-            updateWithNewCoordinates(latitude, longitude, altitude, accuracy);
-        }
-        boolean areNewCoordinatesAccurateEnough =
-                accuracy <= TimedLocationListener.ACCURACY_DEFAULT;
-        if (areNewCoordinatesAccurateEnough) {
-            useAccurateCoordinates();
-        }
-    }
-
-    private void useAccurateCoordinates() {
+                                float accuracy) {
         mLocationListener.stopLocation();
         showLocationListenerStopped();
+        updateWithNewCoordinates(latitude, longitude, altitude, accuracy);
+        boolean accurate = accuracy <= TimedLocationListener.ACCURACY_DEFAULT;
+        if (accurate) {
+            geoInputContainer.showCoordinatesAccurate();
+        } else {
+            geoInputContainer.showCoordinatesInaccurate();
+        }
+        updateButtonTextToGetGeo();
         setResponse();
-        geoInputContainer.showCoordinatesAccurate();
     }
 
     private void updateWithNewCoordinates(double latitude, double longitude, double altitude,
@@ -274,15 +267,11 @@ public class GeoQuestionView extends QuestionView
     public void onTimeout() {
         showLocationListenerStopped();
         View coordinatorLayout = getRootView().findViewById(R.id.coordinator_layout);
-        locationSnackBarManager
-                .displayLocationTimeoutSnackBar(coordinatorLayout, new OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        resetAccuracy();
-                        mLocationListener.startLocationIfPossible();
-                        showLocationListenerStarted();
-                    }
-                }, getContext());
+        locationSnackBarManager.displayLocationTimeoutSnackBar(coordinatorLayout, v -> {
+            resetAccuracy();
+            mLocationListener.startLocationIfPossible();
+            showLocationListenerStarted();
+        }, getContext());
     }
 
     @Override
@@ -291,13 +280,8 @@ public class GeoQuestionView extends QuestionView
         showLocationListenerStopped();
         if (context instanceof AppCompatActivity) {
             View coordinatorLayout = getRootView().findViewById(R.id.coordinator_layout);
-            locationSnackBarManager
-                    .displayGeoLocationDiabled(coordinatorLayout, new OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            navigator.navigateToLocationSettings(getContext());
-                        }
-                    }, getContext());
+            locationSnackBarManager.displayGeoLocationDiabled(coordinatorLayout, v ->
+                    navigator.navigateToLocationSettings(context), context);
         }
     }
 
@@ -347,6 +331,9 @@ public class GeoQuestionView extends QuestionView
     @Override
     public boolean isValid() {
         if (getQuestion().isMandatory()) {
+//            String[] tokens = getResponse().getValue().split("\\|", -1);
+//            String latitude = getLatitudeFromResponseToken(tokens);
+//            String longitude = getLongitudeFromToken(tokens);
             final String lat = geoInputContainer.getLatitudeText();
             final String lon = geoInputContainer.getLongitudeText();
             if (!super.isValid() || !locationValidator.validCoordinates(lat, lon)) {

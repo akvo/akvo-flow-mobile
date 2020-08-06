@@ -114,25 +114,24 @@ class LockedGeoQuestionViewTest {
             )
         closeSoftKeyboard()
         clickGeoButton()
-        addExecutionDelay(300)
         verifyProgressDisplayed()
     }
 
     @Test
     fun ensureErrorSnackBarDisplayedUponTimeout() {
+        resetFields()
         closeSoftKeyboard()
         clickGeoButton()
         simulateLocationTimeout()
-        addExecutionDelay(300)
         verifyErrorSnackBarDisplayed()
     }
 
     @Test
     fun ensureSnackBarRetryShowsProgress() {
+        resetFields()
         clickGeoButton()
         simulateLocationTimeout()
         clickSnackBarRetry()
-        addExecutionDelay(300)
         verifyProgressDisplayed()
     }
 
@@ -141,9 +140,9 @@ class LockedGeoQuestionViewTest {
         //reset values just in case
         resetFields()
         clickGeoButton()
-        addExecutionDelay(300)
+        addExecutionDelay(100)
         provideMockLocation(MOCK_ACCURACY_ACCURATE, Criteria.ACCURACY_FINE)
-        addExecutionDelay(300)
+        addExecutionDelay(100)
 
         verifyGeoInput(R.id.lat_et, MOCK_LATITUDE.toString())
         verifyGeoInput(R.id.lon_et, MOCK_LONGITUDE.toString())
@@ -153,13 +152,14 @@ class LockedGeoQuestionViewTest {
 
     @Test
     fun ensureLocationValuesDisplayedCorrectlyIfInAccurate() {
+        resetFields()
         clickGeoButton()
-        addExecutionDelay(300)
+        addExecutionDelay(100)
         provideMockLocation(
             MOCK_ACCURACY_INACCURATE,
             Criteria.ACCURACY_LOW
         )
-        addExecutionDelay(300)
+        addExecutionDelay(100)
         verifyAccuracy(accuracyFormat.format(MOCK_ACCURACY_INACCURATE.toDouble()), Color.RED)
     }
 
@@ -180,7 +180,7 @@ class LockedGeoQuestionViewTest {
 
         clickGeoButton()
         onView(withId(android.R.id.button1)).perform(click())
-        addExecutionDelay(300)
+        addExecutionDelay(100)
 
         onView(withId(R.id.lat_et)).check(matches(withText("")))
         onView(withId(R.id.lon_et)).check(matches(withText("")))
@@ -194,7 +194,7 @@ class LockedGeoQuestionViewTest {
         closeSoftKeyboard()
 
         clickGeoButton()
-        addExecutionDelay(300)
+        addExecutionDelay(100)
         clickCancelButton()
 
         onView(withId(R.id.lat_et)).check(matches(withText("")))

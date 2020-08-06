@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2019 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2020 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -69,7 +69,6 @@ public class GeoInputContainer extends CoordinatorLayout {
 
     private void init() {
         inflate(getContext(), R.layout.geo_manual_info_layout, this);
-        //addView(view);
         latitudeInput = (EditText) findViewById(R.id.lat_et);
         longitudeInput = (EditText) findViewById(R.id.lon_et);
         elevationInput = (EditText) findViewById(R.id.height_et);

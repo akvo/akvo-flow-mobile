@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2019 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2020 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -331,9 +331,6 @@ public class GeoQuestionView extends QuestionView
     @Override
     public boolean isValid() {
         if (getQuestion().isMandatory()) {
-//            String[] tokens = getResponse().getValue().split("\\|", -1);
-//            String latitude = getLatitudeFromResponseToken(tokens);
-//            String longitude = getLongitudeFromToken(tokens);
             final String lat = geoInputContainer.getLatitudeText();
             final String lon = geoInputContainer.getLongitudeText();
             if (!super.isValid() || !locationValidator.validCoordinates(lat, lon)) {

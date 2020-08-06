@@ -55,6 +55,7 @@ public class GeoInputContainer extends CoordinatorLayout {
     private EditText longitudeInput;
     private EditText elevationInput;
     private TextView statusIndicator;
+    private TextView accuracyWarning;
     private boolean disableWatchers;
 
     public GeoInputContainer(Context context) {
@@ -73,6 +74,7 @@ public class GeoInputContainer extends CoordinatorLayout {
         longitudeInput = (EditText) findViewById(R.id.lon_et);
         elevationInput = (EditText) findViewById(R.id.height_et);
         statusIndicator = (TextView) findViewById(R.id.acc_tv);
+        accuracyWarning = (TextView) findViewById(R.id.accuracy_warning_tv);
         setTextWatchers();
     }
 
@@ -176,10 +178,12 @@ public class GeoInputContainer extends CoordinatorLayout {
 
     void showCoordinatesAccurate() {
         statusIndicator.setTextColor(Color.GREEN);
+        accuracyWarning.setVisibility(GONE);
     }
 
     void showCoordinatesInaccurate() {
         statusIndicator.setTextColor(Color.RED);
+        accuracyWarning.setVisibility(VISIBLE);
     }
 
     void showLocationListenerStopped() {

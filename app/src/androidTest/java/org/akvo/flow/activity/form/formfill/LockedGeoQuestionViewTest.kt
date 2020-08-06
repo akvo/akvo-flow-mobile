@@ -53,7 +53,6 @@ import androidx.test.filters.MediumTest
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.ActivityTestRule
 import androidx.test.rule.GrantPermissionRule
-import it.cosenonjaviste.daggermock.DaggerMock
 import org.akvo.flow.R
 import org.akvo.flow.activity.FormActivity
 import org.akvo.flow.activity.form.FormActivityTestUtil.addExecutionDelay
@@ -61,23 +60,18 @@ import org.akvo.flow.activity.form.FormActivityTestUtil.getFormActivityIntent
 import org.akvo.flow.activity.form.FormActivityTestUtil.getString
 import org.akvo.flow.activity.form.data.SurveyInstaller
 import org.akvo.flow.activity.form.data.SurveyRequisite
-import org.akvo.flow.app.FlowApp
 import org.akvo.flow.event.TimedLocationListener
-import org.akvo.flow.injector.component.ApplicationComponent
-import org.akvo.flow.injector.module.ApplicationModule
 import org.akvo.flow.tests.R.raw
 import org.hamcrest.Description
 import org.hamcrest.Matcher
 import org.hamcrest.core.AllOf.allOf
 import org.hamcrest.core.IsNot.not
 import org.junit.AfterClass
-import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.text.DecimalFormat
 
-@Ignore("Ignore tests until we make changes to geo questions")
 @MediumTest
 @RunWith(AndroidJUnit4::class)
 class LockedGeoQuestionViewTest {
@@ -120,6 +114,7 @@ class LockedGeoQuestionViewTest {
             )
         closeSoftKeyboard()
         clickGeoButton()
+        addExecutionDelay(300)
         verifyProgressDisplayed()
     }
 
@@ -128,6 +123,7 @@ class LockedGeoQuestionViewTest {
         closeSoftKeyboard()
         clickGeoButton()
         simulateLocationTimeout()
+        addExecutionDelay(300)
         verifyErrorSnackBarDisplayed()
     }
 
@@ -136,15 +132,18 @@ class LockedGeoQuestionViewTest {
         clickGeoButton()
         simulateLocationTimeout()
         clickSnackBarRetry()
+        addExecutionDelay(300)
         verifyProgressDisplayed()
     }
 
     @Test
     fun ensureLocationValuesDisplayedCorrectly() {
+        //reset values just in case
+        resetFields()
         clickGeoButton()
-        addExecutionDelay(100)
+        addExecutionDelay(300)
         provideMockLocation(MOCK_ACCURACY_ACCURATE, Criteria.ACCURACY_FINE)
-        addExecutionDelay(100)
+        addExecutionDelay(300)
 
         verifyGeoInput(R.id.lat_et, MOCK_LATITUDE.toString())
         verifyGeoInput(R.id.lon_et, MOCK_LONGITUDE.toString())
@@ -155,12 +154,12 @@ class LockedGeoQuestionViewTest {
     @Test
     fun ensureLocationValuesDisplayedCorrectlyIfInAccurate() {
         clickGeoButton()
-        addExecutionDelay(100)
+        addExecutionDelay(300)
         provideMockLocation(
             MOCK_ACCURACY_INACCURATE,
             Criteria.ACCURACY_LOW
         )
-        addExecutionDelay(100)
+        addExecutionDelay(300)
         verifyAccuracy(accuracyFormat.format(MOCK_ACCURACY_INACCURATE.toDouble()), Color.RED)
     }
 
@@ -181,7 +180,7 @@ class LockedGeoQuestionViewTest {
 
         clickGeoButton()
         onView(withId(android.R.id.button1)).perform(click())
-        addExecutionDelay(100)
+        addExecutionDelay(300)
 
         onView(withId(R.id.lat_et)).check(matches(withText("")))
         onView(withId(R.id.lon_et)).check(matches(withText("")))
@@ -195,7 +194,7 @@ class LockedGeoQuestionViewTest {
         closeSoftKeyboard()
 
         clickGeoButton()
-        addExecutionDelay(100)
+        addExecutionDelay(300)
         clickCancelButton()
 
         onView(withId(R.id.lat_et)).check(matches(withText("")))
@@ -339,11 +338,4 @@ class LockedGeoQuestionViewTest {
             installer.clearSurveys()
         }
     }
-
-    private fun espressoDaggerMockRule() =
-        DaggerMock.rule<ApplicationComponent>(ApplicationModule(app)) {
-            set { component -> app.applicationComponent = component }
-        }
-
-    val app: FlowApp get() = InstrumentationRegistry.getInstrumentation().targetContext.applicationContext as FlowApp
 }

@@ -49,7 +49,7 @@ import androidx.test.espresso.matcher.ViewMatchers.withEffectiveVisibility
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.filters.MediumTest
+import androidx.test.filters.LargeTest
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.ActivityTestRule
 import androidx.test.rule.GrantPermissionRule
@@ -72,7 +72,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import java.text.DecimalFormat
 
-@MediumTest
+@LargeTest
 @RunWith(AndroidJUnit4::class)
 class LockedGeoQuestionViewTest {
     private val accuracyFormat = DecimalFormat("#")
@@ -98,7 +98,7 @@ class LockedGeoQuestionViewTest {
                 155852019L,
                 "156792019",
                 "LockedGeoForm",
-                0L,
+                123L,
                 false
             )
         }

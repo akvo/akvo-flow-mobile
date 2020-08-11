@@ -182,7 +182,7 @@ class LockedGeoQuestionViewTest {
 
         clickGeoButton()
         onView(withId(android.R.id.button1)).perform(click())
-        addExecutionDelay(100)
+        clickCancelButton()
 
         onView(withId(R.id.lat_et)).check(matches(withText("")))
         onView(withId(R.id.lon_et)).check(matches(withText("")))

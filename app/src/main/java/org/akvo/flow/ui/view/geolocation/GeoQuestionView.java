@@ -32,6 +32,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.FragmentManager;
 
+import org.akvo.flow.BuildConfig;
 import org.akvo.flow.R;
 import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionResponse;
@@ -87,7 +88,7 @@ public class GeoQuestionView extends QuestionView
     }
 
     private boolean allowMockLocations(Question q) {
-        return !q.isLocked() || PlatformUtil.isEmulator();
+        return BuildConfig.DEBUG || !q.isLocked() || PlatformUtil.isEmulator();
     }
 
     private void init() {

@@ -81,7 +81,8 @@ class LockedGeoQuestionViewTest {
     var permissionRule: GrantPermissionRule = GrantPermissionRule.grant(
         Manifest.permission.ACCESS_FINE_LOCATION,
         Manifest.permission.WRITE_EXTERNAL_STORAGE,
-        Manifest.permission.READ_PHONE_STATE
+        Manifest.permission.READ_PHONE_STATE,
+        Manifest.permission.ACCESS_BACKGROUND_LOCATION
     )
 
     @get:Rule
@@ -154,7 +155,6 @@ class LockedGeoQuestionViewTest {
     fun ensureLocationValuesDisplayedCorrectlyIfInAccurate() {
         resetFields()
         clickGeoButton()
-        addExecutionDelay(100)
         provideMockLocation(
             MOCK_ACCURACY_INACCURATE,
             Criteria.ACCURACY_LOW
@@ -220,11 +220,13 @@ class LockedGeoQuestionViewTest {
         val locationManager =
             (InstrumentationRegistry.getInstrumentation().context
                 .getSystemService(Context.LOCATION_SERVICE) as LocationManager)
-        locationManager
-            .addTestProvider(
-                LocationManager.GPS_PROVIDER, false, false, false, false, false,
-                false, false, Criteria.POWER_LOW, accuracyRequirement
-            )
+        if (!locationManager.allProviders.contains("gps")) {
+            locationManager
+                .addTestProvider(
+                    LocationManager.GPS_PROVIDER, false, false, false, false, false,
+                    false, false, Criteria.POWER_LOW, accuracyRequirement
+                )
+        }
         locationManager.setTestProviderEnabled(LocationManager.GPS_PROVIDER, true)
         val location = Location(LocationManager.GPS_PROVIDER)
         location.latitude = MOCK_LATITUDE

@@ -214,7 +214,17 @@ class LockedGeoQuestionViewTest {
     private fun verifyAccuracy(accuracy: String, textColor: Int) {
         val input = onView(withId(R.id.acc_tv))
         input.check(matches(isDisplayed()))
-        input.check(matches(withText(getString(R.string.geo_location_accuracy, activityTestRule, accuracy))))
+        input.check(
+            matches(
+                withText(
+                    getString(
+                        R.string.geo_location_accuracy,
+                        activityTestRule,
+                        accuracy
+                    )
+                )
+            )
+        )
         input.check(matches(hasTextColor(textColor)))
     }
 
@@ -222,13 +232,11 @@ class LockedGeoQuestionViewTest {
         val locationManager =
             (InstrumentationRegistry.getInstrumentation().context
                 .getSystemService(Context.LOCATION_SERVICE) as LocationManager)
-        if (!locationManager.allProviders.contains("gps")) {
-            locationManager
-                .addTestProvider(
-                    LocationManager.GPS_PROVIDER, false, false, false, false, false,
-                    false, false, Criteria.POWER_LOW, accuracyRequirement
-                )
-        }
+        locationManager
+            .addTestProvider(
+                LocationManager.GPS_PROVIDER, false, false, false, false, false,
+                false, false, Criteria.POWER_LOW, accuracyRequirement
+            )
         locationManager.setTestProviderEnabled(LocationManager.GPS_PROVIDER, true)
         val location = Location(LocationManager.GPS_PROVIDER)
         location.latitude = MOCK_LATITUDE

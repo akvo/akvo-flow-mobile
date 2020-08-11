@@ -115,7 +115,8 @@ class LockedGeoQuestionViewTest {
             )
         closeSoftKeyboard()
         clickGeoButton()
-        verifyProgressDisplayed()
+        onView(withText("XYZ")).perform(click())
+        //verifyProgressDisplayed()
     }
 
     @Test
@@ -133,7 +134,8 @@ class LockedGeoQuestionViewTest {
         clickGeoButton()
         simulateLocationTimeout()
         clickSnackBarRetry()
-        verifyProgressDisplayed()
+        onView(withText("XYZ")).perform(click())
+        //verifyProgressDisplayed()
     }
 
     @Test

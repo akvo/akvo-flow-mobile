@@ -28,6 +28,7 @@ import android.location.Location
 import android.location.LocationManager
 import android.os.Build
 import android.os.SystemClock
+import android.provider.Settings
 import android.view.View
 import android.widget.TextView
 import androidx.test.espresso.Espresso.closeSoftKeyboard
@@ -67,6 +68,7 @@ import org.hamcrest.Matcher
 import org.hamcrest.core.AllOf.allOf
 import org.hamcrest.core.IsNot.not
 import org.junit.AfterClass
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -76,6 +78,7 @@ import java.text.DecimalFormat
 @RunWith(AndroidJUnit4::class)
 class LockedGeoQuestionViewTest {
     private val accuracyFormat = DecimalFormat("#")
+    private var isTestLab: Boolean = false
 
     @get:Rule
     var permissionRule: GrantPermissionRule = GrantPermissionRule.grant(
@@ -94,7 +97,10 @@ class LockedGeoQuestionViewTest {
             val targetContext = InstrumentationRegistry.getInstrumentation().targetContext
             SurveyRequisite.setRequisites(targetContext)
             val installer = SurveyInstaller(targetContext)
-            installer.installSurvey(raw.locked_geo_form, InstrumentationRegistry.getInstrumentation().context)
+            installer.installSurvey(
+                raw.locked_geo_form,
+                InstrumentationRegistry.getInstrumentation().context
+            )
             return getFormActivityIntent(
                 155852019L,
                 "156792019",
@@ -105,18 +111,35 @@ class LockedGeoQuestionViewTest {
         }
     }
 
+    @Before
+    fun setUp() {
+        val testLabSetting: String? = Settings.System.getString(
+            InstrumentationRegistry.getInstrumentation()
+                .targetContext.contentResolver, "firebase.test.lab")
+        isTestLab = "true" == testLabSetting
+    }
+    /**
+     * Does not work on emulator from firebase as location is provided too fast before progress can
+     * be shown
+     */
     @Test
     fun ensureGeoQuestionProgressDisplayedOnButtonClick() {
-        //reset values just in case
-        resetFields()
-        onView(withId(R.id.acc_tv))
-            .perform(
-                replaceTextInTextView(getString(R.string.geo_location_accuracy_default, activityTestRule))
-            )
-        closeSoftKeyboard()
-        clickGeoButton()
-        onView(withText("XYZ")).perform(click())
-        //verifyProgressDisplayed()
+        if (!isTestLab) {
+            //reset values just in case
+            resetFields()
+            onView(withId(R.id.acc_tv))
+                .perform(
+                    replaceTextInTextView(
+                        getString(
+                            R.string.geo_location_accuracy_default,
+                            activityTestRule
+                        )
+                    )
+                )
+            closeSoftKeyboard()
+            clickGeoButton()
+            verifyProgressDisplayed()
+        }
     }
 
     @Test
@@ -130,12 +153,13 @@ class LockedGeoQuestionViewTest {
 
     @Test
     fun ensureSnackBarRetryShowsProgress() {
-        resetFields()
-        clickGeoButton()
-        simulateLocationTimeout()
-        clickSnackBarRetry()
-        onView(withText("XYZ")).perform(click())
-        //verifyProgressDisplayed()
+        if (!isTestLab) {
+            resetFields()
+            clickGeoButton()
+            simulateLocationTimeout()
+            clickSnackBarRetry()
+            verifyProgressDisplayed()
+        }
     }
 
     @Test
@@ -143,9 +167,7 @@ class LockedGeoQuestionViewTest {
         //reset values just in case
         resetFields()
         clickGeoButton()
-        addExecutionDelay(100)
         provideMockLocation(MOCK_ACCURACY_ACCURATE, Criteria.ACCURACY_FINE)
-        addExecutionDelay(100)
 
         verifyGeoInput(R.id.lat_et, MOCK_LATITUDE.toString())
         verifyGeoInput(R.id.lon_et, MOCK_LONGITUDE.toString())
@@ -154,19 +176,19 @@ class LockedGeoQuestionViewTest {
     }
 
     @Test
-    fun ensureLocationValuesDisplayedCorrectlyIfInAccurate() {
+    fun ensureLocationValuesDisplayedCorrectlyIfInaccurate() {
         resetFields()
         clickGeoButton()
-        provideMockLocation(
-            MOCK_ACCURACY_INACCURATE,
-            Criteria.ACCURACY_LOW
-        )
+        val geoQuestion =
+            activityTestRule.activity.findViewById<View>(R.id.geo_question_view)
+        geoQuestion.post { (geoQuestion as TimedLocationListener.Listener).onLocationReady(
+            MOCK_LATITUDE, MOCK_LONGITUDE, MOCK_ALTITUDE, MOCK_ACCURACY_INACCURATE) }
         addExecutionDelay(100)
         verifyAccuracy(accuracyFormat.format(MOCK_ACCURACY_INACCURATE.toDouble()), Color.RED)
     }
 
     @Test
-    fun ensureFieldsResetWhenGeoButtonPress() {
+    fun ensureDialogShownWhenFieldsNotEmpty() {
         onView(withId(R.id.lat_et)).perform(replaceText(MOCK_LATITUDE.toString()))
         onView(withId(R.id.lon_et)).perform(replaceText(MOCK_LONGITUDE.toString()))
         onView(withId(R.id.height_et)).perform(replaceText(MOCK_ALTITUDE.toString()))
@@ -181,13 +203,7 @@ class LockedGeoQuestionViewTest {
         )
 
         clickGeoButton()
-        onView(withId(android.R.id.button1)).perform(click())
-        clickCancelButton()
-
-        onView(withId(R.id.lat_et)).check(matches(withText("")))
-        onView(withId(R.id.lon_et)).check(matches(withText("")))
-        onView(withId(R.id.height_et)).check(matches(withText("")))
-        onView(withId(R.id.acc_tv)).check(matches(withText(R.string.geo_location_accuracy_default)))
+        onView(withId(android.R.id.button1)).check(matches(isDisplayed()))
     }
 
     @Test

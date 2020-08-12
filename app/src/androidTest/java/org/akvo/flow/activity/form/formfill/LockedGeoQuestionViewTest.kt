@@ -199,17 +199,19 @@ class LockedGeoQuestionViewTest {
 
     @Test
     fun ensureLocationValuesDisplayedCorrectlyWhenCancelled() {
-        resetFields()
-        closeSoftKeyboard()
+        if (!isTestLab) {
+            resetFields()
+            closeSoftKeyboard()
 
-        clickGeoButton()
-        addExecutionDelay(100)
-        clickCancelButton()
+            clickGeoButton()
+            addExecutionDelay(100)
+            clickCancelButton()
 
-        onView(withId(R.id.lat_et)).check(matches(withText("")))
-        onView(withId(R.id.lon_et)).check(matches(withText("")))
-        onView(withId(R.id.height_et)).check(matches(withText("")))
-        onView(withId(R.id.acc_tv)).check(matches(withText(R.string.geo_location_accuracy_default)))
+            onView(withId(R.id.lat_et)).check(matches(withText("")))
+            onView(withId(R.id.lon_et)).check(matches(withText("")))
+            onView(withId(R.id.height_et)).check(matches(withText("")))
+            onView(withId(R.id.acc_tv)).check(matches(withText(R.string.geo_location_accuracy_default)))
+        }
     }
 
     private fun resetFields() {

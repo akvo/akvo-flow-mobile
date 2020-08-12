@@ -20,14 +20,8 @@
 package org.akvo.flow.activity.form.formfill
 
 import android.Manifest
-import android.content.Context
 import android.content.Intent
 import android.graphics.Color
-import android.location.Criteria
-import android.location.Location
-import android.location.LocationManager
-import android.os.Build
-import android.os.SystemClock
 import android.provider.Settings
 import android.view.View
 import android.widget.TextView
@@ -167,7 +161,7 @@ class LockedGeoQuestionViewTest {
         //reset values just in case
         resetFields()
         clickGeoButton()
-        provideMockLocation(MOCK_ACCURACY_ACCURATE, Criteria.ACCURACY_FINE)
+        simulateLocationReceived(MOCK_ACCURACY_ACCURATE)
 
         verifyGeoInput(R.id.lat_et, MOCK_LATITUDE.toString())
         verifyGeoInput(R.id.lon_et, MOCK_LONGITUDE.toString())
@@ -179,10 +173,7 @@ class LockedGeoQuestionViewTest {
     fun ensureLocationValuesDisplayedCorrectlyIfInaccurate() {
         resetFields()
         clickGeoButton()
-        val geoQuestion =
-            activityTestRule.activity.findViewById<View>(R.id.geo_question_view)
-        geoQuestion.post { (geoQuestion as TimedLocationListener.Listener).onLocationReady(
-            MOCK_LATITUDE, MOCK_LONGITUDE, MOCK_ALTITUDE, MOCK_ACCURACY_INACCURATE) }
+        simulateLocationReceived(MOCK_ACCURACY_INACCURATE)
         addExecutionDelay(100)
         verifyAccuracy(accuracyFormat.format(MOCK_ACCURACY_INACCURATE.toDouble()), Color.RED)
     }
@@ -244,26 +235,14 @@ class LockedGeoQuestionViewTest {
         input.check(matches(hasTextColor(textColor)))
     }
 
-    private fun provideMockLocation(accuracy: Float, accuracyRequirement: Int) {
-        val locationManager =
-            (InstrumentationRegistry.getInstrumentation().context
-                .getSystemService(Context.LOCATION_SERVICE) as LocationManager)
-        locationManager
-            .addTestProvider(
-                LocationManager.GPS_PROVIDER, false, false, false, false, false,
-                false, false, Criteria.POWER_LOW, accuracyRequirement
+    private fun simulateLocationReceived(accuracy: Float) {
+        val geoQuestion =
+            activityTestRule.activity.findViewById<View>(R.id.geo_question_view)
+        geoQuestion.post {
+            (geoQuestion as TimedLocationListener.Listener).onLocationReady(
+                MOCK_LATITUDE, MOCK_LONGITUDE, MOCK_ALTITUDE, accuracy
             )
-        locationManager.setTestProviderEnabled(LocationManager.GPS_PROVIDER, true)
-        val location = Location(LocationManager.GPS_PROVIDER)
-        location.latitude = MOCK_LATITUDE
-        location.longitude = MOCK_LONGITUDE
-        location.altitude = MOCK_ALTITUDE
-        location.accuracy = accuracy
-        location.time = System.currentTimeMillis()
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-            location.elapsedRealtimeNanos = SystemClock.elapsedRealtimeNanos()
         }
-        locationManager.setTestProviderLocation(LocationManager.GPS_PROVIDER, location)
     }
 
     private fun verifyGeoInput(resId: Int, text: String) {

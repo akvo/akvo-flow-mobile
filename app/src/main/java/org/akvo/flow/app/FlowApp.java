@@ -22,7 +22,6 @@ package org.akvo.flow.app;
 import androidx.annotation.VisibleForTesting;
 import androidx.multidex.MultiDexApplication;
 
-import com.halfhp.rxtracer.RxTracer;
 import com.mapbox.mapboxsdk.Mapbox;
 
 import org.akvo.flow.BuildConfig;
@@ -75,7 +74,6 @@ public class FlowApp extends MultiDexApplication {
 
         initializeInjector();
         initLogging();
-        RxTracer.enable();
         startUpdateService();
         startBootstrapFolderTracker();
         updateLoggingInfo();

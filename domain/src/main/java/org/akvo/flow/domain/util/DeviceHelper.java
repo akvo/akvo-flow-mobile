@@ -21,14 +21,16 @@
 package org.akvo.flow.domain.util;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.provider.Settings;
+import android.telephony.TelephonyManager;
+
 import androidx.core.content.ContextCompat;
 import androidx.core.content.PermissionChecker;
-import android.telephony.TelephonyManager;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -47,6 +49,7 @@ public class DeviceHelper {
      * gets the device's primary phone number
      *
      */
+    @SuppressLint({"MissingPermission", "HardwareIds"})
     public String getPhoneNumber() {
         TelephonyManager teleMgr = (TelephonyManager) context
                 .getSystemService(Context.TELEPHONY_SERVICE);
@@ -69,6 +72,7 @@ public class DeviceHelper {
      * (only Android < 6.0)
      *
      */
+    @SuppressLint("HardwareIds")
     private String getMacAddress() {
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP) {
             return "";
@@ -78,8 +82,6 @@ public class DeviceHelper {
         WifiManager wifiMgr = (WifiManager) context.getApplicationContext()
                 .getSystemService(Context.WIFI_SERVICE);
         if (wifiMgr != null) {
-            // presumably if we don't have a cell connection, then we must
-            // be connected by WIFI so this should work
             WifiInfo info = wifiMgr.getConnectionInfo();
             if (info != null) {
                 macAddress = info.getMacAddress();
@@ -90,14 +92,18 @@ public class DeviceHelper {
 
     /**
      * gets the device's IMEI (MEID or ESN for CDMA phone)
+     * (only Android < 10.0)
      *
      */
+    @SuppressLint({"MissingPermission", "HardwareIds"})
     public String getImei() {
-        TelephonyManager teleMgr = (TelephonyManager) context
-                .getSystemService(Context.TELEPHONY_SERVICE);
         String number = null;
-        if (teleMgr != null && isAllowedToReadPhoneState()) {
-            number = teleMgr.getDeviceId();
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+            TelephonyManager teleMgr = (TelephonyManager) context
+                    .getSystemService(Context.TELEPHONY_SERVICE);
+            if (teleMgr != null && isAllowedToReadPhoneState()) {
+                number = teleMgr.getDeviceId();
+            }
         }
         if (number == null) {
             number = "NO_IMEI";
@@ -105,6 +111,7 @@ public class DeviceHelper {
         return number;
     }
 
+    @SuppressLint("HardwareIds")
     public String getAndroidId() {
         return Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
     }

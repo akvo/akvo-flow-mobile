@@ -27,6 +27,7 @@
         android:label="@string/app_name"
         android:theme="@style/FlowAppTheme"
         android:usesCleartextTraffic="true"
+        android:requestLegacyExternalStorage="true"
         tools:ignore="GoogleAppIndexingWarning">
 
         <uses-library
@@ -129,7 +130,8 @@
         <activity android:name=".presentation.geoshape.ViewGeoShapeActivity"
             android:configChanges="orientation|screenSize"/>
         <activity android:name=".presentation.geoshape.create.CreateGeoShapeActivity"
-            android:configChanges="orientation|screenSize"/>
+            android:configChanges="orientation|screenSize"
+            android:theme="@style/GeoShapeTheme"/>
 
         <provider
             android:name="androidx.core.content.FileProvider"

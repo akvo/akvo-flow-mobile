@@ -25,6 +25,12 @@ import android.content.Intent;
 import android.util.SparseArray;
 import android.widget.AdapterView;
 
+import androidx.test.espresso.ViewInteraction;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
+import androidx.test.filters.LargeTest;
+import androidx.test.platform.app.InstrumentationRegistry;
+import androidx.test.rule.ActivityTestRule;
+
 import org.akvo.flow.R;
 import org.akvo.flow.activity.FormActivity;
 import org.akvo.flow.activity.form.data.SurveyInstaller;
@@ -47,12 +53,6 @@ import org.junit.runner.RunWith;
 import java.util.List;
 import java.util.Random;
 
-import androidx.test.espresso.ViewInteraction;
-import androidx.test.ext.junit.runners.AndroidJUnit4;
-import androidx.test.filters.MediumTest;
-import androidx.test.platform.app.InstrumentationRegistry;
-import androidx.test.rule.ActivityTestRule;
-
 import static androidx.test.espresso.Espresso.onData;
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
@@ -71,7 +71,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.core.IsNot.not;
 
-@MediumTest
+@LargeTest
 @RunWith(AndroidJUnit4.class)
 public class CascadeQuestionViewTest {
 
@@ -85,7 +85,7 @@ public class CascadeQuestionViewTest {
             FormActivity.class) {
         @Override
         protected Intent getActivityIntent() {
-            return getFormActivityIntent(155852013L, "156792013", "CascadeForm", 0L, false);
+            return getFormActivityIntent(155852013L, "156792013", "CascadeForm", 231L, false);
         }
     };
 

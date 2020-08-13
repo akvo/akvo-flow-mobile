@@ -1,5 +1,13 @@
 Akvo FLOW app release notes
 ===========================
+# ver 2.9.4
+Date: 13 August 2020
+
+* **Upgrade to latest tools** - [#1635](https://github.com/akvo/akvo-flow-mobile/issues/1635)
+* **Accuracy when capturing geolocation data** - [#1680](https://github.com/akvo/akvo-flow-mobile/issues/1680)
+* **Fix small inconsistency with datapoint download** - [#1688](https://github.com/akvo/akvo-flow-mobile/issues/1688)
+
+---------------
 # ver 2.9.3
 Date: 21 July 2020
 

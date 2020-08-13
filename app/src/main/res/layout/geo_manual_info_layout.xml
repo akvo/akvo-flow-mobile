@@ -1,64 +1,82 @@
 <?xml version="1.0" encoding="utf-8"?>
-<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
-             android:layout_width="match_parent"
-             android:layout_height="wrap_content"
-             android:stretchColumns="1"
-        >
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/root_layout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
 
-    <TableRow>
+    <EditText
+        android:id="@+id/lat_et"
+        android:layout_width="206dp"
+        android:layout_height="wrap_content"
+        android:inputType="numberDecimal|numberSigned"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-        <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/lat"/>
+    <EditText
+        android:id="@+id/lon_et"
+        android:layout_width="206dp"
+        android:layout_height="wrap_content"
+        android:inputType="numberDecimal|numberSigned"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/lat_et" />
 
-        <EditText
-                android:id="@+id/lat_et"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="numberDecimal|numberSigned"/>
-    </TableRow>
+    <EditText
+        android:id="@+id/height_et"
+        android:layout_width="204dp"
+        android:layout_height="wrap_content"
+        android:imeOptions="actionDone"
+        android:inputType="numberDecimal|numberSigned"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/lon_et" />
 
-    <TableRow>
+    <TextView
+        android:id="@+id/lat_label"
+        android:layout_width="206dp"
+        android:layout_height="wrap_content"
+        android:text="@string/lat"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/lat_et"
+        app:layout_constraintBottom_toBottomOf="@id/lat_et" />
 
-        <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/lon"/>
+    <TextView
+        android:id="@+id/lon_label"
+        android:layout_width="206dp"
+        android:layout_height="wrap_content"
+        android:text="@string/lon"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/lon_et"
+        app:layout_constraintBottom_toBottomOf="@id/lon_et" />
 
-        <EditText
-                android:id="@+id/lon_et"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="numberDecimal|numberSigned"/>
-    </TableRow>
+    <TextView
+        android:id="@+id/height_label"
+        android:layout_width="204dp"
+        android:layout_height="wrap_content"
+        android:text="@string/elevation"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/height_et"
+        app:layout_constraintBottom_toBottomOf="@id/height_et" />
 
-    <TableRow>
+    <TextView
+        android:id="@+id/acc_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:gravity="center"
+        android:text="@string/geo_location_accuracy_default"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/height_et" />
 
-        <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginRight="4dp"
-                android:text="@string/elevation"/>
+    <TextView
+        android:id="@+id/accuracy_warning_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:text="@string/accuracy_warning"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/acc_tv" />
 
-        <EditText
-                android:id="@+id/height_et"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:imeOptions="actionDone"
-                android:inputType="numberDecimal|numberSigned"/>
-    </TableRow>
-
-    <TableRow>
-
-        <TextView
-                android:id="@+id/acc_tv"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:gravity="center"
-                android:layout_gravity="center"
-                android:layout_marginTop="8dp"
-                android:layout_marginBottom="8dp"
-                android:text="@string/geo_location_accuracy_default"/>
-    </TableRow>
-</TableLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

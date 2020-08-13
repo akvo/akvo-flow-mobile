@@ -6,7 +6,8 @@
     <string name="lowcardspacetitle">Low Storage Space</string>
     <string name="nocardspacedialog">The SD card on this device is full and you can no longer collect data. You must clear space on the SD card in order to continue.</string>
     <string name="lowcardspacedialog">You have %%% MB of storage space left on this device\'s SD card. Once the SD card is full, you will no longer be able to collect data.</string>
-    <string name="getgeo">Check Geo Location</string>
+    <string name="getgeo">Capture Location</string>
+    <string name="updategeo">Recapture Location</string>
     <string name="lat">Lat</string>
     <string name="lon">Lon</string>
     <string name="elevation">Height</string>
@@ -353,6 +354,7 @@
     <string name="confirm_new_submission_title">New Submission?</string>
     <string name="confirm_new_submission_message">You\'ve submitted \"%1$s\" to this datapoint within the last 24 hours.\n\nDo you want to make another submission?</string>
     <string name="content_description_data_point_status">Datapoint status image</string>
+    <string name="accuracy_warning">To improve the geolocation accuracy, recapture.</string>
 
     <plurals name="download_forms_error">
         <item quantity="one">Error downloading form</item>

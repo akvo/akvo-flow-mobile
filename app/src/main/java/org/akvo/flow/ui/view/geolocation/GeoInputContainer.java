@@ -182,7 +182,11 @@ public class GeoInputContainer extends CoordinatorLayout {
 
     void showCoordinatesInaccurate() {
         statusIndicator.setTextColor(Color.RED);
-        accuracyWarning.setVisibility(VISIBLE);
+        if (hasLocation()) {
+            accuracyWarning.setVisibility(VISIBLE);
+        } else {
+            accuracyWarning.setVisibility(GONE);
+        }
     }
 
     void showLocationListenerStopped() {

@@ -134,7 +134,6 @@ public class GeoQuestionView extends QuestionView
     public void startListeningToLocation() {
         resetQuestion(true);
         showLocationListenerStarted();
-        resetAccuracy();
         mLocationListener.startLocationIfPossible();
     }
 
@@ -176,9 +175,6 @@ public class GeoQuestionView extends QuestionView
 
     private void updateButtonTextToCancel() {
         mGeoButton.setText(R.string.cancelbutton);
-    }
-
-    private void resetAccuracy() {
     }
 
     @Override
@@ -238,7 +234,6 @@ public class GeoQuestionView extends QuestionView
     @Override
     public void resetQuestion(boolean fireEvent) {
         super.resetQuestion(fireEvent);
-        resetAccuracy();
         geoInputContainer.displayCoordinates("", "", "");
     }
 
@@ -269,7 +264,6 @@ public class GeoQuestionView extends QuestionView
         showLocationListenerStopped();
         View coordinatorLayout = getRootView().findViewById(R.id.coordinator_layout);
         locationSnackBarManager.displayLocationTimeoutSnackBar(coordinatorLayout, v -> {
-            resetAccuracy();
             mLocationListener.startLocationIfPossible();
             showLocationListenerStarted();
         }, getContext());

@@ -305,9 +305,6 @@ class RecordActivityTest {
         }
 
         fun checkFormSubmissionDialogDisplayed() : RecordScreenRobot {
-           /* onView(withText(R.string.confirm_new_submission_title))
-                .inRoot(isDialog())
-                .check(matches(isDisplayed()))*/
             return checkDialogDisplayed(R.string.confirm_new_submission_title)
         }
     }

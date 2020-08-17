@@ -17,33 +17,17 @@
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
+package org.akvo.flow.domain.repository
 
-package org.akvo.flow.domain.repository;
+import io.reactivex.Observable
+import io.reactivex.Single
+import org.akvo.flow.domain.entity.DomainForm
 
-import androidx.annotation.NonNull;
-
-import org.akvo.flow.domain.entity.DomainForm;
-import org.jetbrains.annotations.NotNull;
-
-import java.util.Set;
-
-import io.reactivex.Observable;
-import io.reactivex.Single;
-
-public interface FormRepository {
-
-    Observable<Boolean> loadForm(String formId, String deviceId);
-
-    Observable<Integer> reloadForms(String deviceId);
-
-    Observable<Integer> downloadForms(String deviceId);
-
-    @NotNull
-    Single<DomainForm> getForm(@NotNull String formId);
-
-    @NonNull
-    Single<Set<String>> loadFormLanguages(@NotNull String formId);
-
-    @NotNull
-    Single<DomainForm> parseForm(@NotNull String formId);
+interface FormRepository {
+    fun loadForm(formId: String?, deviceId: String?): Observable<Boolean?>?
+    fun reloadForms(deviceId: String?): Observable<Int?>?
+    fun downloadForms(deviceId: String?): Observable<Int?>?
+    fun getForm(formId: String): Single<DomainForm>
+    fun loadFormLanguages(formId: String): Single<Set<String>>
+    fun parseForm(formId: String): Single<DomainForm?>
 }

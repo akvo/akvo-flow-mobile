@@ -25,6 +25,7 @@ import org.akvo.flow.data.datasource.DataSourceFactory;
 import org.akvo.flow.data.datasource.DatabaseDataSource;
 import org.akvo.flow.data.datasource.files.FileDataSource;
 import org.akvo.flow.data.entity.ApiFormHeader;
+import org.akvo.flow.data.entity.form.DomainFormMapper;
 import org.akvo.flow.data.entity.form.Form;
 import org.akvo.flow.data.entity.form.FormHeaderParser;
 import org.akvo.flow.data.entity.form.FormIdMapper;
@@ -99,6 +100,9 @@ public class FormDataRepositoryTest {
     @Mock
     Form mockForm;
 
+    @Mock
+    DomainFormMapper mockDomainFormMapper;
+
     private MockWebServer mockWebServer;
     private FormDataRepository formDataRepository;
     private RestApi restApi;
@@ -116,7 +120,7 @@ public class FormDataRepositoryTest {
         DataSourceFactory dataSourceFactory = new DataSourceFactory(null, null,
                 mockDatabaseDataSource, null, mockFileDataSource, null);
         formDataRepository = new FormDataRepository(mockFormHeaderParser, mockXmlParser,
-                restApi, dataSourceFactory, mockFormIdMapper, s3RestApi, null);
+                restApi, dataSourceFactory, mockFormIdMapper, s3RestApi, mockDomainFormMapper);
         ApiFormHeader apiFormHeader = new ApiFormHeader("123456", "", "", "", 1.0, "", true, "");
         when(mockFormHeaderParser.parseOne(anyString())).thenReturn(apiFormHeader);
         when(mockAmazonAuth.getAmazonAuthForGet(anyString(), anyString(), anyString()))

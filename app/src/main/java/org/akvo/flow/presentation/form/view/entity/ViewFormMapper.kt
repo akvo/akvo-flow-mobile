@@ -26,7 +26,7 @@ class ViewFormMapper @Inject constructor(private val viewQuestionGroupMapper: Vi
 
     fun transform(domainForm: DomainForm): ViewForm {
         return ViewForm(
-            domainForm.title,
+            domainForm.name,
             domainForm.version,
             viewQuestionGroupMapper.transform(domainForm.groups)
         )

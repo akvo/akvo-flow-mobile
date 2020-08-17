@@ -8,49 +8,16 @@
     android:id="@+id/form_view_root"
     tools:context=".presentation.form.view.FormViewActivity">
 
-    <include layout="@layout/app_bar_layout"/>
+    <include layout="@layout/app_bar_layout_tabs_adaptable"/>
 
-    <FrameLayout
-        android:layout_marginTop="?actionBarSize"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <androidx.viewpager.widget.ViewPager
-            android:id="@+id/view_pager"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <org.akvo.flow.ui.view.AdaptableTabLayout
-                android:id="@+id/tabs"
-                android:layout_gravity="top"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@color/colorPrimary"
-                app:tabIndicatorColor="@color/tabIndicatorColor"
-                app:tabIndicatorHeight="4dp"
-                app:tabTextColor="@color/white"
-                app:tabTextAppearance="@style/TextAppearance.Tabs"
-                app:tabSelectedTextColor="@color/white"
-                app:tabMode="scrollable"
-                tools:showIn="@layout/activity_form_view">
-
-            </org.akvo.flow.ui.view.AdaptableTabLayout>
-        </androidx.viewpager.widget.ViewPager>
-
-        <View
-            android:layout_marginTop="@dimen/tabs_height"
-            android:layout_height="6dp"
-            android:layout_width="match_parent"
-            android:background="@drawable/shadow_background"/>
-
-        <ProgressBar
-            style="?android:attr/progressBarStyle"
-            android:layout_marginTop="?actionBarSize"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:visibility="gone"
-            tools:visibility="visible"
-            android:id="@+id/progressBar"/>
-    </FrameLayout>
+    <include layout="@layout/form_activity_content" />
+    <ProgressBar
+        style="?android:attr/progressBarStyle"
+        android:layout_marginTop="140dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:visibility="gone"
+        tools:visibility="visible"
+        android:id="@+id/progressBar" />
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

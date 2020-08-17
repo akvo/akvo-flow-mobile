@@ -20,7 +20,6 @@
 package org.akvo.flow.presentation.form.view
 
 import android.os.Bundle
-import android.text.TextUtils
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
@@ -77,7 +76,7 @@ class FormViewActivity : BackActivity(), IFormView,
                 this,
                 supportFragmentManager
             )
-        viewPager = findViewById(R.id.view_pager)
+        viewPager = findViewById(R.id.pager)
         viewPager.adapter = sectionsPagerAdapter
         val tabs: TabLayout = findViewById(R.id.tabs)
         tabs.setupWithViewPager(viewPager)
@@ -94,8 +93,8 @@ class FormViewActivity : BackActivity(), IFormView,
     override fun onResume() {
         super.onResume()
         surveyGroup = intent.getSerializableExtra(ConstantUtil.SURVEY_EXTRA) as SurveyGroup
-        formId = intent.getStringExtra(ConstantUtil.FORM_ID_EXTRA)
-        datapointId = intent.getStringExtra(ConstantUtil.DATA_POINT_ID_EXTRA)
+        formId = intent.getStringExtra(ConstantUtil.FORM_ID_EXTRA)!!
+        datapointId = intent.getStringExtra(ConstantUtil.DATA_POINT_ID_EXTRA)!!
         formInstanceId = intent.getLongExtra(ConstantUtil.RESPONDENT_ID_EXTRA, 0)
         presenter.loadForm(formId, formInstanceId, surveyGroup, datapointId)
         sectionsPagerAdapter.groups = mutableListOf()

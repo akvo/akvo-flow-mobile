@@ -31,7 +31,7 @@ class DomainFormMapper @Inject constructor() {
             dataForm.formId,
             dataForm.surveyId,
             dataForm.name,
-            dataForm.version,
+            dataForm.version.toString(),
             dataForm.type,
             dataForm.location,
             dataForm.filename,

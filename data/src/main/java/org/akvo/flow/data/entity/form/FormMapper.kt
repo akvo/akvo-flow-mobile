@@ -27,7 +27,7 @@ class FormMapper @Inject constructor() {
 
     fun mapForm(cursor: Cursor?): DataForm {
         var resourcesDownloaded = false
-        var formVersion = ""
+        var formVersion = 0.0
         var id = -1 //invalid form
         var formId = ""
         var surveyId = 0
@@ -41,7 +41,7 @@ class FormMapper @Inject constructor() {
             id = getIntColumnValue(cursor, SurveyColumns._ID)
             formId = getStringColumnValue(cursor, SurveyColumns.SURVEY_ID)
             surveyId = getIntColumnValue(cursor, SurveyColumns.SURVEY_GROUP_ID)
-            formVersion = getStringColumnValue(cursor, SurveyColumns.VERSION)
+            formVersion = cursor.getDouble(cursor.getColumnIndexOrThrow(SurveyColumns.VERSION))
             name = getStringColumnValue(cursor, SurveyColumns.NAME)
             type = getStringColumnValue(cursor, SurveyColumns.NAME)
             location = getStringColumnValue(cursor, SurveyColumns.NAME)

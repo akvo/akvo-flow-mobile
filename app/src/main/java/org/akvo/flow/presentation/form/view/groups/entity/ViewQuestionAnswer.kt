@@ -137,7 +137,7 @@ data class ViewLocation(
     val longitude: String,
     val altitude: String = "",
     val accuracy: String = "" //formatted accuracy for displaying
-) // check default value
+)
 {
     fun isValid(): Boolean {
         return latitude.isNotEmpty() && longitude.isNotEmpty()

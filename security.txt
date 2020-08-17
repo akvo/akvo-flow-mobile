@@ -1,0 +1,3 @@
+Contact: mailto:security@akvo.org
+Preferred-Languages: en
+Policy: https://akvo.org/policies/ check the section **Security policy**

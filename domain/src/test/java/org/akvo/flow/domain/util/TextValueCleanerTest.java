@@ -21,12 +21,13 @@ package org.akvo.flow.domain.util;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.powermock.modules.junit4.PowerMockRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
-import static junit.framework.Assert.assertNull;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
-@RunWith(PowerMockRunner.class)
+
+@RunWith(MockitoJUnitRunner.class)
 public class TextValueCleanerTest {
 
     @Test

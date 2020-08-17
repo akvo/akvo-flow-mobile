@@ -29,14 +29,17 @@ import androidx.test.espresso.intent.Intents.intended
 import androidx.test.espresso.intent.matcher.IntentMatchers.hasComponent
 import androidx.test.espresso.matcher.RootMatchers
 import androidx.test.espresso.matcher.ViewMatchers
+import androidx.test.espresso.matcher.ViewMatchers.isChecked
 import androidx.test.espresso.matcher.ViewMatchers.withEffectiveVisibility
 import androidx.test.espresso.matcher.ViewMatchers.withId
+import androidx.test.espresso.matcher.ViewMatchers.withSpinnerText
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import org.akvo.flow.R
 import org.akvo.flow.activity.ToolBarTitleSubtitleMatcher.withToolbarTitle
 import org.akvo.flow.activity.form.FormActivityTestUtil.addExecutionDelay
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.CoreMatchers.allOf
+import org.hamcrest.core.IsNot.not
 
 abstract class ScreenRobot<T : ScreenRobot<T>> {
 
@@ -86,6 +89,21 @@ abstract class ScreenRobot<T : ScreenRobot<T>> {
         onView(withText(stringResId))
             .inRoot(RootMatchers.isDialog())
             .check(matches(ViewMatchers.isDisplayed()))
+        return this as T
+    }
+
+    fun checkCheckboxIsChecked(@IdRes viewId: Int): T {
+        onView(withId(viewId)).check(matches(isChecked()))
+        return this as T
+    }
+
+    fun checkCheckboxIsUnChecked(@IdRes viewId: Int): T {
+        onView(withId(viewId)).check(matches(not(isChecked())))
+        return this as T
+    }
+
+    fun checkMatchesSpinnerText(@IdRes viewId: Int, text: String): T {
+        onView(withId(viewId)).check(matches(withSpinnerText(`is`<String>(text))))
         return this as T
     }
 

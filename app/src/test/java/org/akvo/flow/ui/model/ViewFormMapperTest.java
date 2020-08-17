@@ -25,7 +25,7 @@ import org.akvo.flow.domain.SurveyGroup;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -122,7 +122,6 @@ public class ViewFormMapperTest {
         given(mockSurveyItem.isRegistrationForm()).willReturn(true);
         given(mockSurveyItem.getId()).willReturn("123");
         given(mockSurveyItem.getName()).willReturn("name");
-        given(mockSurveyItem.isSubmittedDataPoint()).willReturn(true);
         given(mockSurveyGroup.isMonitored()).willReturn(true);
 
         ViewForm mapped = mapper.transform(mockSurveyItem, mockSurveyGroup, "deleted");

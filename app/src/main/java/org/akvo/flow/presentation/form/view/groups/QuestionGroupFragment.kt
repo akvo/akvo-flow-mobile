@@ -25,7 +25,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
-import kotlinx.android.synthetic.main.question_group_fragment.questionsRv
+import kotlinx.android.synthetic.main.question_group_fragment.*
 import org.akvo.flow.R
 import org.akvo.flow.app.FlowApp
 import org.akvo.flow.injector.component.ApplicationComponent
@@ -39,8 +39,7 @@ import org.akvo.flow.util.image.GlideImageLoader
 import org.akvo.flow.util.image.ImageLoader
 import javax.inject.Inject
 
-class QuestionGroupFragment : Fragment(),
-    QuestionGroupView {
+class QuestionGroupFragment : Fragment(), QuestionGroupView {
 
     private lateinit var questionGroupTitle: String
     private lateinit var imageLoader: ImageLoader

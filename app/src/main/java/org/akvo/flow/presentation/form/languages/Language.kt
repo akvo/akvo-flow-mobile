@@ -20,6 +20,7 @@ package org.akvo.flow.presentation.form.languages
 
 import android.os.Parcel
 import android.os.Parcelable
+import org.akvo.flow.domain.entity.readStringNonNull
 
 data class Language(
     val languageCode: String,
@@ -27,8 +28,8 @@ data class Language(
     var isSelected: Boolean
 ) : Parcelable {
     constructor(parcel: Parcel) : this(
-        parcel.readString(),
-        parcel.readString(),
+        parcel.readStringNonNull(),
+        parcel.readStringNonNull(),
         parcel.readByte() != 0.toByte()
     )
 

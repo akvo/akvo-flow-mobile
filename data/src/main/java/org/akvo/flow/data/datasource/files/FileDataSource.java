@@ -22,6 +22,10 @@ package org.akvo.flow.data.datasource.files;
 
 import android.text.TextUtils;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.VisibleForTesting;
+
 import org.akvo.flow.data.util.Constants;
 import org.akvo.flow.data.util.ExternalStorageHelper;
 import org.akvo.flow.data.util.FileHelper;
@@ -38,16 +42,12 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.annotation.VisibleForTesting;
 import io.reactivex.Completable;
 import io.reactivex.Maybe;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.functions.Predicate;
 import okhttp3.ResponseBody;
-import timber.log.Timber;
 
 @Singleton
 public class FileDataSource {
@@ -259,16 +259,10 @@ public class FileDataSource {
         return Observable.just(true);
     }
 
-    public Observable<InputStream> getFormFile(String id) {
+    public InputStream getFormFile(String id) throws FileNotFoundException {
         File formFolder = flowFileBrowser.getExistingInternalFolder(FlowFileBrowser.DIR_FORMS);
         InputStream input;
-        try {
-            input = new FileInputStream(new File(formFolder, id + FlowFileBrowser.XML_SUFFIX));
-        } catch (FileNotFoundException e) {
-            Timber.e(e);
-            return Observable.error(e);
-        }
-        return Observable.just(input);
+        return new FileInputStream(new File(formFolder, id + FlowFileBrowser.XML_SUFFIX));
     }
 
     private Single<File> getZipFile(String uuid) {

@@ -133,7 +133,7 @@ public class FormDataRepositoryTest {
         when(mockFileDataSource.extractRemoteArchive(any(ResponseBody.class), anyString()))
                 .thenReturn(Observable.just(true));
         when(mockFileDataSource.getFormFile(anyString()))
-                .thenReturn(Observable.just(mockInputStream));
+                .thenReturn(mockInputStream);
     }
 
     @Test

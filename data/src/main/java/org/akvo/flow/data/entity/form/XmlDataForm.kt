@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2020 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2020 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -15,19 +15,14 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
-package org.akvo.flow.domain.repository
 
-import io.reactivex.Observable
-import io.reactivex.Single
-import org.akvo.flow.domain.entity.DomainForm
+package org.akvo.flow.data.entity.form
 
-interface FormRepository {
-    fun loadForm(formId: String?, deviceId: String?): Observable<Boolean?>?
-    fun reloadForms(deviceId: String?): Observable<Int?>?
-    fun downloadForms(deviceId: String?): Observable<Int?>?
-    fun getForm(formId: String): Single<DomainForm>
-    fun loadFormLanguages(formId: String): Single<Set<String>>
-    suspend fun getFormWithGroups(formId: String): DomainForm
-}
+import org.akvo.flow.domain.entity.DomainQuestionGroup
+
+data class XmlDataForm(
+    val name: String,
+    val version: String,
+    val groups: List<DomainQuestionGroup> = emptyList()
+)

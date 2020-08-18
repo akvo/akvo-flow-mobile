@@ -19,7 +19,6 @@
 package org.akvo.flow.data.entity.form
 
 import org.akvo.flow.data.util.FileHelper
-import org.akvo.flow.domain.entity.DomainForm
 import org.akvo.flow.domain.entity.DomainQuestionGroup
 import org.xmlpull.v1.XmlPullParser
 import org.xmlpull.v1.XmlPullParserException
@@ -114,7 +113,7 @@ class XmlFormParser @Inject constructor(private val helper: FileHelper) {
         return languageCodes
     }
 
-    fun parseToDomainForm(inputStream: InputStream): DomainForm {
+    fun parseToDomainForm(inputStream: InputStream): XmlDataForm {
         val groups: MutableList<DomainQuestionGroup> = ArrayList()
         var version = "0.0"
         var name = ""
@@ -164,7 +163,7 @@ class XmlFormParser @Inject constructor(private val helper: FileHelper) {
         } finally {
             helper.close(inputStream)
         }
-        return DomainForm(name = name, version = version, groups = groups)
+        return XmlDataForm(name = name, version = version, groups = groups)
     }
 
     companion object {

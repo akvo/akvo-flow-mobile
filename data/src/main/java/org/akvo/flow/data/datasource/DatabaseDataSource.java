@@ -431,8 +431,8 @@ public class DatabaseDataSource {
     }
 
     @NotNull
-    public Single<DataForm> getForm(String formId) {
-        return briteSurveyDbAdapter.getForm(formId).map(formMapper::mapForm);
+    public DataForm getForm(String formId) {
+        return formMapper.mapForm(briteSurveyDbAdapter.getForm(formId));
     }
 
     @NotNull

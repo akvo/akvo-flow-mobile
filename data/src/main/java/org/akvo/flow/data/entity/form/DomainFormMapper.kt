@@ -19,7 +19,6 @@
 
 package org.akvo.flow.data.entity.form
 
-import android.database.Cursor
 import org.akvo.flow.domain.entity.DomainForm
 import javax.inject.Inject
 
@@ -41,9 +40,21 @@ class DomainFormMapper @Inject constructor() {
         )
     }
 
-    private fun getStringColumnValue(cursor: Cursor, columnName: String) =
-        cursor.getString(cursor.getColumnIndexOrThrow(columnName))
+    fun mapForms(dataForm: DataForm, parseForm: XmlDataForm): DomainForm {
+        return DomainForm(
+            dataForm.id,
+            dataForm.formId,
+            dataForm.surveyId,
+            parseForm.name,
+            parseForm.version,
+            dataForm.type,
+            dataForm.location,
+            dataForm.filename,
+            dataForm.language,
+            dataForm.cascadeDownloaded,
+            dataForm.deleted,
+            groups = parseForm.groups
+        )
+    }
 
-    private fun getIntColumnValue(cursor: Cursor, columnName: String) =
-        cursor.getInt(cursor.getColumnIndexOrThrow(columnName))
 }

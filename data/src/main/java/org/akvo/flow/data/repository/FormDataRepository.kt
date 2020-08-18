@@ -23,11 +23,11 @@ import io.reactivex.Observable
 import io.reactivex.Single
 import org.akvo.flow.data.datasource.DataSourceFactory
 import org.akvo.flow.data.entity.ApiFormHeader
-import org.akvo.flow.data.entity.form.DataForm
 import org.akvo.flow.data.entity.form.DomainFormMapper
 import org.akvo.flow.data.entity.form.Form
 import org.akvo.flow.data.entity.form.FormHeaderParser
 import org.akvo.flow.data.entity.form.FormIdMapper
+import org.akvo.flow.data.entity.form.XmlDataForm
 import org.akvo.flow.data.entity.form.XmlFormParser
 import org.akvo.flow.data.net.RestApi
 import org.akvo.flow.data.net.s3.S3RestApi
@@ -35,7 +35,6 @@ import org.akvo.flow.data.util.FlowFileBrowser
 import org.akvo.flow.domain.entity.DomainForm
 import org.akvo.flow.domain.repository.FormRepository
 import timber.log.Timber
-import java.io.InputStream
 import javax.inject.Inject
 
 class FormDataRepository @Inject constructor(
@@ -76,25 +75,34 @@ class FormDataRepository @Inject constructor(
     }
 
     override fun loadFormLanguages(formId: String): Single<Set<String>> {
-        return dataSourceFactory.fileDataSource.getFormFile(formId)
-            .firstOrError()
-            .map { input: InputStream? -> xmlParser.parseLanguages(input) }
-    }
-
-    override fun parseForm(formId: String): Single<DomainForm?> {
-        return dataSourceFactory.fileDataSource.getFormFile(formId).firstOrError()
-            .map { inputStream: InputStream? ->
-                xmlParser.parseToDomainForm(
-                    inputStream!!
+        return Single.just(
+            xmlParser.parseLanguages(
+                dataSourceFactory.fileDataSource.getFormFile(
+                    formId
                 )
-            }
+            )
+        )
     }
 
     override fun getForm(formId: String): Single<DomainForm> {
-        return dataSourceFactory.dataBaseDataSource.getForm(formId)
-            .map { dataForm: DataForm? ->
-                domainFormMapper.mapForm(dataForm!!)
-            }
+        return Single.just(
+            domainFormMapper.mapForm(
+                dataSourceFactory.dataBaseDataSource.getForm(
+                    formId
+                )
+            )
+        )
+    }
+
+    override suspend fun getFormWithGroups(formId: String): DomainForm {
+        return domainFormMapper.mapForms(
+            dataSourceFactory.dataBaseDataSource.getForm(formId),
+            parseForm(formId)
+        )
+    }
+
+    private fun parseForm(formId: String): XmlDataForm {
+        return xmlParser.parseToDomainForm(dataSourceFactory.fileDataSource.getFormFile(formId))
     }
 
     private fun downloadFormHeader(formId: String?, deviceId: String?): Observable<Boolean?> {
@@ -154,21 +162,18 @@ class FormDataRepository @Inject constructor(
     }
 
     private fun saveForm(apiFormHeader: ApiFormHeader): Observable<Boolean> {
-        return dataSourceFactory.fileDataSource.getFormFile(apiFormHeader.id)
-            .map { inputStream -> xmlParser.parse(inputStream) }
-            .concatMap { form ->
-                downloadResources(form)
-                    .concatMap {
-                        dataSourceFactory.dataBaseDataSource.insertSurvey(apiFormHeader, true, form)
-                    }
-                    .doOnError { throwable ->
-                        Timber.e(throwable)
-                        dataSourceFactory.dataBaseDataSource.insertSurvey(
-                            apiFormHeader,
-                            false,
-                            form
-                        )
-                    }
+        val form = xmlParser.parse(dataSourceFactory.fileDataSource.getFormFile(apiFormHeader.id))
+        return downloadResources(form)
+            .concatMap {
+                dataSourceFactory.dataBaseDataSource.insertSurvey(apiFormHeader, true, form)
+            }
+            .doOnError { throwable ->
+                Timber.e(throwable)
+                dataSourceFactory.dataBaseDataSource.insertSurvey(
+                    apiFormHeader,
+                    false,
+                    form
+                )
             }
     }
 

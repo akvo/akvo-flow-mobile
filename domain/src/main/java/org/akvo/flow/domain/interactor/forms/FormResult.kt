@@ -21,7 +21,6 @@ package org.akvo.flow.domain.interactor.forms
 
 import org.akvo.flow.domain.entity.DomainForm
 
-
 sealed class FormResult {
     data class Success(val domainForm: DomainForm): FormResult()
     data class ParamError(val message: String): FormResult()

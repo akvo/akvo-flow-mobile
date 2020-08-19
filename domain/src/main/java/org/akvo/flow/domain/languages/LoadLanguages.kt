@@ -19,57 +19,46 @@
 
 package org.akvo.flow.domain.languages
 
-import io.reactivex.Single
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.disposables.Disposable
-import io.reactivex.observers.DisposableSingleObserver
-import org.akvo.flow.domain.executor.PostExecutionThread
-import org.akvo.flow.domain.executor.SchedulerCreator
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.akvo.flow.domain.repository.FormRepository
 import org.akvo.flow.domain.repository.LanguagesRepository
+import timber.log.Timber
 import javax.inject.Inject
 
 class LoadLanguages @Inject constructor(
-    private val postExecutionThread: PostExecutionThread,
-    private val schedulerCreator: SchedulerCreator,
     private val formRepository: FormRepository,
     private val languagesRepository: LanguagesRepository
 ) {
 
-    private val disposables = CompositeDisposable()
-
-    fun execute(observer: DisposableSingleObserver<Pair<Set<String>,Set<String>>>, parameters: Map<String, Any>) {
-        val observable: Single<Pair<Set<String>,Set<String>>> = buildUseCaseObservable(parameters)
-            .subscribeOn(schedulerCreator.obtainScheduler())
-            .observeOn(postExecutionThread.scheduler)
-        addDisposable(observable.subscribeWith(observer))
-    }
-
-    fun dispose() {
-        if (!disposables.isDisposed) {
-            disposables.clear()
-        }
-    }
-
-    private fun <T> buildUseCaseObservable(parameters: Map<String, T>): Single<Pair<Set<String>, Set<String>>> {
+    suspend fun execute(parameters: Map<String, Any>): LanguageResult {
         if (!parameters.containsKey(PARAM_SURVEY_ID) || !parameters.containsKey(PARAM_FORM_ID)) {
-            return Single.error(IllegalArgumentException("Missing survey id or form id"))
+            return LanguageResult.Error(IllegalArgumentException("Missing survey id or form id"))
         }
-        val surveyId = parameters[PARAM_SURVEY_ID] as Long
-        val formId = parameters[PARAM_FORM_ID] as String
-        return languagesRepository.getSavedLanguages(surveyId)
-            .flatMap { selectedLanguages: Set<String> ->
-                formRepository.loadFormLanguages(formId)
-                    .map { formLanguages -> Pair(selectedLanguages, formLanguages) }
+        return withContext(Dispatchers.IO) {
+            try {
+                val surveyId = parameters[PARAM_SURVEY_ID] as Long
+                val formId = parameters[PARAM_FORM_ID] as String
+                LanguageResult.Success(
+                    languagesRepository.getSavedLanguages(surveyId),
+                    formRepository.loadFormLanguages(formId)
+                )
+            } catch (e: Exception) {
+                Timber.e(e)
+                LanguageResult.Error(e)
             }
-    }
-
-    private fun addDisposable(disposable: Disposable) {
-        disposables.add(disposable)
+        }
     }
 
     companion object {
         const val PARAM_SURVEY_ID = "survey_id"
         const val PARAM_FORM_ID = "form_id"
+    }
+
+    sealed class LanguageResult {
+        data class Success(val savedLanguages: Set<String>, val availableLanguages: Set<String>) :
+            LanguageResult()
+
+        data class Error(val exception: Exception) : LanguageResult()
     }
 }

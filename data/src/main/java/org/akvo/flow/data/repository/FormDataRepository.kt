@@ -74,14 +74,8 @@ class FormDataRepository @Inject constructor(
             .concatMap { apiFormHeaders -> downloadForms(apiFormHeaders) }
     }
 
-    override fun loadFormLanguages(formId: String): Single<Set<String>> {
-        return Single.just(
-            xmlParser.parseLanguages(
-                dataSourceFactory.fileDataSource.getFormFile(
-                    formId
-                )
-            )
-        )
+    override suspend fun loadFormLanguages(formId: String): Set<String> {
+        return xmlParser.parseLanguages(dataSourceFactory.fileDataSource.getFormFile(formId))
     }
 
     override fun getForm(formId: String): Single<DomainForm> {

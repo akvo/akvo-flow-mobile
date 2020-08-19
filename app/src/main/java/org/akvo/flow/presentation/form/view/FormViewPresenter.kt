@@ -19,8 +19,6 @@
 
 package org.akvo.flow.presentation.form.view
 
-import io.reactivex.observers.DisposableCompletableObserver
-import io.reactivex.observers.DisposableSingleObserver
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -51,7 +49,6 @@ class FormViewPresenter @Inject constructor(
     private val uiScope = CoroutineScope(Dispatchers.Main + job)
 
     override fun destroy() {
-        saveLanguagesUseCase.dispose()
         uiScope.coroutineContext.cancelChildren()
     }
 
@@ -84,35 +81,28 @@ class FormViewPresenter @Inject constructor(
         val params: MutableMap<String, Any> = HashMap(4)
         params[SaveLanguages.PARAM_SURVEY_ID] = surveyId
         params[SaveLanguages.PARAM_LANGUAGES_LIST] = selectedLanguages
-        saveLanguagesUseCase.execute(object : DisposableCompletableObserver() {
-            override fun onComplete() {
-                view?.onLanguagesSaved()
-            }
-
-            override fun onError(e: Throwable) {
-                view?.onLanguagesSavedError()
-            }
-
-        }, params)
+        uiScope.launch {
+           when(saveLanguagesUseCase.execute(params)) {
+               is SaveLanguages.SaveLanguageResult.Success -> view?.onLanguagesSaved()
+               is SaveLanguages.SaveLanguageResult.Error -> view?.onLanguagesSavedError()
+           }
+        }
     }
 
     fun loadLanguages(surveyId: Long, formId: String) {
         val params: MutableMap<String, Any> = HashMap(2)
         params[LoadLanguages.PARAM_SURVEY_ID] = surveyId
         params[LoadLanguages.PARAM_FORM_ID] = formId
-        loadLanguages.execute(object : DisposableSingleObserver<Pair<Set<String>, Set<String>>>() {
-            override fun onSuccess(selectedAndAvailableLanguages: Pair<Set<String>, Set<String>>) {
-                view?.displayLanguages(
+        uiScope.launch {
+            when(val result = loadLanguages.execute(params)) {
+                is LoadLanguages.LanguageResult.Success ->  view?.displayLanguages(
                     languageMapper.transform(
-                        selectedAndAvailableLanguages.first.toTypedArray(),
-                        selectedAndAvailableLanguages.second
+                        result.savedLanguages.toTypedArray(),
+                        result.availableLanguages
                     )
                 )
+                is LoadLanguages.LanguageResult.Error -> view?.showLanguagesError()
             }
-
-            override fun onError(e: Throwable) {
-                view?.showLanguagesError()
-            }
-        }, params)
+        }
     }
 }

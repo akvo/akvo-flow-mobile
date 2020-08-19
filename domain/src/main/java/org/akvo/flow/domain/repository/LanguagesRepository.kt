@@ -19,10 +19,7 @@
 
 package org.akvo.flow.domain.repository
 
-import io.reactivex.Completable
-import io.reactivex.Single
-
 interface LanguagesRepository {
-    fun getSavedLanguages(surveyId: Long): Single<Set<String>>
-    fun saveLanguages(surveyId: Long, languages: Set<String>): Completable
+    suspend fun getSavedLanguages(surveyId: Long): Set<String>
+    suspend fun saveLanguages(surveyId: Long, languages: Set<String>)
 }

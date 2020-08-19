@@ -481,14 +481,11 @@ public class DatabaseDataSource {
     }
 
     @NotNull
-    public Single<Set<String>> getSavedLanguages(long surveyId) {
-        return briteSurveyDbAdapter.getSavedLanguages(surveyId)
-                .map(formLanguagesMapper::transform);
+    public Set<String> getSavedLanguages(long surveyId) {
+        return formLanguagesMapper.transform(briteSurveyDbAdapter.getSavedLanguages(surveyId));
     }
 
-    @NotNull
-    public Completable saveLanguages(long surveyId, @NotNull Set<String> languages) {
+    public void saveLanguages(long surveyId, @NotNull Set<String> languages) {
         briteSurveyDbAdapter.saveLanguagePreferences(surveyId, languages);
-        return Completable.complete();
     }
 }

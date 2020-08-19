@@ -19,52 +19,42 @@
 
 package org.akvo.flow.domain.languages
 
-import io.reactivex.Completable
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.disposables.Disposable
-import io.reactivex.observers.DisposableCompletableObserver
-import org.akvo.flow.domain.executor.PostExecutionThread
-import org.akvo.flow.domain.executor.SchedulerCreator
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.akvo.flow.domain.repository.LanguagesRepository
+import timber.log.Timber
 import javax.inject.Inject
 
 class SaveLanguages @Inject constructor(
-    private val postExecutionThread: PostExecutionThread,
-    private val schedulerCreator: SchedulerCreator,
     private val languagesRepository: LanguagesRepository
 ) {
 
-    private val disposables = CompositeDisposable()
-
-    fun execute(observer: DisposableCompletableObserver, parameters: Map<String, Any>) {
-        val observable: Completable = buildUseCaseObservable(parameters)
-            .subscribeOn(schedulerCreator.obtainScheduler())
-            .observeOn(postExecutionThread.scheduler)
-        addDisposable(observable.subscribeWith(observer))
-    }
-
-    fun dispose() {
-        if (!disposables.isDisposed) {
-            disposables.clear()
-        }
-    }
-
-    private fun <T> buildUseCaseObservable(parameters: Map<String, T>): Completable {
+    suspend fun execute(parameters: Map<String, Any>): SaveLanguageResult {
         if (!parameters.containsKey(PARAM_SURVEY_ID) || !parameters.containsKey(PARAM_LANGUAGES_LIST)) {
-            return Completable.error(IllegalArgumentException("Missing survey id or selected languages"))
+            return SaveLanguageResult.Error(IllegalArgumentException("Missing survey id or selected languages"))
         }
         val surveyId = parameters[PARAM_SURVEY_ID] as Long
+
         @Suppress("UNCHECKED_CAST")
         val languages = parameters[PARAM_LANGUAGES_LIST] as Set<String>
-        return languagesRepository.saveLanguages(surveyId, languages)
-    }
-
-    private fun addDisposable(disposable: Disposable) {
-        disposables.add(disposable)
+        return withContext(Dispatchers.IO) {
+            try {
+                languagesRepository.saveLanguages(surveyId, languages)
+                SaveLanguageResult.Success
+            } catch (e: Exception) {
+                Timber.e(e)
+                SaveLanguageResult.Error(e)
+            }
+        }
     }
 
     companion object {
         const val PARAM_SURVEY_ID = "survey_id"
         const val PARAM_LANGUAGES_LIST = "languages"
+    }
+
+    sealed class SaveLanguageResult {
+        object Success : SaveLanguageResult()
+        data class Error(val exception: Exception) : SaveLanguageResult()
     }
 }

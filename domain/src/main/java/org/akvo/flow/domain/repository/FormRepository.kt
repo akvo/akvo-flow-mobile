@@ -28,6 +28,6 @@ interface FormRepository {
     fun reloadForms(deviceId: String?): Observable<Int?>?
     fun downloadForms(deviceId: String?): Observable<Int?>?
     fun getForm(formId: String): Single<DomainForm>
-    fun loadFormLanguages(formId: String): Single<Set<String>>
+    suspend fun loadFormLanguages(formId: String): Set<String>
     suspend fun getFormWithGroups(formId: String): DomainForm
 }

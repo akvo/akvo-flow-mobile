@@ -19,8 +19,6 @@
 
 package org.akvo.flow.data.repository
 
-import io.reactivex.Completable
-import io.reactivex.Single
 import org.akvo.flow.data.datasource.DataSourceFactory
 import org.akvo.flow.domain.repository.LanguagesRepository
 import javax.inject.Inject
@@ -28,11 +26,11 @@ import javax.inject.Inject
 class LanguagesDataRepository @Inject constructor(private val dataSourceFactory: DataSourceFactory) :
     LanguagesRepository {
 
-    override fun getSavedLanguages(surveyId: Long): Single<Set<String>> {
+    override suspend fun getSavedLanguages(surveyId: Long): Set<String> {
         return dataSourceFactory.dataBaseDataSource.getSavedLanguages(surveyId)
     }
 
-    override fun saveLanguages(surveyId: Long, languages: Set<String>): Completable {
-        return dataSourceFactory.dataBaseDataSource.saveLanguages(surveyId, languages)
+    override suspend fun saveLanguages(surveyId: Long, languages: Set<String>) {
+        dataSourceFactory.dataBaseDataSource.saveLanguages(surveyId, languages)
     }
 }

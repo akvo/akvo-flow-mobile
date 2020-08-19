@@ -835,11 +835,11 @@ public class BriteSurveyDbAdapter {
         briteDatabase.delete(DataPointDownloadTable.TABLE_NAME, DataPointDownloadTable.COLUMN_SURVEY_ID + " = ?", surveyId + "");
     }
 
-    public Single<Cursor> getSavedLanguages(long surveyId) {
+    public Cursor getSavedLanguages(long surveyId) {
         String sql = "SELECT " + LanguageTable.COLUMN_LANGUAGE_CODE
                 + " FROM " + LanguageTable.TABLE_NAME
                 + " WHERE " + LanguageTable.COLUMN_SURVEY_ID + " = ?";
-        return Single.just(briteDatabase.query(sql, surveyId + ""));
+        return briteDatabase.query(sql, surveyId + "");
     }
 
     public void saveLanguagePreferences(long surveyId, @NonNull Set<String> languageCodes) {

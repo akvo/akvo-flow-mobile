@@ -23,15 +23,6 @@ package org.akvo.flow.service;
 import android.content.Context;
 import android.content.Intent;
 
-import org.akvo.flow.app.FlowApp;
-import org.akvo.flow.util.ConstantUtil;
-
-import java.io.File;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-
-import javax.inject.Inject;
-
 import androidx.annotation.NonNull;
 import androidx.work.Constraints;
 import androidx.work.ExistingPeriodicWorkPolicy;
@@ -41,9 +32,17 @@ import androidx.work.WorkManager;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
+import org.akvo.flow.app.FlowApp;
+import org.akvo.flow.util.ConstantUtil;
+
+import java.io.File;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+
+import javax.inject.Inject;
+
 public class FileChangeTrackingWorker extends Worker {
 
-    private static final long VERIFY_PERIOD_SECONDS = 30;
     private static final String TAG = "FileChangeTrackingWorker";
 
     @Inject
@@ -52,7 +51,7 @@ public class FileChangeTrackingWorker extends Worker {
     public FileChangeTrackingWorker(@NonNull Context context,
             @NonNull WorkerParameters workerParams) {
         super(context, workerParams);
-        FlowApp application = (FlowApp) getApplicationContext();
+        FlowApp application = (FlowApp) context.getApplicationContext();
         application.getApplicationComponent().inject(this);
     }
 

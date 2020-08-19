@@ -1,5 +1,12 @@
 Akvo FLOW app release notes
 ===========================
+# ver 2.9.4.1
+Date: 19 August 2020
+
+* **Crash related to FileChangeTrackingWorker** - [#1701](https://github.com/akvo/akvo-flow-mobile/issues/1701)
+* **Datapoint download fails when an image download fails** - [#1705](https://github.com/akvo/akvo-flow-mobile/issues/1705)
+
+---------------
 # ver 2.9.4
 Date: 13 August 2020
 

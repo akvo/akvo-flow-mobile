@@ -45,6 +45,7 @@ import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
+import androidx.test.filters.RequiresDevice
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.ActivityTestRule
 import androidx.test.rule.GrantPermissionRule
@@ -104,7 +105,6 @@ class LockedGeoQuestionViewTest {
             )
         }
     }
-
     @Before
     fun setUp() {
         val testLabSetting: String? = Settings.System.getString(
@@ -112,10 +112,12 @@ class LockedGeoQuestionViewTest {
                 .targetContext.contentResolver, "firebase.test.lab")
         isTestLab = "true" == testLabSetting
     }
+
     /**
      * Does not work on emulator from firebase as location is provided too fast before progress can
      * be shown
      */
+    @RequiresDevice
     @Test
     fun ensureGeoQuestionProgressDisplayedOnButtonClick() {
         if (!isTestLab) {
@@ -136,15 +138,7 @@ class LockedGeoQuestionViewTest {
         }
     }
 
-    @Test
-    fun ensureErrorSnackBarDisplayedUponTimeout() {
-        resetFields()
-        closeSoftKeyboard()
-        clickGeoButton()
-        simulateLocationTimeout()
-        verifyErrorSnackBarDisplayed()
-    }
-
+    @RequiresDevice
     @Test
     fun ensureSnackBarRetryShowsProgress() {
         if (!isTestLab) {
@@ -154,6 +148,15 @@ class LockedGeoQuestionViewTest {
             clickSnackBarRetry()
             verifyProgressDisplayed()
         }
+    }
+
+    @Test
+    fun ensureErrorSnackBarDisplayedUponTimeout() {
+        resetFields()
+        closeSoftKeyboard()
+        clickGeoButton()
+        simulateLocationTimeout()
+        verifyErrorSnackBarDisplayed()
     }
 
     @Test
@@ -197,6 +200,7 @@ class LockedGeoQuestionViewTest {
         onView(withId(android.R.id.button1)).check(matches(isDisplayed()))
     }
 
+    @RequiresDevice
     @Test
     fun ensureLocationValuesDisplayedCorrectlyWhenCancelled() {
         if (!isTestLab) {

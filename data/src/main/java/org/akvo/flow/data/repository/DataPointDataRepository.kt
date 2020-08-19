@@ -29,6 +29,7 @@ import org.akvo.flow.data.util.MediaHelper
 import org.akvo.flow.domain.exception.AssignmentRequiredException
 import org.akvo.flow.domain.repository.DataPointRepository
 import retrofit2.HttpException
+import timber.log.Timber
 import java.net.HttpURLConnection
 import javax.inject.Inject
 
@@ -84,10 +85,17 @@ class DataPointDataRepository @Inject constructor(
         mapper.getImagesList(dataPoints)
             .filter { image -> !dataSourceFactory.fileDataSource.fileExists(image) }
             .map { image ->
-                val responseBody = s3RestApi.downloadImage(image)
-                dataSourceFactory.fileDataSource.saveRemoteMediaFile(image, responseBody)
-                Unit
+                downloadImage(image)
             }
+    }
+
+    private suspend fun downloadImage(image: String) {
+        try {
+            val responseBody = s3RestApi.downloadImage(image)
+            dataSourceFactory.fileDataSource.saveRemoteMediaFile(image, responseBody)
+        } catch (e: Exception) {
+            Timber.e(e)
+        }
     }
 
     private fun downLoadMedia(filename: String): Completable {

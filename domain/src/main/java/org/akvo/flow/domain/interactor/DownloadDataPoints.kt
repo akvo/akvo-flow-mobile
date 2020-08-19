@@ -25,6 +25,7 @@ import org.akvo.flow.domain.entity.DownloadResult
 import org.akvo.flow.domain.exception.AssignmentRequiredException
 import org.akvo.flow.domain.repository.DataPointRepository
 import org.akvo.flow.domain.util.ConnectivityStateManager
+import timber.log.Timber
 import javax.inject.Inject
 
 class DownloadDataPoints @Inject constructor(
@@ -52,11 +53,13 @@ class DownloadDataPoints @Inject constructor(
                     dataPointRepository.downloadDataPoints((parameters[KEY_SURVEY_ID] as Long?)!!)
                 DownloadResult(DownloadResult.ResultCode.SUCCESS, downloadDataPoints)
             } catch (ex: AssignmentRequiredException) {
+                Timber.e(ex)
                 DownloadResult(
                     DownloadResult.ResultCode.ERROR_ASSIGNMENT_MISSING,
                     0
                 )
             } catch (ex: Exception) {
+                Timber.e(ex)
                 DownloadResult(
                     DownloadResult.ResultCode.ERROR_OTHER,
                     0

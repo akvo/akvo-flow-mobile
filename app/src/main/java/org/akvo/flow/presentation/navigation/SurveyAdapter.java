@@ -21,13 +21,15 @@
 package org.akvo.flow.presentation.navigation;
 
 import android.content.Context;
-import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
-import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.RecyclerView;
 
 import org.akvo.flow.R;
 
@@ -47,6 +49,7 @@ class SurveyAdapter extends RecyclerView.Adapter<SurveyAdapter.SurveyViewHolder>
         this.textColor = ContextCompat.getColor(context, R.color.black_main);
     }
 
+    @NonNull
     @Override
     public SurveyAdapter.SurveyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
@@ -83,7 +86,7 @@ class SurveyAdapter extends RecyclerView.Adapter<SurveyAdapter.SurveyViewHolder>
         notifyDataSetChanged();
     }
 
-    class SurveyViewHolder extends RecyclerView.ViewHolder {
+    static class SurveyViewHolder extends RecyclerView.ViewHolder {
 
         private final TextView surveyTv;
         private final int selectedTextColor;
@@ -91,7 +94,7 @@ class SurveyAdapter extends RecyclerView.Adapter<SurveyAdapter.SurveyViewHolder>
 
         SurveyViewHolder(View view, int selectedTextColor, int textColor) {
             super(view);
-            this.surveyTv = (TextView) view.findViewById(R.id.item_text_view);
+            this.surveyTv = view.findViewById(R.id.item_text_view);
             this.selectedTextColor = selectedTextColor;
             this.textColor = textColor;
         }

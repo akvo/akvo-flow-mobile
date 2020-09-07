@@ -28,6 +28,13 @@ import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.TextView;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.google.android.material.internal.NavigationMenuView;
 import com.google.android.material.navigation.NavigationView;
 
@@ -42,13 +49,6 @@ import org.akvo.flow.uicomponents.SnackBarManager;
 import java.util.List;
 
 import javax.inject.Inject;
-
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
-import androidx.fragment.app.DialogFragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 public class FlowNavigationView extends NavigationView implements IFlowNavigationView {
 
@@ -89,7 +89,7 @@ public class FlowNavigationView extends NavigationView implements IFlowNavigatio
                 new ViewTreeObserver.OnGlobalLayoutListener() {
                     @Override
                     public void onGlobalLayout() {
-                        getViewTreeObserver().removeGlobalOnLayoutListener(this);
+                        getViewTreeObserver().removeOnGlobalLayoutListener(this);
                         initViews();
                         setNavigationItemListener();
                         initCurrentUserText();

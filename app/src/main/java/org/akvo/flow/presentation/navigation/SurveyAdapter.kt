@@ -30,17 +30,11 @@ import org.akvo.flow.R
 import org.akvo.flow.presentation.navigation.SurveyAdapter.SurveyViewHolder
 import java.util.ArrayList
 
-internal class SurveyAdapter(context: Context?) : RecyclerView.Adapter<SurveyViewHolder>() {
-    private val surveyList: MutableList<ViewSurvey>
-    private val selectedTextColor: Int
-    private val textColor: Int
+internal class SurveyAdapter(context: Context) : RecyclerView.Adapter<SurveyViewHolder>() {
+    private val surveyList: MutableList<ViewSurvey> = ArrayList()
+    private val selectedTextColor: Int = ContextCompat.getColor(context, R.color.orange_main)
+    private val textColor: Int = ContextCompat.getColor(context, R.color.black_main)
     private var selectedSurveyId: Long = 0
-
-    init {
-        surveyList = ArrayList()
-        selectedTextColor = ContextCompat.getColor(context!!, R.color.orange_main)
-        textColor = ContextCompat.getColor(context, R.color.black_main)
-    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SurveyViewHolder {
         val view = LayoutInflater.from(parent.context)

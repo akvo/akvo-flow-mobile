@@ -20,6 +20,7 @@
 package org.akvo.flow.presentation.navigation
 
 import android.content.Context
+import android.graphics.Typeface
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -77,6 +78,11 @@ internal class SurveyAdapter(context: Context) : RecyclerView.Adapter<SurveyView
         private val surveyTv: TextView = view.findViewById(R.id.item_text_view)
         fun setViews(navigationItem: ViewSurvey, isSelected: Boolean) {
             surveyTv.text = navigationItem.name
+            if (navigationItem.viewed || isSelected) {
+                surveyTv.setTypeface(null, Typeface.NORMAL)
+            } else {
+                surveyTv.setTypeface(null, Typeface.BOLD)
+            }
             surveyTv.setTextColor(if (isSelected) selectedTextColor else textColor)
         }
     }

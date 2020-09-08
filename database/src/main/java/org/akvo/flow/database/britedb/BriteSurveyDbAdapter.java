@@ -406,8 +406,6 @@ public class BriteSurveyDbAdapter {
      * Updates the matching transmission history records with the status
      * passed in. If the status == Synced, the end date is updated. If
      * the status == In Progress, the start date is updated.
-     *
-     * @return the number of rows affected
      */
     public void updateTransmissionStatus(long id, int status) {
         ContentValues values = new ContentValues();
@@ -452,12 +450,7 @@ public class BriteSurveyDbAdapter {
                 "SELECT * FROM " + Tables.SURVEY_GROUP + " ORDER BY " + SurveyGroupColumns.NAME;
         return briteDatabase
                 .createQuery(Tables.SURVEY_GROUP, sqlQuery)
-                .concatMap(new Function<SqlBrite.Query, Observable<? extends Cursor>>() {
-                    @Override
-                    public Observable<? extends Cursor> apply(SqlBrite.Query query) {
-                        return Observable.just(query.run());
-                    }
-                });
+                .concatMap((Function<SqlBrite.Query, Observable<Cursor>>) query -> Observable.just(query.run()));
     }
 
     public Cursor getForms(long surveyId) {

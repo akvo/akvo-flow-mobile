@@ -205,19 +205,17 @@ public class FormDataRepository implements FormRepository {
                             return Observable.just(true);
                         }
                     }
-
                 });
     }
 
     private Observable<Boolean> downloadAndSaveForm(final ApiFormHeader apiFormHeader) {
         return downloadAndExtractFile(apiFormHeader.getId() + FlowFileBrowser.ZIP_SUFFIX,
                 FlowFileBrowser.DIR_FORMS)
-                .concatMap(new Function<Boolean, Observable<Boolean>>() {
-                    @Override
-                    public Observable<Boolean> apply(Boolean aBoolean) {
-                        return saveForm(apiFormHeader);
-                    }
-                });
+                .concatMap((Function<Boolean, Observable<Boolean>>) aBoolean -> saveForm(apiFormHeader)
+                        .concatMap((Function<Boolean, Observable<Boolean>>) aBoolean1 -> {
+                            dataSourceFactory.getDataBaseDataSource().setSurveyUnViewed(apiFormHeader.getGroupId());
+                            return Observable.just(true);
+                        }));
     }
 
     private Observable<Boolean> downloadAndExtractFile(final String fileName, final String folder) {

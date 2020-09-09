@@ -49,6 +49,7 @@ import org.akvo.flow.domain.entity.InstanceIdUuid;
 import org.akvo.flow.domain.entity.Survey;
 import org.akvo.flow.domain.entity.User;
 import org.akvo.flow.domain.repository.SurveyRepository;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.HashSet;
 import java.util.List;
@@ -254,6 +255,13 @@ public class SurveyDataRepository implements SurveyRepository {
                         return syncTransmissions(transmissions, deviceId);
                     }
                 });
+    }
+
+    @Nullable
+    @Override
+    public Completable setSurveyViewed(long surveyId) {
+        dataSourceFactory.getDataBaseDataSource().setSurveyViewed(surveyId);
+        return Completable.complete();
     }
 
     @VisibleForTesting

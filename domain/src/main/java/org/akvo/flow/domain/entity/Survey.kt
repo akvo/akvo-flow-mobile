@@ -23,6 +23,6 @@ data class Survey(
     val id: Long,
     val name: String,
     val isMonitored: Boolean,
-    val registrationSurveyId: String,
+    val registrationSurveyId: String?,
     val viewed: Boolean
 )

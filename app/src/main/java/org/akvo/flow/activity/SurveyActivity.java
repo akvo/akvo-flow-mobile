@@ -74,7 +74,7 @@ import org.akvo.flow.presentation.navigation.ViewUser;
 import org.akvo.flow.presentation.survey.SurveyPresenter;
 import org.akvo.flow.presentation.survey.SurveyView;
 import org.akvo.flow.service.BootstrapService;
-import org.akvo.flow.service.SurveyDownloadService;
+import org.akvo.flow.service.SurveyDownloadWorker;
 import org.akvo.flow.service.TimeCheckService;
 import org.akvo.flow.tracking.TrackingHelper;
 import org.akvo.flow.tracking.TrackingListener;
@@ -457,7 +457,7 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
 
     private void startServicesOnce() {
         if (!servicesStarted) {
-            startService(new Intent(this, SurveyDownloadService.class));
+            SurveyDownloadWorker.scheduleWork(getApplicationContext());
             startService(new Intent(this, BootstrapService.class));
             startService(new Intent(this, TimeCheckService.class));
             servicesStarted = true;

@@ -20,11 +20,15 @@
 
 package org.akvo.flow.util;
 
-import androidx.annotation.NonNull;
 import android.text.TextUtils;
+
+import androidx.annotation.NonNull;
+
+import javax.inject.Inject;
 
 public class SurveyIdGenerator {
 
+    @Inject
     public SurveyIdGenerator() {
     }
 

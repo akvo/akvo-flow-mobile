@@ -272,6 +272,7 @@ dependencies {
     testImplementation "org.powermock:powermock-api-mockito2:${rootProject.ext.powerMockVersion}"
     testImplementation "org.powermock:powermock-classloading-xstream:${rootProject.ext.powerMockVersion}"
     testImplementation "io.kotlintest:kotlintest-runner-junit4:${rootProject.ext.kotlintestVerion}"
+    testImplementation "io.mockk:mockk:${rootProject.ext.mockkVersion}"
 
     androidTestImplementation "androidx.test.ext:junit:${rootProject.ext.androidXJunit}"
     androidTestImplementation "androidx.test:core:${rootProject.ext.androidXCore}"

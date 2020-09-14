@@ -39,6 +39,7 @@ import java.io.FileInputStream
 import java.io.FileNotFoundException
 import java.io.FileOutputStream
 import java.io.InputStream
+import java.util.Enumeration
 import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
 import java.util.zip.ZipInputStream
@@ -54,7 +55,7 @@ class BootstrapProcessor @Inject constructor(
 ) {
 
     fun processZipFile(zipFile: ZipFile): ProcessingResult {
-        val entries = zipFile.entries()
+        val entries: Enumeration<out ZipEntry> = zipFile.entries()
         while (entries.hasMoreElements()) {
             val entry = entries.nextElement()
             val entryName = entry.name ?: ""

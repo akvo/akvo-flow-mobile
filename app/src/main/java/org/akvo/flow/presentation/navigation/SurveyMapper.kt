@@ -38,7 +38,7 @@ class SurveyMapper @Inject constructor() {
     private fun transform(survey: Survey): ViewSurvey {
         return ViewSurvey(
             survey.id, survey.name, survey.isMonitored,
-            survey.registrationSurveyId
+            survey.registrationSurveyId, survey.viewed
         )
     }
 }

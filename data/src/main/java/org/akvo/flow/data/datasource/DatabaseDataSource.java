@@ -475,4 +475,12 @@ public class DatabaseDataSource {
             briteSurveyDbAdapter.clearCursor(surveyId);
         }
     }
+
+    public void setSurveyViewed(long surveyId) {
+        briteSurveyDbAdapter.setSurveyViewed(surveyId);
+    }
+
+    public void setSurveyUnViewed(double surveyId) {
+        briteSurveyDbAdapter.setSurveyUnViewed(surveyId);
+    }
 }

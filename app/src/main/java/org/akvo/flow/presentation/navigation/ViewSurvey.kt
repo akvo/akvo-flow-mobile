@@ -26,25 +26,28 @@ data class ViewSurvey(
     val id: Long,
     val name: String?,
     val isMonitored: Boolean,
-    val registrationSurveyId: String?
+    val registrationSurveyId: String?,
+    val viewed: Boolean
 ) : Parcelable {
 
     constructor(parcel: Parcel) : this(
         parcel.readLong(),
         parcel.readString(),
         parcel.readByte() != 0.toByte(),
-        parcel.readString()
+        parcel.readString(),
+        parcel.readByte() != 0.toByte()
     )
+
+    override fun writeToParcel(parcel: Parcel, flags: Int) {
+        parcel.writeLong(id)
+        parcel.writeString(name)
+        parcel.writeByte(if (isMonitored) 1 else 0)
+        parcel.writeString(registrationSurveyId)
+        parcel.writeByte(if (viewed) 1 else 0)
+    }
 
     override fun describeContents(): Int {
         return 0
-    }
-
-    override fun writeToParcel(dest: Parcel, flags: Int) {
-        dest.writeLong(id)
-        dest.writeString(name)
-        dest.writeByte((if (isMonitored) 1 else 0).toByte())
-        dest.writeString(registrationSurveyId)
     }
 
     companion object CREATOR : Parcelable.Creator<ViewSurvey> {

@@ -23,7 +23,10 @@ import android.content.Context
 import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
+import io.mockk.spyk
+import io.mockk.verify
 import org.akvo.flow.data.database.SurveyDbDataSource
+import org.akvo.flow.util.ConstantUtil
 import org.akvo.flow.util.SurveyFileNameGenerator
 import org.akvo.flow.util.SurveyIdGenerator
 import org.akvo.flow.util.files.FormFileBrowser
@@ -61,46 +64,80 @@ class BootstrapProcessorTest {
     @MockK
     lateinit var zipFile: ZipFile
 
-    lateinit var processor: BootstrapProcessor
+    @MockK
+    lateinit var zipEntry: ZipEntry
+
+    private lateinit var processor: BootstrapProcessor
 
     @Before
     fun setUp() {
         MockKAnnotations.init(this)
-        processor = BootstrapProcessor(resourcesFileUtil,
+        processor = spyk(BootstrapProcessor(resourcesFileUtil,
             applicationContext,
             surveyFileNameGenerator,
             surveyIdGenerator,
             databaseAdapter,
-            formFileBrowser)
-        //`when`(applicationContext.getString(anyInt())).thenReturn("")
+            formFileBrowser))
+        every { (processor.processCascadeResource(any(), any())) }.returns(ProcessingResult.ProcessingSuccess)
     }
 
     @Test
     fun processZipFileShouldReturnSuccessForEmptyZipFile() {
-        every { (zipFile.entries()) }.returns(object : Enumeration<ZipEntry>,
-            MutableIterator<ZipEntry?> {
-            override fun hasMoreElements(): Boolean {
-                return false
-            }
-
-            override fun nextElement(): ZipEntry? {
-                return null
-            }
-
-            override fun hasNext(): Boolean {
-                return false
-            }
-
-            override fun next(): ZipEntry? {
-                return null
-            }
-
-            override fun remove() {
-                //ignored
-            }
-        })
+        every { (zipFile.entries()) }.returns(TestEntries(emptySequence()))
 
         val result = processor.processZipFile(zipFile)
         assertTrue(result is ProcessingResult.ProcessingSuccess)
+    }
+    @Test
+    fun processZipFileShouldReturnSuccessForZipFileContainingFileWithNullName() {
+        every { (zipFile.entries()) }.returns(TestEntries(sequenceOf(zipEntry)))
+        every { (zipEntry.name) }.returns(null)
+
+        val result = processor.processZipFile(zipFile)
+        assertTrue(result is ProcessingResult.ProcessingSuccess)
+    }
+
+    @Test
+    fun processZipFileShouldReturnSuccessForZipFileContainingOtherFiles() {
+        every { (zipFile.entries()) }.returns(TestEntries(sequenceOf(zipEntry)))
+        every { (zipEntry.name) }.returns("file.jpg")
+
+        val result = processor.processZipFile(zipFile)
+        assertTrue(result is ProcessingResult.ProcessingSuccess)
+    }
+
+    @Test
+    fun processZipFileShouldReturnSuccessForZipFileContainingCascadeRes() {
+        every { (zipFile.entries()) }.returns(TestEntries(sequenceOf(zipEntry)))
+        every { (zipEntry.name) }.returns("file" + ConstantUtil.CASCADE_RES_SUFFIX)
+
+        val result = processor.processZipFile(zipFile)
+        assertTrue(result is ProcessingResult.ProcessingSuccess)
+        verify { processor.processCascadeResource(any(), any()) }
+    }
+
+    class TestEntries(sequence: Sequence<ZipEntry>) : Enumeration<ZipEntry>,
+        MutableIterator<ZipEntry?> {
+        private val iter = sequence.iterator()
+
+        override fun hasMoreElements(): Boolean {
+            return iter.hasNext()
+        }
+
+        override fun nextElement(): ZipEntry? {
+            return iter.next()
+        }
+
+        override fun hasNext(): Boolean {
+            return iter.hasNext()
+        }
+
+        override fun next(): ZipEntry? {
+            return iter.next()
+        }
+
+        override fun remove() {
+            //ignored
+        }
     }
 }

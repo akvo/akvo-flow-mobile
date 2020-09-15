@@ -80,15 +80,15 @@ class BootstrapProcessor @Inject constructor(
 
     @VisibleForTesting
     fun processCascadeResource(zipFile: ZipFile, entry: ZipEntry): ProcessingResult {
-        try {
+        return try {
             FileUtil.extract(
                 ZipInputStream(zipFile.getInputStream(entry)),
                 resourcesFileUtil.getExistingAppInternalFolder(applicationContext)
             )
-            return ProcessingResult.ProcessingSuccess
+            ProcessingResult.ProcessingSuccess
         } catch (e: Exception) {
             Timber.e(e)
-            return ProcessingResult.ProcessingError
+            ProcessingResult.ProcessingError
         }
     }
 
@@ -217,5 +217,4 @@ class BootstrapProcessor @Inject constructor(
     fun closeDb() {
         databaseAdapter.close()
     }
-
 }

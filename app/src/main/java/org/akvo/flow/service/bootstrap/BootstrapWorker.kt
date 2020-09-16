@@ -51,7 +51,6 @@ import javax.inject.Inject
  * lexicographical order by file name; Any fileswith a name starting with . will be skipped (to
  * prevent inadvertent processing of MAC OSX metadata files).
  *
- * @author Christopher Fagiani
  */
 class BootstrapWorker(context: Context, workerParams: WorkerParameters) :
     Worker(context, workerParams) {

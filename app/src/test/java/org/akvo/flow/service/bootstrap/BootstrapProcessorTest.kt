@@ -78,7 +78,15 @@ class BootstrapProcessorTest {
             surveyIdGenerator,
             databaseAdapter,
             formFileBrowser))
-        every { (processor.processCascadeResource(any(), any())) }.returns(ProcessingResult.ProcessingSuccess)
+        every {
+            (processor.processCascadeResource(any(),
+                any()))
+        }.returns(ProcessingResult.ProcessingSuccess)
+        every {
+            processor.processSurveyFile(any(),
+                any(),
+                any())
+        }.returns(ProcessingResult.ProcessingSuccess)
     }
 
     @Test
@@ -86,6 +94,7 @@ class BootstrapProcessorTest {
         every { (zipFile.entries()) }.returns(TestEntries(emptySequence()))
 
         val result = processor.processZipFile(zipFile)
+
         assertTrue(result is ProcessingResult.ProcessingSuccess)
     }
     @Test
@@ -94,6 +103,7 @@ class BootstrapProcessorTest {
         every { (zipEntry.name) }.returns(null)
 
         val result = processor.processZipFile(zipFile)
+
         assertTrue(result is ProcessingResult.ProcessingSuccess)
     }
 
@@ -103,17 +113,30 @@ class BootstrapProcessorTest {
         every { (zipEntry.name) }.returns("file.jpg")
 
         val result = processor.processZipFile(zipFile)
+
         assertTrue(result is ProcessingResult.ProcessingSuccess)
     }
 
     @Test
-    fun processZipFileShouldReturnSuccessForZipFileContainingCascadeRes() {
+    fun processZipFileShouldProcessCascadeResCorrectly() {
         every { (zipFile.entries()) }.returns(TestEntries(sequenceOf(zipEntry)))
         every { (zipEntry.name) }.returns("file" + ConstantUtil.CASCADE_RES_SUFFIX)
 
         val result = processor.processZipFile(zipFile)
-        assertTrue(result is ProcessingResult.ProcessingSuccess)
+
         verify { processor.processCascadeResource(any(), any()) }
+        assertTrue(result is ProcessingResult.ProcessingSuccess)
+    }
+
+    @Test
+    fun processZipFileShouldProcessFormsCorrectly() {
+        every { (zipFile.entries()) }.returns(TestEntries(sequenceOf(zipEntry)))
+        every { (zipEntry.name) }.returns("file" + ConstantUtil.XML_SUFFIX)
+
+        val result = processor.processZipFile(zipFile)
+
+        verify { processor.processSurveyFile(any(), any(), any()) }
+        assertTrue(result is ProcessingResult.ProcessingSuccess)
     }
 
     class TestEntries(sequence: Sequence<ZipEntry>) : Enumeration<ZipEntry>,

@@ -178,7 +178,7 @@ public class GeoQuestionView extends QuestionView
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         mLocationListener.handlePermissionResult(requestCode, permissions, grantResults);
     }
 

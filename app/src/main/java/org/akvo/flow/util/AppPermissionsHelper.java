@@ -43,7 +43,7 @@ public class AppPermissionsHelper {
         this.storagePermissionsHelper = storagePermissionsHelper;
     }
 
-    public boolean allPermissionsGranted(String[] permissions, @NonNull int[] grantResults) {
+    public boolean allPermissionsGranted(@NonNull String[] permissions, @NonNull int[] grantResults) {
         if (grantResults.length > 0 && permissions.length == grantResults.length) {
             for (int grantResult : grantResults) {
                 if (grantResult != PackageManager.PERMISSION_GRANTED) {

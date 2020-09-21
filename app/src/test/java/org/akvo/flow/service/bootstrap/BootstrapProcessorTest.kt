@@ -97,6 +97,7 @@ class BootstrapProcessorTest {
 
         assertTrue(result is ProcessingResult.ProcessingSuccess)
     }
+
     @Test
     fun processZipFileShouldReturnSuccessForZipFileContainingFileWithNullName() {
         every { (zipFile.entries()) }.returns(TestEntries(sequenceOf(zipEntry)))

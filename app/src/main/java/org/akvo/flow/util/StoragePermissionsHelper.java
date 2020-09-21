@@ -39,9 +39,9 @@ public class StoragePermissionsHelper {
         this.context = context;
     }
 
-    public boolean storagePermissionsGranted(String permission, @NonNull int[] grantResults) {
-        return grantResults.length > 0
-                && Manifest.permission.WRITE_EXTERNAL_STORAGE.equals(permission)
+    public boolean storagePermissionsGranted(@NonNull String[] permissions, @NonNull int[] grantResults) {
+        return permissions.length > 0 && grantResults.length > 0
+                && Manifest.permission.WRITE_EXTERNAL_STORAGE.equals(permissions[0])
                 && grantResults[0] == PermissionChecker.PERMISSION_GRANTED;
     }
 

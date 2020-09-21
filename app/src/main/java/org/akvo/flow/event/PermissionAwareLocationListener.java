@@ -58,7 +58,7 @@ public class PermissionAwareLocationListener {
     }
 
     public void handlePermissionResult(int requestCode, String[] permissions, int[] grantResults) {
-        if (grantResults == null || grantResults.length == 0) {
+        if (grantResults == null || grantResults.length == 0 || permissions.length == 0) {
             permissionListener.onPermissionNotGranted();
         } else if (requestCode == ConstantUtil.LOCATION_PERMISSION_CODE
                 && Manifest.permission.ACCESS_FINE_LOCATION.equals(permissions[0])

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010-2017,2020 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2020 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -15,16 +15,16 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
+package org.akvo.flow.database.upgrade
 
-package org.akvo.flow.database;
+import android.database.sqlite.SQLiteDatabase
+import org.akvo.flow.database.DatabaseHelper
 
-public class SurveyGroupColumns {
-    public static final String _ID = "_id";
-    public static final String SURVEY_GROUP_ID = "survey_group_id";
-    public static final String NAME = "name";
-    public static final String REGISTER_SURVEY_ID = "register_survey_id";
-    public static final String MONITORED = "monitored";
-    public static final String VIEWED = "viewed";
+class CursorUpgrader(private val helper: DatabaseHelper, private val db: SQLiteDatabase) :
+    DatabaseUpgrader {
+
+    override fun upgrade() {
+        helper.upgradeFromCursor(db)
+    }
 }

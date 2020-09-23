@@ -158,7 +158,7 @@ public class FlowNavigationPresenter implements Presenter {
     public void onSurveyItemTap(final ViewSurvey viewSurvey) {
         if (viewSurvey != null) {
             Map<String, Object> params = new HashMap<>(2);
-            params.put(SaveSelectedSurvey.KEY_SURVEY_GROUP_ID, viewSurvey.getId());
+            params.put(SaveSelectedSurvey.KEY_SURVEY_ID, viewSurvey.getId());
             saveSelectedSurvey.execute(new DefaultObserver<Boolean>() {
                 @Override
                 public void onError(Throwable e) {

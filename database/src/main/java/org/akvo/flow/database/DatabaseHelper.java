@@ -43,7 +43,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final int VER_DATA_POINT_ASSIGNMENTS_ITERATION = 87;
     public static final int VER_DATA_POINT_ASSIGNMENTS_ITERATION_2 = 88;
     public static final int VER_CURSOR_ITERATION = 89;
-    static final int DATABASE_VERSION = VER_CURSOR_ITERATION;
+    public static final int VER_SURVEY_VIEWED = 90;
+    static final int DATABASE_VERSION = VER_SURVEY_VIEWED;
 
     private static SQLiteDatabase database;
     private static final Object LOCK_OBJ = new Object();
@@ -85,6 +86,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 + SurveyGroupColumns.NAME + " TEXT,"
                 + SurveyGroupColumns.REGISTER_SURVEY_ID + " TEXT,"
                 + SurveyGroupColumns.MONITORED + " INTEGER NOT NULL DEFAULT 0,"
+                + SurveyGroupColumns.VIEWED + " INTEGER NOT NULL DEFAULT 0,"
                 + "UNIQUE (" + SurveyGroupColumns.SURVEY_GROUP_ID + ") ON CONFLICT REPLACE)");
 
         db.execSQL("CREATE TABLE " + Tables.SURVEY_INSTANCE + " ("
@@ -156,6 +158,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public void upgradeFromAssignment(SQLiteDatabase db) {
         db.execSQL("ALTER TABLE " + Tables.RECORD + " ADD COLUMN " + RecordColumns.VIEWED
+                + " INTEGER NOT NULL DEFAULT 1");
+    }
+
+    public void upgradeFromCursor(SQLiteDatabase db) {
+        db.execSQL("ALTER TABLE " + Tables.SURVEY_GROUP + " ADD COLUMN " + SurveyGroupColumns.VIEWED
                 + " INTEGER NOT NULL DEFAULT 1");
     }
 

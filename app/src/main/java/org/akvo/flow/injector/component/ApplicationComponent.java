@@ -47,7 +47,7 @@ import org.akvo.flow.service.BootstrapService;
 import org.akvo.flow.service.DataFixWorker;
 import org.akvo.flow.service.DataPointUploadWorker;
 import org.akvo.flow.service.FileChangeTrackingWorker;
-import org.akvo.flow.service.SurveyDownloadService;
+import org.akvo.flow.service.SurveyDownloadWorker;
 import org.akvo.flow.service.UnPublishDataService;
 import org.akvo.flow.util.logging.LoggingHelper;
 
@@ -95,7 +95,7 @@ public interface ApplicationComponent {
 
     void inject(FileChangeTrackingWorker fileChangeTrackingWorker);
 
-    void inject(SurveyDownloadService surveyDownloadService);
+    void inject(SurveyDownloadWorker surveyDownloadWorker);
 
     void inject(BootstrapService bootstrapService);
 

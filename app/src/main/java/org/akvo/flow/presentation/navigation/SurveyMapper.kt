@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017,2020 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -17,34 +17,28 @@
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
+package org.akvo.flow.presentation.navigation
 
-package org.akvo.flow.presentation.navigation;
+import org.akvo.flow.domain.entity.Survey
+import java.util.ArrayList
+import javax.inject.Inject
 
-import org.akvo.flow.domain.entity.Survey;
+class SurveyMapper @Inject constructor() {
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.inject.Inject;
-
-public class SurveyMapper {
-
-    @Inject
-    public SurveyMapper() {
-    }
-
-    public List<ViewSurvey> transform(List<Survey> surveys) {
-        List<ViewSurvey> viewSurveys = new ArrayList<>();
+    fun transform(surveys: List<Survey>?): List<ViewSurvey> {
+        val viewSurveys: MutableList<ViewSurvey> = ArrayList()
         if (surveys != null) {
-            for (Survey s : surveys) {
-                viewSurveys.add(transform(s));
+            for (s in surveys) {
+                viewSurveys.add(transform(s))
             }
         }
-        return viewSurveys;
+        return viewSurveys
     }
 
-    private ViewSurvey transform(Survey survey) {
-        return new ViewSurvey(survey.getId(), survey.getName(), survey.isMonitored(),
-                survey.getRegistrationSurveyId());
+    private fun transform(survey: Survey): ViewSurvey {
+        return ViewSurvey(
+            survey.id, survey.name, survey.isMonitored,
+            survey.registrationSurveyId, survey.viewed
+        )
     }
 }

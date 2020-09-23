@@ -19,39 +19,25 @@
 
 package org.akvo.flow.service.bootstrap
 
-import android.content.Context
 import android.text.TextUtils
 import androidx.annotation.VisibleForTesting
 import org.akvo.flow.BuildConfig
 import org.akvo.flow.data.database.SurveyDbDataSource
 import org.akvo.flow.domain.Survey
 import org.akvo.flow.domain.SurveyMetadata
-import org.akvo.flow.serialization.form.SurveyMetadataParser
 import org.akvo.flow.util.ConstantUtil
-import org.akvo.flow.util.FileUtil
-import org.akvo.flow.util.SurveyFileNameGenerator
-import org.akvo.flow.util.SurveyIdGenerator
-import org.akvo.flow.util.files.FormFileBrowser
-import org.akvo.flow.util.files.FormResourcesFileBrowser
 import timber.log.Timber
 import java.io.File
-import java.io.FileInputStream
-import java.io.FileNotFoundException
-import java.io.FileOutputStream
-import java.io.InputStream
 import java.util.Enumeration
 import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
-import java.util.zip.ZipInputStream
 import javax.inject.Inject
 
 class BootstrapProcessor @Inject constructor(
-    private val resourcesFileUtil: FormResourcesFileBrowser,
-    private val applicationContext: Context,
-    private val surveyFileNameGenerator: SurveyFileNameGenerator,
-    private val surveyIdGenerator: SurveyIdGenerator,
+
     private val databaseAdapter: SurveyDbDataSource,
-    private val formFileBrowser: FormFileBrowser
+    private val surveyMapper: SurveyMapper,
+    private val fileProcessor: FileProcessor
 ) {
 
     fun processZipFile(zipFile: ZipFile): ProcessingResult {
@@ -81,10 +67,7 @@ class BootstrapProcessor @Inject constructor(
     @VisibleForTesting
     fun processCascadeResource(zipFile: ZipFile, entry: ZipEntry): ProcessingResult {
         return try {
-            FileUtil.extract(
-                ZipInputStream(zipFile.getInputStream(entry)),
-                resourcesFileUtil.getExistingAppInternalFolder(applicationContext)
-            )
+            fileProcessor.extract(zipFile, entry)
             ProcessingResult.ProcessingSuccess
         } catch (e: Exception) {
             Timber.e(e)
@@ -95,21 +78,25 @@ class BootstrapProcessor @Inject constructor(
     @VisibleForTesting
     fun processSurveyFile(zipFile: ZipFile, entry: ZipEntry, entryName: String): ProcessingResult {
         try {
-            val filename = surveyFileNameGenerator.generateFileName(entryName)
-            val idFromFolderName = surveyIdGenerator.getSurveyIdFromFilePath(entryName)
-            var survey = databaseAdapter.getSurvey(idFromFolderName)
-            val surveyFolderName: String = generateSurveyFolder(entry)
+            val filename = surveyMapper.generateFileName(entryName)
+            val idFromFolderName = surveyMapper.getSurveyIdFromFilePath(entryName)
+            val surveyFolderName = surveyMapper.generateSurveyFolderName(entryName)
 
             // in both cases (new survey and existing), we need to update the xml
-            val surveyFile = generateNewSurveyFile(filename, surveyFolderName)
-            FileUtil.copy(zipFile.getInputStream(entry), FileOutputStream(surveyFile))
+            val surveyFile: File = fileProcessor.createAndCopyNewSurveyFile(filename, surveyFolderName, zipFile, entry)
             // now read the survey XML back into memory to see if there is a version
-            val surveyMetadata = readBasicSurveyData(surveyFile)
-            if (surveyMetadata.app.isNullOrBlank() || !BuildConfig.SERVER_BASE.contains(surveyMetadata.app)) {
+            val surveyMetadata = fileProcessor.readBasicSurveyData(surveyFile)
+            if (surveyMetadata.app.isNullOrBlank() || !BuildConfig.SERVER_BASE.contains(
+                    surveyMetadata.app)
+            ) {
                 return ProcessingResult.ProcessingErrorWrongDashboard
             }
-            survey =
-                updateSurvey(filename, idFromFolderName, survey, surveyFolderName, surveyMetadata)
+            var survey = databaseAdapter.getSurvey(idFromFolderName)
+            survey = createOrUpdateSurvey(filename,
+                idFromFolderName,
+                survey,
+                surveyFolderName,
+                surveyMetadata)
 
             // Save the Survey, SurveyGroup, and languages.
             updateSurveyStorage(survey)
@@ -120,49 +107,45 @@ class BootstrapProcessor @Inject constructor(
         }
     }
 
-    @Throws(FileNotFoundException::class)
-    private fun readBasicSurveyData(surveyFile: File): SurveyMetadata {
-        val `in`: InputStream = FileInputStream(surveyFile)
-        val parser = SurveyMetadataParser()
-        return parser.parse(`in`)
-    }
-
-    private fun updateSurvey(
+    @VisibleForTesting
+    fun createOrUpdateSurvey(
         filename: String, idFromFolderName: String,
         survey: Survey?, surveyFolderName: String,
         surveyMetadata: SurveyMetadata
     ): Survey {
         var survey = survey
-        var surveyName = filename
-        if (surveyName.contains(ConstantUtil.DOT_SEPARATOR)) {
-            surveyName = surveyName.substring(0, surveyName.indexOf(ConstantUtil.DOT_SEPARATOR))
-        }
+
         if (survey == null) {
-            survey = createSurvey(idFromFolderName, surveyMetadata, surveyName)
+            survey = createSurvey(idFromFolderName, surveyMetadata, filename)
         }
         survey.location = ConstantUtil.FILE_LOCATION
-        val surveyFileName = generateSurveyFileName(filename, surveyFolderName)
-        survey.fileName = surveyFileName
-        if (!TextUtils.isEmpty(surveyMetadata.name)) {
-            survey.name = surveyMetadata.name
-        }
+        survey.fileName = generateSurveyFileName(filename, surveyFolderName)
+        survey.name = generateSurveyName(surveyMetadata, survey.name)
         survey.surveyGroup = surveyMetadata.surveyGroup
-        if (surveyMetadata.version > 0) {
-            survey.version = surveyMetadata.version
-        } else {
-            survey.version = 1.0
-        }
+        survey.version = generateSurveyVersion(surveyMetadata)
         return survey
     }
 
-    private fun createSurvey(id: String, surveyMetadata: SurveyMetadata, name: String): Survey {
-        val survey = Survey()
-        if (!TextUtils.isEmpty(surveyMetadata.id)) {
-            survey.id = surveyMetadata.id
+    private fun generateSurveyName(surveyMetadata: SurveyMetadata, originalName: String): String {
+        return if (!TextUtils.isEmpty(surveyMetadata.name)) {
+            surveyMetadata.name
         } else {
-            survey.id = id
+            originalName
         }
-        survey.name = name
+    }
+
+    private fun generateSurveyVersion(surveyMetadata: SurveyMetadata): Double {
+        return if (surveyMetadata.version > 0) {
+            surveyMetadata.version
+        } else {
+            1.0
+        }
+    }
+
+    private fun createSurvey(id: String, surveyMetadata: SurveyMetadata, filename: String): Survey {
+        val survey = Survey()
+        survey.id = getSurveyId(surveyMetadata, id)
+        survey.name = surveyNameFormFileName(filename)
         /*
          * Resources are always attached to the zip file
          */
@@ -171,25 +154,21 @@ class BootstrapProcessor @Inject constructor(
         return survey
     }
 
+    private fun getSurveyId(surveyMetadata: SurveyMetadata, id: String): String? {
+        return if (!TextUtils.isEmpty(surveyMetadata.id)) surveyMetadata.id else id
+    }
+
+    private fun surveyNameFormFileName(filename: String): String {
+        return if (filename.contains(ConstantUtil.DOT_SEPARATOR)) {
+            filename.substring(0, filename.indexOf(ConstantUtil.DOT_SEPARATOR))
+        } else {
+            filename
+       }
+    }
+
     private fun updateSurveyStorage(survey: Survey) {
         databaseAdapter.addSurveyGroup(survey.surveyGroup)
         databaseAdapter.saveSurvey(survey)
-    }
-
-    private fun generateNewSurveyFile(filename: String, surveyFolderName: String): File {
-        val formsFolder = formFileBrowser.getExistingAppInternalFolder(applicationContext)
-        return when {
-            TextUtils.isEmpty(surveyFolderName) -> {
-                File(formsFolder, filename)
-            }
-            else -> {
-                val surveyFolder = File(formsFolder, surveyFolderName)
-                if (!surveyFolder.exists()) {
-                    surveyFolder.mkdir()
-                }
-                File(surveyFolder, filename)
-            }
-        }
     }
 
     private fun generateSurveyFileName(filename: String, surveyFolderName: String?): String {
@@ -200,14 +179,6 @@ class BootstrapProcessor @Inject constructor(
         }
         sb.append(filename)
         return sb.toString()
-    }
-
-    private fun generateSurveyFolder(entry: ZipEntry): String {
-        val entryName = entry.name
-        val entryPaths: Array<String> = entryName?.split(File.separator.toRegex())
-            ?.toTypedArray()
-            ?: emptyArray()
-        return if (entryPaths.size < 2) "" else entryPaths[entryPaths.size - 2]
     }
 
     fun openDb() {

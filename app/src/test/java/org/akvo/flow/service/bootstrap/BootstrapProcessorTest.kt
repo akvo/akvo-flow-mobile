@@ -19,23 +19,21 @@
 
 package org.akvo.flow.service.bootstrap
 
-import android.content.Context
 import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.spyk
 import io.mockk.verify
 import org.akvo.flow.data.database.SurveyDbDataSource
+import org.akvo.flow.domain.Survey
+import org.akvo.flow.domain.SurveyMetadata
 import org.akvo.flow.util.ConstantUtil
-import org.akvo.flow.util.SurveyFileNameGenerator
-import org.akvo.flow.util.SurveyIdGenerator
-import org.akvo.flow.util.files.FormFileBrowser
-import org.akvo.flow.util.files.FormResourcesFileBrowser
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
+import java.io.File
 import java.util.Enumeration
 import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
@@ -44,22 +42,7 @@ import java.util.zip.ZipFile
 class BootstrapProcessorTest {
 
     @MockK
-    lateinit var applicationContext: Context
-
-    @MockK
-    lateinit var resourcesFileUtil: FormResourcesFileBrowser
-
-    @MockK
-    lateinit var surveyFileNameGenerator: SurveyFileNameGenerator
-
-    @MockK
-    lateinit var surveyIdGenerator: SurveyIdGenerator
-
-    @MockK
     lateinit var databaseAdapter: SurveyDbDataSource
-
-    @MockK
-    lateinit var formFileBrowser: FormFileBrowser
 
     @MockK
     lateinit var zipFile: ZipFile
@@ -67,31 +50,35 @@ class BootstrapProcessorTest {
     @MockK
     lateinit var zipEntry: ZipEntry
 
+    @MockK
+    lateinit var surveyMapper: SurveyMapper
+
+    @MockK
+    lateinit var fileProcessor: FileProcessor
+
     private lateinit var processor: BootstrapProcessor
 
     @Before
     fun setUp() {
         MockKAnnotations.init(this)
-        processor = spyk(BootstrapProcessor(resourcesFileUtil,
-            applicationContext,
-            surveyFileNameGenerator,
-            surveyIdGenerator,
-            databaseAdapter,
-            formFileBrowser))
+        processor = spyk(BootstrapProcessor(databaseAdapter, surveyMapper, fileProcessor))
         every {
             (processor.processCascadeResource(any(),
                 any()))
         }.returns(ProcessingResult.ProcessingSuccess)
-        every {
-            processor.processSurveyFile(any(),
-                any(),
-                any())
-        }.returns(ProcessingResult.ProcessingSuccess)
+        every { (databaseAdapter.getSurvey(any())) }.returns(Survey())
+        every { (databaseAdapter.addSurveyGroup(any())) }.returns(Unit)
+        every { (databaseAdapter.saveSurvey(any())) }.returns(Unit)
     }
 
     @Test
     fun processZipFileShouldReturnSuccessForEmptyZipFile() {
         every { (zipFile.entries()) }.returns(TestEntries(emptySequence()))
+        every {
+            processor.processSurveyFile(any(),
+                any(),
+                any())
+        }.returns(ProcessingResult.ProcessingSuccess)
 
         val result = processor.processZipFile(zipFile)
 
@@ -102,6 +89,11 @@ class BootstrapProcessorTest {
     fun processZipFileShouldReturnSuccessForZipFileContainingFileWithNullName() {
         every { (zipFile.entries()) }.returns(TestEntries(sequenceOf(zipEntry)))
         every { (zipEntry.name) }.returns(null)
+        every {
+            processor.processSurveyFile(any(),
+                any(),
+                any())
+        }.returns(ProcessingResult.ProcessingSuccess)
 
         val result = processor.processZipFile(zipFile)
 
@@ -112,6 +104,11 @@ class BootstrapProcessorTest {
     fun processZipFileShouldReturnSuccessForZipFileContainingOtherFiles() {
         every { (zipFile.entries()) }.returns(TestEntries(sequenceOf(zipEntry)))
         every { (zipEntry.name) }.returns("file.jpg")
+        every {
+            processor.processSurveyFile(any(),
+                any(),
+                any())
+        }.returns(ProcessingResult.ProcessingSuccess)
 
         val result = processor.processZipFile(zipFile)
 
@@ -122,6 +119,11 @@ class BootstrapProcessorTest {
     fun processZipFileShouldProcessCascadeResCorrectly() {
         every { (zipFile.entries()) }.returns(TestEntries(sequenceOf(zipEntry)))
         every { (zipEntry.name) }.returns("file" + ConstantUtil.CASCADE_RES_SUFFIX)
+        every {
+            processor.processSurveyFile(any(),
+                any(),
+                any())
+        }.returns(ProcessingResult.ProcessingSuccess)
 
         val result = processor.processZipFile(zipFile)
 
@@ -133,10 +135,67 @@ class BootstrapProcessorTest {
     fun processZipFileShouldProcessFormsCorrectly() {
         every { (zipFile.entries()) }.returns(TestEntries(sequenceOf(zipEntry)))
         every { (zipEntry.name) }.returns("file" + ConstantUtil.XML_SUFFIX)
+        every {
+            processor.processSurveyFile(any(),
+                any(),
+                any())
+        }.returns(ProcessingResult.ProcessingSuccess)
 
         val result = processor.processZipFile(zipFile)
 
         verify { processor.processSurveyFile(any(), any(), any()) }
+        assertTrue(result is ProcessingResult.ProcessingSuccess)
+    }
+
+    @Test
+    fun processSurveyFileShouldFailForEmptyAppName() {
+        every { (zipFile.entries()) }.returns(TestEntries(sequenceOf(zipEntry)))
+        every { (zipEntry.name) }.returns("file" + ConstantUtil.XML_SUFFIX)
+        every { (surveyMapper.generateFileName(any())) }.returns("file.xml")
+        every { (surveyMapper.getSurveyIdFromFilePath(any())) }.returns("id")
+        every { (surveyMapper.generateSurveyFolderName(any())) }.returns("folder")
+        every { (fileProcessor.createAndCopyNewSurveyFile(any(), any(), any(), any())) }.returns(spyk(File("file.xml")))
+        val metadata = SurveyMetadata()
+        metadata.app = ""
+        every { (fileProcessor.readBasicSurveyData(any())) }.returns(metadata)
+
+        val result = processor.processSurveyFile(zipFile, zipEntry, zipEntry.name)
+
+        assertTrue(result is ProcessingResult.ProcessingErrorWrongDashboard)
+    }
+
+    @Test
+    fun processSurveyFileShouldFailForWrongAppName() {
+        every { (zipFile.entries()) }.returns(TestEntries(sequenceOf(zipEntry)))
+        every { (zipEntry.name) }.returns("file" + ConstantUtil.XML_SUFFIX)
+        every { (surveyMapper.generateFileName(any())) }.returns("file.xml")
+        every { (surveyMapper.getSurveyIdFromFilePath(any())) }.returns("id")
+        every { (surveyMapper.generateSurveyFolderName(any())) }.returns("folder")
+        every { (fileProcessor.createAndCopyNewSurveyFile(any(), any(), any(), any())) }.returns(spyk(File("file.xml")))
+        val metadata = SurveyMetadata()
+        metadata.app = "dev"
+        every { (fileProcessor.readBasicSurveyData(any())) }.returns(metadata)
+
+        val result = processor.processSurveyFile(zipFile, zipEntry, zipEntry.name)
+
+        assertTrue(result is ProcessingResult.ProcessingErrorWrongDashboard)
+    }
+
+    @Test
+    fun processSurveyFileShouldSucceedForCorrectAppName() {
+        every { (zipFile.entries()) }.returns(TestEntries(sequenceOf(zipEntry)))
+        every { (zipEntry.name) }.returns("file" + ConstantUtil.XML_SUFFIX)
+        every { (surveyMapper.generateFileName(any())) }.returns("file.xml")
+        every { (surveyMapper.getSurveyIdFromFilePath(any())) }.returns("id")
+        every { (surveyMapper.generateSurveyFolderName(any())) }.returns("folder")
+        every { (fileProcessor.createAndCopyNewSurveyFile(any(), any(), any(), any())) }.returns(spyk(File("file.xml")))
+        val metadata = SurveyMetadata()
+        metadata.app = "akvoflow-uat1"
+        every { (fileProcessor.readBasicSurveyData(any())) }.returns(metadata)
+        every { (processor.createOrUpdateSurvey(any(), any(), any(), any(), any())) }.returns(Survey())
+
+        val result = processor.processSurveyFile(zipFile, zipEntry, zipEntry.name)
+
         assertTrue(result is ProcessingResult.ProcessingSuccess)
     }
 

@@ -133,7 +133,6 @@ public class GeoQuestionView extends QuestionView
 
     public void startListeningToLocation() {
         resetQuestion(true);
-        showLocationListenerStarted();
         mLocationListener.startLocationIfPossible();
     }
 
@@ -190,6 +189,11 @@ public class GeoQuestionView extends QuestionView
                 .displayPermissionMissingSnackBar(coordinatorLayout,
                         v -> startListeningToLocation(),
                         getContext());
+    }
+
+    @Override
+    public void onLocationStarted() {
+        showLocationListenerStarted();
     }
 
     @Override

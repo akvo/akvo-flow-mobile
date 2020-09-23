@@ -73,6 +73,11 @@ public class TimedLocationListener implements LocationListener {
             return;
         }
 
+        Listener listener = listenerWeakReference.get();
+        if (listener != null) {
+            listener.onLocationStarted();
+        }
+
         mLocationManager
                 .requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, weakLocationListener);
         mListeningLocation = true;
@@ -85,15 +90,12 @@ public class TimedLocationListener implements LocationListener {
             @Override
             public void run() {
                 // Ensure it runs on the UI thread!
-                mHandler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (mListeningLocation) {
-                            stop();
-                            Listener listener = listenerWeakReference.get();
-                            if (listener != null) {
-                                listener.onTimeout();
-                            }
+                mHandler.post(() -> {
+                    if (mListeningLocation) {
+                        stop();
+                        Listener listener1 = listenerWeakReference.get();
+                        if (listener1 != null) {
+                            listener1.onTimeout();
                         }
                     }
                 });
@@ -156,6 +158,8 @@ public class TimedLocationListener implements LocationListener {
     }
 
     public interface Listener {
+
+        void onLocationStarted();
 
         void onLocationReady(double latitude, double longitude, double altitude, float accuracy);
 

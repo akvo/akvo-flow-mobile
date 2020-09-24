@@ -19,7 +19,16 @@
 
 package org.akvo.flow.service.bootstrap
 
+import io.mockk.MockKAnnotations
+import io.mockk.every
+import io.mockk.impl.annotations.MockK
+import io.mockk.spyk
+import io.mockk.verify
+import org.akvo.flow.domain.Survey
+import org.akvo.flow.domain.SurveyGroup
+import org.akvo.flow.domain.SurveyMetadata
 import org.junit.Assert.assertEquals
+import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
@@ -27,17 +36,42 @@ import org.junit.runners.JUnit4
 @RunWith(JUnit4::class)
 class SurveyMapperTest {
 
+    @MockK
+    lateinit var surveyMetadata: SurveyMetadata
+
+    @MockK
+    lateinit var surveyGroup: SurveyGroup
+
+    @MockK
+    lateinit var survey: Survey
+
+    private lateinit var surveyMapper: SurveyMapper
+
+    @Before
+    fun setUp() {
+        MockKAnnotations.init(this)
+        surveyMapper = spyk(SurveyMapper())
+        every { (surveyMetadata.id) }.returns("1234")
+        every { (surveyMetadata.version) }.returns(1.0)
+        every { (surveyMetadata.name) }.returns("form1")
+        every { (surveyMetadata.surveyGroup) }.returns(surveyGroup)
+        every { (survey.setLocation(any())) }.returns(Unit)
+        every { (survey.setFileName(any())) }.returns(Unit)
+        every { (survey.name) }.returns("name")
+        every { (survey.setName(any())) }.returns(Unit)
+        every { (survey.setSurveyGroup(any())) }.returns(Unit)
+        every { (survey.setVersion(any())) }.returns(Unit)
+    }
+
     @Test
     fun getSurveyIdFromFilePathShouldReturnEmptyIfFolderMissing() {
-        val surveyIdGenerator = SurveyMapper()
-        val surveyId = surveyIdGenerator.getSurveyIdFromFilePath("file.xml")
+        val surveyId = surveyMapper.getSurveyIdFromFilePath("file.xml")
         assertEquals("", surveyId)
     }
 
     //TODO: separate into several methods
     @Test
     fun getSurveyIdFromFilePathShouldReturnCorrectIdFromFolder() {
-        val surveyMapper = SurveyMapper()
         var surveyId = surveyMapper.getSurveyIdFromFilePath("123/file.xml")
         assertEquals("123", surveyId)
         surveyId = surveyMapper.getSurveyIdFromFilePath("folder/123/file.xml")
@@ -52,21 +86,21 @@ class SurveyMapperTest {
 
     @Test
     fun getSurveyIdFromFilePathShouldReturnUseClosestFolderNameIfNoId() {
-        val surveyMapper = SurveyMapper()
         val surveyId = surveyMapper.getSurveyIdFromFilePath("abc/folder/survey.xml")
+
         assertEquals("folder", surveyId)
     }
 
     @Test
     fun generateFileNameShouldReturnEmptyIfOnlySlash() {
-        val surveyMapper = SurveyMapper()
         val fileName = surveyMapper.generateFileName("/")
+
         assertEquals("", fileName)
     }
 
+    //TODO: separate into several methods
     @Test
     fun generateFileNameShouldReturnCorrectSurveyName() {
-        val surveyMapper = SurveyMapper()
         var fileName = surveyMapper.generateFileName("file.xml")
         assertEquals("file.xml", fileName)
         fileName = surveyMapper.generateFileName("folder/file.xml")
@@ -77,8 +111,6 @@ class SurveyMapperTest {
 
     @Test
     fun generateSurveyFolderNameShouldReturnEmptyForEmptyEntryName() {
-        val surveyMapper = SurveyMapper()
-
         val folderName = surveyMapper.generateSurveyFolderName("")
 
         assertEquals("", folderName)
@@ -86,8 +118,6 @@ class SurveyMapperTest {
 
     @Test
     fun generateSurveyFolderNameShouldReturnEmptyOnePartEntryName() {
-        val surveyMapper = SurveyMapper()
-
         val folderName = surveyMapper.generateSurveyFolderName("name")
 
         assertEquals("", folderName)
@@ -95,10 +125,22 @@ class SurveyMapperTest {
 
     @Test
     fun generateSurveyFolderNameShouldReturnCorrectFolderName() {
-        val surveyMapper = SurveyMapper()
-
         val folderName = surveyMapper.generateSurveyFolderName("folder/file.xml")
 
         assertEquals("folder", folderName)
+    }
+
+    @Test
+    fun createOrUpdateSurveyShouldCreateSurveyIfDbSurveyNull() {
+        surveyMapper.createOrUpdateSurvey("file.xml", "123", null, "folder", surveyMetadata)
+
+        verify { surveyMapper.createSurvey(any(), any(), any()) }
+    }
+
+    @Test
+    fun createOrUpdateSurveyShouldNotCreateSurveyIfDbSurveyNotNull() {
+        surveyMapper.createOrUpdateSurvey("file.xml", "123", survey, "folder", surveyMetadata)
+
+        verify(atLeast = 0, atMost = 0) { surveyMapper.createSurvey(any(), any(), any()) }
     }
 }

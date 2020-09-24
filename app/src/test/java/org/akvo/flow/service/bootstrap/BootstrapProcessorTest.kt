@@ -127,7 +127,7 @@ class BootstrapProcessorTest {
 
         val result = processor.processZipFile(zipFile)
 
-        verify { processor.processCascadeResource(any(), any()) }
+        verify { processor.processCascadeResource(any(), any())  }
         assertTrue(result is ProcessingResult.ProcessingSuccess)
     }
 
@@ -192,7 +192,7 @@ class BootstrapProcessorTest {
         val metadata = SurveyMetadata()
         metadata.app = "akvoflow-uat1"
         every { (fileProcessor.readBasicSurveyData(any())) }.returns(metadata)
-        every { (processor.createOrUpdateSurvey(any(), any(), any(), any(), any())) }.returns(Survey())
+        every { (surveyMapper.createOrUpdateSurvey(any(), any(), any(), any(), any())) }.returns(Survey())
 
         val result = processor.processSurveyFile(zipFile, zipEntry, zipEntry.name)
 

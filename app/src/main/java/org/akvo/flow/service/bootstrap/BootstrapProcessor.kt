@@ -19,12 +19,10 @@
 
 package org.akvo.flow.service.bootstrap
 
-import android.text.TextUtils
 import androidx.annotation.VisibleForTesting
 import org.akvo.flow.BuildConfig
 import org.akvo.flow.data.database.SurveyDbDataSource
 import org.akvo.flow.domain.Survey
-import org.akvo.flow.domain.SurveyMetadata
 import org.akvo.flow.util.ConstantUtil
 import timber.log.Timber
 import java.io.File
@@ -91,10 +89,9 @@ class BootstrapProcessor @Inject constructor(
             ) {
                 return ProcessingResult.ProcessingErrorWrongDashboard
             }
-            var survey = databaseAdapter.getSurvey(idFromFolderName)
-            survey = createOrUpdateSurvey(filename,
+            val survey = surveyMapper.createOrUpdateSurvey(filename,
                 idFromFolderName,
-                survey,
+                databaseAdapter.getSurvey(idFromFolderName),
                 surveyFolderName,
                 surveyMetadata)
 
@@ -107,78 +104,9 @@ class BootstrapProcessor @Inject constructor(
         }
     }
 
-    @VisibleForTesting
-    fun createOrUpdateSurvey(
-        filename: String, idFromFolderName: String,
-        survey: Survey?, surveyFolderName: String,
-        surveyMetadata: SurveyMetadata
-    ): Survey {
-        var survey = survey
-
-        if (survey == null) {
-            survey = createSurvey(idFromFolderName, surveyMetadata, filename)
-        }
-        survey.location = ConstantUtil.FILE_LOCATION
-        survey.fileName = generateSurveyFileName(filename, surveyFolderName)
-        survey.name = generateSurveyName(surveyMetadata, survey.name)
-        survey.surveyGroup = surveyMetadata.surveyGroup
-        survey.version = generateSurveyVersion(surveyMetadata)
-        return survey
-    }
-
-    private fun generateSurveyName(surveyMetadata: SurveyMetadata, originalName: String): String {
-        return if (!TextUtils.isEmpty(surveyMetadata.name)) {
-            surveyMetadata.name
-        } else {
-            originalName
-        }
-    }
-
-    private fun generateSurveyVersion(surveyMetadata: SurveyMetadata): Double {
-        return if (surveyMetadata.version > 0) {
-            surveyMetadata.version
-        } else {
-            1.0
-        }
-    }
-
-    private fun createSurvey(id: String, surveyMetadata: SurveyMetadata, filename: String): Survey {
-        val survey = Survey()
-        survey.id = getSurveyId(surveyMetadata, id)
-        survey.name = surveyNameFormFileName(filename)
-        /*
-         * Resources are always attached to the zip file
-         */
-        survey.isHelpDownloaded = true
-        survey.type = ConstantUtil.SURVEY_TYPE
-        return survey
-    }
-
-    private fun getSurveyId(surveyMetadata: SurveyMetadata, id: String): String? {
-        return if (!TextUtils.isEmpty(surveyMetadata.id)) surveyMetadata.id else id
-    }
-
-    private fun surveyNameFormFileName(filename: String): String {
-        return if (filename.contains(ConstantUtil.DOT_SEPARATOR)) {
-            filename.substring(0, filename.indexOf(ConstantUtil.DOT_SEPARATOR))
-        } else {
-            filename
-       }
-    }
-
     private fun updateSurveyStorage(survey: Survey) {
         databaseAdapter.addSurveyGroup(survey.surveyGroup)
         databaseAdapter.saveSurvey(survey)
-    }
-
-    private fun generateSurveyFileName(filename: String, surveyFolderName: String?): String {
-        val sb = StringBuilder(20)
-        if (!TextUtils.isEmpty(surveyFolderName)) {
-            sb.append(surveyFolderName)
-            sb.append(File.separator)
-        }
-        sb.append(filename)
-        return sb.toString()
     }
 
     fun openDb() {

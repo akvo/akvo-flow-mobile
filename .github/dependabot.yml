@@ -1,0 +1,19 @@
+
+version: 2
+updates:
+- package-ecosystem: gradle
+  directory: "/"
+  schedule:
+    interval: daily
+  open-pull-requests-limit: 10
+  reviewers:
+      - "valllllll2000"
+  ignore:
+        - dependency-name: com.squareup.okhttp3:logging-interceptor
+          versions: "> 3.12.12"
+        - dependency-name: com.squareup.okhttp3:mockwebserver
+          versions: "> 3.12.12"
+        - dependency-name: com.squareup.okhttp3:okhttp
+          versions: "> 3.12.12"
+        - dependency-name: com.squareup.retrofit2:retrofit
+          versions: "> 2.6.4"

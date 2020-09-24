@@ -22,6 +22,8 @@ package org.akvo.flow.event;
 
 import android.Manifest;
 import android.content.Context;
+
+import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.PermissionChecker;
 
@@ -57,8 +59,9 @@ public class PermissionAwareLocationListener {
         }
     }
 
-    public void handlePermissionResult(int requestCode, String[] permissions, int[] grantResults) {
-        if (grantResults == null || grantResults.length == 0) {
+    public void handlePermissionResult(int requestCode, @NonNull String[] permissions,
+                                       @NonNull int[] grantResults) {
+        if (grantResults.length == 0 || permissions.length == 0) {
             permissionListener.onPermissionNotGranted();
         } else if (requestCode == ConstantUtil.LOCATION_PERMISSION_CODE
                 && Manifest.permission.ACCESS_FINE_LOCATION.equals(permissions[0])

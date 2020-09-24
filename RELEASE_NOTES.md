@@ -1,5 +1,14 @@
 Akvo FLOW app release notes
 ===========================
+# ver 2.9.5
+Date: 23 September 2020
+
+* **Visually show that surveys have been updated or loaded** - [#636](https://github.com/akvo/akvo-flow-mobile/issues/636)
+* **Crash when trying to start SurveyDownloadService in background** - [#1521](https://github.com/akvo/akvo-flow-mobile/issues/1521)
+* **Crash reported by Firebase related to permissions** - [#1717](https://github.com/akvo/akvo-flow-mobile/issues/1717)
+* **Location permission related bug** - [#1722](https://github.com/akvo/akvo-flow-mobile/issues/1722)
+
+---------------
 # ver 2.9.4.1
 Date: 19 August 2020
 

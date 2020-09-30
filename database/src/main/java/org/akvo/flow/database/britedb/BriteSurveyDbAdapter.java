@@ -419,16 +419,6 @@ public class BriteSurveyDbAdapter {
                 id + "");
     }
 
-    /**
-     * Delete any Record that contains no SurveyInstance
-     */
-    public void deleteEmptyRecords() {
-        briteDatabase.execute("DELETE FROM " + Tables.RECORD
-                + " WHERE " + RecordColumns.RECORD_ID + " NOT IN "
-                + "(SELECT DISTINCT " + SurveyInstanceColumns.RECORD_ID
-                + " FROM " + Tables.SURVEY_INSTANCE + ")");
-    }
-
     public Observable<Boolean> deleteSurveyAndGroup(long surveyGroupId) {
         deleteSurveyGroup(surveyGroupId);
         deleteSurvey(surveyGroupId);

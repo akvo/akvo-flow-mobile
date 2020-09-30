@@ -163,7 +163,6 @@ public class DatabaseDataSource {
 
             syncResponses(surveyInstance.getQasList(), id);
         }
-        briteSurveyDbAdapter.deleteEmptyRecords();
     }
 
     private void syncResponses(List<ApiQuestionAnswer> responses, long surveyInstanceId) {

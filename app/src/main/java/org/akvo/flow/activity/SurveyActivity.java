@@ -354,7 +354,6 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
             // Delete empty responses, if any
             if (mDatabase != null) {
                 mDatabase.deleteEmptySurveyInstances();
-                mDatabase.deleteEmptyRecords();
             }
 
             presenter.verifyApkUpdate();

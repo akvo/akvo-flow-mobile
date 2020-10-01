@@ -29,7 +29,7 @@ import android.widget.BaseAdapter
 import android.widget.ImageView
 import android.widget.TextView
 import org.akvo.flow.R
-import org.akvo.flow.database.SurveyInstanceStatus
+import org.akvo.flow.presentation.datapoints.list.entity.DataPointStatus
 import org.akvo.flow.presentation.datapoints.list.entity.ListDataPoint
 
 internal class DataPointListAdapter(context: Context?) : BaseAdapter() {
@@ -72,16 +72,15 @@ internal class DataPointListAdapter(context: Context?) : BaseAdapter() {
         } else {
             idView.visibility = View.GONE
         }
-        var statusRes = 5
-        when (status) {
-            SurveyInstanceStatus.SAVED, SurveyInstanceStatus.SUBMIT_REQUESTED
-            -> statusRes = R.drawable.ic_status_saved_18dp
-            SurveyInstanceStatus.SUBMITTED
-            -> statusRes = R.drawable.ic_status_submitted_18dp
-            SurveyInstanceStatus.UPLOADED, SurveyInstanceStatus.DOWNLOADED
-            -> statusRes = R.drawable.ic_status_synced_18dp
-            5
-            -> statusRes = R.drawable.ic_baseline_block_24
+        val statusRes = when (status) {
+            DataPointStatus.SAVED
+            -> R.drawable.ic_status_saved_18dp
+            DataPointStatus.SUBMITTED
+            -> R.drawable.ic_status_submitted_18dp
+            DataPointStatus.READY
+            -> R.drawable.ic_status_synced_18dp
+            DataPointStatus.DOWNLOADING
+            -> R.drawable.ic_baseline_block_24
         }
         statusImage.setImageResource(statusRes)
         if (viewed) {

@@ -28,11 +28,11 @@ public class DataPoint {
     private final long surveyGroupId;
     private final Double latitude;
     private final Double longitude;
-    private final int status;
+    private final SurveyInstanceStatus status;
     private final boolean viewed;
 
     public DataPoint(String id, String name, long lastModified, long surveyGroupId, Double latitude,
-            Double longitude, int status, boolean viewed) {
+            Double longitude, SurveyInstanceStatus status, boolean viewed) {
         this.id = id;
         this.name = name;
         this.lastModified = lastModified;
@@ -67,7 +67,7 @@ public class DataPoint {
         return longitude;
     }
 
-    public int getStatus() {
+    public SurveyInstanceStatus getStatus() {
         return status;
     }
 

@@ -20,6 +20,7 @@
 package org.akvo.flow.presentation.datapoints.list.entity
 
 import org.akvo.flow.domain.entity.DataPoint
+import org.akvo.flow.domain.entity.SurveyInstanceStatus
 import org.akvo.flow.presentation.datapoints.DisplayNameMapper
 import java.util.ArrayList
 import javax.inject.Inject
@@ -35,7 +36,7 @@ class ListDataPointMapper @Inject constructor(
         }
         return ListDataPoint(
             displayNameMapper.createDisplayName(dataPoint.name),
-            dataPoint.status,
+            formatStatus(dataPoint),
             dataPoint.id,
             formatCoordinate(dataPoint.latitude),
             formatCoordinate(dataPoint.longitude),
@@ -43,6 +44,19 @@ class ListDataPointMapper @Inject constructor(
             dataPoint.wasViewed(),
             distanceMapper.mapDistance(latitude, longitude, dataPoint)
         )
+    }
+
+    private fun formatStatus(dataPoint: DataPoint): DataPointStatus {
+        return when (dataPoint.status) {
+            SurveyInstanceStatus.SAVED, SurveyInstanceStatus.SUBMIT_REQUESTED
+            -> DataPointStatus.SAVED
+            SurveyInstanceStatus.SUBMITTED
+            -> DataPointStatus.READY
+            SurveyInstanceStatus.DOWNLOADED, SurveyInstanceStatus.UPLOADED
+            -> DataPointStatus.READY
+            else
+            -> DataPointStatus.DOWNLOADING
+        }
     }
 
     private fun formatCoordinate(coordinate: Double?): Double {

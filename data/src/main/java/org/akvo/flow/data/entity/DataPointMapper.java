@@ -22,17 +22,18 @@ package org.akvo.flow.data.entity;
 
 import android.database.Cursor;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 import org.akvo.flow.database.SurveyDbAdapter;
 import org.akvo.flow.database.SurveyInstanceColumns;
 import org.akvo.flow.domain.entity.DataPoint;
+import org.akvo.flow.domain.entity.SurveyInstanceStatus;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 
 public class DataPointMapper {
 
@@ -69,7 +70,24 @@ public class DataPointMapper {
             status = cursor.getInt(columnIndex);
         }
         return new DataPoint(id, name, lastModified, surveyGroupId, latitude, longitude,
-                status, viewed);
+                mapStatus(status), viewed);
+    }
+
+    private SurveyInstanceStatus mapStatus(int status) {
+        switch (status) {
+            case org.akvo.flow.database.SurveyInstanceStatus.SAVED:
+                return SurveyInstanceStatus.SAVED;
+            case org.akvo.flow.database.SurveyInstanceStatus.SUBMIT_REQUESTED:
+                return SurveyInstanceStatus.SUBMIT_REQUESTED;
+            case org.akvo.flow.database.SurveyInstanceStatus.SUBMITTED:
+                return SurveyInstanceStatus.SUBMITTED;
+            case org.akvo.flow.database.SurveyInstanceStatus.UPLOADED:
+                return SurveyInstanceStatus.UPLOADED;
+            case org.akvo.flow.database.SurveyInstanceStatus.DOWNLOADED:
+                return SurveyInstanceStatus.DOWNLOADED;
+            default:
+                return SurveyInstanceStatus.MISSING;
+        }
     }
 
     @NonNull

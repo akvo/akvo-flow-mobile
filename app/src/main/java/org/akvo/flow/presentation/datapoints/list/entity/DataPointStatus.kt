@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017,2020 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2020 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -15,25 +15,13 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
+
 package org.akvo.flow.presentation.datapoints.list.entity
 
-data class ListDataPoint(
-    val displayName: String,
-    val status: DataPointStatus,
-    val id: String,
-    val latitude: Double,
-    val longitude: Double,
-    val displayDate: String,
-    val viewed: Boolean,
-    val distanceText: String
-) {
-
-    val isLocationValid: Boolean
-        get() = latitude != INVALID_COORDINATE && longitude != INVALID_COORDINATE
-
-    companion object {
-        const val INVALID_COORDINATE = -1.0
-    }
+enum class DataPointStatus {
+    SAVED,
+    SUBMITTED,
+    READY,
+    DOWNLOADING
 }

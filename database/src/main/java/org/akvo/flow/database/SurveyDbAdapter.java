@@ -393,16 +393,6 @@ public class SurveyDbAdapter {
     }
 
     /**
-     * Delete any SurveyInstance that contains no response.
-     */
-    public void deleteEmptySurveyInstances() {
-        executeSql("DELETE FROM " + Tables.SURVEY_INSTANCE
-                + " WHERE " + SurveyInstanceColumns._ID + " NOT IN "
-                + "(SELECT DISTINCT " + ResponseColumns.SURVEY_INSTANCE_ID
-                + " FROM " + Tables.RESPONSE + ")");
-    }
-
-    /**
      * Query the given table, returning a Cursor over the result set.
      */
     public Cursor query(String table, String[] columns, String selection, String[] selectionArgs,

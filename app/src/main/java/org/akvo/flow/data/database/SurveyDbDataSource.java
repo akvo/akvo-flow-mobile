@@ -384,10 +384,6 @@ public class SurveyDbDataSource {
         briteSurveyDbAdapter.deleteAllSurveys();
     }
 
-    public void deleteEmptySurveyInstances() {
-        surveyDbAdapter.deleteEmptySurveyInstances();
-    }
-
     public Cursor getFormInstances(String surveyedLocaleId) {
         return surveyDbAdapter.getFormInstances(surveyedLocaleId);
     }

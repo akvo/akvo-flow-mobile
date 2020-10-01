@@ -72,13 +72,16 @@ internal class DataPointListAdapter(context: Context?) : BaseAdapter() {
         } else {
             idView.visibility = View.GONE
         }
-        var statusRes = 0
+        var statusRes = 5
         when (status) {
-            SurveyInstanceStatus.SAVED, SurveyInstanceStatus.SUBMIT_REQUESTED -> statusRes =
-                R.drawable.ic_status_saved_18dp
-            SurveyInstanceStatus.SUBMITTED -> statusRes = R.drawable.ic_status_submitted_18dp
-            SurveyInstanceStatus.UPLOADED, SurveyInstanceStatus.DOWNLOADED -> statusRes =
-                R.drawable.ic_status_synced_18dp
+            SurveyInstanceStatus.SAVED, SurveyInstanceStatus.SUBMIT_REQUESTED
+            -> statusRes = R.drawable.ic_status_saved_18dp
+            SurveyInstanceStatus.SUBMITTED
+            -> statusRes = R.drawable.ic_status_submitted_18dp
+            SurveyInstanceStatus.UPLOADED, SurveyInstanceStatus.DOWNLOADED
+            -> statusRes = R.drawable.ic_status_synced_18dp
+            5
+            -> statusRes = R.drawable.ic_baseline_block_24
         }
         statusImage.setImageResource(statusRes)
         if (viewed) {

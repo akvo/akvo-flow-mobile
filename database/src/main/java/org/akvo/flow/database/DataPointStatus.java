@@ -17,23 +17,11 @@
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.akvo.flow.data.entity.images
+package org.akvo.flow.database;
 
-import org.akvo.flow.data.entity.ApiSurveyInstance
-import org.akvo.flow.data.util.MediaHelper
-import javax.inject.Inject
+public class DataPointStatus {
 
-class DataPointImageMapper @Inject constructor(private val mediaHelper: MediaHelper) {
-
-    fun getImagesList(formInstances: List<ApiSurveyInstance>): List<String> {
-        val images = mutableListOf<String>()
-        formInstances.forEach { surveyInstance ->
-            surveyInstance.qasList.forEach { questionAnswer ->
-                if (!questionAnswer.answer.isNullOrBlank() && ("IMAGE" == questionAnswer.type)) {
-                    images.add(mediaHelper.cleanMediaFileName(questionAnswer.answer))
-                }
-            }
-        }
-        return images
-    }
+    public static final int SAVED = 0;
+    public static final int DOWNLOADING = 1;
+    public static final int DOWNLOADED = 2;
 }

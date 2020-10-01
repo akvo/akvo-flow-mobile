@@ -43,7 +43,7 @@ class RestApi(
             DataPointDownloadService::class.java,
             baseUrl
         )
-            .getAssignedDataPoints(deviceHelper.androidId, cursor, surveyId.toString() + "")
+            .getAssignedDataPointsV2(deviceHelper.androidId, cursor, surveyId.toString() + "")
     }
 
     fun getPendingFiles(formIds: List<String?>?, deviceId: String?): Observable<ApiFilesResult> {

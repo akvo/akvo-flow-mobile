@@ -20,8 +20,8 @@ package org.akvo.flow.data.repository
 
 import io.reactivex.Completable
 import org.akvo.flow.data.datasource.DataSourceFactory
-import org.akvo.flow.data.entity.ApiDataPoint
 import org.akvo.flow.data.entity.ApiLocaleResult
+import org.akvo.flow.data.entity.ApiSurveyInstance
 import org.akvo.flow.data.entity.images.DataPointImageMapper
 import org.akvo.flow.data.net.RestApi
 import org.akvo.flow.data.net.s3.S3RestApi
@@ -47,7 +47,7 @@ class DataPointDataRepository @Inject constructor(
         var moreToLoad = true
         try {
             while (moreToLoad) {
-                val apiLocaleResult = restApi.downloadDataPoints(surveyId, backendDataPointsCursor)
+                val apiLocaleResult: ApiLocaleResult = restApi.downloadDataPoints(surveyId, backendDataPointsCursor)
                 syncedDataPoints += syncDataPoints(apiLocaleResult)
                 if (apiLocaleResult.dataPoints.isNotEmpty()) {
                     backendDataPointsCursor = apiLocaleResult.cursor
@@ -76,13 +76,12 @@ class DataPointDataRepository @Inject constructor(
 
     private suspend fun syncDataPoints(apiLocaleResult: ApiLocaleResult): Int {
         val dataPoints = apiLocaleResult.dataPoints
-        val syncDataPoints = dataSourceFactory.dataBaseDataSource.syncDataPoints(dataPoints)
-        downLoadImages(apiLocaleResult.dataPoints)
-        return syncDataPoints
+        //downLoadImages(apiLocaleResult.dataPoints) FIXME: do at the end
+        return dataSourceFactory.dataBaseDataSource.syncDataPoints(dataPoints)
     }
 
-    private suspend fun downLoadImages(dataPoints: List<ApiDataPoint>) {
-        mapper.getImagesList(dataPoints)
+    private suspend fun downLoadImages(formInstances: List<ApiSurveyInstance>) {
+        mapper.getImagesList(formInstances)
             .filter { image -> !dataSourceFactory.fileDataSource.fileExists(image) }
             .map { image ->
                 downloadImage(image)

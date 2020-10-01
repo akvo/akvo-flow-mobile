@@ -35,4 +35,14 @@ interface DataPointDownloadService {
         @Query(ApiUrls.CURSOR) cursor: String? = null,
         @Query(ApiUrls.SURVEY_ID) surveyId: String
     ): ApiLocaleResult
+
+    /**
+     * params need to be in alphabetic order
+     */
+    @GET(ApiUrls.DATA_POINTS_V2)
+    suspend fun getAssignedDataPointsV2(
+        @Query(ApiUrls.ANDROID_ID) androidId: String,
+        @Query(ApiUrls.CURSOR) cursor: String? = null,
+        @Query(ApiUrls.SURVEY_ID) surveyId: String
+    ): ApiLocaleResult
 }

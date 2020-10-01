@@ -41,6 +41,7 @@ import org.akvo.flow.data.entity.form.Form;
 import org.akvo.flow.data.entity.form.FormMapper;
 import org.akvo.flow.data.util.FlowFileBrowser;
 import org.akvo.flow.database.Constants;
+import org.akvo.flow.database.DataPointStatus;
 import org.akvo.flow.database.RecordColumns;
 import org.akvo.flow.database.ResponseColumns;
 import org.akvo.flow.database.SurveyColumns;
@@ -126,11 +127,10 @@ public class DatabaseDataSource {
                 values.put(RecordColumns.LATITUDE, dataPoint.getLatitude());
                 values.put(RecordColumns.LONGITUDE, dataPoint.getLongitude());
                 values.put(RecordColumns.LAST_MODIFIED, dataPoint.getLastModified());
+                values.put(RecordColumns.STATUS, DataPointStatus.DOWNLOADING);
 
-                syncSurveyInstances(dataPoint.getSurveyInstances(), dataPointId);
-
-                boolean insertedNewRecord = briteSurveyDbAdapter.insertOrUpdateRecord(dataPointId, values);
-                if (insertedNewRecord) {
+                boolean isNewDataPoint = briteSurveyDbAdapter.insertOrUpdateRecord(dataPointId, values);
+                if (isNewDataPoint) {
                     newDataPoints++;
                 }
             }

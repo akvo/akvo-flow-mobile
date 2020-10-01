@@ -22,8 +22,6 @@ package org.akvo.flow.data.entity;
 
 import com.google.gson.annotations.SerializedName;
 
-import java.util.List;
-
 public class ApiDataPoint {
 
     private String displayName;
@@ -39,8 +37,6 @@ public class ApiDataPoint {
 
     @SerializedName("lastUpdateDateTime")
     private long lastModified;
-
-    private List<ApiSurveyInstance> surveyInstances;
 
     public String getDisplayName() {
         return displayName;
@@ -88,14 +84,6 @@ public class ApiDataPoint {
 
     public void setLastModified(long lastModified) {
         this.lastModified = lastModified;
-    }
-
-    public List<ApiSurveyInstance> getSurveyInstances() {
-        return surveyInstances;
-    }
-
-    public void setSurveyInstances(List<ApiSurveyInstance> surveyInstances) {
-        this.surveyInstances = surveyInstances;
     }
 
     @Override

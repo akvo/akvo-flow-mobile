@@ -77,7 +77,7 @@ public class BriteSurveyDbAdapter {
     public Observable<Cursor> getFilteredDataPoints(long surveyGroupId, Double latitude,
                                                     Double longitude, int orderBy) {
         String queryString = "SELECT sl.*,"
-                + " MIN(r." + SurveyInstanceColumns.STATUS + ") as " + SurveyInstanceColumns.STATUS
+                + " COALESCE(MIN(r." + SurveyInstanceColumns.STATUS + "), 5) as " + SurveyInstanceColumns.STATUS
                 + " FROM "
                 + Tables.RECORD + " AS sl LEFT JOIN " + Tables.SURVEY_INSTANCE + " AS r ON "
                 + "sl." + RecordColumns.RECORD_ID + "=" + "r." + SurveyInstanceColumns.RECORD_ID;

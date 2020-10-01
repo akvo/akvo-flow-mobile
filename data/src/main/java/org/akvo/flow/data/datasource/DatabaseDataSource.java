@@ -482,4 +482,8 @@ public class DatabaseDataSource {
     public void setSurveyUnViewed(double surveyId) {
         briteSurveyDbAdapter.setSurveyUnViewed(surveyId);
     }
+
+    public void cleanDataPoints(Long surveyGroupId) {
+        briteSurveyDbAdapter.cleanDataPoints(surveyGroupId);
+    }
 }

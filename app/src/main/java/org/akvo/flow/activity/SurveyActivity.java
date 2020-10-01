@@ -351,11 +351,6 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
             navigateToSetUp();
         } else {
             activityJustCreated = false;
-            // Delete empty responses, if any
-            if (mDatabase != null) {
-                mDatabase.deleteEmptySurveyInstances();
-            }
-
             presenter.verifyApkUpdate();
             updateAddDataPointFab();
             if (!permissionsResults) {

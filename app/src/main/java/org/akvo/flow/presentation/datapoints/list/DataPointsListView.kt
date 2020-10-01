@@ -38,4 +38,6 @@ interface DataPointsListView {
     fun hideMenu()
     fun showNonMonitoredMenu()
     fun showMonitoredMenu()
+    fun displayErrorDataPointDownloading()
+    fun onDataPointClicked(id: String)
 }

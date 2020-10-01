@@ -356,6 +356,8 @@
     <string name="content_description_data_point_status">Datapoint status image</string>
     <string name="accuracy_warning">To improve the geolocation accuracy, recapture.</string>
 
+    <string name="data_point_not_ready_to_be_opened">This datapoint is still being downloaded and cannot be opened yet</string>
+
     <plurals name="download_forms_error">
         <item quantity="one">Error downloading form</item>
         <item quantity="other">Error downloading forms</item>

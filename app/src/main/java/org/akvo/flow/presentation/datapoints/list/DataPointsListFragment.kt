@@ -263,9 +263,17 @@ class DataPointsListFragment : Fragment(), LocationListener, AdapterView.OnItemC
         progressBar.visibility = View.GONE
     }
 
+    override fun displayErrorDataPointDownloading() {
+        dataPointSyncSnackBarManager.showErrorDataPointBeingDownloaded(view)
+    }
+
+    override fun onDataPointClicked(id: String) {
+        mListener!!.onDatapointSelected(id)
+    }
+
     override fun onItemClick(parent: AdapterView<*>?, view: View, position: Int, id: Long) {
-        val (_, _, localeId) = mAdapter.getItem(position)
-        mListener!!.onDatapointSelected(localeId)
+        val listDatapoint = mAdapter.getItem(position)
+        presenter.onDataPointClicked(listDatapoint)
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {

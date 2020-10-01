@@ -33,6 +33,8 @@ import org.akvo.flow.domain.interactor.UseCase
 import org.akvo.flow.domain.interactor.datapoints.GetSavedDataPoints
 import org.akvo.flow.domain.util.Constants
 import org.akvo.flow.presentation.Presenter
+import org.akvo.flow.presentation.datapoints.list.entity.DataPointStatus
+import org.akvo.flow.presentation.datapoints.list.entity.ListDataPoint
 import org.akvo.flow.presentation.datapoints.list.entity.ListDataPointMapper
 import org.akvo.flow.util.ConstantUtil
 import timber.log.Timber
@@ -235,5 +237,13 @@ class DataPointsListPresenter @Inject internal constructor(
     private fun noSurveySelected() {
         view?.displayData(emptyList())
         view?.showNoSurveySelected()
+    }
+
+    fun onDataPointClicked(listDatapoint: ListDataPoint) {
+        if (listDatapoint.status == DataPointStatus.DOWNLOADING) {
+            view?.displayErrorDataPointDownloading()
+        } else {
+            view?.onDataPointClicked(listDatapoint.id)
+        }
     }
 }

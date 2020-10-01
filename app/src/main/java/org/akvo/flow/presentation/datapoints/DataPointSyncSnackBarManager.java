@@ -22,12 +22,13 @@ package org.akvo.flow.presentation.datapoints;
 
 import android.view.View;
 
+import androidx.annotation.StringRes;
+
 import org.akvo.flow.R;
 import org.akvo.flow.uicomponents.SnackBarManager;
+import org.jetbrains.annotations.Nullable;
 
 import javax.inject.Inject;
-
-import androidx.annotation.StringRes;
 
 public class DataPointSyncSnackBarManager {
 
@@ -82,6 +83,13 @@ public class DataPointSyncSnackBarManager {
         if (rootView != null) {
             displaySnackBar(rootView.getContext()
                     .getString(R.string.data_points_sync_no_data_points), rootView);
+        }
+    }
+
+    public void showErrorDataPointBeingDownloaded(@Nullable View rootView) {
+        if (rootView != null) {
+            displaySnackBar(rootView.getContext()
+                    .getString(R.string.data_point_not_ready_to_be_opened), rootView);
         }
     }
 }

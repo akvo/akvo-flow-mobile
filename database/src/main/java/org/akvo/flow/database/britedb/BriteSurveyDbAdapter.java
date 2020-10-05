@@ -811,14 +811,14 @@ public class BriteSurveyDbAdapter {
                 + " WHERE " + DataPointDownloadTable.COLUMN_SURVEY_ID + " = ? ", surveyId + "");
     }
 
-    public void saveCursor(long surveyId, String cursor) {
+    public void saveDataPointCursor(long surveyId, String cursor) {
         ContentValues contentValues = new ContentValues(2);
         contentValues.put(DataPointDownloadTable.COLUMN_SURVEY_ID, surveyId);
         contentValues.put(DataPointDownloadTable.COLUMN_CURSOR, cursor);
         briteDatabase.insert(DataPointDownloadTable.TABLE_NAME, contentValues);
     }
 
-    public void clearCursor(long surveyId) {
+    public void clearDataPointCursor(long surveyId) {
         briteDatabase.delete(DataPointDownloadTable.TABLE_NAME, DataPointDownloadTable.COLUMN_SURVEY_ID + " = ?", surveyId + "");
     }
 

@@ -469,9 +469,9 @@ public class DatabaseDataSource {
 
     public void saveDataPointCursor(long surveyId, @Nullable String cursor) {
         if (cursor != null) {
-            briteSurveyDbAdapter.saveCursor(surveyId, cursor);
+            briteSurveyDbAdapter.saveDataPointCursor(surveyId, cursor);
         } else {
-            briteSurveyDbAdapter.clearCursor(surveyId);
+            briteSurveyDbAdapter.clearDataPointCursor(surveyId);
         }
     }
 

@@ -837,4 +837,21 @@ public class BriteSurveyDbAdapter {
                         + " FROM " + Tables.SURVEY_INSTANCE + ")";
         briteDatabase.delete(Tables.RECORD, where, surveyGroupId + "", "0");
     }
+
+    public Cursor getFormInstanceCursor(long dataPointId) {
+        return briteDatabase.query("SELECT " + FormInstanceDownloadTable.COLUMN_CURSOR
+                + " FROM " + FormInstanceDownloadTable.TABLE_NAME
+                + " WHERE " + FormInstanceDownloadTable.COLUMN_DATAPOINT_ID + " = ? ", dataPointId + "");
+    }
+
+    public void saveFormInstanceCursor(long dataPointId, @NonNull String cursor) {
+        ContentValues contentValues = new ContentValues(2);
+        contentValues.put(FormInstanceDownloadTable.COLUMN_DATAPOINT_ID, dataPointId);
+        contentValues.put(FormInstanceDownloadTable.COLUMN_CURSOR, cursor);
+        briteDatabase.insert(FormInstanceDownloadTable.TABLE_NAME, contentValues);
+    }
+
+    public void clearFormInstanceCursor(long dataPointId) {
+        briteDatabase.delete(FormInstanceDownloadTable.TABLE_NAME, FormInstanceDownloadTable.COLUMN_DATAPOINT_ID + " = ?", dataPointId + "");
+    }
 }

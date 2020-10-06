@@ -475,6 +475,18 @@ public class DatabaseDataSource {
         }
     }
 
+    public String getFormInstanceCursor(long dataPointId) {
+        return cursorMapper.transform(briteSurveyDbAdapter.getFormInstanceCursor(dataPointId));
+    }
+
+    public void saveFormInstanceCursor(long dataPointId, @Nullable String cursor) {
+        if (cursor != null) {
+            briteSurveyDbAdapter.saveFormInstanceCursor(dataPointId, cursor);
+        } else {
+            briteSurveyDbAdapter.clearFormInstanceCursor(dataPointId);
+        }
+    }
+
     public void setSurveyViewed(long surveyId) {
         briteSurveyDbAdapter.setSurveyViewed(surveyId);
     }

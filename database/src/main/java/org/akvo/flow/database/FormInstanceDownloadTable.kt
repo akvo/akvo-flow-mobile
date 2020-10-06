@@ -30,14 +30,14 @@ open class FormInstanceDownloadTable {
     companion object {
         const val TABLE_NAME = "form_instance_download"
         const val COLUMN_CURSOR = "cursor"
-        const val COLUMN_SURVEY_ID = "datapoint_id"
+        const val COLUMN_DATAPOINT_ID = "datapoint_id"
 
         private const val _ID = "_id"
         private const val CREATE_TABLE =
                 ("CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " ("
                         + _ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
-                        + COLUMN_SURVEY_ID + " INTEGER NOT NULL,"
+                        + COLUMN_DATAPOINT_ID + " INTEGER NOT NULL,"
                         + COLUMN_CURSOR + " TEXT NOT NULL, "
-                        + "UNIQUE(" + COLUMN_SURVEY_ID + ") ON CONFLICT REPLACE)")
+                        + "UNIQUE(" + COLUMN_DATAPOINT_ID + ") ON CONFLICT REPLACE)")
     }
 }

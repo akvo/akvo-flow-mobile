@@ -31,6 +31,7 @@ import com.squareup.sqlbrite2.BriteDatabase;
 import com.squareup.sqlbrite2.SqlBrite;
 
 import org.akvo.flow.database.DataPointDownloadTable;
+import org.akvo.flow.database.FormInstanceDownloadTable;
 import org.akvo.flow.database.RecordColumns;
 import org.akvo.flow.database.ResponseColumns;
 import org.akvo.flow.database.SurveyColumns;
@@ -672,6 +673,7 @@ public class BriteSurveyDbAdapter {
         briteDatabase.delete(Tables.RECORD, null);
         briteDatabase.delete(Tables.TRANSMISSION, null);
         briteDatabase.delete(DataPointDownloadTable.TABLE_NAME, null);
+        briteDatabase.delete(FormInstanceDownloadTable.TABLE_NAME, null);
     }
 
     private void deleteAllResponses() {
@@ -805,7 +807,7 @@ public class BriteSurveyDbAdapter {
         briteDatabase.update(Tables.RECORD, contentValues, where, dataPointId);
     }
 
-    public Cursor getCursor(long surveyId) {
+    public Cursor getDataPointCursor(long surveyId) {
         return briteDatabase.query("SELECT " + DataPointDownloadTable.COLUMN_CURSOR
                 + " FROM " + DataPointDownloadTable.TABLE_NAME
                 + " WHERE " + DataPointDownloadTable.COLUMN_SURVEY_ID + " = ? ", surveyId + "");

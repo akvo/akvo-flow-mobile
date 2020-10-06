@@ -46,6 +46,9 @@ public class UpgraderFactory {
                 databaseUpgrader.addUpgrader(new CursorUpgrader(helper, db));
             case DatabaseHelper.VER_SURVEY_VIEWED:
                 databaseUpgrader.addUpgrader(new SurveyViewedUpgrader(helper, db));
+            case DatabaseHelper.VER_DATAPOINT_STATUS:
+                databaseUpgrader.addUpgrader(new DataPointStatusUpgrader(helper, db));
+
             default:
                 break;
         }

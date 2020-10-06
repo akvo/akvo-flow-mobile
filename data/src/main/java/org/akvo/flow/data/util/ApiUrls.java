@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2018,2020 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -24,6 +24,7 @@ public class ApiUrls {
     public static final String DATA_POINTS = "/datapoints";
    // public static final String DATA_POINTS_V2 = "/v2/datapoints";
     public static final String DATA_POINTS_V2 = DATA_POINTS; //FIXME: for test
+    public static final String FORM_INSTANCES = "/instancedata";
     public static final String DEVICE_NOTIFICATION = "/devicenotification";
     public static final String PROCESSING_NOTIFICATION = "processor";
     public static final String S3_FILE_PATH = "/{key}/{file}";
@@ -39,6 +40,7 @@ public class ApiUrls {
     public static final String ACTION = "action";
     public static final String FORM_ID = "formID";
     public static final String FILENAME = "fileName";
+    public static final String DATA_POINT_ID = "dataPointId";
     public static final String APK_VERSION_SERVICE_PATH =
             "/deviceapprest?action=getLatestVersion&deviceType=androidPhone&appCode=flowapp";
     public static final String SURVEY_ID = "surveyId";

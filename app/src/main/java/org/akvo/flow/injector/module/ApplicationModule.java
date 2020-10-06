@@ -53,6 +53,7 @@ import org.akvo.flow.data.repository.SurveyDataRepository;
 import org.akvo.flow.data.repository.UserDataRepository;
 import org.akvo.flow.database.DataPointDownloadTable;
 import org.akvo.flow.database.DatabaseHelper;
+import org.akvo.flow.database.FormInstanceDownloadTable;
 import org.akvo.flow.database.LanguageTable;
 import org.akvo.flow.database.SurveyLanguagesDataSource;
 import org.akvo.flow.database.SurveyLanguagesDbDataSource;
@@ -183,7 +184,7 @@ public class ApplicationModule {
     @Provides
     @Singleton
     public SQLiteOpenHelper provideOpenHelper() {
-        return new DatabaseHelper(application, new LanguageTable(), new DataPointDownloadTable());
+        return new DatabaseHelper(application, new LanguageTable(), new DataPointDownloadTable(), new FormInstanceDownloadTable());
     }
 
     @Provides

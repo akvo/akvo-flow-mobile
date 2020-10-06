@@ -46,18 +46,21 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final int VER_CURSOR_ITERATION = 89;
     public static final int VER_SURVEY_VIEWED = 90;
     public static final int VER_DATAPOINT_STATUS = 91;
-    static final int DATABASE_VERSION = VER_DATAPOINT_STATUS;
+    public static final int VER_FORM_INSTANCE_CURSOR = 92;
+    static final int DATABASE_VERSION = VER_FORM_INSTANCE_CURSOR;
 
     private static SQLiteDatabase database;
     private static final Object LOCK_OBJ = new Object();
     private volatile static int instanceCount = 0;
     private final LanguageTable languageTable;
     private final DataPointDownloadTable dataPointDownloadTable;
+    private final FormInstanceDownloadTable formInstanceDownloadTable;
 
-    public DatabaseHelper(Context context, LanguageTable languageTable, DataPointDownloadTable dataPointDownloadTable) {
+    public DatabaseHelper(Context context, LanguageTable languageTable, DataPointDownloadTable dataPointDownloadTable, FormInstanceDownloadTable formInstanceDownloadTable) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
         this.languageTable = languageTable;
         this.dataPointDownloadTable = dataPointDownloadTable;
+        this.formInstanceDownloadTable = formInstanceDownloadTable;
     }
 
     @Override
@@ -141,6 +144,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 + "UNIQUE (" + TransmissionColumns.FILENAME + ") ON CONFLICT REPLACE)");
         languageTable.onCreate(db);
         dataPointDownloadTable.onCreate(db);
+        formInstanceDownloadTable.onCreate(db);
         createIndexes(db);
     }
 
@@ -174,6 +178,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 + " INTEGER NOT NULL DEFAULT 0");
     }
 
+    public void upgradeFromDataPointStatus(@NotNull SQLiteDatabase db) {
+        formInstanceDownloadTable.onCreate(db);
+    }
     /**
      * This is not ideal but due to our setup, using something other than getWritableDatabase
      * produces errors.

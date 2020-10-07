@@ -28,8 +28,9 @@ interface FormInstanceDownloadService {
 
     @GET(ApiUrls.FORM_INSTANCES)
     suspend fun getFormInstances(
+            @Query(ApiUrls.ACTION) action: String = ApiUrls.GET_FORM_INSTANCES,
             @Query(ApiUrls.ANDROID_ID) androidId: String,
             @Query(ApiUrls.CURSOR) cursor: String? = null,
-            @Query(ApiUrls.DATA_POINT_ID) dataPointId: String
+            @Query(ApiUrls.IDENTIFIER) dataPointId: String
     ): ApiFormInstanceResult
 }

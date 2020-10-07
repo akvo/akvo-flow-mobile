@@ -20,6 +20,7 @@ package org.akvo.flow.data.repository
 
 import io.reactivex.Completable
 import org.akvo.flow.data.datasource.DataSourceFactory
+import org.akvo.flow.data.entity.ApiFormInstanceResult
 import org.akvo.flow.data.entity.ApiLocaleResult
 import org.akvo.flow.data.entity.ApiSurveyInstance
 import org.akvo.flow.data.entity.images.DataPointImageMapper
@@ -42,20 +43,24 @@ class DataPointDataRepository @Inject constructor(
     ) : DataPointRepository {
 
     override suspend fun downloadDataPoints(surveyId: Long): Int {
+
         var syncedDataPoints = 0
         var backendDataPointsCursor = dataSourceFactory.dataBaseDataSource.getDataPointCursor(surveyId)
         var moreToLoad = true
+        var dataPointIds = mutableListOf<String>()
         try {
             while (moreToLoad) {
                 val apiLocaleResult: ApiLocaleResult = restApi.downloadDataPoints(surveyId, backendDataPointsCursor)
                 syncedDataPoints += syncDataPoints(apiLocaleResult)
                 if (apiLocaleResult.dataPoints.isNotEmpty()) {
+                    dataPointIds.addAll(apiLocaleResult.dataPoints.map { apiDataPoint -> apiDataPoint.id })
                     backendDataPointsCursor = apiLocaleResult.cursor
                 }
                 moreToLoad = apiLocaleResult.dataPoints.isNotEmpty()
                         && backendDataPointsCursor != null // cursor is null with old datapoint api
             }
             dataSourceFactory.dataBaseDataSource.saveDataPointCursor(surveyId, backendDataPointsCursor)
+            downloadFormInstances(dataPointIds);
             return syncedDataPoints
         } catch (e: HttpException) {
             if ((e.code() == HttpURLConnection.HTTP_NOT_FOUND)) {
@@ -66,6 +71,33 @@ class DataPointDataRepository @Inject constructor(
         }
     }
 
+    suspend fun downloadFormInstances(dataPointIds: List<String>):Int {
+        var syncedFormInstances = 0
+        dataPointIds.forEach { dataPointId ->
+            var formInstanceCursor = dataSourceFactory.dataBaseDataSource.getFormInstanceCursor(dataPointId)
+            var moreToLoad = true
+            try {
+                while(moreToLoad) {
+                    val formInstanceResult: ApiFormInstanceResult = restApi.downloadFormInstances(dataPointId, formInstanceCursor)
+                    syncedFormInstances += syncFormInstances(formInstanceResult, dataPointId)
+                    if (formInstanceResult.formInstances.isNotEmpty()) {
+                        formInstanceCursor = formInstanceResult.cursor
+                    }
+                    moreToLoad = formInstanceResult.formInstances.isNotEmpty() && formInstanceCursor != null
+                }
+            } catch (e: HttpException) {
+                if((e.code() == HttpURLConnection.HTTP_NOT_FOUND)) {
+                    throw AssignmentRequiredException("Dashboard Assignment missing")
+                } else {
+                    throw e
+                }
+            }
+            dataSourceFactory.dataBaseDataSource.saveFormInstanceCursor(dataPointId, formInstanceCursor)
+            dataSourceFactory.dataBaseDataSource.setDataPointStatusToDownloaded(dataPointId)
+        }
+        return syncedFormInstances;
+    }
+
     override fun cleanPathAndDownLoadMedia(filename: String): Completable {
         return downLoadMedia(mediaHelper.cleanMediaFileName(filename))
     }
@@ -74,10 +106,16 @@ class DataPointDataRepository @Inject constructor(
         return dataSourceFactory.dataBaseDataSource.markDataPointAsViewed(dataPointId)
     }
 
-    private suspend fun syncDataPoints(apiLocaleResult: ApiLocaleResult): Int {
+    private fun syncDataPoints(apiLocaleResult: ApiLocaleResult): Int {
         val dataPoints = apiLocaleResult.dataPoints
-        //downLoadImages(apiLocaleResult.dataPoints) FIXME: do at the end
         return dataSourceFactory.dataBaseDataSource.syncDataPoints(dataPoints)
+    }
+
+    private suspend fun syncFormInstances(apiFormInstanceResult: ApiFormInstanceResult, dataPointId: String):Int {
+        val formInstances = apiFormInstanceResult.formInstances
+        dataSourceFactory.dataBaseDataSource.syncSurveyInstances(formInstances, dataPointId)
+        downLoadImages(formInstances)
+        return formInstances.size
     }
 
     private suspend fun downLoadImages(formInstances: List<ApiSurveyInstance>) {

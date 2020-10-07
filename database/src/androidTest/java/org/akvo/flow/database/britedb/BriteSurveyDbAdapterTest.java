@@ -30,6 +30,7 @@ import com.squareup.sqlbrite2.SqlBrite;
 
 import org.akvo.flow.database.DataPointDownloadTable;
 import org.akvo.flow.database.DatabaseHelper;
+import org.akvo.flow.database.FormInstanceDownloadTable;
 import org.akvo.flow.database.LanguageTable;
 import org.akvo.flow.database.RecordColumns;
 import org.akvo.flow.database.ResponseColumns;
@@ -55,7 +56,7 @@ public class BriteSurveyDbAdapterTest {
 
     @Before
     public void setUp() {
-        DatabaseHelper databaseHelper = new DatabaseHelper(InstrumentationRegistry.getInstrumentation().getTargetContext(), new LanguageTable(), new DataPointDownloadTable());
+        DatabaseHelper databaseHelper = new DatabaseHelper(InstrumentationRegistry.getInstrumentation().getTargetContext(), new LanguageTable(), new DataPointDownloadTable(), new FormInstanceDownloadTable());
         SqlBrite sqlBrite = new SqlBrite.Builder().build();
         BriteDatabase db = sqlBrite.wrapDatabaseHelper(databaseHelper, AndroidSchedulers.mainThread());
         this.adapter = new BriteSurveyDbAdapter(db);

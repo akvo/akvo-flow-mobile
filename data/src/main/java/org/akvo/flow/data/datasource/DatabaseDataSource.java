@@ -148,7 +148,7 @@ public class DatabaseDataSource {
                 orderBy == Constants.ORDER_BY_NAME);
     }
 
-    private void syncSurveyInstances(List<ApiSurveyInstance> surveyInstances, String dataPointId) {
+    public void syncSurveyInstances(List<ApiSurveyInstance> surveyInstances, String dataPointId) {
         for (ApiSurveyInstance surveyInstance : surveyInstances) {
 
             ContentValues values = new ContentValues();
@@ -475,11 +475,11 @@ public class DatabaseDataSource {
         }
     }
 
-    public String getFormInstanceCursor(long dataPointId) {
+    public String getFormInstanceCursor(String dataPointId) {
         return cursorMapper.transform(briteSurveyDbAdapter.getFormInstanceCursor(dataPointId));
     }
 
-    public void saveFormInstanceCursor(long dataPointId, @Nullable String cursor) {
+    public void saveFormInstanceCursor(@NonNull String dataPointId, @Nullable String cursor) {
         if (cursor != null) {
             briteSurveyDbAdapter.saveFormInstanceCursor(dataPointId, cursor);
         } else {
@@ -497,5 +497,9 @@ public class DatabaseDataSource {
 
     public void cleanDataPoints(Long surveyGroupId) {
         briteSurveyDbAdapter.cleanDataPoints(surveyGroupId);
+    }
+
+    public void setDataPointStatusToDownloaded(@NotNull String dataPointId) {
+        briteSurveyDbAdapter.setDataPointStatusToDownloaded(dataPointId);
     }
 }

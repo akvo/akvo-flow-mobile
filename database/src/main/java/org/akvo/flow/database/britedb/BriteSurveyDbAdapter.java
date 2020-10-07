@@ -31,6 +31,7 @@ import com.squareup.sqlbrite2.BriteDatabase;
 import com.squareup.sqlbrite2.SqlBrite;
 
 import org.akvo.flow.database.DataPointDownloadTable;
+import org.akvo.flow.database.DataPointStatus;
 import org.akvo.flow.database.FormInstanceDownloadTable;
 import org.akvo.flow.database.RecordColumns;
 import org.akvo.flow.database.ResponseColumns;
@@ -838,20 +839,26 @@ public class BriteSurveyDbAdapter {
         briteDatabase.delete(Tables.RECORD, where, surveyGroupId + "", "0");
     }
 
-    public Cursor getFormInstanceCursor(long dataPointId) {
+    public Cursor getFormInstanceCursor(@NonNull String dataPointId) {
         return briteDatabase.query("SELECT " + FormInstanceDownloadTable.COLUMN_CURSOR
                 + " FROM " + FormInstanceDownloadTable.TABLE_NAME
                 + " WHERE " + FormInstanceDownloadTable.COLUMN_DATAPOINT_ID + " = ? ", dataPointId + "");
     }
 
-    public void saveFormInstanceCursor(long dataPointId, @NonNull String cursor) {
+    public void saveFormInstanceCursor(@NonNull String dataPointId, @NonNull String cursor) {
         ContentValues contentValues = new ContentValues(2);
         contentValues.put(FormInstanceDownloadTable.COLUMN_DATAPOINT_ID, dataPointId);
         contentValues.put(FormInstanceDownloadTable.COLUMN_CURSOR, cursor);
         briteDatabase.insert(FormInstanceDownloadTable.TABLE_NAME, contentValues);
     }
 
-    public void clearFormInstanceCursor(long dataPointId) {
+    public void clearFormInstanceCursor(@NonNull String dataPointId) {
         briteDatabase.delete(FormInstanceDownloadTable.TABLE_NAME, FormInstanceDownloadTable.COLUMN_DATAPOINT_ID + " = ?", dataPointId + "");
+    }
+
+    public void setDataPointStatusToDownloaded(String dataPointId) {
+        ContentValues contentValues = new ContentValues(1);
+        contentValues.put(RecordColumns.STATUS, DataPointStatus.DOWNLOADED);
+        briteDatabase.update(Tables.RECORD, contentValues, RecordColumns.RECORD_ID + " = ?", dataPointId);
     }
 }

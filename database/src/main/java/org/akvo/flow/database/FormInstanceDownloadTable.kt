@@ -36,7 +36,7 @@ open class FormInstanceDownloadTable {
         private const val CREATE_TABLE =
                 ("CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " ("
                         + _ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
-                        + COLUMN_DATAPOINT_ID + " INTEGER NOT NULL,"
+                        + COLUMN_DATAPOINT_ID + " TEXT NOT NULL,"
                         + COLUMN_CURSOR + " TEXT NOT NULL, "
                         + "UNIQUE(" + COLUMN_DATAPOINT_ID + ") ON CONFLICT REPLACE)")
     }

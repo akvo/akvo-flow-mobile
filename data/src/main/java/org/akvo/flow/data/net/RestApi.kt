@@ -25,6 +25,7 @@ import org.akvo.flow.data.entity.ApiFilesResult
 import org.akvo.flow.data.entity.ApiFormInstanceResult
 import org.akvo.flow.data.entity.ApiLocaleResult
 import org.akvo.flow.data.net.gae.*
+import org.akvo.flow.data.util.ApiUrls
 import org.akvo.flow.domain.util.DeviceHelper
 import timber.log.Timber
 import javax.inject.Singleton
@@ -44,12 +45,12 @@ class RestApi(
             .getAssignedDataPointsV2(deviceHelper.androidId, cursor, surveyId.toString())
     }
 
-    suspend fun downloadFormInstances(dataPointId: Long, cursor: String? = null): ApiFormInstanceResult {
+    suspend fun downloadFormInstances(dataPointId: String, cursor: String? = null): ApiFormInstanceResult {
         return serviceFactory.createRetrofitServiceWithInterceptor(
                 FormInstanceDownloadService::class.java,
                 baseUrl
         )
-                .getFormInstances(deviceHelper.androidId, cursor, dataPointId.toString())
+                .getFormInstances(ApiUrls.GET_FORM_INSTANCES, deviceHelper.androidId, cursor, dataPointId)
     }
 
     fun getPendingFiles(formIds: List<String?>?, deviceId: String?): Observable<ApiFilesResult> {

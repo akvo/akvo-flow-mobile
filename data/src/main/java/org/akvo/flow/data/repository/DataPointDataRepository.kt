@@ -71,7 +71,7 @@ class DataPointDataRepository @Inject constructor(
         }
     }
 
-    suspend fun downloadFormInstances(dataPointIds: List<String>):Int {
+    private suspend fun downloadFormInstances(dataPointIds: List<String>):Int {
         var syncedFormInstances = 0
         dataPointIds.forEach { dataPointId ->
             var formInstanceCursor = dataSourceFactory.dataBaseDataSource.getFormInstanceCursor(dataPointId)

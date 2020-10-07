@@ -22,8 +22,7 @@ package org.akvo.flow.data.util;
 
 public class ApiUrls {
     public static final String DATA_POINTS = "/datapoints";
-   // public static final String DATA_POINTS_V2 = "/v2/datapoints";
-    public static final String DATA_POINTS_V2 = DATA_POINTS; //FIXME: for test
+    public static final String DATA_POINTS_V2 = "/v2/datapoints";
     public static final String FORM_INSTANCES = "/instancedata";
     public static final String GET_FORM_INSTANCES = "getFormInstances";
     public static final String DEVICE_NOTIFICATION = "/devicenotification";

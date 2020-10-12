@@ -85,4 +85,6 @@ public interface SurveyRepository {
 
     @Nullable
     Completable setSurveyViewed(long surveyId);
+
+    Completable cleanDataPoints(Long surveyGroupId);
 }

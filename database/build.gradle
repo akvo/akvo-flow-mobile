@@ -75,4 +75,15 @@ dependencies {
     testImplementation "org.powermock:powermock-module-junit4-rule:${rootProject.ext.powerMockVersion}"
     testImplementation "org.powermock:powermock-api-mockito2:${rootProject.ext.powerMockVersion}"
     testImplementation "org.powermock:powermock-classloading-xstream:${rootProject.ext.powerMockVersion}"
+
+    androidTestImplementation "androidx.test.ext:junit:${rootProject.ext.androidXJunit}"
+    androidTestImplementation "androidx.test:core:${rootProject.ext.androidXCore}"
+    androidTestImplementation "com.google.dexmaker:dexmaker:${rootProject.ext.dexMakerVersion}"
+    androidTestImplementation "com.google.dexmaker:dexmaker-mockito:${rootProject.ext.dexMakerVersion}"
+    androidTestImplementation "androidx.test:rules:${rootProject.ext.rulesVersion}"
+    androidTestImplementation "androidx.test.espresso:espresso-core:${rootProject.ext.espressoVersion}"
+    androidTestImplementation "androidx.test.espresso:espresso-contrib:${rootProject.ext.espressoVersion}"
+    androidTestImplementation "androidx.test.espresso:espresso-intents:${rootProject.ext.espressoVersion}"
+    androidTestImplementation "com.github.fabioCollini.daggermock:daggermock:${rootProject.ext.daggermockVersion}"
+    androidTestImplementation "com.github.fabioCollini.daggermock:daggermock-kotlin:${rootProject.ext.daggermockVersion}"
 }

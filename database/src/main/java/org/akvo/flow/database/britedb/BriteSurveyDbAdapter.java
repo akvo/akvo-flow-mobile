@@ -419,16 +419,6 @@ public class BriteSurveyDbAdapter {
                 id + "");
     }
 
-    /**
-     * Delete any Record that contains no SurveyInstance
-     */
-    public void deleteEmptyRecords() {
-        briteDatabase.execute("DELETE FROM " + Tables.RECORD
-                + " WHERE " + RecordColumns.RECORD_ID + " NOT IN "
-                + "(SELECT DISTINCT " + SurveyInstanceColumns.RECORD_ID
-                + " FROM " + Tables.SURVEY_INSTANCE + ")");
-    }
-
     public Observable<Boolean> deleteSurveyAndGroup(long surveyGroupId) {
         deleteSurveyGroup(surveyGroupId);
         deleteSurvey(surveyGroupId);
@@ -830,5 +820,19 @@ public class BriteSurveyDbAdapter {
 
     public void clearCursor(long surveyId) {
         briteDatabase.delete(DataPointDownloadTable.TABLE_NAME, DataPointDownloadTable.COLUMN_SURVEY_ID + " = ?", surveyId + "");
+    }
+
+    public void cleanDataPoints(Long surveyGroupId) {
+        String where1 = SurveyInstanceColumns._ID + " NOT IN "
+                + "(SELECT DISTINCT " + ResponseColumns.SURVEY_INSTANCE_ID
+                + " FROM " + Tables.RESPONSE + ")";
+        briteDatabase.delete(Tables.SURVEY_INSTANCE, where1);
+        String where =
+                RecordColumns.SURVEY_GROUP_ID + " =? AND "
+                        + RecordColumns.STATUS + " =? AND "
+                        + RecordColumns.RECORD_ID + " NOT IN "
+                        + "(SELECT DISTINCT " + SurveyInstanceColumns.RECORD_ID
+                        + " FROM " + Tables.SURVEY_INSTANCE + ")";
+        briteDatabase.delete(Tables.RECORD, where, surveyGroupId + "", "0");
     }
 }

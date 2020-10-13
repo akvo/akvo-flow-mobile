@@ -133,7 +133,6 @@ public class GeoQuestionView extends QuestionView
 
     public void startListeningToLocation() {
         resetQuestion(true);
-        showLocationListenerStarted();
         mLocationListener.startLocationIfPossible();
     }
 
@@ -178,7 +177,7 @@ public class GeoQuestionView extends QuestionView
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         mLocationListener.handlePermissionResult(requestCode, permissions, grantResults);
     }
 
@@ -190,6 +189,11 @@ public class GeoQuestionView extends QuestionView
                 .displayPermissionMissingSnackBar(coordinatorLayout,
                         v -> startListeningToLocation(),
                         getContext());
+    }
+
+    @Override
+    public void onLocationStarted() {
+        showLocationListenerStarted();
     }
 
     @Override

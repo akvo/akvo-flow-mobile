@@ -26,6 +26,8 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.text.TextUtils;
 
+import androidx.annotation.NonNull;
+
 import com.squareup.sqlbrite2.BriteDatabase;
 
 import org.akvo.flow.database.RecordColumns;
@@ -49,8 +51,6 @@ import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
-
-import androidx.annotation.NonNull;
 
 /**
  * Temporary class to access SurveyDb from the app without having to refactor the whole architecture
@@ -382,10 +382,6 @@ public class SurveyDbDataSource {
 
     public void deleteAllSurveys() {
         briteSurveyDbAdapter.deleteAllSurveys();
-    }
-
-    public void deleteEmptyRecords() {
-        surveyDbAdapter.deleteEmptyRecords();
     }
 
     public void deleteEmptySurveyInstances() {

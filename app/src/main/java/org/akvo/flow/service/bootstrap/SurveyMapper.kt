@@ -20,7 +20,6 @@
 package org.akvo.flow.service.bootstrap
 
 import android.text.TextUtils
-import androidx.annotation.VisibleForTesting
 import org.akvo.flow.domain.Survey
 import org.akvo.flow.domain.SurveyMetadata
 import org.akvo.flow.util.ConstantUtil
@@ -89,8 +88,19 @@ class SurveyMapper @Inject constructor() {
         return survey
     }
 
-    @VisibleForTesting
-    fun generateSurveyName(surveyMetadata: SurveyMetadata, originalName: String): String {
+    fun createSurvey(id: String, surveyMetadata: SurveyMetadata, filename: String): Survey {
+        val survey = Survey()
+        survey.id = getSurveyId(surveyMetadata, id)
+        survey.name = surveyNameFromFileName(filename)
+        /*
+         * Resources are always attached to the zip file
+         */
+        survey.isHelpDownloaded = true
+        survey.type = ConstantUtil.SURVEY_TYPE
+        return survey
+    }
+
+    private fun generateSurveyName(surveyMetadata: SurveyMetadata, originalName: String): String {
         return if (!TextUtils.isEmpty(surveyMetadata.name)) {
             surveyMetadata.name
         } else {
@@ -104,19 +114,6 @@ class SurveyMapper @Inject constructor() {
         } else {
             1.0
         }
-    }
-
-    @VisibleForTesting
-    fun createSurvey(id: String, surveyMetadata: SurveyMetadata, filename: String): Survey {
-        val survey = Survey()
-        survey.id = getSurveyId(surveyMetadata, id)
-        survey.name = surveyNameFromFileName(filename)
-        /*
-         * Resources are always attached to the zip file
-         */
-        survey.isHelpDownloaded = true
-        survey.type = ConstantUtil.SURVEY_TYPE
-        return survey
     }
 
     private fun getSurveyId(surveyMetadata: SurveyMetadata, id: String): String? {

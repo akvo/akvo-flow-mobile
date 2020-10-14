@@ -43,7 +43,7 @@ import org.akvo.flow.domain.repository.UserRepository;
 import org.akvo.flow.injector.module.ApplicationModule;
 import org.akvo.flow.injector.module.ViewModule;
 import org.akvo.flow.service.ApkUpdateWorker;
-import org.akvo.flow.service.BootstrapService;
+import org.akvo.flow.service.bootstrap.BootstrapWorker;
 import org.akvo.flow.service.DataFixWorker;
 import org.akvo.flow.service.DataPointUploadWorker;
 import org.akvo.flow.service.FileChangeTrackingWorker;
@@ -97,7 +97,7 @@ public interface ApplicationComponent {
 
     void inject(SurveyDownloadWorker surveyDownloadWorker);
 
-    void inject(BootstrapService bootstrapService);
+    void inject(BootstrapWorker bootstrapService);
 
     void inject(DataFixWorker dataFixWorker);
 

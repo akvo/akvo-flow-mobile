@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2018,2020 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -33,6 +33,7 @@ import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
 import org.akvo.flow.app.FlowApp;
+import org.akvo.flow.service.bootstrap.ZipFileLister;
 import org.akvo.flow.util.ConstantUtil;
 
 import java.io.File;
@@ -58,7 +59,7 @@ public class FileChangeTrackingWorker extends Worker {
     @NonNull
     @Override
     public Result doWork() {
-        List<File> files = zipFileLister.getZipFiles();
+        List<File> files = zipFileLister.listZipFiles();
         if (!files.isEmpty()) {
             sendBroadcast();
         }

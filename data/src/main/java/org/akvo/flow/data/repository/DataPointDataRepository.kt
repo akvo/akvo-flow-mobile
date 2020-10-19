@@ -46,20 +46,21 @@ class DataPointDataRepository @Inject constructor(
 
     override suspend fun downloadDataPoints(surveyId: Long, assignedFormIds: MutableList<String>): Int {
         var syncedDataPoints = 0
-        var gaeCursor = dataSourceFactory.dataBaseDataSource.getDataPointCursor(surveyId)
+        val dataBaseDataSource = dataSourceFactory.dataBaseDataSource
+        var gaeCursor = dataBaseDataSource.getDataPointCursor(surveyId)
         var moreToLoad = true
         try {
             while (moreToLoad) {
                 val apiLocaleResult = restApi.downloadDataPoints(surveyId, gaeCursor)
                 val dataPoints = apiLocaleResult.dataPoints
-                syncedDataPoints += dataSourceFactory.dataBaseDataSource.syncDataPoints(dataPoints)
+                syncedDataPoints += dataBaseDataSource.syncDataPoints(dataPoints)
                 downLoadImages(dataPoints, assignedFormIds)
                 if (dataPoints.isNotEmpty()) {
                     gaeCursor = apiLocaleResult.cursor
                 }
                 moreToLoad = dataPoints.isNotEmpty() && gaeCursor != null // cursor is null with old datapoint api
+                dataBaseDataSource.saveDataPointCursor(surveyId, gaeCursor)
             }
-            dataSourceFactory.dataBaseDataSource.saveDataPointCursor(surveyId, gaeCursor)
             return syncedDataPoints
         } catch (e: HttpException) {
             if ((e.code() == HttpURLConnection.HTTP_NOT_FOUND)) {

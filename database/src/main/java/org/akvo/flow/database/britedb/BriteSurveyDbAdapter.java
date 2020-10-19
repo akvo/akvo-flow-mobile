@@ -454,18 +454,7 @@ public class BriteSurveyDbAdapter {
     }
 
     public Cursor getForms(long surveyId) {
-        String columns = SurveyColumns._ID + ", "
-                + SurveyColumns.SURVEY_ID + ", "
-                + SurveyColumns.NAME + ", "
-                + SurveyColumns.FILENAME + ", "
-                + SurveyColumns.TYPE + ", "
-                + SurveyColumns.LANGUAGE + ", "
-                + SurveyColumns.HELP_DOWNLOADED + ", "
-                + SurveyColumns.VERSION + ", "
-                + SurveyColumns.LOCATION;
-        String sqlQuery = "SELECT "
-                + columns
-                + " FROM " + Tables.SURVEY;
+        String sqlQuery = "SELECT * FROM " + Tables.SURVEY;
         String whereClause = SurveyColumns.DELETED + " <> 1";
         String[] whereParams = new String[0];
         if (surveyId > 0) {

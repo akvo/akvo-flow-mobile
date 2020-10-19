@@ -23,6 +23,8 @@ package org.akvo.flow.domain.repository;
 import org.akvo.flow.domain.entity.DomainForm;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
+
 import io.reactivex.Observable;
 import io.reactivex.Single;
 
@@ -36,4 +38,7 @@ public interface FormRepository {
 
     @NotNull
     Single<DomainForm> getForm(@NotNull String formId);
+
+    @NotNull
+    List<DomainForm> getForms(long surveyId);
 }

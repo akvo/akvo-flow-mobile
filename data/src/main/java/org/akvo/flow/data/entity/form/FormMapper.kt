@@ -25,6 +25,42 @@ import javax.inject.Inject
 
 class FormMapper @Inject constructor() {
 
+    fun mapForms(cursor: Cursor?): List<DataForm> {
+        val forms = mutableListOf<DataForm>()
+        if (cursor != null && cursor.moveToFirst()) {
+            do {
+                val id = getIntColumnValue(cursor, SurveyColumns._ID)
+                val formId = getStringColumnValue(cursor, SurveyColumns.SURVEY_ID)
+                val surveyId = getIntColumnValue(cursor, SurveyColumns.SURVEY_GROUP_ID)
+                val formVersion = getStringColumnValue(cursor, SurveyColumns.VERSION)
+                val name = getStringColumnValue(cursor, SurveyColumns.NAME)
+                val type = getStringColumnValue(cursor, SurveyColumns.NAME)
+                val location = getStringColumnValue(cursor, SurveyColumns.NAME)
+                val filename = getStringColumnValue(cursor, SurveyColumns.NAME)
+                val language = getStringColumnValue(cursor, SurveyColumns.NAME)
+                val resourcesDownloaded = getIntColumnValue(cursor, SurveyColumns.HELP_DOWNLOADED) == 1
+                val deleted = getIntColumnValue(cursor, SurveyColumns.DELETED) == 1
+                val dataForm = DataForm(
+                    id,
+                    formId,
+                    surveyId,
+                    name,
+                    formVersion,
+                    type,
+                    location,
+                    filename,
+                    language,
+                    resourcesDownloaded,
+                    deleted
+                )
+                forms.add(dataForm)
+            } while (cursor.moveToNext())
+        }
+        cursor?.close()
+        return forms
+    }
+
+
     fun mapForm(cursor: Cursor?): DataForm {
         var resourcesDownloaded = false
         var formVersion = ""
@@ -50,8 +86,7 @@ class FormMapper @Inject constructor() {
             resourcesDownloaded = getIntColumnValue(cursor, SurveyColumns.HELP_DOWNLOADED) == 1
             deleted = getIntColumnValue(cursor, SurveyColumns.DELETED) == 1
         }
-        cursor?.close()
-        return DataForm(
+        val dataForm = DataForm(
             id,
             formId,
             surveyId,
@@ -64,6 +99,8 @@ class FormMapper @Inject constructor() {
             resourcesDownloaded,
             deleted
         )
+        cursor?.close()
+        return dataForm
     }
 
     private fun getStringColumnValue(cursor: Cursor, columnName: String) =

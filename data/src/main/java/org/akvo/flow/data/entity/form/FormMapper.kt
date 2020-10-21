@@ -32,12 +32,12 @@ class FormMapper @Inject constructor() {
                 val id = getIntColumnValue(cursor, SurveyColumns._ID)
                 val formId = getStringColumnValue(cursor, SurveyColumns.SURVEY_ID)
                 val surveyId = getIntColumnValue(cursor, SurveyColumns.SURVEY_GROUP_ID)
-                val formVersion = getStringColumnValue(cursor, SurveyColumns.VERSION)
+                val formVersion = getDoubleColumnValue(cursor, SurveyColumns.VERSION).toString()
                 val name = getStringColumnValue(cursor, SurveyColumns.NAME)
-                val type = getStringColumnValue(cursor, SurveyColumns.NAME)
-                val location = getStringColumnValue(cursor, SurveyColumns.NAME)
-                val filename = getStringColumnValue(cursor, SurveyColumns.NAME)
-                val language = getStringColumnValue(cursor, SurveyColumns.NAME)
+                val type = getStringColumnValue(cursor, SurveyColumns.TYPE)
+                val location = getStringColumnValue(cursor, SurveyColumns.LOCATION)
+                val filename = getStringColumnValue(cursor, SurveyColumns.FILENAME)
+                val language = getStringColumnValue(cursor, SurveyColumns.LANGUAGE)
                 val resourcesDownloaded = getIntColumnValue(cursor, SurveyColumns.HELP_DOWNLOADED) == 1
                 val deleted = getIntColumnValue(cursor, SurveyColumns.DELETED) == 1
                 val dataForm = DataForm(
@@ -77,12 +77,12 @@ class FormMapper @Inject constructor() {
             id = getIntColumnValue(cursor, SurveyColumns._ID)
             formId = getStringColumnValue(cursor, SurveyColumns.SURVEY_ID)
             surveyId = getIntColumnValue(cursor, SurveyColumns.SURVEY_GROUP_ID)
-            formVersion = getStringColumnValue(cursor, SurveyColumns.VERSION)
+            formVersion = getDoubleColumnValue(cursor, SurveyColumns.VERSION).toString()
             name = getStringColumnValue(cursor, SurveyColumns.NAME)
-            type = getStringColumnValue(cursor, SurveyColumns.NAME)
-            location = getStringColumnValue(cursor, SurveyColumns.NAME)
-            filename = getStringColumnValue(cursor, SurveyColumns.NAME)
-            language = getStringColumnValue(cursor, SurveyColumns.NAME)
+            type = getStringColumnValue(cursor, SurveyColumns.TYPE)
+            location = getStringColumnValue(cursor, SurveyColumns.LOCATION)
+            filename = getStringColumnValue(cursor, SurveyColumns.FILENAME)
+            language = getStringColumnValue(cursor, SurveyColumns.LANGUAGE)
             resourcesDownloaded = getIntColumnValue(cursor, SurveyColumns.HELP_DOWNLOADED) == 1
             deleted = getIntColumnValue(cursor, SurveyColumns.DELETED) == 1
         }
@@ -102,6 +102,9 @@ class FormMapper @Inject constructor() {
         cursor?.close()
         return dataForm
     }
+
+    private fun getDoubleColumnValue(cursor: Cursor, columnName: String) =
+        cursor.getDouble(cursor.getColumnIndexOrThrow(columnName))
 
     private fun getStringColumnValue(cursor: Cursor, columnName: String) =
         cursor.getString(cursor.getColumnIndexOrThrow(columnName))

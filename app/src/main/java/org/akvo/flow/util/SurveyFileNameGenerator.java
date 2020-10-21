@@ -22,8 +22,11 @@ package org.akvo.flow.util;
 
 import androidx.annotation.NonNull;
 
+import javax.inject.Inject;
+
 public class SurveyFileNameGenerator {
 
+    @Inject
     public SurveyFileNameGenerator() {
     }
 

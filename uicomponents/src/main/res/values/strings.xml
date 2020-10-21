@@ -48,7 +48,8 @@
     <string name="bootstrapstart">Loading survey data from SD card</string>
     <string name="bootstrapcomplete">Done loading data from SD card</string>
     <string name="bootstraperror">Error processing bootstrap zip file</string>
-    <string name="bootstrap_invalid_app">Error: Form doesn\'t belong to this Flow instance</string>
+    <string name="bootstrap_invalid_app_title">Bootstrap Error</string>
+    <string name="bootstrap_invalid_app_message">Form doesn\'t belong to this Flow instance</string>
     <string name="transmissionhist">Transmission History</string>
     <string name="transstartdate">Started:</string>
     <string name="transenddate">Finished:</string>

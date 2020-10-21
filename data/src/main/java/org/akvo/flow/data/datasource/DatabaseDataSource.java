@@ -164,7 +164,6 @@ public class DatabaseDataSource {
 
             syncResponses(surveyInstance.getQasList(), id);
         }
-        briteSurveyDbAdapter.deleteEmptyRecords();
     }
 
     private void syncResponses(List<ApiQuestionAnswer> responses, long surveyInstanceId) {
@@ -487,5 +486,9 @@ public class DatabaseDataSource {
 
     public void setSurveyUnViewed(double surveyId) {
         briteSurveyDbAdapter.setSurveyUnViewed(surveyId);
+    }
+
+    public void cleanDataPoints(Long surveyGroupId) {
+        briteSurveyDbAdapter.cleanDataPoints(surveyGroupId);
     }
 }

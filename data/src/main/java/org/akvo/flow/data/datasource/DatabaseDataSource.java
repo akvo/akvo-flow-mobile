@@ -56,6 +56,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -428,6 +429,10 @@ public class DatabaseDataSource {
     @NotNull
     public Single<DataForm> getForm(String formId) {
         return briteSurveyDbAdapter.getForm(formId).map(formMapper::mapForm);
+    }
+
+    public List<DataForm> getForms(long surveyId) {
+        return formMapper.mapForms(briteSurveyDbAdapter.getForms(surveyId));
     }
 
     @NotNull

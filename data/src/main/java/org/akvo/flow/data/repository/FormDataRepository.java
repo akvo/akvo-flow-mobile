@@ -131,6 +131,12 @@ public class FormDataRepository implements FormRepository {
         return dataSourceFactory.getDataBaseDataSource().getForm(formId).map(domainFormMapper::mapForm);
     }
 
+    @NotNull
+    @Override
+    public List<DomainForm> getForms(long surveyId) {
+        return domainFormMapper.mapForms(dataSourceFactory.getDataBaseDataSource().getForms(surveyId));
+    }
+
     private Observable<Boolean> downloadFormHeader(String formId, String deviceId) {
         return restApi.downloadFormHeader(formId, deviceId)
                 .map(new Function<String, ApiFormHeader>() {

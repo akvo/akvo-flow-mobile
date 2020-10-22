@@ -27,7 +27,7 @@ import org.akvo.flow.ui.fragment.ResponseListFragment
 
 class RecordTabsAdapter(fm: FragmentManager?, private val tabsTitles: Array<String>) :
     FragmentPagerAdapter(fm!!, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
-    
+
     override fun getCount(): Int {
         return tabsTitles.size
     }

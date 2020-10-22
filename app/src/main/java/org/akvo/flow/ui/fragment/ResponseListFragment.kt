@@ -43,6 +43,7 @@ import org.akvo.flow.database.SurveyDbAdapter
 import org.akvo.flow.domain.SurveyGroup
 import org.akvo.flow.injector.component.ApplicationComponent
 import org.akvo.flow.injector.component.DaggerViewComponent
+import org.akvo.flow.tracking.TrackingHelper
 import org.akvo.flow.ui.Navigator
 import org.akvo.flow.ui.adapter.ResponseListAdapter
 import org.akvo.flow.util.ConstantUtil
@@ -54,6 +55,7 @@ class ResponseListFragment : ListFragment(), LoaderManager.LoaderCallbacks<Curso
     private var mAdapter: ResponseListAdapter? = null
     private var recordId: String? = null
     private var responseListListener: ResponseListListener? = null
+    private var trackingHelper: TrackingHelper? = null
 
     @JvmField
     @Inject
@@ -67,6 +69,7 @@ class ResponseListFragment : ListFragment(), LoaderManager.LoaderCallbacks<Curso
         } else {
             throw IllegalArgumentException("activity must implement ResponseListListener")
         }
+        trackingHelper = TrackingHelper(activity)
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -103,6 +106,7 @@ class ResponseListFragment : ListFragment(), LoaderManager.LoaderCallbacks<Curso
         refresh()
         LocalBroadcastManager.getInstance(activity!!).registerReceiver(dataSyncReceiver,
             IntentFilter(ConstantUtil.ACTION_DATA_SYNC))
+        trackingHelper?.logHistoryTabViewed();
     }
 
     override fun onPause() {
@@ -113,6 +117,7 @@ class ResponseListFragment : ListFragment(), LoaderManager.LoaderCallbacks<Curso
     override fun onDetach() {
         super.onDetach()
         responseListListener = null
+        trackingHelper = null
     }
 
     private fun refresh() {

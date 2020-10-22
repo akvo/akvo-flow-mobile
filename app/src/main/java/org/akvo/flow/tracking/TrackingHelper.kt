@@ -152,4 +152,8 @@ class TrackingHelper(context: Context) {
     fun logFormSubmissionRepeatConfirmationDialogEvent() {
         firebaseAnalytics.logEvent("monitoring_form_repeat_dialog_shown", null)
     }
+
+    fun logHistoryTabViewed() {
+        firebaseAnalytics.logEvent("history_tab_viewed", null)
+    }
 }

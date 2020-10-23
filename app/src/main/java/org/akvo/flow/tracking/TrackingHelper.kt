@@ -82,13 +82,11 @@ class TrackingHelper(context: Context) {
     }
 
     fun logImageSizeChanged(imageSize: Int) {
-        var size = ""
-        when (imageSize) {
-            ImageSize.IMAGE_SIZE_320_240 -> size = "small"
-            ImageSize.IMAGE_SIZE_640_480 -> size = "medium"
-            ImageSize.IMAGE_SIZE_1280_960 -> size = "large"
-            else -> {
-            }
+        val size = when (imageSize) {
+            ImageSize.IMAGE_SIZE_320_240 -> "small"
+            ImageSize.IMAGE_SIZE_640_480 -> "medium"
+            ImageSize.IMAGE_SIZE_1280_960 -> "large"
+            else -> ""
         }
         val params = Bundle()
         params.putString("image_size", size)

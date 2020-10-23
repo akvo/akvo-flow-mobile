@@ -52,10 +52,10 @@ import javax.inject.Inject
 
 class ResponseListFragment : ListFragment(), LoaderManager.LoaderCallbacks<Cursor> {
     private var mSurveyGroup: SurveyGroup? = null
-    private var mAdapter: ResponseListAdapter? = null
     private var recordId: String? = null
     private var responseListListener: ResponseListListener? = null
     private var trackingHelper: TrackingHelper? = null
+    private lateinit var mAdapter: ResponseListAdapter
 
     @JvmField
     @Inject
@@ -74,13 +74,11 @@ class ResponseListFragment : ListFragment(), LoaderManager.LoaderCallbacks<Curso
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        val intent = activity!!.intent
-        mSurveyGroup = intent.getSerializableExtra(ConstantUtil.SURVEY_GROUP_EXTRA) as SurveyGroup
-        recordId = intent.getStringExtra(ConstantUtil.DATA_POINT_ID_EXTRA)
-        if (mAdapter == null) {
-            mAdapter = ResponseListAdapter(activity)
-            listAdapter = mAdapter
-        }
+        val intent = activity?.intent
+        mSurveyGroup = intent?.getSerializableExtra(ConstantUtil.SURVEY_GROUP_EXTRA) as SurveyGroup?
+        recordId = intent?.getStringExtra(ConstantUtil.DATA_POINT_ID_EXTRA)
+        mAdapter = ResponseListAdapter(activity)
+        listAdapter = mAdapter
         registerForContextMenu(listView)
         setHasOptionsMenu(true)
         initializeInjector()
@@ -106,7 +104,7 @@ class ResponseListFragment : ListFragment(), LoaderManager.LoaderCallbacks<Curso
         refresh()
         LocalBroadcastManager.getInstance(activity!!).registerReceiver(dataSyncReceiver,
             IntentFilter(ConstantUtil.ACTION_DATA_SYNC))
-        trackingHelper?.logHistoryTabViewed();
+        trackingHelper?.logHistoryTabViewed()
     }
 
     override fun onPause() {
@@ -137,16 +135,15 @@ class ResponseListFragment : ListFragment(), LoaderManager.LoaderCallbacks<Curso
     }
 
     override fun onContextItemSelected(item: MenuItem): Boolean {
-        val info = item
-            .menuInfo as AdapterContextMenuInfo
+        val info = item.menuInfo as AdapterContextMenuInfo
 
         // This ID is the _id column in the SQLite db
-        val surveyInstanceId = mAdapter!!.getItemId(info.position)
+        val surveyInstanceId = mAdapter.getItemId(info.position)
         when (item.itemId) {
             DELETE_ONE -> {
                 val itemView = info.targetView
-                showConfirmationDialog(surveyInstanceId,
-                    itemView.getTag(ConstantUtil.SURVEY_ID_TAG_KEY).toString() + "")
+                val surveyId = itemView.getTag(ConstantUtil.SURVEY_ID_TAG_KEY).toString()
+                showConfirmationDialog(surveyInstanceId, surveyId)
             }
             VIEW_HISTORY -> viewSurveyInstanceHistory(surveyInstanceId)
         }
@@ -189,8 +186,12 @@ class ResponseListFragment : ListFragment(), LoaderManager.LoaderCallbacks<Curso
         val formId = view.getTag(ConstantUtil.SURVEY_ID_TAG_KEY).toString()
         val formInstanceId = view.getTag(ConstantUtil.RESPONDENT_ID_TAG_KEY) as Long
         val readOnly = view.getTag(ConstantUtil.READ_ONLY_TAG_KEY) as Boolean
-        navigator!!.navigateToFormActivity(activity, recordId, formId,
-            formInstanceId, readOnly, mSurveyGroup)
+        navigator?.navigateToFormActivity(activity,
+            recordId,
+            formId,
+            formInstanceId,
+            readOnly,
+            mSurveyGroup)
     }
 
     override fun onCreateLoader(id: Int, args: Bundle?): Loader<Cursor> {
@@ -198,7 +199,7 @@ class ResponseListFragment : ListFragment(), LoaderManager.LoaderCallbacks<Curso
     }
 
     override fun onLoadFinished(loader: Loader<Cursor>, cursor: Cursor) {
-        mAdapter!!.changeCursor(cursor)
+        mAdapter.changeCursor(cursor)
     }
 
     override fun onLoaderReset(loader: Loader<Cursor>) {

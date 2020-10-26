@@ -19,42 +19,27 @@
 
 package org.akvo.flow.service.bootstrap
 
-import android.content.Context
-import android.text.TextUtils
 import androidx.annotation.VisibleForTesting
 import org.akvo.flow.BuildConfig
 import org.akvo.flow.data.database.SurveyDbDataSource
 import org.akvo.flow.domain.Survey
-import org.akvo.flow.domain.SurveyMetadata
-import org.akvo.flow.serialization.form.SurveyMetadataParser
 import org.akvo.flow.util.ConstantUtil
-import org.akvo.flow.util.FileUtil
-import org.akvo.flow.util.SurveyFileNameGenerator
-import org.akvo.flow.util.SurveyIdGenerator
-import org.akvo.flow.util.files.FormFileBrowser
-import org.akvo.flow.util.files.FormResourcesFileBrowser
 import timber.log.Timber
 import java.io.File
-import java.io.FileInputStream
-import java.io.FileNotFoundException
-import java.io.FileOutputStream
-import java.io.InputStream
+import java.util.Enumeration
 import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
-import java.util.zip.ZipInputStream
 import javax.inject.Inject
 
 class BootstrapProcessor @Inject constructor(
-    private val resourcesFileUtil: FormResourcesFileBrowser,
-    private val applicationContext: Context,
-    private val surveyFileNameGenerator: SurveyFileNameGenerator,
-    private val surveyIdGenerator: SurveyIdGenerator,
+
     private val databaseAdapter: SurveyDbDataSource,
-    private val formFileBrowser: FormFileBrowser
+    private val surveyMapper: SurveyMapper,
+    private val fileProcessor: FileProcessor
 ) {
 
     fun processZipFile(zipFile: ZipFile): ProcessingResult {
-        val entries = zipFile.entries()
+        val entries: Enumeration<out ZipEntry> = zipFile.entries()
         while (entries.hasMoreElements()) {
             val entry = entries.nextElement()
             val entryName = entry.name ?: ""
@@ -79,36 +64,36 @@ class BootstrapProcessor @Inject constructor(
 
     @VisibleForTesting
     fun processCascadeResource(zipFile: ZipFile, entry: ZipEntry): ProcessingResult {
-        try {
-            FileUtil.extract(
-                ZipInputStream(zipFile.getInputStream(entry)),
-                resourcesFileUtil.getExistingAppInternalFolder(applicationContext)
-            )
-            return ProcessingResult.ProcessingSuccess
+        return try {
+            fileProcessor.extract(zipFile, entry)
+            ProcessingResult.ProcessingSuccess
         } catch (e: Exception) {
             Timber.e(e)
-            return ProcessingResult.ProcessingError
+            ProcessingResult.ProcessingError
         }
     }
 
     @VisibleForTesting
     fun processSurveyFile(zipFile: ZipFile, entry: ZipEntry, entryName: String): ProcessingResult {
         try {
-            val filename = surveyFileNameGenerator.generateFileName(entryName)
-            val idFromFolderName = surveyIdGenerator.getSurveyIdFromFilePath(entryName)
-            var survey = databaseAdapter.getSurvey(idFromFolderName)
-            val surveyFolderName: String = generateSurveyFolder(entry)
+            val filename = surveyMapper.generateFileName(entryName)
+            val idFromFolderName = surveyMapper.getSurveyIdFromFilePath(entryName)
+            val surveyFolderName = surveyMapper.generateSurveyFolderName(entryName)
 
             // in both cases (new survey and existing), we need to update the xml
-            val surveyFile = generateNewSurveyFile(filename, surveyFolderName)
-            FileUtil.copy(zipFile.getInputStream(entry), FileOutputStream(surveyFile))
+            val surveyFile: File = fileProcessor.createAndCopyNewSurveyFile(filename, surveyFolderName, zipFile, entry)
             // now read the survey XML back into memory to see if there is a version
-            val surveyMetadata = readBasicSurveyData(surveyFile)
-            if (surveyMetadata.app.isNullOrBlank() || !BuildConfig.SERVER_BASE.contains(surveyMetadata.app)) {
+            val surveyMetadata = fileProcessor.readBasicSurveyData(surveyFile)
+            if (surveyMetadata.app.isNullOrBlank() || !BuildConfig.SERVER_BASE.contains(
+                    surveyMetadata.app)
+            ) {
                 return ProcessingResult.ProcessingErrorWrongDashboard
             }
-            survey =
-                updateSurvey(filename, idFromFolderName, survey, surveyFolderName, surveyMetadata)
+            val survey = surveyMapper.createOrUpdateSurvey(filename,
+                idFromFolderName,
+                databaseAdapter.getSurvey(idFromFolderName),
+                surveyFolderName,
+                surveyMetadata)
 
             // Save the Survey, SurveyGroup, and languages.
             updateSurveyStorage(survey)
@@ -119,94 +104,9 @@ class BootstrapProcessor @Inject constructor(
         }
     }
 
-    @Throws(FileNotFoundException::class)
-    private fun readBasicSurveyData(surveyFile: File): SurveyMetadata {
-        val `in`: InputStream = FileInputStream(surveyFile)
-        val parser = SurveyMetadataParser()
-        return parser.parse(`in`)
-    }
-
-    private fun updateSurvey(
-        filename: String, idFromFolderName: String,
-        survey: Survey?, surveyFolderName: String,
-        surveyMetadata: SurveyMetadata
-    ): Survey {
-        var survey = survey
-        var surveyName = filename
-        if (surveyName.contains(ConstantUtil.DOT_SEPARATOR)) {
-            surveyName = surveyName.substring(0, surveyName.indexOf(ConstantUtil.DOT_SEPARATOR))
-        }
-        if (survey == null) {
-            survey = createSurvey(idFromFolderName, surveyMetadata, surveyName)
-        }
-        survey.location = ConstantUtil.FILE_LOCATION
-        val surveyFileName = generateSurveyFileName(filename, surveyFolderName)
-        survey.fileName = surveyFileName
-        if (!TextUtils.isEmpty(surveyMetadata.name)) {
-            survey.name = surveyMetadata.name
-        }
-        survey.surveyGroup = surveyMetadata.surveyGroup
-        if (surveyMetadata.version > 0) {
-            survey.version = surveyMetadata.version
-        } else {
-            survey.version = 1.0
-        }
-        return survey
-    }
-
-    private fun createSurvey(id: String, surveyMetadata: SurveyMetadata, name: String): Survey {
-        val survey = Survey()
-        if (!TextUtils.isEmpty(surveyMetadata.id)) {
-            survey.id = surveyMetadata.id
-        } else {
-            survey.id = id
-        }
-        survey.name = name
-        /*
-         * Resources are always attached to the zip file
-         */
-        survey.isHelpDownloaded = true
-        survey.type = ConstantUtil.SURVEY_TYPE
-        return survey
-    }
-
     private fun updateSurveyStorage(survey: Survey) {
         databaseAdapter.addSurveyGroup(survey.surveyGroup)
         databaseAdapter.saveSurvey(survey)
-    }
-
-    private fun generateNewSurveyFile(filename: String, surveyFolderName: String): File {
-        val formsFolder = formFileBrowser.getExistingAppInternalFolder(applicationContext)
-        return when {
-            TextUtils.isEmpty(surveyFolderName) -> {
-                File(formsFolder, filename)
-            }
-            else -> {
-                val surveyFolder = File(formsFolder, surveyFolderName)
-                if (!surveyFolder.exists()) {
-                    surveyFolder.mkdir()
-                }
-                File(surveyFolder, filename)
-            }
-        }
-    }
-
-    private fun generateSurveyFileName(filename: String, surveyFolderName: String?): String {
-        val sb = StringBuilder(20)
-        if (!TextUtils.isEmpty(surveyFolderName)) {
-            sb.append(surveyFolderName)
-            sb.append(File.separator)
-        }
-        sb.append(filename)
-        return sb.toString()
-    }
-
-    private fun generateSurveyFolder(entry: ZipEntry): String {
-        val entryName = entry.name
-        val entryPaths: Array<String> = entryName?.split(File.separator.toRegex())
-            ?.toTypedArray()
-            ?: emptyArray()
-        return if (entryPaths.size < 2) "" else entryPaths[entryPaths.size - 2]
     }
 
     fun openDb() {
@@ -216,5 +116,4 @@ class BootstrapProcessor @Inject constructor(
     fun closeDb() {
         databaseAdapter.close()
     }
-
 }

@@ -1,5 +1,14 @@
 Akvo FLOW app release notes
 ===========================
+# ver 2.9.6
+Date: 29 October 2020
+
+* **Crash when trying to start BootstrapService in background** - [#1522](https://github.com/akvo/akvo-flow-mobile/issues/1522)
+* **Reorganize dependencies for dependabot** - [#1730](https://github.com/akvo/akvo-flow-mobile/issues/1730)
+* **Datapoint download overload issues** - [#1733](https://github.com/akvo/akvo-flow-mobile/issues/1733)
+* **Datapoint history tracking** - [#1743](https://github.com/akvo/akvo-flow-mobile/issues/1743)
+
+---------------
 # ver 2.9.5
 Date: 23 September 2020
 

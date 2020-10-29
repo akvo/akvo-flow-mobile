@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017,2019 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2020 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -15,26 +15,19 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
+package org.akvo.flow.database.upgrade
 
-package org.akvo.flow.util;
+import android.database.sqlite.SQLiteDatabase
+import org.akvo.flow.database.DatabaseHelper
 
-import androidx.annotation.NonNull;
+internal class SurveyViewedUpgrader(
+    private val helper: DatabaseHelper,
+    private val db: SQLiteDatabase
+) :
+    DatabaseUpgrader {
 
-public class SurveyFileNameGenerator {
-
-    public SurveyFileNameGenerator() {
-    }
-
-    @NonNull
-    public String generateFileName(@NonNull String entryName) {
-        if (entryName.isEmpty()) {
-            return "";
-        }
-        int fileSeparatorPosition = entryName.lastIndexOf("/");
-        return fileSeparatorPosition < 0 ?
-                entryName :
-                entryName.substring(fileSeparatorPosition + 1);
+    override fun upgrade() {
+        helper.upgradeFromSurveyViewed(db)
     }
 }

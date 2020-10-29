@@ -264,6 +264,12 @@ public class SurveyDataRepository implements SurveyRepository {
         return Completable.complete();
     }
 
+    @Override
+    public Completable cleanDataPoints(Long surveyGroupId) {
+        dataSourceFactory.getDataBaseDataSource().cleanDataPoints(surveyGroupId);
+        return Completable.complete();
+    }
+
     @VisibleForTesting
     Observable<List<Transmission>> getSurveyTransmissions(@NonNull String surveyId) {
         return getFormIds(surveyId)

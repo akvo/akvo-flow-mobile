@@ -257,13 +257,13 @@ dependencies {
 
     implementation "com.google.firebase:firebase-analytics:${rootProject.ext.firebaseAnalyticsVersion}"
     implementation "com.google.firebase:firebase-crashlytics:${rootProject.ext.crashlyticsVersion}"
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"
     implementation "androidx.core:core-ktx:${rootProject.ext.coreKtxVersion}"
     implementation "com.mapbox.mapboxsdk:mapbox-android-sdk:${rootProject.ext.mapboxVersion}"
     implementation "com.mapbox.mapboxsdk:mapbox-android-plugin-annotation-v9:${rootProject.ext.mapboxAnnotationsVersion}"
     implementation "androidx.work:work-runtime:${rootProject.ext.workVersion}"
     implementation "org.slf4j:slf4j-nop:${rootProject.ext.slf4JVersion}"
-    implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
+    implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion"
 
     testImplementation "junit:junit:${rootProject.ext.jUnitVersion}"
     testImplementation "org.mockito:mockito-core:${rootProject.ext.mockitoCoreVersion}"
@@ -272,6 +272,7 @@ dependencies {
     testImplementation "org.powermock:powermock-api-mockito2:${rootProject.ext.powerMockVersion}"
     testImplementation "org.powermock:powermock-classloading-xstream:${rootProject.ext.powerMockVersion}"
     testImplementation "io.kotlintest:kotlintest-runner-junit4:${rootProject.ext.kotlintestVerion}"
+    testImplementation "io.mockk:mockk:${rootProject.ext.mockkVersion}"
 
     androidTestImplementation "androidx.test.ext:junit:${rootProject.ext.androidXJunit}"
     androidTestImplementation "androidx.test:core:${rootProject.ext.androidXCore}"

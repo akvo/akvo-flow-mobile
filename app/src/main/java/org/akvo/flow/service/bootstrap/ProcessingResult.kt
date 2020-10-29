@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2020 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -15,24 +15,12 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 
-package org.akvo.flow.broadcast;
+package org.akvo.flow.service.bootstrap
 
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-
-import org.akvo.flow.service.bootstrap.BootstrapWorker;
-
-import timber.log.Timber;
-
-public class BootStrapReceiver extends BroadcastReceiver {
-
-    @Override
-    public void onReceive(Context context, Intent intent) {
-        Timber.d("Bootstrap will be started");
-        BootstrapWorker.scheduleWork(context.getApplicationContext());
-    }
+sealed class ProcessingResult {
+    object ProcessingSuccess: ProcessingResult()
+    object ProcessingErrorWrongDashboard: ProcessingResult()
+    object ProcessingError: ProcessingResult()
 }

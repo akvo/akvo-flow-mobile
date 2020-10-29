@@ -50,7 +50,6 @@ import org.akvo.flow.injector.module.ApplicationModule
 import org.akvo.flow.presentation.ScreenRobot
 import org.akvo.flow.presentation.ScreenRobot.Companion.withRobot
 import org.akvo.flow.presentation.datapoints.map.one.DataPointMapActivity
-import org.akvo.flow.service.BootstrapService
 import org.akvo.flow.tests.R.raw.data
 import org.akvo.flow.util.ConstantUtil
 import org.junit.Before
@@ -132,19 +131,6 @@ class RecordActivityTest {
         withRobot(RecordScreenRobot::class.java)
             .provideActivityContext(intentsTestRule.activity)
             .checkTitleIs(R.string.unknown)
-    }
-
-    @Test
-    fun onFormClickShouldShowErrorMessageWhenBootstrapPending() {
-        BootstrapService.isProcessing = true
-
-        intentsTestRule.launchActivity(null)
-
-        intentsTestRule.activity.onFormClick(FORM_ID)
-
-        withRobot(RecordScreenRobot::class.java)
-            .checkSnackBarDisplayedWithText(R.string.pleasewaitforbootstrap)
-        BootstrapService.isProcessing = false
     }
 
     @Test

@@ -26,6 +26,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 import org.akvo.flow.database.migration.TransmissionMigrationHelper;
 import org.akvo.flow.database.upgrade.UpgraderFactory;
+import org.jetbrains.annotations.NotNull;
 
 import timber.log.Timber;
 
@@ -43,7 +44,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final int VER_DATA_POINT_ASSIGNMENTS_ITERATION = 87;
     public static final int VER_DATA_POINT_ASSIGNMENTS_ITERATION_2 = 88;
     public static final int VER_CURSOR_ITERATION = 89;
-    static final int DATABASE_VERSION = VER_CURSOR_ITERATION;
+    public static final int VER_SURVEY_VIEWED = 90;
+    public static final int VER_DATAPOINT_STATUS = 91;
+    static final int DATABASE_VERSION = VER_DATAPOINT_STATUS;
 
     private static SQLiteDatabase database;
     private static final Object LOCK_OBJ = new Object();
@@ -85,6 +88,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 + SurveyGroupColumns.NAME + " TEXT,"
                 + SurveyGroupColumns.REGISTER_SURVEY_ID + " TEXT,"
                 + SurveyGroupColumns.MONITORED + " INTEGER NOT NULL DEFAULT 0,"
+                + SurveyGroupColumns.VIEWED + " INTEGER NOT NULL DEFAULT 0,"
                 + "UNIQUE (" + SurveyGroupColumns.SURVEY_GROUP_ID + ") ON CONFLICT REPLACE)");
 
         db.execSQL("CREATE TABLE " + Tables.SURVEY_INSTANCE + " ("
@@ -123,6 +127,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 + RecordColumns.LONGITUDE + " REAL,"// REFERENCES ...
                 + RecordColumns.LAST_MODIFIED + " INTEGER NOT NULL DEFAULT 0,"
                 + RecordColumns.VIEWED + " INTEGER NOT NULL DEFAULT 1,"
+                + RecordColumns.STATUS + " INTEGER NOT NULL DEFAULT 0,"
                 + "UNIQUE (" + RecordColumns.RECORD_ID + ") ON CONFLICT REPLACE)");
 
         db.execSQL("CREATE TABLE " + Tables.TRANSMISSION + " ("
@@ -157,6 +162,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void upgradeFromAssignment(SQLiteDatabase db) {
         db.execSQL("ALTER TABLE " + Tables.RECORD + " ADD COLUMN " + RecordColumns.VIEWED
                 + " INTEGER NOT NULL DEFAULT 1");
+    }
+
+    public void upgradeFromCursor(SQLiteDatabase db) {
+        db.execSQL("ALTER TABLE " + Tables.SURVEY_GROUP + " ADD COLUMN " + SurveyGroupColumns.VIEWED
+                + " INTEGER NOT NULL DEFAULT 1");
+    }
+
+    public void upgradeFromSurveyViewed(@NotNull SQLiteDatabase db) {
+        db.execSQL("ALTER TABLE " + Tables.RECORD + " ADD COLUMN " + RecordColumns.STATUS
+                + " INTEGER NOT NULL DEFAULT 0");
     }
 
     /**

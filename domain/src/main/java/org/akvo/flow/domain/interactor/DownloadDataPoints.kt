@@ -24,16 +24,19 @@ import kotlinx.coroutines.withContext
 import org.akvo.flow.domain.entity.DownloadResult
 import org.akvo.flow.domain.exception.AssignmentRequiredException
 import org.akvo.flow.domain.repository.DataPointRepository
+import org.akvo.flow.domain.repository.FormRepository
 import org.akvo.flow.domain.util.ConnectivityStateManager
+import timber.log.Timber
 import javax.inject.Inject
 
 class DownloadDataPoints @Inject constructor(
     private val dataPointRepository: DataPointRepository,
+    private val formRepository: FormRepository,
     private val connectivityStateManager: ConnectivityStateManager
 ) {
     suspend fun execute(parameters: Map<String, Any>): DownloadResult {
         if (parameters[KEY_SURVEY_ID] == null) {
-           throw IllegalArgumentException("Missing surveyId")
+           throw IllegalArgumentException("Missing surveyId or registrationFormId")
         }
         return if (!connectivityStateManager.isConnectionAvailable) {
             DownloadResult(
@@ -48,15 +51,23 @@ class DownloadDataPoints @Inject constructor(
     private suspend fun syncDataPoints(parameters: Map<String, Any>): DownloadResult {
         return withContext(Dispatchers.IO) {
             try {
+                val surveyId = (parameters[KEY_SURVEY_ID] as Long?)!!
+                val assignedForms = formRepository.getForms(surveyId)
+                val assignedFormIds = mutableListOf<String>()
+                for (f in assignedForms) {
+                    assignedFormIds.add(f.formId)
+                }
                 val downloadDataPoints =
-                    dataPointRepository.downloadDataPoints((parameters[KEY_SURVEY_ID] as Long?)!!)
+                    dataPointRepository.downloadDataPoints(surveyId, assignedFormIds)
                 DownloadResult(DownloadResult.ResultCode.SUCCESS, downloadDataPoints)
             } catch (ex: AssignmentRequiredException) {
+                Timber.e(ex)
                 DownloadResult(
                     DownloadResult.ResultCode.ERROR_ASSIGNMENT_MISSING,
                     0
                 )
             } catch (ex: Exception) {
+                Timber.e(ex)
                 DownloadResult(
                     DownloadResult.ResultCode.ERROR_OTHER,
                     0

@@ -42,7 +42,6 @@ import org.akvo.flow.uicomponents.SnackBarManager
 import org.akvo.flow.util.ConstantUtil
 import javax.inject.Inject
 
-
 class RecordActivity : BackActivity(), FormListListener, ResponseListListener, RecordView,
     ConfirmFormInstanceDialogListener {
 

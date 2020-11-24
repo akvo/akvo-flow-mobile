@@ -26,6 +26,10 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import org.akvo.flow.BuildConfig;
 import org.akvo.flow.R;
 import org.akvo.flow.activity.FormActivity;
@@ -52,8 +56,6 @@ import java.util.Locale;
 
 import javax.inject.Inject;
 
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import timber.log.Timber;
 
 public class CaddisflyQuestionView extends QuestionView implements View.OnClickListener,
@@ -179,10 +181,10 @@ public class CaddisflyQuestionView extends QuestionView implements View.OnClickL
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
         if (requestCode == ConstantUtil.STORAGE_PERMISSION_CODE) {
-            if (storagePermissionsHelper.storagePermissionsGranted(permissions[0], grantResults)) {
+            if (storagePermissionsHelper.storagePermissionsGranted(permissions, grantResults)) {
                 launchCaddisflyTest();
             } else {
                 storagePermissionNotGranted();

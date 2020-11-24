@@ -24,6 +24,7 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.os.Environment;
 import android.text.TextUtils;
 import android.view.MenuItem;
 import android.view.View;
@@ -73,8 +74,8 @@ import org.akvo.flow.presentation.navigation.UserOptionsDialog;
 import org.akvo.flow.presentation.navigation.ViewUser;
 import org.akvo.flow.presentation.survey.SurveyPresenter;
 import org.akvo.flow.presentation.survey.SurveyView;
-import org.akvo.flow.service.BootstrapService;
-import org.akvo.flow.service.SurveyDownloadService;
+import org.akvo.flow.service.bootstrap.BootstrapWorker;
+import org.akvo.flow.service.SurveyDownloadWorker;
 import org.akvo.flow.service.TimeCheckService;
 import org.akvo.flow.tracking.TrackingHelper;
 import org.akvo.flow.tracking.TrackingListener;
@@ -85,7 +86,6 @@ import org.akvo.flow.ui.fragment.TabsAdapter;
 import org.akvo.flow.uicomponents.SnackBarManager;
 import org.akvo.flow.util.AppPermissionsHelper;
 import org.akvo.flow.util.ConstantUtil;
-import org.akvo.flow.util.StatusUtil;
 import org.akvo.flow.util.ViewUtil;
 
 import java.util.ArrayList;
@@ -351,12 +351,6 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
             navigateToSetUp();
         } else {
             activityJustCreated = false;
-            // Delete empty responses, if any
-            if (mDatabase != null) {
-                mDatabase.deleteEmptySurveyInstances();
-                mDatabase.deleteEmptyRecords();
-            }
-
             presenter.verifyApkUpdate();
             updateAddDataPointFab();
             if (!permissionsResults) {
@@ -448,7 +442,7 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     }
 
     private void startServicesIfPossible() {
-        if (StatusUtil.hasExternalStorage()) {
+        if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
             startServicesOnce();
         } else {
             displayExternalStorageMissing();
@@ -457,8 +451,8 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
 
     private void startServicesOnce() {
         if (!servicesStarted) {
-            startService(new Intent(this, SurveyDownloadService.class));
-            startService(new Intent(this, BootstrapService.class));
+            SurveyDownloadWorker.scheduleWork(getApplicationContext());
+            BootstrapWorker.scheduleWork(getApplicationContext());
             startService(new Intent(this, TimeCheckService.class));
             servicesStarted = true;
         }

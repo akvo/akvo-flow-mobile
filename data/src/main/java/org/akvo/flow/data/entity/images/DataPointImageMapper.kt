@@ -20,22 +20,38 @@
 package org.akvo.flow.data.entity.images
 
 import org.akvo.flow.data.entity.ApiDataPoint
+import org.akvo.flow.data.entity.ApiSurveyInstance
 import org.akvo.flow.data.util.MediaHelper
 import javax.inject.Inject
 
-class DataPointImageMapper @Inject constructor(private val mediaHelper: MediaHelper) {
+class DataPointImageMapper @Inject constructor(
+    private val mediaHelper: MediaHelper
+) {
 
-    fun getImagesList(dataPoints: List<ApiDataPoint>): List<String> {
+    fun getImagesList(
+        dataPoints: List<ApiDataPoint>,
+        assignedFormIds: MutableList<String>
+    ): List<String> {
         val images = mutableListOf<String>()
         dataPoints.forEach { dataPoint ->
             dataPoint.surveyInstances.forEach { surveyInstance ->
-                surveyInstance.qasList.forEach { questionAnswer ->
-                    if (!questionAnswer.answer.isNullOrBlank() && ("IMAGE" == questionAnswer.type)) {
-                        images.add(mediaHelper.cleanMediaFileName(questionAnswer.answer))
-                    }
-                }
+                addImageIfFormAssigned(surveyInstance, images, assignedFormIds)
             }
         }
         return images
+    }
+
+    private fun addImageIfFormAssigned(
+        surveyInstance: ApiSurveyInstance,
+        images: MutableList<String>,
+        assignedFormIds: MutableList<String>
+    ) {
+        if (assignedFormIds.contains(surveyInstance.surveyId.toString())) {
+            surveyInstance.qasList.forEach { questionAnswer ->
+                if (!questionAnswer.answer.isNullOrBlank() && ("IMAGE" == questionAnswer.type)) {
+                    images.add(mediaHelper.cleanMediaFileName(questionAnswer.answer))
+                }
+            }
+        }
     }
 }

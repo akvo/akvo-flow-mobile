@@ -27,6 +27,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Set;
 
+import java.util.List;
+
 import io.reactivex.Observable;
 import io.reactivex.Single;
 
@@ -40,6 +42,9 @@ public interface FormRepository {
 
     @NotNull
     Single<DomainForm> getForm(@NotNull String formId);
+
+    @NotNull
+    List<DomainForm> getForms(long surveyId);
 
     @NonNull
     Single<Set<String>> loadFormLanguages(@NotNull String formId);

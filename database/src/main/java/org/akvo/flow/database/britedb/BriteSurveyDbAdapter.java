@@ -407,8 +407,6 @@ public class BriteSurveyDbAdapter {
      * Updates the matching transmission history records with the status
      * passed in. If the status == Synced, the end date is updated. If
      * the status == In Progress, the start date is updated.
-     *
-     * @return the number of rows affected
      */
     public void updateTransmissionStatus(long id, int status) {
         ContentValues values = new ContentValues();
@@ -420,16 +418,6 @@ public class BriteSurveyDbAdapter {
         }
         briteDatabase.update(Tables.TRANSMISSION, values, TransmissionColumns._ID + " = ?",
                 id + "");
-    }
-
-    /**
-     * Delete any Record that contains no SurveyInstance
-     */
-    public void deleteEmptyRecords() {
-        briteDatabase.execute("DELETE FROM " + Tables.RECORD
-                + " WHERE " + RecordColumns.RECORD_ID + " NOT IN "
-                + "(SELECT DISTINCT " + SurveyInstanceColumns.RECORD_ID
-                + " FROM " + Tables.SURVEY_INSTANCE + ")");
     }
 
     public Observable<Boolean> deleteSurveyAndGroup(long surveyGroupId) {
@@ -453,27 +441,11 @@ public class BriteSurveyDbAdapter {
                 "SELECT * FROM " + Tables.SURVEY_GROUP + " ORDER BY " + SurveyGroupColumns.NAME;
         return briteDatabase
                 .createQuery(Tables.SURVEY_GROUP, sqlQuery)
-                .concatMap(new Function<SqlBrite.Query, Observable<? extends Cursor>>() {
-                    @Override
-                    public Observable<? extends Cursor> apply(SqlBrite.Query query) {
-                        return Observable.just(query.run());
-                    }
-                });
+                .concatMap((Function<SqlBrite.Query, Observable<Cursor>>) query -> Observable.just(query.run()));
     }
 
     public Cursor getForms(long surveyId) {
-        String columns = SurveyColumns._ID + ", "
-                + SurveyColumns.SURVEY_ID + ", "
-                + SurveyColumns.NAME + ", "
-                + SurveyColumns.FILENAME + ", "
-                + SurveyColumns.TYPE + ", "
-                + SurveyColumns.LANGUAGE + ", "
-                + SurveyColumns.HELP_DOWNLOADED + ", "
-                + SurveyColumns.VERSION + ", "
-                + SurveyColumns.LOCATION;
-        String sqlQuery = "SELECT "
-                + columns
-                + " FROM " + Tables.SURVEY;
+        String sqlQuery = "SELECT * FROM " + Tables.SURVEY;
         String whereClause = SurveyColumns.DELETED + " <> 1";
         String[] whereParams = new String[0];
         if (surveyId > 0) {
@@ -515,7 +487,11 @@ public class BriteSurveyDbAdapter {
     }
 
     public void addSurveyGroup(ContentValues values) {
-        briteDatabase.insert(Tables.SURVEY_GROUP, values);
+        String where = SurveyGroupColumns.SURVEY_GROUP_ID + " = ? ";
+        int updatedRows = briteDatabase.update(Tables.SURVEY_GROUP, values, where, values.get(SurveyGroupColumns.SURVEY_GROUP_ID) + "");
+        if (updatedRows < 1) {
+            briteDatabase.insert(Tables.SURVEY_GROUP, values);
+        }
     }
 
     public Observable<Cursor> getUsers() {
@@ -615,20 +591,6 @@ public class BriteSurveyDbAdapter {
     }
 
     /**
-     * updates the survey table by recording the help download flag
-     */
-    public void markSurveyHelpDownloaded(String surveyId, boolean isDownloaded) {
-        ContentValues updatedValues = new ContentValues();
-        updatedValues.put(SurveyColumns.HELP_DOWNLOADED, isDownloaded ? 1 : 0);
-
-        int updatedRows = briteDatabase
-                .update(Tables.SURVEY, updatedValues, SurveyColumns.SURVEY_ID + " = ?", surveyId);
-        if (updatedRows < 1) {
-            Timber.e("Could not update record for Survey %s", surveyId);
-        }
-    }
-
-    /**
      * marks a survey record identified by the ID passed in as deleted.
      */
     public void setFormsDeleted(Set<String> formIds) {
@@ -644,6 +606,21 @@ public class BriteSurveyDbAdapter {
         } finally {
             transaction.end();
         }
+    }
+
+    public void setSurveyViewed(long surveyId) {
+        updateSurveyStatus(surveyId, 1);
+    }
+
+    public void setSurveyUnViewed(double surveyId) {
+        updateSurveyStatus(surveyId, 0);
+    }
+
+    private void updateSurveyStatus(double surveyId, int status) {
+        ContentValues contentValues = new ContentValues(1);
+        contentValues.put(SurveyGroupColumns.VIEWED, status);
+        String where = SurveyGroupColumns.SURVEY_GROUP_ID + " = ? ";
+        briteDatabase.update(Tables.SURVEY_GROUP, contentValues, where, surveyId + "");
     }
 
     /**
@@ -833,6 +810,20 @@ public class BriteSurveyDbAdapter {
 
     public void clearCursor(long surveyId) {
         briteDatabase.delete(DataPointDownloadTable.TABLE_NAME, DataPointDownloadTable.COLUMN_SURVEY_ID + " = ?", surveyId + "");
+    }
+
+    public void cleanDataPoints(Long surveyGroupId) {
+        String where1 = SurveyInstanceColumns._ID + " NOT IN "
+                + "(SELECT DISTINCT " + ResponseColumns.SURVEY_INSTANCE_ID
+                + " FROM " + Tables.RESPONSE + ")";
+        briteDatabase.delete(Tables.SURVEY_INSTANCE, where1);
+        String where =
+                RecordColumns.SURVEY_GROUP_ID + " =? AND "
+                        + RecordColumns.STATUS + " =? AND "
+                        + RecordColumns.RECORD_ID + " NOT IN "
+                        + "(SELECT DISTINCT " + SurveyInstanceColumns.RECORD_ID
+                        + " FROM " + Tables.SURVEY_INSTANCE + ")";
+        briteDatabase.delete(Tables.RECORD, where, surveyGroupId + "", "0");
     }
 
     public Single<Cursor> getSavedLanguages(long surveyId) {

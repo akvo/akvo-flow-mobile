@@ -30,6 +30,10 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+
 import org.akvo.flow.R;
 import org.akvo.flow.activity.FormActivity;
 import org.akvo.flow.domain.Question;
@@ -54,8 +58,6 @@ import java.io.File;
 
 import javax.inject.Inject;
 
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -151,9 +153,10 @@ public class PhotoQuestionView extends QuestionView implements IPhotoQuestionVie
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
         if (requestCode == ConstantUtil.STORAGE_PERMISSION_CODE) {
-            if (storagePermissionsHelper.storagePermissionsGranted(permissions[0], grantResults)) {
+            if (storagePermissionsHelper.storagePermissionsGranted(permissions, grantResults)) {
                 notifyQuestionListeners(QuestionInteractionEvent.TAKE_PHOTO_EVENT);
             } else {
                 storagePermissionNotGranted();

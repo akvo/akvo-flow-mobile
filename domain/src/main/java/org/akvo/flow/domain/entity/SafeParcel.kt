@@ -23,5 +23,5 @@ import android.os.Parcel
 
 fun Parcel.readStringNonNull(): String {
     val unParceled = readString()
-   return unParceled?: unParceled ?: ""
+    return unParceled ?: unParceled ?: ""
 }

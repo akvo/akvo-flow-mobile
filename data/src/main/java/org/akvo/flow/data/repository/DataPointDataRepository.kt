@@ -19,9 +19,12 @@
 package org.akvo.flow.data.repository
 
 import io.reactivex.Completable
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.withContext
 import org.akvo.flow.data.datasource.DataSourceFactory
 import org.akvo.flow.data.entity.ApiDataPoint
-import org.akvo.flow.data.entity.ApiLocaleResult
 import org.akvo.flow.data.entity.images.DataPointImageMapper
 import org.akvo.flow.data.net.RestApi
 import org.akvo.flow.data.net.s3.S3RestApi
@@ -29,6 +32,7 @@ import org.akvo.flow.data.util.MediaHelper
 import org.akvo.flow.domain.exception.AssignmentRequiredException
 import org.akvo.flow.domain.repository.DataPointRepository
 import retrofit2.HttpException
+import timber.log.Timber
 import java.net.HttpURLConnection
 import javax.inject.Inject
 
@@ -40,21 +44,23 @@ class DataPointDataRepository @Inject constructor(
     private val mediaHelper: MediaHelper
     ) : DataPointRepository {
 
-    override suspend fun downloadDataPoints(surveyId: Long): Int {
+    override suspend fun downloadDataPoints(surveyId: Long, assignedFormIds: MutableList<String>): Int {
         var syncedDataPoints = 0
-        var backendDataPointsCursor = dataSourceFactory.dataBaseDataSource.getDataPointCursor(surveyId)
+        val dataBaseDataSource = dataSourceFactory.dataBaseDataSource
+        var gaeCursor = dataBaseDataSource.getDataPointCursor(surveyId)
         var moreToLoad = true
         try {
             while (moreToLoad) {
-                val apiLocaleResult = restApi.downloadDataPoints(surveyId, backendDataPointsCursor)
-                syncedDataPoints += syncDataPoints(apiLocaleResult)
-                if (apiLocaleResult.dataPoints.isNotEmpty()) {
-                    backendDataPointsCursor = apiLocaleResult.cursor
+                val apiLocaleResult = restApi.downloadDataPoints(surveyId, gaeCursor)
+                val dataPoints = apiLocaleResult.dataPoints
+                syncedDataPoints += dataBaseDataSource.syncDataPoints(dataPoints)
+                downLoadImages(dataPoints, assignedFormIds)
+                if (dataPoints.isNotEmpty()) {
+                    gaeCursor = apiLocaleResult.cursor
                 }
-                moreToLoad = apiLocaleResult.dataPoints.isNotEmpty()
-                        && backendDataPointsCursor != null // cursor is null with old datapoint api
+                moreToLoad = dataPoints.isNotEmpty() && gaeCursor != null // cursor is null with old datapoint api
+                dataBaseDataSource.saveDataPointCursor(surveyId, gaeCursor)
             }
-            dataSourceFactory.dataBaseDataSource.saveDataPointCursor(surveyId, backendDataPointsCursor)
             return syncedDataPoints
         } catch (e: HttpException) {
             if ((e.code() == HttpURLConnection.HTTP_NOT_FOUND)) {
@@ -73,21 +79,26 @@ class DataPointDataRepository @Inject constructor(
         return dataSourceFactory.dataBaseDataSource.markDataPointAsViewed(dataPointId)
     }
 
-    private suspend fun syncDataPoints(apiLocaleResult: ApiLocaleResult): Int {
-        val dataPoints = apiLocaleResult.dataPoints
-        val syncDataPoints = dataSourceFactory.dataBaseDataSource.syncDataPoints(dataPoints)
-        downLoadImages(apiLocaleResult.dataPoints)
-        return syncDataPoints
+    private suspend fun downLoadImages(
+        dataPoints: List<ApiDataPoint>,
+        assignedFormIds: MutableList<String>
+    ) {
+        withContext(Dispatchers.IO) {
+            mapper.getImagesList(dataPoints, assignedFormIds)
+                .filter { image -> !dataSourceFactory.fileDataSource.fileExists(image) }
+                .map {
+                    async { downloadImage(it) }
+                }.awaitAll()
+        }
     }
 
-    private suspend fun downLoadImages(dataPoints: List<ApiDataPoint>) {
-        mapper.getImagesList(dataPoints)
-            .filter { image -> !dataSourceFactory.fileDataSource.fileExists(image) }
-            .map { image ->
-                val responseBody = s3RestApi.downloadImage(image)
-                dataSourceFactory.fileDataSource.saveRemoteMediaFile(image, responseBody)
-                Unit
-            }
+    private suspend fun downloadImage(image: String) {
+        try {
+            val responseBody = s3RestApi.downloadImage(image)
+            dataSourceFactory.fileDataSource.saveRemoteMediaFile(image, responseBody)
+        } catch (e: Exception) {
+            Timber.e(e)
+        }
     }
 
     private fun downLoadMedia(filename: String): Completable {

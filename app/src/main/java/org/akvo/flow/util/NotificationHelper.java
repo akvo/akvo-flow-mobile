@@ -28,12 +28,12 @@ import android.content.Intent;
 import android.os.Build;
 import android.text.TextUtils;
 
-import org.akvo.flow.R;
-import org.akvo.flow.activity.SurveyActivity;
-
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.TaskStackBuilder;
 import androidx.core.content.ContextCompat;
+
+import org.akvo.flow.R;
+import org.akvo.flow.activity.SurveyActivity;
 
 public class NotificationHelper {
 
@@ -171,6 +171,7 @@ public class NotificationHelper {
                 .setSmallIcon(R.drawable.notification_icon)
                 .setContentTitle(title)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setAutoCancel(true) //hide when user presses it
                 .setTicker(title);
         if (!TextUtils.isEmpty(text)) {
             builder.setStyle(new NotificationCompat.BigTextStyle().bigText(text));

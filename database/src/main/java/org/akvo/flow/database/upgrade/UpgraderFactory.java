@@ -42,6 +42,10 @@ public class UpgraderFactory {
                 databaseUpgrader.addUpgrader(new AssignmentsUpgrader(helper, db));
             case DatabaseHelper.VER_DATA_POINT_ASSIGNMENTS_ITERATION_2:
                 databaseUpgrader.addUpgrader(new Assignments2Upgrader(db, new DataPointDownloadTable()));
+            case DatabaseHelper.VER_CURSOR_ITERATION:
+                databaseUpgrader.addUpgrader(new CursorUpgrader(helper, db));
+            case DatabaseHelper.VER_SURVEY_VIEWED:
+                databaseUpgrader.addUpgrader(new SurveyViewedUpgrader(helper, db));
             default:
                 break;
         }

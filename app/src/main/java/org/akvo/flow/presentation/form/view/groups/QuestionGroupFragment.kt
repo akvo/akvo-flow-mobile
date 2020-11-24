@@ -25,7 +25,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
-import kotlinx.android.synthetic.main.question_group_fragment.*
+import androidx.recyclerview.widget.RecyclerView
 import org.akvo.flow.R
 import org.akvo.flow.app.FlowApp
 import org.akvo.flow.injector.component.ApplicationComponent
@@ -43,6 +43,7 @@ class QuestionGroupFragment : Fragment(), QuestionGroupView {
 
     private lateinit var questionGroupTitle: String
     private lateinit var imageLoader: ImageLoader
+    private lateinit var questionsRv: RecyclerView
 
     @Inject
     lateinit var presenter: QuestionGroupPresenter
@@ -75,6 +76,7 @@ class QuestionGroupFragment : Fragment(), QuestionGroupView {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        questionsRv = view.findViewById(R.id.questionsRv)
         questionsRv.layoutManager = LinearLayoutManager(activity)
         questionsRv.recycledViewPool.setMaxRecycledViews(
             GroupQuestionsAdapter.ViewType.OPTION.ordinal,

@@ -35,7 +35,6 @@ import org.akvo.flow.domain.interactor.forms.GetSavedFormInstance
 import org.akvo.flow.domain.interactor.users.GetSelectedUser
 import org.akvo.flow.presentation.Presenter
 import org.akvo.flow.presentation.datapoints.DisplayNameMapper
-import org.akvo.flow.service.BootstrapService
 import timber.log.Timber
 import java.util.UUID
 import javax.inject.Inject
@@ -61,12 +60,6 @@ class RecordPresenter @Inject constructor(
     }
 
     fun onFormClick(formId: String, datapointId: String, survey: SurveyGroup) {
-        //TODO: this in not correct as we don't know which form is being processed
-        if (BootstrapService.isProcessing) {
-            view?.showBootStrapPendingError()
-            return
-        }
-
         //check user
         getSelectedUserUseCase.execute(object : DefaultObserver<User>() {
             override fun onError(e: Throwable) {

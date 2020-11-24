@@ -40,6 +40,14 @@ class DomainFormMapper @Inject constructor() {
         )
     }
 
+    fun mapForms(dataForms: MutableList<DataForm>): MutableList<DomainForm> {
+        val domainForms = mutableListOf<DomainForm>()
+        for (f in dataForms) {
+            domainForms.add(mapForm(f))
+        }
+        return domainForms
+    }
+
     fun mapForms(dataForm: DataForm, parseForm: XmlDataForm): DomainForm {
         return DomainForm(
             dataForm.id,
@@ -56,5 +64,4 @@ class DomainFormMapper @Inject constructor() {
             groups = parseForm.groups
         )
     }
-
 }

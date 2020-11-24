@@ -29,6 +29,10 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.content.FileProvider;
+
 import org.akvo.flow.R;
 import org.akvo.flow.activity.FormActivity;
 import org.akvo.flow.domain.Question;
@@ -52,8 +56,6 @@ import java.io.File;
 
 import javax.inject.Inject;
 
-import androidx.annotation.Nullable;
-import androidx.core.content.FileProvider;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -151,9 +153,10 @@ public class VideoQuestionView extends QuestionView implements IVideoQuestionVie
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
         if (requestCode == ConstantUtil.STORAGE_PERMISSION_CODE) {
-            if (storagePermissionsHelper.storagePermissionsGranted(permissions[0], grantResults)) {
+            if (storagePermissionsHelper.storagePermissionsGranted(permissions, grantResults)) {
                 notifyQuestionListeners(QuestionInteractionEvent.TAKE_VIDEO_EVENT);
             } else {
                 storagePermissionNotGranted();

@@ -51,7 +51,7 @@ public class GetSavedDataPoints extends UseCase {
 
     @Inject
     protected GetSavedDataPoints(ThreadExecutor threadExecutor,
-            PostExecutionThread postExecutionThread, SurveyRepository surveyRepository) {
+                                 PostExecutionThread postExecutionThread, SurveyRepository surveyRepository) {
         super(threadExecutor, postExecutionThread);
         this.surveyRepository = surveyRepository;
     }
@@ -66,6 +66,12 @@ public class GetSavedDataPoints extends UseCase {
         Double longitude = (Double) parameters.get(KEY_LONGITUDE);
         Integer orderBy = (Integer) parameters.get(KEY_ORDER_BY);
         final String filter = (String) parameters.get(KEY_FILTER);
+        return surveyRepository.cleanDataPoints(surveyGroupId)
+               .andThen(loadDataPoints(filter, surveyGroupId, latitude, longitude, orderBy));
+    }
+
+    private Observable<List<DataPoint>> loadDataPoints(String filter, Long surveyGroupId,
+                                                       Double latitude, Double longitude, Integer orderBy) {
         if (TextUtils.isEmpty(filter)) {
             return surveyRepository.getDataPoints(surveyGroupId, latitude, longitude, orderBy);
         } else {
@@ -74,7 +80,7 @@ public class GetSavedDataPoints extends UseCase {
     }
 
     private Observable<List<DataPoint>> getFilteredDataPoints(Long surveyGroupId, Double latitude,
-            Double longitude, Integer orderBy, @NonNull final String filter) {
+                                                              Double longitude, Integer orderBy, @NonNull final String filter) {
         return surveyRepository.getDataPoints(surveyGroupId, latitude, longitude, orderBy)
                 .flatMap(new Function<List<DataPoint>, ObservableSource<List<DataPoint>>>() {
                     @Override
@@ -87,7 +93,7 @@ public class GetSavedDataPoints extends UseCase {
     }
 
     private Observable<List<DataPoint>> filterDataPoints(@NonNull List<DataPoint> dataPoints,
-            @NonNull final String filter) {
+                                                         @NonNull final String filter) {
         return Observable
                 .fromIterable(dataPoints)
                 .filter(new Predicate<DataPoint>() {

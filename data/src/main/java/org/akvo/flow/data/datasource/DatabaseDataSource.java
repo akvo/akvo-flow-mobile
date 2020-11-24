@@ -57,6 +57,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -167,7 +168,6 @@ public class DatabaseDataSource {
 
             syncResponses(surveyInstance.getQasList(), id);
         }
-        briteSurveyDbAdapter.deleteEmptyRecords();
     }
 
     private void syncResponses(List<ApiQuestionAnswer> responses, long surveyInstanceId) {
@@ -435,6 +435,10 @@ public class DatabaseDataSource {
         return formMapper.mapForm(briteSurveyDbAdapter.getForm(formId));
     }
 
+    public List<DataForm> getForms(long surveyId) {
+        return formMapper.mapForms(briteSurveyDbAdapter.getForms(surveyId));
+    }
+
     @NotNull
     public Completable markDataPointAsViewed(@NotNull String dataPointId) {
         briteSurveyDbAdapter.markDataPointAsViewed(dataPointId);
@@ -478,6 +482,18 @@ public class DatabaseDataSource {
         } else {
             briteSurveyDbAdapter.clearCursor(surveyId);
         }
+    }
+
+    public void setSurveyViewed(long surveyId) {
+        briteSurveyDbAdapter.setSurveyViewed(surveyId);
+    }
+
+    public void setSurveyUnViewed(double surveyId) {
+        briteSurveyDbAdapter.setSurveyUnViewed(surveyId);
+    }
+
+    public void cleanDataPoints(Long surveyGroupId) {
+        briteSurveyDbAdapter.cleanDataPoints(surveyGroupId);
     }
 
     @NotNull

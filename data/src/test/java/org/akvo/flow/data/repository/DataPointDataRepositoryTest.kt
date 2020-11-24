@@ -70,7 +70,7 @@ class DataPointDataRepositoryTest {
     @Before
     fun setUp() {
         MockKAnnotations.init(this)
-        every { mockMapper.getImagesList(any()) } returns emptyList()
+        every { mockMapper.getImagesList(any(), any()) } returns emptyList()
         every { mockDataSourceFactory.dataBaseDataSource } returns mockDatabaseDataSource
         every { mockDatabaseDataSource.getDataPointCursor(any()) } returns null
         repository =
@@ -94,7 +94,7 @@ class DataPointDataRepositoryTest {
         every { spyHttpException.code() } returns HttpURLConnection.HTTP_NOT_FOUND
 
         try {
-            val result = repository.downloadDataPoints(123L)
+            val result = repository.downloadDataPoints(123L,  mutableListOf("123"))
         } catch (e: Exception) {
             assert(e is AssignmentRequiredException)
         }
@@ -111,7 +111,7 @@ class DataPointDataRepositoryTest {
         every { spyHttpException.code() } returns HttpURLConnection.HTTP_BAD_GATEWAY
 
         try {
-            val result: Int = repository.downloadDataPoints(123L)
+            val result: Int = repository.downloadDataPoints(123L, mutableListOf("123"))
         } catch (e: Exception) {
             assert(e is HttpException)
         }
@@ -124,7 +124,7 @@ class DataPointDataRepositoryTest {
         )
         every { mockDatabaseDataSource.syncDataPoints(any()) } returns 1
 
-        val result: Int = repository.downloadDataPoints(123L)
+        val result: Int = repository.downloadDataPoints(123L, mutableListOf("123"))
 
         assertEquals(1, result)
     }

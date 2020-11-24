@@ -22,6 +22,16 @@ package org.akvo.flow.service;
 import android.content.Context;
 import android.content.Intent;
 
+import androidx.annotation.NonNull;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.work.Constraints;
+import androidx.work.ExistingWorkPolicy;
+import androidx.work.NetworkType;
+import androidx.work.OneTimeWorkRequest;
+import androidx.work.WorkManager;
+import androidx.work.Worker;
+import androidx.work.WorkerParameters;
+
 import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.domain.interactor.CheckSubmittedFiles;
 import org.akvo.flow.domain.interactor.ExportSurveyInstances;
@@ -33,15 +43,6 @@ import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 
-import androidx.annotation.NonNull;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
-import androidx.work.Constraints;
-import androidx.work.ExistingWorkPolicy;
-import androidx.work.NetworkType;
-import androidx.work.OneTimeWorkRequest;
-import androidx.work.WorkManager;
-import androidx.work.Worker;
-import androidx.work.WorkerParameters;
 import io.reactivex.observers.DisposableCompletableObserver;
 import timber.log.Timber;
 
@@ -60,7 +61,7 @@ public class DataFixWorker extends Worker {
 
     public DataFixWorker(@NonNull Context context, @NonNull WorkerParameters workerParams) {
         super(context, workerParams);
-        FlowApp application = (FlowApp) getApplicationContext();
+        FlowApp application = (FlowApp) context.getApplicationContext();
         application.getApplicationComponent().inject(this);
     }
 

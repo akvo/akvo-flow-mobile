@@ -27,8 +27,8 @@ import org.akvo.flow.R
 import org.akvo.flow.presentation.form.view.groups.entity.ViewQuestionAnswer
 import org.akvo.flow.presentation.form.view.groups.entity.ViewQuestionAnswer.NumberViewQuestionAnswer
 import org.akvo.flow.presentation.form.view.groups.entity.exhaustive
-import java.lang.IllegalArgumentException
 
+@Suppress("UNCHECKED_CAST")
 class GroupQuestionsAdapter<T : QuestionViewHolder<ViewQuestionAnswer>>(private val questionAnswers: MutableList<ViewQuestionAnswer> = mutableListOf()) :
     RecyclerView.Adapter<T>() {
 

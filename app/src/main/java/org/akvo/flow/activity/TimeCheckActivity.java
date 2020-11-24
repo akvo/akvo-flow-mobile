@@ -24,15 +24,15 @@ import android.os.Bundle;
 import android.widget.Button;
 import android.widget.TextView;
 
+import androidx.appcompat.app.AppCompatActivity;
+
 import org.akvo.flow.R;
 import org.akvo.flow.service.DataPointUploadWorker;
-import org.akvo.flow.service.SurveyDownloadService;
+import org.akvo.flow.service.SurveyDownloadWorker;
 import org.akvo.flow.service.TimeCheckService;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-
-import androidx.appcompat.app.AppCompatActivity;
 
 public class TimeCheckActivity extends AppCompatActivity {
     private static final String PATTERN = "HH:mm, yyyy-MM-dd (zzzz)";
@@ -56,7 +56,7 @@ public class TimeCheckActivity extends AppCompatActivity {
         // to time changes (the ones interacting with S3)
         super.onActivityResult(requestCode, resultCode, data);
         startService(new Intent(this, TimeCheckService.class));// Re-check time setting status
-        startService(new Intent(this, SurveyDownloadService.class));
+        SurveyDownloadWorker.scheduleWork(getApplicationContext());
         DataPointUploadWorker.scheduleUpload(getApplicationContext(), false);
         finish();
     }

@@ -23,11 +23,13 @@ import io.reactivex.Observable
 import io.reactivex.Single
 import org.akvo.flow.domain.entity.DomainForm
 
+
 interface FormRepository {
     fun loadForm(formId: String?, deviceId: String?): Observable<Boolean?>?
     fun reloadForms(deviceId: String?): Observable<Int?>?
     fun downloadForms(deviceId: String?): Observable<Int?>?
     fun getForm(formId: String): Single<DomainForm>
+    fun getForms(surveyId: Long): List<DomainForm>
     suspend fun loadFormLanguages(formId: String): Set<String>
     suspend fun getFormWithGroups(formId: String): DomainForm
 }

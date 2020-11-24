@@ -29,4 +29,5 @@ public class RecordColumns {
     public static final String LONGITUDE = "longitude";
     public static final String LAST_MODIFIED = "last_modified";
     public static final String VIEWED = "viewed";
+    public static final String STATUS = "status";
 }

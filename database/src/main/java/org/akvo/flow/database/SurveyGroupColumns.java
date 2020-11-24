@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010-2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2010-2017,2020 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -26,4 +26,5 @@ public class SurveyGroupColumns {
     public static final String NAME = "name";
     public static final String REGISTER_SURVEY_ID = "register_survey_id";
     public static final String MONITORED = "monitored";
+    public static final String VIEWED = "viewed";
 }

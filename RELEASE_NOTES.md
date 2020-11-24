@@ -1,5 +1,30 @@
 Akvo FLOW app release notes
 ===========================
+# ver 2.9.6
+Date: 29 October 2020
+
+* **Crash when trying to start BootstrapService in background** - [#1522](https://github.com/akvo/akvo-flow-mobile/issues/1522)
+* **Reorganize dependencies for dependabot** - [#1730](https://github.com/akvo/akvo-flow-mobile/issues/1730)
+* **Datapoint download overload issues** - [#1733](https://github.com/akvo/akvo-flow-mobile/issues/1733)
+* **Datapoint history tracking** - [#1743](https://github.com/akvo/akvo-flow-mobile/issues/1743)
+
+---------------
+# ver 2.9.5
+Date: 23 September 2020
+
+* **Visually show that surveys have been updated or loaded** - [#636](https://github.com/akvo/akvo-flow-mobile/issues/636)
+* **Crash when trying to start SurveyDownloadService in background** - [#1521](https://github.com/akvo/akvo-flow-mobile/issues/1521)
+* **Crash reported by Firebase related to permissions** - [#1717](https://github.com/akvo/akvo-flow-mobile/issues/1717)
+* **Location permission related bug** - [#1722](https://github.com/akvo/akvo-flow-mobile/issues/1722)
+
+---------------
+# ver 2.9.4.1
+Date: 19 August 2020
+
+* **Crash related to FileChangeTrackingWorker** - [#1701](https://github.com/akvo/akvo-flow-mobile/issues/1701)
+* **Datapoint download fails when an image download fails** - [#1705](https://github.com/akvo/akvo-flow-mobile/issues/1705)
+
+---------------
 # ver 2.9.4
 Date: 13 August 2020
 

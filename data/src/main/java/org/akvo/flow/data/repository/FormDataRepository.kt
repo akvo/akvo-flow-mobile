@@ -37,6 +37,7 @@ import org.akvo.flow.domain.repository.FormRepository
 import timber.log.Timber
 import javax.inject.Inject
 
+
 class FormDataRepository @Inject constructor(
     private val formHeaderParser: FormHeaderParser,
     private val xmlParser: XmlFormParser,
@@ -44,11 +45,11 @@ class FormDataRepository @Inject constructor(
     private val dataSourceFactory: DataSourceFactory,
     private val formIdMapper: FormIdMapper,
     private val s3RestApi: S3RestApi,
-    private val domainFormMapper: DomainFormMapper
+    private val domainFormMapper: DomainFormMapper,
 ) : FormRepository {
     override fun loadForm(
         formId: String?,
-        deviceId: String?
+        deviceId: String?,
     ): Observable<Boolean?>? {
         val dataBaseDataSource = dataSourceFactory.dataBaseDataSource
         return if (TEST_FORM_ID == formId) {
@@ -86,6 +87,10 @@ class FormDataRepository @Inject constructor(
                 )
             )
         )
+    }
+
+    override fun getForms(surveyId: Long): List<DomainForm> {
+        return domainFormMapper.mapForms(dataSourceFactory.dataBaseDataSource.getForms(surveyId))
     }
 
     override suspend fun getFormWithGroups(formId: String): DomainForm {
@@ -147,7 +152,7 @@ class FormDataRepository @Inject constructor(
 
     private fun downloadAndExtractFile(
         fileName: String,
-        folder: String
+        folder: String,
     ): Observable<Boolean> {
         return s3RestApi.downloadArchive(fileName)
             .concatMap { responseBody ->

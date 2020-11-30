@@ -19,4 +19,10 @@
 
 package org.akvo.flow.presentation.form.view.entity
 
-data class ViewQuestionGroup(val heading: String, val isRepeatable: Boolean)
+import org.akvo.flow.presentation.form.view.groups.entity.ViewQuestionAnswer
+
+data class ViewQuestionGroup(
+    val heading: String,
+    val isRepeatable: Boolean,
+    val questionAnswers: ArrayList<ViewQuestionAnswer> = arrayListOf()
+)

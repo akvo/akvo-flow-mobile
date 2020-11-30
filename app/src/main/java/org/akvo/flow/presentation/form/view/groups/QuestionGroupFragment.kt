@@ -227,12 +227,17 @@ class QuestionGroupFragment : Fragment(), QuestionGroupView {
     companion object {
 
         private const val QUESTION_GROUP_TITLE = "group_title"
+        private const val QUESTION_ANSWERS = "answers"
 
         @JvmStatic
-        fun newInstance(questionGroupTitle: String): QuestionGroupFragment {
+        fun newInstance(
+            questionGroupTitle: String,
+            questionAnswers: ArrayList<ViewQuestionAnswer>
+        ): QuestionGroupFragment {
             return QuestionGroupFragment().apply {
                 arguments = Bundle().apply {
                     putString(QUESTION_GROUP_TITLE, questionGroupTitle)
+                    putParcelableArrayList(QUESTION_ANSWERS, questionAnswers)
                 }
             }
         }

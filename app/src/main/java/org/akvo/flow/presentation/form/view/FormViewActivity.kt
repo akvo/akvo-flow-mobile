@@ -73,7 +73,6 @@ class FormViewActivity : BackActivity(), IFormView,
         presenter.view = this
         sectionsPagerAdapter =
             QuestionGroupsPagerAdapter(
-                this,
                 supportFragmentManager
             )
         viewPager = findViewById(R.id.pager)

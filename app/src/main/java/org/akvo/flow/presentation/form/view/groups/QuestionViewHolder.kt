@@ -241,7 +241,7 @@ sealed class QuestionViewHolder<T : ViewQuestionAnswer>(val view: View) :
             index: Int
         ) {
             setUpTitle(questionAnswer.title, questionAnswer.mandatory)
-            if (questionAnswer.viewLocation.isValid()) {
+            if (questionAnswer.viewLocation != null && questionAnswer.viewLocation.isValid()) {
                 view.findViewById<TextInputEditText>(R.id.lat_et)
                     .setText(questionAnswer.viewLocation.latitude)
                 view.findViewById<TextInputEditText>(R.id.lon_et)

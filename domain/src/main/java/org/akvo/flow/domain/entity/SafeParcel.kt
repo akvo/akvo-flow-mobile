@@ -20,8 +20,20 @@
 package org.akvo.flow.domain.entity
 
 import android.os.Parcel
+import android.os.Parcelable
+import java.util.ArrayList
 
 fun Parcel.readStringNonNull(): String {
     val unParceled = readString()
     return unParceled ?: unParceled ?: ""
+}
+
+fun Parcel.createStringArrayNonNull(): ArrayList<String> {
+    val unParceled = createStringArrayList()
+    return unParceled ?: unParceled ?: arrayListOf()
+}
+
+fun <T> Parcel.createTypedArrayNonNull(creator: Parcelable.Creator<T>): List<T> {
+    val unParceled = createTypedArray(creator)
+    return unParceled?.toList() ?: emptyList()
 }

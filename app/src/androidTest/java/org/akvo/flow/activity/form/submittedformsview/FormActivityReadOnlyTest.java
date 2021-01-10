@@ -430,7 +430,7 @@ public class FormActivityReadOnlyTest {
 
     private void verifyCascadeLevelSpinner(List<CascadeNode> values, int i) {
         ViewInteraction cascadeLevelSpinner = onView(
-                allOf(withId(R.id.cascade_level_spinner), withTagValue(is(i))));
+                allOf(withId(R.id.cascade_level_textview), withTagValue(is(i))));
         cascadeLevelSpinner.perform(scrollTo());
         cascadeLevelSpinner.check(matches(isDisplayed()));
         cascadeLevelSpinner

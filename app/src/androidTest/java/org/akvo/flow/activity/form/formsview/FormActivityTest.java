@@ -419,7 +419,7 @@ public class FormActivityTest {
 
     private void verifyCascadeFirstLevelSpinner(Question question) {
         ViewInteraction cascadeFirstLevelSpinner = onView(
-                allOf(withId(R.id.cascade_level_spinner),
+                allOf(withId(R.id.cascade_level_textview),
                         withQuestionViewParent(question, CascadeQuestionView.class)));
         cascadeFirstLevelSpinner.perform(scrollTo());
         cascadeFirstLevelSpinner.check(matches(isDisplayed()));

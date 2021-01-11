@@ -24,6 +24,14 @@ import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 
+import androidx.test.espresso.DataInteraction;
+import androidx.test.espresso.ViewInteraction;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
+import androidx.test.filters.LargeTest;
+import androidx.test.platform.app.InstrumentationRegistry;
+import androidx.test.rule.ActivityTestRule;
+import androidx.test.rule.GrantPermissionRule;
+
 import org.akvo.flow.R;
 import org.akvo.flow.activity.FormActivity;
 import org.akvo.flow.activity.form.data.SurveyInstaller;
@@ -53,14 +61,6 @@ import org.junit.runner.RunWith;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import androidx.test.espresso.DataInteraction;
-import androidx.test.espresso.ViewInteraction;
-import androidx.test.ext.junit.runners.AndroidJUnit4;
-import androidx.test.filters.LargeTest;
-import androidx.test.platform.app.InstrumentationRegistry;
-import androidx.test.rule.ActivityTestRule;
-import androidx.test.rule.GrantPermissionRule;
 
 import static androidx.test.espresso.Espresso.onData;
 import static androidx.test.espresso.Espresso.onView;
@@ -427,11 +427,11 @@ public class FormActivityTest {
 
     private void verifyCascadeLevelSpinnerTitle(Question question) {
         ViewInteraction firstLevelCascadeDescription = onView(
-                allOf(withId(R.id.cascade_spinner_item_text),
+                allOf(withId(R.id.cascade_level_textview),
                         withQuestionViewParent(question, CascadeQuestionView.class)));
         firstLevelCascadeDescription.perform(scrollTo());
         firstLevelCascadeDescription.check(matches(isDisplayed()));
-        firstLevelCascadeDescription.check(matches(withText(R.string.select)));
+        firstLevelCascadeDescription.check(matches(withHint(R.string.cascade_level_textview_hint)));
     }
 
     private void verifyCascadeFirstLevelNumber(Question question, Level level) {

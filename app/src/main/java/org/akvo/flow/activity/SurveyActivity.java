@@ -55,7 +55,6 @@ import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.entity.User;
 import org.akvo.flow.domain.interactor.DefaultObserver;
 import org.akvo.flow.domain.interactor.users.GetSelectedUser;
-import org.akvo.flow.domain.util.VersionHelper;
 import org.akvo.flow.injector.component.ApplicationComponent;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
@@ -71,12 +70,14 @@ import org.akvo.flow.presentation.navigation.EditUserDialog;
 import org.akvo.flow.presentation.navigation.FlowNavigationView;
 import org.akvo.flow.presentation.navigation.SurveyDeleteConfirmationDialog;
 import org.akvo.flow.presentation.navigation.UserOptionsDialog;
+import org.akvo.flow.presentation.navigation.ViewSurvey;
 import org.akvo.flow.presentation.navigation.ViewUser;
+import org.akvo.flow.presentation.survey.CustomDrawerArrowDrawable;
 import org.akvo.flow.presentation.survey.SurveyPresenter;
 import org.akvo.flow.presentation.survey.SurveyView;
-import org.akvo.flow.service.bootstrap.BootstrapWorker;
 import org.akvo.flow.service.SurveyDownloadWorker;
 import org.akvo.flow.service.TimeCheckService;
+import org.akvo.flow.service.bootstrap.BootstrapWorker;
 import org.akvo.flow.tracking.TrackingHelper;
 import org.akvo.flow.tracking.TrackingListener;
 import org.akvo.flow.ui.Navigator;
@@ -87,6 +88,7 @@ import org.akvo.flow.uicomponents.SnackBarManager;
 import org.akvo.flow.util.AppPermissionsHelper;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.ViewUtil;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -142,9 +144,6 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     AppPermissionsHelper appPermissionsHelper;
 
     @Inject
-    VersionHelper versionHelper;
-
-    @Inject
     SurveyPresenter presenter;
 
     private SurveyGroup mSurveyGroup;
@@ -157,6 +156,7 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     private boolean permissionsResults;
     private TrackingHelper trackingHelper;
     private boolean servicesStarted = false;
+    private CustomDrawerArrowDrawable customDrawerArrowDrawable;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -319,7 +319,8 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     private void initNavigationDrawer() {
         mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout,
                 R.string.drawer_open, R.string.drawer_close);
-
+        customDrawerArrowDrawable = new CustomDrawerArrowDrawable(getSupportActionBar().getThemedContext());
+        mDrawerToggle.setDrawerArrowDrawable(customDrawerArrowDrawable);
         mDrawerLayout.addDrawerListener(mDrawerToggle);
         if (mSurveyGroup == null) {
             mDrawerLayout.openDrawer(GravityCompat.START);
@@ -654,6 +655,13 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
         navigate(() -> navigator.navigateToOfflineAreasList(SurveyActivity.this));
     }
 
+    @Override
+    public void updateDrawerIcon(@NotNull List<ViewSurvey> newSurveys) {
+        if (customDrawerArrowDrawable != null) {
+            customDrawerArrowDrawable.setEnabled(newSurveys.size() > 0);
+        }
+    }
+
     private void navigate(Runnable runnable) {
         mDrawerLayout.closeDrawers();
         mDrawerLayout.postDelayed(runnable, NAVIGATION_DRAWER_DELAY_MILLIS);
@@ -747,4 +755,5 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     public void onWindowSelected(String id) {
         onDatapointSelected(id);
     }
+
 }

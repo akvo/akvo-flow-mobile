@@ -84,7 +84,14 @@ class BootstrapProcessor @Inject constructor(
             val surveyFile: File = fileProcessor.createAndCopyNewSurveyFile(filename, surveyFolderName, zipFile, entry)
             // now read the survey XML back into memory to see if there is a version
             val surveyMetadata = fileProcessor.readBasicSurveyData(surveyFile)
-            if (surveyMetadata.app.isNullOrBlank() || !BuildConfig.SERVER_BASE.contains(
+
+            //uat1 uses the same for server base and instance url
+            val instanceCodeName: String = if (BuildConfig.SERVER_BASE == BuildConfig.INSTANCE_URL) {
+                BuildConfig.AWS_BUCKET
+            } else {
+                BuildConfig.SERVER_BASE
+            }
+            if (surveyMetadata.app.isNullOrBlank() || !instanceCodeName.contains(
                     surveyMetadata.app)
             ) {
                 return ProcessingResult.ProcessingErrorWrongDashboard

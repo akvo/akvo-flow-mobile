@@ -19,14 +19,9 @@
 package org.akvo.flow.ui.view
 
 import android.content.Context
-import android.graphics.Paint
-import android.view.View
-import android.view.ViewGroup
 import android.widget.ArrayAdapter
-import android.widget.TextView
 import org.akvo.flow.R
 import org.akvo.flow.domain.Node
-import timber.log.Timber
 
 internal class CascadeAdapter(context: Context?, nodes: List<Node>?) : ArrayAdapter<Node?>(
     context!!, R.layout.cascade_spinner_item, R.id.cascade_spinner_item_text, nodes!!
@@ -36,36 +31,6 @@ internal class CascadeAdapter(context: Context?, nodes: List<Node>?) : ArrayAdap
     init {
         setDropDownViewResource(R.layout.cascade_spinner_item)
         this.nodes = nodes
-    }
-
-    override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
-        val view = super.getView(position, convertView, parent)
-        setStyle(view, position)
-        return view
-    }
-
-    override fun getDropDownView(
-        position: Int, convertView: View,
-        parent: ViewGroup
-    ): View {
-        val view = super.getDropDownView(position, convertView, parent)
-        setStyle(view, position)
-        return view
-    }
-
-    private fun setStyle(view: View, position: Int) {
-        try {
-            val text = view.findViewById<TextView>(R.id.cascade_spinner_item_text)
-            var flags = text.paintFlags
-            flags = if (position == 0) {
-                flags or Paint.FAKE_BOLD_TEXT_FLAG
-            } else {
-                flags and Paint.FAKE_BOLD_TEXT_FLAG.inv()
-            }
-            text.paintFlags = flags
-        } catch (e: ClassCastException) {
-            Timber.e("View cannot be casted to TextView!")
-        }
     }
 
     fun getItem(itemText: String?): Node? {
@@ -79,5 +44,4 @@ internal class CascadeAdapter(context: Context?, nodes: List<Node>?) : ArrayAdap
         }
         return null
     }
-
 }

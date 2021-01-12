@@ -55,7 +55,7 @@ public class CascadeQuestionView extends QuestionView {
     @Inject
     FormResourcesFileBrowser resourcesFileUtil;
 
-    private static final int POSITION_NONE = -1; // no spinner position id
+    private static final int POSITION_NONE = -1; // no textView position id
     private static final long ID_NONE = -1; // no node id
     private static final long ID_ROOT = 0; // root node id
 
@@ -131,7 +131,7 @@ public class CascadeQuestionView extends QuestionView {
 
         final int nextLevel = updatedSpinnerIndex + 1;
 
-        // First, clean up descendant spinners (if any)
+        // First, clean up descendant textViews (if any)
         while (nextLevel < cascadeLevelsContainer.getChildCount()) {
             cascadeLevelsContainer.removeViewAt(nextLevel);
         }
@@ -183,13 +183,12 @@ public class CascadeQuestionView extends QuestionView {
 
         ArrayAdapter<Node> adapter = new CascadeAdapter(getContext(), values);
         autoCompleteTextView.setAdapter(adapter);
-        autoCompleteTextView.setTag(position);// Tag the spinner with its position within the container
+        autoCompleteTextView.setTag(position);// Tag the textView with its position within the container
         autoCompleteTextView.setEnabled(!isReadOnly());
         if (selection != POSITION_NONE) {
             autoCompleteTextView.setText(adapter.getItem(selection).toString());
         }
         if (!isReadOnly()) {
-            // Attach listener asynchronously, preventing selection event from being fired off right away
             autoCompleteTextView.setOnItemClickListener((parent, view1, position1, id) -> {
                 final int index = (Integer) autoCompleteTextView.getTag();
                 updateTextViews(index);
@@ -212,8 +211,8 @@ public class CascadeQuestionView extends QuestionView {
 
         List<CascadeNode> values = CascadeValue.deserialize(answer);
 
-        // For each existing value, we load the corresponding level nodes, and create a spinner
-        // view, automatically selecting the token. On each iteration, we keep track of selected
+        // For each existing value, we load the corresponding level nodes, and create an
+        // AutocompleteTextView automatically selecting the token. On each iteration, we keep track of selected
         // value's id, in order to fetch the descendant nodes from the DB.
         int index = 0;
         long parentId = 0;

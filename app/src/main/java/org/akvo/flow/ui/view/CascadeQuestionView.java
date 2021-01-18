@@ -20,6 +20,7 @@
 package org.akvo.flow.ui.view;
 
 import android.content.Context;
+import android.os.Build;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -195,6 +196,14 @@ public class CascadeQuestionView extends QuestionView {
                 captureResponse();
                 setError(null);
             });
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+                autoCompleteTextView.setOnDismissListener(() -> {
+                    final int index = (Integer) autoCompleteTextView.getTag();
+                    if (getSelectedNode(index) == null) {
+                        setError(getResources().getString(R.string.error_question_mandatory));
+                    }
+                });
+            }
         }
         cascadeLevelsContainer.addView(view);
     }

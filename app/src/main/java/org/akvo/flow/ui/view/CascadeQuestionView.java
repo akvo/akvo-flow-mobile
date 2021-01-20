@@ -20,11 +20,11 @@
 package org.akvo.flow.ui.view;
 
 import android.content.Context;
-import android.os.Build;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -56,7 +56,7 @@ public class CascadeQuestionView extends QuestionView {
     @Inject
     FormResourcesFileBrowser resourcesFileUtil;
 
-    private static final int POSITION_NONE = -1; // no textView position id
+    public  static final int POSITION_NONE = -1; // no textView position id
     private static final long ID_NONE = -1; // no node id
     private static final long ID_ROOT = 0; // root node id
 
@@ -174,37 +174,37 @@ public class CascadeQuestionView extends QuestionView {
 
         View view = inflater.inflate(R.layout.cascading_level_item, cascadeLevelsContainer, false);
         final TextView text = view.findViewById(R.id.cascade_level_number);
-        final AutoCompleteTextView autoCompleteTextView = view.findViewById(R.id.cascade_level_textview);
-        if (!isReadOnly()) {
-            autoCompleteTextView.setOnClickListener(v -> autoCompleteTextView.showDropDown());
-            autoCompleteTextView.setOnFocusChangeListener((v, hasFocus) -> autoCompleteTextView.showDropDown());
-        }
+        final FlowAutoComplete autoCompleteTextView = view.findViewById(R.id.cascade_level_textview);
 
-        text.setText(mLevels != null && mLevels.length > position ? mLevels[position] : "");
+        String levelTitle = mLevels != null && mLevels.length > position ? mLevels[position] : "";
+        text.setText(levelTitle);
 
-        ArrayAdapter<Node> adapter = new CascadeAdapter(getContext(), values);
-        autoCompleteTextView.setAdapter(adapter);
-        autoCompleteTextView.setTag(position);// Tag the textView with its position within the container
-        autoCompleteTextView.setEnabled(!isReadOnly());
-        if (selection != POSITION_NONE) {
-            autoCompleteTextView.setText(adapter.getItem(selection).toString());
-        }
-        if (!isReadOnly()) {
-            autoCompleteTextView.setOnItemClickListener((parent, view1, position1, id) -> {
-                final int index = (Integer) autoCompleteTextView.getTag();
-                updateTextViews(index);
-                captureResponse();
-                setError(null);
-            });
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-                autoCompleteTextView.setOnDismissListener(() -> {
-                    final int index = (Integer) autoCompleteTextView.getTag();
-                    if (getSelectedNode(index) == null) {
-                        setError(getResources().getString(R.string.error_question_mandatory));
-                    }
-                });
+        autoCompleteTextView.updateAutoComplete(position, values, selection, levelTitle, isReadOnly());
+        autoCompleteTextView.setOnItemClickListener((parent, view1, position1, id) -> {
+            int index = (int) autoCompleteTextView.getTag();
+            updateTextViews(index);
+            captureResponse();
+        });
+        autoCompleteTextView.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                //ignore
             }
-        }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                //ignore
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (!autoCompleteTextView.isPopupShowing()) {
+                    int index = (int) autoCompleteTextView.getTag();
+                    updateTextViews(index);
+                    captureResponse();
+                }
+            }
+        });
         cascadeLevelsContainer.addView(view);
     }
 

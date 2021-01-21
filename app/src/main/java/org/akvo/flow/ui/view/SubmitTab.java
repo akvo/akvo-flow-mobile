@@ -29,15 +29,15 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import androidx.annotation.Nullable;
+import androidx.annotation.VisibleForTesting;
+
 import org.akvo.flow.R;
 import org.akvo.flow.domain.Question;
 import org.akvo.flow.event.SurveyListener;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import androidx.annotation.Nullable;
-import androidx.annotation.VisibleForTesting;
 
 public class SubmitTab extends ListView implements OnClickListener {
 
@@ -46,10 +46,10 @@ public class SubmitTab extends ListView implements OnClickListener {
 
     private final QuestionListAdapter adapter;
 
-    private SurveyListener mListener;
+    private final SurveyListener mListener;
 
-    private TextView mHeaderView;
-    private Button mSubmitButton;
+    private final TextView mHeaderView;
+    private final Button mSubmitButton;
 
     public SubmitTab(Context context) {
         super(context);
@@ -59,7 +59,7 @@ public class SubmitTab extends ListView implements OnClickListener {
         mListener = (SurveyListener) context;
         setId(R.id.submit_tab);
         final int listPadding = (int) getResources().getDimension(R.dimen.form_left_right_padding);
-        setPadding(listPadding, 0, listPadding, listPadding);
+        setPadding(listPadding, listPadding, listPadding, listPadding);
 
         mHeaderView = (TextView) inflate(context, R.layout.submit_tab_header);
 

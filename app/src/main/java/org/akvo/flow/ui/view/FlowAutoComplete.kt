@@ -20,13 +20,9 @@
 package org.akvo.flow.ui.view
 
 import android.content.Context
-import android.os.Build
-import android.text.Editable
-import android.text.TextWatcher
 import android.util.AttributeSet
 import android.view.View
 import android.view.View.OnFocusChangeListener
-import android.widget.AdapterView
 import androidx.appcompat.widget.AppCompatAutoCompleteTextView
 import org.akvo.flow.R
 import org.akvo.flow.domain.Node
@@ -46,14 +42,12 @@ class FlowAutoComplete @JvmOverloads constructor(
         position: Int,
         values: List<Node>,
         selection: Int,
-        levelTitle: String,
         readOnly: Boolean
     ) {
         val adapter = CascadeAdapter(context, values)
         setAdapter(adapter)
         tag = position // Tag the textView with its position within the container
         isEnabled = !readOnly
-        hint = context.getString(R.string.cascade_level_textview_hint, levelTitle)
         if (selection != POSITION_NONE) {
             setText(adapter.getItem(selection).toString())
         }
@@ -65,42 +59,6 @@ class FlowAutoComplete @JvmOverloads constructor(
                         showDropDown()
                     }
                 }
-            AdapterView.OnItemClickListener { _: AdapterView<*>?, _: View?, _: Int, _: Long ->
-                error = null
-            }.also { onItemClickListener = it }
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-                setOnDismissListener {
-                    if (getSelectedItem() == null) {
-                        error = resources.getString(R.string.cascade_level_textview_error)
-                    }
-                }
-            }
-            addTextChangedListener(object : TextWatcher {
-                override fun beforeTextChanged(
-                    s: CharSequence,
-                    start: Int,
-                    count: Int,
-                    after: Int
-                ) {
-                    //ignore
-                }
-
-                override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
-                    //ignore
-                }
-
-                override fun afterTextChanged(s: Editable) {
-                    error = if (!isPopupShowing) {
-                        if (getSelectedItem() == null) {
-                            resources.getString(R.string.cascade_level_textview_error)
-                        } else {
-                            null
-                        }
-                    } else {
-                        null
-                    }
-                }
-            })
             validator = object : Validator {
                 override fun isValid(text: CharSequence): Boolean {
                     return adapter.getItem(text.toString()) != null
@@ -113,7 +71,7 @@ class FlowAutoComplete @JvmOverloads constructor(
         }
     }
 
-    private fun getSelectedItem(): String? {
+    fun getSelectedItem(): String? {
         return (adapter as CascadeAdapter).getItem(text.toString())?.name
     }
 }

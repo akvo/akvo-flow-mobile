@@ -154,12 +154,11 @@
         <item name="android:textSize">16sp</item>
     </style>
 
-    <style name="FormButtonStyle" parent="Widget.AppCompat.Button.Borderless.Colored">
-        <item name="android:background">@drawable/bg_btn_outline</item>
+    <style name="FormButtonStyle" parent="Widget.MaterialComponents.Button.OutlinedButton">
         <item name="android:textSize">16sp</item>
     </style>
 
-    <style name="RepeatButtonStyle" parent="Widget.AppCompat.Button.Borderless.Colored">
+    <style name="RepeatButtonStyle" parent="Widget.MaterialComponents.Button.TextButton">
         <item name="android:textSize">16sp</item>
     </style>
 

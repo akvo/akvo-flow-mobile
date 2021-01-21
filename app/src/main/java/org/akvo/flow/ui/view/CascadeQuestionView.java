@@ -20,6 +20,7 @@
 package org.akvo.flow.ui.view;
 
 import android.content.Context;
+import android.os.Build;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
@@ -28,6 +29,8 @@ import android.view.View;
 import android.widget.AutoCompleteTextView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import com.google.android.material.textfield.TextInputLayout;
 
 import org.akvo.flow.R;
 import org.akvo.flow.data.database.cascade.CascadeDB;
@@ -179,12 +182,22 @@ public class CascadeQuestionView extends QuestionView {
         String levelTitle = mLevels != null && mLevels.length > position ? mLevels[position] : "";
         text.setText(levelTitle);
 
-        autoCompleteTextView.updateAutoComplete(position, values, selection, levelTitle, isReadOnly());
+        autoCompleteTextView.updateAutoComplete(position, values, selection, isReadOnly());
+        final TextInputLayout layout = view.findViewById(R.id.outlinedTextField);
+        layout.setHint(getContext().getString(R.string.cascade_level_textview_hint, levelTitle));
         autoCompleteTextView.setOnItemClickListener((parent, view1, position1, id) -> {
             int index = (int) autoCompleteTextView.getTag();
             updateTextViews(index);
             captureResponse();
+            layout.setError(null);
         });
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            autoCompleteTextView.setOnDismissListener(() -> {
+                if (autoCompleteTextView.getSelectedItem() == null) {
+                    layout.setError(getContext().getString(R.string.cascade_level_textview_error));
+                }
+            });
+        }
         autoCompleteTextView.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -202,6 +215,13 @@ public class CascadeQuestionView extends QuestionView {
                     int index = (int) autoCompleteTextView.getTag();
                     updateTextViews(index);
                     captureResponse();
+                    if (autoCompleteTextView.getSelectedItem() == null) {
+                        layout.setError(getContext().getString(R.string.cascade_level_textview_error));
+                    } else {
+                        layout.setError(null);
+                    }
+                } else {
+                    layout.setError(null);
                 }
             }
         });

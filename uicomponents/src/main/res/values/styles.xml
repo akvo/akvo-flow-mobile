@@ -32,6 +32,7 @@
     <style name="TextAppearance.Tabs" parent="TextAppearance.Design.Tab">
         <item name="android:textStyle">bold</item>
         <item name="android:singleLine">true</item>
+        <item name="android:textColor">@color/white</item>
     </style>
 
     <style name="FlowAppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />

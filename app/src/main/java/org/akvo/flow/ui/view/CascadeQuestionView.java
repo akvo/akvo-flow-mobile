@@ -195,6 +195,8 @@ public class CascadeQuestionView extends QuestionView {
             autoCompleteTextView.setOnDismissListener(() -> {
                 if (autoCompleteTextView.getSelectedItem() == null) {
                     layout.setError(getContext().getString(R.string.cascade_level_textview_error));
+                    int index = (int) autoCompleteTextView.getTag();
+                    updateTextViews(index);
                 }
             });
         }
@@ -217,6 +219,7 @@ public class CascadeQuestionView extends QuestionView {
                     captureResponse();
                     if (autoCompleteTextView.getSelectedItem() == null) {
                         layout.setError(getContext().getString(R.string.cascade_level_textview_error));
+                        updateTextViews(index);
                     } else {
                         layout.setError(null);
                     }

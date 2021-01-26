@@ -85,7 +85,7 @@ class BootstrapProcessor @Inject constructor(
             // now read the survey XML back into memory to see if there is a version
             val surveyMetadata = fileProcessor.readBasicSurveyData(surveyFile)
 
-            //uat1 uses the same for server base and instance url
+            //most instances use the same for server base and instance url now
             val instanceCodeName: String = if (BuildConfig.SERVER_BASE == BuildConfig.INSTANCE_URL) {
                 BuildConfig.AWS_BUCKET
             } else {

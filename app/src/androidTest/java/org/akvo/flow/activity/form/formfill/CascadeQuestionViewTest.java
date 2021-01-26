@@ -58,12 +58,13 @@ import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.action.ViewActions.scrollTo;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
-import static androidx.test.espresso.matcher.ViewMatchers.withHint;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withTagValue;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
+import static org.akvo.flow.activity.CustomMatchers.hasTextInputLayoutHintText;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.addExecutionDelay;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.getFormActivityIntent;
+import static org.akvo.flow.activity.form.FormActivityTestUtil.getString;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.verifyCascadeLevelNumber;
 import static org.akvo.flow.tests.R.raw.cascade_form;
 import static org.hamcrest.CoreMatchers.is;
@@ -119,30 +120,31 @@ public class CascadeQuestionViewTest {
                 Level level = levels.get(i);
                 verifyCascadeLevelNumber(level);
 
-                ViewInteraction cascadeLevel = onView(
-                        allOf(withId(R.id.cascade_level_textview), withTagValue(is(i))));
+                ViewInteraction cascadeLevelInputLayout = onView(
+                        allOf(withId(R.id.outlinedTextField), withTagValue(is(i))));
 
-                verifyCascadeInitialState(cascadeLevel);
+                verifyCascadeInitialState(cascadeLevelInputLayout, level.getText());
 
                 int position = random.nextInt(levelNodes.size());
                 Node node = levelNodes.get(position);
                 levelNodes = cascadeNodes.get((int) node.getId());
+                ViewInteraction cascadeLevelInput = onView(
+                        allOf(withId(R.id.cascade_level_textview), withTagValue(is(i))));
+                selectCascadeItem(cascadeLevelInput, node);
 
-                selectCascadeItem(cascadeLevel, node);
-
-                verifyCascadeNewState(cascadeLevel, node);
+                verifyCascadeNewState(cascadeLevelInput, node);
             }
         }
     }
 
-    private void verifyCascadeInitialState(ViewInteraction cascadeLevelSpinner) {
-        cascadeLevelSpinner.perform(scrollTo());
-        cascadeLevelSpinner.check(matches(isDisplayed()));
-        cascadeLevelSpinner.check(matches(withHint(R.string.cascade_level_textview_hint)));
+    private void verifyCascadeInitialState(ViewInteraction cascadeLevelInput, String text) {
+        cascadeLevelInput.perform(scrollTo());
+        cascadeLevelInput.check(matches(isDisplayed()));
+        cascadeLevelInput.check(matches(hasTextInputLayoutHintText(getString(R.string.cascade_level_textview_hint, rule, text))));
     }
 
-    private void selectCascadeItem(ViewInteraction cascadeLevelSpinner, Node node) {
-        cascadeLevelSpinner.perform(click());
+    private void selectCascadeItem(ViewInteraction cascadeLevelInput, Node node) {
+        cascadeLevelInput.perform(click());
         addExecutionDelay(100);
         onView(withText(node.getName()))
                 .inRoot(RootMatchers.isPlatformPopup())
@@ -150,8 +152,8 @@ public class CascadeQuestionViewTest {
         addExecutionDelay(100);
     }
 
-    private void verifyCascadeNewState(ViewInteraction cascadeLevelSpinner, Node node) {
-        cascadeLevelSpinner.check(matches(withText(node.getName())));
+    private void verifyCascadeNewState(ViewInteraction cascadeLevelInput, Node node) {
+        cascadeLevelInput.check(matches(withText(node.getName())));
     }
 
     public static Matcher<Node> withNode(final Node nodeToMatch) {

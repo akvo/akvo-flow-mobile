@@ -76,6 +76,7 @@ import static androidx.test.espresso.matcher.ViewMatchers.withHint;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static org.akvo.flow.activity.ChildPositionMatcher.childAtPosition;
+import static org.akvo.flow.activity.CustomMatchers.hasTextInputLayoutHintText;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.getCameraButton;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.getDateButton;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.getDateEditText;
@@ -85,6 +86,7 @@ import static org.akvo.flow.activity.form.FormActivityTestUtil.getFreeTextInput;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.getGalleryButton;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.getGeoButton;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.getOptionView;
+import static org.akvo.flow.activity.form.FormActivityTestUtil.getString;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.selectAndVerifyTab;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.verifyAccuracyLabel;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.verifyDoubleEntryTitle;
@@ -427,11 +429,12 @@ public class FormActivityTest {
 
     private void verifyCascadeLevelSpinnerTitle(Question question) {
         ViewInteraction firstLevelCascadeDescription = onView(
-                allOf(withId(R.id.cascade_level_textview),
+                allOf(withId(R.id.outlinedTextField),
                         withQuestionViewParent(question, CascadeQuestionView.class)));
         firstLevelCascadeDescription.perform(scrollTo());
         firstLevelCascadeDescription.check(matches(isDisplayed()));
-        firstLevelCascadeDescription.check(matches(withHint(R.string.cascade_level_textview_hint)));
+        String levelText = question.getLevels().get(0).getText();
+        firstLevelCascadeDescription.check(matches(hasTextInputLayoutHintText(getString(R.string.cascade_level_textview_hint, rule, levelText))));
     }
 
     private void verifyCascadeFirstLevelNumber(Question question, Level level) {

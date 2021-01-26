@@ -185,6 +185,7 @@ public class CascadeQuestionView extends QuestionView {
         autoCompleteTextView.updateAutoComplete(position, values, selection, isReadOnly());
         final TextInputLayout layout = view.findViewById(R.id.outlinedTextField);
         layout.setHint(getContext().getString(R.string.cascade_level_textview_hint, levelTitle));
+        layout.setTag(position);
         autoCompleteTextView.setOnItemClickListener((parent, view1, position1, id) -> {
             int index = (int) autoCompleteTextView.getTag();
             updateTextViews(index);

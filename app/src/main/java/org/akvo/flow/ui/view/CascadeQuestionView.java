@@ -178,14 +178,15 @@ public class CascadeQuestionView extends QuestionView {
         View view = inflater.inflate(R.layout.cascading_level_item, cascadeLevelsContainer, false);
         final TextView text = view.findViewById(R.id.cascade_level_number);
         final FlowAutoComplete autoCompleteTextView = view.findViewById(R.id.cascade_level_textview);
+        final TextInputLayout layout = view.findViewById(R.id.outlinedTextField);
 
         String levelTitle = mLevels != null && mLevels.length > position ? mLevels[position] : "";
         text.setText(levelTitle);
 
-        autoCompleteTextView.updateAutoComplete(position, values, selection, isReadOnly());
-        final TextInputLayout layout = view.findViewById(R.id.outlinedTextField);
         layout.setHint(getContext().getString(R.string.cascade_level_textview_hint, levelTitle));
         layout.setTag(position);
+
+        autoCompleteTextView.updateAutoComplete(position, values, selection, isReadOnly());
         autoCompleteTextView.setOnItemClickListener((parent, view1, position1, id) -> {
             int index = (int) autoCompleteTextView.getTag();
             updateTextViews(index);

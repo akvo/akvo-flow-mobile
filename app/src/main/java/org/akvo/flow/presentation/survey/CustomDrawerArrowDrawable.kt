@@ -20,18 +20,22 @@ package org.akvo.flow.presentation.survey
 
 import android.content.Context
 import android.graphics.Canvas
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.appcompat.graphics.drawable.DrawerArrowDrawable
 import org.akvo.flow.R
 
 class CustomDrawerArrowDrawable(context: Context) : DrawerArrowDrawable(context) {
 
-    private val customDrawable = context.resources.getDrawable(R.drawable.ic_new_forms_icon, null)
+    private val customDrawable = AppCompatResources.getDrawable(context, R.drawable.ic_new_forms_icon)
+
     var isEnabled = false
 
     override fun draw(canvas: Canvas) {
         if (isEnabled) {
-            customDrawable.setBounds(bounds.left, bounds.top, bounds.right, bounds.bottom)
-            customDrawable.draw(canvas)
+            customDrawable?.let {
+                customDrawable.setBounds(bounds.left, bounds.top, bounds.right, bounds.bottom)
+                customDrawable.draw(canvas)
+            }
         } else {
             super.draw(canvas)
         }

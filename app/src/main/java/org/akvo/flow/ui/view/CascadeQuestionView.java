@@ -252,9 +252,9 @@ public class CascadeQuestionView extends QuestionView {
         long parentId = 0;
         while (index < values.size()) {
             int valuePosition = POSITION_NONE;
-            List<Node> spinnerValues = mDatabase.getValues(parentId);
-            for (int pos = 0; pos < spinnerValues.size(); pos++) {
-                Node node = spinnerValues.get(pos);
+            List<Node> cascadeLevelValues = mDatabase.getValues(parentId);
+            for (int pos = 0; pos < cascadeLevelValues.size(); pos++) {
+                Node node = cascadeLevelValues.get(pos);
                 CascadeNode v = values.get(index);
                 if (node.getName().equals(v.getName())) {
                     valuePosition = pos;
@@ -263,11 +263,11 @@ public class CascadeQuestionView extends QuestionView {
                 }
             }
 
-            if (valuePosition == POSITION_NONE || spinnerValues.isEmpty()) {
+            if (valuePosition == POSITION_NONE || cascadeLevelValues.isEmpty()) {
                 cascadeLevelsContainer.removeAllViews();
                 return;// Cannot reassemble response
             }
-            addLevelView(index, spinnerValues, valuePosition);
+            addLevelView(index, cascadeLevelValues, valuePosition);
             index++;
         }
         if (!isReadOnly()) {

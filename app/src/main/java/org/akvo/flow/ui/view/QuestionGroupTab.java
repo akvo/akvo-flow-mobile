@@ -28,6 +28,8 @@ import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import androidx.constraintlayout.widget.ConstraintLayout;
+
 import org.akvo.flow.R;
 import org.akvo.flow.domain.Dependency;
 import org.akvo.flow.domain.Question;
@@ -50,8 +52,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import androidx.constraintlayout.widget.ConstraintLayout;
 
 public class QuestionGroupTab extends ConstraintLayout
         implements QuestionGroupIterationHeader.OnDeleteListener {
@@ -351,9 +351,6 @@ public class QuestionGroupTab extends ConstraintLayout
         } else {
             layoutParams = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
         }
-        int margin = getDimension(R.dimen.form_left_right_padding);
-        layoutParams.leftMargin = margin;
-        layoutParams.rightMargin = margin;
         return layoutParams;
     }
 

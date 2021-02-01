@@ -204,6 +204,10 @@ class FlowNavigationView @JvmOverloads constructor(
 
     override fun displaySurveys(surveys: List<ViewSurvey>, selectedSurveyId: Long?) {
         surveyAdapter.setSurveys(surveys, selectedSurveyId!!)
+        val newSurveys = surveys.filter {
+            !it.viewed
+        }
+        drawerNavigationListener?.updateDrawerIcon(newSurveys)
     }
 
     override fun notifySurveyDeleted(surveyGroupId: Long) {
@@ -296,5 +300,6 @@ class FlowNavigationView @JvmOverloads constructor(
         fun navigateToAbout()
         fun navigateToSettings()
         fun navigateToOfflineMaps()
+        fun updateDrawerIcon(newSurveys: List<ViewSurvey>)
     }
 }

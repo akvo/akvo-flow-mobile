@@ -163,8 +163,10 @@ public class ConstantUtil {
     public static final int NOTIFICATION_FORM = 106;
 
     public static final int NOTIFICATION_BOOTSTRAP = 106;
+    public static final int NOTIFICATION_TIME = 107;
 
     public static final String NOTIFICATION_CHANNEL_ID = "1";
+    public static final String NOTIFICATION_CHANNEL_TIME = "2";
 
     public static final int UN_PUBLISH_NOTIFICATION_ID = 1235;
 

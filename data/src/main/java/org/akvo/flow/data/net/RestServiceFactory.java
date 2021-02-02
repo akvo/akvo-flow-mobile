@@ -51,6 +51,15 @@ public class RestServiceFactory {
         return retrofit.create(clazz);
     }
 
+    public <T> T createSimpleRetrofitService(final Class<T> clazz, String baseUrl) {
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(baseUrl)
+                .addConverterFactory(GsonConverterFactory.create())
+                .client(okHttpClient)
+                .build();
+        return retrofit.create(clazz);
+    }
+
     public <T> T createRetrofitService(final Class<T> clazz, String baseUrl) {
         return createRetrofit(clazz, baseUrl, okHttpClient, GsonConverterFactory.create());
     }

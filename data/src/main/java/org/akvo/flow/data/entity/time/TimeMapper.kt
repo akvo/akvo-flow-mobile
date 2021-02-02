@@ -16,23 +16,24 @@
  * You should have received a copy of the GNU General Public License
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.akvo.flow.service.time
 
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
-import org.akvo.flow.util.NotificationHelper
+package org.akvo.flow.data.entity.time
 
-class CancelNotificationReceiver : BroadcastReceiver() {
+import android.text.TextUtils
+import java.text.DateFormat
+import javax.inject.Inject
 
-    override fun onReceive(context: Context, intent: Intent) {
-        val notificationId = intent.getIntExtra(NOTIFICATION_ID_EXTRA, -1)
-        if (notificationId > -1) {
-            NotificationHelper.cancelNotification(context, notificationId)
+class TimeMapper @Inject constructor(private val dateFormat: DateFormat) {
+
+    fun formatTime(time: String): Long {
+        return if (isValid(time)) {
+            dateFormat.parse(time)?.time ?: -1
+        } else {
+            -1
         }
     }
 
-    companion object {
-        const val NOTIFICATION_ID_EXTRA = "notification_id"
+    fun isValid(value: String?): Boolean {
+        return !TextUtils.isEmpty(value) && !value.equals("null", ignoreCase = true)
     }
 }

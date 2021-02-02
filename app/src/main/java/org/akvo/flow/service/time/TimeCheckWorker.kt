@@ -20,49 +20,42 @@ package org.akvo.flow.service.time
 
 import android.content.Context
 import androidx.work.Constraints
+import androidx.work.CoroutineWorker
 import androidx.work.ExistingWorkPolicy
 import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
-import androidx.work.Worker
 import androidx.work.WorkerParameters
-import org.akvo.flow.api.FlowApi
+import org.akvo.flow.app.FlowApp
+import org.akvo.flow.domain.interactor.time.FetchServerTime
 import org.akvo.flow.util.NotificationHelper
-import org.akvo.flow.util.StringUtil
 import timber.log.Timber
-import java.io.IOException
-import java.text.DateFormat
-import java.text.ParseException
-import java.text.SimpleDateFormat
-import java.util.Locale
-import java.util.TimeZone
 import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 import kotlin.math.abs
 
 class TimeCheckWorker(context: Context, workerParams: WorkerParameters) :
-    Worker(context, workerParams) {
+    CoroutineWorker(context, workerParams) {
 
-    override fun doWork(): Result {
+    @Inject
+    lateinit var fetchServerTime: FetchServerTime
+
+    init {
+        val application = applicationContext as FlowApp
+        application.getApplicationComponent().inject(this)
+    }
+
+    override suspend fun doWork(): Result {
         return try {
-            val flowApi = FlowApi()
-            val time = flowApi.serverTime
-            if (StringUtil.isValid(time)) {
-                val df: DateFormat = SimpleDateFormat(PATTERN, Locale.getDefault())
-                df.timeZone = TimeZone.getTimeZone(TIMEZONE)
-                df.parse(time)?.let {
-                    val local = System.currentTimeMillis()
-                    val onTime = abs(it.time - local) < OFFSET_THRESHOLD
+            val serverTime = fetchServerTime.execute()
+            val local = System.currentTimeMillis()
+            val onTime = serverTime == INVALID_TIME || abs(serverTime - local) < OFFSET_THRESHOLD
 
-                    if (!onTime) {
-                        NotificationHelper.showTimeCheckNotification(applicationContext)
-                    }
-                }
+            if (!onTime) {
+                NotificationHelper.showTimeCheckNotification(applicationContext)
             }
             Result.success()
-        } catch (e: IOException) {
-            Timber.e(e, "Error fetching time")
-            Result.failure()
-        } catch (e: ParseException) {
+        } catch (e: Exception) {
             Timber.e(e, "Error fetching time")
             Result.failure()
         }
@@ -71,8 +64,7 @@ class TimeCheckWorker(context: Context, workerParams: WorkerParameters) :
     companion object {
         private const val TAG = "TimeCheckWorker"
         private const val OFFSET_THRESHOLD = (13 * 60 * 1000 ).toLong()// 13 minutes
-        private const val PATTERN = "yyyy-MM-dd'T'HH:mm:ss'Z'" // ISO 8601
-        private const val TIMEZONE = "UTC"
+        private const val INVALID_TIME = -1L
 
         @JvmStatic
         fun scheduleWork(context: Context) {

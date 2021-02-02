@@ -16,23 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.akvo.flow.service.time
 
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
-import org.akvo.flow.util.NotificationHelper
+package org.akvo.flow.data.entity.time
 
-class CancelNotificationReceiver : BroadcastReceiver() {
-
-    override fun onReceive(context: Context, intent: Intent) {
-        val notificationId = intent.getIntExtra(NOTIFICATION_ID_EXTRA, -1)
-        if (notificationId > -1) {
-            NotificationHelper.cancelNotification(context, notificationId)
-        }
-    }
-
-    companion object {
-        const val NOTIFICATION_ID_EXTRA = "notification_id"
-    }
-}
+data class TimeResult(val time: String)

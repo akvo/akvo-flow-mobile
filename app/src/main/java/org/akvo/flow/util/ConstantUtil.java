@@ -32,10 +32,8 @@ public class ConstantUtil {
      */
     public static final String ARCHIVE_SUFFIX = ".zip";
     public static final String XML_SUFFIX = ".xml";
-    public static final String BOOTSTRAP_DB_FILE = "dbinstructions.sql";
     public static final String PROCESSED_OK_SUFFIX = ".processed";
     public static final String PROCESSED_ERROR_SUFFIX = ".error";
-    public static final String BOOTSTRAP_ROLLBACK_FILE = "rollback.sql";
     public static final String CASCADE_RES_SUFFIX = ".sqlite.zip";
     public static final String DOT_SEPARATOR = ".";
 
@@ -163,8 +161,10 @@ public class ConstantUtil {
     public static final int NOTIFICATION_FORM = 106;
 
     public static final int NOTIFICATION_BOOTSTRAP = 106;
+    public static final int NOTIFICATION_TIME = 107;
 
     public static final String NOTIFICATION_CHANNEL_ID = "1";
+    public static final String NOTIFICATION_CHANNEL_TIME = "2";
 
     public static final int UN_PUBLISH_NOTIFICATION_ID = 1235;
 

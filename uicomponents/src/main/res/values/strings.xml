@@ -360,6 +360,11 @@
     <string name="cascade_level_textview_hint">Search or select %1$s</string>
     <string name="cascade_level_textview_error">This answer is not valid</string>
 
+    <string name="time_check_notification_title">Your phone time is inaccurate!</string>
+    <string name="time_check_notification_message">Flow app may not work correctly</string>
+    <string name="time_check_action_fix">Fix it</string>
+    <string name="time_check_action_dismiss">Dismiss</string>
+
     <plurals name="download_forms_error">
         <item quantity="one">Error downloading form</item>
         <item quantity="other">Error downloading forms</item>

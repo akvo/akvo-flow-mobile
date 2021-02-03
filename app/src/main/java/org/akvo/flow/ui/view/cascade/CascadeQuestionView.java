@@ -155,53 +155,59 @@ public class CascadeQuestionView extends QuestionView implements CascadeView {
         String levelTitle = mLevels != null && mLevels.length > position ? mLevels[position] : "";
         text.setText(levelTitle);
 
-        layout.setHint(getContext().getString(R.string.cascade_level_textview_hint, levelTitle));
+        if (isReadOnly()) {
+            layout.setEnabled(false);
+        } else {
+            layout.setHint(getContext().getString(R.string.cascade_level_textview_hint, levelTitle));
+        }
         layout.setTag(position);
 
         autoCompleteTextView.updateAutoComplete(position, values, selection, isReadOnly());
-        autoCompleteTextView.setOnItemClickListener((parent, view1, position1, id) -> {
-            int index = (int) autoCompleteTextView.getTag();
-            updateTextViews(index);
-            captureResponse();
-            layout.setError(null);
-        });
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-            autoCompleteTextView.setOnDismissListener(() -> {
-                if (autoCompleteTextView.getSelectedItem() == null) {
-                    layout.setError(getContext().getString(R.string.cascade_level_textview_error));
-                    int index = (int) autoCompleteTextView.getTag();
-                    updateTextViews(index);
-                }
+        if (!isReadOnly()) {
+            autoCompleteTextView.setOnItemClickListener((parent, view1, position1, id) -> {
+                int index = (int) autoCompleteTextView.getTag();
+                updateTextViews(index);
+                captureResponse();
+                layout.setError(null);
             });
-        }
-        autoCompleteTextView.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                //ignore
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                //ignore
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                if (!autoCompleteTextView.isPopupShowing()) {
-                    int index = (int) autoCompleteTextView.getTag();
-                    updateTextViews(index);
-                    captureResponse();
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+                autoCompleteTextView.setOnDismissListener(() -> {
                     if (autoCompleteTextView.getSelectedItem() == null) {
                         layout.setError(getContext().getString(R.string.cascade_level_textview_error));
+                        int index = (int) autoCompleteTextView.getTag();
                         updateTextViews(index);
+                    }
+                });
+            }
+            autoCompleteTextView.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                    //ignore
+                }
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+                    //ignore
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {
+                    if (!autoCompleteTextView.isPopupShowing()) {
+                        int index = (int) autoCompleteTextView.getTag();
+                        updateTextViews(index);
+                        captureResponse();
+                        if (autoCompleteTextView.getSelectedItem() == null) {
+                            layout.setError(getContext().getString(R.string.cascade_level_textview_error));
+                            updateTextViews(index);
+                        } else {
+                            layout.setError(null);
+                        }
                     } else {
                         layout.setError(null);
                     }
-                } else {
-                    layout.setError(null);
                 }
-            }
-        });
+            });
+        }
         cascadeLevelsContainer.addView(view);
     }
 

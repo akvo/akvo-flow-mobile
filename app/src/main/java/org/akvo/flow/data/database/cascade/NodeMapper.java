@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2019 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2019,2021 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -21,10 +21,12 @@
 package org.akvo.flow.data.database.cascade;
 
 import android.database.Cursor;
-import androidx.annotation.NonNull;
 import android.util.SparseArray;
 
+import androidx.annotation.NonNull;
+
 import org.akvo.flow.domain.Node;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,8 +37,8 @@ class NodeMapper {
     }
 
     @NonNull
-    List<Node> mapNodes(Cursor c) {
-        List<Node> result = new ArrayList<Node>(c.getCount());
+    List<Node> mapNodes(@NotNull Cursor c) {
+        List<Node> result = new ArrayList<>(c.getCount());
         if (c.moveToFirst()) {
             final int codeCol = c.getColumnIndex(NodeColumns.CODE);
             do {
@@ -49,7 +51,7 @@ class NodeMapper {
     }
 
     @NonNull
-    SparseArray<List<Node>> nodesAsMap(Cursor c) {
+    SparseArray<List<Node>> nodesAsMap(@NotNull Cursor c) {
         SparseArray<List<Node>> resultMap = new SparseArray<>();
         List<Node> nodes = mapNodes(c);
         for (Node node : nodes) {
@@ -65,10 +67,10 @@ class NodeMapper {
     }
 
     @NonNull
-    private Node mapNode(Cursor c, int codeColulumnIdx) {
-        Long id = c.getLong(c.getColumnIndex(NodeColumns.ID));
+    private Node mapNode(Cursor c, int codeColumnIdx) {
+        long id = c.getLong(c.getColumnIndex(NodeColumns.ID));
         String name = c.getString(c.getColumnIndex(NodeColumns.NAME));
-        String code = codeColulumnIdx > -1 ? c.getString(codeColulumnIdx) : null;
+        String code = codeColumnIdx > -1 ? c.getString(codeColumnIdx) : null;
         long parent = c.getLong(c.getColumnIndex(NodeColumns.PARENT));
         return new Node(id, name, code, parent);
     }

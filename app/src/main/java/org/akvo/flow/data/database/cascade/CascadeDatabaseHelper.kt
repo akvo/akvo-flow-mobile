@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2018,2021 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -17,28 +17,23 @@
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
+package org.akvo.flow.data.database.cascade
 
-package org.akvo.flow.data.database.cascade;
+import android.content.Context
+import android.database.sqlite.SQLiteDatabase
+import android.database.sqlite.SQLiteOpenHelper
 
-import android.content.Context;
-import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteOpenHelper;
+class CascadeDatabaseHelper(context: Context, dbPath: String) : SQLiteOpenHelper(context, dbPath, null, VERSION) {
 
-public class CascadeDatabaseHelper extends SQLiteOpenHelper {
-
-    private static final int VERSION = 1;
-
-    public CascadeDatabaseHelper(Context context, String dbPath) {
-        super(context, dbPath, null, VERSION);
-    }
-
-    @Override
-    public void onCreate(SQLiteDatabase db) {
+    override fun onCreate(db: SQLiteDatabase) {
         //EMPTY
     }
 
-    @Override
-    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+    override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
         //EMPTY
+    }
+
+    companion object {
+        private const val VERSION = 1
     }
 }

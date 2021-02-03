@@ -205,7 +205,7 @@ public class SurveyInstaller {
             if (db.exists()) {
                 CascadeDB cascadeDB = new CascadeDB(context, db.getAbsolutePath());
                 cascadeDB.open();
-                SparseArray<List<Node>> values = cascadeDB.getValues();
+                SparseArray<List<Node>> values = cascadeDB.loadAllValues();
                 cascadeDB.close();
                 return values;
             }

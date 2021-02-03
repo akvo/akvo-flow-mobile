@@ -24,7 +24,6 @@ import android.database.SQLException
 import android.database.sqlite.SQLiteDatabase
 import android.util.SparseArray
 import org.akvo.flow.domain.Node
-import java.util.ArrayList
 
 class CascadeDB(private val mContext: Context, private val mDBPath: String) {
     private val nodeMapper = NodeMapper()
@@ -40,30 +39,6 @@ class CascadeDB(private val mContext: Context, private val mDBPath: String) {
     fun close() {
         helper.close()
         database = null
-    }
-
-    val isOpen: Boolean get() = database != null
-
-    fun loadValuesForParent(parent: Long): List<Node> {
-        var result: List<Node> = ArrayList()
-        return database?.let { database ->
-            val c = database.query(
-                TABLE_NODE,
-                null,
-                NodeColumns.PARENT + "=?",
-                arrayOf(parent.toString()),
-                null,
-                null,
-                NodeColumns.NAME
-            )
-            c?.let { cursor ->
-                result = nodeMapper.mapNodes(cursor)
-                if (!cursor.isClosed) {
-                    cursor.close()
-                }
-                result
-            }
-        } ?: result
     }
 
     fun loadAllValues(): SparseArray<List<Node>> {

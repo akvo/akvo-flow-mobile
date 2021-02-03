@@ -42,7 +42,7 @@ import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionGroup;
 import org.akvo.flow.domain.Survey;
 import org.akvo.flow.ui.view.CaddisflyQuestionView;
-import org.akvo.flow.ui.view.CascadeQuestionView;
+import org.akvo.flow.ui.view.cascade.CascadeQuestionView;
 import org.akvo.flow.ui.view.GeoshapeQuestionView;
 import org.akvo.flow.ui.view.QuestionView;
 import org.akvo.flow.ui.view.SubmitTab;

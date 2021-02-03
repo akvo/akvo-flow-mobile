@@ -17,7 +17,7 @@
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.akvo.flow.ui.view
+package org.akvo.flow.ui.view.cascade
 
 import android.content.Context
 import android.util.AttributeSet
@@ -26,7 +26,7 @@ import android.view.View.OnFocusChangeListener
 import androidx.appcompat.widget.AppCompatAutoCompleteTextView
 import org.akvo.flow.R
 import org.akvo.flow.domain.Node
-import org.akvo.flow.ui.view.CascadeQuestionView.POSITION_NONE
+import org.akvo.flow.ui.view.cascade.CascadeQuestionView.POSITION_NONE
 
 class FlowAutoComplete @JvmOverloads constructor(
     context: Context,

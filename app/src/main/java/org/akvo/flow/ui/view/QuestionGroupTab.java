@@ -38,6 +38,7 @@ import org.akvo.flow.domain.QuestionResponse;
 import org.akvo.flow.event.QuestionInteractionListener;
 import org.akvo.flow.event.SurveyListener;
 import org.akvo.flow.ui.view.barcode.BarcodeQuestionViewFactory;
+import org.akvo.flow.ui.view.cascade.CascadeQuestionView;
 import org.akvo.flow.ui.view.geolocation.GeoQuestionView;
 import org.akvo.flow.ui.view.media.photo.PhotoQuestionView;
 import org.akvo.flow.ui.view.media.video.VideoQuestionView;

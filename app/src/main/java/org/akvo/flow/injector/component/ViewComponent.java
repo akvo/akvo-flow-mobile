@@ -47,7 +47,7 @@ import org.akvo.flow.presentation.settings.publish.PublishFilesPreferenceView;
 import org.akvo.flow.presentation.signature.SignatureActivity;
 import org.akvo.flow.ui.fragment.ResponseListFragment;
 import org.akvo.flow.ui.view.CaddisflyQuestionView;
-import org.akvo.flow.ui.view.CascadeQuestionView;
+import org.akvo.flow.ui.view.cascade.CascadeQuestionView;
 import org.akvo.flow.ui.view.GeoshapeQuestionView;
 import org.akvo.flow.ui.view.geolocation.GeoQuestionView;
 import org.akvo.flow.ui.view.media.photo.PhotoQuestionView;

@@ -1,23 +1,23 @@
 /*
- *  Copyright (C) 2014-2019,2021 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2021 Stichting Akvo (Akvo Foundation)
  *
- *  This file is part of Akvo Flow.
+ * This file is part of Akvo Flow.
  *
- *  Akvo Flow is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
+ * Akvo Flow is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- *  Akvo Flow is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ * Akvo Flow is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License
+ * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.akvo.flow.ui.view;
+package org.akvo.flow.ui.view.cascade;
 
 import android.content.Context;
 import android.os.Build;
@@ -33,7 +33,6 @@ import android.widget.TextView;
 import com.google.android.material.textfield.TextInputLayout;
 
 import org.akvo.flow.R;
-import org.akvo.flow.data.database.cascade.CascadeDB;
 import org.akvo.flow.domain.Level;
 import org.akvo.flow.domain.Node;
 import org.akvo.flow.domain.Question;
@@ -43,10 +42,9 @@ import org.akvo.flow.event.SurveyListener;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
 import org.akvo.flow.serialization.response.value.CascadeValue;
+import org.akvo.flow.ui.view.QuestionView;
 import org.akvo.flow.util.ConstantUtil;
-import org.akvo.flow.util.files.FormResourcesFileBrowser;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -54,10 +52,7 @@ import javax.inject.Inject;
 
 import timber.log.Timber;
 
-public class CascadeQuestionView extends QuestionView {
-
-    @Inject
-    FormResourcesFileBrowser resourcesFileUtil;
+public class CascadeQuestionView extends QuestionView implements CascadeView {
 
     public  static final int POSITION_NONE = -1; // no textView position id
     private static final long ID_NONE = -1; // no node id
@@ -66,7 +61,9 @@ public class CascadeQuestionView extends QuestionView {
     private String[] mLevels;
     private LinearLayout cascadeLevelsContainer;
     private boolean mFinished;
-    private CascadeDB mDatabase;
+
+    @Inject
+    CascadePresenter presenter;
 
     public CascadeQuestionView(Context context, Question q, SurveyListener surveyListener) {
         super(context, q, surveyListener);
@@ -87,17 +84,8 @@ public class CascadeQuestionView extends QuestionView {
                 mLevels[i] = levels.get(i).getText();
             }
         }
-
-        // Construct local filename (src refers to remote location of the resource)
-        String src = getQuestion().getSrc();
-        if (!TextUtils.isEmpty(src)) {
-            File db = resourcesFileUtil.findFile(getContext().getApplicationContext(), src);
-            if (db.exists()) {
-                mDatabase = new CascadeDB(getContext(), db.getAbsolutePath());
-                mDatabase.open();
-            }
-        }
-        updateTextViews(POSITION_NONE);
+        presenter.setView(this);
+        presenter.loadCascadeData(getQuestion().getSrc(), getContext());
     }
 
     private void initialiseInjector() {
@@ -108,28 +96,12 @@ public class CascadeQuestionView extends QuestionView {
     }
 
     @Override
-    public void onResume() {
-        if (mDatabase != null && !mDatabase.isOpen()) {
-            mDatabase.open();
-        }
-    }
-
-    @Override
-    public void onPause() {
-        if (mDatabase != null) {
-            mDatabase.close();
-        }
-    }
-
-    @Override
     public void onDestroy() {
-        if (mDatabase != null) {
-            mDatabase.close();
-        }
+       presenter.destroy();
     }
 
-    private void updateTextViews(int updatedSpinnerIndex) {
-        if (mDatabase == null) {
+    public void updateTextViews(int updatedSpinnerIndex) {
+        if (!presenter.isValidDatabase()) {
             return;
         }
 
@@ -152,7 +124,7 @@ public class CascadeQuestionView extends QuestionView {
             }
         }
 
-        List<Node> values = mDatabase.loadValuesForParent(parent);
+        List<Node> values = presenter.loadValuesForParent(parent);
         if (!values.isEmpty()) {
             addLevelView(nextLevel, values, POSITION_NONE);
             mFinished = updatedSpinnerIndex == POSITION_NONE;
@@ -239,7 +211,7 @@ public class CascadeQuestionView extends QuestionView {
 
         cascadeLevelsContainer.removeAllViews();
         String answer = resp != null ? resp.getValue() : null;
-        if (mDatabase == null || TextUtils.isEmpty(answer)) {
+        if (!presenter.isValidDatabase() || TextUtils.isEmpty(answer)) {
             return;
         }
 
@@ -252,7 +224,7 @@ public class CascadeQuestionView extends QuestionView {
         long parentId = 0;
         while (index < values.size()) {
             int valuePosition = POSITION_NONE;
-            List<Node> cascadeLevelValues = mDatabase.loadValuesForParent(parentId);
+            List<Node> cascadeLevelValues = presenter.loadValuesForParent(parentId);
             for (int pos = 0; pos < cascadeLevelValues.size(); pos++) {
                 Node node = cascadeLevelValues.get(pos);
                 CascadeNode v = values.get(index);
@@ -283,7 +255,7 @@ public class CascadeQuestionView extends QuestionView {
         } else {
             updateTextViews(POSITION_NONE);
         }
-        if (mDatabase == null) {
+        if (!presenter.isValidDatabase()) {
             String error = getContext()
                     .getString(R.string.cascade_error_message, getQuestion().getSrc());
             Timber.e(new IllegalStateException(error));

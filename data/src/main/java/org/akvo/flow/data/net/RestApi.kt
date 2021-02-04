@@ -23,10 +23,12 @@ import io.reactivex.Observable
 import org.akvo.flow.data.entity.ApiApkData
 import org.akvo.flow.data.entity.ApiFilesResult
 import org.akvo.flow.data.entity.ApiLocaleResult
+import org.akvo.flow.data.entity.time.TimeResult
 import org.akvo.flow.data.net.gae.DataPointDownloadService
 import org.akvo.flow.data.net.gae.DeviceFilesService
 import org.akvo.flow.data.net.gae.FlowApiService
 import org.akvo.flow.data.net.gae.ProcessingNotificationService
+import org.akvo.flow.data.util.Constants
 import org.akvo.flow.domain.util.DeviceHelper
 import timber.log.Timber
 import javax.inject.Singleton
@@ -111,5 +113,15 @@ class RestApi(
             .doOnError { t ->
                 Timber.e(Exception(t), "Error downloading all form headers")
             }
+    }
+
+    suspend fun fetchServerTime(): TimeResult {
+        val serverBase: String = if (baseUrl.startsWith(Constants.HTTPS_PREFIX)) {
+            Constants.HTTP_PREFIX + baseUrl.substring(Constants.HTTPS_PREFIX.length)
+        } else {
+            baseUrl
+        }
+        return serviceFactory.createSimpleRetrofitService(FlowApiService::class.java, serverBase)
+            .fetchServerTime(System.currentTimeMillis().toString())
     }
 }

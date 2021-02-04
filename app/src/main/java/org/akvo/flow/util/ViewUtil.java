@@ -24,15 +24,11 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Point;
 import android.os.Build;
-import android.os.Handler;
 import android.view.Display;
 import android.view.ViewTreeObserver;
 import android.view.WindowManager;
 
 import org.akvo.flow.R;
-import org.akvo.flow.service.ServiceToastRunnable;
-
-import androidx.annotation.NonNull;
 
 /**
  * Utility class to handle common features for the View tier
@@ -156,19 +152,6 @@ public class ViewUtil {
         }
 
         builder.show();
-    }
-
-    /**
-     * Display a UI Toast using the Handler's thread (main thread)
-     *
-     * @param msg                message to display
-     * @param uiThreadHandler    the handler to use
-     * @param applicationContext the Context to use for the toast
-     */
-    public static void displayToastFromService(@NonNull final String msg,
-            @NonNull Handler uiThreadHandler,
-            @NonNull final Context applicationContext) {
-        uiThreadHandler.post(new ServiceToastRunnable(applicationContext, msg));
     }
 
     public static int getScreenWidth(Context context) {

@@ -1,5 +1,14 @@
 Akvo FLOW app release notes
 ===========================
+# ver 2.9.7
+Date: 28 January 2021
+
+* **Simplify cascade usage** - [#1218](https://github.com/akvo/akvo-flow-mobile/issues/1218)
+* **Indicate in main menu that new survey forms are downloaded or updated** - [#1754](https://github.com/akvo/akvo-flow-mobile/issues/1754)
+* **Add Sidaama language** - [#1766](https://github.com/akvo/akvo-flow-mobile/issues/1766)
+* **Bootstrap is broken** - [#1768](https://github.com/akvo/akvo-flow-mobile/issues/1768)
+
+---------------
 # ver 2.9.6
 Date: 29 October 2020
 

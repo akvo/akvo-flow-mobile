@@ -14,6 +14,8 @@
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
+    <uses-permission android:name="android.permission.VIBRATE" />
 
     <uses-feature
         android:name="android.hardware.camera"
@@ -56,6 +58,7 @@
             android:label="@string/app_name" />
         <activity android:name=".presentation.record.RecordActivity" />
         <activity
+            android:theme="@style/FormAppTheme"
             android:name=".activity.FormActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:windowSoftInputMode="adjustResize" />
@@ -78,7 +81,7 @@
             android:theme="@style/FlowAppTheme.NoTitle"/>
         <activity android:name=".presentation.datapoints.map.one.DataPointMapActivity" />
 
-        <service android:name=".service.TimeCheckService" />
+        <service android:name=".service.time.TimeCheckWorker" />
         <service android:name=".service.UnPublishDataService" />
 
         <receiver android:name=".broadcast.UpdateReceiver">
@@ -105,7 +108,7 @@
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
-
+        <receiver android:name=".service.time.CancelNotificationReceiver" />
         <activity
             android:name=".presentation.about.AboutActivity"
             android:label="@string/about_activity_title" />

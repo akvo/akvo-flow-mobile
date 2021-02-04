@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2014-2019 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2014-2019,2021 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -20,17 +20,17 @@
 package org.akvo.flow.ui.view;
 
 import android.content.Context;
-import android.graphics.Paint;
+import android.os.Build;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.LinearLayout;
-import android.widget.Spinner;
-import android.widget.SpinnerAdapter;
 import android.widget.TextView;
+
+import com.google.android.material.textfield.TextInputLayout;
 
 import org.akvo.flow.R;
 import org.akvo.flow.data.database.cascade.CascadeDB;
@@ -52,21 +52,19 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import androidx.annotation.NonNull;
 import timber.log.Timber;
 
-public class CascadeQuestionView extends QuestionView
-        implements AdapterView.OnItemSelectedListener {
+public class CascadeQuestionView extends QuestionView {
 
     @Inject
     FormResourcesFileBrowser resourcesFileUtil;
 
-    private static final int POSITION_NONE = -1; // no spinner position id
+    public  static final int POSITION_NONE = -1; // no textView position id
     private static final long ID_NONE = -1; // no node id
     private static final long ID_ROOT = 0; // root node id
 
     private String[] mLevels;
-    private LinearLayout mSpinnerContainer;
+    private LinearLayout cascadeLevelsContainer;
     private boolean mFinished;
     private CascadeDB mDatabase;
 
@@ -79,7 +77,7 @@ public class CascadeQuestionView extends QuestionView
         setQuestionView(R.layout.cascade_question_view);
         initialiseInjector();
 
-        mSpinnerContainer = findViewById(R.id.cascade_content);
+        cascadeLevelsContainer = findViewById(R.id.cascade_content);
 
         // Load level names
         List<Level> levels = getQuestion().getLevels();
@@ -99,7 +97,7 @@ public class CascadeQuestionView extends QuestionView
                 mDatabase.open();
             }
         }
-        updateSpinners(POSITION_NONE);
+        updateTextViews(POSITION_NONE);
     }
 
     private void initialiseInjector() {
@@ -130,22 +128,22 @@ public class CascadeQuestionView extends QuestionView
         }
     }
 
-    private void updateSpinners(int updatedSpinnerIndex) {
+    private void updateTextViews(int updatedSpinnerIndex) {
         if (mDatabase == null) {
             return;
         }
 
         final int nextLevel = updatedSpinnerIndex + 1;
 
-        // First, clean up descendant spinners (if any)
-        while (nextLevel < mSpinnerContainer.getChildCount()) {
-            mSpinnerContainer.removeViewAt(nextLevel);
+        // First, clean up descendant textViews (if any)
+        while (nextLevel < cascadeLevelsContainer.getChildCount()) {
+            cascadeLevelsContainer.removeViewAt(nextLevel);
         }
 
         long parent = ID_ROOT;
         if (updatedSpinnerIndex != POSITION_NONE) {
-            Node node = (Node) getSpinner(updatedSpinnerIndex).getSelectedItem();
-            if (node.getId() == ID_NONE) {
+            Node node = getSelectedNode(updatedSpinnerIndex);
+            if (node == null || node.getId() == ID_NONE) {
                 // if this is the first level, it means we've got no answer at all
                 mFinished = false;
                 return; // Do not load more levels
@@ -163,56 +161,89 @@ public class CascadeQuestionView extends QuestionView
         }
     }
 
+    private Node getSelectedNode(int textViewIndex) {
+        View childAt = cascadeLevelsContainer.getChildAt(textViewIndex);
+        AutoCompleteTextView textView = childAt != null? childAt.findViewById(R.id.cascade_level_textview): null;
+        return textView != null? ((CascadeAdapter) textView.getAdapter()).getItem(textView.getText().toString()): null;
+    }
+
     private void addLevelView(int position, List<Node> values, int selection) {
-        Timber.d("Will add nodes to "+position+", values: "+values+ ", selection: "+selection);
+        Timber.d("Will add nodes to " + position + ", values: " + values + ", selection: " + selection);
         if (values.isEmpty()) {
             return;
         }
 
         LayoutInflater inflater = LayoutInflater.from(getContext());
 
-        View view = inflater.inflate(R.layout.cascading_level_item, mSpinnerContainer, false);
+        View view = inflater.inflate(R.layout.cascading_level_item, cascadeLevelsContainer, false);
         final TextView text = view.findViewById(R.id.cascade_level_number);
-        final Spinner spinner = view.findViewById(R.id.cascade_level_spinner);
+        final FlowAutoComplete autoCompleteTextView = view.findViewById(R.id.cascade_level_textview);
+        final TextInputLayout layout = view.findViewById(R.id.outlinedTextField);
 
-        text.setText(mLevels != null && mLevels.length > position ? mLevels[position] : "");
+        String levelTitle = mLevels != null && mLevels.length > position ? mLevels[position] : "";
+        text.setText(levelTitle);
 
-        // Insert a fake 'Select' value
-        Node node = new Node(ID_NONE, getContext().getString(R.string.select), null, ID_NONE);
-        values.add(0, node);
-
-        SpinnerAdapter adapter = new CascadeAdapter(getContext(), values);
-        spinner.setAdapter(adapter);
-        spinner.setTag(position);// Tag the spinner with its position within the container
-        spinner.setEnabled(!isReadOnly());
-        if (selection != POSITION_NONE) {
-            spinner.setSelection(selection + 1);// Skip level title item
+        if (isReadOnly()) {
+            layout.setEnabled(false);
+        } else {
+            layout.setHint(getContext().getString(R.string.cascade_level_textview_hint, levelTitle));
         }
+        layout.setTag(position);
+
+        autoCompleteTextView.updateAutoComplete(position, values, selection, isReadOnly());
         if (!isReadOnly()) {
-            // Attach listener asynchronously, preventing selection event from being fired off right away
-            spinner.post(() -> spinner.setOnItemSelectedListener(CascadeQuestionView.this));
+            autoCompleteTextView.setOnItemClickListener((parent, view1, position1, id) -> {
+                int index = (int) autoCompleteTextView.getTag();
+                updateTextViews(index);
+                captureResponse();
+                layout.setError(null);
+            });
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+                autoCompleteTextView.setOnDismissListener(() -> {
+                    if (autoCompleteTextView.getSelectedItem() == null) {
+                        layout.setError(getContext().getString(R.string.cascade_level_textview_error));
+                        int index = (int) autoCompleteTextView.getTag();
+                        updateTextViews(index);
+                    }
+                });
+            }
+            autoCompleteTextView.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                    //ignore
+                }
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+                    //ignore
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {
+                    if (!autoCompleteTextView.isPopupShowing()) {
+                        int index = (int) autoCompleteTextView.getTag();
+                        updateTextViews(index);
+                        captureResponse();
+                        if (autoCompleteTextView.getSelectedItem() == null) {
+                            layout.setError(getContext().getString(R.string.cascade_level_textview_error));
+                            updateTextViews(index);
+                        } else {
+                            layout.setError(null);
+                        }
+                    } else {
+                        layout.setError(null);
+                    }
+                }
+            });
         }
-        mSpinnerContainer.addView(view);
-    }
-
-    @Override
-    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        final int index = (Integer) parent.getTag();
-        updateSpinners(index);
-        captureResponse();
-        setError(null);
-    }
-
-    @Override
-    public void onNothingSelected(AdapterView<?> parent) {
-        //EMPTY
+        cascadeLevelsContainer.addView(view);
     }
 
     @Override
     public void rehydrate(QuestionResponse resp) {
         super.rehydrate(resp);
 
-        mSpinnerContainer.removeAllViews();
+        cascadeLevelsContainer.removeAllViews();
         String answer = resp != null ? resp.getValue() : null;
         if (mDatabase == null || TextUtils.isEmpty(answer)) {
             return;
@@ -220,16 +251,16 @@ public class CascadeQuestionView extends QuestionView
 
         List<CascadeNode> values = CascadeValue.deserialize(answer);
 
-        // For each existing value, we load the corresponding level nodes, and create a spinner
-        // view, automatically selecting the token. On each iteration, we keep track of selected
+        // For each existing value, we load the corresponding level nodes, and create an
+        // AutocompleteTextView automatically selecting the token. On each iteration, we keep track of selected
         // value's id, in order to fetch the descendant nodes from the DB.
         int index = 0;
         long parentId = 0;
         while (index < values.size()) {
             int valuePosition = POSITION_NONE;
-            List<Node> spinnerValues = mDatabase.getValues(parentId);
-            for (int pos = 0; pos < spinnerValues.size(); pos++) {
-                Node node = spinnerValues.get(pos);
+            List<Node> cascadeLevelValues = mDatabase.getValues(parentId);
+            for (int pos = 0; pos < cascadeLevelValues.size(); pos++) {
+                Node node = cascadeLevelValues.get(pos);
                 CascadeNode v = values.get(index);
                 if (node.getName().equals(v.getName())) {
                     valuePosition = pos;
@@ -238,15 +269,15 @@ public class CascadeQuestionView extends QuestionView
                 }
             }
 
-            if (valuePosition == POSITION_NONE || spinnerValues.isEmpty()) {
-                mSpinnerContainer.removeAllViews();
+            if (valuePosition == POSITION_NONE || cascadeLevelValues.isEmpty()) {
+                cascadeLevelsContainer.removeAllViews();
                 return;// Cannot reassemble response
             }
-            addLevelView(index, spinnerValues, valuePosition);
+            addLevelView(index, cascadeLevelValues, valuePosition);
             index++;
         }
         if (!isReadOnly()) {
-            updateSpinners(index - 1);// Last updated item position
+            updateTextViews(index - 1);// Last updated item position
         }
     }
 
@@ -254,14 +285,14 @@ public class CascadeQuestionView extends QuestionView
     public void resetQuestion(boolean fireEvent) {
         super.resetQuestion(fireEvent);
         if (isReadOnly()) {
-            mSpinnerContainer.removeAllViews();
+            cascadeLevelsContainer.removeAllViews();
         } else {
-            updateSpinners(POSITION_NONE);
+            updateTextViews(POSITION_NONE);
         }
         if (mDatabase == null) {
             String error = getContext()
                     .getString(R.string.cascade_error_message, getQuestion().getSrc());
-            Timber.e(new IllegalStateException(error), error);
+            Timber.e(new IllegalStateException(error));
             setError(error);
         }
     }
@@ -269,9 +300,9 @@ public class CascadeQuestionView extends QuestionView
     @Override
     public void captureResponse(boolean suppressListeners) {
         List<CascadeNode> values = new ArrayList<>();
-        for (int i = 0; i < mSpinnerContainer.getChildCount(); i++) {
-            Node node = (Node) getSpinner(i).getSelectedItem();
-            if (node.getId() != ID_NONE) {
+        for (int i = 0; i < cascadeLevelsContainer.getChildCount(); i++) {
+            Node node = getSelectedNode(i);
+            if (node != null && node.getId() != ID_NONE) {
                 CascadeNode v = new CascadeNode();
                 v.setName(node.getName());
                 v.setCode(node.getCode());
@@ -284,10 +315,6 @@ public class CascadeQuestionView extends QuestionView
         setResponse(suppressListeners, question, response, ConstantUtil.CASCADE_RESPONSE_TYPE);
     }
 
-    private Spinner getSpinner(int position) {
-        return (Spinner) mSpinnerContainer.getChildAt(position).findViewById(R.id.cascade_level_spinner);
-    }
-
     @Override
     public boolean isValid() {
         boolean valid = super.isValid() && mFinished;
@@ -297,42 +324,4 @@ public class CascadeQuestionView extends QuestionView
         return valid;
     }
 
-    private static class CascadeAdapter extends ArrayAdapter<Node> {
-
-        CascadeAdapter(Context context, List<Node> objects) {
-            super(context, R.layout.cascade_spinner_item, R.id.cascade_spinner_item_text, objects);
-            setDropDownViewResource(R.layout.cascade_spinner_item);
-        }
-
-        @NonNull
-        @Override
-        public View getView(int position, View convertView, @NonNull ViewGroup parent) {
-            View view = super.getView(position, convertView, parent);
-            setStyle(view, position);
-            return view;
-        }
-
-        @Override
-        public View getDropDownView(final int position, View convertView,
-                @NonNull ViewGroup parent) {
-            View view = super.getDropDownView(position, convertView, parent);
-            setStyle(view, position);
-            return view;
-        }
-
-        private void setStyle(View view, int position) {
-            try {
-                TextView text = view.findViewById(R.id.cascade_spinner_item_text);
-                int flags = text.getPaintFlags();
-                if (position == 0) {
-                    flags |= Paint.FAKE_BOLD_TEXT_FLAG;
-                } else {
-                    flags &= ~Paint.FAKE_BOLD_TEXT_FLAG;
-                }
-                text.setPaintFlags(flags);
-            } catch (ClassCastException e) {
-                Timber.e("View cannot be casted to TextView!");
-            }
-        }
-    }
 }

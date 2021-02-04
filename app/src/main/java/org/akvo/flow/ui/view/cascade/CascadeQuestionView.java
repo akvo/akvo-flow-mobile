@@ -71,6 +71,7 @@ public class CascadeQuestionView extends QuestionView implements CascadeView {
     }
 
     private void init() {
+        Timber.d("Init");
         setQuestionView(R.layout.cascade_question_view);
         initialiseInjector();
 
@@ -98,6 +99,14 @@ public class CascadeQuestionView extends QuestionView implements CascadeView {
     @Override
     public void onDestroy() {
        presenter.destroy();
+    }
+
+    @Override
+    public void displayCascades() {
+        updateTextViews(CascadeQuestionView.POSITION_NONE);
+        QuestionResponse resp = getResponse();
+        String answer = resp != null ? resp.getValue() : null;
+        displayAnswer(answer);
     }
 
     public void updateTextViews(int updatedSpinnerIndex) {
@@ -163,6 +172,11 @@ public class CascadeQuestionView extends QuestionView implements CascadeView {
         layout.setTag(position);
 
         autoCompleteTextView.updateAutoComplete(position, values, selection, isReadOnly());
+        setUpListeners(autoCompleteTextView, layout);
+        cascadeLevelsContainer.addView(view);
+    }
+
+    private void setUpListeners(FlowAutoComplete autoCompleteTextView, TextInputLayout layout) {
         if (!isReadOnly()) {
             autoCompleteTextView.setOnItemClickListener((parent, view1, position1, id) -> {
                 int index = (int) autoCompleteTextView.getTag();
@@ -208,18 +222,21 @@ public class CascadeQuestionView extends QuestionView implements CascadeView {
                 }
             });
         }
-        cascadeLevelsContainer.addView(view);
     }
 
     @Override
     public void rehydrate(QuestionResponse resp) {
         super.rehydrate(resp);
-
-        cascadeLevelsContainer.removeAllViews();
+        Timber.d("rehydrate");
         String answer = resp != null ? resp.getValue() : null;
+        displayAnswer(answer);
+    }
+
+    private void displayAnswer(String answer) {
         if (!presenter.isValidDatabase() || TextUtils.isEmpty(answer)) {
             return;
         }
+        cascadeLevelsContainer.removeAllViews();
 
         List<CascadeNode> values = CascadeValue.deserialize(answer);
 
@@ -256,6 +273,7 @@ public class CascadeQuestionView extends QuestionView implements CascadeView {
     @Override
     public void resetQuestion(boolean fireEvent) {
         super.resetQuestion(fireEvent);
+        Timber.d("resetQuestion");
         if (isReadOnly()) {
             cascadeLevelsContainer.removeAllViews();
         } else {

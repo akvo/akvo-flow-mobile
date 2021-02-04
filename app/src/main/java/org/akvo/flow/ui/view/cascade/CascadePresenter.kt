@@ -22,6 +22,14 @@ package org.akvo.flow.ui.view.cascade
 import android.content.Context
 import android.text.TextUtils
 import android.util.SparseArray
+import androidx.core.util.isEmpty
+import androidx.core.util.isNotEmpty
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancelChildren
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.akvo.flow.data.database.cascade.CascadeDB
 import org.akvo.flow.domain.Node
 import org.akvo.flow.presentation.Presenter
@@ -31,7 +39,11 @@ import javax.inject.Inject
 
 class CascadePresenter @Inject constructor(): Presenter {
 
+    private var isLoading: Boolean = false
+
     private var values: SparseArray<List<Node>> = SparseArray()
+    private var job = SupervisorJob()
+    private val uiScope = CoroutineScope(Dispatchers.Main + job)
 
     @Inject
     lateinit var resourcesFileUtil: FormResourcesFileBrowser
@@ -39,7 +51,7 @@ class CascadePresenter @Inject constructor(): Presenter {
     var isValidDatabase = false
 
     override fun destroy() {
-        //EMPTY
+        uiScope.coroutineContext.cancelChildren()
     }
 
     fun setView(view: CascadeView) {
@@ -47,18 +59,30 @@ class CascadePresenter @Inject constructor(): Presenter {
     }
 
     fun loadCascadeData(src: String, context: Context) {
-        // Construct local filename (src refers to remote location of the resource)
-        if (!TextUtils.isEmpty(src)) {
+        uiScope.launch {
+            if (values.isEmpty() && !TextUtils.isEmpty(src)) {
+                isLoading = true
+                values = loadCascadeFromDb(context, src)
+                isLoading = false
+                isValidDatabase = values.isNotEmpty()
+            }
+
+            view?.displayCascades()
+        }
+    }
+
+    private suspend fun loadCascadeFromDb(context: Context, src: String): SparseArray<List<Node>> {
+        var values: SparseArray<List<Node>> = SparseArray()
+        return withContext(Dispatchers.IO) {
             val db: File = resourcesFileUtil.findFile(context.applicationContext, src)
             if (db.exists()) {
                 val cascadeDB = CascadeDB(context, db.absolutePath)
                 cascadeDB.open()
                 values = cascadeDB.loadAllValues()
                 cascadeDB.close()
-                isValidDatabase = true;
             }
+            values
         }
-        view?.updateTextViews(CascadeQuestionView.POSITION_NONE)
     }
 
     fun loadValuesForParent(parent: Long?): List<Node> {

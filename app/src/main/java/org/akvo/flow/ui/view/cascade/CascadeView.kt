@@ -21,4 +21,5 @@ package org.akvo.flow.ui.view.cascade
 
 interface CascadeView {
     fun updateTextViews(positionNone: Int)
+    fun displayCascades()
 }

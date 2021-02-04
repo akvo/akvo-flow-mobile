@@ -212,6 +212,9 @@ android {
         biogas.res.srcDirs = ['src/snv/res', 'src/biogas/res']
         cookstoves.res.srcDirs = ['src/snv/res', 'src/cookstoves/res']
     }
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
 }
 
 private Properties readProperties(String fileName) {

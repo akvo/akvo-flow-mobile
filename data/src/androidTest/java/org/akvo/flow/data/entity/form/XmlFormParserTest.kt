@@ -20,14 +20,12 @@
 package org.akvo.flow.data.entity.form
 
 import androidx.test.platform.app.InstrumentationRegistry
-import org.junit.Assert.assertEquals
 import org.akvo.flow.data.tests.R
 import org.akvo.flow.data.util.FileHelper
-import org.akvo.flow.domain.entity.DomainForm
+import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.Mock
-import org.mockito.runners.MockitoJUnitRunner
+import org.mockito.junit.MockitoJUnitRunner
 import java.io.InputStream
 
 @RunWith(MockitoJUnitRunner::class)
@@ -40,10 +38,10 @@ class XmlFormParserTest {
         val input: InputStream =
             InstrumentationRegistry.getInstrumentation().targetContext.resources
             .openRawResource(R.raw.date_form)
-        val result: DomainForm = parser.parseToDomainForm(input)
+        val result: XmlDataForm = parser.parseXmlForm(input)
 
         assertEquals("1.0", result.version)
-        assertEquals("DateForm", result.title)
+        assertEquals("DateForm", result.name)
         assertEquals(1, result.groups.size)
         assertEquals("DateFormGroup", result.groups[0].heading)
         assertEquals(true, result.groups[0].isRepeatable)
@@ -56,10 +54,10 @@ class XmlFormParserTest {
         val input: InputStream =
             InstrumentationRegistry.getInstrumentation().targetContext.resources
                 .openRawResource(R.raw.empty_form)
-        val result: DomainForm = parser.parseToDomainForm(input)
+        val result: XmlDataForm = parser.parseXmlForm(input)
 
         assertEquals("0.0", result.version)
-        assertEquals("", result.title)
+        assertEquals("", result.name)
         assertEquals(1, result.groups.size)
         assertEquals("", result.groups[0].heading)
         assertEquals(false, result.groups[0].isRepeatable)

@@ -22,11 +22,15 @@ package org.akvo.flow.presentation.form.view
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.async
 import kotlinx.coroutines.cancelChildren
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import org.akvo.flow.domain.SurveyGroup
 import org.akvo.flow.domain.interactor.forms.FormResult
 import org.akvo.flow.domain.interactor.forms.GetFormWithGroups
+import org.akvo.flow.domain.interactor.responses.LoadResponses
+import org.akvo.flow.domain.interactor.responses.ResponsesResult
 import org.akvo.flow.domain.languages.LoadLanguages
 import org.akvo.flow.domain.languages.SaveLanguages
 import org.akvo.flow.presentation.Presenter
@@ -40,7 +44,8 @@ class FormViewPresenter @Inject constructor(
     private val languageMapper: LanguageMapper,
     private val loadLanguages: LoadLanguages,
     private val getFormUseCase: GetFormWithGroups,
-    private val viewFormMapper: ViewFormMapper
+    private val viewFormMapper: ViewFormMapper,
+    private val loadResponses: LoadResponses
 ) : Presenter {
 
     var view: IFormView? = null
@@ -60,18 +65,28 @@ class FormViewPresenter @Inject constructor(
     ) {
         val params: MutableMap<String, Any> = HashMap(2)
         params[GetFormWithGroups.PARAM_FORM_ID] = formId
+
+        val paramsResponses: MutableMap<String, Any> = HashMap(2)
+        paramsResponses[LoadResponses.PARAM_FORM_INSTANCE_ID] = formInstanceId
+        //TODO: show loading
         uiScope.launch {
-            when (val result = getFormUseCase.execute(params)) {
-                is FormResult.Success -> {
-                    view?.displayForm(viewFormMapper.transform(result.domainForm))
+            try {
+                // coroutineScope is needed, else in case of any network error, it will crash
+                coroutineScope {
+                    val formResult = async { getFormUseCase.execute(params)} .await()
+                    val responsesResult = async { loadResponses.execute(paramsResponses)} .await()
+                    if (formResult is FormResult.Success && responsesResult is ResponsesResult.Success) {
+                        view?.displayForm(viewFormMapper.transform(formResult.domainForm, responsesResult.responses))
+                    } else if (formResult is FormResult.ParamError ) {
+                        Timber.e(formResult.message)
+                        view?.showErrorLoadingForm()
+                    } else {
+                        //TODO: display specific error when responses could not be loaded
+                        view?.showErrorLoadingForm()
+                    }
                 }
-                is FormResult.ParamError -> {
-                    Timber.e(result.message)
-                    view?.showErrorLoadingForm()
-                }
-                else -> {
-                    view?.showErrorLoadingForm()
-                }
+            } catch (e: Exception) {
+                view?.showErrorLoadingForm()
             }
         }
     }
@@ -89,6 +104,7 @@ class FormViewPresenter @Inject constructor(
         }
     }
 
+    //TODO: use the loaded form
     fun loadLanguages(surveyId: Long, formId: String) {
         val params: MutableMap<String, Any> = HashMap(2)
         params[LoadLanguages.PARAM_SURVEY_ID] = surveyId

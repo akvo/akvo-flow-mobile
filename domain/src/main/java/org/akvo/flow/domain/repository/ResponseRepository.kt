@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2021 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -17,23 +17,10 @@
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.akvo.flow.domain.entity
+package org.akvo.flow.domain.repository
 
-import android.os.Parcel
-import android.os.Parcelable
-import java.util.ArrayList
+import org.akvo.flow.domain.entity.Response
 
-fun Parcel.readStringNonNull(): String {
-    val unParceled = readString()
-    return unParceled ?: unParceled ?: ""
-}
-
-fun Parcel.createStringArrayNonNull(): ArrayList<String> {
-    val unParceled = createStringArrayList()
-    return unParceled ?: unParceled ?: arrayListOf()
-}
-
-fun <T> Parcel.createTypedArrayNonNull(creator: Parcelable.Creator<T>): MutableList<T> {
-    val unParceled = createTypedArray(creator)
-    return unParceled?.toMutableList() ?: mutableListOf()
+interface ResponseRepository {
+    suspend fun getResponses(instanceId: Long): List<Response>
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2021 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -17,35 +17,35 @@
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.akvo.flow.domain.interactor.forms
+package org.akvo.flow.domain.interactor.responses
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import org.akvo.flow.domain.repository.FormRepository
+import org.akvo.flow.domain.repository.ResponseRepository
 import timber.log.Timber
 import javax.inject.Inject
 
-class GetFormWithGroups@Inject constructor(private val formRepository: FormRepository) {
+class LoadResponses @Inject constructor(private val responseRepository: ResponseRepository) {
 
-    suspend fun execute(parameters: Map<String, Any>): FormResult {
-        Timber.d("Started getting forms")
-        if (!parameters.containsKey(PARAM_FORM_ID)) {
-            return FormResult.ParamError("Missing form id")
+    suspend fun execute(parameters: Map<String, Any>): ResponsesResult {
+        Timber.d("Started getting responses")
+        if (!parameters.containsKey(PARAM_FORM_INSTANCE_ID)) {
+            return ResponsesResult.ParamError("Missing form instance id")
         }
         return withContext(Dispatchers.IO) {
             try {
-                val domainForm =
-                    formRepository.getFormWithGroups(parameters[PARAM_FORM_ID] as String)
-                Timber.d("Ended getting forms")
-                FormResult.Success(domainForm)
+                val responses =
+                    responseRepository.getResponses(parameters[PARAM_FORM_INSTANCE_ID] as Long)
+                Timber.d("Ended getting responses")
+                ResponsesResult.Success(responses)
             } catch (e: Exception) {
                 Timber.e(e)
-                FormResult.GenericError
+                ResponsesResult.GenericError
             }
         }
     }
 
     companion object {
-        const val PARAM_FORM_ID = "form_id"
+        const val PARAM_FORM_INSTANCE_ID = "form_instance"
     }
 }

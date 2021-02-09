@@ -20,15 +20,16 @@
 package org.akvo.flow.presentation.form.view.entity
 
 import org.akvo.flow.domain.entity.DomainForm
+import org.akvo.flow.domain.entity.Response
 import javax.inject.Inject
 
 class ViewFormMapper @Inject constructor(private val viewQuestionGroupMapper: ViewQuestionGroupMapper) {
 
-    fun transform(domainForm: DomainForm): ViewForm {
+    fun transform(domainForm: DomainForm, responses: List<Response>): ViewForm {
         return ViewForm(
             domainForm.name,
             domainForm.version,
-            viewQuestionGroupMapper.transform(domainForm.groups)
+            viewQuestionGroupMapper.transform(domainForm.groups, responses)
         )
     }
 }

@@ -17,23 +17,12 @@
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.akvo.flow.domain.entity
+package org.akvo.flow.domain.interactor.responses
 
-import android.os.Parcel
-import android.os.Parcelable
-import java.util.ArrayList
+import org.akvo.flow.domain.entity.Response
 
-fun Parcel.readStringNonNull(): String {
-    val unParceled = readString()
-    return unParceled ?: unParceled ?: ""
-}
-
-fun Parcel.createStringArrayNonNull(): ArrayList<String> {
-    val unParceled = createStringArrayList()
-    return unParceled ?: unParceled ?: arrayListOf()
-}
-
-fun <T> Parcel.createTypedArrayNonNull(creator: Parcelable.Creator<T>): MutableList<T> {
-    val unParceled = createTypedArray(creator)
-    return unParceled?.toMutableList() ?: mutableListOf()
+sealed class ResponsesResult {
+    data class Success(val responses: List<Response>): ResponsesResult()
+    data class ParamError(val message: String): ResponsesResult()
+    object GenericError : ResponsesResult()
 }

@@ -20,6 +20,12 @@ package org.akvo.flow.data.entity.form
 
 import org.akvo.flow.data.util.FileHelper
 import org.akvo.flow.domain.entity.DomainQuestionGroup
+import org.akvo.flow.domain.entity.question.AltText
+import org.akvo.flow.domain.entity.question.Dependency
+import org.akvo.flow.domain.entity.question.Level
+import org.akvo.flow.domain.entity.question.Option
+import org.akvo.flow.domain.entity.question.Question
+import org.akvo.flow.domain.entity.question.QuestionHelp
 import org.xmlpull.v1.XmlPullParser
 import org.xmlpull.v1.XmlPullParserException
 import org.xmlpull.v1.XmlPullParserFactory
@@ -113,12 +119,20 @@ class XmlFormParser @Inject constructor(private val helper: FileHelper) {
         return languageCodes
     }
 
-    fun parseToDomainForm(inputStream: InputStream): XmlDataForm {
-        val groups: MutableList<DomainQuestionGroup> = ArrayList()
+    fun parseXmlForm(inputStream: InputStream): XmlDataForm {
+        val groups: MutableList<DomainQuestionGroup> = mutableListOf()
         var version = "0.0"
         var name = ""
         val parserFactory: XmlPullParserFactory
-        var questionGroup: DomainQuestionGroup? = null
+        var currentQuestionGroup: DomainQuestionGroup? = null
+        var currentQuestion: Question? = null
+        var currentOptions = mutableListOf<Option>()
+        var currentOption: Option? = null
+        var currentLevels = mutableListOf<Level>()
+        var currentLevel: Level? = null
+        var currentAltText: AltText? = null
+        var currentHelp: QuestionHelp? = null
+        var lastText: String? = null
         try {
             parserFactory = XmlPullParserFactory.newInstance()
             val parser = parserFactory.newPullParser()
@@ -126,32 +140,190 @@ class XmlFormParser @Inject constructor(private val helper: FileHelper) {
             parser.setInput(inputStream, null)
             var eventType = parser.eventType
             while (eventType != XmlPullParser.END_DOCUMENT) {
+
                 when (eventType) {
+                    /**
+                     * Beginning of a tag for example <question>
+                     */
                     XmlPullParser.START_TAG -> {
                         when (parser.name) {
                             SURVEY -> {
-                                val attributeValue = parser.getAttributeValue(null, VERSION)
+                                val attributeValue = getStringAttribute(parser, VERSION)
                                 if (attributeValue != null) {
                                     version = attributeValue
                                 }
-                                val attributeValue1 = parser.getAttributeValue(null, NAME)
+                                val attributeValue1 = getStringAttribute(parser, NAME)
                                 if (attributeValue1 != null) {
                                     name = attributeValue1
                                 }
                             }
                             QUESTION_GROUP -> {
-                                val repeatable = "true" == parser.getAttributeValue(null, REPEATABLE)
-                                questionGroup = DomainQuestionGroup("", repeatable)
+                                val repeatable = "true" == getStringAttribute(parser, REPEATABLE)
+                                currentQuestionGroup = DomainQuestionGroup("", repeatable)
                             }
                             QUESTION_GROUP_HEADING -> {
-                                questionGroup?.heading = parser.nextText()
+                                currentQuestionGroup?.heading = parser.nextText()
+                            }
+                            QUESTION -> {
+                                val resource = getStringAttribute(parser, CASCADE_RESOURCE)
+                                var order = getIntAttribute(parser, ORDER)
+                                if (order == -1) {
+                                    order = 1
+                                    if (currentQuestionGroup != null) {
+                                        order = currentQuestionGroup.questions.size + 1
+                                    }
+                                }
+
+                                currentQuestion = Question(
+                                    cascadeResource = resource,
+                                    order = order,
+                                    isMandatory = getBooleanAttribute(parser, MANDATORY),
+                                    isLocked = getBooleanAttribute(parser, LOCKED),
+                                    isDoubleEntry = getBooleanAttribute(parser, DOUBLE_ENTRY),
+                                    isAllowMultiple = getBooleanAttribute(parser, ALLOW_MULT),
+                                    type = parser.getAttributeValue(null, TYPE),
+                                    questionId = parser.getAttributeValue(null, ID),
+                                    isLocaleName = getBooleanAttribute(parser, LOCALE_NAME),
+                                    isLocaleLocation = getBooleanAttribute(parser, LOCALE_LOCATION),
+                                    caddisflyRes = getStringAttribute(parser, CADDISFLY_RESOURCE),
+                                    isAllowPoints = getBooleanAttribute(parser, ALLOW_POINTS),
+                                    isAllowLine = getBooleanAttribute(parser, ALLOW_LINE),
+                                    isAllowPolygon = getBooleanAttribute(parser, ALLOW_POLYGON)
+                                )
+                            }
+                            OPTIONS -> {
+                                currentOptions = mutableListOf()
+                                if (currentQuestion != null) {
+                                    currentQuestion.isAllowOther = getBooleanAttribute(
+                                        parser,
+                                        ALLOW_OTHER
+                                    )
+                                    currentQuestion.isAllowMultiple = getBooleanAttribute(
+                                        parser,
+                                        ALLOW_MULT
+                                    )
+                                }
+                            }
+                            OPTION -> {
+                                currentOption = Option(code = getStringAttribute(parser, CODE))
+                            }
+                            LEVELS -> {
+                                currentLevels = mutableListOf()
+                            }
+                            LEVEL -> {
+                                currentLevel = Level()
+                            }
+                            DEPENDENCY -> {
+                                currentQuestion?.addDependency(
+                                    Dependency(
+                                        question = getStringAttribute(parser, QUESTION),
+                                        answer = getStringAttribute(parser, ANSWER)
+                                    )
+                                )
+                            }
+                            VALIDATION_RULE -> {
+                                //currentValidation = ValidationRule()
+                                //TODO: added later, not needed for read only
+                            }
+                            ALT_TEXT -> {
+                                currentAltText = AltText(
+                                    languageCode = getStringAttribute(parser, LANG),
+                                    type = getStringAttribute(parser, VALUE)
+                                )
+                            }
+                            HELP -> {
+                                currentHelp = QuestionHelp()
+                            }
+
+                        }
+                    }
+                    /**
+                     * End of a tag for example </question>
+                     */
+                    XmlPullParser.END_TAG -> {
+                        when (parser.name) {
+                            QUESTION_GROUP -> {
+                                currentQuestionGroup?.let {
+                                    groups.add(it)
+                                }
+                            }
+                            QUESTION -> {
+                                if (currentQuestionGroup != null && currentQuestion != null) {
+                                    if (lastText!= null) {
+                                        currentQuestion.text = lastText
+                                        lastText = null
+                                    }
+                                    currentQuestionGroup.questions.add(currentQuestion)
+                                    currentQuestion = null
+                                }
+                            }
+                            OPTIONS -> {
+                                currentQuestion?.options?.addAll(currentOptions)
+                                currentOptions = mutableListOf()
+                            }
+                            OPTION -> {
+                                if (currentOption != null) {
+                                    if (lastText!= null) {
+                                        currentOption.text = lastText
+                                        lastText = null
+                                    }
+                                    currentOptions.add(currentOption)
+                                    currentOption  = null
+                                }
+                            }
+                            LEVELS -> {
+                                currentQuestion?.levels?.addAll(currentLevels)
+                                currentLevels = mutableListOf()
+                            }
+                            LEVEL -> {
+                               if (currentLevel != null) {
+                                   if (lastText!= null) {
+                                       currentLevel.text = lastText
+                                       lastText = null
+                                   }
+                                   currentLevels.add(currentLevel)
+                                   currentLevel = null
+                               }
+                            }
+                            DEPENDENCY -> {
+                                //nothing to do
+                            }
+                            ALT_TEXT -> {
+                                //can be inside question, help or option
+                                if (currentAltText != null) {
+                                    when {
+                                        currentOption != null -> {
+                                            currentOption.addAltText(currentAltText)
+                                        }
+                                        currentHelp != null -> {
+                                            currentHelp.addAltText(currentAltText)
+                                        }
+                                        currentQuestion != null -> {
+                                            currentQuestion.addAltText(currentAltText)
+                                        }
+                                    }
+                                    currentAltText = null
+                                }
+                            }
+                            HELP -> {
+                                if (currentHelp != null) {
+                                    if (lastText!= null) {
+                                        currentHelp.text = lastText
+                                        lastText = null
+                                    }
+                                    currentQuestion?.questionHelp?.add(currentHelp)
+                                    currentHelp = null
+                                }
+
                             }
                         }
                     }
-                    XmlPullParser.END_TAG -> {
-                        if (QUESTION_GROUP == parser.name && questionGroup != null) {
-                            groups.add(questionGroup)
-                        }
+                    /**
+                     * this is the <text>some text</text> content
+                     * <text> can appear in multiple places: inside question, option, level, help
+                     */
+                    XmlPullParser.TEXT -> {
+                        lastText = parser.text
                     }
                 }
                 eventType = parser.next()
@@ -166,17 +338,57 @@ class XmlFormParser @Inject constructor(private val helper: FileHelper) {
         return XmlDataForm(name = name, version = version, groups = groups)
     }
 
+    private fun getIntAttribute(parser: XmlPullParser, attributeName: String) =
+        parser.getAttributeValue(null, attributeName)?.toInt() ?: -1
+
+    private fun getStringAttribute(parser: XmlPullParser, attributeName: String) =
+        parser.getAttributeValue(null, attributeName)
+
+    private fun getBooleanAttribute(parser: XmlPullParser, attributeName: String) =
+        parser.getAttributeValue(null, attributeName)?.toBoolean() ?: false
+
     companion object {
+        private const val OPTIONS = "options"
         private const val QUESTION = "question"
         private const val QUESTION_GROUP = "questionGroup"
         private const val QUESTION_GROUP_HEADING = "heading"
         private const val SURVEY = "survey"
         private const val CASCADE_RESOURCE = "cascadeResource"
+        private const val ORDER = "order"
+        private const val MANDATORY = "mandatory"
+        private const val LOCKED = "locked"
+        private const val DOUBLE_ENTRY = "requireDoubleEntry"
+        private const val LOCALE_NAME = "localeNameFlag"
+        private const val LOCALE_LOCATION = "localeLocationFlag"
+        private const val CADDISFLY_RESOURCE = "caddisflyResourceUuid"
+        private const val ALLOW_OTHER = "allowOther"
+        private const val ALLOW_MULT = "allowMultiple"
+        private const val OPTION = "option"
+        private const val VALUE = "value"
+        private const val CODE = "code"
+        private const val ALLOW_POINTS = "allowPoints"
+        private const val ALLOW_LINE = "allowLine"
+        private const val ALLOW_POLYGON = "allowPolygon"
+        private const val TYPE = "type"
+        private const val ID = "id"
         private const val VERSION = "version"
         private const val DEFAULT_LANG = "defaultLanguageCode"
         private const val ALT_TEXT = "altText"
         private const val LANG = "language"
         private const val NAME = "name"
         private const val REPEATABLE = "repeatable"
+        private const val LEVELS = "levels"
+        private const val LEVEL = "level"
+        private const val DEPENDENCY = "dependency"
+        private const val ANSWER = "answer-value"
+        private const val VALIDATION_RULE = "validationRule"
+        private const val MIN_VAL = "minVal"
+        private const val MAX_VAL = "maxVal"
+        private const val VALIDATION_TYPE = "validationType"
+        private const val MAX_LENGTH = "maxLength"
+        private const val ALLOW_DEC = "allowDecimal"
+        private const val ALLOW_SIGN = "signed"
+        private const val HELP = "help"
+
     }
 }

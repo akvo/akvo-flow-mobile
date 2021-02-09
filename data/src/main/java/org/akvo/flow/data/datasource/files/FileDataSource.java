@@ -261,7 +261,6 @@ public class FileDataSource {
 
     public InputStream getFormFile(String id) throws FileNotFoundException {
         File formFolder = flowFileBrowser.getExistingInternalFolder(FlowFileBrowser.DIR_FORMS);
-        InputStream input;
         return new FileInputStream(new File(formFolder, id + FlowFileBrowser.XML_SUFFIX));
     }
 

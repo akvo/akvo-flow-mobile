@@ -19,6 +19,7 @@
 
 package org.akvo.flow.presentation.form.view.groups.entity
 
+import android.os.Bundle
 import android.os.Parcel
 import android.os.Parcelable
 import org.akvo.flow.domain.entity.createStringArrayNonNull
@@ -30,7 +31,7 @@ sealed class ViewQuestionAnswer : Parcelable {
     abstract val questionId: String
     abstract val title: String // title is composed of order + . title ej: 1. Question one
     abstract val mandatory: Boolean
-    abstract val translations: List<String>
+    abstract val translations: Bundle
 
     //TODO: add tooltip
     //TODO: dependencies?
@@ -39,7 +40,7 @@ sealed class ViewQuestionAnswer : Parcelable {
         override val questionId: String,
         override val title: String,
         override val mandatory: Boolean,
-        override val translations: List<String>,
+        override val translations: Bundle = Bundle(),
         val answer: String,
         val requireDoubleEntry: Boolean,
     ) : ViewQuestionAnswer(), Parcelable {
@@ -47,15 +48,16 @@ sealed class ViewQuestionAnswer : Parcelable {
             parcel.readStringNonNull(),
             parcel.readStringNonNull(),
             parcel.readByte() != 0.toByte(),
-            parcel.createStringArrayNonNull(),
+            parcel.readBundle(Bundle::class.java.classLoader) ?: Bundle(),
             parcel.readStringNonNull(),
-            parcel.readByte() != 0.toByte())
+            parcel.readByte() != 0.toByte()
+        )
 
         override fun writeToParcel(parcel: Parcel, flags: Int) {
             parcel.writeString(questionId)
             parcel.writeString(title)
             parcel.writeByte(if (mandatory) 1 else 0)
-            parcel.writeStringList(translations)
+            parcel.writeBundle(translations)
             parcel.writeString(answer)
             parcel.writeByte(if (requireDoubleEntry) 1 else 0)
         }
@@ -75,11 +77,13 @@ sealed class ViewQuestionAnswer : Parcelable {
         }
     }
 
+    //number has fields like allow signed, min max etc...
+    //number question type is not defined
     data class NumberViewQuestionAnswer(
         override val questionId: String,
         override val title: String,
         override val mandatory: Boolean,
-        override val translations: List<String>,
+        override val translations: Bundle = Bundle(),
         val answer: String,
         val requireDoubleEntry: Boolean,
     ) : ViewQuestionAnswer(), Parcelable {
@@ -87,15 +91,16 @@ sealed class ViewQuestionAnswer : Parcelable {
             parcel.readStringNonNull(),
             parcel.readStringNonNull(),
             parcel.readByte() != 0.toByte(),
-            parcel.createStringArrayNonNull(),
+            parcel.readBundle(Bundle::class.java.classLoader) ?: Bundle(),
             parcel.readStringNonNull(),
-            parcel.readByte() != 0.toByte())
+            parcel.readByte() != 0.toByte()
+        )
 
         override fun writeToParcel(parcel: Parcel, flags: Int) {
             parcel.writeString(questionId)
             parcel.writeString(title)
             parcel.writeByte(if (mandatory) 1 else 0)
-            parcel.writeStringList(translations)
+            parcel.writeBundle(translations)
             parcel.writeString(answer)
             parcel.writeByte(if (requireDoubleEntry) 1 else 0)
         }
@@ -119,8 +124,8 @@ sealed class ViewQuestionAnswer : Parcelable {
         override val questionId: String,
         override val title: String,
         override val mandatory: Boolean,
-        override val translations: List<String>,
-        val options: List<ViewOption> = emptyList(), //set to empty if no answer
+        override val translations: Bundle = Bundle(),
+        val options: MutableList<ViewOption> = mutableListOf(), //set to empty if no answer
         val allowMultiple: Boolean = false,
         val allowOther: Boolean = false,
     ) : ViewQuestionAnswer(), Parcelable {
@@ -128,16 +133,17 @@ sealed class ViewQuestionAnswer : Parcelable {
             parcel.readStringNonNull(),
             parcel.readStringNonNull(),
             parcel.readByte() != 0.toByte(),
-            parcel.createStringArrayNonNull(),
+            parcel.readBundle(Bundle::class.java.classLoader) ?: Bundle(),
             parcel.createTypedArrayNonNull(ViewOption),
             parcel.readByte() != 0.toByte(),
-            parcel.readByte() != 0.toByte())
+            parcel.readByte() != 0.toByte()
+        )
 
         override fun writeToParcel(parcel: Parcel, flags: Int) {
             parcel.writeString(questionId)
             parcel.writeString(title)
             parcel.writeByte(if (mandatory) 1 else 0)
-            parcel.writeStringList(translations)
+            parcel.writeBundle(translations)
             parcel.writeTypedList(options)
             parcel.writeByte(if (allowMultiple) 1 else 0)
             parcel.writeByte(if (allowOther) 1 else 0)
@@ -162,21 +168,22 @@ sealed class ViewQuestionAnswer : Parcelable {
         override val questionId: String,
         override val title: String,
         override val mandatory: Boolean,
-        override val translations: List<String>,
+        override val translations: Bundle = Bundle(),
         val answers: List<ViewCascadeLevel> = emptyList(), //empty if no answer
     ) : ViewQuestionAnswer() {
         constructor(parcel: Parcel) : this(
             parcel.readStringNonNull(),
             parcel.readStringNonNull(),
             parcel.readByte() != 0.toByte(),
-            parcel.createStringArrayNonNull(),
-            parcel.createTypedArrayNonNull(ViewCascadeLevel))
+            parcel.readBundle(Bundle::class.java.classLoader) ?: Bundle(),
+            parcel.createTypedArrayNonNull(ViewCascadeLevel)
+        )
 
         override fun writeToParcel(parcel: Parcel, flags: Int) {
             parcel.writeString(questionId)
             parcel.writeString(title)
             parcel.writeByte(if (mandatory) 1 else 0)
-            parcel.writeStringList(translations)
+            parcel.writeBundle(translations)
             parcel.writeTypedList(answers)
         }
 
@@ -199,21 +206,22 @@ sealed class ViewQuestionAnswer : Parcelable {
         override val questionId: String,
         override val title: String,
         override val mandatory: Boolean,
-        override val translations: List<String>,
+        override val translations: Bundle = Bundle(),
         val viewLocation: ViewLocation?,
     ) : ViewQuestionAnswer() {
         constructor(parcel: Parcel) : this(
             parcel.readStringNonNull(),
             parcel.readStringNonNull(),
             parcel.readByte() != 0.toByte(),
-            parcel.createStringArrayNonNull(),
-            parcel.readParcelable(ViewLocation::class.java.classLoader))
+            parcel.readBundle(Bundle::class.java.classLoader) ?: Bundle(),
+            parcel.readParcelable(ViewLocation::class.java.classLoader)
+        )
 
         override fun writeToParcel(parcel: Parcel, flags: Int) {
             parcel.writeString(questionId)
             parcel.writeString(title)
             parcel.writeByte(if (mandatory) 1 else 0)
-            parcel.writeStringList(translations)
+            parcel.writeBundle(translations)
             parcel.writeParcelable(viewLocation, flags)
         }
 
@@ -236,7 +244,7 @@ sealed class ViewQuestionAnswer : Parcelable {
         override val questionId: String,
         override val title: String,
         override val mandatory: Boolean,
-        override val translations: List<String>,
+        override val translations: Bundle = Bundle(),
         val filePath: String,
         val location: ViewLocation?, // TODO use valid and invalid location object?
     ) : ViewQuestionAnswer() {
@@ -244,15 +252,16 @@ sealed class ViewQuestionAnswer : Parcelable {
             parcel.readStringNonNull(),
             parcel.readStringNonNull(),
             parcel.readByte() != 0.toByte(),
-            parcel.createStringArrayNonNull(),
+            parcel.readBundle(Bundle::class.java.classLoader) ?: Bundle(),
             parcel.readStringNonNull(),
-            parcel.readParcelable(ViewLocation::class.java.classLoader))
+            parcel.readParcelable(ViewLocation::class.java.classLoader)
+        )
 
         override fun writeToParcel(parcel: Parcel, flags: Int) {
             parcel.writeString(questionId)
             parcel.writeString(title)
             parcel.writeByte(if (mandatory) 1 else 0)
-            parcel.writeStringList(translations)
+            parcel.writeBundle(translations)
             parcel.writeString(filePath)
             parcel.writeParcelable(location, flags)
         }
@@ -276,21 +285,22 @@ sealed class ViewQuestionAnswer : Parcelable {
         override val questionId: String,
         override val title: String,
         override val mandatory: Boolean,
-        override val translations: List<String>,
+        override val translations: Bundle = Bundle(),
         val filePath: String,
     ) : ViewQuestionAnswer() {
         constructor(parcel: Parcel) : this(
             parcel.readStringNonNull(),
             parcel.readStringNonNull(),
             parcel.readByte() != 0.toByte(),
-            parcel.createStringArrayNonNull(),
-            parcel.readStringNonNull())
+            parcel.readBundle(Bundle::class.java.classLoader) ?: Bundle(),
+            parcel.readStringNonNull()
+        )
 
         override fun writeToParcel(parcel: Parcel, flags: Int) {
             parcel.writeString(questionId)
             parcel.writeString(title)
             parcel.writeByte(if (mandatory) 1 else 0)
-            parcel.writeStringList(translations)
+            parcel.writeBundle(translations)
             parcel.writeString(filePath)
         }
 
@@ -314,21 +324,22 @@ sealed class ViewQuestionAnswer : Parcelable {
         override val questionId: String,
         override val title: String,
         override val mandatory: Boolean,
-        override val translations: List<String>,
+        override val translations: Bundle = Bundle(),
         val answer: String,
     ) : ViewQuestionAnswer() {
         constructor(parcel: Parcel) : this(
             parcel.readStringNonNull(),
             parcel.readStringNonNull(),
             parcel.readByte() != 0.toByte(),
-            parcel.createStringArrayNonNull(),
-            parcel.readStringNonNull())
+            parcel.readBundle(Bundle::class.java.classLoader) ?: Bundle(),
+            parcel.readStringNonNull()
+        )
 
         override fun writeToParcel(parcel: Parcel, flags: Int) {
             parcel.writeString(questionId)
             parcel.writeString(title)
             parcel.writeByte(if (mandatory) 1 else 0)
-            parcel.writeStringList(translations)
+            parcel.writeBundle(translations)
             parcel.writeString(answer)
         }
 
@@ -351,21 +362,22 @@ sealed class ViewQuestionAnswer : Parcelable {
         override val questionId: String,
         override val title: String,
         override val mandatory: Boolean,
-        override val translations: List<String>,
+        override val translations: Bundle = Bundle(),
         val answers: List<String>,
     ) : ViewQuestionAnswer() {
         constructor(parcel: Parcel) : this(
             parcel.readStringNonNull(),
             parcel.readStringNonNull(),
             parcel.readByte() != 0.toByte(),
-            parcel.createStringArrayNonNull(),
-            parcel.createStringArrayNonNull())
+            parcel.readBundle(Bundle::class.java.classLoader) ?: Bundle(),
+            parcel.createStringArrayNonNull()
+        )
 
         override fun writeToParcel(parcel: Parcel, flags: Int) {
             parcel.writeString(questionId)
             parcel.writeString(title)
             parcel.writeByte(if (mandatory) 1 else 0)
-            parcel.writeStringList(translations)
+            parcel.writeBundle(translations)
             parcel.writeStringList(answers)
         }
 
@@ -388,21 +400,22 @@ sealed class ViewQuestionAnswer : Parcelable {
         override val questionId: String,
         override val title: String,
         override val mandatory: Boolean,
-        override val translations: List<String>,
+        override val translations: Bundle = Bundle(),
         val geojsonAnswer: String,
     ) : ViewQuestionAnswer() {
         constructor(parcel: Parcel) : this(
             parcel.readStringNonNull(),
             parcel.readStringNonNull(),
             parcel.readByte() != 0.toByte(),
-            parcel.createStringArrayNonNull(),
-            parcel.readStringNonNull())
+            parcel.readBundle(Bundle::class.java.classLoader)?:Bundle(),
+            parcel.readStringNonNull()
+        )
 
         override fun writeToParcel(parcel: Parcel, flags: Int) {
             parcel.writeString(questionId)
             parcel.writeString(title)
             parcel.writeByte(if (mandatory) 1 else 0)
-            parcel.writeStringList(translations)
+            parcel.writeBundle(translations)
             parcel.writeString(geojsonAnswer)
         }
 
@@ -425,7 +438,7 @@ sealed class ViewQuestionAnswer : Parcelable {
         override val questionId: String,
         override val title: String,
         override val mandatory: Boolean,
-        override val translations: List<String>,
+        override val translations: Bundle = Bundle(),
         val base64ImageString: String,
         val name: String,
     ) : ViewQuestionAnswer() {
@@ -433,15 +446,16 @@ sealed class ViewQuestionAnswer : Parcelable {
             parcel.readStringNonNull(),
             parcel.readStringNonNull(),
             parcel.readByte() != 0.toByte(),
-            parcel.createStringArrayNonNull(),
+            parcel.readBundle(Bundle::class.java.classLoader)?:Bundle(),
             parcel.readStringNonNull(),
-            parcel.readStringNonNull())
+            parcel.readStringNonNull()
+        )
 
         override fun writeToParcel(parcel: Parcel, flags: Int) {
             parcel.writeString(questionId)
             parcel.writeString(title)
             parcel.writeByte(if (mandatory) 1 else 0)
-            parcel.writeStringList(translations)
+            parcel.writeBundle(translations)
             parcel.writeString(base64ImageString)
             parcel.writeString(name)
         }
@@ -465,21 +479,22 @@ sealed class ViewQuestionAnswer : Parcelable {
         override val questionId: String,
         override val title: String,
         override val mandatory: Boolean,
-        override val translations: List<String>,
+        override val translations: Bundle = Bundle(),
         val answers: List<String>, //name +": " +value +" " +unit;
     ) : ViewQuestionAnswer() {
         constructor(parcel: Parcel) : this(
             parcel.readStringNonNull(),
             parcel.readStringNonNull(),
             parcel.readByte() != 0.toByte(),
-            parcel.createStringArrayNonNull(),
-            parcel.createStringArrayNonNull())
+            parcel.readBundle(Bundle::class.java.classLoader)?:Bundle(),
+            parcel.createStringArrayNonNull()
+        )
 
         override fun writeToParcel(parcel: Parcel, flags: Int) {
             parcel.writeString(questionId)
             parcel.writeString(title)
             parcel.writeByte(if (mandatory) 1 else 0)
-            parcel.writeStringList(translations)
+            parcel.writeBundle(translations)
             parcel.writeStringList(answers)
         }
 
@@ -510,7 +525,8 @@ data class ViewLocation(
         parcel.readStringNonNull(),
         parcel.readStringNonNull(),
         parcel.readStringNonNull(),
-        parcel.readStringNonNull())
+        parcel.readStringNonNull()
+    )
 
     fun isValid(): Boolean {
         return latitude.isNotEmpty() && longitude.isNotEmpty()
@@ -548,7 +564,8 @@ data class ViewOption(
         parcel.readStringNonNull(),
         parcel.readStringNonNull(),
         parcel.readByte() != 0.toByte(),
-        parcel.readByte() != 0.toByte())
+        parcel.readByte() != 0.toByte()
+    )
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         parcel.writeString(name)
@@ -575,7 +592,8 @@ data class ViewOption(
 data class ViewCascadeLevel(val level: String, val answer: String) : Parcelable {
     constructor(parcel: Parcel) : this(
         parcel.readStringNonNull(),
-        parcel.readStringNonNull())
+        parcel.readStringNonNull()
+    )
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         parcel.writeString(level)

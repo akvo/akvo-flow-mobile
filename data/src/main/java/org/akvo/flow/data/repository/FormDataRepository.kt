@@ -101,7 +101,7 @@ class FormDataRepository @Inject constructor(
     }
 
     private fun parseForm(formId: String): XmlDataForm {
-        return xmlParser.parseToDomainForm(dataSourceFactory.fileDataSource.getFormFile(formId))
+        return xmlParser.parseXmlForm(dataSourceFactory.fileDataSource.getFormFile(formId))
     }
 
     private fun downloadFormHeader(formId: String?, deviceId: String?): Observable<Boolean?> {

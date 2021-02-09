@@ -19,4 +19,7 @@
 
 package org.akvo.flow.domain.entity
 
-data class DomainQuestionGroup(var heading: String, val isRepeatable: Boolean)
+import org.akvo.flow.domain.entity.question.Question
+
+data class DomainQuestionGroup(var heading: String, val isRepeatable: Boolean, val questions: MutableList<Question> = mutableListOf()) {
+}

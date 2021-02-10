@@ -364,13 +364,15 @@ sealed class ViewQuestionAnswer : Parcelable {
         override val mandatory: Boolean,
         override val translations: Bundle = Bundle(),
         val answers: List<String>,
+        val allowMultiple: Boolean
     ) : ViewQuestionAnswer() {
         constructor(parcel: Parcel) : this(
             parcel.readStringNonNull(),
             parcel.readStringNonNull(),
             parcel.readByte() != 0.toByte(),
             parcel.readBundle(Bundle::class.java.classLoader) ?: Bundle(),
-            parcel.createStringArrayNonNull()
+            parcel.createStringArrayNonNull(),
+            parcel.readByte() != 0.toByte(),
         )
 
         override fun writeToParcel(parcel: Parcel, flags: Int) {
@@ -379,6 +381,7 @@ sealed class ViewQuestionAnswer : Parcelable {
             parcel.writeByte(if (mandatory) 1 else 0)
             parcel.writeBundle(translations)
             parcel.writeStringList(answers)
+            parcel.writeByte(if (allowMultiple) 1 else 0)
         }
 
         override fun describeContents(): Int {

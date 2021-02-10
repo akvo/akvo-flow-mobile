@@ -21,6 +21,7 @@ package org.akvo.flow.presentation.form.view.entity
 
 import android.os.Bundle
 import android.text.TextUtils
+import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonIOException
 import com.google.gson.JsonSyntaxException
@@ -36,26 +37,39 @@ import org.akvo.flow.presentation.form.view.groups.entity.ViewCascadeLevel
 import org.akvo.flow.presentation.form.view.groups.entity.ViewLocation
 import org.akvo.flow.presentation.form.view.groups.entity.ViewOption
 import org.akvo.flow.presentation.form.view.groups.entity.ViewQuestionAnswer
+import org.akvo.flow.util.ConstantUtil.CADDISFLY_QUESTION_TYPE
 import org.akvo.flow.util.ConstantUtil.CASCADE_QUESTION_TYPE
 import org.akvo.flow.util.ConstantUtil.DATE_QUESTION_TYPE
-import org.akvo.flow.util.ConstantUtil.FREE_QUESTION_TYPE
+import org.akvo.flow.util.ConstantUtil.GEOSHAPE_QUESTION_TYPE
 import org.akvo.flow.util.ConstantUtil.GEO_QUESTION_TYPE
 import org.akvo.flow.util.ConstantUtil.OPTION_QUESTION_TYPE
 import org.akvo.flow.util.ConstantUtil.PHOTO_QUESTION_TYPE
+import org.akvo.flow.util.ConstantUtil.SCAN_QUESTION_TYPE
+import org.akvo.flow.util.ConstantUtil.SIGNATURE_QUESTION_TYPE
 import org.akvo.flow.util.ConstantUtil.VIDEO_QUESTION_TYPE
 import org.json.JSONArray
 import org.json.JSONException
 import timber.log.Timber
+import java.text.DateFormat
+import java.text.SimpleDateFormat
 import java.util.ArrayList
+import java.util.Calendar
+import java.util.GregorianCalendar
 import java.util.HashMap
+import java.util.Locale
+import java.util.TimeZone
 import javax.inject.Inject
 
 class ViewQuestionGroupMapper @Inject constructor() {
+    //TODO: inject
+    private val localCalendar: Calendar = GregorianCalendar.getInstance(Locale.getDefault())
+    private val userDisplayedDateFormat: DateFormat = SimpleDateFormat.getDateInstance()
 
-    fun transform(
-        groups: List<DomainQuestionGroup>,
-        responses: List<Response>
-    ): List<ViewQuestionGroup> {
+    init {
+        userDisplayedDateFormat.timeZone = TimeZone.getDefault()
+    }
+
+    fun transform(groups: List<DomainQuestionGroup>, responses: List<Response>): List<ViewQuestionGroup> {
         val viewGroups: MutableList<ViewQuestionGroup> = mutableListOf()
         for (g in groups) {
             viewGroups.add(transform(g, responses))
@@ -63,10 +77,7 @@ class ViewQuestionGroupMapper @Inject constructor() {
         return viewGroups
     }
 
-    private fun transform(
-        group: DomainQuestionGroup,
-        responses: List<Response>
-    ): ViewQuestionGroup {
+    private fun transform(group: DomainQuestionGroup, responses: List<Response>): ViewQuestionGroup {
         return ViewQuestionGroup(
             group.heading, group.isRepeatable, listOfAnswers(
                 group.questions,
@@ -82,7 +93,7 @@ class ViewQuestionGroupMapper @Inject constructor() {
         val answers = arrayListOf<ViewQuestionAnswer>()
         questions.forEach { question ->
             val listOfResponses: List<Response> = getResponsesForQuestion(
-                question.questionId
+                question.questionId, responses
             )
             answers.add(createQuestionAnswer(question, listOfResponses))
         }
@@ -101,21 +112,12 @@ class ViewQuestionGroupMapper @Inject constructor() {
         } else {
             ""
         }
-        when (question.type) {
-            FREE_QUESTION_TYPE -> {
-                return ViewQuestionAnswer.FreeTextViewQuestionAnswer(
-                    question.questionId ?: "",
-                    question.order.toString() + question.text,
-                    question.isMandatory,
-                    mapToBundle(question.languageTranslationMap),
-                    answer,
-                    question.isDoubleEntry
-                )
-            }
+        val title = """${question.order}. ${question.text}"""
+        return when (question.type) {
             OPTION_QUESTION_TYPE -> {
-                return ViewQuestionAnswer.OptionViewQuestionAnswer(
+                ViewQuestionAnswer.OptionViewQuestionAnswer(
                     question.questionId ?: "",
-                    question.order.toString() + question.text,
+                    title,
                     question.isMandatory,
                     mapToBundle(question.languageTranslationMap),
                     mapToViewOption(question.options, answer),
@@ -124,38 +126,28 @@ class ViewQuestionGroupMapper @Inject constructor() {
             }
 
             CASCADE_QUESTION_TYPE -> {
-                return ViewQuestionAnswer.CascadeViewQuestionAnswer(
+                ViewQuestionAnswer.CascadeViewQuestionAnswer(
                     question.questionId ?: "",
-                    question.order.toString() + question.text,
+                    title,
                     question.isMandatory,
                     mapToBundle(question.languageTranslationMap),
                     mapToCascadeResponse(answer, question.levels)
                 )
             }
             GEO_QUESTION_TYPE -> {
-                return ViewQuestionAnswer.LocationViewQuestionAnswer(
+                ViewQuestionAnswer.LocationViewQuestionAnswer(
                     question.questionId ?: "",
-                    question.order.toString() + question.text,
+                    title,
                     question.isMandatory,
                     mapToBundle(question.languageTranslationMap),
                     mapToLocationResponse(answer)
                 )
             }
             PHOTO_QUESTION_TYPE -> {
-                val media = deserializeMedia(answer)
-                val viewLocation = if (media.location != null) {
-                    ViewLocation(
-                        media.location.latitude.toString(),
-                        media.location.longitude.toString(),
-                        media.location.altitude.toString(),
-                        media.location.accuracy.toString()
-                    )
-                } else {
-                    null
-                }
-                return ViewQuestionAnswer.PhotoViewQuestionAnswer(
+                val (media, viewLocation) = mapMediaLocation(answer)
+                ViewQuestionAnswer.PhotoViewQuestionAnswer(
                     question.questionId ?: "",
-                    question.order.toString() + question.text,
+                    title,
                     question.isMandatory,
                     mapToBundle(question.languageTranslationMap),
                     media.filename,
@@ -164,24 +156,137 @@ class ViewQuestionGroupMapper @Inject constructor() {
             }
             VIDEO_QUESTION_TYPE -> {
                 val media = deserializeMedia(answer)
-                return ViewQuestionAnswer.VideoViewQuestionAnswer(
+                ViewQuestionAnswer.VideoViewQuestionAnswer(
                     question.questionId ?: "",
-                    question.order.toString() + question.text,
+                    title,
                     question.isMandatory,
                     mapToBundle(question.languageTranslationMap),
                     media.filename
                 )
             }
             DATE_QUESTION_TYPE -> {
-                return ViewQuestionAnswer.DateViewQuestionAnswer(
+                ViewQuestionAnswer.DateViewQuestionAnswer(
                     question.questionId ?: "",
-                    question.order.toString() + question.text,
+                    title,
                     question.isMandatory,
                     mapToBundle(question.languageTranslationMap),
-                    answer
+                    formatDate(answer)
+                )
+            }
+            SCAN_QUESTION_TYPE -> {
+                ViewQuestionAnswer.BarcodeViewQuestionAnswer(
+                    question.questionId ?: "",
+                    title,
+                    question.isMandatory,
+                    mapToBundle(question.languageTranslationMap),
+                    formatBarcode(answer),
+                    question.isAllowMultiple
+                )
+            }
+            GEOSHAPE_QUESTION_TYPE -> {
+                ViewQuestionAnswer.GeoShapeViewQuestionAnswer(
+                    question.questionId ?: "",
+                    title,
+                    question.isMandatory,
+                    mapToBundle(question.languageTranslationMap),
+                    answer, //Unformatted answer
+                )
+            }
+            SIGNATURE_QUESTION_TYPE -> {
+                val signature: Signature = mapToSignature(answer)
+                ViewQuestionAnswer.SignatureViewQuestionAnswer(
+                    question.questionId ?: "",
+                    title,
+                    question.isMandatory,
+                    mapToBundle(question.languageTranslationMap),
+                    signature.image,
+                    signature.name
+                )
+            }
+            CADDISFLY_QUESTION_TYPE -> {
+                ViewQuestionAnswer.CaddisflyViewQuestionAnswer(
+                    question.questionId ?: "",
+                    title,
+                    question.isMandatory,
+                    mapToBundle(question.languageTranslationMap),
+                    mapCaddisfly(answer)
+                )
+            }
+            else -> {
+                //free text or number
+                ViewQuestionAnswer.FreeTextViewQuestionAnswer(
+                    question.questionId ?: "",
+                    title,
+                    question.isMandatory,
+                    mapToBundle(question.languageTranslationMap),
+                    answer,
+                    question.isDoubleEntry
                 )
             }
         }
+    }
+
+    private fun mapCaddisfly(answer: String?): List<String> {
+        val resultsToDisplay = mutableListOf<String>()
+        var results: List<CaddisflyTestResult> = mutableListOf()
+        if (!TextUtils.isEmpty(answer)) {
+            try {
+                val gson = Gson()
+                val caddisflyResult:CaddisflyResult = gson.fromJson(answer, CaddisflyResult::class.java)
+                results = caddisflyResult.results
+            } catch (e: JsonSyntaxException) {
+                Timber.e(e, "Unable to parse caddisfly result: %s", answer)
+            }
+        }
+        for (r in results) {
+            resultsToDisplay.add(r.buildResultToDisplay())
+        }
+        return resultsToDisplay
+    }
+
+    private fun mapToSignature(answer: String): Signature {
+        if (!TextUtils.isEmpty(answer)) {
+            try {
+                val mapper = GsonMapper(GsonBuilder().create())
+                return mapper.read(answer, Signature::class.java)
+            } catch (e: JsonSyntaxException) {
+                Timber.e("Value is not a valid JSON response: %s", answer)
+            }
+        }
+        return Signature("", "")
+    }
+
+    private fun mapMediaLocation(answer: String): Pair<Media, ViewLocation?> {
+        val media = deserializeMedia(answer)
+        val location = media.location
+        val viewLocation = if (location != null) {
+            ViewLocation(
+                location.latitude.toString(),
+                location.longitude.toString(),
+                location.altitude.toString(),
+                location.accuracy.toString()
+            )
+        } else {
+            null
+        }
+        return Pair(media, viewLocation)
+    }
+
+    private fun formatBarcode(answer: String): List<String> {
+        val values = answer.split("\\|".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+        return values.asList()
+    }
+
+    private fun formatDate(answer: String): String {
+        val formattedDate = ""
+        try {
+            val timeStamp = answer.toLong()
+            localCalendar.timeInMillis = timeStamp
+            userDisplayedDateFormat.format(localCalendar.time)
+        } catch (e: NumberFormatException) {
+            Timber.e(e)
+        }
+        return formattedDate
     }
 
     private fun deserializeMedia(data: String): Media {
@@ -314,11 +419,9 @@ class ViewQuestionGroupMapper @Inject constructor() {
     /**
      * There may be a list of responses if the question is repeatable
      */
-    private fun getResponsesForQuestion(
-        questionId: String?
-    ): List<Response> {
+    private fun getResponsesForQuestion(questionId: String?, responses: List<Response>): List<Response> {
         val questionResponses = mutableListOf<Response>()
-        for (r in questionResponses) {
+        for (r in responses) {
             if (r.questionId == questionId) {
                 questionResponses.add(r)
             }
@@ -345,4 +448,27 @@ class ViewQuestionGroupMapper @Inject constructor() {
         val altitude: Double,
         val accuracy: Float
     )
+
+    data class Signature(
+        var name: String,
+        val image: String
+    )
+
+    data class CaddisflyResult(var results: List<CaddisflyTestResult>)
+
+    data class CaddisflyTestResult(
+        var id: Int,
+        var name: String,
+        var value: String,
+        var unit: String
+    ) {
+
+        fun buildResultToDisplay(): String {
+            return name +
+                    ": " +
+                    value +
+                    " " +
+                    unit
+        }
+    }
 }

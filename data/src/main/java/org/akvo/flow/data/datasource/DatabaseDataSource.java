@@ -57,7 +57,6 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -358,8 +357,8 @@ public class DatabaseDataSource {
         return Completable.complete();
     }
 
-    public Single<Cursor> getResponses(Long surveyInstanceId) {
-        return Single.just(briteSurveyDbAdapter.getResponses(surveyInstanceId));
+    public Cursor getResponses(Long surveyInstanceId) {
+        return briteSurveyDbAdapter.getResponses(surveyInstanceId);
     }
 
     public Completable createTransmissions(final Long instanceId, final String formId,

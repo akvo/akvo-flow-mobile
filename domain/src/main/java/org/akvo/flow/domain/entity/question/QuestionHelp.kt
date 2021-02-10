@@ -36,10 +36,10 @@ data class QuestionHelp(
      * checks whether this help object is well formed
      */
     fun isValid(): Boolean {
-        return if (text == null || text.trim { it <= ' ' }.isEmpty()) {
+        return if (text == null || text!!.trim { it <= ' ' }.isEmpty()) {
             false
         } else {
-            !"null".equals(text.trim { it <= ' ' }, ignoreCase = true)
+            !"null".equals(text!!.trim { it <= ' ' }, ignoreCase = true)
         }
     }
 }

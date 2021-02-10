@@ -40,6 +40,7 @@ import org.akvo.flow.domain.repository.FormInstanceRepository;
 import org.akvo.flow.domain.repository.FormRepository;
 import org.akvo.flow.domain.repository.LanguagesRepository;
 import org.akvo.flow.domain.repository.MissingAndDeletedRepository;
+import org.akvo.flow.domain.repository.ResponseRepository;
 import org.akvo.flow.domain.repository.SurveyRepository;
 import org.akvo.flow.domain.repository.TimeRepository;
 import org.akvo.flow.domain.repository.UserRepository;
@@ -96,6 +97,8 @@ public interface ApplicationComponent {
     TimeRepository timeRepository();
 
     LanguagesRepository languagesRepository();
+
+    ResponseRepository responseRepository();
 
     Gson gson();
 

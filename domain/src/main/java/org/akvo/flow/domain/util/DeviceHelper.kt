@@ -47,7 +47,6 @@ class DeviceHelper @Inject constructor(private val context: Context) {
         computeImei()
     }
 
-    @get:SuppressLint("HardwareIds")
     val androidId: String by lazy {
         Settings.Secure.getString(context.contentResolver, Settings.Secure.ANDROID_ID)
     }
@@ -56,7 +55,7 @@ class DeviceHelper @Inject constructor(private val context: Context) {
      * gets the device's primary phone number on the SIM card
      *
      */
-    @SuppressLint("MissingPermission", "HardwareIds")
+    @SuppressLint("MissingPermission")
     fun computePhoneNumber(): String? {
         if (androidId.isNotBlank()) {
             //if we have androidId, we don't need the phone number. Phone numbers can be duplicated like +52 or 1
@@ -83,7 +82,6 @@ class DeviceHelper @Inject constructor(private val context: Context) {
     /** Returns the devices Mac Address
      * (only Android < 6.0)
      */
-    @SuppressLint("HardwareIds")
     private fun computeMacAddress(): String? {
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP) {
             return ""
@@ -104,7 +102,6 @@ class DeviceHelper @Inject constructor(private val context: Context) {
      * gets the device's IMEI (MEID or ESN for CDMA phone)
      * (only Android < 10.0)
      */
-    @SuppressLint("HardwareIds")
     fun computeImei(): String {
         var number: String? = null
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {

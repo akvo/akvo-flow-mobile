@@ -47,6 +47,7 @@ class DeviceHelper @Inject constructor(private val context: Context) {
         computeImei()
     }
 
+    @get:SuppressLint("HardwareIds")
     val androidId: String by lazy {
         Settings.Secure.getString(context.contentResolver, Settings.Secure.ANDROID_ID)
     }
@@ -102,6 +103,7 @@ class DeviceHelper @Inject constructor(private val context: Context) {
      * gets the device's IMEI (MEID or ESN for CDMA phone)
      * (only Android < 10.0)
      */
+    @SuppressLint("MissingPermission")
     fun computeImei(): String {
         var number: String? = null
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {

@@ -6,7 +6,7 @@ versionName=$(git describe --abbrev=0)
 filename="$HOME/akvo-flow-mobile-deployment-${versionName}-${formattedDate}.log"
 echo "logs will be saved to: ${filename}"
 
-stream="flumen-dev"
+stream="K2 Engine"
 zulip_release_started() {
   if [[ "${ZULIP_URL}" ]]; then
     curl -X POST https://akvo.zulipchat.com/api/v1/messages \

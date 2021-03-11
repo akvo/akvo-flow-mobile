@@ -1,5 +1,12 @@
 Akvo FLOW app release notes
 ===========================
+# ver 2.9.8
+Date: 11 March 2021
+
+* **Lenovo tablets 'replace' each other in Device List** - [#1780](https://github.com/akvo/akvo-flow-mobile/issues/1780)
+* **TimeCheckService crash** - [#1774](https://github.com/akvo/akvo-flow-mobile/issues/1774)
+
+---------------
 # ver 2.9.7
 Date: 28 January 2021
 

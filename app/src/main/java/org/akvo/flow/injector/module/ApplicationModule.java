@@ -32,6 +32,7 @@ import com.squareup.sqlbrite2.SqlBrite;
 import org.akvo.flow.BuildConfig;
 import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.data.datasource.preferences.SharedPreferencesDataSource;
+import org.akvo.flow.data.entity.time.TimeMapper;
 import org.akvo.flow.data.executor.JobExecutor;
 import org.akvo.flow.data.net.Encoder;
 import org.akvo.flow.data.net.HmacInterceptor;
@@ -50,6 +51,7 @@ import org.akvo.flow.data.repository.FormInstanceDataRepository;
 import org.akvo.flow.data.repository.MissingAndDeletedDataRepository;
 import org.akvo.flow.data.repository.SetupDataRepository;
 import org.akvo.flow.data.repository.SurveyDataRepository;
+import org.akvo.flow.data.repository.TimeDataRepository;
 import org.akvo.flow.data.repository.UserDataRepository;
 import org.akvo.flow.database.DataPointDownloadTable;
 import org.akvo.flow.database.DatabaseHelper;
@@ -67,6 +69,7 @@ import org.akvo.flow.domain.repository.FormRepository;
 import org.akvo.flow.domain.repository.MissingAndDeletedRepository;
 import org.akvo.flow.domain.repository.SetupRepository;
 import org.akvo.flow.domain.repository.SurveyRepository;
+import org.akvo.flow.domain.repository.TimeRepository;
 import org.akvo.flow.domain.repository.UserRepository;
 import org.akvo.flow.domain.util.DeviceHelper;
 import org.akvo.flow.domain.util.GsonMapper;
@@ -94,7 +97,9 @@ public class ApplicationModule {
 
     private static final String SERVICE_FACTORY_DATE_PATTERN = "yyyy/MM/dd HH:mm:ss";
     private static final String REST_API_DATE_PATTERN = "EEE, dd MMM yyyy HH:mm:ss ";
-    private static final String TIMEZONE = "GMT";
+    private static final String SERVER_DATE_PATTERN = "yyyy-MM-dd'T'HH:mm:ss'Z'";// ISO 8601
+    private static final String TIMEZONE_GMT = "GMT";
+    private static final String TIMEZONE_UTC = "UTC";
     private static final String PREFS_NAME = "flow_prefs";
     private static final int PREFS_MODE = Context.MODE_PRIVATE;
     private static final int CONNECTION_TIMEOUT = 10;
@@ -125,6 +130,12 @@ public class ApplicationModule {
     @Singleton
     public FileRepository provideFileRepository(FileDataRepository fileDataRepository) {
         return fileDataRepository;
+    }
+
+    @Provides
+    @Singleton
+    public TimeRepository provideTimeRepository(TimeDataRepository timeDataRepository) {
+        return timeDataRepository;
     }
 
     @Provides
@@ -210,7 +221,7 @@ public class ApplicationModule {
 
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(SERVICE_FACTORY_DATE_PATTERN,
                 Locale.US);
-        simpleDateFormat.setTimeZone(TimeZone.getTimeZone(TIMEZONE));
+        simpleDateFormat.setTimeZone(TimeZone.getTimeZone(TIMEZONE_GMT));
         OkHttpClient.Builder httpClient = createHttpClient(loggingInterceptor);
         httpClient.addInterceptor(
                 new HmacInterceptor(BuildConfig.API_KEY, simpleDateFormat, encoder,
@@ -268,7 +279,7 @@ public class ApplicationModule {
     public S3RestApi provideS3RestApi(RestServiceFactory serviceFactory, AmazonAuthHelper amazonAuthHelper,
             BodyCreator bodyCreator) {
         final DateFormat df = new SimpleDateFormat(REST_API_DATE_PATTERN, Locale.US);
-        df.setTimeZone(TimeZone.getTimeZone(TIMEZONE));
+        df.setTimeZone(TimeZone.getTimeZone(TIMEZONE_GMT));
         return new S3RestApi(serviceFactory, amazonAuthHelper, df, bodyCreator,
                 "https://" + BuildConfig.AWS_BUCKET + ".s3.amazonaws.com");
     }
@@ -277,6 +288,14 @@ public class ApplicationModule {
     @Singleton
     public Gson provideGson() {
         return new Gson();
+    }
+
+    @Provides
+    @Singleton
+    public TimeMapper provideTimeMapper() {
+        DateFormat df = new SimpleDateFormat(SERVER_DATE_PATTERN, Locale.getDefault());
+        df.setTimeZone(TimeZone.getTimeZone(TIMEZONE_UTC));
+        return new TimeMapper(df);
     }
 
     @Provides

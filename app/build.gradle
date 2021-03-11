@@ -251,6 +251,7 @@ dependencies {
     implementation "com.squareup.okhttp3:logging-interceptor:${rootProject.ext.loggingInterceptorVersion}"
     implementation "com.google.code.gson:gson:${rootProject.ext.gsonVersion}"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:${rootProject.ext.coroutinesVersion}"
+    implementation "androidx.work:work-runtime-ktx:${rootProject.ext.workVersion}"
 
     debugImplementation "com.squareup.leakcanary:leakcanary-android:${rootProject.ext.leakCanaryVersion}"
 

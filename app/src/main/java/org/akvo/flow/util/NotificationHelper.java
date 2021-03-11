@@ -34,6 +34,10 @@ import androidx.core.content.ContextCompat;
 
 import org.akvo.flow.R;
 import org.akvo.flow.activity.SurveyActivity;
+import org.akvo.flow.activity.TimeCheckActivity;
+import org.akvo.flow.service.time.CancelNotificationReceiver;
+
+import static org.akvo.flow.util.ConstantUtil.NOTIFICATION_TIME;
 
 public class NotificationHelper {
 
@@ -100,7 +104,7 @@ public class NotificationHelper {
     }
 
     public static Notification getUnPublishingNotification(Context context) {
-        createNotificationChannel(context);
+        createLowPriorityChannel(context);
         String title = context.getString(R.string.unpublish_service_notification_title);
         NotificationCompat.Builder b = new NotificationCompat.Builder(context,
                 ConstantUtil.NOTIFICATION_CHANNEL_ID)
@@ -112,6 +116,38 @@ public class NotificationHelper {
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .setOngoing(true);
         return (b.build());
+    }
+
+    public static void showTimeCheckNotification(Context context) {
+        createHighPriorityChannel(context);
+
+        Intent intent = new Intent(context, TimeCheckActivity.class);
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0,
+                intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        Intent actionIntent = new Intent(context, CancelNotificationReceiver.class);
+        actionIntent.putExtra(CancelNotificationReceiver.NOTIFICATION_ID_EXTRA, NOTIFICATION_TIME);
+        PendingIntent dismissIntent = PendingIntent.getBroadcast(context, NOTIFICATION_TIME, actionIntent,
+                PendingIntent.FLAG_CANCEL_CURRENT);
+
+        NotificationCompat.Builder b = new NotificationCompat.Builder(context,
+                ConstantUtil.NOTIFICATION_CHANNEL_TIME)
+                .setSmallIcon(R.drawable.notification_icon)
+                .setContentTitle(context.getString(R.string.time_check_notification_title))
+                .setVibrate(new long[]{300})
+                .setContentText(context.getString(R.string.time_check_notification_message))
+                .setTicker(context.getString(R.string.time_check_notification_message))
+                .setColor(ContextCompat.getColor(context, R.color.orange_main))
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setFullScreenIntent(pendingIntent, true)
+                .setAutoCancel(true)
+                .setCategory(NotificationCompat.CATEGORY_REMINDER)
+                .addAction(R.drawable.notification_icon, context.getString(R.string.time_check_action_fix), pendingIntent)
+                .addAction(R.drawable.notification_icon, context.getString(R.string.time_check_action_dismiss), dismissIntent);
+
+        NotificationManager notificationManager =
+                (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.notify(NOTIFICATION_TIME, b.build());
     }
 
     public static void showSyncingNotification(Context context) {
@@ -137,9 +173,13 @@ public class NotificationHelper {
     }
 
     public static void hidePendingNotification(Context context) {
+        cancelNotification(context, PENDING_WORK_NOTIFICATION_ID);
+    }
+
+    public static void cancelNotification(Context context, int pendingWorkNotificationId) {
         NotificationManager notificationManager =
                 (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        notificationManager.cancel(PENDING_WORK_NOTIFICATION_ID);
+        notificationManager.cancel(pendingWorkNotificationId);
     }
 
     private static void notifyWithDummyIntent(Context context, int notificationId,
@@ -151,7 +191,7 @@ public class NotificationHelper {
                 stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
         builder.setContentIntent(resultPendingIntent);
 
-        createNotificationChannel(context);
+        createLowPriorityChannel(context);
 
         NotificationManager notificationManager =
                 (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
@@ -186,13 +226,27 @@ public class NotificationHelper {
                 .setColor(ContextCompat.getColor(context, R.color.red));
     }
 
-    private static void createNotificationChannel(Context context) {
+    private static void createLowPriorityChannel(Context context) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            createNotificationChannel(context, NotificationManager.IMPORTANCE_LOW,
+                    ConstantUtil.NOTIFICATION_CHANNEL_ID);
+        }
+    }
+
+    private static void createHighPriorityChannel(Context context) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            createNotificationChannel(context, NotificationManager.IMPORTANCE_HIGH,
+                    ConstantUtil.NOTIFICATION_CHANNEL_TIME);
+        }
+    }
+
+    private static void createNotificationChannel(Context context, int importance, String channelId) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             CharSequence name = context.getString(R.string.channel_name);
             String description = context.getString(R.string.channel_description);
             NotificationChannel channel = new NotificationChannel(
-                    ConstantUtil.NOTIFICATION_CHANNEL_ID, name,
-                    NotificationManager.IMPORTANCE_LOW);
+                    channelId, name,
+                    importance);
             channel.setDescription(description);
             channel.enableVibration(false);
             NotificationManager notificationManager = context

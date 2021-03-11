@@ -28,6 +28,7 @@ import com.squareup.sqlbrite2.BriteDatabase;
 import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.broadcast.BootReceiver;
 import org.akvo.flow.broadcast.DataTimeoutReceiver;
+import org.akvo.flow.data.entity.time.TimeMapper;
 import org.akvo.flow.database.SurveyLanguagesDataSource;
 import org.akvo.flow.domain.executor.PostExecutionThread;
 import org.akvo.flow.domain.executor.SchedulerCreator;
@@ -39,6 +40,7 @@ import org.akvo.flow.domain.repository.FormInstanceRepository;
 import org.akvo.flow.domain.repository.FormRepository;
 import org.akvo.flow.domain.repository.MissingAndDeletedRepository;
 import org.akvo.flow.domain.repository.SurveyRepository;
+import org.akvo.flow.domain.repository.TimeRepository;
 import org.akvo.flow.domain.repository.UserRepository;
 import org.akvo.flow.injector.module.ApplicationModule;
 import org.akvo.flow.injector.module.ViewModule;
@@ -49,6 +51,7 @@ import org.akvo.flow.service.DataPointUploadWorker;
 import org.akvo.flow.service.FileChangeTrackingWorker;
 import org.akvo.flow.service.SurveyDownloadWorker;
 import org.akvo.flow.service.UnPublishDataService;
+import org.akvo.flow.service.time.TimeCheckWorker;
 import org.akvo.flow.util.logging.LoggingHelper;
 
 import javax.inject.Singleton;
@@ -89,7 +92,11 @@ public interface ApplicationComponent {
 
     MissingAndDeletedRepository missingAndDeletedRepository();
 
+    TimeRepository timeRepository();
+
     Gson gson();
+
+    TimeMapper timeMapper();
 
     SurveyLanguagesDataSource provideSurveyLanguageDataSource();
 
@@ -110,6 +117,8 @@ public interface ApplicationComponent {
     void inject(DataPointUploadWorker dataPointUploadWorker);
 
     void inject(ApkUpdateWorker apkUpdateWorker);
+
+    void inject(TimeCheckWorker apkUpdateWorker);
 
     void inject(FlowApp app);
 }

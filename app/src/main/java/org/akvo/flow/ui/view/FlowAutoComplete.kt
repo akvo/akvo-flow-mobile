@@ -44,14 +44,17 @@ class FlowAutoComplete @JvmOverloads constructor(
         selection: Int,
         readOnly: Boolean
     ) {
-        val adapter = CascadeAdapter(context, values)
-        setAdapter(adapter)
         tag = position // Tag the textView with its position within the container
         isEnabled = !readOnly
+        isFocusable = !readOnly
+        isClickable = !readOnly
+
         if (selection != POSITION_NONE) {
-            setText(adapter.getItem(selection).toString())
+            setText(values[selection].name)
         }
         if (!readOnly) {
+            val adapter = CascadeAdapter(context, values)
+            setAdapter(adapter)
             setOnClickListener { showDropDown() }
             onFocusChangeListener =
                 OnFocusChangeListener { _: View?, hasFocus: Boolean ->

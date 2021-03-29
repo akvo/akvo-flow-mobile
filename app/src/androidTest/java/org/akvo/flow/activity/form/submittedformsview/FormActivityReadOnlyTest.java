@@ -82,7 +82,6 @@ import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.isEnabled;
 import static androidx.test.espresso.matcher.ViewMatchers.isFocusable;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
-import static androidx.test.espresso.matcher.ViewMatchers.withSpinnerText;
 import static androidx.test.espresso.matcher.ViewMatchers.withTagValue;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.getCameraButton;
@@ -430,11 +429,11 @@ public class FormActivityReadOnlyTest {
 
     private void verifyCascadeLevelSpinner(List<CascadeNode> values, int i) {
         ViewInteraction cascadeLevelSpinner = onView(
-                allOf(withId(R.id.cascade_level_spinner), withTagValue(is(i))));
+                allOf(withId(R.id.cascade_level_textview), withTagValue(is(i))));
         cascadeLevelSpinner.perform(scrollTo());
         cascadeLevelSpinner.check(matches(isDisplayed()));
         cascadeLevelSpinner
-                .check(matches(withSpinnerText(values.get(i).getName())));
+                .check(matches(withText(values.get(i).getName())));
     }
 
     private void verifyFreeTextQuestionView(Question question) {

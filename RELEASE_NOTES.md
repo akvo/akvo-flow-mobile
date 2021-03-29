@@ -1,5 +1,21 @@
 Akvo FLOW app release notes
 ===========================
+# ver 2.9.8
+Date: 11 March 2021
+
+* **Lenovo tablets 'replace' each other in Device List** - [#1780](https://github.com/akvo/akvo-flow-mobile/issues/1780)
+* **TimeCheckService crash** - [#1774](https://github.com/akvo/akvo-flow-mobile/issues/1774)
+
+---------------
+# ver 2.9.7
+Date: 28 January 2021
+
+* **Simplify cascade usage** - [#1218](https://github.com/akvo/akvo-flow-mobile/issues/1218)
+* **Indicate in main menu that new survey forms are downloaded or updated** - [#1754](https://github.com/akvo/akvo-flow-mobile/issues/1754)
+* **Add Sidaama language** - [#1766](https://github.com/akvo/akvo-flow-mobile/issues/1766)
+* **Bootstrap is broken** - [#1768](https://github.com/akvo/akvo-flow-mobile/issues/1768)
+
+---------------
 # ver 2.9.6
 Date: 29 October 2020
 

@@ -29,10 +29,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import org.akvo.flow.R;
 import org.akvo.flow.service.DataPointUploadWorker;
 import org.akvo.flow.service.SurveyDownloadWorker;
-import org.akvo.flow.service.TimeCheckService;
+import org.akvo.flow.service.time.TimeCheckWorker;
+import org.akvo.flow.util.NotificationHelper;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+
+import static org.akvo.flow.util.ConstantUtil.NOTIFICATION_TIME;
 
 public class TimeCheckActivity extends AppCompatActivity {
     private static final String PATTERN = "HH:mm, yyyy-MM-dd (zzzz)";
@@ -48,6 +51,8 @@ public class TimeCheckActivity extends AppCompatActivity {
         Button b = findViewById(R.id.adjust_btn);
         b.setOnClickListener(v -> startActivityForResult(
                 new Intent(android.provider.Settings.ACTION_DATE_SETTINGS), 0));
+
+        NotificationHelper.cancelNotification(getApplicationContext(), NOTIFICATION_TIME);
     }
 
     @Override
@@ -55,7 +60,7 @@ public class TimeCheckActivity extends AppCompatActivity {
         // Since date/time settings (might) have been updated, we fire the services sensitive
         // to time changes (the ones interacting with S3)
         super.onActivityResult(requestCode, resultCode, data);
-        startService(new Intent(this, TimeCheckService.class));// Re-check time setting status
+        TimeCheckWorker.scheduleWork(getApplicationContext());// Re-check time setting status
         SurveyDownloadWorker.scheduleWork(getApplicationContext());
         DataPointUploadWorker.scheduleUpload(getApplicationContext(), false);
         finish();

@@ -75,8 +75,8 @@ class DataPointDataRepository @Inject constructor(
         return downLoadMedia(mediaHelper.cleanMediaFileName(filename))
     }
 
-    override fun markDataPointAsViewed(dataPointId: String): Completable {
-        return dataSourceFactory.dataBaseDataSource.markDataPointAsViewed(dataPointId)
+    override fun markDataPointAsViewed(dataPointId: String) {
+        dataSourceFactory.dataBaseDataSource.markDataPointAsViewed(dataPointId)
     }
 
     private suspend fun downLoadImages(

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2020,2021 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -19,48 +19,19 @@
 
 package org.akvo.flow.domain.interactor.datapoints
 
-import io.reactivex.Completable
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.disposables.Disposable
-import io.reactivex.observers.DisposableCompletableObserver
-import io.reactivex.schedulers.Schedulers
-import org.akvo.flow.domain.executor.PostExecutionThread
-import org.akvo.flow.domain.executor.ThreadExecutor
 import org.akvo.flow.domain.repository.DataPointRepository
 import javax.inject.Inject
 
 class MarkDatapointViewed @Inject constructor(
-    private val dataPointRepository: DataPointRepository,
-    private val threadExecutor: ThreadExecutor,
-    private val postExecutionThread: PostExecutionThread
-
+    private val dataPointRepository: DataPointRepository
 ) {
 
-    private val disposables = CompositeDisposable()
-
-    fun execute(observer: DisposableCompletableObserver, parameters: Map<String?, Any>?) {
-        val observable: Completable = buildUseCaseObservable(parameters)
-            .subscribeOn(Schedulers.from(threadExecutor))
-            .observeOn(postExecutionThread.scheduler)
-        addDisposable(observable.subscribeWith(observer))
-    }
-
-    fun dispose() {
-        if (!disposables.isDisposed) {
-            disposables.clear()
-        }
-    }
-
-    private fun <T> buildUseCaseObservable(parameters: Map<String?, T>?): Completable {
+    fun execute(parameters: Map<String?, Any>?) {
         if (parameters == null || !parameters.containsKey(PARAM_DATAPOINT_ID)) {
-            return Completable.error(IllegalArgumentException("Missing file name"))
+            throw IllegalArgumentException("Missing file name")
         }
         val dataPointId = parameters[PARAM_DATAPOINT_ID] as String
-        return dataPointRepository.markDataPointAsViewed(dataPointId)
-    }
-
-    private fun addDisposable(disposable: Disposable) {
-        disposables.add(disposable)
+        dataPointRepository.markDataPointAsViewed(dataPointId)
     }
 
     companion object {

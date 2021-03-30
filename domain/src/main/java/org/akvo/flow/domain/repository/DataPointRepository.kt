@@ -23,5 +23,5 @@ import io.reactivex.Completable
 interface DataPointRepository {
     suspend fun downloadDataPoints(surveyId: Long, assignedFormIds: MutableList<String>): Int
     fun cleanPathAndDownLoadMedia(filename: String): Completable
-    fun markDataPointAsViewed(dataPointId: String): Completable
+    fun markDataPointAsViewed(dataPointId: String)
 }

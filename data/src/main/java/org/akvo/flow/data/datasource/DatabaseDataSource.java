@@ -434,10 +434,8 @@ public class DatabaseDataSource {
         return formMapper.mapForms(briteSurveyDbAdapter.getForms(surveyId));
     }
 
-    @NotNull
-    public Completable markDataPointAsViewed(@NotNull String dataPointId) {
+    public void markDataPointAsViewed(@NotNull String dataPointId) {
         briteSurveyDbAdapter.markDataPointAsViewed(dataPointId);
-        return Completable.complete();
     }
 
     public Single<Long> getSavedFormInstance(@NotNull String formId, @NotNull String datapointId) {

@@ -20,7 +20,6 @@
 package org.akvo.flow.presentation.survey
 
 import androidx.core.util.Pair
-import io.reactivex.observers.DisposableCompletableObserver
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -63,7 +62,6 @@ class SurveyPresenter @Inject constructor(
         getApkDataPreferences.dispose()
         saveApkUpdateNotified.dispose()
         getSelectedUser.dispose()
-        markDatapointViewed.dispose()
         uiScope.coroutineContext.cancelChildren()
     }
 
@@ -128,17 +126,12 @@ class SurveyPresenter @Inject constructor(
     }
 
     private fun setDataPointAsViewed(datapointId: String, user: User) {
-        val params: MutableMap<String?, Any> = HashMap(2)
-        params[MarkDatapointViewed.PARAM_DATAPOINT_ID] = datapointId
-        markDatapointViewed.execute(object : DisposableCompletableObserver() {
-            override fun onComplete() {
-                view?.openDataPoint(datapointId, user)
-            }
-
-            override fun onError(e: Throwable) {
-                view?.openDataPoint(datapointId, user)
-            }
-        }, params)
+        uiScope.launch {
+            val params: MutableMap<String?, Any> = HashMap(2)
+            params[MarkDatapointViewed.PARAM_DATAPOINT_ID] = datapointId
+            markDatapointViewed.execute(params)
+            view?.openDataPoint(datapointId, user)
+        }
     }
 
     fun onAddDataPointTap(surveyGroup: SurveyGroup) {

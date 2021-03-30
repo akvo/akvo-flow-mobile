@@ -579,6 +579,21 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
         }
     }
 
+    @Override
+    public void openEmptyForm(@NotNull User user, String formId) {
+        navigator.navigateToFormActivity(this, mSurveyGroup, formId, user);
+    }
+
+    @Override
+    public void showMissingFormError() {
+        Toast.makeText(this, R.string.error_missing_form, Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void showMissingCascadeError() {
+        Toast.makeText(this, R.string.error_missing_cascade, Toast.LENGTH_LONG).show();
+    }
+
     private void displayRecord(String datapointId) {
         navigator.navigateToRecordActivity(this, datapointId, mSurveyGroup);
     }
@@ -671,8 +686,7 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     void onAddDataPointTap() {
         if (mDatabase != null) {
             addDataPointFab.setEnabled(false);
-            String newLocaleId = mDatabase.createSurveyedLocale(mSurveyGroup.getId());
-            onDatapointSelected(newLocaleId);
+            presenter.onAddDataPointTap(mSurveyGroup);
         }
     }
 

@@ -20,7 +20,10 @@
 
 package org.akvo.flow.domain.entity;
 
-public class User {
+import android.os.Parcel;
+import android.os.Parcelable;
+
+public class User implements Parcelable {
 
     private final long id;
     private final String name;
@@ -30,11 +33,39 @@ public class User {
         this.name = name;
     }
 
+    protected User(Parcel in) {
+        id = in.readLong();
+        name = in.readString();
+    }
+
+    public static final Creator<User> CREATOR = new Creator<User>() {
+        @Override
+        public User createFromParcel(Parcel in) {
+            return new User(in);
+        }
+
+        @Override
+        public User[] newArray(int size) {
+            return new User[size];
+        }
+    };
+
     public long getId() {
         return id;
     }
 
     public String getName() {
         return name;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeLong(id);
+        dest.writeString(name);
     }
 }

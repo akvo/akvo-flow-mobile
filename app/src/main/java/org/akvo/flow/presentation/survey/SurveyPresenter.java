@@ -23,11 +23,14 @@ package org.akvo.flow.presentation.survey;
 import androidx.core.util.Pair;
 
 import org.akvo.flow.BuildConfig;
+import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.entity.ApkData;
+import org.akvo.flow.domain.entity.DomainForm;
 import org.akvo.flow.domain.entity.User;
 import org.akvo.flow.domain.interactor.DefaultObserver;
 import org.akvo.flow.domain.interactor.UseCase;
 import org.akvo.flow.domain.interactor.datapoints.MarkDatapointViewed;
+import org.akvo.flow.domain.interactor.forms.GetRegistrationForm;
 import org.akvo.flow.domain.interactor.users.GetSelectedUser;
 import org.akvo.flow.domain.util.VersionHelper;
 import org.akvo.flow.presentation.Presenter;
@@ -42,6 +45,7 @@ import javax.inject.Named;
 
 import io.reactivex.annotations.NonNull;
 import io.reactivex.observers.DisposableCompletableObserver;
+import io.reactivex.observers.DisposableSingleObserver;
 import timber.log.Timber;
 
 public class SurveyPresenter implements Presenter {
@@ -54,6 +58,7 @@ public class SurveyPresenter implements Presenter {
     private final ViewApkMapper viewApkMapper;
     private final GetSelectedUser getSelectedUser;
     private final MarkDatapointViewed markDatapointViewed;
+    private final GetRegistrationForm getRegistrationForm;
 
     private SurveyView view;
 
@@ -61,13 +66,15 @@ public class SurveyPresenter implements Presenter {
     public SurveyPresenter(@Named("GetApkDataPreferences") UseCase getApkDataPreferences,
                            @Named("SaveApkUpdateNotified") UseCase saveApkUpdateNotified,
                            VersionHelper versionHelper, ViewApkMapper viewApkMapper,
-                           GetSelectedUser getSelectedUser, MarkDatapointViewed markDatapointViewed) {
+                           GetSelectedUser getSelectedUser, MarkDatapointViewed markDatapointViewed,
+                           GetRegistrationForm getForm) {
         this.getApkDataPreferences = getApkDataPreferences;
         this.saveApkUpdateNotified = saveApkUpdateNotified;
         this.versionHelper = versionHelper;
         this.viewApkMapper = viewApkMapper;
         this.getSelectedUser = getSelectedUser;
         this.markDatapointViewed = markDatapointViewed;
+        this.getRegistrationForm = getForm;
     }
 
     @Override
@@ -76,6 +83,7 @@ public class SurveyPresenter implements Presenter {
         saveApkUpdateNotified.dispose();
         getSelectedUser.dispose();
         markDatapointViewed.dispose();
+        getRegistrationForm.dispose();
     }
 
     public void setView(SurveyView view) {
@@ -154,5 +162,41 @@ public class SurveyPresenter implements Presenter {
                 view.openDataPoint(datapointId, user);
             }
         }, params);
+    }
+
+    public void onAddDataPointTap(SurveyGroup surveyGroup) {
+        getSelectedUser.execute(new DefaultObserver<User>() {
+            @Override
+            public void onError(Throwable e) {
+                Timber.e(e);
+                view.showMissingUserError();
+            }
+
+            @Override
+            public void onNext(@NonNull User user) {
+                if (user.getName() == null) {
+                    view.showMissingUserError();
+                } else {
+                    Map<String, Object> params = new HashMap<>(2);
+                    params.put(GetRegistrationForm.PARAM_SURVEY_ID, surveyGroup.getId());
+                    params.put(GetRegistrationForm.PARAM_REGISTRATION_FORM_ID, surveyGroup.getRegisterSurveyId());
+                    getRegistrationForm.execute(new DisposableSingleObserver<DomainForm>() {
+                        @Override
+                        public void onSuccess(@NonNull DomainForm domainForm) {
+                            if (domainForm.getCascadeDownloaded()) {
+                                view.openEmptyForm(user, domainForm.getFormId());
+                            } else {
+                                view.showMissingCascadeError();
+                            }
+                        }
+
+                        @Override
+                        public void onError(@NonNull Throwable e) {
+                            view.showMissingFormError();
+                        }
+                    }, params);
+                }
+            }
+        }, null);
     }
 }

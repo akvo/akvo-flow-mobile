@@ -30,4 +30,10 @@ public interface SurveyView {
     void showMissingUserError();
 
     void openDataPoint(String datapointId, User user);
+
+    void openEmptyForm(User user, String formId);
+
+    void showMissingFormError();
+
+    void showMissingCascadeError();
 }

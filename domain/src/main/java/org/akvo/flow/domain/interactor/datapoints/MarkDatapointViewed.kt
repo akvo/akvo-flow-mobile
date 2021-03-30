@@ -19,19 +19,28 @@
 
 package org.akvo.flow.domain.interactor.datapoints
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.akvo.flow.domain.repository.DataPointRepository
+import timber.log.Timber
 import javax.inject.Inject
 
 class MarkDatapointViewed @Inject constructor(
     private val dataPointRepository: DataPointRepository
 ) {
 
-    fun execute(parameters: Map<String?, Any>?) {
+    suspend fun execute(parameters: Map<String?, Any>?) {
         if (parameters == null || !parameters.containsKey(PARAM_DATAPOINT_ID)) {
             throw IllegalArgumentException("Missing file name")
         }
-        val dataPointId = parameters[PARAM_DATAPOINT_ID] as String
-        dataPointRepository.markDataPointAsViewed(dataPointId)
+        withContext(Dispatchers.IO) {
+            try {
+                val dataPointId = parameters[PARAM_DATAPOINT_ID] as String
+                dataPointRepository.markDataPointAsViewed(dataPointId)
+            } catch (e: Exception) {
+                Timber.e(e)
+            }
+        }
     }
 
     companion object {

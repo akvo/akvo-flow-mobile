@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2019 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2019,2021 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -22,13 +22,14 @@ package org.akvo.flow.data.datasource.preferences;
 
 import android.content.SharedPreferences;
 
+import androidx.annotation.Nullable;
+
 import org.akvo.flow.domain.entity.ApkData;
 import org.akvo.flow.domain.util.GsonMapper;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import androidx.annotation.Nullable;
 import io.reactivex.Observable;
 
 @Singleton
@@ -118,8 +119,8 @@ public class SharedPreferencesDataSource {
         return Observable.just(true);
     }
 
-    public Observable<Long> getSelectedUser() {
-        return Observable.just(getLong(KEY_USER_ID, LONG_VALUE_UNSET));
+    public Long getSelectedUser() {
+        return getLong(KEY_USER_ID, LONG_VALUE_UNSET);
     }
 
     public Observable<Boolean> setSelectedUser(long userId) {

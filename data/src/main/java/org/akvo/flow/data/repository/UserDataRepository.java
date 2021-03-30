@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2019 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2019,2021 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -87,7 +87,7 @@ public class UserDataRepository implements UserRepository {
     }
 
     @Override
-    public Observable<Long> getSelectedUser() {
+    public Long getSelectedUser() {
         return dataSourceFactory.getSharedPreferencesDataSource().getSelectedUser();
     }
 

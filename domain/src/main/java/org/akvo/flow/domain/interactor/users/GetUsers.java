@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2018,2021 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -20,6 +20,7 @@
 
 package org.akvo.flow.domain.interactor.users;
 
+import androidx.annotation.NonNull;
 import androidx.core.util.Pair;
 
 import org.akvo.flow.domain.entity.User;
@@ -35,7 +36,6 @@ import java.util.Map;
 import javax.inject.Inject;
 
 import io.reactivex.Observable;
-import io.reactivex.functions.Function;
 
 public class GetUsers extends UseCase {
 
@@ -52,28 +52,22 @@ public class GetUsers extends UseCase {
 
     @Override
     protected <T> Observable buildUseCaseObservable(Map<String, T> parameters) {
-        return surveyRepository.getUsers()
-                .concatMap(new Function<List<User>, Observable<Pair<User, List<User>>>>() {
-                    @Override
-                    public Observable<Pair<User, List<User>>> apply(final List<User> users) {
-                        return userRepository.getSelectedUser()
-                                .map(new Function<Long, Pair<User, List<User>>>() {
-                                    @Override
-                                    public Pair<User, List<User>> apply(final Long selectedUserId) {
-                                        User currentUser = null;
-                                        for (User u : users) {
-                                            if (selectedUserId.equals(u.getId())) {
-                                                currentUser = u;
-                                                break;
-                                            }
-                                        }
-                                        if (currentUser != null) {
-                                            users.remove(currentUser);
-                                        }
-                                        return new Pair<>(currentUser, users);
-                                    }
-                                });
-                    }
-                });
+        Long selectedUserId = userRepository.getSelectedUser();
+        return surveyRepository.getUsers().map(users -> mapUsers(selectedUserId, users));
+    }
+
+    @NonNull
+    private Pair<User, List<User>> mapUsers(Long selectedUserId, List<User> users) {
+        User currentUser = null;
+        for (User u : users) {
+            if (selectedUserId.equals(u.getId())) {
+                currentUser = u;
+                break;
+            }
+        }
+        if (currentUser != null) {
+            users.remove(currentUser);
+        }
+        return new Pair<>(currentUser, users);
     }
 }

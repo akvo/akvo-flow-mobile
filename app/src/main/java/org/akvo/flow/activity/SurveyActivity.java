@@ -25,7 +25,6 @@ import android.content.res.Configuration;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Environment;
-import android.text.TextUtils;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
@@ -53,8 +52,6 @@ import org.akvo.flow.database.SurveyInstanceStatus;
 import org.akvo.flow.domain.Survey;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.entity.User;
-import org.akvo.flow.domain.interactor.DefaultObserver;
-import org.akvo.flow.domain.interactor.users.GetSelectedUser;
 import org.akvo.flow.injector.component.ApplicationComponent;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
@@ -76,8 +73,8 @@ import org.akvo.flow.presentation.survey.CustomDrawerArrowDrawable;
 import org.akvo.flow.presentation.survey.SurveyPresenter;
 import org.akvo.flow.presentation.survey.SurveyView;
 import org.akvo.flow.service.SurveyDownloadWorker;
-import org.akvo.flow.service.time.TimeCheckWorker;
 import org.akvo.flow.service.bootstrap.BootstrapWorker;
+import org.akvo.flow.service.time.TimeCheckWorker;
 import org.akvo.flow.tracking.TrackingHelper;
 import org.akvo.flow.tracking.TrackingListener;
 import org.akvo.flow.ui.Navigator;
@@ -98,7 +95,6 @@ import javax.inject.Inject;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import timber.log.Timber;
 
 public class SurveyActivity extends AppCompatActivity implements RecordListListener,
         FlowNavigationView.DrawerNavigationListener,
@@ -136,9 +132,6 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
 
     @Inject
     SnackBarManager snackBarManager;
-
-    @Inject
-    GetSelectedUser getSelectedUser;
 
     @Inject
     AppPermissionsHelper appPermissionsHelper;
@@ -183,7 +176,7 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
 
             //When the app is restarted we need to display the current user
             if (savedInstanceState == null) {
-                showSelectedUser();
+                presenter.checkSelectedUser();
             }
             activityJustCreated = true;
             setNavigationView();
@@ -432,7 +425,6 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
         if (mDatabase != null) {
             mDatabase.close();
         }
-        getSelectedUser.dispose();
     }
 
     @Override
@@ -629,21 +621,9 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
                 formInstanceId, readOnly, mSurveyGroup);
     }
 
-    private void showSelectedUser() {
-        getSelectedUser.execute(new DefaultObserver<User>() {
-            @Override
-            public void onError(Throwable e) {
-                Timber.e(e);
-            }
-
-            @Override
-            public void onNext(User user) {
-                String userName = user.getName();
-                if (!TextUtils.isEmpty(userName)) {
-                    showMessage(getString(R.string.logged_in_as) + " " + userName);
-                }
-            }
-        }, null);
+    @Override
+    public void displaySelectedUser(@NotNull String name) {
+        showMessage(getString(R.string.logged_in_as) + " " + name);
     }
 
     private void showMessage(String message) {

@@ -35,6 +35,7 @@ import org.akvo.flow.domain.interactor.datapoints.MarkDatapointViewed
 import org.akvo.flow.domain.interactor.forms.GetRegistrationForm
 import org.akvo.flow.domain.interactor.forms.RegistrationFormResult
 import org.akvo.flow.domain.interactor.users.GetSelectedUser
+import org.akvo.flow.domain.interactor.users.ResultCode
 import org.akvo.flow.domain.util.VersionHelper
 import org.akvo.flow.presentation.Presenter
 import org.akvo.flow.presentation.entity.ViewApkMapper
@@ -61,7 +62,6 @@ class SurveyPresenter @Inject constructor(
     override fun destroy() {
         getApkDataPreferences.dispose()
         saveApkUpdateNotified.dispose()
-        getSelectedUser.dispose()
         uiScope.coroutineContext.cancelChildren()
     }
 
@@ -105,24 +105,17 @@ class SurveyPresenter @Inject constructor(
         } else {
             System.currentTimeMillis() - lastNotified >= ConstantUtil.UPDATE_NOTIFICATION_DELAY_IN_MS
         }
-
     }
 
     fun onDatapointSelected(datapointId: String) {
-        getSelectedUser.execute(object : DefaultObserver<User?>() {
-            override fun onError(e: Throwable) {
-                Timber.e(e)
+        uiScope.launch {
+            val userResult = getSelectedUser.execute()
+            if (userResult.resultCode == ResultCode.SUCCESS) {
+                setDataPointAsViewed(datapointId, userResult.user)
+            } else {
                 view?.showMissingUserError()
             }
-
-            override fun onNext(user: User) {
-                if (user.name == null) {
-                    view?.showMissingUserError()
-                } else {
-                    setDataPointAsViewed(datapointId, user)
-                }
-            }
-        }, null)
+        }
     }
 
     private fun setDataPointAsViewed(datapointId: String, user: User) {
@@ -135,36 +128,37 @@ class SurveyPresenter @Inject constructor(
     }
 
     fun onAddDataPointTap(surveyGroup: SurveyGroup) {
-        getSelectedUser.execute(object : DefaultObserver<User>() {
-            override fun onError(e: Throwable) {
-                Timber.e(e)
+        uiScope.launch {
+            val userResult = getSelectedUser.execute()
+            if (userResult.resultCode == ResultCode.SUCCESS) {
+                val params: MutableMap<String, Any> = HashMap(2)
+                params[GetRegistrationForm.PARAM_SURVEY_ID] = surveyGroup.id
+                params[GetRegistrationForm.PARAM_REGISTRATION_FORM_ID] =
+                    surveyGroup.registerSurveyId
+                val result: RegistrationFormResult = getRegistrationForm.execute(params)
+                val domainForm = result.form
+                if (domainForm != null) {
+                    if (domainForm.cascadeDownloaded) {
+                        view?.openEmptyForm(userResult.user, domainForm.formId)
+                    } else {
+                        view?.showMissingCascadeError()
+                    }
+                } else {
+                    view?.showMissingFormError()
+                }
+            } else {
                 view?.showMissingUserError()
             }
+        }
+    }
 
-            override fun onNext(user: User) {
-                if (user.name == null) {
-                    view?.showMissingUserError()
-                } else {
-                    uiScope.launch {
-                        val params: MutableMap<String, Any> = HashMap(2)
-                        params[GetRegistrationForm.PARAM_SURVEY_ID] = surveyGroup.id
-                        params[GetRegistrationForm.PARAM_REGISTRATION_FORM_ID] =
-                            surveyGroup.registerSurveyId
-                        val result: RegistrationFormResult = getRegistrationForm.execute(params)
-                        val domainForm = result.form
-                        if (domainForm != null) {
-                            if (domainForm.cascadeDownloaded) {
-                                view?.openEmptyForm(user, domainForm.formId)
-                            } else {
-                                view?.showMissingCascadeError()
-                            }
-                        } else {
-                            view?.showMissingFormError()
-                        }
-                    }
-                }
+    fun checkSelectedUser() {
+        uiScope.launch {
+            val userResult = getSelectedUser.execute()
+            if (userResult.resultCode == ResultCode.SUCCESS) {
+                view?.displaySelectedUser(userResult.user.name!!)
             }
-        }, null)
+        }
     }
 
     companion object {

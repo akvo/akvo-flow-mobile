@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018,2020 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2021 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -15,19 +15,14 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
-package org.akvo.flow.presentation.survey
+
+package org.akvo.flow.domain.interactor.users
 
 import org.akvo.flow.domain.entity.User
-import org.akvo.flow.presentation.entity.ViewApkData
 
-interface SurveyView {
-    fun showNewVersionAvailable(apkData: ViewApkData?)
-    fun showMissingUserError()
-    fun openDataPoint(datapointId: String?, user: User?)
-    fun openEmptyForm(user: User?, formId: String?)
-    fun showMissingFormError()
-    fun showMissingCascadeError()
-    fun displaySelectedUser(name: String)
+data class SelectedUserResult(val user: User, val resultCode: ResultCode)
+
+enum class ResultCode {
+    SUCCESS, ERROR_USER_NAME, ERROR_OTHER
 }

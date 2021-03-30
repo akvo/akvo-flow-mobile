@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2019,2021 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2021 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -15,29 +15,10 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 
-package org.akvo.flow.domain.repository;
+package org.akvo.flow.domain.interactor.forms
 
-import org.akvo.flow.domain.entity.DomainForm;
-import org.jetbrains.annotations.NotNull;
+import org.akvo.flow.domain.entity.DomainForm
 
-import java.util.List;
-
-import io.reactivex.Observable;
-
-public interface FormRepository {
-
-    Observable<Boolean> loadForm(String formId, String deviceId);
-
-    Observable<Integer> reloadForms(String deviceId);
-
-    Observable<Integer> downloadForms(String deviceId);
-
-    @NotNull
-    DomainForm getForm(@NotNull String formId);
-
-    @NotNull
-    List<DomainForm> getForms(long surveyId);
-}
+data class RegistrationFormResult(val form: DomainForm?)

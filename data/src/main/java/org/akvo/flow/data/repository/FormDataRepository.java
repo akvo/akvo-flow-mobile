@@ -43,7 +43,6 @@ import java.util.List;
 import javax.inject.Inject;
 
 import io.reactivex.Observable;
-import io.reactivex.Single;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 import okhttp3.ResponseBody;
@@ -127,8 +126,8 @@ public class FormDataRepository implements FormRepository {
 
     @Override
     @NotNull
-    public Single<DomainForm> getForm(@NotNull String formId) {
-        return dataSourceFactory.getDataBaseDataSource().getForm(formId).map(domainFormMapper::mapForm);
+    public DomainForm getForm(@NotNull String formId) {
+        return domainFormMapper.mapForm(dataSourceFactory.getDataBaseDataSource().getForm(formId));
     }
 
     @NotNull

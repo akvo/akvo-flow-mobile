@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2020 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2018-2021 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -21,16 +21,20 @@ package org.akvo.flow.presentation.survey
 
 import androidx.core.util.Pair
 import io.reactivex.observers.DisposableCompletableObserver
-import io.reactivex.observers.DisposableSingleObserver
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancelChildren
+import kotlinx.coroutines.launch
 import org.akvo.flow.BuildConfig
 import org.akvo.flow.domain.SurveyGroup
 import org.akvo.flow.domain.entity.ApkData
-import org.akvo.flow.domain.entity.DomainForm
 import org.akvo.flow.domain.entity.User
 import org.akvo.flow.domain.interactor.DefaultObserver
 import org.akvo.flow.domain.interactor.UseCase
 import org.akvo.flow.domain.interactor.datapoints.MarkDatapointViewed
 import org.akvo.flow.domain.interactor.forms.GetRegistrationForm
+import org.akvo.flow.domain.interactor.forms.RegistrationFormResult
 import org.akvo.flow.domain.interactor.users.GetSelectedUser
 import org.akvo.flow.domain.util.VersionHelper
 import org.akvo.flow.presentation.Presenter
@@ -50,13 +54,17 @@ class SurveyPresenter @Inject constructor(
     private val markDatapointViewed: MarkDatapointViewed,
     private val getRegistrationForm: GetRegistrationForm
 ) : Presenter {
+
     private var view: SurveyView? = null
+    private var job = SupervisorJob()
+    private val uiScope = CoroutineScope(Dispatchers.Main + job)
+
     override fun destroy() {
         getApkDataPreferences.dispose()
         saveApkUpdateNotified.dispose()
         getSelectedUser.dispose()
         markDatapointViewed.dispose()
-        getRegistrationForm.dispose()
+        uiScope.coroutineContext.cancelChildren()
     }
 
     fun setView(view: SurveyView?) {
@@ -144,23 +152,23 @@ class SurveyPresenter @Inject constructor(
                 if (user.name == null) {
                     view?.showMissingUserError()
                 } else {
-                    val params: MutableMap<String, Any> = HashMap(2)
-                    params[GetRegistrationForm.PARAM_SURVEY_ID] = surveyGroup.id
-                    params[GetRegistrationForm.PARAM_REGISTRATION_FORM_ID] =
-                        surveyGroup.registerSurveyId
-                    getRegistrationForm.execute(object : DisposableSingleObserver<DomainForm>() {
-                        override fun onSuccess(domainForm: DomainForm) {
+                    uiScope.launch {
+                        val params: MutableMap<String, Any> = HashMap(2)
+                        params[GetRegistrationForm.PARAM_SURVEY_ID] = surveyGroup.id
+                        params[GetRegistrationForm.PARAM_REGISTRATION_FORM_ID] =
+                            surveyGroup.registerSurveyId
+                        val result: RegistrationFormResult = getRegistrationForm.execute(params)
+                        val domainForm = result.form
+                        if (domainForm != null) {
                             if (domainForm.cascadeDownloaded) {
                                 view?.openEmptyForm(user, domainForm.formId)
                             } else {
                                 view?.showMissingCascadeError()
                             }
-                        }
-
-                        override fun onError(e: Throwable) {
+                        } else {
                             view?.showMissingFormError()
                         }
-                    }, params)
+                    }
                 }
             }
         }, null)

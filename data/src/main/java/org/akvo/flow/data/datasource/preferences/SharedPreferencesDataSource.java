@@ -149,12 +149,12 @@ public class SharedPreferencesDataSource {
     }
 
     @Nullable
-    public Observable<ApkData> getApkData() {
+    public ApkData getApkData() {
         String apkDataString = preferences.getString(KEY_APK_DATA, null);
         if (apkDataString == null) {
-            return Observable.just(ApkData.NOT_SET_VALUE);
+            return ApkData.NOT_SET_VALUE;
         }
-        return Observable.just(gsonMapper.read(apkDataString, ApkData.class));
+        return gsonMapper.read(apkDataString, ApkData.class);
     }
 
     public Observable<Boolean> setApkData(ApkData apkData) {
@@ -162,13 +162,12 @@ public class SharedPreferencesDataSource {
         return Observable.just(true);
     }
 
-    public Observable<Long> getAppUpdateNotifiedTime() {
-        return Observable.just(getLong(KEY_APP_UPDATE_LAST_NOTIFIED, LONG_VALUE_UNSET));
+    public Long getAppUpdateNotifiedTime() {
+        return getLong(KEY_APP_UPDATE_LAST_NOTIFIED, LONG_VALUE_UNSET);
     }
 
-    public Observable<Boolean> setAppUpdateNotifiedTime() {
+    public void setAppUpdateNotifiedTime() {
         setLong(KEY_APP_UPDATE_LAST_NOTIFIED, System.currentTimeMillis());
-        return Observable.just(true);
     }
 
     public Observable<Boolean> clearAppUpdateNotified() {

@@ -63,7 +63,7 @@ public class ApkDataRepository implements ApkRepository {
     }
 
     @Override
-    public Observable<ApkData> getApkDataPreference() {
+    public ApkData getApkDataPreference() {
         return dataSourceFactory.getSharedPreferencesDataSource().getApkData();
     }
 }

@@ -19,7 +19,6 @@
  */
 package org.akvo.flow.presentation.survey
 
-import androidx.core.util.Pair
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -29,8 +28,8 @@ import org.akvo.flow.BuildConfig
 import org.akvo.flow.domain.SurveyGroup
 import org.akvo.flow.domain.entity.ApkData
 import org.akvo.flow.domain.entity.User
-import org.akvo.flow.domain.interactor.DefaultObserver
-import org.akvo.flow.domain.interactor.UseCase
+import org.akvo.flow.domain.interactor.apk.GetApkDataPreferences
+import org.akvo.flow.domain.interactor.apk.SaveApkUpdateNotified
 import org.akvo.flow.domain.interactor.datapoints.MarkDatapointViewed
 import org.akvo.flow.domain.interactor.forms.GetRegistrationForm
 import org.akvo.flow.domain.interactor.forms.RegistrationFormResult
@@ -40,14 +39,12 @@ import org.akvo.flow.domain.util.VersionHelper
 import org.akvo.flow.presentation.Presenter
 import org.akvo.flow.presentation.entity.ViewApkMapper
 import org.akvo.flow.util.ConstantUtil
-import timber.log.Timber
 import java.util.HashMap
 import javax.inject.Inject
-import javax.inject.Named
 
 class SurveyPresenter @Inject constructor(
-    @param:Named("GetApkDataPreferences") private val getApkDataPreferences: UseCase,
-    @param:Named("SaveApkUpdateNotified") private val saveApkUpdateNotified: UseCase,
+    private val getApkDataPreferences: GetApkDataPreferences,
+    private val saveApkUpdateNotified: SaveApkUpdateNotified,
     private val versionHelper: VersionHelper,
     private val viewApkMapper: ViewApkMapper,
     private val getSelectedUser: GetSelectedUser,
@@ -60,8 +57,6 @@ class SurveyPresenter @Inject constructor(
     private val uiScope = CoroutineScope(Dispatchers.Main + job)
 
     override fun destroy() {
-        getApkDataPreferences.dispose()
-        saveApkUpdateNotified.dispose()
         uiScope.coroutineContext.cancelChildren()
     }
 
@@ -70,16 +65,10 @@ class SurveyPresenter @Inject constructor(
     }
 
     fun verifyApkUpdate() {
-        getApkDataPreferences.execute(object :
-            DefaultObserver<Pair<ApkData, Long>>() {
-            override fun onError(e: Throwable) {
-                Timber.e(e)
-            }
-
-            override fun onNext(apkDataLongPair: Pair<ApkData, Long>) {
-                showApkUpdateIfNeeded(apkDataLongPair.first, apkDataLongPair.second!!)
-            }
-        }, null)
+        uiScope.launch {
+            val result = getApkDataPreferences.execute()
+            showApkUpdateIfNeeded(result.apkData, result.notificationTime)
+        }
     }
 
     private fun showApkUpdateIfNeeded(apkData: ApkData?, lastNotified: Long) {
@@ -91,12 +80,10 @@ class SurveyPresenter @Inject constructor(
     }
 
     private fun notifyNewVersionAvailable(apkData: ApkData?) {
-        saveApkUpdateNotified.execute(object : DefaultObserver<Boolean?>() {
-            override fun onError(e: Throwable) {
-                Timber.e(e)
-            }
-        }, null)
-        view?.showNewVersionAvailable(viewApkMapper.transform(apkData))
+        uiScope.launch {
+            saveApkUpdateNotified.execute()
+            view?.showNewVersionAvailable(viewApkMapper.transform(apkData))
+        }
     }
 
     private fun shouldNotifyNewVersion(lastNotified: Long): Boolean {

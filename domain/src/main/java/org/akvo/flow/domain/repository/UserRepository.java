@@ -64,7 +64,7 @@ public interface UserRepository {
 
     Observable<Boolean> clearAppUpdateNotified();
 
-    Observable<Long> getLastNotificationTime();
+    Long getLastNotificationTime();
 
-    Observable<Boolean> saveLastNotificationTime();
+    void saveLastNotificationTime();
 }

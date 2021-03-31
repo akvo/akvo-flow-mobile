@@ -693,7 +693,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
     public void onSurveySubmit() {
         recordDuration(false);
         saveState();
-        presenter.onSubmitPressed(surveyInstanceId);
+        presenter.onSubmitPressed(surveyInstanceId, formId, survey);
     }
 
     @Override
@@ -719,6 +719,15 @@ public class FormActivity extends BackActivity implements SurveyListener,
     }
 
     @Override
+    public void GoToListOfForms() {
+        readOnly = true;
+        navigator.navigateToRecordActivity(this, dataPointId, survey);
+        finish();
+        Toast.makeText(getApplicationContext(), R.string.snackbar_submitted, Toast.LENGTH_LONG)
+                .show();
+    }
+
+    @Override
     public void showErrorExport() {
         snackBarManager.displaySnackBar(rootView, R.string.form_submit_error, this);
     }
@@ -731,7 +740,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
 
     @Override
     public void onMobileUploadSet(long instanceId) {
-        presenter.onSubmitPressed(instanceId);
+        presenter.onSubmitPressed(instanceId, formId, survey);
     }
 
     @Override

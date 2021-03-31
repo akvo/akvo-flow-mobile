@@ -77,14 +77,7 @@ class RecordActivityTest {
         override fun getActivityIntent(): Intent {
             val targetContext: Context = getInstrumentation().targetContext
             val result = Intent(targetContext, RecordActivity::class.java)
-            result.putExtra(
-                ConstantUtil.SURVEY_GROUP_EXTRA, SurveyGroup(
-                    155852013L,
-                    "",
-                    FORM_ID,
-                    true
-                )
-            )
+            result.putExtra(ConstantUtil.SURVEY_GROUP_EXTRA, SurveyGroup(155852013L, "", FORM_ID, true))
 
             val dataPointId = setUpFormData(targetContext)
             result.putExtra(ConstantUtil.DATA_POINT_ID_EXTRA, dataPointId.toString())
@@ -101,19 +94,7 @@ class RecordActivityTest {
 
     @Before
     fun beforeClass() {
-        val form = DomainForm(
-            1,
-            "1",
-            1,
-            "name",
-            "1.0",
-            "",
-            "",
-            "",
-            "",
-            cascadeDownloaded = true,
-            deleted = false
-        )
+        val form = DomainForm(1, "1", 1, "name", "1.0", "", "", "", "", cascadeDownloaded = true, deleted = false)
         `when`(formRepository.getForm(anyString())).thenReturn(form)
         `when`(surveyRepository.getDataPoint(anyString())).thenReturn(Single.just(dataPoint))
         `when`(userRepository.selectedUser).thenReturn(1L)
@@ -156,9 +137,7 @@ class RecordActivityTest {
     @Test
     fun onFormClickShouldShowErrorMessageUserError() {
         given(userRepository.getSelectedUser()).willAnswer {
-            throw java.lang.Exception(
-                "user not found"
-            )
+            throw java.lang.Exception("user not found")
         }
 
         intentsTestRule.launchActivity(null)
@@ -183,19 +162,7 @@ class RecordActivityTest {
 
     @Test
     fun onFormClickShouldShowErrorMessageCascadeMissing() {
-        val form = DomainForm(
-            1,
-            "1",
-            1,
-            "name",
-            "1.0",
-            "",
-            "",
-            "",
-            "",
-            cascadeDownloaded = false,
-            deleted = false
-        )
+        val form = DomainForm(1, "1", 1, "name", "1.0", "", "", "", "", cascadeDownloaded = false, deleted = false)
         `when`(formRepository.getForm(anyString())).thenReturn(form)
         intentsTestRule.launchActivity(null)
 
@@ -208,10 +175,9 @@ class RecordActivityTest {
     @Test
     fun onFormClickShouldShowErrorMessageFormNotFound() {
         given(formRepository.getForm(anyString())).willAnswer {
-            throw java.lang.Exception(
-                "form not found"
-            )
+            throw java.lang.Exception("form not found")
         }
+
         intentsTestRule.launchActivity(null)
 
         intentsTestRule.activity.onFormClick(FORM_ID)
@@ -222,11 +188,7 @@ class RecordActivityTest {
 
     @Test
     fun onFormClickShouldLaunchFormActivityWhenCorrectDataPointAndSavedInstance() {
-        `when`(formInstanceRepository.getSavedFormInstance(anyString(), anyString())).thenReturn(
-            Single.just(
-                1L
-            )
-        )
+        `when`(formInstanceRepository.getSavedFormInstance(anyString(), anyString())).thenReturn(Single.just(1L))
 
         intentsTestRule.launchActivity(null)
 
@@ -237,30 +199,10 @@ class RecordActivityTest {
 
     @Test
     fun onFormClickShouldLaunchFormActivityWhenRegistrationForm() {
-        val form = DomainForm(
-            1,
-            FORM_ID,
-            1,
-            "name",
-            "1.0",
-            "",
-            "",
-            "",
-            "",
-            cascadeDownloaded = true,
-            deleted = false
-        )
+        val form = DomainForm(1, FORM_ID, 1, "name", "1.0", "", "", "", "", cascadeDownloaded = true, deleted = false)
         `when`(formRepository.getForm(anyString())).thenReturn(form)
-        `when`(formInstanceRepository.getSavedFormInstance(anyString(), anyString())).thenReturn(
-            Single.just(
-                -1L
-            )
-        )
-        `when`(formInstanceRepository.createFormInstance(any(DomainFormInstance::class.java))).thenReturn(
-            Single.just(
-                1L
-            )
-        )
+        `when`(formInstanceRepository.getSavedFormInstance(anyString(), anyString())).thenReturn(Single.just(-1L))
+        `when`(formInstanceRepository.createFormInstance(any(DomainFormInstance::class.java))).thenReturn(Single.just(1L))
 
         intentsTestRule.launchActivity(null)
 
@@ -272,30 +214,10 @@ class RecordActivityTest {
 
     @Test
     fun onFormClickShouldLaunchFormActivityWhenRecentMoreThan24Hours() {
-        val form = DomainForm(
-            1,
-            "123",
-            1,
-            "name",
-            "1.0",
-            "",
-            "",
-            "",
-            "",
-            cascadeDownloaded = true,
-            deleted = false
-        )
+        val form = DomainForm(1, "123", 1, "name", "1.0", "", "", "", "", cascadeDownloaded = true, deleted = false)
         `when`(formRepository.getForm(anyString())).thenReturn(form)
-        `when`(formInstanceRepository.getSavedFormInstance(anyString(), anyString())).thenReturn(
-            Single.just(
-                -1L
-            )
-        )
-        `when`(formInstanceRepository.createFormInstance(any(DomainFormInstance::class.java))).thenReturn(
-            Single.just(
-                1L
-            )
-        )
+        `when`(formInstanceRepository.getSavedFormInstance(anyString(), anyString())).thenReturn(Single.just(-1L))
+        `when`(formInstanceRepository.createFormInstance(any(DomainFormInstance::class.java))).thenReturn(Single.just(1L))
         `when`(
             formInstanceRepository.getLatestSubmittedFormInstance(
                 anyString(),
@@ -313,25 +235,9 @@ class RecordActivityTest {
 
     @Test
     fun onFormClickShouldDisplayDialogWhenRecentLessThan24Hours() {
-        val form = DomainForm(
-            1,
-            "123",
-            1,
-            "name",
-            "1.0",
-            "",
-            "",
-            "",
-            "",
-            cascadeDownloaded = true,
-            deleted = false
-        )
+        val form = DomainForm(1, "123", 1, "name", "1.0", "", "", "", "", cascadeDownloaded = true, deleted = false)
         `when`(formRepository.getForm(anyString())).thenReturn(form)
-        `when`(formInstanceRepository.getSavedFormInstance(anyString(), anyString())).thenReturn(
-            Single.just(
-                -1L
-            )
-        )
+        `when`(formInstanceRepository.getSavedFormInstance(anyString(), anyString())).thenReturn(Single.just(-1L))
         `when`(
             formInstanceRepository.getLatestSubmittedFormInstance(
                 anyString(),

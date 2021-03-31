@@ -21,6 +21,7 @@
 package org.akvo.flow.domain.interactor.apk;
 
 import android.os.Build;
+
 import androidx.annotation.Nullable;
 
 import org.akvo.flow.domain.entity.ApkData;
@@ -35,7 +36,6 @@ import javax.inject.Inject;
 import io.reactivex.Observable;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.BiFunction;
 import io.reactivex.functions.Function;
 import io.reactivex.observers.DisposableObserver;
 
@@ -78,25 +78,17 @@ public class RefreshApkData {
             throw new IllegalArgumentException("Missing params");
         }
         return apkRepository.loadApkData(Build.VERSION.SDK_INT + "")
-                .concatMap(new Function<ApkData, Observable<Boolean>>() {
-                    @Override
-                    public Observable<Boolean> apply(final ApkData apkData) {
-                        final String currentVersionName = (String) parameters
-                                .get(APP_VERSION_PARAM);
-                        if (shouldAppBeUpdated(apkData, currentVersionName)) {
-                            return apkRepository.getApkDataPreference()
-                                    .concatMap(new Function<ApkData, Observable<Boolean>>() {
-                                        @Override
-                                        public Observable<Boolean> apply(ApkData savedApkData) {
-                                            if (apkDataNeedsSaving(savedApkData, apkData)) {
-                                                return saveNewApkVersion(apkData);
-                                            }
-                                            return Observable.just(false);
-                                        }
-                                    });
+                .concatMap((Function<ApkData, Observable<Boolean>>) apkData -> {
+                    final String currentVersionName = (String) parameters
+                            .get(APP_VERSION_PARAM);
+                    if (shouldAppBeUpdated(apkData, currentVersionName)) {
+                        ApkData savedApkData = apkRepository.getApkDataPreference();
+                        if (apkDataNeedsSaving(savedApkData, apkData)) {
+                            return saveNewApkVersion(apkData);
                         }
                         return Observable.just(false);
                     }
+                    return Observable.just(false);
                 });
     }
 
@@ -119,11 +111,6 @@ public class RefreshApkData {
     private <T> Observable<Boolean> saveNewApkVersion(ApkData apkData) {
         return Observable.zip(apkRepository.saveApkDataPreference(apkData),
                 userRepository.clearAppUpdateNotified(),
-                new BiFunction<Boolean, Boolean, Boolean>() {
-                    @Override
-                    public Boolean apply(Boolean first, Boolean second) {
-                        return first && second;
-                    }
-                });
+                (first, second) -> first && second);
     }
 }

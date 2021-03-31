@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018,2020 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2018,2021 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -17,17 +17,25 @@
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package org.akvo.flow.presentation.survey
+package org.akvo.flow.domain.interactor.apk
 
-import org.akvo.flow.domain.entity.User
-import org.akvo.flow.presentation.entity.ViewApkData
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import org.akvo.flow.domain.repository.UserRepository
+import timber.log.Timber
+import javax.inject.Inject
 
-interface SurveyView {
-    fun showNewVersionAvailable(apkData: ViewApkData?)
-    fun showMissingUserError()
-    fun openDataPoint(datapointId: String?, user: User?)
-    fun openEmptyForm(user: User?, formId: String?)
-    fun showMissingFormError()
-    fun showMissingCascadeError()
-    fun displaySelectedUser(name: String)
+class SaveApkUpdateNotified @Inject constructor(
+   private val userRepository: UserRepository
+) {
+
+    suspend fun execute() {
+        withContext(Dispatchers.IO) {
+            try {
+                userRepository.saveLastNotificationTime()
+            } catch (ex: Exception) {
+                Timber.e(ex)
+            }
+        }
+    }
 }

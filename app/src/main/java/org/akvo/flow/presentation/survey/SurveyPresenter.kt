@@ -19,8 +19,6 @@
  */
 package org.akvo.flow.presentation.survey
 
-import androidx.core.util.Pair
-import io.reactivex.observers.DisposableCompletableObserver
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -30,24 +28,23 @@ import org.akvo.flow.BuildConfig
 import org.akvo.flow.domain.SurveyGroup
 import org.akvo.flow.domain.entity.ApkData
 import org.akvo.flow.domain.entity.User
-import org.akvo.flow.domain.interactor.DefaultObserver
-import org.akvo.flow.domain.interactor.UseCase
+import org.akvo.flow.domain.interactor.apk.GetApkDataPreferences
+import org.akvo.flow.domain.interactor.apk.SaveApkUpdateNotified
 import org.akvo.flow.domain.interactor.datapoints.MarkDatapointViewed
 import org.akvo.flow.domain.interactor.forms.GetRegistrationForm
 import org.akvo.flow.domain.interactor.forms.RegistrationFormResult
 import org.akvo.flow.domain.interactor.users.GetSelectedUser
+import org.akvo.flow.domain.interactor.users.ResultCode
 import org.akvo.flow.domain.util.VersionHelper
 import org.akvo.flow.presentation.Presenter
 import org.akvo.flow.presentation.entity.ViewApkMapper
 import org.akvo.flow.util.ConstantUtil
-import timber.log.Timber
 import java.util.HashMap
 import javax.inject.Inject
-import javax.inject.Named
 
 class SurveyPresenter @Inject constructor(
-    @param:Named("GetApkDataPreferences") private val getApkDataPreferences: UseCase,
-    @param:Named("SaveApkUpdateNotified") private val saveApkUpdateNotified: UseCase,
+    private val getApkDataPreferences: GetApkDataPreferences,
+    private val saveApkUpdateNotified: SaveApkUpdateNotified,
     private val versionHelper: VersionHelper,
     private val viewApkMapper: ViewApkMapper,
     private val getSelectedUser: GetSelectedUser,
@@ -60,10 +57,6 @@ class SurveyPresenter @Inject constructor(
     private val uiScope = CoroutineScope(Dispatchers.Main + job)
 
     override fun destroy() {
-        getApkDataPreferences.dispose()
-        saveApkUpdateNotified.dispose()
-        getSelectedUser.dispose()
-        markDatapointViewed.dispose()
         uiScope.coroutineContext.cancelChildren()
     }
 
@@ -72,16 +65,10 @@ class SurveyPresenter @Inject constructor(
     }
 
     fun verifyApkUpdate() {
-        getApkDataPreferences.execute(object :
-            DefaultObserver<Pair<ApkData, Long>>() {
-            override fun onError(e: Throwable) {
-                Timber.e(e)
-            }
-
-            override fun onNext(apkDataLongPair: Pair<ApkData, Long>) {
-                showApkUpdateIfNeeded(apkDataLongPair.first, apkDataLongPair.second!!)
-            }
-        }, null)
+        uiScope.launch {
+            val result = getApkDataPreferences.execute()
+            showApkUpdateIfNeeded(result.apkData, result.notificationTime)
+        }
     }
 
     private fun showApkUpdateIfNeeded(apkData: ApkData?, lastNotified: Long) {
@@ -93,12 +80,10 @@ class SurveyPresenter @Inject constructor(
     }
 
     private fun notifyNewVersionAvailable(apkData: ApkData?) {
-        saveApkUpdateNotified.execute(object : DefaultObserver<Boolean?>() {
-            override fun onError(e: Throwable) {
-                Timber.e(e)
-            }
-        }, null)
-        view?.showNewVersionAvailable(viewApkMapper.transform(apkData))
+        uiScope.launch {
+            saveApkUpdateNotified.execute()
+            view?.showNewVersionAvailable(viewApkMapper.transform(apkData))
+        }
     }
 
     private fun shouldNotifyNewVersion(lastNotified: Long): Boolean {
@@ -107,71 +92,60 @@ class SurveyPresenter @Inject constructor(
         } else {
             System.currentTimeMillis() - lastNotified >= ConstantUtil.UPDATE_NOTIFICATION_DELAY_IN_MS
         }
-
     }
 
     fun onDatapointSelected(datapointId: String) {
-        getSelectedUser.execute(object : DefaultObserver<User?>() {
-            override fun onError(e: Throwable) {
-                Timber.e(e)
+        uiScope.launch {
+            val userResult = getSelectedUser.execute()
+            if (userResult.resultCode == ResultCode.SUCCESS) {
+                setDataPointAsViewed(datapointId, userResult.user)
+            } else {
                 view?.showMissingUserError()
             }
-
-            override fun onNext(user: User) {
-                if (user.name == null) {
-                    view?.showMissingUserError()
-                } else {
-                    setDataPointAsViewed(datapointId, user)
-                }
-            }
-        }, null)
+        }
     }
 
     private fun setDataPointAsViewed(datapointId: String, user: User) {
-        val params: MutableMap<String?, Any> = HashMap(2)
-        params[MarkDatapointViewed.PARAM_DATAPOINT_ID] = datapointId
-        markDatapointViewed.execute(object : DisposableCompletableObserver() {
-            override fun onComplete() {
-                view?.openDataPoint(datapointId, user)
-            }
-
-            override fun onError(e: Throwable) {
-                view?.openDataPoint(datapointId, user)
-            }
-        }, params)
+        uiScope.launch {
+            val params: MutableMap<String?, Any> = HashMap(2)
+            params[MarkDatapointViewed.PARAM_DATAPOINT_ID] = datapointId
+            markDatapointViewed.execute(params)
+            view?.openDataPoint(datapointId, user)
+        }
     }
 
     fun onAddDataPointTap(surveyGroup: SurveyGroup) {
-        getSelectedUser.execute(object : DefaultObserver<User>() {
-            override fun onError(e: Throwable) {
-                Timber.e(e)
+        uiScope.launch {
+            val userResult = getSelectedUser.execute()
+            if (userResult.resultCode == ResultCode.SUCCESS) {
+                val params: MutableMap<String, Any> = HashMap(2)
+                params[GetRegistrationForm.PARAM_SURVEY_ID] = surveyGroup.id
+                params[GetRegistrationForm.PARAM_REGISTRATION_FORM_ID] =
+                    surveyGroup.registerSurveyId
+                val result: RegistrationFormResult = getRegistrationForm.execute(params)
+                val domainForm = result.form
+                if (domainForm != null) {
+                    if (domainForm.cascadeDownloaded) {
+                        view?.openEmptyForm(userResult.user, domainForm.formId)
+                    } else {
+                        view?.showMissingCascadeError()
+                    }
+                } else {
+                    view?.showMissingFormError()
+                }
+            } else {
                 view?.showMissingUserError()
             }
+        }
+    }
 
-            override fun onNext(user: User) {
-                if (user.name == null) {
-                    view?.showMissingUserError()
-                } else {
-                    uiScope.launch {
-                        val params: MutableMap<String, Any> = HashMap(2)
-                        params[GetRegistrationForm.PARAM_SURVEY_ID] = surveyGroup.id
-                        params[GetRegistrationForm.PARAM_REGISTRATION_FORM_ID] =
-                            surveyGroup.registerSurveyId
-                        val result: RegistrationFormResult = getRegistrationForm.execute(params)
-                        val domainForm = result.form
-                        if (domainForm != null) {
-                            if (domainForm.cascadeDownloaded) {
-                                view?.openEmptyForm(user, domainForm.formId)
-                            } else {
-                                view?.showMissingCascadeError()
-                            }
-                        } else {
-                            view?.showMissingFormError()
-                        }
-                    }
-                }
+    fun checkSelectedUser() {
+        uiScope.launch {
+            val userResult = getSelectedUser.execute()
+            if (userResult.resultCode == ResultCode.SUCCESS) {
+                view?.displaySelectedUser(userResult.user.name!!)
             }
-        }, null)
+        }
     }
 
     companion object {

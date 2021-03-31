@@ -44,7 +44,7 @@ public interface UserRepository {
 
     Observable<Boolean> setSelectedSurvey(long surveyGroupId);
 
-    Observable<Long> getSelectedUser();
+    Long getSelectedUser();
 
     Observable<Boolean> clearSelectedUser();
 
@@ -64,7 +64,7 @@ public interface UserRepository {
 
     Observable<Boolean> clearAppUpdateNotified();
 
-    Observable<Long> getLastNotificationTime();
+    Long getLastNotificationTime();
 
-    Observable<Boolean> saveLastNotificationTime();
+    void saveLastNotificationTime();
 }

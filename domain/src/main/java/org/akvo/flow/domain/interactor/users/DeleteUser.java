@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2018,2021 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -55,23 +55,13 @@ public class DeleteUser extends UseCase {
             return Observable.error(new IllegalArgumentException("missing user"));
         }
         final User user = (User) parameters.get(PARAM_USER);
-        return userRepository.getSelectedUser()
-                .concatMap(new Function<Long, Observable<Boolean>>() {
-                    @Override
-                    public Observable<Boolean> apply(Long selectedUserId) {
-                        if (selectedUserId.equals(user.getId())) {
-                            return userRepository.clearSelectedUser().concatMap(
-                                    new Function<Boolean, Observable<Boolean>>() {
-                                        @Override
-                                        public Observable<Boolean> apply(Boolean aBoolean) {
-                                            return deleteUser(user);
-                                        }
-                                    });
-                        } else {
-                            return deleteUser(user);
-                        }
-                    }
-                });
+        Long selectedUserId = userRepository.getSelectedUser();
+        if (selectedUserId.equals(user.getId())) {
+            return userRepository.clearSelectedUser().concatMap(
+                    (Function<Boolean, Observable<Boolean>>) aBoolean -> deleteUser(user));
+        } else {
+            return deleteUser(user);
+        }
     }
 
     private Observable<Boolean> deleteUser(User user) {

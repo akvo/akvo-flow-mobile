@@ -17,17 +17,17 @@
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
+package org.akvo.flow.presentation.survey
 
-package org.akvo.flow.presentation.survey;
+import org.akvo.flow.domain.entity.User
+import org.akvo.flow.presentation.entity.ViewApkData
 
-import org.akvo.flow.domain.entity.User;
-import org.akvo.flow.presentation.entity.ViewApkData;
-
-public interface SurveyView {
-
-    void showNewVersionAvailable(ViewApkData apkData);
-
-    void showMissingUserError();
-
-    void openDataPoint(String datapointId, User user);
+interface SurveyView {
+    fun showNewVersionAvailable(apkData: ViewApkData?)
+    fun showMissingUserError()
+    fun openDataPoint(datapointId: String?, user: User?)
+    fun openEmptyForm(user: User?, formId: String?)
+    fun showMissingFormError()
+    fun showMissingCascadeError()
+    fun displaySelectedUser(name: String)
 }

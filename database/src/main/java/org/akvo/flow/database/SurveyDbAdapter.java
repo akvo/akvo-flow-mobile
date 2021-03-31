@@ -339,6 +339,9 @@ public class SurveyDbAdapter {
      * @return last surveyInstance with those attributes
      */
     public Long getLastSurveyInstance(String surveyedLocaleId, String surveyId) {
+        if (surveyedLocaleId == null) {
+            return null;
+        }
         Cursor cursor = database.query(Tables.SURVEY_INSTANCE,
                 new String[] {
                         SurveyInstanceColumns._ID, SurveyInstanceColumns.RECORD_ID,

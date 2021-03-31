@@ -66,8 +66,7 @@ public class GetSavedDataPoints extends UseCase {
         Double longitude = (Double) parameters.get(KEY_LONGITUDE);
         Integer orderBy = (Integer) parameters.get(KEY_ORDER_BY);
         final String filter = (String) parameters.get(KEY_FILTER);
-        return surveyRepository.cleanDataPoints(surveyGroupId)
-               .andThen(loadDataPoints(filter, surveyGroupId, latitude, longitude, orderBy));
+        return loadDataPoints(filter, surveyGroupId, latitude, longitude, orderBy);
     }
 
     private Observable<List<DataPoint>> loadDataPoints(String filter, Long surveyGroupId,

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2018,2021 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -17,22 +17,25 @@
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
+package org.akvo.flow.domain.interactor.apk
 
-package org.akvo.flow.presentation.form;
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import org.akvo.flow.domain.repository.UserRepository
+import timber.log.Timber
+import javax.inject.Inject
 
-public interface FormView {
+class SaveApkUpdateNotified @Inject constructor(
+   private val userRepository: UserRepository
+) {
 
-    void showLoading();
-
-    void hideLoading();
-
-    void dismiss();
-
-    void showErrorExport();
-
-    void showMobileUploadSetting(long surveyInstanceId);
-
-    void startSync(boolean isMobileSyncAllowed);
-
-    void GoToListOfForms();
+    suspend fun execute() {
+        withContext(Dispatchers.IO) {
+            try {
+                userRepository.saveLastNotificationTime()
+            } catch (ex: Exception) {
+                Timber.e(ex)
+            }
+        }
+    }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2020 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2018-2020,2021 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -25,9 +25,8 @@ import androidx.annotation.NonNull;
 import org.akvo.flow.domain.entity.DomainForm;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Set;
-
 import java.util.List;
+import java.util.Set;
 
 import io.reactivex.Observable;
 import io.reactivex.Single;
@@ -41,7 +40,7 @@ public interface FormRepository {
     Observable<Integer> downloadForms(String deviceId);
 
     @NotNull
-    Single<DomainForm> getForm(@NotNull String formId);
+    DomainForm getForm(@NotNull String formId);
 
     @NotNull
     List<DomainForm> getForms(long surveyId);

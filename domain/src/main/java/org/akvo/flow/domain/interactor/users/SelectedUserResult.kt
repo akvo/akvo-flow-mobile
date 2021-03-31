@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2021 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -15,26 +15,14 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 
-package org.akvo.flow.domain.entity;
+package org.akvo.flow.domain.interactor.users
 
-public class User {
+import org.akvo.flow.domain.entity.User
 
-    private final long id;
-    private final String name;
+data class SelectedUserResult(val user: User, val resultCode: ResultCode)
 
-    public User(long id, String name) {
-        this.id = id;
-        this.name = name;
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
+enum class ResultCode {
+    SUCCESS, ERROR_USER_NAME, ERROR_OTHER
 }

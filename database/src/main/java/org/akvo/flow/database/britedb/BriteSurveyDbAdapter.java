@@ -753,10 +753,10 @@ public class BriteSurveyDbAdapter {
         return queryTransmissions(column, whereClause, selectionArgs);
     }
 
-    public Single<Cursor> getForm(String formId) {
+    public Cursor getForm(String formId) {
         String sql =
                 "SELECT * FROM " + Tables.SURVEY + " WHERE " + SurveyColumns.SURVEY_ID + " = ?";
-        return Single.just(briteDatabase.query(sql, formId));
+        return briteDatabase.query(sql, formId);
     }
 
     public Single<Cursor> getSavedFormInstance(String formId, String datapointId) {

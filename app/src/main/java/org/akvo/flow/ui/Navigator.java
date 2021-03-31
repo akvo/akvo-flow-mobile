@@ -30,6 +30,13 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.TaskStackBuilder;
+import androidx.core.content.FileProvider;
+
 import org.akvo.flow.R;
 import org.akvo.flow.activity.AddUserActivity;
 import org.akvo.flow.activity.AppUpdateActivity;
@@ -37,6 +44,7 @@ import org.akvo.flow.activity.FormActivity;
 import org.akvo.flow.activity.SurveyActivity;
 import org.akvo.flow.activity.TransmissionHistoryActivity;
 import org.akvo.flow.domain.SurveyGroup;
+import org.akvo.flow.domain.entity.User;
 import org.akvo.flow.offlinemaps.presentation.list.OfflineAreasListActivity;
 import org.akvo.flow.presentation.AppDownloadDialogFragment;
 import org.akvo.flow.presentation.FullImageActivity;
@@ -59,12 +67,6 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.TaskStackBuilder;
-import androidx.core.content.FileProvider;
 import timber.log.Timber;
 
 public class Navigator {
@@ -113,6 +115,18 @@ public class Navigator {
         i.putExtra(ConstantUtil.DATA_POINT_ID_EXTRA, dataPointId);
         i.putExtra(ConstantUtil.RESPONDENT_ID_EXTRA, formInstanceId);
         i.putExtra(ConstantUtil.READ_ONLY_EXTRA, readOnly);
+        activity.startActivityForResult(i, ConstantUtil.FORM_FILLING_REQUEST);
+    }
+
+    /**
+     * This is when "add datapoint" is pressed
+     */
+    public void navigateToFormActivity(Activity activity, SurveyGroup mSurveyGroup, String formId, User user) {
+        Intent i = new Intent(activity, FormActivity.class);
+        i.putExtra(ConstantUtil.FORM_ID_EXTRA, formId);
+        i.putExtra(ConstantUtil.SURVEY_GROUP_EXTRA, mSurveyGroup);
+        i.putExtra(ConstantUtil.READ_ONLY_EXTRA, false);
+        i.putExtra(ConstantUtil.VIEW_USER_EXTRA, user);
         activity.startActivityForResult(i, ConstantUtil.FORM_FILLING_REQUEST);
     }
 

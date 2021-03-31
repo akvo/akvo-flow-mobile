@@ -142,7 +142,7 @@ class RecordPresenter @Inject constructor(
             datapointId,
             form.version,
             user.id.toString(),
-            user.name,
+            user.name?:"",
             SurveyInstanceStatus.SAVED,
             UUID.randomUUID().toString(),
             time,

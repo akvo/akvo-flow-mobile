@@ -17,24 +17,33 @@
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
+package org.akvo.flow.domain.entity
 
-package org.akvo.flow.domain.entity;
+import android.os.Parcel
+import android.os.Parcelable
 
-public class User {
+data class User (val id: Long, val name: String?) : Parcelable {
+    constructor(parcel: Parcel) : this(
+        parcel.readLong(),
+        parcel.readString()
+    )
 
-    private final long id;
-    private final String name;
-
-    public User(long id, String name) {
-        this.id = id;
-        this.name = name;
+    override fun writeToParcel(parcel: Parcel, flags: Int) {
+        parcel.writeLong(id)
+        parcel.writeString(name)
     }
 
-    public long getId() {
-        return id;
+    override fun describeContents(): Int {
+        return 0
     }
 
-    public String getName() {
-        return name;
+    companion object CREATOR : Parcelable.Creator<User> {
+        override fun createFromParcel(parcel: Parcel): User {
+            return User(parcel)
+        }
+
+        override fun newArray(size: Int): Array<User?> {
+            return arrayOfNulls(size)
+        }
     }
 }

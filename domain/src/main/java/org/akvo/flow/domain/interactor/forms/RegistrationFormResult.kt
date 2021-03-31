@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2020 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2021 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -16,18 +16,9 @@
  * You should have received a copy of the GNU General Public License
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.akvo.flow.util.logging
 
-import com.google.firebase.crashlytics.FirebaseCrashlytics
-import timber.log.Timber
+package org.akvo.flow.domain.interactor.forms
 
-class CrashlyticsTree : Timber.Tree() {
+import org.akvo.flow.domain.entity.DomainForm
 
-    override fun log(priority: Int, tag: String?, message: String, t: Throwable?) {
-        if (t != null) {
-            FirebaseCrashlytics.getInstance().recordException(t)
-        } else {
-            FirebaseCrashlytics.getInstance().log("$tag: + $message")
-        }
-    }
-}
+data class RegistrationFormResult(val form: DomainForm?)

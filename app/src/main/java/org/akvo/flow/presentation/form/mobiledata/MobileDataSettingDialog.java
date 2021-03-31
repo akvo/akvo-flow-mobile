@@ -23,8 +23,8 @@ package org.akvo.flow.presentation.form.mobiledata;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.os.Bundle;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
@@ -77,6 +77,12 @@ public class MobileDataSettingDialog extends DialogFragment implements MobileDat
     }
 
     @Override
+    public void onDestroy() {
+        super.onDestroy();
+        presenter.destroy();
+    }
+
+    @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         instanceId = getArguments().getLong(PARAM_INSTANCE_ID);
@@ -111,17 +117,8 @@ public class MobileDataSettingDialog extends DialogFragment implements MobileDat
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle(R.string.mobile_data_dialog_title)
                 .setMessage(R.string.mobile_data_dialog_subtitle)
-                .setNegativeButton(R.string.no_thanks_button, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        presenter.saveEnableMobileData(false);
-                    }
-                })
-                .setPositiveButton(R.string.enable_button, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        presenter.saveEnableMobileData(true);
-                    }
-                });
+                .setNegativeButton(R.string.no_thanks_button, (dialog, which) -> presenter.saveEnableMobileData(false))
+                .setPositiveButton(R.string.enable_button, (dialog, id) -> presenter.saveEnableMobileData(true));
         return builder.create();
     }
 

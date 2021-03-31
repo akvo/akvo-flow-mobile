@@ -19,9 +19,9 @@
  */
 package org.akvo.flow.domain.interactor.users
 
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.akvo.flow.domain.entity.User
+import org.akvo.flow.domain.executor.CoroutineDispatcher
 import org.akvo.flow.domain.repository.SurveyRepository
 import org.akvo.flow.domain.repository.UserRepository
 import org.akvo.flow.domain.util.Constants
@@ -30,13 +30,14 @@ import javax.inject.Inject
 
 class GetSelectedUser @Inject constructor(
     private val userRepository: UserRepository,
-    private val surveyRepository: SurveyRepository
+    private val surveyRepository: SurveyRepository,
+    private val coroutineDispatcher: CoroutineDispatcher
 ) {
 
     suspend fun execute(): SelectedUserResult {
-        return withContext(Dispatchers.IO) {
+        return withContext(coroutineDispatcher.getDispatcher()) {
             try {
-                val userId = userRepository.selectedUser
+                val userId = userRepository.fetchSelectedUser()
                 if (Constants.INVALID_USER_ID == userId) {
                     SelectedUserResult(
                         User(Constants.INVALID_USER_ID, null),

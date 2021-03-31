@@ -20,20 +20,21 @@
 package org.akvo.flow.domain.interactor.forms
 
 import android.text.TextUtils
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import org.akvo.flow.domain.executor.CoroutineDispatcher
 import org.akvo.flow.domain.repository.FormRepository
 import javax.inject.Inject
 
 class GetRegistrationForm @Inject constructor(
-    private val formRepository: FormRepository
+    private val formRepository: FormRepository,
+    private val coroutineDispatcher: CoroutineDispatcher
 ) {
 
     suspend fun execute(parameters: Map<String, Any>): RegistrationFormResult {
         if (!parameters.containsKey(PARAM_SURVEY_ID)) {
             throw IllegalArgumentException("Missing survey id")
         }
-        return withContext(Dispatchers.IO) {
+        return withContext(coroutineDispatcher.getDispatcher()) {
             try {
                 val formId: String? = parameters[PARAM_REGISTRATION_FORM_ID] as String?
                 if (!TextUtils.isEmpty(formId) && !"null".equals(formId, ignoreCase = true)) {

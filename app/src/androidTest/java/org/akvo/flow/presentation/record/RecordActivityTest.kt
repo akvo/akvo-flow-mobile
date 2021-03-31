@@ -28,6 +28,7 @@ import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import io.reactivex.Single
 import io.reactivex.internal.schedulers.TrampolineScheduler
 import it.cosenonjaviste.daggermock.DaggerMock
+import kotlinx.coroutines.Dispatchers
 import org.akvo.flow.R
 import org.akvo.flow.activity.FormActivity
 import org.akvo.flow.activity.form.FormActivityTestUtil.addExecutionDelay
@@ -39,6 +40,7 @@ import org.akvo.flow.domain.entity.DataPoint
 import org.akvo.flow.domain.entity.DomainForm
 import org.akvo.flow.domain.entity.DomainFormInstance
 import org.akvo.flow.domain.entity.User
+import org.akvo.flow.domain.executor.CoroutineDispatcher
 import org.akvo.flow.domain.executor.SchedulerCreator
 import org.akvo.flow.domain.repository.FormInstanceRepository
 import org.akvo.flow.domain.repository.FormRepository
@@ -61,7 +63,6 @@ import org.mockito.Mockito.`when`
 import org.mockito.Mockito.anyLong
 import org.mockito.Mockito.anyString
 import org.mockito.Mockito.mock
-
 
 @LargeTest
 @RunWith(AndroidJUnit4::class)
@@ -91,18 +92,20 @@ class RecordActivityTest {
     private val userRepository: UserRepository = mock(UserRepository::class.java)
     private val dataPoint: DataPoint = mock(DataPoint::class.java)
     private val schedulerCreator: SchedulerCreator = mock(SchedulerCreator::class.java)
+    private val dispatcher: CoroutineDispatcher = mock(CoroutineDispatcher::class.java)
 
     @Before
     fun beforeClass() {
         val form = DomainForm(1, "1", 1, "name", "1.0", "", "", "", "", cascadeDownloaded = true, deleted = false)
         `when`(formRepository.getForm(anyString())).thenReturn(form)
         `when`(surveyRepository.getDataPoint(anyString())).thenReturn(Single.just(dataPoint))
-        `when`(userRepository.selectedUser).thenReturn(1L)
+        `when`(userRepository.fetchSelectedUser()).thenReturn(1L)
         `when`(surveyRepository.getUser(1L)).thenReturn(User(1L, "test_user"))
         `when`(dataPoint.latitude).thenReturn(41.3819219)
         `when`(dataPoint.longitude).thenReturn(2.148909)
         `when`(dataPoint.name).thenReturn(DATAPOINT_NAME)
         `when`(schedulerCreator.obtainScheduler()).thenReturn(TrampolineScheduler.instance())
+        `when`(dispatcher.getDispatcher()).thenReturn(Dispatchers.Main)
     }
 
     @Test
@@ -136,7 +139,7 @@ class RecordActivityTest {
 
     @Test
     fun onFormClickShouldShowErrorMessageUserError() {
-        given(userRepository.getSelectedUser()).willAnswer {
+        given(userRepository.fetchSelectedUser()).willAnswer {
             throw java.lang.Exception("user not found")
         }
 
@@ -150,7 +153,7 @@ class RecordActivityTest {
 
     @Test
     fun onFormClickShouldShowErrorMessageUserMissing() {
-        `when`(userRepository.selectedUser).thenReturn(-1L)
+        `when`(userRepository.fetchSelectedUser()).thenReturn(-1L)
 
         intentsTestRule.launchActivity(null)
 

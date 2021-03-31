@@ -6,12 +6,34 @@ versionName=$(git describe --abbrev=0)
 filename="$HOME/akvo-flow-mobile-deployment-${versionName}-${formattedDate}.log"
 echo "logs will be saved to: ${filename}"
 
-if [[ "${SLACK_WEBHOOK_URL}" ]]; then
-  curl -X POST -H 'Content-type: application/json' --data '{"text":"Will start release '$versionName'!"}' https://hooks.slack.com/services/${SLACK_WEBHOOK_URL}
-else
-  echo "Setup SLACK_WEBHOOK_URL to send messages to slack"
-fi
+stream="flumen-dev"
+zulip_release_started() {
+  if [[ "${ZULIP_URL}" ]]; then
+    curl -X POST https://akvo.zulipchat.com/api/v1/messages \
+    -u ${ZULIP_URL} \
+    -d "type=stream" \
+    -d $"to=$stream" \
+    -d "subject=Releases" \
+    -d $"content=Releasing flow app $versionName"
+  else
+    echo "setup ZULIP_URL to send messages to zulip"
+  fi
+}
 
+zulip_release_completed() {
+  if [[ "${ZULIP_URL}" ]]; then
+    curl -X POST https://akvo.zulipchat.com/api/v1/messages \
+    -u ${ZULIP_URL} \
+    -d "type=stream" \
+    -d $"to=$stream"  \
+    -d "subject=Releases" \
+    -d "content=App release successful"
+  else
+    echo "setup ZULIP_URL to send messages to zulip"
+  fi
+}
+
+zulip_release_started
 util/upload-apk/script/flow-releases.sh |& tee ${filename}
 
 a=$(grep -c 'generating apk version' ${filename})
@@ -20,6 +42,7 @@ c=$(cat tmp/instances.txt | grep -v ^$ | wc -l)
 
 if [[ "${a}" == "${b}" ]] && [[ "${a}" == "${c}" ]]; then
   echo "Release successful"
+  zulip_release_completed
 else
   echo "Some instances failed"
   grep "Error updating APK version in GAE" ${filename}

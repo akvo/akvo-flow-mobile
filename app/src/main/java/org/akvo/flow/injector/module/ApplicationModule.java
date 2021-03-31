@@ -60,6 +60,7 @@ import org.akvo.flow.database.DatabaseHelper;
 import org.akvo.flow.database.LanguageTable;
 import org.akvo.flow.database.SurveyLanguagesDataSource;
 import org.akvo.flow.database.SurveyLanguagesDbDataSource;
+import org.akvo.flow.domain.executor.CoroutineDispatcher;
 import org.akvo.flow.domain.executor.PostExecutionThread;
 import org.akvo.flow.domain.executor.SchedulerCreator;
 import org.akvo.flow.domain.executor.ThreadExecutor;
@@ -267,6 +268,12 @@ public class ApplicationModule {
     @Singleton
     public SchedulerCreator provideSchedulerCreator(ThreadExecutor threadExecutor) {
         return new SchedulerCreator(threadExecutor);
+    }
+
+    @Provides
+    @Singleton
+    public CoroutineDispatcher provideCoroutineDispatcher() {
+        return new CoroutineDispatcher();
     }
 
     @Provides

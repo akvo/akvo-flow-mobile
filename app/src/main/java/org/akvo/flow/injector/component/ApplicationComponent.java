@@ -30,6 +30,7 @@ import org.akvo.flow.broadcast.BootReceiver;
 import org.akvo.flow.broadcast.DataTimeoutReceiver;
 import org.akvo.flow.data.entity.time.TimeMapper;
 import org.akvo.flow.database.SurveyLanguagesDataSource;
+import org.akvo.flow.domain.executor.CoroutineDispatcher;
 import org.akvo.flow.domain.executor.PostExecutionThread;
 import org.akvo.flow.domain.executor.SchedulerCreator;
 import org.akvo.flow.domain.executor.ThreadExecutor;
@@ -83,6 +84,8 @@ public interface ApplicationComponent {
     PostExecutionThread postExecutionThread();
 
     SchedulerCreator schedulerCreator();
+
+    CoroutineDispatcher coroutineDispatcher();
 
     FileRepository fileRepository();
 

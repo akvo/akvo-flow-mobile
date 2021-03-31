@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2020 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2021 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -202,8 +202,8 @@ public class DatabaseDataSource {
         return briteSurveyDbAdapter.getUsers();
     }
 
-    public Observable<Cursor> getUser(Long userId) {
-        return Observable.just(briteSurveyDbAdapter.getUser(userId));
+    public Cursor getUser(Long userId) {
+        return briteSurveyDbAdapter.getUser(userId);
     }
 
     public Observable<Boolean> editUser(User user) {
@@ -438,10 +438,8 @@ public class DatabaseDataSource {
         return formMapper.mapForms(briteSurveyDbAdapter.getForms(surveyId));
     }
 
-    @NotNull
-    public Completable markDataPointAsViewed(@NotNull String dataPointId) {
+    public void markDataPointAsViewed(@NotNull String dataPointId) {
         briteSurveyDbAdapter.markDataPointAsViewed(dataPointId);
-        return Completable.complete();
     }
 
     public Single<Long> getSavedFormInstance(@NotNull String formId, @NotNull String datapointId) {

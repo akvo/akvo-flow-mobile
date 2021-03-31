@@ -20,7 +20,6 @@
 package org.akvo.flow.data.repository
 
 import io.reactivex.Observable
-import io.reactivex.Single
 import org.akvo.flow.data.datasource.DataSourceFactory
 import org.akvo.flow.data.entity.ApiFormHeader
 import org.akvo.flow.data.entity.form.DomainFormMapper
@@ -79,14 +78,8 @@ class FormDataRepository @Inject constructor(
         return xmlParser.parseLanguages(dataSourceFactory.fileDataSource.getFormFile(formId))
     }
 
-    override fun getForm(formId: String): Single<DomainForm> {
-        return Single.just(
-            domainFormMapper.mapForm(
-                dataSourceFactory.dataBaseDataSource.getForm(
-                    formId
-                )
-            )
-        )
+    override fun getForm(formId: String): DomainForm {
+        return domainFormMapper.mapForm(dataSourceFactory.dataBaseDataSource.getForm(formId))
     }
 
     override fun getForms(surveyId: Long): List<DomainForm> {

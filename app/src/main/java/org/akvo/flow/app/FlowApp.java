@@ -27,12 +27,10 @@ import com.mapbox.mapboxsdk.Mapbox;
 import org.akvo.flow.BuildConfig;
 import org.akvo.flow.R;
 import org.akvo.flow.data.preference.Prefs;
-import org.akvo.flow.domain.entity.User;
 import org.akvo.flow.domain.interactor.DefaultObserver;
 import org.akvo.flow.domain.interactor.UseCase;
 import org.akvo.flow.domain.interactor.setup.SaveSetup;
 import org.akvo.flow.domain.interactor.setup.SetUpParams;
-import org.akvo.flow.domain.interactor.users.GetSelectedUser;
 import org.akvo.flow.injector.component.ApplicationComponent;
 import org.akvo.flow.injector.component.DaggerApplicationComponent;
 import org.akvo.flow.injector.module.ApplicationModule;
@@ -55,9 +53,6 @@ public class FlowApp extends MultiDexApplication {
 
     @Inject
     Prefs prefs;
-
-    @Inject
-    GetSelectedUser getSelectedUser;
 
     @Inject
     @Named("saveSetup")
@@ -120,18 +115,7 @@ public class FlowApp extends MultiDexApplication {
     }
 
     private void updateLoggingInfo() {
-        getSelectedUser.execute(new DefaultObserver<User>() {
-            @Override
-            public void onError(Throwable e) {
-                Timber.e(e);
-            }
-
-            @Override
-            public void onNext(User user) {
-                String deviceId = prefs.getString(Prefs.KEY_DEVICE_IDENTIFIER, null);
-                loggingHelper.initLoginData(deviceId);
-            }
-        }, null);
-
+        String deviceId = prefs.getString(Prefs.KEY_DEVICE_IDENTIFIER, null);
+        loggingHelper.initLoginData(deviceId);
     }
 }

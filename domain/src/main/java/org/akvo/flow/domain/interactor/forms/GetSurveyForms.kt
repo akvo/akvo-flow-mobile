@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020,2021 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2021 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -17,33 +17,35 @@
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.akvo.flow.domain.interactor.datapoints
+package org.akvo.flow.domain.interactor.forms
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import org.akvo.flow.domain.repository.DataPointRepository
+import org.akvo.flow.domain.entity.DomainForm
+import org.akvo.flow.domain.repository.FormRepository
 import timber.log.Timber
 import javax.inject.Inject
 
-class MarkDatapointViewed @Inject constructor(
-    private val dataPointRepository: DataPointRepository
+class GetSurveyForms @Inject constructor(
+    private val formRepository: FormRepository
 ) {
 
-    suspend fun execute(parameters: Map<String?, Any>?) {
-        if (parameters == null || !parameters.containsKey(PARAM_DATAPOINT_ID)) {
-            throw IllegalArgumentException("Missing file name")
+    suspend fun execute(parameters: Map<String, Any>): List<DomainForm> {
+        if (!parameters.containsKey(PARAM_SURVEY_ID)) {
+            throw IllegalArgumentException("Missing survey id")
         }
-        withContext(Dispatchers.IO) {
+        return withContext(Dispatchers.IO) {
             try {
-                val dataPointId = parameters[PARAM_DATAPOINT_ID] as String
-                dataPointRepository.markDataPointAsViewed(dataPointId)
+                val surveyId = parameters[PARAM_SURVEY_ID] as Long
+                formRepository.getForms(surveyId)
             } catch (e: Exception) {
                 Timber.e(e)
+                emptyList()
             }
         }
     }
 
     companion object {
-        const val PARAM_DATAPOINT_ID = "data_point_id"
+        const val PARAM_SURVEY_ID = "survey_id"
     }
 }

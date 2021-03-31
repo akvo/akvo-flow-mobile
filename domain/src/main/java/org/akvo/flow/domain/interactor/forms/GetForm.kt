@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2020,2021 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -54,7 +54,11 @@ class GetForm @Inject constructor(
         if (!parameters.containsKey(PARAM_FORM_ID)) {
             return Single.error(IllegalArgumentException("Missing form id"))
         }
-        return formRepository.getForm(parameters[PARAM_FORM_ID] as String)
+        return try {
+            Single.just(formRepository.getForm(parameters[PARAM_FORM_ID] as String))
+        } catch (e: Exception) {
+            Single.error(e)
+        }
     }
 
     private fun addDisposable(disposable: Disposable) {

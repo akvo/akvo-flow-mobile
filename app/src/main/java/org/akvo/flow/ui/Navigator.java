@@ -134,7 +134,7 @@ public class Navigator {
     public void navigateToFormActivity(Activity activity, SurveyGroup mSurveyGroup, String formId, User user) {
         Intent i = new Intent(activity, FormActivity.class);
         i.putExtra(ConstantUtil.FORM_ID_EXTRA, formId);
-        i.putExtra(ConstantUtil.SURVEY_GROUP_EXTRA, mSurveyGroup);
+        i.putExtra(ConstantUtil.SURVEY_EXTRA, mSurveyGroup);
         i.putExtra(ConstantUtil.READ_ONLY_EXTRA, false);
         i.putExtra(ConstantUtil.VIEW_USER_EXTRA, user);
         activity.startActivityForResult(i, ConstantUtil.FORM_FILLING_REQUEST);

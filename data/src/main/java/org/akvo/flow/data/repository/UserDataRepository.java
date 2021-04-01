@@ -87,7 +87,7 @@ public class UserDataRepository implements UserRepository {
     }
 
     @Override
-    public Long getSelectedUser() {
+    public Long fetchSelectedUser() {
         return dataSourceFactory.getSharedPreferencesDataSource().getSelectedUser();
     }
 

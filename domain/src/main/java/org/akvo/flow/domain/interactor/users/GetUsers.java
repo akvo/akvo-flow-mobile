@@ -52,7 +52,7 @@ public class GetUsers extends UseCase {
 
     @Override
     protected <T> Observable buildUseCaseObservable(Map<String, T> parameters) {
-        Long selectedUserId = userRepository.getSelectedUser();
+        Long selectedUserId = userRepository.fetchSelectedUser();
         return surveyRepository.getUsers().map(users -> mapUsers(selectedUserId, users));
     }
 

@@ -19,38 +19,33 @@
 
 package org.akvo.flow.domain.interactor.forms
 
-import android.text.TextUtils
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import org.akvo.flow.domain.executor.CoroutineDispatcher
+import org.akvo.flow.domain.entity.DomainForm
 import org.akvo.flow.domain.repository.FormRepository
+import timber.log.Timber
 import javax.inject.Inject
 
-class GetRegistrationForm @Inject constructor(
-    private val formRepository: FormRepository,
-    private val coroutineDispatcher: CoroutineDispatcher
+class GetSurveyForms @Inject constructor(
+    private val formRepository: FormRepository
 ) {
 
-    suspend fun execute(parameters: Map<String, Any>): RegistrationFormResult {
+    suspend fun execute(parameters: Map<String, Any>): List<DomainForm> {
         if (!parameters.containsKey(PARAM_SURVEY_ID)) {
             throw IllegalArgumentException("Missing survey id")
         }
-        return withContext(coroutineDispatcher.getDispatcher()) {
+        return withContext(Dispatchers.IO) {
             try {
-                val formId: String? = parameters[PARAM_REGISTRATION_FORM_ID] as String?
-                if (!TextUtils.isEmpty(formId) && !"null".equals(formId, ignoreCase = true)) {
-                    RegistrationFormResult(formRepository.getForm(formId!!))
-                } else {
-                    val surveyId = parameters[PARAM_SURVEY_ID] as Long
-                    RegistrationFormResult(formRepository.getForms(surveyId)[0])
-                }
+                val surveyId = parameters[PARAM_SURVEY_ID] as Long
+                formRepository.getForms(surveyId)
             } catch (e: Exception) {
-                RegistrationFormResult(null)
+                Timber.e(e)
+                emptyList()
             }
         }
     }
 
     companion object {
         const val PARAM_SURVEY_ID = "survey_id"
-        const val PARAM_REGISTRATION_FORM_ID = "registration_id"
     }
 }

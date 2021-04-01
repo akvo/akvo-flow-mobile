@@ -191,7 +191,7 @@ class RecordActivityTest {
 
     @Test
     fun onFormClickShouldLaunchFormActivityWhenCorrectDataPointAndSavedInstance() {
-        `when`(formInstanceRepository.getSavedFormInstance(anyString(), anyString())).thenReturn(Single.just(1L))
+        `when`(formInstanceRepository.getSavedFormInstanceId(anyString(), anyString())).thenReturn(1L)
 
         intentsTestRule.launchActivity(null)
 
@@ -204,7 +204,7 @@ class RecordActivityTest {
     fun onFormClickShouldLaunchFormActivityWhenRegistrationForm() {
         val form = DomainForm(1, FORM_ID, 1, "name", "1.0", "", "", "", "", cascadeDownloaded = true, deleted = false)
         `when`(formRepository.getForm(anyString())).thenReturn(form)
-        `when`(formInstanceRepository.getSavedFormInstance(anyString(), anyString())).thenReturn(Single.just(-1L))
+        `when`(formInstanceRepository.getSavedFormInstanceId(anyString(), anyString())).thenReturn(-1L)
         `when`(formInstanceRepository.createFormInstance(any(DomainFormInstance::class.java))).thenReturn(Single.just(1L))
 
         intentsTestRule.launchActivity(null)
@@ -219,7 +219,7 @@ class RecordActivityTest {
     fun onFormClickShouldLaunchFormActivityWhenRecentMoreThan24Hours() {
         val form = DomainForm(1, "123", 1, "name", "1.0", "", "", "", "", cascadeDownloaded = true, deleted = false)
         `when`(formRepository.getForm(anyString())).thenReturn(form)
-        `when`(formInstanceRepository.getSavedFormInstance(anyString(), anyString())).thenReturn(Single.just(-1L))
+        `when`(formInstanceRepository.getSavedFormInstanceId(anyString(), anyString())).thenReturn(-1L)
         `when`(formInstanceRepository.createFormInstance(any(DomainFormInstance::class.java))).thenReturn(Single.just(1L))
         `when`(
             formInstanceRepository.getLatestSubmittedFormInstance(
@@ -227,7 +227,7 @@ class RecordActivityTest {
                 anyString(),
                 anyLong()
             )
-        ).thenReturn(Single.just(-1L))
+        ).thenReturn(-1L)
 
         intentsTestRule.launchActivity(null)
 
@@ -240,14 +240,14 @@ class RecordActivityTest {
     fun onFormClickShouldDisplayDialogWhenRecentLessThan24Hours() {
         val form = DomainForm(1, "123", 1, "name", "1.0", "", "", "", "", cascadeDownloaded = true, deleted = false)
         `when`(formRepository.getForm(anyString())).thenReturn(form)
-        `when`(formInstanceRepository.getSavedFormInstance(anyString(), anyString())).thenReturn(Single.just(-1L))
+        `when`(formInstanceRepository.getSavedFormInstanceId(anyString(), anyString())).thenReturn(-1L)
         `when`(
             formInstanceRepository.getLatestSubmittedFormInstance(
                 anyString(),
                 anyString(),
                 anyLong()
             )
-        ).thenReturn(Single.just(1L))
+        ).thenReturn(1L)
 
         intentsTestRule.launchActivity(null)
 

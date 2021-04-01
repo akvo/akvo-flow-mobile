@@ -438,15 +438,13 @@ public class DatabaseDataSource {
         briteSurveyDbAdapter.markDataPointAsViewed(dataPointId);
     }
 
-    public Single<Long> getSavedFormInstance(@NotNull String formId, @NotNull String datapointId) {
-        return briteSurveyDbAdapter.getSavedFormInstance(formId, datapointId)
-                .map(formInstanceMapper::getFormInstanceId);
+    public Long getSavedFormInstanceId(@NotNull String formId, @NotNull String datapointId) {
+        return formInstanceMapper.getFormInstanceId(briteSurveyDbAdapter.getSavedFormInstance(formId, datapointId));
     }
 
-    public Single<Long> getRecentSubmittedFormInstance(@NotNull String formId,
+    public Long getRecentSubmittedFormInstance(@NotNull String formId,
                                                        @NotNull String datapointId, long maxDate) {
-        return briteSurveyDbAdapter.getRecentSubmittedFormInstance(formId, datapointId, maxDate)
-                .map(formInstanceMapper::getFormInstanceId);
+        return formInstanceMapper.getFormInstanceId(briteSurveyDbAdapter.getRecentSubmittedFormInstance(formId, datapointId, maxDate));
     }
 
     @NotNull

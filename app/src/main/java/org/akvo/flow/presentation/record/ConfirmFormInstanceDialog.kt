@@ -26,13 +26,14 @@ import android.os.Bundle
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 import org.akvo.flow.R
-import org.akvo.flow.domain.entity.DomainFormInstance
+import org.akvo.flow.domain.entity.User
 
 class ConfirmFormInstanceDialog : DialogFragment() {
 
     private var listener: ConfirmFormInstanceDialogListener? = null
-    private lateinit var formInstance: DomainFormInstance
     private lateinit var formName: String
+    private lateinit var formId: String
+    private lateinit var user: User
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -51,8 +52,9 @@ class ConfirmFormInstanceDialog : DialogFragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        formInstance = arguments!!.getParcelable(FORM_INSTANCE)!!
+        formId = arguments!!.getString(FORM_ID)!!
         formName = arguments!!.getString(FORM_NAME)!!
+        user = arguments!!.getParcelable(USER)!!
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
@@ -62,7 +64,8 @@ class ConfirmFormInstanceDialog : DialogFragment() {
             .setCancelable(true)
             .setPositiveButton(R.string.confirm_new_submission) { _, _ ->
                 listener?.onUserConfirmed(
-                    formInstance
+                    formId,
+                    user
                 )
             }
             .setNegativeButton(R.string.cancelbutton) { _, _ -> dismiss() }
@@ -71,20 +74,23 @@ class ConfirmFormInstanceDialog : DialogFragment() {
 
     companion object {
 
-        private const val FORM_INSTANCE = "form_instance"
+        private const val FORM_ID = "form_id"
         private const val FORM_NAME = "form_name"
+        private const val USER = "user"
 
         const val TAG = "ConfirmFormInstanceDialog"
 
         @JvmStatic
         fun newInstance(
-            formInstance: DomainFormInstance,
-            formName: String
+            formName: String,
+            formId: String,
+            user: User
         ): ConfirmFormInstanceDialog {
             return ConfirmFormInstanceDialog().apply {
                 arguments = Bundle().apply {
-                    putParcelable(FORM_INSTANCE, formInstance)
+                    putString(FORM_ID, formId)
                     putString(FORM_NAME, formName)
+                    putParcelable(USER, user)
                 }
             }
         }

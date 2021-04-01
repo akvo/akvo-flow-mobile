@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2021 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -19,33 +19,38 @@
 
 package org.akvo.flow.domain.interactor.forms
 
+import android.text.TextUtils
 import kotlinx.coroutines.withContext
 import org.akvo.flow.domain.executor.CoroutineDispatcher
-import org.akvo.flow.domain.repository.FormInstanceRepository
+import org.akvo.flow.domain.repository.FormRepository
 import javax.inject.Inject
 
-class GetSavedFormInstance @Inject constructor(
-    private val formInstanceRepository: FormInstanceRepository,
+class GetRegistrationForm @Inject constructor(
+    private val formRepository: FormRepository,
     private val coroutineDispatcher: CoroutineDispatcher
 ) {
 
-    suspend fun execute(parameters: Map<String, Any>): Long {
-        if (!parameters.containsKey(PARAM_FORM_ID) || !parameters.containsKey(PARAM_DATAPOINT_ID)) {
-            throw IllegalArgumentException("Missing form id")
+    suspend fun execute(parameters: Map<String, Any>): RegistrationFormResult {
+        if (!parameters.containsKey(PARAM_SURVEY_ID)) {
+            throw IllegalArgumentException("Missing survey id")
         }
         return withContext(coroutineDispatcher.getDispatcher()) {
             try {
-                val formId = parameters[PARAM_FORM_ID] as String
-                val datapointId = parameters[PARAM_DATAPOINT_ID] as String
-                formInstanceRepository.getSavedFormInstanceId(formId, datapointId)
+                val formId: String? = parameters[PARAM_REGISTRATION_FORM_ID] as String?
+                if (!TextUtils.isEmpty(formId) && !"null".equals(formId, ignoreCase = true)) {
+                    RegistrationFormResult(formRepository.getForm(formId!!))
+                } else {
+                    val surveyId = parameters[PARAM_SURVEY_ID] as Long
+                    RegistrationFormResult(formRepository.getForms(surveyId)[0])
+                }
             } catch (e: Exception) {
-                -1L
+                RegistrationFormResult(null)
             }
         }
     }
 
     companion object {
-        const val PARAM_FORM_ID = "form_id"
-        const val PARAM_DATAPOINT_ID = "datapoint_id"
+        const val PARAM_SURVEY_ID = "survey_id"
+        const val PARAM_REGISTRATION_FORM_ID = "registration_id"
     }
 }

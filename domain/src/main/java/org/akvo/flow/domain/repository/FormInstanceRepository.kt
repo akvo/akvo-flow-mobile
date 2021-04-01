@@ -25,13 +25,13 @@ import java.util.concurrent.TimeUnit
 
 interface FormInstanceRepository {
 
-    fun getSavedFormInstance(formId: String, datapointId: String): Single<Long>
+    fun getSavedFormInstanceId(formId: String, datapointId: String): Long
 
     fun getLatestSubmittedFormInstance(
         formId: String,
         datapointId: String,
         maxDate: Long = TimeUnit.DAYS.toMillis(1)
-    ): Single<Long>
+    ): Long
 
     fun createFormInstance(domainFormInstance: DomainFormInstance): Single<Long>
 }

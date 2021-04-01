@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2021 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -17,18 +17,14 @@
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.akvo.flow.presentation.record
+package org.akvo.flow.domain.executor
 
-import org.akvo.flow.domain.entity.User
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 
-interface RecordView {
-    fun showBootStrapPendingError()
-    fun showMissingCascadeError()
-    fun navigateToForm(formId: String, formInstanceId: Long)
-    fun navigateToForm(formId: String, user: User)
-    fun showDataPointTitle(displayName: String)
-    fun showDataPointError()
-    fun showMissingUserError()
-    fun showFormNotFound()
-    fun displayWarningDialog(formName: String, formId: String, user: User)
+open class CoroutineDispatcher {
+
+    open fun getDispatcher(): CoroutineDispatcher {
+        return Dispatchers.IO
+    }
 }

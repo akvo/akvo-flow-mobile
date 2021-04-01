@@ -27,7 +27,7 @@ class CrashlyticsTree : Timber.Tree() {
         if (t != null) {
             FirebaseCrashlytics.getInstance().recordException(t)
         } else {
-            FirebaseCrashlytics.getInstance().log("tag: + message")
+            FirebaseCrashlytics.getInstance().log("$tag: + $message")
         }
     }
 }

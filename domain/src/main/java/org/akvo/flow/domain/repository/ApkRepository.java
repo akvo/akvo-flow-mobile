@@ -29,5 +29,5 @@ public interface ApkRepository {
 
     Observable<Boolean> saveApkDataPreference(@NonNull ApkData apkData);
 
-    Observable<ApkData> getApkDataPreference();
+    ApkData getApkDataPreference();
 }

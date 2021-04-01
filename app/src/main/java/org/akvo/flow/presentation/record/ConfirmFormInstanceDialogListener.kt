@@ -19,9 +19,9 @@
 
 package org.akvo.flow.presentation.record
 
-import org.akvo.flow.domain.entity.DomainFormInstance
+import org.akvo.flow.domain.entity.User
 
 interface ConfirmFormInstanceDialogListener {
 
-    fun onUserConfirmed(formInstance: DomainFormInstance)
+    fun onUserConfirmed(formId: String, user: User)
 }

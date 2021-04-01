@@ -43,8 +43,6 @@ import org.akvo.flow.domain.interactor.UnSyncedTransmissionsExist;
 import org.akvo.flow.domain.interactor.UploadSurveyDataPoints;
 import org.akvo.flow.domain.interactor.UseCase;
 import org.akvo.flow.domain.interactor.apk.GetApkData;
-import org.akvo.flow.domain.interactor.apk.GetApkDataPreferences;
-import org.akvo.flow.domain.interactor.apk.SaveApkUpdateNotified;
 import org.akvo.flow.domain.interactor.datapoints.GetSavedDataPoints;
 import org.akvo.flow.domain.interactor.forms.DownloadForm;
 import org.akvo.flow.domain.interactor.forms.ReloadForms;
@@ -235,18 +233,6 @@ public class ViewModule {
     @Named("getApkData")
     UseCase provideGetApkData(GetApkData getApkData) {
         return getApkData;
-    }
-
-    @Provides
-    @Named("GetApkDataPreferences")
-    UseCase provideGetApkDataPreferences(GetApkDataPreferences getApkDataPreferences) {
-        return getApkDataPreferences;
-    }
-
-    @Provides
-    @Named("SaveApkUpdateNotified")
-    UseCase provideSaveApkUpdateNotified(SaveApkUpdateNotified saveApkUpdateNotified) {
-        return saveApkUpdateNotified;
     }
 
     @Provides

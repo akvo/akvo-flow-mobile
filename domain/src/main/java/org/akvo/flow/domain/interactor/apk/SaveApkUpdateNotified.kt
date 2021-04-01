@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2018,2021 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -15,20 +15,27 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
+ *
  */
+package org.akvo.flow.domain.interactor.apk
 
-package org.akvo.flow.presentation.record
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import org.akvo.flow.domain.repository.UserRepository
+import timber.log.Timber
+import javax.inject.Inject
 
-import org.akvo.flow.domain.entity.User
+class SaveApkUpdateNotified @Inject constructor(
+   private val userRepository: UserRepository
+) {
 
-interface RecordView {
-    fun showBootStrapPendingError()
-    fun showMissingCascadeError()
-    fun navigateToForm(formId: String, formInstanceId: Long)
-    fun navigateToForm(formId: String, user: User)
-    fun showDataPointTitle(displayName: String)
-    fun showDataPointError()
-    fun showMissingUserError()
-    fun showFormNotFound()
-    fun displayWarningDialog(formName: String, formId: String, user: User)
+    suspend fun execute() {
+        withContext(Dispatchers.IO) {
+            try {
+                userRepository.saveLastNotificationTime()
+            } catch (ex: Exception) {
+                Timber.e(ex)
+            }
+        }
+    }
 }

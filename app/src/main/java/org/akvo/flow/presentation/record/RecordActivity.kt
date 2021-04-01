@@ -30,7 +30,7 @@ import com.google.android.material.tabs.TabLayout
 import org.akvo.flow.R
 import org.akvo.flow.app.FlowApp
 import org.akvo.flow.domain.SurveyGroup
-import org.akvo.flow.domain.entity.DomainFormInstance
+import org.akvo.flow.domain.entity.User
 import org.akvo.flow.injector.component.DaggerViewComponent
 import org.akvo.flow.tracking.TrackingHelper
 import org.akvo.flow.ui.Navigator
@@ -131,14 +131,14 @@ class RecordActivity : BackActivity(), FormListListener, ResponseListListener, R
         showErrorMessage(R.string.error_missing_form)
     }
 
-    override fun displayWarningDialog(domainFormInstance: DomainFormInstance, formName: String) {
+    override fun displayWarningDialog(formName: String, formId: String, user: User) {
         trackingHelper.logFormSubmissionRepeatConfirmationDialogEvent()
-        ConfirmFormInstanceDialog.newInstance(domainFormInstance, formName)
+        ConfirmFormInstanceDialog.newInstance(formName, formId, user)
             .show(supportFragmentManager, ConfirmFormInstanceDialog.TAG)
     }
 
-    override fun onUserConfirmed(formInstance: DomainFormInstance) {
-        presenter.createNewFormInstance(formInstance)
+    override fun onUserConfirmed(formId: String, user: User) {
+        navigateToForm(formId, user)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -170,6 +170,16 @@ class RecordActivity : BackActivity(), FormListListener, ResponseListListener, R
             formInstanceId,
             false,
             surveyGroup
+        )
+    }
+
+    override fun navigateToForm(formId: String, user: User) {
+        navigator.navigateToFormActivity(
+            this,
+            surveyGroup,
+            formId,
+            user,
+            dataPointId
         )
     }
 

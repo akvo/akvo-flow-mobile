@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2020 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2021 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -752,28 +752,27 @@ public class BriteSurveyDbAdapter {
         return queryTransmissions(column, whereClause, selectionArgs);
     }
 
-    public Single<Cursor> getForm(String formId) {
+    public Cursor getForm(String formId) {
         String sql =
                 "SELECT * FROM " + Tables.SURVEY + " WHERE " + SurveyColumns.SURVEY_ID + " = ?";
-        return Single.just(briteDatabase.query(sql, formId));
+        return briteDatabase.query(sql, formId);
     }
 
-    public Single<Cursor> getSavedFormInstance(String formId, String datapointId) {
+    public Cursor getSavedFormInstance(String formId, String datapointId) {
         String sql = "SELECT " + SurveyInstanceColumns._ID + " FROM " + Tables.SURVEY_INSTANCE +
                 " WHERE " + Tables.SURVEY_INSTANCE + "." + SurveyInstanceColumns.SURVEY_ID + "= ?" +
                 " AND " + SurveyInstanceColumns.STATUS + "= ?" +
                 " AND " + SurveyInstanceColumns.RECORD_ID + "= ?" +
                 " ORDER BY " + SurveyInstanceColumns.START_DATE + " DESC LIMIT 1";
 
-        return Single.just(briteDatabase
-                .query(sql, formId, String.valueOf(SurveyInstanceStatus.SAVED), datapointId));
+        return briteDatabase.query(sql, formId, String.valueOf(SurveyInstanceStatus.SAVED), datapointId);
     }
 
     public Single<Long> createFormInstance(ContentValues initialValues) {
         return Single.just(briteDatabase.insert(Tables.SURVEY_INSTANCE, initialValues));
     }
 
-    public Single<Cursor> getRecentSubmittedFormInstance(String formId, String dataPointId, long maxDate) {
+    public Cursor getRecentSubmittedFormInstance(String formId, String dataPointId, long maxDate) {
         long dateParam = System.currentTimeMillis() - maxDate;
         String sql = "SELECT * FROM " + Tables.SURVEY_INSTANCE +
                 " WHERE " + Tables.SURVEY_INSTANCE + "." + SurveyInstanceColumns.SURVEY_ID + "= ?" +
@@ -783,8 +782,7 @@ public class BriteSurveyDbAdapter {
                 " AND " + SurveyInstanceColumns.SUBMITTED_DATE + " > ?" +
                 " ORDER BY " + SurveyInstanceColumns.SUBMITTED_DATE + " DESC LIMIT 1";
 
-        return Single.just(briteDatabase
-                .query(sql, formId, dataPointId, String.valueOf(dateParam)));
+        return briteDatabase.query(sql, formId, dataPointId, String.valueOf(dateParam));
     }
 
     public void markDataPointAsViewed(String dataPointId) {

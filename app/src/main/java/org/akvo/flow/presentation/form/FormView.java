@@ -33,4 +33,6 @@ public interface FormView {
     void showMobileUploadSetting(long surveyInstanceId);
 
     void startSync(boolean isMobileSyncAllowed);
+
+    void GoToListOfForms();
 }

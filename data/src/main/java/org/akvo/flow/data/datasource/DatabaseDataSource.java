@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2020 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2021 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -56,7 +56,6 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -199,8 +198,8 @@ public class DatabaseDataSource {
         return briteSurveyDbAdapter.getUsers();
     }
 
-    public Observable<Cursor> getUser(Long userId) {
-        return Observable.just(briteSurveyDbAdapter.getUser(userId));
+    public Cursor getUser(Long userId) {
+        return briteSurveyDbAdapter.getUser(userId);
     }
 
     public Observable<Boolean> editUser(User user) {
@@ -427,29 +426,25 @@ public class DatabaseDataSource {
     }
 
     @NotNull
-    public Single<DataForm> getForm(String formId) {
-        return briteSurveyDbAdapter.getForm(formId).map(formMapper::mapForm);
+    public DataForm getForm(String formId) {
+        return formMapper.mapForm(briteSurveyDbAdapter.getForm(formId));
     }
 
     public List<DataForm> getForms(long surveyId) {
         return formMapper.mapForms(briteSurveyDbAdapter.getForms(surveyId));
     }
 
-    @NotNull
-    public Completable markDataPointAsViewed(@NotNull String dataPointId) {
+    public void markDataPointAsViewed(@NotNull String dataPointId) {
         briteSurveyDbAdapter.markDataPointAsViewed(dataPointId);
-        return Completable.complete();
     }
 
-    public Single<Long> getSavedFormInstance(@NotNull String formId, @NotNull String datapointId) {
-        return briteSurveyDbAdapter.getSavedFormInstance(formId, datapointId)
-                .map(formInstanceMapper::getFormInstanceId);
+    public Long getSavedFormInstanceId(@NotNull String formId, @NotNull String datapointId) {
+        return formInstanceMapper.getFormInstanceId(briteSurveyDbAdapter.getSavedFormInstance(formId, datapointId));
     }
 
-    public Single<Long> getRecentSubmittedFormInstance(@NotNull String formId,
+    public Long getRecentSubmittedFormInstance(@NotNull String formId,
                                                        @NotNull String datapointId, long maxDate) {
-        return briteSurveyDbAdapter.getRecentSubmittedFormInstance(formId, datapointId, maxDate)
-                .map(formInstanceMapper::getFormInstanceId);
+        return formInstanceMapper.getFormInstanceId(briteSurveyDbAdapter.getRecentSubmittedFormInstance(formId, datapointId, maxDate));
     }
 
     @NotNull

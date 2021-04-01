@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2020-2021 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -19,46 +19,30 @@
 
 package org.akvo.flow.domain.interactor.forms
 
-import io.reactivex.Single
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.disposables.Disposable
-import io.reactivex.observers.DisposableSingleObserver
+import kotlinx.coroutines.withContext
 import org.akvo.flow.domain.entity.DomainForm
-import org.akvo.flow.domain.executor.PostExecutionThread
-import org.akvo.flow.domain.executor.SchedulerCreator
+import org.akvo.flow.domain.executor.CoroutineDispatcher
 import org.akvo.flow.domain.repository.FormRepository
+import timber.log.Timber
 import javax.inject.Inject
 
 class GetForm @Inject constructor(
     private val formRepository: FormRepository,
-    private val postExecutionThread: PostExecutionThread,
-    private val schedulerCreator: SchedulerCreator
+    private val coroutineDispatcher: CoroutineDispatcher
 ) {
 
-    private val disposables = CompositeDisposable()
-
-    fun execute(observer: DisposableSingleObserver<DomainForm>, parameters: Map<String, Any>) {
-        val observable: Single<DomainForm> = buildUseCaseObservable(parameters)
-            .subscribeOn(schedulerCreator.obtainScheduler())
-            .observeOn(postExecutionThread.scheduler)
-        addDisposable(observable.subscribeWith(observer))
-    }
-
-    fun dispose() {
-        if (!disposables.isDisposed) {
-            disposables.clear()
-        }
-    }
-
-    private fun <T> buildUseCaseObservable(parameters: Map<String, T>): Single<DomainForm> {
+    suspend fun execute(parameters: Map<String, Any>): DomainForm? {
         if (!parameters.containsKey(PARAM_FORM_ID)) {
-            return Single.error(IllegalArgumentException("Missing form id"))
+            throw IllegalArgumentException("Missing form id")
         }
-        return formRepository.getForm(parameters[PARAM_FORM_ID] as String)
-    }
-
-    private fun addDisposable(disposable: Disposable) {
-        disposables.add(disposable)
+        return withContext(coroutineDispatcher.getDispatcher()) {
+            try {
+                formRepository.getForm(parameters[PARAM_FORM_ID] as String)
+            } catch (e: Exception) {
+                Timber.e(e)
+                null
+            }
+        }
     }
 
     companion object {

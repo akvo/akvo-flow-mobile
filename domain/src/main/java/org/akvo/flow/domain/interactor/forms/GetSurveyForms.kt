@@ -23,6 +23,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.akvo.flow.domain.entity.DomainForm
 import org.akvo.flow.domain.repository.FormRepository
+import timber.log.Timber
 import javax.inject.Inject
 
 class GetSurveyForms @Inject constructor(
@@ -38,6 +39,7 @@ class GetSurveyForms @Inject constructor(
                 val surveyId = parameters[PARAM_SURVEY_ID] as Long
                 formRepository.getForms(surveyId)
             } catch (e: Exception) {
+                Timber.e(e)
                 emptyList()
             }
         }

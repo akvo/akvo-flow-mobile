@@ -55,7 +55,7 @@ public class DeleteUser extends UseCase {
             return Observable.error(new IllegalArgumentException("missing user"));
         }
         final User user = (User) parameters.get(PARAM_USER);
-        Long selectedUserId = userRepository.getSelectedUser();
+        Long selectedUserId = userRepository.fetchSelectedUser();
         if (selectedUserId.equals(user.getId())) {
             return userRepository.clearSelectedUser().concatMap(
                     (Function<Boolean, Observable<Boolean>>) aBoolean -> deleteUser(user));

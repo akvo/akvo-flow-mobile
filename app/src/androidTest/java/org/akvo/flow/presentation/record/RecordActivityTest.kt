@@ -25,10 +25,10 @@ import androidx.test.espresso.intent.rule.IntentsTestRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
-import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.internal.schedulers.TrampolineScheduler
 import it.cosenonjaviste.daggermock.DaggerMock
+import kotlinx.coroutines.Dispatchers
 import org.akvo.flow.R
 import org.akvo.flow.activity.FormActivity
 import org.akvo.flow.activity.form.FormActivityTestUtil.addExecutionDelay
@@ -40,6 +40,7 @@ import org.akvo.flow.domain.entity.DataPoint
 import org.akvo.flow.domain.entity.DomainForm
 import org.akvo.flow.domain.entity.DomainFormInstance
 import org.akvo.flow.domain.entity.User
+import org.akvo.flow.domain.executor.CoroutineDispatcher
 import org.akvo.flow.domain.executor.SchedulerCreator
 import org.akvo.flow.domain.repository.FormInstanceRepository
 import org.akvo.flow.domain.repository.FormRepository
@@ -56,6 +57,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.BDDMockito.given
 import org.mockito.Mockito
 import org.mockito.Mockito.`when`
 import org.mockito.Mockito.anyLong
@@ -90,18 +92,20 @@ class RecordActivityTest {
     private val userRepository: UserRepository = mock(UserRepository::class.java)
     private val dataPoint: DataPoint = mock(DataPoint::class.java)
     private val schedulerCreator: SchedulerCreator = mock(SchedulerCreator::class.java)
+    private val dispatcher: CoroutineDispatcher = mock(CoroutineDispatcher::class.java)
 
     @Before
     fun beforeClass() {
         val form = DomainForm(1, "1", 1, "name", "1.0", "", "", "", "", cascadeDownloaded = true, deleted = false)
-        `when`(formRepository.getForm(anyString())).thenReturn(Single.just(form))
+        `when`(formRepository.getForm(anyString())).thenReturn(form)
         `when`(surveyRepository.getDataPoint(anyString())).thenReturn(Single.just(dataPoint))
-        `when`(userRepository.selectedUser).thenReturn(Observable.just(1L))
-        `when`(surveyRepository.getUser(1L)).thenReturn(Observable.just(User(1L, "test_user")))
+        `when`(userRepository.fetchSelectedUser()).thenReturn(1L)
+        `when`(surveyRepository.getUser(1L)).thenReturn(User(1L, "test_user"))
         `when`(dataPoint.latitude).thenReturn(41.3819219)
         `when`(dataPoint.longitude).thenReturn(2.148909)
         `when`(dataPoint.name).thenReturn(DATAPOINT_NAME)
         `when`(schedulerCreator.obtainScheduler()).thenReturn(TrampolineScheduler.instance())
+        `when`(dispatcher.getDispatcher()).thenReturn(Dispatchers.Main)
     }
 
     @Test
@@ -135,7 +139,9 @@ class RecordActivityTest {
 
     @Test
     fun onFormClickShouldShowErrorMessageUserError() {
-        `when`(userRepository.selectedUser).thenReturn(Observable.error(Exception("user not found")))
+        given(userRepository.fetchSelectedUser()).willAnswer {
+            throw java.lang.Exception("user not found")
+        }
 
         intentsTestRule.launchActivity(null)
 
@@ -147,7 +153,7 @@ class RecordActivityTest {
 
     @Test
     fun onFormClickShouldShowErrorMessageUserMissing() {
-        `when`(userRepository.selectedUser).thenReturn(Observable.just(-1L))
+        `when`(userRepository.fetchSelectedUser()).thenReturn(-1L)
 
         intentsTestRule.launchActivity(null)
 
@@ -160,7 +166,7 @@ class RecordActivityTest {
     @Test
     fun onFormClickShouldShowErrorMessageCascadeMissing() {
         val form = DomainForm(1, "1", 1, "name", "1.0", "", "", "", "", cascadeDownloaded = false, deleted = false)
-        `when`(formRepository.getForm(anyString())).thenReturn(Single.just(form))
+        `when`(formRepository.getForm(anyString())).thenReturn(form)
         intentsTestRule.launchActivity(null)
 
         intentsTestRule.activity.onFormClick(FORM_ID)
@@ -171,7 +177,10 @@ class RecordActivityTest {
 
     @Test
     fun onFormClickShouldShowErrorMessageFormNotFound() {
-        `when`(formRepository.getForm(anyString())).thenReturn(Single.error(Exception("form not found")))
+        given(formRepository.getForm(anyString())).willAnswer {
+            throw java.lang.Exception("form not found")
+        }
+
         intentsTestRule.launchActivity(null)
 
         intentsTestRule.activity.onFormClick(FORM_ID)
@@ -194,7 +203,7 @@ class RecordActivityTest {
     @Test
     fun onFormClickShouldLaunchFormActivityWhenRegistrationForm() {
         val form = DomainForm(1, FORM_ID, 1, "name", "1.0", "", "", "", "", cascadeDownloaded = true, deleted = false)
-        `when`(formRepository.getForm(anyString())).thenReturn(Single.just(form))
+        `when`(formRepository.getForm(anyString())).thenReturn(form)
         `when`(formInstanceRepository.getSavedFormInstance(anyString(), anyString())).thenReturn(Single.just(-1L))
         `when`(formInstanceRepository.createFormInstance(any(DomainFormInstance::class.java))).thenReturn(Single.just(1L))
 
@@ -209,10 +218,16 @@ class RecordActivityTest {
     @Test
     fun onFormClickShouldLaunchFormActivityWhenRecentMoreThan24Hours() {
         val form = DomainForm(1, "123", 1, "name", "1.0", "", "", "", "", cascadeDownloaded = true, deleted = false)
-        `when`(formRepository.getForm(anyString())).thenReturn(Single.just(form))
+        `when`(formRepository.getForm(anyString())).thenReturn(form)
         `when`(formInstanceRepository.getSavedFormInstance(anyString(), anyString())).thenReturn(Single.just(-1L))
         `when`(formInstanceRepository.createFormInstance(any(DomainFormInstance::class.java))).thenReturn(Single.just(1L))
-        `when`(formInstanceRepository.getLatestSubmittedFormInstance(anyString(), anyString(), anyLong())).thenReturn(Single.just(-1L))
+        `when`(
+            formInstanceRepository.getLatestSubmittedFormInstance(
+                anyString(),
+                anyString(),
+                anyLong()
+            )
+        ).thenReturn(Single.just(-1L))
 
         intentsTestRule.launchActivity(null)
 
@@ -224,9 +239,15 @@ class RecordActivityTest {
     @Test
     fun onFormClickShouldDisplayDialogWhenRecentLessThan24Hours() {
         val form = DomainForm(1, "123", 1, "name", "1.0", "", "", "", "", cascadeDownloaded = true, deleted = false)
-        `when`(formRepository.getForm(anyString())).thenReturn(Single.just(form))
+        `when`(formRepository.getForm(anyString())).thenReturn(form)
         `when`(formInstanceRepository.getSavedFormInstance(anyString(), anyString())).thenReturn(Single.just(-1L))
-        `when`(formInstanceRepository.getLatestSubmittedFormInstance(anyString(), anyString(), anyLong())).thenReturn(Single.just(1L))
+        `when`(
+            formInstanceRepository.getLatestSubmittedFormInstance(
+                anyString(),
+                anyString(),
+                anyLong()
+            )
+        ).thenReturn(Single.just(1L))
 
         intentsTestRule.launchActivity(null)
 

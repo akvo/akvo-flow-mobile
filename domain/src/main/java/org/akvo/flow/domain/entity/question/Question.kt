@@ -29,7 +29,7 @@ data class Question(
     val renderType: String? = null,
     var questionHelp: MutableList<QuestionHelp> = mutableListOf(),
     val type: String? = null,
-    val options: MutableList<Option>? = null,
+    var options: MutableList<Option>? = null,
     var isAllowMultiple: Boolean = false,
     val isLocked: Boolean = false,
     val languageTranslationMap: HashMap<String?, AltText> = HashMap(),

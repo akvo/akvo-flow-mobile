@@ -258,8 +258,13 @@ class XmlFormParser @Inject constructor(private val helper: FileHelper) {
                                 }
                             }
                             OPTIONS -> {
-                                currentQuestion?.options?.addAll(currentOptions)
-                                currentOptions = mutableListOf()
+                                if (currentQuestion !=null) {
+                                    if (currentQuestion.options == null) {
+                                        currentQuestion.options = mutableListOf()
+                                    }
+                                    currentQuestion.options?.addAll(currentOptions)
+                                    currentOptions = mutableListOf()
+                                }
                             }
                             OPTION -> {
                                 if (currentOption != null) {

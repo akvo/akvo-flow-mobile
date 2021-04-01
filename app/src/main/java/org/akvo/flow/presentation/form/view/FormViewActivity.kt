@@ -168,7 +168,7 @@ class FormViewActivity : BackActivity(), IFormView,
     }
 
     override fun showErrorLoadingForm() {
-        Toast.makeText(this, R.string.error_loading_form, Toast.LENGTH_SHORT).show()
+        Toast.makeText(applicationContext, R.string.error_loading_form, Toast.LENGTH_SHORT).show()
     }
 
     override fun useSelectedLanguages(

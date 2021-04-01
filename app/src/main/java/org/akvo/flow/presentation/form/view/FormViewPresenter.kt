@@ -86,6 +86,7 @@ class FormViewPresenter @Inject constructor(
                     }
                 }
             } catch (e: Exception) {
+                Timber.e(e)
                 view?.showErrorLoadingForm()
             }
         }

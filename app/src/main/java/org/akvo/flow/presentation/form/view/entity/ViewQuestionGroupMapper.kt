@@ -25,6 +25,7 @@ import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonIOException
 import com.google.gson.JsonSyntaxException
+import com.google.gson.annotations.SerializedName
 import com.google.gson.reflect.TypeToken
 import org.akvo.flow.domain.entity.DomainQuestionGroup
 import org.akvo.flow.domain.entity.Response
@@ -228,12 +229,15 @@ class ViewQuestionGroupMapper @Inject constructor() {
 
     private fun mapCaddisfly(answer: String?): List<String> {
         val resultsToDisplay = mutableListOf<String>()
-        var results: List<CaddisflyTestResult> = mutableListOf()
+        val results = mutableListOf<CaddisflyTestResult>()
         if (!TextUtils.isEmpty(answer)) {
             try {
                 val gson = Gson()
-                val caddisflyResult:CaddisflyResult = gson.fromJson(answer, CaddisflyResult::class.java)
-                results = caddisflyResult.results
+                val caddisflyResult: CaddisflyResult =
+                    gson.fromJson(answer, CaddisflyResult::class.java)
+                if (caddisflyResult.results != null) {
+                    results.addAll(caddisflyResult.results)
+                }
             } catch (e: JsonSyntaxException) {
                 Timber.e(e, "Unable to parse caddisfly result: %s", answer)
             }
@@ -278,15 +282,14 @@ class ViewQuestionGroupMapper @Inject constructor() {
     }
 
     private fun formatDate(answer: String): String {
-        val formattedDate = ""
-        try {
+        return try {
             val timeStamp = answer.toLong()
             localCalendar.timeInMillis = timeStamp
             userDisplayedDateFormat.format(localCalendar.time)
         } catch (e: NumberFormatException) {
             Timber.e(e)
+            ""
         }
-        return formattedDate
     }
 
     private fun deserializeMedia(data: String): Media {
@@ -350,6 +353,9 @@ class ViewQuestionGroupMapper @Inject constructor() {
                 )
             }
         }
+        Timber.d("options " + options?.size)
+        Timber.d("response " + response)
+        Timber.d("selected " + selectedOptions)
         return viewOptions
     }
 
@@ -454,7 +460,7 @@ class ViewQuestionGroupMapper @Inject constructor() {
         val image: String
     )
 
-    data class CaddisflyResult(var results: List<CaddisflyTestResult>)
+    data class CaddisflyResult(@SerializedName("result") var results: List<CaddisflyTestResult>)
 
     data class CaddisflyTestResult(
         var id: Int,

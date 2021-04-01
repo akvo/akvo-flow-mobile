@@ -54,9 +54,7 @@ class RecordPresenter @Inject constructor(
     private val uiScope = CoroutineScope(Dispatchers.Main + job)
 
     override fun destroy() {
-        getFormUseCase.dispose()
-        getSavedFormInstanceUseCase.dispose()
-        getRecentSubmittedFormInstanceUseCase.dispose()
+        getDataPoint.dispose()
         uiScope.coroutineContext.cancelChildren()
     }
 
@@ -67,71 +65,55 @@ class RecordPresenter @Inject constructor(
             if (userResult.resultCode == ResultCode.SUCCESS) {
                 val params: MutableMap<String, Any> = HashMap(2)
                 params[GetForm.PARAM_FORM_ID] = formId
-                getFormUseCase.execute(object : DisposableSingleObserver<DomainForm>() {
-                    override fun onSuccess(domainForm: DomainForm) {
-                        if (!domainForm.cascadeDownloaded) {
-                            view?.showMissingCascadeError()
-                        } else {
-                            getSavedFormInstance(formId, datapointId, survey, domainForm, userResult.user)
-                        }
+                val domainForm: DomainForm? = getFormUseCase.execute(params)
+                if (domainForm == null) {
+                    view?.showFormNotFound()
+                } else {
+                    if (!domainForm.cascadeDownloaded) {
+                        view?.showMissingCascadeError()
+                    } else {
+                        getSavedFormInstance(formId, datapointId, survey, domainForm, userResult.user)
                     }
-
-                    override fun onError(e: Throwable) {
-                        view?.showFormNotFound()
-                    }
-                }, params)
+                }
             } else {
                 view?.showMissingUserError()
             }
         }
     }
 
-    private fun getSavedFormInstance(
+    private suspend fun getSavedFormInstance(
         formId: String,
         datapointId: String,
         survey: SurveyGroup,
         domainForm: DomainForm,
-        user: User
+        user: User,
     ) {
         val params: MutableMap<String, Any> = HashMap(4)
         params[GetSavedFormInstance.PARAM_FORM_ID] = formId
         params[GetSavedFormInstance.PARAM_DATAPOINT_ID] = datapointId
-        getSavedFormInstanceUseCase.execute(object :
-            DisposableSingleObserver<Long>() {
-            override fun onSuccess(formInstanceId: Long) {
-                if (formInstanceId != -1L) {
-                    view?.navigateToForm(formId, formInstanceId)
-                } else {
-                    if (formId != survey.registerSurveyId) {
-                        verifyLatestSubmittedForm(
-                            domainForm,
-                            formId,
-                            datapointId,
-                            user
-                        )
-                    } else {
-                        view?.navigateToForm(formId, user)
-                    }
-                }
+        val formInstanceId: Long = getSavedFormInstanceUseCase.execute(params)
+        if (formInstanceId != -1L) {
+            //there is a saved form, just open it
+            view?.navigateToForm(formId, formInstanceId)
+        } else {
+            if (formId != survey.registerSurveyId) {
+                verifyLatestSubmittedForm(
+                    domainForm,
+                    formId,
+                    datapointId,
+                    user
+                )
+            } else {
+                view?.navigateToForm(formId, user)
             }
-
-            override fun onError(e: Throwable) {
-                if (formId != survey.registerSurveyId) {
-                    verifyLatestSubmittedForm(
-                        domainForm,
-                        formId,
-                        datapointId,
-                        user
-                    )
-                } else {
-                    view?.navigateToForm(formId, user)
-
-                }
-            }
-        }, params)
+        }
     }
 
-    private fun verifyLatestSubmittedForm(
+    /**
+     * In order to prevent duplicated submissions we check if there is a recent submission for that
+     * form and in that case we ask user confirmation before submitting another one
+     */
+    private suspend fun verifyLatestSubmittedForm(
         form: DomainForm,
         formId: String,
         datapointId: String,
@@ -140,21 +122,12 @@ class RecordPresenter @Inject constructor(
         val params: MutableMap<String, Any> = HashMap(4)
         params[GetRecentSubmittedFormInstance.PARAM_FORM_ID] = formId
         params[GetRecentSubmittedFormInstance.PARAM_DATAPOINT_ID] = datapointId
-        getRecentSubmittedFormInstanceUseCase.execute(object :
-            DisposableSingleObserver<Long>() {
-            override fun onSuccess(formInstanceId: Long) {
-                if (formInstanceId != -1L) {
-                    view?.displayWarningDialog(form.name, formId, user)
-                } else {
-                    view?.navigateToForm(formId, user)
-                }
-            }
-
-            override fun onError(e: Throwable) {
-                Timber.e(e)
-                view?.navigateToForm(formId, user)
-            }
-        }, params)
+        val formInstanceId: Long = getRecentSubmittedFormInstanceUseCase.execute(params)
+        if (formInstanceId != -1L) {
+            view?.displayWarningDialog(form.name, formId, user)
+        } else {
+            view?.navigateToForm(formId, user)
+        }
     }
 
     fun loadDataPoint(dataPointId: String) {

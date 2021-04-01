@@ -61,46 +61,37 @@ class FormMapper @Inject constructor() {
     }
 
 
-    fun mapForm(cursor: Cursor?): DataForm {
-        var resourcesDownloaded = false
-        var formVersion = ""
-        var id = -1 //invalid form
-        var formId = ""
-        var surveyId = 0
-        var name = ""
-        var type = ""
-        var location = ""
-        var filename = ""
-        var language = ""
-        var deleted = false
+    fun mapForm(cursor: Cursor?): DataForm? {
         if (cursor != null && cursor.moveToFirst()) {
-            id = getIntColumnValue(cursor, SurveyColumns._ID)
-            formId = getStringColumnValue(cursor, SurveyColumns.SURVEY_ID)
-            surveyId = getIntColumnValue(cursor, SurveyColumns.SURVEY_GROUP_ID)
-            formVersion = getDoubleColumnValue(cursor, SurveyColumns.VERSION).toString()
-            name = getStringColumnValue(cursor, SurveyColumns.NAME)
-            type = getStringColumnValue(cursor, SurveyColumns.TYPE)
-            location = getStringColumnValue(cursor, SurveyColumns.LOCATION)
-            filename = getStringColumnValue(cursor, SurveyColumns.FILENAME)
-            language = getStringColumnValue(cursor, SurveyColumns.LANGUAGE)
-            resourcesDownloaded = getIntColumnValue(cursor, SurveyColumns.HELP_DOWNLOADED) == 1
-            deleted = getIntColumnValue(cursor, SurveyColumns.DELETED) == 1
+            val id = getIntColumnValue(cursor, SurveyColumns._ID)
+            val formId = getStringColumnValue(cursor, SurveyColumns.SURVEY_ID)
+            val surveyId = getIntColumnValue(cursor, SurveyColumns.SURVEY_GROUP_ID)
+            val formVersion = getDoubleColumnValue(cursor, SurveyColumns.VERSION).toString()
+            val name = getStringColumnValue(cursor, SurveyColumns.NAME)
+            val type = getStringColumnValue(cursor, SurveyColumns.TYPE)
+            val location = getStringColumnValue(cursor, SurveyColumns.LOCATION)
+            val filename = getStringColumnValue(cursor, SurveyColumns.FILENAME)
+            val language = getStringColumnValue(cursor, SurveyColumns.LANGUAGE)
+            val resourcesDownloaded = getIntColumnValue(cursor, SurveyColumns.HELP_DOWNLOADED) == 1
+            val deleted = getIntColumnValue(cursor, SurveyColumns.DELETED) == 1
+            cursor.close()
+            return DataForm(
+                id,
+                formId,
+                surveyId,
+                name,
+                formVersion,
+                type,
+                location,
+                filename,
+                language,
+                resourcesDownloaded,
+                deleted
+            )
+        } else {
+            cursor?.close()
+            return null
         }
-        val dataForm = DataForm(
-            id,
-            formId,
-            surveyId,
-            name,
-            formVersion,
-            type,
-            location,
-            filename,
-            language,
-            resourcesDownloaded,
-            deleted
-        )
-        cursor?.close()
-        return dataForm
     }
 
     private fun getDoubleColumnValue(cursor: Cursor, columnName: String) =

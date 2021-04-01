@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2020-2021 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -19,47 +19,30 @@
 
 package org.akvo.flow.domain.interactor.forms
 
-import io.reactivex.Single
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.disposables.Disposable
-import io.reactivex.observers.DisposableSingleObserver
-import org.akvo.flow.domain.executor.PostExecutionThread
-import org.akvo.flow.domain.executor.SchedulerCreator
+import kotlinx.coroutines.withContext
+import org.akvo.flow.domain.executor.CoroutineDispatcher
 import org.akvo.flow.domain.repository.FormInstanceRepository
 import javax.inject.Inject
 
 class GetRecentSubmittedFormInstance @Inject constructor(
     private val formInstanceRepository: FormInstanceRepository,
-    private val postExecutionThread: PostExecutionThread,
-    private val schedulerCreator: SchedulerCreator
+    private val coroutineDispatcher: CoroutineDispatcher,
 ) {
 
-    private val disposables = CompositeDisposable()
-
-    fun execute(observer: DisposableSingleObserver<Long>, parameters: Map<String, Any>) {
-        val observable: Single<Long> = buildUseCaseObservable(parameters)
-            .subscribeOn(schedulerCreator.obtainScheduler())
-            .observeOn(postExecutionThread.scheduler)
-        addDisposable(observable.subscribeWith(observer))
-    }
-
-    fun dispose() {
-        if (!disposables.isDisposed) {
-            disposables.clear()
-        }
-    }
-
-    private fun <T> buildUseCaseObservable(parameters: Map<String, T>): Single<Long> {
+    suspend fun execute(parameters: Map<String, Any>): Long {
         if (!parameters.containsKey(PARAM_FORM_ID) || !parameters.containsKey(PARAM_DATAPOINT_ID)) {
-            return Single.error(IllegalArgumentException("Missing form id"))
+            throw IllegalArgumentException("Missing form id")
         }
-        val formId = parameters[PARAM_FORM_ID] as String
-        val datapointId = parameters[PARAM_DATAPOINT_ID] as String
-        return formInstanceRepository.getLatestSubmittedFormInstance(formId, datapointId)
-    }
+        return withContext(coroutineDispatcher.getDispatcher()) {
+            try {
+                val formId = parameters[PARAM_FORM_ID] as String
+                val datapointId = parameters[PARAM_DATAPOINT_ID] as String
+                formInstanceRepository.getLatestSubmittedFormInstance(formId, datapointId)
+            } catch (e: Exception) {
+                -1L
+            }
+        }
 
-    private fun addDisposable(disposable: Disposable) {
-        disposables.add(disposable)
     }
 
     companion object {

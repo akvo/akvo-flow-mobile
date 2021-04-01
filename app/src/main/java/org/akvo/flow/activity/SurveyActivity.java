@@ -578,12 +578,14 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
 
     @Override
     public void showMissingFormError() {
-        Toast.makeText(this, R.string.error_missing_form, Toast.LENGTH_LONG).show();
+        Toast.makeText(this, R.string.error_missing_registration_form, Toast.LENGTH_LONG).show();
+        addDataPointFab.setEnabled(true);
     }
 
     @Override
     public void showMissingCascadeError() {
         Toast.makeText(this, R.string.error_missing_cascade, Toast.LENGTH_LONG).show();
+        addDataPointFab.setEnabled(true);
     }
 
     private void displayRecord(String datapointId) {

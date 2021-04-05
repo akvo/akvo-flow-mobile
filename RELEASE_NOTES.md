@@ -1,5 +1,11 @@
 Akvo FLOW app release notes
 ===========================
+# ver 2.9.9.1
+Date: 05 April 2021
+
+* **Fix crash when adding datapoint** - [#1799](https://github.com/akvo/akvo-flow-mobile/issues/1799)
+
+---------------
 # ver 2.9.9
 Date: 01 April 2021
 

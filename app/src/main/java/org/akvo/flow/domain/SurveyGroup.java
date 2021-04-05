@@ -19,6 +19,8 @@
 
 package org.akvo.flow.domain;
 
+import org.jetbrains.annotations.Nullable;
+
 import java.io.Serializable;
 
 public class SurveyGroup implements Serializable {
@@ -45,6 +47,7 @@ public class SurveyGroup implements Serializable {
         mRegisterSurveyId = surveyId;
     }
 
+    @Nullable
     public String getRegisterSurveyId() {
         return mRegisterSurveyId;
     }

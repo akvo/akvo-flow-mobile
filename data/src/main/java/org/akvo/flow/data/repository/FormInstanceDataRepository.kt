@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2020-2021 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -28,15 +28,15 @@ import javax.inject.Inject
 class FormInstanceDataRepository @Inject constructor(private val dataSourceFactory: DataSourceFactory) :
     FormInstanceRepository {
 
-    override fun getSavedFormInstance(formId: String, datapointId: String): Single<Long> {
-        return dataSourceFactory.dataBaseDataSource.getSavedFormInstance(formId, datapointId)
+    override fun getSavedFormInstanceId(formId: String, datapointId: String): Long {
+        return dataSourceFactory.dataBaseDataSource.getSavedFormInstanceId(formId, datapointId)
     }
 
     override fun getLatestSubmittedFormInstance(
         formId: String,
         datapointId: String,
         maxDate: Long
-    ): Single<Long> {
+    ): Long {
         return dataSourceFactory.dataBaseDataSource.getRecentSubmittedFormInstance(
             formId,
             datapointId,

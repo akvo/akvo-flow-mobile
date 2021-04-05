@@ -140,6 +140,16 @@ public class Navigator {
         activity.startActivityForResult(i, ConstantUtil.FORM_FILLING_REQUEST);
     }
 
+    public void navigateToFormActivity(Activity activity, SurveyGroup mSurveyGroup, String formId, User user, String dataPointId) {
+        Intent i = new Intent(activity, FormActivity.class);
+        i.putExtra(ConstantUtil.FORM_ID_EXTRA, formId);
+        i.putExtra(ConstantUtil.SURVEY_EXTRA, mSurveyGroup);
+        i.putExtra(ConstantUtil.READ_ONLY_EXTRA, false);
+        i.putExtra(ConstantUtil.VIEW_USER_EXTRA, user);
+        i.putExtra(ConstantUtil.DATA_POINT_ID_EXTRA, dataPointId);
+        activity.startActivityForResult(i, ConstantUtil.FORM_FILLING_REQUEST);
+    }
+
     public void navigateToTakePhoto(@NonNull Activity activity, Uri uri) {
         Intent intent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
         PackageManager packageManager = activity.getPackageManager();

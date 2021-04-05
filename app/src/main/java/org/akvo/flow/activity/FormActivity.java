@@ -846,7 +846,8 @@ public class FormActivity extends BackActivity implements SurveyListener,
             //create datapoint if doesn't exist yet
             dataPointId = mDatabase.createSurveyedLocale(survey.getId());
             surveyInstanceId = mDatabase.createSurveyRespondent(form.getId(), form.getVersion(), user, dataPointId);
-
+        } else if (surveyInstanceId == INVALID_INSTANCE_ID) {
+            surveyInstanceId = mDatabase.createSurveyRespondent(form.getId(), form.getVersion(), user, dataPointId);
         }
         String questionIdKey = event.getSource().getQuestion().getId();
         QuestionResponse eventResponse = event.getSource().getResponse();

@@ -131,6 +131,7 @@
     <string name="last_response">Last Response:</string>
     <string name="error_missing_cascade">Cascade files are not downloaded</string>
     <string name="error_missing_form">Form not found. Please re-download all the forms</string>
+    <string name="error_missing_registration_form">Registration form not found. Make sure it was assigned.</string>
     <string name="tab_forms">FORMS</string>
     <string name="tab_history">HISTORY</string>
     <!--Form & transmission status-->

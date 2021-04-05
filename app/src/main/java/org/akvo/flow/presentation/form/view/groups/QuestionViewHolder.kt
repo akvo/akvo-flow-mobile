@@ -249,11 +249,11 @@ sealed class QuestionViewHolder<T : ViewQuestionAnswer>(val view: View) :
                 view.findViewById<TextInputEditText>(R.id.height_et)
                     .setText(questionAnswer.viewLocation.altitude)
                 val accuracy = questionAnswer.viewLocation.accuracy
+                val accuracyTv = view.findViewById<TextView>(R.id.acc_tv)
                 if (accuracy.isNotEmpty()) {
-                    view.findViewById<TextInputEditText>(R.id.height_et).setText(accuracy)
+                    accuracyTv.text = accuracy
                 } else {
-                    view.findViewById<TextInputEditText>(R.id.height_et)
-                        .setText(R.string.geo_location_accuracy_default)
+                    accuracyTv.setText(R.string.geo_location_accuracy_default)
                 }
             }
         }

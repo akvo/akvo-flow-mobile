@@ -116,13 +116,15 @@ class ViewQuestionGroupMapper @Inject constructor() {
         val title = """${question.order}. ${question.text}"""
         return when (question.type) {
             OPTION_QUESTION_TYPE -> {
+                Timber.d("question: "+question)
                 ViewQuestionAnswer.OptionViewQuestionAnswer(
                     question.questionId ?: "",
                     title,
                     question.isMandatory,
                     mapToBundle(question.languageTranslationMap),
                     mapToViewOption(question.options, answer),
-                    question.isDoubleEntry
+                    question.isAllowMultiple,
+                    question.isAllowOther
                 )
             }
 
@@ -314,7 +316,7 @@ class ViewQuestionGroupMapper @Inject constructor() {
         val latitude = getLatitudeFromResponseToken(tokens)
         val longitude = getLongitudeFromToken(tokens)
         val altitude = getAltitudeFromToken(tokens)
-        return ViewLocation(latitude, longitude, altitude)
+        return ViewLocation(latitude = latitude, longitude = longitude, altitude = altitude)
     }
 
     private fun getLatitudeFromResponseToken(token: Array<String>?): String {
@@ -340,7 +342,7 @@ class ViewQuestionGroupMapper @Inject constructor() {
         response: String
     ): MutableList<ViewOption> {
         val viewOptions = mutableListOf<ViewOption>()
-        val selectedOptions = deserializeToOptions(response)
+        val selectedOptions: MutableList<String> = deserializeToOptions(response)
         if (options != null) {
             for (option in options) {
                 viewOptions.add(

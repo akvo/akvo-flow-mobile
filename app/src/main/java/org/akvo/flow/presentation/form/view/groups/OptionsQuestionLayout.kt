@@ -42,7 +42,6 @@ class OptionsQuestionLayout @JvmOverloads constructor(
                 view.isEnabled = false
                 view.id = i // View ID will match option position within the array
                 view.isChecked = option.selected
-
             }
         } else {
             //radio button

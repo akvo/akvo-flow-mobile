@@ -32,7 +32,6 @@ import org.akvo.flow.domain.interactor.apk.GetApkDataPreferences
 import org.akvo.flow.domain.interactor.apk.SaveApkUpdateNotified
 import org.akvo.flow.domain.interactor.datapoints.MarkDatapointViewed
 import org.akvo.flow.domain.interactor.forms.GetRegistrationForm
-import org.akvo.flow.domain.interactor.forms.RegistrationFormResult
 import org.akvo.flow.domain.interactor.users.GetSelectedUser
 import org.akvo.flow.domain.interactor.users.ResultCode
 import org.akvo.flow.domain.util.VersionHelper
@@ -121,9 +120,8 @@ class SurveyPresenter @Inject constructor(
                 val params: MutableMap<String, Any> = HashMap(2)
                 params[GetRegistrationForm.PARAM_SURVEY_ID] = surveyGroup.id
                 params[GetRegistrationForm.PARAM_REGISTRATION_FORM_ID] =
-                    surveyGroup.registerSurveyId
-                val result: RegistrationFormResult = getRegistrationForm.execute(params)
-                val domainForm = result.form
+                    surveyGroup.registerSurveyId ?: ""
+                val domainForm = getRegistrationForm.execute(params).form
                 if (domainForm != null) {
                     if (domainForm.cascadeDownloaded) {
                         view?.openEmptyForm(userResult.user, domainForm.formId)

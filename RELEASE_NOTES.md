@@ -1,5 +1,18 @@
 Akvo FLOW app release notes
 ===========================
+# ver 2.9.9.1
+Date: 05 April 2021
+
+* **Fix crash when adding datapoint** - [#1799](https://github.com/akvo/akvo-flow-mobile/issues/1799)
+
+---------------
+# ver 2.9.9
+Date: 01 April 2021
+
+* **New datapoint FAB should take user to Registration form** - [#1790](https://github.com/akvo/akvo-flow-mobile/issues/1790)
+* **Answers not being saved and thus not being able to submit** - [#1787](https://github.com/akvo/akvo-flow-mobile/issues/1787)
+
+---------------
 # ver 2.9.8
 Date: 11 March 2021
 

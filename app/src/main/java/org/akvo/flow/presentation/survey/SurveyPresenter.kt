@@ -120,7 +120,7 @@ class SurveyPresenter @Inject constructor(
                 val params: MutableMap<String, Any> = HashMap(2)
                 params[GetRegistrationForm.PARAM_SURVEY_ID] = surveyGroup.id
                 params[GetRegistrationForm.PARAM_REGISTRATION_FORM_ID] =
-                    surveyGroup.registerSurveyId
+                    surveyGroup.registerSurveyId ?: ""
                 val domainForm = getRegistrationForm.execute(params).form
                 if (domainForm != null) {
                     if (domainForm.cascadeDownloaded) {

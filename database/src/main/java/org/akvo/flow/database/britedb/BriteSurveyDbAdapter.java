@@ -822,4 +822,11 @@ public class BriteSurveyDbAdapter {
                         + " FROM " + Tables.SURVEY_INSTANCE + ")";
         briteDatabase.delete(Tables.RECORD, where, surveyGroupId + "", "0");
     }
+
+    public long updateFormVersion(long formInstanceId, double formVersion) {
+        ContentValues contentValues = new ContentValues(1);
+        contentValues.put(SurveyInstanceColumns.VERSION, formVersion);
+        String where = SurveyInstanceColumns._ID + " = ? AND "+ SurveyInstanceColumns.VERSION + " != ?";
+        return briteDatabase.update(Tables.SURVEY_INSTANCE, contentValues, where, String.valueOf(formInstanceId), String.valueOf(formVersion));
+    }
 }

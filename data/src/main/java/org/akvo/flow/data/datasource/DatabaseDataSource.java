@@ -486,4 +486,8 @@ public class DatabaseDataSource {
     public void cleanDataPoints(Long surveyGroupId) {
         briteSurveyDbAdapter.cleanDataPoints(surveyGroupId);
     }
+
+    public long updateFormVersion(long formInstanceId, double formVersion) {
+        return briteSurveyDbAdapter.updateFormVersion(formInstanceId, formVersion);
+    }
 }

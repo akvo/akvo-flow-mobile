@@ -34,4 +34,6 @@ interface FormInstanceRepository {
     ): Long
 
     fun createFormInstance(domainFormInstance: DomainFormInstance): Single<Long>
+
+    fun updateFormVersion(formInstanceId: Long, formVersion: Double): Long
 }

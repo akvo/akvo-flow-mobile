@@ -365,6 +365,7 @@
     <string name="time_check_notification_message">Flow app may not work correctly</string>
     <string name="time_check_action_fix">Fix it</string>
     <string name="time_check_action_dismiss">Dismiss</string>
+    <string name="form_updated">The form version has been updated</string>
 
     <plurals name="download_forms_error">
         <item quantity="one">Error downloading form</item>

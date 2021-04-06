@@ -210,7 +210,8 @@ public class FormActivity extends BackActivity implements SurveyListener,
         ActionBar supportActionBar = getSupportActionBar();
         if (supportActionBar != null) {
             supportActionBar.setTitle(form.getName());
-            supportActionBar.setSubtitle("v " + getVersion());
+            String subtitle = "v " + getVersion();
+            supportActionBar.setSubtitle(subtitle);
         }
     }
 
@@ -317,18 +318,22 @@ public class FormActivity extends BackActivity implements SurveyListener,
     }
 
     private double getVersion() {
-        double version = 0.0;
-        Cursor c = mDatabase.getFormInstance(surveyInstanceId);
-        if (c.moveToFirst()) {
-            version = c.getDouble(SurveyDbAdapter.FormInstanceQuery.VERSION);
-        }
-        c.close();
+        if (readOnly) {
+            double version = 0.0;
+            Cursor c = mDatabase.getFormInstance(surveyInstanceId);
+            if (c.moveToFirst()) {
+                version = c.getDouble(SurveyDbAdapter.FormInstanceQuery.VERSION);
+            }
+            c.close();
 
-        if (version == 0.0) {
-            version = form.getVersion();// Default to current value
-        }
+            if (version == 0.0) {
+                version = form.getVersion();// Default to current value
+            }
 
-        return version;
+            return version;
+        } else {
+            return form.getVersion();
+        }
     }
 
     /**

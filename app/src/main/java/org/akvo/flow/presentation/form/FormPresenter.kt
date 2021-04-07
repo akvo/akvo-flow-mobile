@@ -129,8 +129,8 @@ class FormPresenter @Inject constructor(
         }
     }
 
-    fun updateInstanceVersion(readOnly: Boolean, form: @NotNull Survey, formInstanceId: Long?) {
-        if (readOnly || formInstanceId == null) {
+    fun updateInstanceVersion(readOnly: Boolean, form: @NotNull Survey, formInstanceId: Long) {
+        if (readOnly || formInstanceId == -1L) {
             return
         }
         //update submission form version

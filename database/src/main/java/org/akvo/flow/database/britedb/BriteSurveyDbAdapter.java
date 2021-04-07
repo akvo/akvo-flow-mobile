@@ -831,7 +831,7 @@ public class BriteSurveyDbAdapter {
         return briteDatabase.update(Tables.SURVEY_INSTANCE, contentValues, where, String.valueOf(formInstanceId), String.valueOf(formVersion));
     }
 
-    public int formVersionUpdateNotified(long formId, double formVersion) {
+    public int formVersionUpdateNotified(String formId, double formVersion) {
         Cursor cursor = briteDatabase.query("SELECT " + FormUpdateNotifiedTable.COLUMN_NEW_FORM_VERSION
                 + " FROM " + FormUpdateNotifiedTable.TABLE_NAME
                 + " WHERE " + FormUpdateNotifiedTable.COLUMN_FORM_ID + " = ? AND " + FormUpdateNotifiedTable.COLUMN_NEW_FORM_VERSION + " = ? ", formId + "", formVersion + "");
@@ -843,7 +843,7 @@ public class BriteSurveyDbAdapter {
         return count;
     }
 
-    public void saveFormVersionNotified(long formId, double formVersion) {
+    public void saveFormVersionNotified(String formId, double formVersion) {
         ContentValues contentValues = new ContentValues(2);
         contentValues.put(FormUpdateNotifiedTable.COLUMN_FORM_ID, formId);
         contentValues.put(FormUpdateNotifiedTable.COLUMN_NEW_FORM_VERSION, formVersion);

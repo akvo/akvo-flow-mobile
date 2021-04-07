@@ -36,7 +36,7 @@ class SetFormVersionUpdateNotified @Inject constructor(
         }
         return withContext(coroutineDispatcher.getDispatcher()) {
             try {
-                val formId = parameters[PARAM_FORM_ID] as Long
+                val formId = parameters[PARAM_FORM_ID] as String
                 val formVersion = parameters[PARAM_FORM_VERSION] as Double
                 userRepository.saveFormVersionNotified(formId, formVersion)
             } catch (e: Exception) {

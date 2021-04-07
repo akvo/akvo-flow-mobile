@@ -36,7 +36,7 @@ open class FormUpdateNotifiedTable {
         private const val CREATE_TABLE =
             ("CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " ("
                     + _ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
-                    + COLUMN_FORM_ID + " INTEGER NOT NULL,"
+                    + COLUMN_FORM_ID + " TEXT NOT NULL,"
                     + COLUMN_NEW_FORM_VERSION + " REAL NOT NULL, "
                     + "UNIQUE(" + COLUMN_FORM_ID + ") ON CONFLICT REPLACE)")
     }

@@ -147,12 +147,12 @@ public class UserDataRepository implements UserRepository {
     }
 
     @Override
-    public int formVersionUpdateNotified(long formId, double formVersion) {
+    public int formVersionUpdateNotified(String formId, double formVersion) {
         return dataSourceFactory.getDataBaseDataSource().formVersionUpdateNotified(formId, formVersion);
     }
 
     @Override
-    public void saveFormVersionNotified(long formId, double formVersion) {
+    public void saveFormVersionNotified(String formId, double formVersion) {
         dataSourceFactory.getDataBaseDataSource().saveFormVersionNotified(formId, formVersion);
     }
 }

@@ -32,6 +32,8 @@ import org.akvo.flow.domain.interactor.ExportSurveyInstance
 import org.akvo.flow.domain.interactor.UseCase
 import org.akvo.flow.domain.interactor.forms.GetSurveyForms
 import org.akvo.flow.domain.interactor.forms.UpdateFormInstance
+import org.akvo.flow.domain.interactor.settings.FormVersionUpdateNotified
+import org.akvo.flow.domain.interactor.settings.SetFormVersionUpdateNotified
 import org.akvo.flow.presentation.Presenter
 import org.jetbrains.annotations.NotNull
 import timber.log.Timber
@@ -44,7 +46,9 @@ class FormPresenter @Inject constructor(
     @param:Named("mobileUploadSet") private val mobileUploadSet: UseCase,
     @param:Named("mobileUploadAllowed") private val mobileUploadAllowed: UseCase,
     private val getSurveyForms: GetSurveyForms,
-    private val updateFormInstance: UpdateFormInstance
+    private val updateFormInstance: UpdateFormInstance,
+    private val formVersionUpdateNotified: FormVersionUpdateNotified,
+    private val setFormVersionUpdateNotified: SetFormVersionUpdateNotified
 ) : Presenter {
 
     private var view: FormView? = null
@@ -138,10 +142,15 @@ class FormPresenter @Inject constructor(
             val params: MutableMap<String, Any> = HashMap(4)
             params[UpdateFormInstance.PARAM_FORM_INSTANCE_ID] = formInstanceId
             params[UpdateFormInstance.PARAM_FORM_VERSION] = form.version
+            params[SetFormVersionUpdateNotified.PARAM_FORM_ID] = form.id
             val result: UpdateFormInstance.FormVersionUpdateResult = updateFormInstance.execute(params)
             if (result == UpdateFormInstance.FormVersionUpdateResult.FormVersionUpdated) {
-                view?.showFormUpdated()
+                if (formVersionUpdateNotified.execute(params) == FormVersionUpdateNotified.FormVersionNotifiedResult.FormVersionNotNotified) {
+                    view?.showFormUpdated()
+                    setFormVersionUpdateNotified.execute(params)
+                }
             }
         }
     }
 }
+

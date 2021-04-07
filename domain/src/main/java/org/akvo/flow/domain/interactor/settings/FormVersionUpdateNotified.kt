@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2021 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -17,47 +17,47 @@
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.akvo.flow.domain.interactor.forms
+package org.akvo.flow.domain.interactor.settings
 
 import kotlinx.coroutines.withContext
 import org.akvo.flow.domain.executor.CoroutineDispatcher
-import org.akvo.flow.domain.repository.FormInstanceRepository
+import org.akvo.flow.domain.repository.UserRepository
 import timber.log.Timber
 import javax.inject.Inject
 
-class UpdateFormInstance @Inject constructor(
-    private val formInstanceRepository: FormInstanceRepository,
-    private val coroutineDispatcher: CoroutineDispatcher
+class FormVersionUpdateNotified @Inject constructor(
+    private val userRepository: UserRepository,
+    private val coroutineDispatcher: CoroutineDispatcher,
 ) {
 
-    suspend fun execute(parameters: Map<String, Any>): FormVersionUpdateResult {
-        if (parameters[PARAM_FORM_INSTANCE_ID] == null|| parameters[PARAM_FORM_VERSION] == null) {
-            throw IllegalArgumentException("Missing form instance id or form version")
+    suspend fun execute(parameters: Map<String, Any>): FormVersionNotifiedResult {
+        if (parameters[PARAM_FORM_ID] == null || parameters[PARAM_FORM_VERSION] == null) {
+            throw IllegalArgumentException("Missing form id or form version")
         }
         return withContext(coroutineDispatcher.getDispatcher()) {
             try {
-                val formInstanceId = parameters[PARAM_FORM_INSTANCE_ID] as Long
+                val formId = parameters[PARAM_FORM_ID] as Long
                 val formVersion = parameters[PARAM_FORM_VERSION] as Double
-                val updated: Long = formInstanceRepository.updateFormVersion(formInstanceId, formVersion)
-                if (updated > 0) {
-                    FormVersionUpdateResult.FormVersionUpdated
+                val notified: Int = userRepository.formVersionUpdateNotified(formId, formVersion)
+                if (notified > 0) {
+                    FormVersionNotifiedResult.FormVersionNotified
                 } else {
-                    FormVersionUpdateResult.FormVersionNotUpdated
+                    FormVersionNotifiedResult.FormVersionNotNotified
                 }
             } catch (e: Exception) {
                 Timber.e(e)
-                FormVersionUpdateResult.FormVersionNotUpdated
+                FormVersionNotifiedResult.FormVersionNotNotified
             }
         }
     }
 
     companion object {
-        const val PARAM_FORM_INSTANCE_ID = "form_instance_id"
+        const val PARAM_FORM_ID = "form_id"
         const val PARAM_FORM_VERSION = "form_version"
     }
 
-    sealed class FormVersionUpdateResult {
-        object FormVersionUpdated: FormVersionUpdateResult()
-        object FormVersionNotUpdated: FormVersionUpdateResult()
+    sealed class FormVersionNotifiedResult {
+        object FormVersionNotified: FormVersionNotifiedResult()
+        object FormVersionNotNotified: FormVersionNotifiedResult()
     }
 }

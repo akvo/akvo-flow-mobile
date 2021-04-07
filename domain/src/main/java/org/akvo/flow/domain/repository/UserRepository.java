@@ -67,4 +67,8 @@ public interface UserRepository {
     Long getLastNotificationTime();
 
     void saveLastNotificationTime();
+
+    int formVersionUpdateNotified(long formId, double formVersion);
+
+    void saveFormVersionNotified(long formId, double formVersion);
 }

@@ -490,4 +490,12 @@ public class DatabaseDataSource {
     public long updateFormVersion(long formInstanceId, double formVersion) {
         return briteSurveyDbAdapter.updateFormVersion(formInstanceId, formVersion);
     }
+
+    public int formVersionUpdateNotified(long formId, double formVersion) {
+        return briteSurveyDbAdapter.formVersionUpdateNotified(formId, formVersion);
+    }
+
+    public void saveFormVersionNotified(long formId, double formVersion) {
+        briteSurveyDbAdapter.saveFormVersionNotified(formId, formVersion);
+    }
 }

@@ -42,6 +42,7 @@ import androidx.viewpager.widget.ViewPager;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
+import com.google.firebase.perf.metrics.AddTrace;
 
 import org.akvo.flow.R;
 import org.akvo.flow.app.FlowApp;
@@ -562,6 +563,7 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
         Toast.makeText(this, R.string.mustselectuser, Toast.LENGTH_LONG).show();
     }
 
+    @AddTrace(name = "openDataPoint")
     @Override
     public void openDataPoint(String datapointId, User user) {
         if (mSurveyGroup != null && mSurveyGroup.isMonitored()) {
@@ -592,6 +594,7 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
         navigator.navigateToRecordActivity(this, datapointId, mSurveyGroup);
     }
 
+    @AddTrace(name = "displayForm")
     private void displayForm(String datapointId, User user) {
         Survey registrationForm =
                 mDatabase != null ? mDatabase.getRegistrationForm(mSurveyGroup) : null;
@@ -664,6 +667,7 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
         mDrawerLayout.postDelayed(runnable, NAVIGATION_DRAWER_DELAY_MILLIS);
     }
 
+    @AddTrace(name = "onAddDataPointTap")
     @OnClick(R.id.add_data_point_fab)
     void onAddDataPointTap() {
         if (mDatabase != null) {

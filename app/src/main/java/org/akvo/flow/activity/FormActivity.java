@@ -43,6 +43,7 @@ import androidx.fragment.app.DialogFragment;
 import androidx.viewpager.widget.ViewPager;
 
 import com.google.android.material.tabs.TabLayout;
+import com.google.firebase.perf.metrics.AddTrace;
 
 import org.akvo.flow.R;
 import org.akvo.flow.app.FlowApp;
@@ -166,6 +167,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
     private Uri imagePath;
     private User user;
 
+    @AddTrace(name = "onCreateTrace")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

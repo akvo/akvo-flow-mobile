@@ -83,7 +83,7 @@ public class SurveyInstaller {
         DatabaseHelper databaseHelper = new DatabaseHelper(context, new LanguageTable(), new DataPointDownloadTable());
         BriteDatabase db = sqlBrite
                 .wrapDatabaseHelper(databaseHelper, AndroidSchedulers.mainThread());
-        this.adapter = new SurveyDbDataSource(context, db);
+        this.adapter = new SurveyDbDataSource(db, databaseHelper);
     }
 
     public Survey installSurvey(int resId, Context context) {

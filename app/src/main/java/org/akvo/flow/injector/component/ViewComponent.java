@@ -45,7 +45,9 @@ import org.akvo.flow.presentation.record.RecordActivity;
 import org.akvo.flow.presentation.settings.PreferenceActivity;
 import org.akvo.flow.presentation.settings.publish.PublishFilesPreferenceView;
 import org.akvo.flow.presentation.signature.SignatureActivity;
+import org.akvo.flow.ui.fragment.FormListFragment;
 import org.akvo.flow.ui.fragment.ResponseListFragment;
+import org.akvo.flow.ui.fragment.StatsDialogFragment;
 import org.akvo.flow.ui.view.CaddisflyQuestionView;
 import org.akvo.flow.ui.view.CascadeQuestionView;
 import org.akvo.flow.ui.view.GeoshapeQuestionView;
@@ -53,6 +55,7 @@ import org.akvo.flow.ui.view.geolocation.GeoQuestionView;
 import org.akvo.flow.ui.view.media.photo.PhotoQuestionView;
 import org.akvo.flow.ui.view.media.video.VideoQuestionView;
 import org.akvo.flow.ui.view.signature.SignatureQuestionView;
+import org.jetbrains.annotations.NotNull;
 
 import dagger.Component;
 
@@ -77,6 +80,8 @@ public interface ViewComponent {
     void inject(AboutActivity aboutActivity);
 
     void inject(ResponseListFragment responseListFragment);
+
+    void inject(@NotNull FormListFragment formListFragment);
 
     void inject(HelpActivity activity);
 
@@ -121,4 +126,6 @@ public interface ViewComponent {
     void inject(ViewGeoShapeActivity viewGeoShapeActivity);
 
     void inject(PropertiesDialog propertiesDialog);
+
+    void inject(@NotNull StatsDialogFragment statsDialogFragment);
 }

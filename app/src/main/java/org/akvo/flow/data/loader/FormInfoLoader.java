@@ -22,6 +22,8 @@ package org.akvo.flow.data.loader;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteOpenHelper;
+
 import androidx.annotation.NonNull;
 
 import org.akvo.flow.data.loader.base.AsyncLoader;
@@ -43,18 +45,19 @@ public class FormInfoLoader extends AsyncLoader<List<FormInfo>> {
     private final long surveyGroupId;
     private final String recordId;
     private final SurveyGroup surveyGroup;
+    private final SQLiteOpenHelper databaseHelper;
 
-    public FormInfoLoader(Context context, String recordId, SurveyGroup surveyGroup) {
+    public FormInfoLoader(Context context, String recordId, SurveyGroup surveyGroup, SQLiteOpenHelper databaseHelper) {
         super(context);
         this.surveyGroup = surveyGroup;
         this.surveyGroupId = surveyGroup.getId();
         this.recordId = recordId;
+        this.databaseHelper = databaseHelper;
     }
 
     @Override
     public List<FormInfo> loadInBackground() {
-        Context context = getContext();
-        SurveyDbAdapter database = new SurveyDbAdapter(context);
+        SurveyDbAdapter database = new SurveyDbAdapter(databaseHelper);
         database.open();
 
         boolean submittedDataPoint = isDataPointSubmitted(database);

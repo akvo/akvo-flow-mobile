@@ -21,6 +21,7 @@
 package org.akvo.flow.injector.component;
 
 import android.content.Context;
+import android.database.sqlite.SQLiteOpenHelper;
 
 import com.google.gson.Gson;
 import com.squareup.sqlbrite2.BriteDatabase;
@@ -96,6 +97,8 @@ public interface ApplicationComponent {
     MissingAndDeletedRepository missingAndDeletedRepository();
 
     TimeRepository timeRepository();
+
+    SQLiteOpenHelper openHelper();
 
     Gson gson();
 

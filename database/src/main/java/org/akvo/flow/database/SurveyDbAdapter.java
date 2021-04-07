@@ -21,10 +21,10 @@
 package org.akvo.flow.database;
 
 import android.content.ContentValues;
-import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
 
 /**
  * Database class for the survey db. It can create/upgrade the database as well
@@ -53,19 +53,16 @@ public class SurveyDbAdapter {
             ResponseColumns.INCLUDE, ResponseColumns.FILENAME, ResponseColumns.ITERATION
     };
 
-    private DatabaseHelper databaseHelper;
+    private final SQLiteOpenHelper databaseHelper;
     private SQLiteDatabase database;
-
-    private final Context context;
 
     /**
      * Constructor - takes the context to allow the database to be
      * opened/created
      *
-     * @param ctx the Context within which to work
      */
-    public SurveyDbAdapter(Context ctx) {
-        this.context = ctx;
+    public SurveyDbAdapter(SQLiteOpenHelper databaseHelper) {
+        this.databaseHelper = databaseHelper;
     }
 
     /**
@@ -74,7 +71,6 @@ public class SurveyDbAdapter {
      * @throws SQLException if the database could be neither opened or created
      */
     public SurveyDbAdapter open() throws SQLException {
-        databaseHelper = new DatabaseHelper(context, new LanguageTable(), new DataPointDownloadTable());
         database = databaseHelper.getWritableDatabase();
         return this;
     }

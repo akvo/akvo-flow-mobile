@@ -35,4 +35,6 @@ public interface FormView {
     void startSync(boolean isMobileSyncAllowed);
 
     void GoToListOfForms();
+
+    void showFormUpdated();
 }

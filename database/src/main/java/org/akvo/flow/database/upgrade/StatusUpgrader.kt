@@ -16,24 +16,17 @@
  * You should have received a copy of the GNU General Public License
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
+package org.akvo.flow.database.upgrade
 
-package org.akvo.flow.domain.repository
+import android.database.sqlite.SQLiteDatabase
+import org.akvo.flow.database.FormUpdateNotifiedTable
 
-import io.reactivex.Single
-import org.akvo.flow.domain.entity.DomainFormInstance
-import java.util.concurrent.TimeUnit
+class StatusUpgrader(
+    private val db: SQLiteDatabase,
+    private val formUpdateNotifiedTable: FormUpdateNotifiedTable
+) : DatabaseUpgrader {
 
-interface FormInstanceRepository {
-
-    fun getSavedFormInstanceId(formId: String, datapointId: String): Long
-
-    fun getLatestSubmittedFormInstance(
-        formId: String,
-        datapointId: String,
-        maxDate: Long = TimeUnit.DAYS.toMillis(1)
-    ): Long
-
-    fun createFormInstance(domainFormInstance: DomainFormInstance): Single<Long>
-
-    fun updateFormVersion(formInstanceId: Long, formVersion: Double): Long
+    override fun upgrade() {
+        formUpdateNotifiedTable.onCreate(db)
+    }
 }

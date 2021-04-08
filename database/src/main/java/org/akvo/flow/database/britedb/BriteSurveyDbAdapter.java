@@ -31,6 +31,7 @@ import com.squareup.sqlbrite2.BriteDatabase;
 import com.squareup.sqlbrite2.SqlBrite;
 
 import org.akvo.flow.database.DataPointDownloadTable;
+import org.akvo.flow.database.FormUpdateNotifiedTable;
 import org.akvo.flow.database.RecordColumns;
 import org.akvo.flow.database.ResponseColumns;
 import org.akvo.flow.database.SurveyColumns;
@@ -821,5 +822,31 @@ public class BriteSurveyDbAdapter {
                         + "(SELECT DISTINCT " + SurveyInstanceColumns.RECORD_ID
                         + " FROM " + Tables.SURVEY_INSTANCE + ")";
         briteDatabase.delete(Tables.RECORD, where, surveyGroupId + "", "0");
+    }
+
+    public long updateFormVersion(long formInstanceId, double formVersion) {
+        ContentValues contentValues = new ContentValues(1);
+        contentValues.put(SurveyInstanceColumns.VERSION, formVersion);
+        String where = SurveyInstanceColumns._ID + " = ? AND "+ SurveyInstanceColumns.VERSION + " != ?";
+        return briteDatabase.update(Tables.SURVEY_INSTANCE, contentValues, where, String.valueOf(formInstanceId), String.valueOf(formVersion));
+    }
+
+    public int formVersionUpdateNotified(String formId, double formVersion) {
+        Cursor cursor = briteDatabase.query("SELECT " + FormUpdateNotifiedTable.COLUMN_NEW_FORM_VERSION
+                + " FROM " + FormUpdateNotifiedTable.TABLE_NAME
+                + " WHERE " + FormUpdateNotifiedTable.COLUMN_FORM_ID + " = ? AND " + FormUpdateNotifiedTable.COLUMN_NEW_FORM_VERSION + " = ? ", formId + "", formVersion + "");
+        int count = 0;
+        if (cursor != null) {
+            count = cursor.getCount();
+            cursor.close();
+        }
+        return count;
+    }
+
+    public void saveFormVersionNotified(String formId, double formVersion) {
+        ContentValues contentValues = new ContentValues(2);
+        contentValues.put(FormUpdateNotifiedTable.COLUMN_FORM_ID, formId);
+        contentValues.put(FormUpdateNotifiedTable.COLUMN_NEW_FORM_VERSION, formVersion);
+        briteDatabase.insert(FormUpdateNotifiedTable.TABLE_NAME, contentValues);
     }
 }

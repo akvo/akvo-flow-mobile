@@ -19,15 +19,19 @@
  */
 package org.akvo.flow.presentation.survey
 
+import org.akvo.flow.domain.entity.DomainForm
 import org.akvo.flow.domain.entity.User
 import org.akvo.flow.presentation.entity.ViewApkData
 
 interface SurveyView {
     fun showNewVersionAvailable(apkData: ViewApkData?)
     fun showMissingUserError()
-    fun openDataPoint(datapointId: String?, user: User?)
     fun openEmptyForm(user: User, formId: String?)
     fun showMissingFormError()
     fun showMissingCascadeError()
     fun displaySelectedUser(name: String)
+    fun displayForm(datapointId: String, user: User, domainForm: DomainForm)
+    fun displayRecord(datapointId: String)
+    fun showLoading()
+    fun hideLoading()
 }

@@ -27,7 +27,7 @@ import kotlinx.coroutines.launch
 import org.akvo.flow.BuildConfig
 import org.akvo.flow.domain.SurveyGroup
 import org.akvo.flow.domain.entity.ApkData
-import org.akvo.flow.domain.entity.User
+import org.akvo.flow.domain.entity.DomainForm
 import org.akvo.flow.domain.interactor.apk.GetApkDataPreferences
 import org.akvo.flow.domain.interactor.apk.SaveApkUpdateNotified
 import org.akvo.flow.domain.interactor.datapoints.MarkDatapointViewed
@@ -38,6 +38,7 @@ import org.akvo.flow.domain.util.VersionHelper
 import org.akvo.flow.presentation.Presenter
 import org.akvo.flow.presentation.entity.ViewApkMapper
 import org.akvo.flow.util.ConstantUtil
+import timber.log.Timber
 import java.util.HashMap
 import javax.inject.Inject
 
@@ -48,9 +49,10 @@ class SurveyPresenter @Inject constructor(
     private val viewApkMapper: ViewApkMapper,
     private val getSelectedUser: GetSelectedUser,
     private val markDatapointViewed: MarkDatapointViewed,
-    private val getRegistrationForm: GetRegistrationForm
+    private val getRegistrationForm: GetRegistrationForm,
 ) : Presenter {
 
+    private var datapointProcessing: Boolean = false
     private var view: SurveyView? = null
     private var job = SupervisorJob()
     private val uiScope = CoroutineScope(Dispatchers.Main + job)
@@ -93,35 +95,57 @@ class SurveyPresenter @Inject constructor(
         }
     }
 
-    fun onDatapointSelected(datapointId: String) {
-        uiScope.launch {
-            val userResult = getSelectedUser.execute()
-            if (userResult.resultCode == ResultCode.SUCCESS) {
-                setDataPointAsViewed(datapointId, userResult.user)
-            } else {
-                view?.showMissingUserError()
+    fun onDatapointSelected(datapointId: String, survey: SurveyGroup?) {
+        if (datapointProcessing) {
+            Timber.d("datapoint processing busy, skipping")
+            return
+        } else {
+            Timber.d("datapoint will be processed")
+            uiScope.launch {
+                datapointProcessing = true
+                view?.showLoading()
+                val userResult = getSelectedUser.execute()
+                if (userResult.resultCode == ResultCode.SUCCESS) {
+                    if (survey != null && survey.isMonitored) {
+                        //show a list of forms/submissions
+                        view?.displayRecord(datapointId)
+                        markDataPointViewed(datapointId)
+                    } else {
+                        //only one form possible
+                        val domainForm = fetchRegistrationForm(survey)
+                        view?.hideLoading()
+                        if (domainForm != null) {
+                            if (domainForm.cascadeDownloaded) {
+                                view?.displayForm(datapointId, userResult.user, domainForm)
+                                markDataPointViewed(datapointId)
+                            } else {
+                                view?.showMissingCascadeError()
+                            }
+                        } else {
+                            view?.showMissingFormError()
+                        }
+                    }
+                    datapointProcessing = false
+                } else {
+                    view?.hideLoading()
+                    view?.showMissingUserError()
+                    datapointProcessing = false
+                }
             }
         }
     }
 
-    private fun setDataPointAsViewed(datapointId: String, user: User) {
-        uiScope.launch {
-            val params: MutableMap<String?, Any> = HashMap(2)
-            params[MarkDatapointViewed.PARAM_DATAPOINT_ID] = datapointId
-            markDatapointViewed.execute(params)
-            view?.openDataPoint(datapointId, user)
-        }
+    private suspend fun markDataPointViewed(datapointId: String) {
+        val params: MutableMap<String?, Any> = HashMap(2)
+        params[MarkDatapointViewed.PARAM_DATAPOINT_ID] = datapointId
+        markDatapointViewed.execute(params)
     }
 
     fun onAddDataPointTap(surveyGroup: SurveyGroup) {
         uiScope.launch {
             val userResult = getSelectedUser.execute()
             if (userResult.resultCode == ResultCode.SUCCESS) {
-                val params: MutableMap<String, Any> = HashMap(2)
-                params[GetRegistrationForm.PARAM_SURVEY_ID] = surveyGroup.id
-                params[GetRegistrationForm.PARAM_REGISTRATION_FORM_ID] =
-                    surveyGroup.registerSurveyId ?: ""
-                val domainForm = getRegistrationForm.execute(params).form
+                val domainForm = fetchRegistrationForm(surveyGroup)
                 if (domainForm != null) {
                     if (domainForm.cascadeDownloaded) {
                         view?.openEmptyForm(userResult.user, domainForm.formId)
@@ -135,6 +159,17 @@ class SurveyPresenter @Inject constructor(
                 view?.showMissingUserError()
             }
         }
+    }
+
+    private suspend fun fetchRegistrationForm(survey: SurveyGroup?): DomainForm? {
+        if (survey != null) {
+            val params: MutableMap<String, Any> = HashMap(2)
+            params[GetRegistrationForm.PARAM_SURVEY_ID] = survey.id
+            params[GetRegistrationForm.PARAM_REGISTRATION_FORM_ID] =
+                survey.registerSurveyId ?: ""
+            return getRegistrationForm.execute(params).form
+        }
+        return null
     }
 
     fun checkSelectedUser() {

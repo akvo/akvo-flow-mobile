@@ -50,8 +50,8 @@ import org.akvo.flow.data.database.SurveyDbDataSource;
 import org.akvo.flow.data.preference.Prefs;
 import org.akvo.flow.database.SurveyDbAdapter;
 import org.akvo.flow.database.SurveyInstanceStatus;
-import org.akvo.flow.domain.Survey;
 import org.akvo.flow.domain.SurveyGroup;
+import org.akvo.flow.domain.entity.DomainForm;
 import org.akvo.flow.domain.entity.User;
 import org.akvo.flow.injector.component.ApplicationComponent;
 import org.akvo.flow.injector.component.DaggerViewComponent;
@@ -555,22 +555,12 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
 
     @Override
     public void onDatapointSelected(final String datapointId) {
-        presenter.onDatapointSelected(datapointId);
+        presenter.onDatapointSelected(datapointId, mSurveyGroup);
     }
 
     @Override
     public void showMissingUserError() {
         Toast.makeText(this, R.string.mustselectuser, Toast.LENGTH_LONG).show();
-    }
-
-    @AddTrace(name = "openDataPoint")
-    @Override
-    public void openDataPoint(String datapointId, User user) {
-        if (mSurveyGroup != null && mSurveyGroup.isMonitored()) {
-            displayRecord(datapointId);
-        } else {
-            displayForm(datapointId, user);
-        }
     }
 
     @Override
@@ -590,23 +580,23 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
         addDataPointFab.setEnabled(true);
     }
 
-    private void displayRecord(String datapointId) {
+    public void displayRecord(@NonNull String datapointId) {
         navigator.navigateToRecordActivity(this, datapointId, mSurveyGroup);
     }
 
-    @AddTrace(name = "displayForm")
-    private void displayForm(String datapointId, User user) {
-        Survey registrationForm =
-                mDatabase != null ? mDatabase.getRegistrationForm(mSurveyGroup) : null;
-        if (registrationForm == null) {
-            Toast.makeText(this, R.string.error_missing_form, Toast.LENGTH_LONG).show();
-            return;
-        } else if (!registrationForm.isHelpDownloaded()) {
-            Toast.makeText(this, R.string.error_missing_cascade, Toast.LENGTH_LONG).show();
-            return;
-        }
+    @Override
+    public void showLoading() {
+        findViewById(R.id.progress).setVisibility(View.VISIBLE);
+    }
 
-        final String registrationFormId = registrationForm.getId();
+    @Override
+    public void hideLoading() {
+        findViewById(R.id.progress).setVisibility(View.GONE);
+    }
+
+    @AddTrace(name = "displayForm")
+    public void displayForm(@NonNull String datapointId, @NonNull User user, DomainForm registrationForm) {
+        final String registrationFormId = registrationForm.getFormId() +"";
         long formInstanceId;
         boolean readOnly;
         Cursor c = mDatabase.getFormInstances(datapointId);
@@ -616,7 +606,7 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
             readOnly = status != SurveyInstanceStatus.SAVED;
         } else {
             formInstanceId = mDatabase
-                    .createSurveyRespondent(registrationForm.getId(), registrationForm.getVersion(),
+                    .createSurveyRespondent(registrationFormId, Double.parseDouble(registrationForm.getVersion()),
                             user, datapointId);
             readOnly = false;
         }

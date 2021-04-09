@@ -31,7 +31,9 @@ import org.akvo.flow.domain.entity.DomainForm
 import org.akvo.flow.domain.interactor.apk.GetApkDataPreferences
 import org.akvo.flow.domain.interactor.apk.SaveApkUpdateNotified
 import org.akvo.flow.domain.interactor.datapoints.MarkDatapointViewed
+import org.akvo.flow.domain.interactor.forms.GetFormInstance
 import org.akvo.flow.domain.interactor.forms.GetRegistrationForm
+import org.akvo.flow.domain.interactor.forms.GetSavedFormInstance
 import org.akvo.flow.domain.interactor.users.GetSelectedUser
 import org.akvo.flow.domain.interactor.users.ResultCode
 import org.akvo.flow.domain.util.VersionHelper
@@ -50,6 +52,7 @@ class SurveyPresenter @Inject constructor(
     private val getSelectedUser: GetSelectedUser,
     private val markDatapointViewed: MarkDatapointViewed,
     private val getRegistrationForm: GetRegistrationForm,
+    private val getFormInstance: GetFormInstance
 ) : Presenter {
 
     private var datapointProcessing: Boolean = false
@@ -103,7 +106,6 @@ class SurveyPresenter @Inject constructor(
             Timber.d("datapoint will be processed")
             uiScope.launch {
                 datapointProcessing = true
-                view?.showLoading()
                 val userResult = getSelectedUser.execute()
                 if (userResult.resultCode == ResultCode.SUCCESS) {
                     if (survey != null && survey.isMonitored) {
@@ -113,11 +115,23 @@ class SurveyPresenter @Inject constructor(
                     } else {
                         //only one form possible
                         val domainForm = fetchRegistrationForm(survey)
-                        view?.hideLoading()
                         if (domainForm != null) {
                             if (domainForm.cascadeDownloaded) {
-                                view?.displayForm(datapointId, userResult.user, domainForm)
                                 markDataPointViewed(datapointId)
+                                val params: MutableMap<String, Any> = HashMap(4)
+                                params[GetSavedFormInstance.PARAM_FORM_ID] = domainForm.formId
+                                params[GetSavedFormInstance.PARAM_DATAPOINT_ID] = datapointId
+                                val result = getFormInstance.execute(params)
+                                if (result is GetFormInstance.GetFormInstanceResult.GetFormInstanceResultSuccess) {
+                                    //instance exists, open it
+                                    view?.navigateToForm(datapointId,
+                                        result.surveyInstanceId,
+                                        result.readOnly,
+                                        domainForm.formId)
+                                } else {
+                                    //no instance exist yet
+                                    view?.navigateToForm(domainForm.formId, userResult.user, datapointId)
+                                }
                             } else {
                                 view?.showMissingCascadeError()
                             }
@@ -127,7 +141,6 @@ class SurveyPresenter @Inject constructor(
                     }
                     datapointProcessing = false
                 } else {
-                    view?.hideLoading()
                     view?.showMissingUserError()
                     datapointProcessing = false
                 }

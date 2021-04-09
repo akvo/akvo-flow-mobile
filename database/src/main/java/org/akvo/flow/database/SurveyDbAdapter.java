@@ -300,20 +300,6 @@ public class SurveyDbAdapter {
     }
 
     /**
-     * Get all the SurveyInstances for a particular data point. Registration form will be at the top
-     * of the list, all other forms will be ordered by submission date (desc).
-     */
-    public Cursor getFormInstances(String recordId) {
-        return database.query(SURVEY_INSTANCE_JOIN_SURVEY,
-                FormInstanceQuery.PROJECTION,
-                Tables.SURVEY_INSTANCE + "." + SurveyInstanceColumns.RECORD_ID + "= ?",
-                new String[] { recordId },
-                null, null,
-                "CASE WHEN survey.survey_id = survey_group.register_survey_id THEN 0 ELSE 1 END, "
-                        + SurveyInstanceColumns.START_DATE + " DESC");
-    }
-
-    /**
      * Get all the SurveyInstances for a particular data point which actually have non empty
      * responses. Registration form will be at the top of the list, all other forms will be ordered
      * by submission date (desc).
@@ -389,16 +375,6 @@ public class SurveyDbAdapter {
      */
     public enum SurveyedLocaleMeta {
         NAME, GEOLOCATION
-    }
-
-    /**
-     * Delete any SurveyInstance that contains no response.
-     */
-    public void deleteEmptySurveyInstances() {
-        executeSql("DELETE FROM " + Tables.SURVEY_INSTANCE
-                + " WHERE " + SurveyInstanceColumns._ID + " NOT IN "
-                + "(SELECT DISTINCT " + ResponseColumns.SURVEY_INSTANCE_ID
-                + " FROM " + Tables.RESPONSE + ")");
     }
 
     /**

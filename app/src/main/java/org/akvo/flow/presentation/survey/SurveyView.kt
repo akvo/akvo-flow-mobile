@@ -19,7 +19,6 @@
  */
 package org.akvo.flow.presentation.survey
 
-import org.akvo.flow.domain.entity.DomainForm
 import org.akvo.flow.domain.entity.User
 import org.akvo.flow.presentation.entity.ViewApkData
 
@@ -30,8 +29,12 @@ interface SurveyView {
     fun showMissingFormError()
     fun showMissingCascadeError()
     fun displaySelectedUser(name: String)
-    fun displayForm(datapointId: String, user: User, domainForm: DomainForm)
+    fun navigateToForm(
+        datapointId: String,
+        surveyInstanceId: Long,
+        readOnly: Boolean,
+        registrationFormId: String
+    )
     fun displayRecord(datapointId: String)
-    fun showLoading()
-    fun hideLoading()
+    fun navigateToForm(formId: String, user: User, datapointId: String)
 }

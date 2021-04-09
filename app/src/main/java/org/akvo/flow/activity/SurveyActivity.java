@@ -22,7 +22,6 @@ package org.akvo.flow.activity;
 import android.Manifest;
 import android.content.Intent;
 import android.content.res.Configuration;
-import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Environment;
 import android.view.MenuItem;
@@ -48,10 +47,7 @@ import org.akvo.flow.R;
 import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.data.database.SurveyDbDataSource;
 import org.akvo.flow.data.preference.Prefs;
-import org.akvo.flow.database.SurveyDbAdapter;
-import org.akvo.flow.database.SurveyInstanceStatus;
 import org.akvo.flow.domain.SurveyGroup;
-import org.akvo.flow.domain.entity.DomainForm;
 import org.akvo.flow.domain.entity.User;
 import org.akvo.flow.injector.component.ApplicationComponent;
 import org.akvo.flow.injector.component.DaggerViewComponent;
@@ -584,36 +580,19 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
         navigator.navigateToRecordActivity(this, datapointId, mSurveyGroup);
     }
 
-    @Override
-    public void showLoading() {
-        findViewById(R.id.progress).setVisibility(View.VISIBLE);
+    public void navigateToForm(@NotNull String datapointId, long formInstanceId, boolean readOnly, @NonNull String registrationFormId) {
+        navigator.navigateToFormActivity(this, datapointId, registrationFormId, formInstanceId, readOnly, mSurveyGroup);
     }
 
     @Override
-    public void hideLoading() {
-        findViewById(R.id.progress).setVisibility(View.GONE);
-    }
-
-    @AddTrace(name = "displayForm")
-    public void displayForm(@NonNull String datapointId, @NonNull User user, DomainForm registrationForm) {
-        final String registrationFormId = registrationForm.getFormId() +"";
-        long formInstanceId;
-        boolean readOnly;
-        Cursor c = mDatabase.getFormInstances(datapointId);
-        if (c.moveToFirst()) {
-            formInstanceId = c.getLong(SurveyDbAdapter.FormInstanceQuery._ID);
-            int status = c.getInt(SurveyDbAdapter.FormInstanceQuery.STATUS);
-            readOnly = status != SurveyInstanceStatus.SAVED;
-        } else {
-            formInstanceId = mDatabase
-                    .createSurveyRespondent(registrationFormId, Double.parseDouble(registrationForm.getVersion()),
-                            user, datapointId);
-            readOnly = false;
-        }
-        c.close();
-
-        navigator.navigateToFormActivity(this, datapointId, registrationFormId,
-                formInstanceId, readOnly, mSurveyGroup);
+    public void navigateToForm(@NotNull String formId, @NotNull User user, @NonNull String dataPointId) {
+        navigator.navigateToFormActivity(
+                this,
+                mSurveyGroup,
+                formId,
+                user,
+                dataPointId
+        );
     }
 
     @Override

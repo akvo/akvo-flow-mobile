@@ -549,6 +549,7 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
         return mDrawerToggle.onOptionsItemSelected(item) || super.onOptionsItemSelected(item);
     }
 
+    @AddTrace(name = "onDatapointSelected")
     @Override
     public void onDatapointSelected(final String datapointId) {
         presenter.onDatapointSelected(datapointId, mSurveyGroup);

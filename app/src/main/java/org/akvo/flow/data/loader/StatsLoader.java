@@ -22,6 +22,7 @@ package org.akvo.flow.data.loader;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteOpenHelper;
 
 import org.akvo.flow.data.loader.base.AsyncLoader;
 import org.akvo.flow.data.loader.models.Stats;
@@ -37,16 +38,17 @@ public class StatsLoader extends AsyncLoader<Stats> {
     private final long mSurveyGroupId;
 
     private static final long WEEK_IN_MS = 1000 * 60 * 60 * 24 * 7;// Week milliseconds
+    private final SQLiteOpenHelper databaseHelper;
 
-    public StatsLoader(Context context, long surveyGroupId) {
+    public StatsLoader(Context context, long surveyGroupId, SQLiteOpenHelper databaseHelper) {
         super(context);
         this.mSurveyGroupId = surveyGroupId;
+        this.databaseHelper = databaseHelper;
     }
 
     @Override
     public Stats loadInBackground() {
-        Context context = getContext();
-        SurveyDbAdapter database = new SurveyDbAdapter(context);
+        SurveyDbAdapter database = new SurveyDbAdapter(databaseHelper);
         database.open();
         Stats stats = new Stats();
 

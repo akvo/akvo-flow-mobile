@@ -26,7 +26,7 @@ interface SurveyView {
     fun showNewVersionAvailable(apkData: ViewApkData?)
     fun showMissingUserError()
     fun openDataPoint(datapointId: String?, user: User?)
-    fun openEmptyForm(user: User?, formId: String?)
+    fun openEmptyForm(user: User, formId: String?)
     fun showMissingFormError()
     fun showMissingCascadeError()
     fun displaySelectedUser(name: String)

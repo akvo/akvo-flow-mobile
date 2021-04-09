@@ -25,6 +25,7 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.content.IntentFilter
 import android.database.Cursor
+import android.database.sqlite.SQLiteOpenHelper
 import android.os.Bundle
 import android.view.ContextMenu
 import android.view.ContextMenu.ContextMenuInfo
@@ -57,9 +58,11 @@ class ResponseListFragment : ListFragment(), LoaderManager.LoaderCallbacks<Curso
     private var trackingHelper: TrackingHelper? = null
     private lateinit var mAdapter: ResponseListAdapter
 
-    @JvmField
     @Inject
-    var navigator: Navigator? = null
+    lateinit var navigator: Navigator
+
+    @Inject
+    lateinit var databaseHelper: SQLiteOpenHelper
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -163,8 +166,7 @@ class ResponseListFragment : ListFragment(), LoaderManager.LoaderCallbacks<Curso
     }
 
     private fun deleteSurveyInstance(surveyId: String?, surveyInstanceId: Long) {
-        val context = activity!!.applicationContext
-        val db = SurveyDbAdapter(context)
+        val db = SurveyDbAdapter(databaseHelper)
         val nameResetNeeded = surveyId != null && (surveyId == mSurveyGroup?.registerSurveyId)
         db.open()
         if (nameResetNeeded) {
@@ -179,14 +181,14 @@ class ResponseListFragment : ListFragment(), LoaderManager.LoaderCallbacks<Curso
     }
 
     private fun viewSurveyInstanceHistory(surveyInstanceId: Long) {
-        navigator?.navigateToTransmissionActivity(activity, surveyInstanceId)
+        navigator.navigateToTransmissionActivity(activity, surveyInstanceId)
     }
 
     override fun onListItemClick(list: ListView, view: View, position: Int, id: Long) {
         val formId = view.getTag(ConstantUtil.SURVEY_ID_TAG_KEY).toString()
         val formInstanceId = view.getTag(ConstantUtil.RESPONDENT_ID_TAG_KEY) as Long
         val readOnly = view.getTag(ConstantUtil.READ_ONLY_TAG_KEY) as Boolean
-        navigator?.navigateToFormActivity(activity,
+        navigator.navigateToFormActivity(activity,
             recordId,
             formId,
             formInstanceId,
@@ -195,7 +197,7 @@ class ResponseListFragment : ListFragment(), LoaderManager.LoaderCallbacks<Curso
     }
 
     override fun onCreateLoader(id: Int, args: Bundle?): Loader<Cursor> {
-        return SurveyInstanceResponseLoader(activity, recordId)
+        return SurveyInstanceResponseLoader(activity, recordId, databaseHelper)
     }
 
     override fun onLoadFinished(loader: Loader<Cursor>, cursor: Cursor) {

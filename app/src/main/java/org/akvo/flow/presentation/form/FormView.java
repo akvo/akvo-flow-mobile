@@ -37,4 +37,6 @@ public interface FormView {
     void GoToListOfForms();
 
     void showFormUpdated();
+
+    void trackFormDraftFormVersionUpdated();
 }

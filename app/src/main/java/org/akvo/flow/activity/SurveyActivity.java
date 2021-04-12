@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2020 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2021 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -598,7 +598,7 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
     }
 
     @Override
-    public void reEnableClickListener() {
+    public void enableClickListener() {
         DataPointsListFragment listFragment = mTabsAdapter.getListFragment();
         if (listFragment != null) {
             listFragment.enableItemClicks();

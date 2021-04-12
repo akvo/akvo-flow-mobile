@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2020 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2021 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -87,7 +87,6 @@ class DataPointsListFragment : Fragment(), LocationListener, AdapterView.OnItemC
     private var mListener: RecordListListener? = null
     private var trackingListener: TrackingListener? = null
     private lateinit var mAdapter: DataPointListAdapter
-
     private lateinit var listView: ListView
     private lateinit var emptyTitleTv: TextView
     private lateinit var emptySubTitleTv: TextView

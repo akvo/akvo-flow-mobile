@@ -128,16 +128,16 @@ class SurveyPresenter @Inject constructor(
                             }
                         } else {
                             view?.showMissingCascadeError()
-                            view?.reEnableClickListener()
+                            view?.enableClickListener()
                         }
                     } else {
                         view?.showMissingFormError()
-                        view?.reEnableClickListener()
+                        view?.enableClickListener()
                     }
                 }
             } else {
                 view?.showMissingUserError()
-                view?.reEnableClickListener()
+                view?.enableClickListener()
             }
         }
     }

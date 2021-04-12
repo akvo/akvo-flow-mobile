@@ -31,7 +31,7 @@ class GetFormInstance @Inject constructor(
 
     suspend fun execute(parameters: Map<String, Any>): GetFormInstanceResult {
         if (!parameters.containsKey(PARAM_FORM_ID) || !parameters.containsKey(PARAM_DATAPOINT_ID)) {
-            throw IllegalArgumentException("Missing form id")
+            throw IllegalArgumentException("Missing form id or datapoint id")
         }
         return withContext(coroutineDispatcher.getDispatcher()) {
             try {

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018,2020 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2018,2020,2021 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -37,5 +37,5 @@ interface SurveyView {
     )
     fun displayRecord(datapointId: String)
     fun navigateToForm(formId: String, user: User, datapointId: String)
-    fun reEnableClickListener()
+    fun enableClickListener()
 }

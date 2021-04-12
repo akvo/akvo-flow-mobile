@@ -57,6 +57,7 @@ import org.akvo.flow.offlinemaps.presentation.OfflineMapSelectedListener;
 import org.akvo.flow.offlinemaps.presentation.dialog.OfflineMapsDialog;
 import org.akvo.flow.offlinemaps.presentation.infowindow.InfoWindowLayout;
 import org.akvo.flow.presentation.UserDeleteConfirmationDialog;
+import org.akvo.flow.presentation.datapoints.list.DataPointsListFragment;
 import org.akvo.flow.presentation.datapoints.map.DataPointsMapFragment;
 import org.akvo.flow.presentation.entity.ViewApkData;
 import org.akvo.flow.presentation.navigation.CreateUserDialog;
@@ -594,6 +595,14 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
                 user,
                 dataPointId
         );
+    }
+
+    @Override
+    public void reEnableClickListener() {
+        DataPointsListFragment listFragment = mTabsAdapter.getListFragment();
+        if (listFragment != null) {
+            listFragment.enableItemClicks();
+        }
     }
 
     @Override

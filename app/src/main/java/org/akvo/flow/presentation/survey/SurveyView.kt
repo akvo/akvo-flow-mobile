@@ -37,4 +37,5 @@ interface SurveyView {
     )
     fun displayRecord(datapointId: String)
     fun navigateToForm(formId: String, user: User, datapointId: String)
+    fun reEnableClickListener()
 }

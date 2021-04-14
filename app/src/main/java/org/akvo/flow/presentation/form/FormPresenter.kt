@@ -124,7 +124,7 @@ class FormPresenter @Inject constructor(
                 if (forms.size <= 1) {
                     view?.dismiss()
                 } else {
-                   view?.GoToListOfForms()
+                   view?.goToListOfForms()
                 }
             }
         } else {

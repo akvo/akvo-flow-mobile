@@ -730,7 +730,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
     }
 
     @Override
-    public void GoToListOfForms() {
+    public void goToListOfForms() {
         readOnly = true;
         navigator.navigateToRecordActivity(this, dataPointId, survey);
         finish();

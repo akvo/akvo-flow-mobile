@@ -32,6 +32,9 @@
         android:requestLegacyExternalStorage="true"
         tools:ignore="GoogleAppIndexingWarning">
 
+        <meta-data
+            android:name="firebase_performance_logcat_enabled"
+            android:value="true" />
         <uses-library
             android:name="org.apache.http.legacy"
             android:required="false" />
@@ -79,7 +82,6 @@
             android:theme="@style/FlowAppTheme.NoTitle"/>
         <activity android:name=".presentation.datapoints.map.one.DataPointMapActivity" />
 
-        <service android:name=".service.time.TimeCheckWorker" />
         <service android:name=".service.UnPublishDataService" />
 
         <receiver android:name=".broadcast.UpdateReceiver">

@@ -154,4 +154,8 @@ class TrackingHelper(context: Context) {
     fun logHistoryTabViewed() {
         firebaseAnalytics.logEvent("history_tab_viewed", null)
     }
+
+    fun logFormVersionUpdated() {
+        firebaseAnalytics.logEvent("draft_form_version_updated", null)
+    }
 }

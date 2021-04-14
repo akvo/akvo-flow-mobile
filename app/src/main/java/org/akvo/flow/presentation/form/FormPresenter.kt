@@ -25,12 +25,17 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.launch
+import org.akvo.flow.domain.Survey
 import org.akvo.flow.domain.SurveyGroup
 import org.akvo.flow.domain.interactor.DefaultObserver
 import org.akvo.flow.domain.interactor.ExportSurveyInstance
 import org.akvo.flow.domain.interactor.UseCase
 import org.akvo.flow.domain.interactor.forms.GetSurveyForms
+import org.akvo.flow.domain.interactor.forms.UpdateFormInstance
+import org.akvo.flow.domain.interactor.settings.FormVersionUpdateNotified
+import org.akvo.flow.domain.interactor.settings.SetFormVersionUpdateNotified
 import org.akvo.flow.presentation.Presenter
+import org.jetbrains.annotations.NotNull
 import timber.log.Timber
 import java.util.HashMap
 import javax.inject.Inject
@@ -40,7 +45,10 @@ class FormPresenter @Inject constructor(
     private val exportSurveyInstance: ExportSurveyInstance,
     @param:Named("mobileUploadSet") private val mobileUploadSet: UseCase,
     @param:Named("mobileUploadAllowed") private val mobileUploadAllowed: UseCase,
-    private val getSurveyForms: GetSurveyForms
+    private val getSurveyForms: GetSurveyForms,
+    private val updateFormInstance: UpdateFormInstance,
+    private val formVersionUpdateNotified: FormVersionUpdateNotified,
+    private val setFormVersionUpdateNotified: SetFormVersionUpdateNotified
 ) : Presenter {
 
     private var view: FormView? = null
@@ -116,7 +124,7 @@ class FormPresenter @Inject constructor(
                 if (forms.size <= 1) {
                     view?.dismiss()
                 } else {
-                   view?.GoToListOfForms()
+                   view?.goToListOfForms()
                 }
             }
         } else {
@@ -124,4 +132,26 @@ class FormPresenter @Inject constructor(
             view?.dismiss()
         }
     }
+
+    fun updateInstanceVersion(readOnly: Boolean, form: @NotNull Survey, formInstanceId: Long) {
+        if (readOnly || formInstanceId == -1L) {
+            return
+        }
+        //update submission form version
+        uiScope.launch {
+            val params: MutableMap<String, Any> = HashMap(4)
+            params[UpdateFormInstance.PARAM_FORM_INSTANCE_ID] = formInstanceId
+            params[UpdateFormInstance.PARAM_FORM_VERSION] = form.version
+            params[SetFormVersionUpdateNotified.PARAM_FORM_ID] = form.id
+            val result: UpdateFormInstance.FormVersionUpdateResult = updateFormInstance.execute(params)
+            if (result == UpdateFormInstance.FormVersionUpdateResult.FormVersionUpdated) {
+                view?.trackDraftFormVersionUpdated()
+                if (formVersionUpdateNotified.execute(params) == FormVersionUpdateNotified.FormVersionNotifiedResult.FormVersionNotNotified) {
+                    view?.showFormUpdated()
+                    setFormVersionUpdateNotified.execute(params)
+                }
+            }
+        }
+    }
 }
+

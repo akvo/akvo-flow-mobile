@@ -65,6 +65,7 @@ import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.functions.Function;
 import io.reactivex.functions.Predicate;
+import kotlin.Pair;
 
 public class DatabaseDataSource {
 
@@ -485,5 +486,22 @@ public class DatabaseDataSource {
 
     public void cleanDataPoints(Long surveyGroupId) {
         briteSurveyDbAdapter.cleanDataPoints(surveyGroupId);
+    }
+
+    public long updateFormVersion(long formInstanceId, double formVersion) {
+        return briteSurveyDbAdapter.updateFormVersion(formInstanceId, formVersion);
+    }
+
+    public int formVersionUpdateNotified(String formId, double formVersion) {
+        return briteSurveyDbAdapter.formVersionUpdateNotified(formId, formVersion);
+    }
+
+    public void saveFormVersionNotified(String formId, double formVersion) {
+        briteSurveyDbAdapter.saveFormVersionNotified(formId, formVersion);
+    }
+
+    @NotNull
+    public Pair<Long, Integer> getFormInstance(@NotNull String formId, @NotNull String datapointId) {
+        return formInstanceMapper.mapFormInstanceIdStatus(briteSurveyDbAdapter.getFormInstance(formId, datapointId));
     }
 }

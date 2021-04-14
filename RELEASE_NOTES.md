@@ -1,5 +1,13 @@
 Akvo FLOW app release notes
 ===========================
+# ver 2.9.10
+Date: 14 April 2021
+
+* **Outdated form version is used if the form is updated while drafts were already started** - [#1544](https://github.com/akvo/akvo-flow-mobile/issues/1544)
+* **Performance decrease when opening a datapoint** - [#1803](https://github.com/akvo/akvo-flow-mobile/issues/1803)
+* **Form version update tracking** - [#1806](https://github.com/akvo/akvo-flow-mobile/issues/1806)
+
+---------------
 # ver 2.9.9.1
 Date: 05 April 2021
 

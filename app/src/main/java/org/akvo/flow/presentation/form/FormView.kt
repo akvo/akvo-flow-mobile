@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2018,2021 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -17,24 +17,16 @@
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
+package org.akvo.flow.presentation.form
 
-package org.akvo.flow.presentation.form;
-
-public interface FormView {
-
-    void showLoading();
-
-    void hideLoading();
-
-    void dismiss();
-
-    void showErrorExport();
-
-    void showMobileUploadSetting(long surveyInstanceId);
-
-    void startSync(boolean isMobileSyncAllowed);
-
-    void GoToListOfForms();
-
-    void showFormUpdated();
+interface FormView {
+    fun showLoading()
+    fun hideLoading()
+    fun dismiss()
+    fun showErrorExport()
+    fun showMobileUploadSetting(surveyInstanceId: Long)
+    fun startSync(isMobileSyncAllowed: Boolean)
+    fun goToListOfForms()
+    fun showFormUpdated()
+    fun trackDraftFormVersionUpdated()
 }

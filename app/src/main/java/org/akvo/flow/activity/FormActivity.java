@@ -68,6 +68,7 @@ import org.akvo.flow.presentation.form.FormPresenter;
 import org.akvo.flow.presentation.form.FormView;
 import org.akvo.flow.presentation.form.mobiledata.MobileDataSettingDialog;
 import org.akvo.flow.service.DataPointUploadWorker;
+import org.akvo.flow.tracking.TrackingHelper;
 import org.akvo.flow.ui.Navigator;
 import org.akvo.flow.ui.adapter.LanguageAdapter;
 import org.akvo.flow.ui.adapter.SurveyTabAdapter;
@@ -166,6 +167,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
 
     private Uri imagePath;
     private User user;
+    private TrackingHelper trackingHelper;
 
     @AddTrace(name = "onCreateTrace")
     @Override
@@ -190,6 +192,8 @@ public class FormActivity extends BackActivity implements SurveyListener,
             loadResponseData();
             spaceLeftOnCard();
         }
+
+        trackingHelper = new TrackingHelper(this);
     }
 
     private void loadResponseData() {
@@ -726,7 +730,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
     }
 
     @Override
-    public void GoToListOfForms() {
+    public void goToListOfForms() {
         readOnly = true;
         navigator.navigateToRecordActivity(this, dataPointId, survey);
         finish();
@@ -742,6 +746,13 @@ public class FormActivity extends BackActivity implements SurveyListener,
     @Override
     public void showFormUpdated() {
         snackBarManager.displaySnackBar(rootView, R.string.form_updated, this);
+    }
+
+    @Override
+    public void trackDraftFormVersionUpdated() {
+        if (trackingHelper != null) {
+            trackingHelper.logFormVersionUpdated();
+        }
     }
 
     @Override

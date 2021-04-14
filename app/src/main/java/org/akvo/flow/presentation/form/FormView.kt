@@ -28,5 +28,5 @@ interface FormView {
     fun startSync(isMobileSyncAllowed: Boolean)
     fun goToListOfForms()
     fun showFormUpdated()
-    fun trackFormDraftFormVersionUpdated()
+    fun trackDraftFormVersionUpdated()
 }

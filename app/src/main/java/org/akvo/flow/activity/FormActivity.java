@@ -749,7 +749,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
     }
 
     @Override
-    public void trackFormDraftFormVersionUpdated() {
+    public void trackDraftFormVersionUpdated() {
         if (trackingHelper != null) {
             trackingHelper.logFormVersionUpdated();
         }

@@ -145,7 +145,7 @@ class FormPresenter @Inject constructor(
             params[SetFormVersionUpdateNotified.PARAM_FORM_ID] = form.id
             val result: UpdateFormInstance.FormVersionUpdateResult = updateFormInstance.execute(params)
             if (result == UpdateFormInstance.FormVersionUpdateResult.FormVersionUpdated) {
-                view?.trackFormDraftFormVersionUpdated()
+                view?.trackDraftFormVersionUpdated()
                 if (formVersionUpdateNotified.execute(params) == FormVersionUpdateNotified.FormVersionNotifiedResult.FormVersionNotNotified) {
                     view?.showFormUpdated()
                     setFormVersionUpdateNotified.execute(params)

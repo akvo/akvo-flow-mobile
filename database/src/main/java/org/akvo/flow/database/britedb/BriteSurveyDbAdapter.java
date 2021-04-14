@@ -769,6 +769,18 @@ public class BriteSurveyDbAdapter {
         return briteDatabase.query(sql, formId, String.valueOf(SurveyInstanceStatus.SAVED), datapointId);
     }
 
+    public Cursor getFormInstance(String formId, String datapointId) {
+        String sql = "SELECT " +
+                SurveyInstanceColumns._ID + ", " +
+                SurveyInstanceColumns.STATUS +
+                " FROM " + Tables.SURVEY_INSTANCE +
+                " WHERE " + Tables.SURVEY_INSTANCE + "." + SurveyInstanceColumns.SURVEY_ID + "= ?" +
+                " AND " + SurveyInstanceColumns.RECORD_ID + "= ?" +
+                " ORDER BY " + SurveyInstanceColumns.START_DATE + " DESC LIMIT 1";
+
+        return briteDatabase.query(sql, formId, datapointId);
+    }
+
     public Single<Long> createFormInstance(ContentValues initialValues) {
         return Single.just(briteDatabase.insert(Tables.SURVEY_INSTANCE, initialValues));
     }
@@ -789,7 +801,7 @@ public class BriteSurveyDbAdapter {
     public void markDataPointAsViewed(String dataPointId) {
         ContentValues contentValues = new ContentValues(1);
         contentValues.put(RecordColumns.VIEWED, 1);
-        String where = RecordColumns.RECORD_ID + " = ? ";
+        String where = RecordColumns.RECORD_ID + " = ? AND " + RecordColumns.VIEWED + " = 0";
         briteDatabase.update(Tables.RECORD, contentValues, where, dataPointId);
     }
 
@@ -849,4 +861,5 @@ public class BriteSurveyDbAdapter {
         contentValues.put(FormUpdateNotifiedTable.COLUMN_NEW_FORM_VERSION, formVersion);
         briteDatabase.insert(FormUpdateNotifiedTable.TABLE_NAME, contentValues);
     }
+
 }

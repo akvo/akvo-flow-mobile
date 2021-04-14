@@ -179,4 +179,18 @@ public class FormInstanceMapper {
         }
         return formInstanceId;
     }
+
+    public kotlin.Pair<Long, Integer> mapFormInstanceIdStatus(Cursor cursor) {
+        long formInstanceId = -1L;
+        int status = 0;
+        if (cursor!= null && cursor.moveToFirst()) {
+            formInstanceId = getInstanceId(cursor);
+            int statusColumn = cursor.getColumnIndexOrThrow(SurveyInstanceColumns.STATUS);
+            status = cursor.getInt(statusColumn);
+        }
+        if (cursor != null) {
+            cursor.close();
+        }
+        return new kotlin.Pair(formInstanceId, status);
+    }
 }

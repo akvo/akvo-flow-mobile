@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2020 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2021 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -22,7 +22,6 @@ package org.akvo.flow.activity;
 import android.Manifest;
 import android.content.Intent;
 import android.content.res.Configuration;
-import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Environment;
 import android.view.MenuItem;
@@ -48,9 +47,6 @@ import org.akvo.flow.R;
 import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.data.database.SurveyDbDataSource;
 import org.akvo.flow.data.preference.Prefs;
-import org.akvo.flow.database.SurveyDbAdapter;
-import org.akvo.flow.database.SurveyInstanceStatus;
-import org.akvo.flow.domain.Survey;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.entity.User;
 import org.akvo.flow.injector.component.ApplicationComponent;
@@ -61,6 +57,7 @@ import org.akvo.flow.offlinemaps.presentation.OfflineMapSelectedListener;
 import org.akvo.flow.offlinemaps.presentation.dialog.OfflineMapsDialog;
 import org.akvo.flow.offlinemaps.presentation.infowindow.InfoWindowLayout;
 import org.akvo.flow.presentation.UserDeleteConfirmationDialog;
+import org.akvo.flow.presentation.datapoints.list.DataPointsListFragment;
 import org.akvo.flow.presentation.datapoints.map.DataPointsMapFragment;
 import org.akvo.flow.presentation.entity.ViewApkData;
 import org.akvo.flow.presentation.navigation.CreateUserDialog;
@@ -553,24 +550,15 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
         return mDrawerToggle.onOptionsItemSelected(item) || super.onOptionsItemSelected(item);
     }
 
+    @AddTrace(name = "onDatapointSelected")
     @Override
     public void onDatapointSelected(final String datapointId) {
-        presenter.onDatapointSelected(datapointId);
+        presenter.onDatapointSelected(datapointId, mSurveyGroup);
     }
 
     @Override
     public void showMissingUserError() {
         Toast.makeText(this, R.string.mustselectuser, Toast.LENGTH_LONG).show();
-    }
-
-    @AddTrace(name = "openDataPoint")
-    @Override
-    public void openDataPoint(String datapointId, User user) {
-        if (mSurveyGroup != null && mSurveyGroup.isMonitored()) {
-            displayRecord(datapointId);
-        } else {
-            displayForm(datapointId, user);
-        }
     }
 
     @Override
@@ -590,40 +578,31 @@ public class SurveyActivity extends AppCompatActivity implements RecordListListe
         addDataPointFab.setEnabled(true);
     }
 
-    private void displayRecord(String datapointId) {
+    public void displayRecord(@NonNull String datapointId) {
         navigator.navigateToRecordActivity(this, datapointId, mSurveyGroup);
     }
 
-    @AddTrace(name = "displayForm")
-    private void displayForm(String datapointId, User user) {
-        Survey registrationForm =
-                mDatabase != null ? mDatabase.getRegistrationForm(mSurveyGroup) : null;
-        if (registrationForm == null) {
-            Toast.makeText(this, R.string.error_missing_form, Toast.LENGTH_LONG).show();
-            return;
-        } else if (!registrationForm.isHelpDownloaded()) {
-            Toast.makeText(this, R.string.error_missing_cascade, Toast.LENGTH_LONG).show();
-            return;
-        }
+    public void navigateToForm(@NotNull String datapointId, long formInstanceId, boolean readOnly, @NonNull String registrationFormId) {
+        navigator.navigateToFormActivity(this, datapointId, registrationFormId, formInstanceId, readOnly, mSurveyGroup);
+    }
 
-        final String registrationFormId = registrationForm.getId();
-        long formInstanceId;
-        boolean readOnly;
-        Cursor c = mDatabase.getFormInstances(datapointId);
-        if (c.moveToFirst()) {
-            formInstanceId = c.getLong(SurveyDbAdapter.FormInstanceQuery._ID);
-            int status = c.getInt(SurveyDbAdapter.FormInstanceQuery.STATUS);
-            readOnly = status != SurveyInstanceStatus.SAVED;
-        } else {
-            formInstanceId = mDatabase
-                    .createSurveyRespondent(registrationForm.getId(), registrationForm.getVersion(),
-                            user, datapointId);
-            readOnly = false;
-        }
-        c.close();
+    @Override
+    public void navigateToForm(@NotNull String formId, @NotNull User user, @NonNull String dataPointId) {
+        navigator.navigateToFormActivity(
+                this,
+                mSurveyGroup,
+                formId,
+                user,
+                dataPointId
+        );
+    }
 
-        navigator.navigateToFormActivity(this, datapointId, registrationFormId,
-                formInstanceId, readOnly, mSurveyGroup);
+    @Override
+    public void enableClickListener() {
+        DataPointsListFragment listFragment = mTabsAdapter.getListFragment();
+        if (listFragment != null) {
+            listFragment.enableItemClicks();
+        }
     }
 
     @Override

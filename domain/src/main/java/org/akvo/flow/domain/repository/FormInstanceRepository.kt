@@ -36,4 +36,6 @@ interface FormInstanceRepository {
     fun createFormInstance(domainFormInstance: DomainFormInstance): Single<Long>
 
     fun updateFormVersion(formInstanceId: Long, formVersion: Double): Long
+
+    fun getFormInstance(formId: String, datapointId: String): Pair<Long, Int>
 }

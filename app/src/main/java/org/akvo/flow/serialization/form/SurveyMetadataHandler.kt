@@ -60,6 +60,9 @@ class SurveyMetadataHandler : DefaultHandler() {
                         surveyGroupForm != null)
             }
             surveyMetadata.app = attributes.getValue(APP)
+            if (attributes.getValue(ALIAS) != null) {
+                surveyMetadata.alias = attributes.getValue(ALIAS)
+            }
         }
     }
 
@@ -72,5 +75,6 @@ class SurveyMetadataHandler : DefaultHandler() {
         private const val SURVEY_GROUP_ID = "surveyGroupId"
         private const val SURVEY_GROUP_NAME = "surveyGroupName"
         private const val REGISTRATION_SURVEY = "registrationSurvey"
+        private const val ALIAS = "alias"
     }
 }

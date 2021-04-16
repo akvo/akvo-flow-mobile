@@ -85,16 +85,8 @@ class BootstrapProcessor @Inject constructor(
             // now read the survey XML back into memory to see if there is a version
             val surveyMetadata = fileProcessor.readBasicSurveyData(surveyFile)
 
-            //most instances use the same for server base and instance url now
-            val instanceCodeName: String = if (BuildConfig.SERVER_BASE == BuildConfig.INSTANCE_URL) {
-                BuildConfig.AWS_BUCKET
-            } else {
-                BuildConfig.SERVER_BASE
-            }
-            if (surveyMetadata.app.isNullOrBlank() || !instanceCodeName.contains(
-                    surveyMetadata.app)
-            ) {
-                return ProcessingResult.ProcessingErrorWrongDashboard
+            if (surveyMetadata.alias.isEmpty() || !BuildConfig.INSTANCE_URL.contains(surveyMetadata.alias)) {
+                    return ProcessingResult.ProcessingErrorWrongDashboard
             }
             val survey = surveyMapper.createOrUpdateSurvey(filename,
                 idFromFolderName,

@@ -24,5 +24,6 @@ data class SurveyMetadata (
     var app: String? = null,
     var name: String? = null,
     var surveyGroup: SurveyGroup? = null,
-    var version: Double = 0.0
+    var version: Double = 0.0,
+    var alias: String = ""
 )

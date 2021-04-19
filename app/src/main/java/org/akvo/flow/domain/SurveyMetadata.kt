@@ -21,7 +21,7 @@ package org.akvo.flow.domain
 
 data class SurveyMetadata (
     var id: String? = null,
-    var app: String? = null,
+    var app: String = "",
     var name: String? = null,
     var surveyGroup: SurveyGroup? = null,
     var version: Double = 0.0,

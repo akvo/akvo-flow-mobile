@@ -85,8 +85,16 @@ class BootstrapProcessor @Inject constructor(
             // now read the survey XML back into memory to see if there is a version
             val surveyMetadata = fileProcessor.readBasicSurveyData(surveyFile)
 
-            if (surveyMetadata.alias.isEmpty() || !BuildConfig.INSTANCE_URL.contains(surveyMetadata.alias)) {
+            if (surveyMetadata.alias.isNotEmpty() ) {
+                if (!BuildConfig.INSTANCE_URL.contains(surveyMetadata.alias)) {
                     return ProcessingResult.ProcessingErrorWrongDashboard
+                }
+            } else if (surveyMetadata.app.isNotEmpty()) {
+                if (!BuildConfig.AWS_BUCKET.contains(surveyMetadata.app)) {
+                    return ProcessingResult.ProcessingErrorWrongDashboard
+                }
+            } else {
+                return ProcessingResult.ProcessingErrorWrongDashboard
             }
             val survey = surveyMapper.createOrUpdateSurvey(filename,
                 idFromFolderName,

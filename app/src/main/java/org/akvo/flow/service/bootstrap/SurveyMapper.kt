@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2020,2021 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -101,8 +101,8 @@ class SurveyMapper @Inject constructor() {
     }
 
     private fun generateSurveyName(surveyMetadata: SurveyMetadata, originalName: String): String {
-        return if (!TextUtils.isEmpty(surveyMetadata.name)) {
-            surveyMetadata.name
+        return if (!surveyMetadata.name.isNullOrEmpty()) {
+            surveyMetadata.name!!
         } else {
             originalName
         }

@@ -26,6 +26,7 @@ import androidx.annotation.Nullable;
 
 import org.akvo.flow.database.DataPointDownloadTable;
 import org.akvo.flow.database.DatabaseHelper;
+import org.akvo.flow.database.FormUpdateNotifiedTable;
 
 public class UpgraderFactory {
 
@@ -46,6 +47,8 @@ public class UpgraderFactory {
                 databaseUpgrader.addUpgrader(new CursorUpgrader(helper, db));
             case DatabaseHelper.VER_SURVEY_VIEWED:
                 databaseUpgrader.addUpgrader(new SurveyViewedUpgrader(helper, db));
+            case DatabaseHelper.VER_DATAPOINT_STATUS:
+                databaseUpgrader.addUpgrader(new StatusUpgrader(db, new FormUpdateNotifiedTable()));
             default:
                 break;
         }

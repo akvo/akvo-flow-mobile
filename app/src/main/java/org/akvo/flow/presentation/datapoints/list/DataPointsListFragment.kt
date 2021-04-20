@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2020 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2017-2021 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -81,12 +81,13 @@ class DataPointsListFragment : Fragment(), LocationListener, AdapterView.OnItemC
     private lateinit var weakLocationListener: WeakLocationListener
 
     private var mLocationManager: LocationManager? = null
+
     private var mLatitude: Double? = null
     private var mLongitude: Double? = null
     private var mListener: RecordListListener? = null
     private var trackingListener: TrackingListener? = null
-
     private lateinit var mAdapter: DataPointListAdapter
+    private lateinit var listView: ListView
     private lateinit var emptyTitleTv: TextView
     private lateinit var emptySubTitleTv: TextView
     private lateinit var emptyIv: ImageView
@@ -141,7 +142,7 @@ class DataPointsListFragment : Fragment(), LocationListener, AdapterView.OnItemC
             .getSystemService(Context.LOCATION_SERVICE) as LocationManager
         weakLocationListener = WeakLocationListener(this)
         val view = view!!
-        val listView = view.findViewById<ListView>(R.id.locales_lv)
+        listView = view.findViewById(R.id.locales_lv)
         val emptyView = view.findViewById<View>(R.id.empty_view)
         listView.emptyView = emptyView
         emptyTitleTv = view.findViewById(R.id.empty_title_tv)
@@ -189,6 +190,7 @@ class DataPointsListFragment : Fragment(), LocationListener, AdapterView.OnItemC
             updateLocation()
             presenter.loadDataPoints(mLatitude, mLongitude)
         }
+        listView.onItemClickListener = this
     }
 
     private fun updateLocation() {
@@ -264,6 +266,7 @@ class DataPointsListFragment : Fragment(), LocationListener, AdapterView.OnItemC
     }
 
     override fun onItemClick(parent: AdapterView<*>?, view: View, position: Int, id: Long) {
+        listView.onItemClickListener = null
         val (_, _, localeId) = mAdapter.getItem(position)
         mListener!!.onDatapointSelected(localeId)
     }
@@ -419,6 +422,10 @@ class DataPointsListFragment : Fragment(), LocationListener, AdapterView.OnItemC
 
     override fun showNoDataPointsToSync() {
         dataPointSyncSnackBarManager.showNoDataPointsToDownload(view)
+    }
+
+    fun enableItemClicks() {
+        listView.onItemClickListener = this
     }
 
     class DataSyncBroadcastReceiver(fragment: DataPointsListFragment) :

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2020,2021 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -85,15 +85,15 @@ class BootstrapProcessor @Inject constructor(
             // now read the survey XML back into memory to see if there is a version
             val surveyMetadata = fileProcessor.readBasicSurveyData(surveyFile)
 
-            //most instances use the same for server base and instance url now
-            val instanceCodeName: String = if (BuildConfig.SERVER_BASE == BuildConfig.INSTANCE_URL) {
-                BuildConfig.AWS_BUCKET
+            if (surveyMetadata.alias.isNotEmpty() ) {
+                if (!BuildConfig.INSTANCE_URL.contains(surveyMetadata.alias)) {
+                    return ProcessingResult.ProcessingErrorWrongDashboard
+                }
+            } else if (surveyMetadata.app.isNotEmpty()) {
+                if (!BuildConfig.AWS_BUCKET.contains(surveyMetadata.app)) {
+                    return ProcessingResult.ProcessingErrorWrongDashboard
+                }
             } else {
-                BuildConfig.SERVER_BASE
-            }
-            if (surveyMetadata.app.isNullOrBlank() || !instanceCodeName.contains(
-                    surveyMetadata.app)
-            ) {
                 return ProcessingResult.ProcessingErrorWrongDashboard
             }
             val survey = surveyMapper.createOrUpdateSurvey(filename,

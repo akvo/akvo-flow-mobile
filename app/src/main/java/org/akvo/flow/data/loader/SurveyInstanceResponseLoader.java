@@ -22,6 +22,7 @@ package org.akvo.flow.data.loader;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteOpenHelper;
 
 import org.akvo.flow.data.loader.base.AsyncLoader;
 import org.akvo.flow.database.SurveyDbAdapter;
@@ -29,15 +30,17 @@ import org.akvo.flow.database.SurveyDbAdapter;
 public class SurveyInstanceResponseLoader extends AsyncLoader<Cursor> {
 
     private final String surveyedLocaleId;
+    private final SQLiteOpenHelper databaseHelper;
 
-    public SurveyInstanceResponseLoader(Context context, String surveyedLocaleId) {
+    public SurveyInstanceResponseLoader(Context context, String surveyedLocaleId, SQLiteOpenHelper databaseHelper) {
         super(context);
         this.surveyedLocaleId = surveyedLocaleId;
+        this.databaseHelper = databaseHelper;
     }
 
     @Override
     public Cursor loadInBackground() {
-        SurveyDbAdapter database = new SurveyDbAdapter(getContext().getApplicationContext());
+        SurveyDbAdapter database = new SurveyDbAdapter(databaseHelper);
         database.open();
         Cursor formInstances = database.getFormInstancesWithResponses(surveyedLocaleId);
         database.close();

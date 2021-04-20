@@ -71,6 +71,10 @@ public class TabsAdapter extends FragmentPagerAdapter {
         return (DataPointsMapFragment) fragmentsRef.get(POSITION_MAP);
     }
 
+    public DataPointsListFragment getListFragment() {
+        return (DataPointsListFragment) fragmentsRef.get(POSITION_LIST);
+    }
+
     @NonNull
     @Override
     public Object instantiateItem(@NonNull ViewGroup container, int position) {

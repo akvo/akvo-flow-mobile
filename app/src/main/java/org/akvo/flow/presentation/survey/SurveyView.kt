@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018,2020 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2018,2020,2021 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -25,9 +25,17 @@ import org.akvo.flow.presentation.entity.ViewApkData
 interface SurveyView {
     fun showNewVersionAvailable(apkData: ViewApkData?)
     fun showMissingUserError()
-    fun openDataPoint(datapointId: String?, user: User?)
-    fun openEmptyForm(user: User?, formId: String?)
+    fun openEmptyForm(user: User, formId: String?)
     fun showMissingFormError()
     fun showMissingCascadeError()
     fun displaySelectedUser(name: String)
+    fun navigateToForm(
+        datapointId: String,
+        surveyInstanceId: Long,
+        readOnly: Boolean,
+        registrationFormId: String
+    )
+    fun displayRecord(datapointId: String)
+    fun navigateToForm(formId: String, user: User, datapointId: String)
+    fun enableClickListener()
 }

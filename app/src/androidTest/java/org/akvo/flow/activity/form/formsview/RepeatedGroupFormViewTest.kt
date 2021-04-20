@@ -23,6 +23,7 @@ import android.content.Intent
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
+import androidx.test.espresso.matcher.ViewMatchers.isEnabled
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -32,6 +33,7 @@ import androidx.test.rule.ActivityTestRule
 import androidx.test.rule.GrantPermissionRule
 import org.akvo.flow.R
 import org.akvo.flow.activity.FormActivity
+import org.akvo.flow.activity.form.FormActivityTestUtil.addExecutionDelay
 import org.akvo.flow.activity.form.FormActivityTestUtil.getFormActivityIntent
 import org.akvo.flow.activity.form.FormActivityTestUtil.verifyRepeatHeaderText
 import org.akvo.flow.activity.form.FormActivityTestUtil.withQuestionViewParent
@@ -97,6 +99,7 @@ class RepeatedGroupFormViewTest {
     fun verifyRepetitionsDisplayedCorrectly() {
         verifyRepeatHeaderText("Repetitions: 2")
         verifyFirstIterationDisplayedInFull()
+        addExecutionDelay(10000)
         verifySecondIterationPartiallyDisplayed()
     }
 
@@ -140,7 +143,7 @@ class RepeatedGroupFormViewTest {
                 withText("")
             )
         ).check(
-            matches(isDisplayed())
+            matches(isEnabled())
         )
     }
 }

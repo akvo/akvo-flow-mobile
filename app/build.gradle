@@ -5,6 +5,7 @@ apply plugin: 'com.google.firebase.crashlytics'
 apply from: rootProject.file("jacoco.gradle")
 apply plugin: 'kotlin-kapt'
 apply plugin: 'com.google.firebase.appdistribution'
+apply plugin: 'com.google.firebase.firebase-perf'
 
 dexcount {
     enabled = !project.hasProperty("nodexcount")
@@ -265,6 +266,9 @@ dependencies {
     implementation "androidx.work:work-runtime:${rootProject.ext.workVersion}"
     implementation "org.slf4j:slf4j-nop:${rootProject.ext.slf4JVersion}"
     implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion"
+    implementation platform("com.google.firebase:firebase-bom:${rootProject.ext.firebaseBomVersion}")
+    implementation 'com.google.firebase:firebase-perf'
+    implementation 'com.google.firebase:firebase-perf-ktx'
 
     testImplementation "junit:junit:${rootProject.ext.jUnitVersion}"
     testImplementation "org.mockito:mockito-core:${rootProject.ext.mockitoCoreVersion}"

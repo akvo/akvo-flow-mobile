@@ -21,9 +21,9 @@
 package org.akvo.flow.data.database;
 
 import android.content.ContentValues;
-import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
+import android.database.sqlite.SQLiteOpenHelper;
 import android.text.TextUtils;
 
 import androidx.annotation.NonNull;
@@ -63,9 +63,9 @@ public class SurveyDbDataSource {
     private final TransmissionsMapper transmissionsMapper = new TransmissionsMapper();
 
     @Inject
-    public SurveyDbDataSource(Context context, BriteDatabase briteDatabase) {
+    public SurveyDbDataSource(BriteDatabase briteDatabase, SQLiteOpenHelper databaseHelper) {
         this.briteSurveyDbAdapter = new BriteSurveyDbAdapter(briteDatabase);
-        this.surveyDbAdapter = new SurveyDbAdapter(context);
+        this.surveyDbAdapter = new SurveyDbAdapter(databaseHelper);
     }
 
     /**
@@ -382,14 +382,6 @@ public class SurveyDbDataSource {
 
     public void deleteAllSurveys() {
         briteSurveyDbAdapter.deleteAllSurveys();
-    }
-
-    public void deleteEmptySurveyInstances() {
-        surveyDbAdapter.deleteEmptySurveyInstances();
-    }
-
-    public Cursor getFormInstances(String surveyedLocaleId) {
-        return surveyDbAdapter.getFormInstances(surveyedLocaleId);
     }
 
     public Long getLastSurveyInstance(String mRecordId, String id) {

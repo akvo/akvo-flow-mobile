@@ -72,7 +72,7 @@ class RecordPresenter @Inject constructor(
                     if (!domainForm.cascadeDownloaded) {
                         view?.showMissingCascadeError()
                     } else {
-                        getSavedFormInstance(formId, datapointId, survey, domainForm, userResult.user)
+                        openSavedFormInstance(formId, datapointId, survey, domainForm, userResult.user)
                     }
                 }
             } else {
@@ -81,7 +81,7 @@ class RecordPresenter @Inject constructor(
         }
     }
 
-    private suspend fun getSavedFormInstance(
+    private suspend fun openSavedFormInstance(
         formId: String,
         datapointId: String,
         survey: SurveyGroup,

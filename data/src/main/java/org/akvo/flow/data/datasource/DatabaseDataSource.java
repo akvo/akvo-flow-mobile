@@ -66,6 +66,7 @@ import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.functions.Function;
 import io.reactivex.functions.Predicate;
+import kotlin.Pair;
 
 public class DatabaseDataSource {
 
@@ -501,5 +502,22 @@ public class DatabaseDataSource {
     public Completable saveLanguages(long surveyId, @NotNull Set<String> languages) {
         briteSurveyDbAdapter.saveLanguagePreferences(surveyId, languages);
         return Completable.complete();
+    }
+
+    public long updateFormVersion(long formInstanceId, double formVersion) {
+        return briteSurveyDbAdapter.updateFormVersion(formInstanceId, formVersion);
+    }
+
+    public int formVersionUpdateNotified(String formId, double formVersion) {
+        return briteSurveyDbAdapter.formVersionUpdateNotified(formId, formVersion);
+    }
+
+    public void saveFormVersionNotified(String formId, double formVersion) {
+        briteSurveyDbAdapter.saveFormVersionNotified(formId, formVersion);
+    }
+
+    @NotNull
+    public Pair<Long, Integer> getFormInstance(@NotNull String formId, @NotNull String datapointId) {
+        return formInstanceMapper.mapFormInstanceIdStatus(briteSurveyDbAdapter.getFormInstance(formId, datapointId));
     }
 }

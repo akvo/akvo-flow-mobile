@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2020 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -15,24 +15,18 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
+package org.akvo.flow.database.upgrade
 
-package org.akvo.flow.presentation.form;
+import android.database.sqlite.SQLiteDatabase
+import org.akvo.flow.database.FormUpdateNotifiedTable
 
-public interface FormView {
+class StatusUpgrader(
+    private val db: SQLiteDatabase,
+    private val formUpdateNotifiedTable: FormUpdateNotifiedTable
+) : DatabaseUpgrader {
 
-    void showLoading();
-
-    void hideLoading();
-
-    void dismiss();
-
-    void showErrorExport();
-
-    void showMobileUploadSetting(long surveyInstanceId);
-
-    void startSync(boolean isMobileSyncAllowed);
-
-    void GoToListOfForms();
+    override fun upgrade() {
+        formUpdateNotifiedTable.onCreate(db)
+    }
 }

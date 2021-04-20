@@ -1,5 +1,11 @@
 Akvo FLOW app release notes
 ===========================
+# ver 2.9.10.1
+Date: 20 April 2021
+
+* **Bootstrap surveys verification** - [#1810](https://github.com/akvo/akvo-flow-mobile/issues/1810)
+
+---------------
 # ver 2.9.10
 Date: 14 April 2021
 

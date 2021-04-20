@@ -54,7 +54,7 @@ class FormViewActivity : BackActivity(), IFormView,
     private lateinit var datapointId: String
     private lateinit var formId: String
     private lateinit var viewPager: ViewPager
-    private var formInstanceId: Long = 0L
+    private var formInstanceId: Long = -1L
 
     @Inject
     lateinit var navigator: Navigator
@@ -94,7 +94,7 @@ class FormViewActivity : BackActivity(), IFormView,
         surveyGroup = intent.getSerializableExtra(ConstantUtil.SURVEY_EXTRA) as SurveyGroup
         formId = intent.getStringExtra(ConstantUtil.FORM_ID_EXTRA)!!
         datapointId = intent.getStringExtra(ConstantUtil.DATA_POINT_ID_EXTRA)!!
-        formInstanceId = intent.getLongExtra(ConstantUtil.RESPONDENT_ID_EXTRA, 0)
+        formInstanceId = intent.getLongExtra(ConstantUtil.RESPONDENT_ID_EXTRA, -1L)
         presenter.loadForm(formId, formInstanceId, surveyGroup, datapointId)
         sectionsPagerAdapter.groups = mutableListOf()
         sectionsPagerAdapter.notifyDataSetChanged()

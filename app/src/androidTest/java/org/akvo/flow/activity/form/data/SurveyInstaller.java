@@ -36,6 +36,7 @@ import org.akvo.flow.data.database.SurveyDbDataSource;
 import org.akvo.flow.data.database.cascade.CascadeDB;
 import org.akvo.flow.database.DataPointDownloadTable;
 import org.akvo.flow.database.DatabaseHelper;
+import org.akvo.flow.database.FormUpdateNotifiedTable;
 import org.akvo.flow.database.LanguageTable;
 import org.akvo.flow.domain.Node;
 import org.akvo.flow.domain.Question;
@@ -80,10 +81,10 @@ public class SurveyInstaller {
 
     public SurveyInstaller(Context context) {
         SqlBrite sqlBrite = new SqlBrite.Builder().build();
-        DatabaseHelper databaseHelper = new DatabaseHelper(context, new LanguageTable(), new DataPointDownloadTable());
+        DatabaseHelper databaseHelper = new DatabaseHelper(context, new LanguageTable(), new DataPointDownloadTable(), new FormUpdateNotifiedTable());
         BriteDatabase db = sqlBrite
                 .wrapDatabaseHelper(databaseHelper, AndroidSchedulers.mainThread());
-        this.adapter = new SurveyDbDataSource(context, db);
+        this.adapter = new SurveyDbDataSource(db, databaseHelper);
     }
 
     public Survey installSurvey(int resId, Context context) {
@@ -110,9 +111,8 @@ public class SurveyInstaller {
                         user, surveyedLocaleId);
         Map<String, QuestionResponse> questionResponseMap = new HashMap<>();
         if (responseBuilders != null) {
-            int length = responseBuilders.length;
-            for (int i = 0; i < length; i++) {
-                QuestionResponse responseToSave = responseBuilders[i]
+            for (QuestionResponse.QuestionResponseBuilder responseBuilder : responseBuilders) {
+                QuestionResponse responseToSave = responseBuilder
                         .setSurveyInstanceId(surveyInstanceId)
                         .createQuestionResponse();
                 questionResponseMap.put(responseToSave.getResponseKey(), responseToSave);

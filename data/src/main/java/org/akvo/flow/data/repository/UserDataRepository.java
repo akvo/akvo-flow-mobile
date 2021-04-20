@@ -145,4 +145,14 @@ public class UserDataRepository implements UserRepository {
     public void saveLastNotificationTime() {
         dataSourceFactory.getSharedPreferencesDataSource().setAppUpdateNotifiedTime();
     }
+
+    @Override
+    public int formVersionUpdateNotified(String formId, double formVersion) {
+        return dataSourceFactory.getDataBaseDataSource().formVersionUpdateNotified(formId, formVersion);
+    }
+
+    @Override
+    public void saveFormVersionNotified(String formId, double formVersion) {
+        dataSourceFactory.getDataBaseDataSource().saveFormVersionNotified(formId, formVersion);
+    }
 }

@@ -47,4 +47,12 @@ class FormInstanceDataRepository @Inject constructor(private val dataSourceFacto
     override fun createFormInstance(domainFormInstance: DomainFormInstance): Single<Long> {
         return dataSourceFactory.dataBaseDataSource.createFormInstance(domainFormInstance)
     }
+
+    override fun updateFormVersion(formInstanceId: Long, formVersion: Double): Long {
+        return dataSourceFactory.dataBaseDataSource.updateFormVersion(formInstanceId, formVersion)
+    }
+
+    override fun getFormInstance(formId: String, datapointId: String): Pair<Long, Int> {
+        return dataSourceFactory.dataBaseDataSource.getFormInstance(formId, datapointId)
+    }
 }

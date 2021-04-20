@@ -39,7 +39,7 @@ sealed class QuestionViewHolder<T : ViewQuestionAnswer>(val view: View) :
     private fun mandatoryText(mandatory: Boolean): String {
         return when {
             mandatory -> {
-                " *"
+                "*"
             }
             else -> {
                 ""

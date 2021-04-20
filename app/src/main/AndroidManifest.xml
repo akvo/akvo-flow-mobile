@@ -41,7 +41,7 @@
 
         <activity
             android:name=".presentation.form.view.FormViewActivity"
-            android:theme="@style/FlowAppTheme" />
+            android:theme="@style/FormAppTheme" />
         <activity
             android:name=".presentation.main.MainActivity"
             android:launchMode="singleInstance"

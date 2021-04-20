@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2020,2021 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -148,7 +148,7 @@ class BootstrapProcessorTest {
     }
 
     @Test
-    fun processSurveyFileShouldFailForEmptyAppName() {
+    fun processSurveyFileShouldFailForEmptyAppNameAndAlias() {
         every { (zipFile.entries()) }.returns(TestEntries(sequenceOf(zipEntry)))
         every { (zipEntry.name) }.returns("file" + ConstantUtil.XML_SUFFIX)
         every { (surveyMapper.generateFileName(any())) }.returns("file.xml")
@@ -157,6 +157,7 @@ class BootstrapProcessorTest {
         every { (fileProcessor.createAndCopyNewSurveyFile(any(), any(), any(), any())) }.returns(spyk(File("file.xml")))
         val metadata = SurveyMetadata()
         metadata.app = ""
+        metadata.alias = ""
         every { (fileProcessor.readBasicSurveyData(any())) }.returns(metadata)
 
         val result = processor.processSurveyFile(zipFile, zipEntry, zipEntry.name)
@@ -179,6 +180,25 @@ class BootstrapProcessorTest {
         val result = processor.processSurveyFile(zipFile, zipEntry, zipEntry.name)
 
         assertTrue(result is ProcessingResult.ProcessingErrorWrongDashboard)
+    }
+
+    @Test
+    fun processSurveyFileShouldSucceedForCorrectAliasName() {
+        every { (zipFile.entries()) }.returns(TestEntries(sequenceOf(zipEntry)))
+        every { (zipEntry.name) }.returns("file" + ConstantUtil.XML_SUFFIX)
+        every { (surveyMapper.generateFileName(any())) }.returns("file.xml")
+        every { (surveyMapper.getSurveyIdFromFilePath(any())) }.returns("id")
+        every { (surveyMapper.generateSurveyFolderName(any())) }.returns("folder")
+        every { (fileProcessor.createAndCopyNewSurveyFile(any(), any(), any(), any())) }.returns(spyk(File("file.xml")))
+        val metadata = SurveyMetadata()
+        metadata.alias = "uat1.akvoflow.org"
+        metadata.app = "akvoflow-uat"
+        every { (fileProcessor.readBasicSurveyData(any())) }.returns(metadata)
+        every { (surveyMapper.createOrUpdateSurvey(any(), any(), any(), any(), any())) }.returns(Survey())
+
+        val result = processor.processSurveyFile(zipFile, zipEntry, zipEntry.name)
+
+        assertTrue(result is ProcessingResult.ProcessingSuccess)
     }
 
     @Test

@@ -23,6 +23,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
 import org.akvo.flow.presentation.form.view.entity.ViewQuestionGroup
+import org.akvo.flow.presentation.form.view.groups.repeatable.RepeatableQuestionGroupFragment
 
 class QuestionGroupsPagerAdapter(fm: FragmentManager) :
     FragmentPagerAdapter(fm, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
@@ -30,7 +31,14 @@ class QuestionGroupsPagerAdapter(fm: FragmentManager) :
     var groups: List<ViewQuestionGroup> = mutableListOf()
 
     override fun getItem(position: Int): Fragment {
-        return QuestionGroupFragment.newInstance(groups[position].heading, groups[position].questionAnswers)
+        val viewQuestionGroup = groups[position]
+        if (viewQuestionGroup.isRepeatable) {
+            return RepeatableQuestionGroupFragment.newInstance(viewQuestionGroup.heading,
+                viewQuestionGroup.repetitions)
+        } else {
+            return QuestionGroupFragment.newInstance(viewQuestionGroup.heading,
+                viewQuestionGroup.questionAnswers)
+        }
     }
 
     override fun getPageTitle(position: Int): CharSequence {

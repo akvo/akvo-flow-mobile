@@ -515,7 +515,6 @@ sealed class ViewQuestionAnswer : Parcelable {
             }
         }
     }
-
 }
 
 data class ViewLocation(

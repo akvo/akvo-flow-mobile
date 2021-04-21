@@ -38,6 +38,7 @@ import org.akvo.flow.presentation.form.view.groups.entity.ViewCascadeLevel
 import org.akvo.flow.presentation.form.view.groups.entity.ViewLocation
 import org.akvo.flow.presentation.form.view.groups.entity.ViewOption
 import org.akvo.flow.presentation.form.view.groups.entity.ViewQuestionAnswer
+import org.akvo.flow.presentation.form.view.groups.repeatable.GroupRepetition
 import org.akvo.flow.util.ConstantUtil.CADDISFLY_QUESTION_TYPE
 import org.akvo.flow.util.ConstantUtil.CASCADE_QUESTION_TYPE
 import org.akvo.flow.util.ConstantUtil.DATE_QUESTION_TYPE
@@ -53,7 +54,6 @@ import org.json.JSONException
 import timber.log.Timber
 import java.text.DateFormat
 import java.text.SimpleDateFormat
-import java.util.ArrayList
 import java.util.Calendar
 import java.util.GregorianCalendar
 import java.util.HashMap
@@ -79,37 +79,76 @@ class ViewQuestionGroupMapper @Inject constructor() {
     }
 
     private fun transform(group: DomainQuestionGroup, responses: List<Response>): ViewQuestionGroup {
-        return ViewQuestionGroup(
-            group.heading, group.isRepeatable, listOfAnswers(
-                group.questions,
-                responses
+        if (group.isRepeatable) {
+            val maxRepsNumber: Int = countRepetitions(group.questions, responses)
+            return ViewQuestionGroup(
+                group.heading, group.isRepeatable, repetitions = listOfRepetitions(
+                    group.questions,
+                    responses,
+                    maxRepsNumber
+                )
             )
-        )
+        } else {
+            return ViewQuestionGroup(
+                group.heading, group.isRepeatable, questionAnswers = listOfAnswers(
+                    group.questions,
+                    responses,
+                    0
+                )
+            )
+        }
+    }
+
+    private fun listOfRepetitions(
+        questions: MutableList<Question>,
+        responses: List<Response>,
+        maxRepsNumber: Int,
+    ): ArrayList<GroupRepetition> {
+        val groupRepetitions = arrayListOf<GroupRepetition>()
+        for (repetition in 0 until maxRepsNumber) {
+            val header = "Repetition " + (repetition + 1)
+            Timber.d(header)
+            groupRepetitions.add(GroupRepetition(header,
+                listOfAnswers(questions, responses, repetition)))
+        }
+        return groupRepetitions
+    }
+
+    private fun countRepetitions(questions: MutableList<Question>, responses: List<Response>): Int {
+        var repetitionsCount = 0
+        questions.forEach { question ->
+            val listOfResponses: List<Response> = getResponsesForQuestion(
+                question.questionId, responses
+            )
+            if (listOfResponses.size > repetitionsCount) {
+                repetitionsCount = listOfResponses.size
+            }
+        }
+        return repetitionsCount
     }
 
     private fun listOfAnswers(
         questions: MutableList<Question>,
-        responses: List<Response>
+        responses: List<Response>,
+        repetition: Int
     ): ArrayList<ViewQuestionAnswer> {
         val answers = arrayListOf<ViewQuestionAnswer>()
         questions.forEach { question ->
             val listOfResponses: List<Response> = getResponsesForQuestion(
                 question.questionId, responses
             )
-            answers.add(createQuestionAnswer(question, listOfResponses))
+            answers.add(createQuestionAnswer(question, listOfResponses, repetition))
         }
         return answers
     }
 
-    //TODO: consider how to display repeatable question groups
-    //Add repetition object and inside all the questions
     private fun createQuestionAnswer(
         question: Question,
-        listOfResponses: List<Response>
+        listOfResponses: List<Response>,
+        repetition: Int
     ): ViewQuestionAnswer {
-        //first response only for now //TODO: check if works for repeatable ones
-        val answer = if (listOfResponses.isNotEmpty()) {
-            listOfResponses[0].value
+        val answer = if (listOfResponses.isNotEmpty() && listOfResponses.size > repetition) {
+            listOfResponses[repetition].value
         } else {
             ""
         }
@@ -403,7 +442,10 @@ class ViewQuestionGroupMapper @Inject constructor() {
         try {
             val listType = object : TypeToken<ArrayList<CascadeLevel>>() {}.type
             val mapper = GsonMapper(GsonBuilder().create())
-            cascadeLevels.addAll(mapper.read(data, listType))
+            val elements: ArrayList<CascadeLevel>? = mapper.read(data, listType)
+            if (elements != null) {
+                cascadeLevels.addAll(elements)
+            }
         } catch (e: JsonSyntaxException) {
             Timber.e("Value is not a valid JSON response: $data")
             // Default to old format

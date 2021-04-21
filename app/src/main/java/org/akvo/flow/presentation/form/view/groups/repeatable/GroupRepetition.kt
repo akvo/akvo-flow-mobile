@@ -32,9 +32,9 @@ data class GroupRepetition(val header: String, val questionAnswers: List<ViewQue
         parcel.readStringNonNull(),
         parcel.createParcelableItemList())
 
-    override fun writeToParcel(dest: Parcel, flags: Int) {
-        dest.writeString(header)
-        dest.writeParcelableItemList(questionAnswers, flags)
+    override fun writeToParcel(parcel: Parcel, flags: Int) {
+        parcel.writeString(header)
+        parcel.writeParcelableItemList(questionAnswers, flags)
     }
 
     companion object {

@@ -21,12 +21,16 @@ package org.akvo.flow.presentation.form.view.groups.entity
 
 import android.os.Bundle
 import android.os.Parcel
-import android.os.Parcelable
+import org.akvo.flow.domain.entity.KParcelable
 import org.akvo.flow.domain.entity.createStringArrayNonNull
 import org.akvo.flow.domain.entity.createTypedArrayNonNull
+import org.akvo.flow.domain.entity.parcelableCreator
 import org.akvo.flow.domain.entity.readStringNonNull
+import org.akvo.flow.domain.entity.safeReadBoolean
+import org.akvo.flow.domain.entity.safeReadBundle
+import org.akvo.flow.domain.entity.safeWriteBoolean
 
-sealed class ViewQuestionAnswer : Parcelable {
+sealed class ViewQuestionAnswer : KParcelable {
 
     abstract val questionId: String
     abstract val title: String // title is composed of order + . title ej: 1. Question one
@@ -43,37 +47,28 @@ sealed class ViewQuestionAnswer : Parcelable {
         override val translations: Bundle = Bundle(),
         val answer: String,
         val requireDoubleEntry: Boolean,
-    ) : ViewQuestionAnswer(), Parcelable {
+    ) : ViewQuestionAnswer() {
         constructor(parcel: Parcel) : this(
             parcel.readStringNonNull(),
             parcel.readStringNonNull(),
-            parcel.readByte() != 0.toByte(),
-            parcel.readBundle(Bundle::class.java.classLoader) ?: Bundle(),
+            parcel.safeReadBoolean(),
+            parcel.safeReadBundle(),
             parcel.readStringNonNull(),
-            parcel.readByte() != 0.toByte()
+            parcel.safeReadBoolean()
         )
 
         override fun writeToParcel(parcel: Parcel, flags: Int) {
             parcel.writeString(questionId)
             parcel.writeString(title)
-            parcel.writeByte(if (mandatory) 1 else 0)
+            parcel.safeWriteBoolean(mandatory)
             parcel.writeBundle(translations)
             parcel.writeString(answer)
-            parcel.writeByte(if (requireDoubleEntry) 1 else 0)
+            parcel.safeWriteBoolean(requireDoubleEntry)
         }
 
-        override fun describeContents(): Int {
-            return 0
-        }
-
-        companion object CREATOR : Parcelable.Creator<FreeTextViewQuestionAnswer> {
-            override fun createFromParcel(parcel: Parcel): FreeTextViewQuestionAnswer {
-                return FreeTextViewQuestionAnswer(parcel)
-            }
-
-            override fun newArray(size: Int): Array<FreeTextViewQuestionAnswer?> {
-                return arrayOfNulls(size)
-            }
+        companion object {
+            @JvmField
+            val CREATOR = parcelableCreator(::FreeTextViewQuestionAnswer)
         }
     }
 
@@ -86,37 +81,28 @@ sealed class ViewQuestionAnswer : Parcelable {
         override val translations: Bundle = Bundle(),
         val answer: String,
         val requireDoubleEntry: Boolean,
-    ) : ViewQuestionAnswer(), Parcelable {
+    ) : ViewQuestionAnswer() {
         constructor(parcel: Parcel) : this(
             parcel.readStringNonNull(),
             parcel.readStringNonNull(),
-            parcel.readByte() != 0.toByte(),
-            parcel.readBundle(Bundle::class.java.classLoader) ?: Bundle(),
+            parcel.safeReadBoolean(),
+            parcel.safeReadBundle(),
             parcel.readStringNonNull(),
-            parcel.readByte() != 0.toByte()
+            parcel.safeReadBoolean()
         )
 
         override fun writeToParcel(parcel: Parcel, flags: Int) {
             parcel.writeString(questionId)
             parcel.writeString(title)
-            parcel.writeByte(if (mandatory) 1 else 0)
+            parcel.safeWriteBoolean(mandatory)
             parcel.writeBundle(translations)
             parcel.writeString(answer)
-            parcel.writeByte(if (requireDoubleEntry) 1 else 0)
+            parcel.safeWriteBoolean(requireDoubleEntry)
         }
 
-        override fun describeContents(): Int {
-            return 0
-        }
-
-        companion object CREATOR : Parcelable.Creator<NumberViewQuestionAnswer> {
-            override fun createFromParcel(parcel: Parcel): NumberViewQuestionAnswer {
-                return NumberViewQuestionAnswer(parcel)
-            }
-
-            override fun newArray(size: Int): Array<NumberViewQuestionAnswer?> {
-                return arrayOfNulls(size)
-            }
+        companion object {
+            @JvmField
+            val CREATOR = parcelableCreator(::NumberViewQuestionAnswer)
         }
     }
 
@@ -128,39 +114,30 @@ sealed class ViewQuestionAnswer : Parcelable {
         val options: MutableList<ViewOption> = mutableListOf(), //set to empty if no answer
         val allowMultiple: Boolean = false,
         val allowOther: Boolean = false,
-    ) : ViewQuestionAnswer(), Parcelable {
+    ) : ViewQuestionAnswer() {
         constructor(parcel: Parcel) : this(
             parcel.readStringNonNull(),
             parcel.readStringNonNull(),
-            parcel.readByte() != 0.toByte(),
-            parcel.readBundle(Bundle::class.java.classLoader) ?: Bundle(),
-            parcel.createTypedArrayNonNull(ViewOption),
-            parcel.readByte() != 0.toByte(),
-            parcel.readByte() != 0.toByte()
+            parcel.safeReadBoolean(),
+            parcel.safeReadBundle(),
+            parcel.createTypedArrayNonNull(ViewOption.CREATOR),
+            parcel.safeReadBoolean(),
+            parcel.safeReadBoolean()
         )
 
         override fun writeToParcel(parcel: Parcel, flags: Int) {
             parcel.writeString(questionId)
             parcel.writeString(title)
-            parcel.writeByte(if (mandatory) 1 else 0)
+            parcel.safeWriteBoolean(mandatory)
             parcel.writeBundle(translations)
             parcel.writeTypedList(options)
-            parcel.writeByte(if (allowMultiple) 1 else 0)
-            parcel.writeByte(if (allowOther) 1 else 0)
+            parcel.safeWriteBoolean(allowMultiple)
+            parcel.safeWriteBoolean(allowOther)
         }
 
-        override fun describeContents(): Int {
-            return 0
-        }
-
-        companion object CREATOR : Parcelable.Creator<OptionViewQuestionAnswer> {
-            override fun createFromParcel(parcel: Parcel): OptionViewQuestionAnswer {
-                return OptionViewQuestionAnswer(parcel)
-            }
-
-            override fun newArray(size: Int): Array<OptionViewQuestionAnswer?> {
-                return arrayOfNulls(size)
-            }
+        companion object {
+            @JvmField
+            val CREATOR = parcelableCreator(::OptionViewQuestionAnswer)
         }
     }
 
@@ -174,31 +151,22 @@ sealed class ViewQuestionAnswer : Parcelable {
         constructor(parcel: Parcel) : this(
             parcel.readStringNonNull(),
             parcel.readStringNonNull(),
-            parcel.readByte() != 0.toByte(),
-            parcel.readBundle(Bundle::class.java.classLoader) ?: Bundle(),
-            parcel.createTypedArrayNonNull(ViewCascadeLevel)
+            parcel.safeReadBoolean(),
+            parcel.safeReadBundle(),
+            parcel.createTypedArrayNonNull(ViewCascadeLevel.CREATOR)
         )
 
         override fun writeToParcel(parcel: Parcel, flags: Int) {
             parcel.writeString(questionId)
             parcel.writeString(title)
-            parcel.writeByte(if (mandatory) 1 else 0)
+            parcel.safeWriteBoolean(mandatory)
             parcel.writeBundle(translations)
             parcel.writeTypedList(answers)
         }
 
-        override fun describeContents(): Int {
-            return 0
-        }
-
-        companion object CREATOR : Parcelable.Creator<CascadeViewQuestionAnswer> {
-            override fun createFromParcel(parcel: Parcel): CascadeViewQuestionAnswer {
-                return CascadeViewQuestionAnswer(parcel)
-            }
-
-            override fun newArray(size: Int): Array<CascadeViewQuestionAnswer?> {
-                return arrayOfNulls(size)
-            }
+        companion object {
+            @JvmField
+            val CREATOR = parcelableCreator(::CascadeViewQuestionAnswer)
         }
     }
 
@@ -212,31 +180,22 @@ sealed class ViewQuestionAnswer : Parcelable {
         constructor(parcel: Parcel) : this(
             parcel.readStringNonNull(),
             parcel.readStringNonNull(),
-            parcel.readByte() != 0.toByte(),
-            parcel.readBundle(Bundle::class.java.classLoader) ?: Bundle(),
+            parcel.safeReadBoolean(),
+            parcel.safeReadBundle(),
             parcel.readParcelable(ViewLocation::class.java.classLoader)
         )
 
         override fun writeToParcel(parcel: Parcel, flags: Int) {
             parcel.writeString(questionId)
             parcel.writeString(title)
-            parcel.writeByte(if (mandatory) 1 else 0)
+            parcel.safeWriteBoolean(mandatory)
             parcel.writeBundle(translations)
             parcel.writeParcelable(viewLocation, flags)
         }
 
-        override fun describeContents(): Int {
-            return 0
-        }
-
-        companion object CREATOR : Parcelable.Creator<LocationViewQuestionAnswer> {
-            override fun createFromParcel(parcel: Parcel): LocationViewQuestionAnswer {
-                return LocationViewQuestionAnswer(parcel)
-            }
-
-            override fun newArray(size: Int): Array<LocationViewQuestionAnswer?> {
-                return arrayOfNulls(size)
-            }
+        companion object {
+            @JvmField
+            val CREATOR = parcelableCreator(::LocationViewQuestionAnswer)
         }
     }
 
@@ -251,8 +210,8 @@ sealed class ViewQuestionAnswer : Parcelable {
         constructor(parcel: Parcel) : this(
             parcel.readStringNonNull(),
             parcel.readStringNonNull(),
-            parcel.readByte() != 0.toByte(),
-            parcel.readBundle(Bundle::class.java.classLoader) ?: Bundle(),
+            parcel.safeReadBoolean(),
+            parcel.safeReadBundle(),
             parcel.readStringNonNull(),
             parcel.readParcelable(ViewLocation::class.java.classLoader)
         )
@@ -260,24 +219,15 @@ sealed class ViewQuestionAnswer : Parcelable {
         override fun writeToParcel(parcel: Parcel, flags: Int) {
             parcel.writeString(questionId)
             parcel.writeString(title)
-            parcel.writeByte(if (mandatory) 1 else 0)
+            parcel.safeWriteBoolean(mandatory)
             parcel.writeBundle(translations)
             parcel.writeString(filePath)
             parcel.writeParcelable(location, flags)
         }
 
-        override fun describeContents(): Int {
-            return 0
-        }
-
-        companion object CREATOR : Parcelable.Creator<PhotoViewQuestionAnswer> {
-            override fun createFromParcel(parcel: Parcel): PhotoViewQuestionAnswer {
-                return PhotoViewQuestionAnswer(parcel)
-            }
-
-            override fun newArray(size: Int): Array<PhotoViewQuestionAnswer?> {
-                return arrayOfNulls(size)
-            }
+        companion object {
+            @JvmField
+            val CREATOR = parcelableCreator(::PhotoViewQuestionAnswer)
         }
     }
 
@@ -291,31 +241,22 @@ sealed class ViewQuestionAnswer : Parcelable {
         constructor(parcel: Parcel) : this(
             parcel.readStringNonNull(),
             parcel.readStringNonNull(),
-            parcel.readByte() != 0.toByte(),
-            parcel.readBundle(Bundle::class.java.classLoader) ?: Bundle(),
+            parcel.safeReadBoolean(),
+            parcel.safeReadBundle(),
             parcel.readStringNonNull()
         )
 
         override fun writeToParcel(parcel: Parcel, flags: Int) {
             parcel.writeString(questionId)
             parcel.writeString(title)
-            parcel.writeByte(if (mandatory) 1 else 0)
+            parcel.safeWriteBoolean(mandatory)
             parcel.writeBundle(translations)
             parcel.writeString(filePath)
         }
 
-        override fun describeContents(): Int {
-            return 0
-        }
-
-        companion object CREATOR : Parcelable.Creator<VideoViewQuestionAnswer> {
-            override fun createFromParcel(parcel: Parcel): VideoViewQuestionAnswer {
-                return VideoViewQuestionAnswer(parcel)
-            }
-
-            override fun newArray(size: Int): Array<VideoViewQuestionAnswer?> {
-                return arrayOfNulls(size)
-            }
+        companion object {
+            @JvmField
+            val CREATOR = parcelableCreator(::VideoViewQuestionAnswer)
         }
     }
 
@@ -330,31 +271,22 @@ sealed class ViewQuestionAnswer : Parcelable {
         constructor(parcel: Parcel) : this(
             parcel.readStringNonNull(),
             parcel.readStringNonNull(),
-            parcel.readByte() != 0.toByte(),
-            parcel.readBundle(Bundle::class.java.classLoader) ?: Bundle(),
+            parcel.safeReadBoolean(),
+            parcel.safeReadBundle(),
             parcel.readStringNonNull()
         )
 
         override fun writeToParcel(parcel: Parcel, flags: Int) {
             parcel.writeString(questionId)
             parcel.writeString(title)
-            parcel.writeByte(if (mandatory) 1 else 0)
+            parcel.safeWriteBoolean(mandatory)
             parcel.writeBundle(translations)
             parcel.writeString(answer)
         }
 
-        override fun describeContents(): Int {
-            return 0
-        }
-
-        companion object CREATOR : Parcelable.Creator<DateViewQuestionAnswer> {
-            override fun createFromParcel(parcel: Parcel): DateViewQuestionAnswer {
-                return DateViewQuestionAnswer(parcel)
-            }
-
-            override fun newArray(size: Int): Array<DateViewQuestionAnswer?> {
-                return arrayOfNulls(size)
-            }
+        companion object {
+            @JvmField
+            val CREATOR = parcelableCreator(::DateViewQuestionAnswer)
         }
     }
 
@@ -369,33 +301,24 @@ sealed class ViewQuestionAnswer : Parcelable {
         constructor(parcel: Parcel) : this(
             parcel.readStringNonNull(),
             parcel.readStringNonNull(),
-            parcel.readByte() != 0.toByte(),
-            parcel.readBundle(Bundle::class.java.classLoader) ?: Bundle(),
+            parcel.safeReadBoolean(),
+            parcel.safeReadBundle(),
             parcel.createStringArrayNonNull(),
-            parcel.readByte() != 0.toByte(),
+            parcel.safeReadBoolean(),
         )
 
         override fun writeToParcel(parcel: Parcel, flags: Int) {
             parcel.writeString(questionId)
             parcel.writeString(title)
-            parcel.writeByte(if (mandatory) 1 else 0)
+            parcel.safeWriteBoolean(mandatory)
             parcel.writeBundle(translations)
             parcel.writeStringList(answers)
-            parcel.writeByte(if (allowMultiple) 1 else 0)
+            parcel.safeWriteBoolean(allowMultiple)
         }
 
-        override fun describeContents(): Int {
-            return 0
-        }
-
-        companion object CREATOR : Parcelable.Creator<BarcodeViewQuestionAnswer> {
-            override fun createFromParcel(parcel: Parcel): BarcodeViewQuestionAnswer {
-                return BarcodeViewQuestionAnswer(parcel)
-            }
-
-            override fun newArray(size: Int): Array<BarcodeViewQuestionAnswer?> {
-                return arrayOfNulls(size)
-            }
+        companion object {
+            @JvmField
+            val CREATOR = parcelableCreator(::BarcodeViewQuestionAnswer)
         }
     }
 
@@ -409,31 +332,22 @@ sealed class ViewQuestionAnswer : Parcelable {
         constructor(parcel: Parcel) : this(
             parcel.readStringNonNull(),
             parcel.readStringNonNull(),
-            parcel.readByte() != 0.toByte(),
-            parcel.readBundle(Bundle::class.java.classLoader)?:Bundle(),
+            parcel.safeReadBoolean(),
+            parcel.safeReadBundle(),
             parcel.readStringNonNull()
         )
 
         override fun writeToParcel(parcel: Parcel, flags: Int) {
             parcel.writeString(questionId)
             parcel.writeString(title)
-            parcel.writeByte(if (mandatory) 1 else 0)
+            parcel.safeWriteBoolean(mandatory)
             parcel.writeBundle(translations)
             parcel.writeString(geojsonAnswer)
         }
 
-        override fun describeContents(): Int {
-            return 0
-        }
-
-        companion object CREATOR : Parcelable.Creator<GeoShapeViewQuestionAnswer> {
-            override fun createFromParcel(parcel: Parcel): GeoShapeViewQuestionAnswer {
-                return GeoShapeViewQuestionAnswer(parcel)
-            }
-
-            override fun newArray(size: Int): Array<GeoShapeViewQuestionAnswer?> {
-                return arrayOfNulls(size)
-            }
+        companion object {
+            @JvmField
+            val CREATOR = parcelableCreator(::GeoShapeViewQuestionAnswer)
         }
     }
 
@@ -448,8 +362,8 @@ sealed class ViewQuestionAnswer : Parcelable {
         constructor(parcel: Parcel) : this(
             parcel.readStringNonNull(),
             parcel.readStringNonNull(),
-            parcel.readByte() != 0.toByte(),
-            parcel.readBundle(Bundle::class.java.classLoader)?:Bundle(),
+            parcel.safeReadBoolean(),
+            parcel.safeReadBundle(),
             parcel.readStringNonNull(),
             parcel.readStringNonNull()
         )
@@ -457,24 +371,15 @@ sealed class ViewQuestionAnswer : Parcelable {
         override fun writeToParcel(parcel: Parcel, flags: Int) {
             parcel.writeString(questionId)
             parcel.writeString(title)
-            parcel.writeByte(if (mandatory) 1 else 0)
+            parcel.safeWriteBoolean(mandatory)
             parcel.writeBundle(translations)
             parcel.writeString(base64ImageString)
             parcel.writeString(name)
         }
 
-        override fun describeContents(): Int {
-            return 0
-        }
-
-        companion object CREATOR : Parcelable.Creator<SignatureViewQuestionAnswer> {
-            override fun createFromParcel(parcel: Parcel): SignatureViewQuestionAnswer {
-                return SignatureViewQuestionAnswer(parcel)
-            }
-
-            override fun newArray(size: Int): Array<SignatureViewQuestionAnswer?> {
-                return arrayOfNulls(size)
-            }
+        companion object {
+            @JvmField
+            val CREATOR = parcelableCreator(::SignatureViewQuestionAnswer)
         }
     }
 
@@ -488,31 +393,22 @@ sealed class ViewQuestionAnswer : Parcelable {
         constructor(parcel: Parcel) : this(
             parcel.readStringNonNull(),
             parcel.readStringNonNull(),
-            parcel.readByte() != 0.toByte(),
-            parcel.readBundle(Bundle::class.java.classLoader)?:Bundle(),
+            parcel.safeReadBoolean(),
+            parcel.safeReadBundle(),
             parcel.createStringArrayNonNull()
         )
 
         override fun writeToParcel(parcel: Parcel, flags: Int) {
             parcel.writeString(questionId)
             parcel.writeString(title)
-            parcel.writeByte(if (mandatory) 1 else 0)
+            parcel.safeWriteBoolean(mandatory)
             parcel.writeBundle(translations)
             parcel.writeStringList(answers)
         }
 
-        override fun describeContents(): Int {
-            return 0
-        }
-
-        companion object CREATOR : Parcelable.Creator<CaddisflyViewQuestionAnswer> {
-            override fun createFromParcel(parcel: Parcel): CaddisflyViewQuestionAnswer {
-                return CaddisflyViewQuestionAnswer(parcel)
-            }
-
-            override fun newArray(size: Int): Array<CaddisflyViewQuestionAnswer?> {
-                return arrayOfNulls(size)
-            }
+        companion object {
+            @JvmField
+            val CREATOR = parcelableCreator(::CaddisflyViewQuestionAnswer)
         }
     }
 }
@@ -522,7 +418,7 @@ data class ViewLocation(
     val longitude: String,
     val altitude: String = "",
     val accuracy: String = "", //formatted accuracy for displaying
-) : Parcelable {
+) : KParcelable {
     constructor(parcel: Parcel) : this(
         parcel.readStringNonNull(),
         parcel.readStringNonNull(),
@@ -541,18 +437,9 @@ data class ViewLocation(
         parcel.writeString(accuracy)
     }
 
-    override fun describeContents(): Int {
-        return 0
-    }
-
-    companion object CREATOR : Parcelable.Creator<ViewLocation> {
-        override fun createFromParcel(parcel: Parcel): ViewLocation {
-            return ViewLocation(parcel)
-        }
-
-        override fun newArray(size: Int): Array<ViewLocation?> {
-            return arrayOfNulls(size)
-        }
+    companion object {
+        @JvmField
+        val CREATOR = parcelableCreator(::ViewLocation)
     }
 }
 
@@ -561,37 +448,28 @@ data class ViewOption(
     val code: String = "",
     val isOther: Boolean = false,
     val selected: Boolean,
-) : Parcelable {
+) : KParcelable {
     constructor(parcel: Parcel) : this(
         parcel.readStringNonNull(),
         parcel.readStringNonNull(),
-        parcel.readByte() != 0.toByte(),
-        parcel.readByte() != 0.toByte()
+        parcel.safeReadBoolean(),
+        parcel.safeReadBoolean()
     )
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         parcel.writeString(name)
         parcel.writeString(code)
-        parcel.writeByte(if (isOther) 1 else 0)
-        parcel.writeByte(if (selected) 1 else 0)
+        parcel.safeWriteBoolean(isOther)
+        parcel.safeWriteBoolean(selected)
     }
 
-    override fun describeContents(): Int {
-        return 0
-    }
-
-    companion object CREATOR : Parcelable.Creator<ViewOption> {
-        override fun createFromParcel(parcel: Parcel): ViewOption {
-            return ViewOption(parcel)
-        }
-
-        override fun newArray(size: Int): Array<ViewOption?> {
-            return arrayOfNulls(size)
-        }
+    companion object {
+        @JvmField
+        val CREATOR = parcelableCreator(::ViewOption)
     }
 }
 
-data class ViewCascadeLevel(val level: String, val answer: String) : Parcelable {
+data class ViewCascadeLevel(val level: String, val answer: String) : KParcelable {
     constructor(parcel: Parcel) : this(
         parcel.readStringNonNull(),
         parcel.readStringNonNull()
@@ -602,18 +480,9 @@ data class ViewCascadeLevel(val level: String, val answer: String) : Parcelable 
         parcel.writeString(answer)
     }
 
-    override fun describeContents(): Int {
-        return 0
-    }
-
-    companion object CREATOR : Parcelable.Creator<ViewCascadeLevel> {
-        override fun createFromParcel(parcel: Parcel): ViewCascadeLevel {
-            return ViewCascadeLevel(parcel)
-        }
-
-        override fun newArray(size: Int): Array<ViewCascadeLevel?> {
-            return arrayOfNulls(size)
-        }
+    companion object {
+        @JvmField
+        val CREATOR = parcelableCreator(::ViewCascadeLevel)
     }
 }
 

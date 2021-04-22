@@ -36,8 +36,7 @@ import org.akvo.flow.presentation.datapoints.map.one.DataPointMapActivity;
 import org.akvo.flow.presentation.form.languages.LanguagesDialogFragment;
 import org.akvo.flow.presentation.form.mobiledata.MobileDataSettingDialog;
 import org.akvo.flow.presentation.form.view.FormViewActivity;
-import org.akvo.flow.presentation.form.view.groups.QuestionGroupFragment;
-import org.akvo.flow.presentation.form.view.groups.repeatable.RepeatableQuestionGroupFragment;
+import org.akvo.flow.presentation.form.view.groups.MediaQuestionLayout;
 import org.akvo.flow.presentation.geoshape.ViewGeoShapeActivity;
 import org.akvo.flow.presentation.geoshape.create.CreateGeoShapeActivity;
 import org.akvo.flow.presentation.geoshape.properties.PropertiesDialog;
@@ -137,7 +136,5 @@ public interface ViewComponent {
 
     void inject(@NotNull StatsDialogFragment statsDialogFragment);
 
-    void inject(@NotNull QuestionGroupFragment questionGroupFragment);
-
-    void inject(@NotNull RepeatableQuestionGroupFragment repeatableQuestionGroupFragment);
+    void inject(@NotNull MediaQuestionLayout mediaQuestionLayout);
 }

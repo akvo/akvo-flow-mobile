@@ -36,7 +36,6 @@ import org.akvo.flow.presentation.form.languages.LanguagesDialogFragment
 import org.akvo.flow.presentation.form.view.entity.ViewForm
 import org.akvo.flow.presentation.form.view.groups.GeoShapeListener
 import org.akvo.flow.presentation.form.view.groups.MediaQuestionListener
-import org.akvo.flow.presentation.form.view.groups.QuestionGroupFragment
 import org.akvo.flow.presentation.form.view.groups.QuestionGroupsPagerAdapter
 import org.akvo.flow.ui.Navigator
 import org.akvo.flow.uicomponents.BackActivity
@@ -180,12 +179,6 @@ class FormViewActivity : BackActivity(), IFormView,
         } else {
             displayError(availableLanguages)
         }
-    }
-
-    override fun downloadMedia(filename: String, index: Int) {
-        val groupFragment =
-            supportFragmentManager.fragments[viewPager.currentItem] as QuestionGroupFragment
-        groupFragment.downloadMedia(filename, index)
     }
 
     override fun viewVideo(filePath: String) {

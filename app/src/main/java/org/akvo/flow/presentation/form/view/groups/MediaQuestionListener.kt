@@ -20,7 +20,6 @@
 package org.akvo.flow.presentation.form.view.groups
 
 interface MediaQuestionListener {
-    fun downloadMedia(filename: String, index: Int)
     fun viewVideo(filePath: String)
     fun viewImage(filePath: String)
 }

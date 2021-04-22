@@ -27,43 +27,16 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import org.akvo.flow.R
-import org.akvo.flow.app.FlowApp
-import org.akvo.flow.injector.component.ApplicationComponent
-import org.akvo.flow.injector.component.DaggerViewComponent
-import org.akvo.flow.presentation.form.view.groups.QuestionGroupPresenter
-import org.akvo.flow.presentation.form.view.groups.QuestionGroupView
-import org.akvo.flow.util.image.GlideImageLoader
-import org.akvo.flow.util.image.ImageLoader
-import javax.inject.Inject
 
-class RepeatableQuestionGroupFragment : Fragment(), QuestionGroupView {
+class RepeatableQuestionGroupFragment : Fragment(){
 
     private lateinit var questionGroupTitle: String
     private lateinit var groupRepetitions: ArrayList<GroupRepetition>
-    private lateinit var imageLoader: ImageLoader
-    private lateinit var repetitionsRv: RecyclerView
-
-    @Inject
-    lateinit var presenter: QuestionGroupPresenter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         questionGroupTitle = arguments!!.getString(QUESTION_GROUP_TITLE, "")
         groupRepetitions = arguments!!.getParcelableArrayList(REPETITIONS_LIST)?: arrayListOf()
-        initialiseInjector()
-        imageLoader = GlideImageLoader(this)
-        presenter.setView(this)
-    }
-
-    private fun initialiseInjector() {
-        val viewComponent =
-            DaggerViewComponent.builder().applicationComponent(getApplicationComponent())
-                .build()
-        viewComponent.inject(this)
-    }
-
-    private fun getApplicationComponent(): ApplicationComponent? {
-        return (context?.applicationContext as FlowApp).getApplicationComponent()
     }
 
     override fun onCreateView(
@@ -75,26 +48,10 @@ class RepeatableQuestionGroupFragment : Fragment(), QuestionGroupView {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        repetitionsRv = view.findViewById(R.id.repetitionsRv)
-        repetitionsRv.apply {
+        view.findViewById<RecyclerView>(R.id.repetitionsRv).apply {
             layoutManager = LinearLayoutManager(activity)
             adapter = RepeatableGroupQuestionAdapter(groupRepetitions)
         }
-    }
-
-    //TODO: fix this
-    override fun showDownloadSuccess(viewIndex: Int) {
-      //  (repetitionsRv.adapter as GroupQuestionsAdapter).showDownLoadSuccess(viewIndex)
-    }
-
-    //TODO: fix this
-    override fun showDownloadFailed(viewIndex: Int) {
-      //  (repetitionsRv.adapter as GroupQuestionsAdapter).showDownLoadFailed(viewIndex)
-    }
-
-    //TODO: fix this
-    fun downloadMedia(filename: String, index: Int) {
-        presenter.downloadMedia(filename, index)
     }
 
     companion object {

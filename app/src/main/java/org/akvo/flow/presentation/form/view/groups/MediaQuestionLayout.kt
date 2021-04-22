@@ -28,11 +28,18 @@ import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.ProgressBar
 import androidx.core.content.ContextCompat
+import io.reactivex.observers.DisposableCompletableObserver
 import org.akvo.flow.R
+import org.akvo.flow.app.FlowApp
+import org.akvo.flow.domain.interactor.datapoints.DownloadMedia
+import org.akvo.flow.injector.component.ApplicationComponent
+import org.akvo.flow.injector.component.DaggerViewComponent
 import org.akvo.flow.util.image.DrawableLoadListener
 import org.akvo.flow.util.image.GlideImageLoader
 import org.akvo.flow.util.image.ImageLoader
 import java.io.File
+import java.util.HashMap
+import javax.inject.Inject
 
 class MediaQuestionLayout @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
@@ -45,6 +52,9 @@ class MediaQuestionLayout @JvmOverloads constructor(
     private var listener: MediaQuestionListener
     private var imageLoader: ImageLoader = GlideImageLoader(context)
 
+    @Inject
+    lateinit var downloadMedia: DownloadMedia
+
     init {
         inflate(context, R.layout.media_question_preview, this)
         imageView = findViewById(R.id.image)
@@ -56,7 +66,19 @@ class MediaQuestionLayout @JvmOverloads constructor(
         } else {
             throw IllegalArgumentException("Activity must implement MediaQuestionListener")
         }
+        initialiseInjector()
     }
+
+    private fun initialiseInjector() {
+        val viewComponent = DaggerViewComponent.builder().applicationComponent(
+            applicationComponent
+        )
+            .build()
+        viewComponent.inject(this)
+    }
+
+    private val applicationComponent: ApplicationComponent
+        get() = (context.applicationContext as FlowApp).getApplicationComponent()
 
     fun setUpImageDisplay(index: Int, filePath: String) {
         progressBar.visibility = View.GONE
@@ -92,7 +114,18 @@ class MediaQuestionLayout @JvmOverloads constructor(
         downloadButton.setOnClickListener {
             progressBar.visibility = View.VISIBLE
             downloadButton.visibility = View.GONE
-            listener.downloadMedia(filePath, index)
+            val params: MutableMap<String?, Any> = HashMap(2)
+            params[DownloadMedia.PARAM_FILE_PATH] = filePath
+            downloadMedia.execute(object :
+                DisposableCompletableObserver() {
+                override fun onComplete() {
+                    setUpImageDisplay(index, filePath)
+                }
+
+                override fun onError(e: Throwable) {
+                    setUpImageDisplay(index, filePath)
+                }
+            }, params)
         }
     }
 }

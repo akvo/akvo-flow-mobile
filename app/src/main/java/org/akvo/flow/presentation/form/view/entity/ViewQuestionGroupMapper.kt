@@ -161,7 +161,7 @@ class ViewQuestionGroupMapper @Inject constructor() {
                     title,
                     question.isMandatory,
                     mapToBundle(question.languageTranslationMap),
-                    mapToViewOption(question.options, answer),
+                    mapToViewOption(question.options, answer, question.isAllowOther),
                     question.isAllowMultiple,
                     question.isAllowOther
                 )
@@ -378,20 +378,31 @@ class ViewQuestionGroupMapper @Inject constructor() {
 
     private fun mapToViewOption(
         options: MutableList<Option>?,
-        response: String
+        response: String, allowOther: Boolean
     ): MutableList<ViewOption> {
         val viewOptions = mutableListOf<ViewOption>()
         val selectedOptions: MutableList<String> = deserializeToOptions(response)
+        val optionsToRemove = mutableListOf<String>()
         if (options != null) {
             for (option in options) {
+                val selected = selectedOptions.contains(option.text)
                 viewOptions.add(
                     ViewOption(
                         option.text ?: "",
                         option.code ?: "",
                         option.isOther,
-                        selectedOptions.contains(option.text)
+                        selected
                     )
                 )
+                if (selected && option.text != null) {
+                    optionsToRemove.add(option.text!!)
+                }
+            }
+            if (allowOther) {
+                selectedOptions.removeAll(optionsToRemove)
+                val otherSelected = selectedOptions.size > 0
+                val otherName = if (otherSelected) selectedOptions[0] else "OTHER"
+                viewOptions.add(ViewOption(name = otherName, code = "OTHER", isOther = true, otherSelected))
             }
         }
         Timber.d("options " + options?.size)

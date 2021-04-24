@@ -155,7 +155,6 @@ class ViewQuestionGroupMapper @Inject constructor() {
         val title = """${question.order}. ${question.text}"""
         return when (question.type) {
             OPTION_QUESTION_TYPE -> {
-                Timber.d("question: "+question)
                 ViewQuestionAnswer.OptionViewQuestionAnswer(
                     question.questionId ?: "",
                     title,
@@ -274,13 +273,12 @@ class ViewQuestionGroupMapper @Inject constructor() {
         if (!TextUtils.isEmpty(answer)) {
             try {
                 val gson = Gson()
-                val caddisflyResult: CaddisflyResult =
-                    gson.fromJson(answer, CaddisflyResult::class.java)
-                if (caddisflyResult.results != null) {
+                val caddisflyResult = gson.fromJson(answer, CaddisflyResult::class.java)
+                if (caddisflyResult != null) {
                     results.addAll(caddisflyResult.results)
                 }
             } catch (e: JsonSyntaxException) {
-                Timber.e(e, "Unable to parse caddisfly result: %s", answer)
+                Timber.e("Unable to parse caddisfly result: %s", answer)
             }
         }
         for (r in results) {
@@ -405,9 +403,6 @@ class ViewQuestionGroupMapper @Inject constructor() {
                 viewOptions.add(ViewOption(name = otherName, code = "OTHER", isOther = true, otherSelected))
             }
         }
-        Timber.d("options " + options?.size)
-        Timber.d("response " + response)
-        Timber.d("selected " + selectedOptions)
         return viewOptions
     }
 
@@ -432,7 +427,7 @@ class ViewQuestionGroupMapper @Inject constructor() {
             }
             return options
         } catch (e: JSONException) {
-            Timber.e(e)
+            Timber.e("Value is not a valid JSON response: $data")
         }
 
         // Default to old format
@@ -492,7 +487,6 @@ class ViewQuestionGroupMapper @Inject constructor() {
 
     companion object {
         private const val TEXT = "text"
-        private const val RESPONSE_DELIMITER = "|"
         private const val POSITION_LATITUDE = 0
         private const val POSITION_LONGITUDE = 1
         private const val POSITION_ALTITUDE = 2

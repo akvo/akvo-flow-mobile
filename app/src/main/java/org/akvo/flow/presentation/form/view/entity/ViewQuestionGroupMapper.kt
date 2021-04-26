@@ -115,7 +115,7 @@ class ViewQuestionGroupMapper @Inject constructor() {
     }
 
     private fun countRepetitions(questions: MutableList<Question>, responses: List<Response>): Int {
-        var repetitionsCount = 0
+        var repetitionsCount = 1
         questions.forEach { question ->
             val listOfResponses: List<Response> = getResponsesForQuestion(
                 question.questionId, responses
@@ -399,7 +399,7 @@ class ViewQuestionGroupMapper @Inject constructor() {
             if (allowOther) {
                 selectedOptions.removeAll(optionsToRemove)
                 val otherSelected = selectedOptions.size > 0
-                val otherName = if (otherSelected) selectedOptions[0] else "OTHER"
+                val otherName = if (otherSelected) "Other: " + selectedOptions[0] else "Other"
                 viewOptions.add(ViewOption(name = otherName, code = "OTHER", isOther = true, otherSelected))
             }
         }

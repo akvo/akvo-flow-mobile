@@ -26,7 +26,6 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
-import org.akvo.flow.domain.SurveyGroup
 import org.akvo.flow.domain.interactor.forms.FormResult
 import org.akvo.flow.domain.interactor.forms.GetFormWithGroups
 import org.akvo.flow.domain.interactor.responses.LoadResponses
@@ -60,15 +59,13 @@ class FormViewPresenter @Inject constructor(
     fun loadForm(
         formId: String,
         formInstanceId: Long,
-        surveyGroup: SurveyGroup,
-        recordId: String
     ) {
         val params: MutableMap<String, Any> = HashMap(2)
         params[GetFormWithGroups.PARAM_FORM_ID] = formId
 
         val paramsResponses: MutableMap<String, Any> = HashMap(2)
         paramsResponses[LoadResponses.PARAM_FORM_INSTANCE_ID] = formInstanceId
-        //TODO: show loading
+        view?.showLoading()
         uiScope.launch {
             try {
                 // coroutineScope is needed, else in case of any network error, it will crash
@@ -76,17 +73,22 @@ class FormViewPresenter @Inject constructor(
                     val formResult = async { getFormUseCase.execute(params)} .await()
                     val responsesResult = async { loadResponses.execute(paramsResponses)} .await()
                     if (formResult is FormResult.Success && responsesResult is ResponsesResult.Success) {
-                        view?.displayForm(viewFormMapper.transform(formResult.domainForm, responsesResult.responses))
+                        val viewForm = viewFormMapper.transform(formResult.domainForm, responsesResult.responses)
+                        view?.hideLoading()
+                        view?.displayForm(viewForm)
                     } else if (formResult is FormResult.ParamError ) {
                         Timber.e(formResult.message)
+                        view?.hideLoading()
                         view?.showErrorLoadingForm()
                     } else {
                         //TODO: display specific error when responses could not be loaded
+                        view?.hideLoading()
                         view?.showErrorLoadingForm()
                     }
                 }
             } catch (e: Exception) {
                 Timber.e(e)
+                view?.hideLoading()
                 view?.showErrorLoadingForm()
             }
         }

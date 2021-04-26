@@ -22,6 +22,8 @@ package org.akvo.flow.presentation.form.view
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
+import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.core.content.FileProvider
@@ -53,6 +55,7 @@ class FormViewActivity : BackActivity(), IFormView,
     private lateinit var datapointId: String
     private lateinit var formId: String
     private lateinit var viewPager: ViewPager
+    private lateinit var progressBar: ProgressBar
     private var formInstanceId: Long = -1L
 
     @Inject
@@ -78,6 +81,7 @@ class FormViewActivity : BackActivity(), IFormView,
         viewPager.adapter = sectionsPagerAdapter
         val tabs: TabLayout = findViewById(R.id.tabs)
         tabs.setupWithViewPager(viewPager)
+        progressBar = findViewById(R.id.progressBar)
     }
 
     private fun initializeInjector() {
@@ -94,7 +98,7 @@ class FormViewActivity : BackActivity(), IFormView,
         formId = intent.getStringExtra(ConstantUtil.FORM_ID_EXTRA)!!
         datapointId = intent.getStringExtra(ConstantUtil.DATA_POINT_ID_EXTRA)!!
         formInstanceId = intent.getLongExtra(ConstantUtil.RESPONDENT_ID_EXTRA, -1L)
-        presenter.loadForm(formId, formInstanceId, surveyGroup, datapointId)
+        presenter.loadForm(formId, formInstanceId)
         sectionsPagerAdapter.groups = mutableListOf()
         sectionsPagerAdapter.notifyDataSetChanged()
     }
@@ -209,5 +213,13 @@ class FormViewActivity : BackActivity(), IFormView,
         val data = Bundle()
         data.putString(ConstantUtil.GEOSHAPE_RESULT, geoJson)
         navigator.navigateToViewGeoShapeActivity(this, data)
+    }
+
+    override fun showLoading() {
+        progressBar.visibility = View.VISIBLE
+    }
+
+    override fun hideLoading() {
+        progressBar.visibility = View.GONE
     }
 }

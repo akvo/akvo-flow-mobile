@@ -97,8 +97,7 @@ class Navigator @Inject constructor() {
         activity: FragmentActivity?, dataPointId: String?, formId: String?,
         formInstanceId: Long, readOnly: Boolean, survey: SurveyGroup?
     ) {
-        if (readOnly && isDebugInstance()) {
-            Timber.d("Form activity")
+        if (readOnly && isInternalInstance()) {
             val i = Intent(activity, FormViewActivity::class.java)
             i.putExtra(ConstantUtil.FORM_ID_EXTRA, formId)
             i.putExtra(ConstantUtil.SURVEY_EXTRA, survey)
@@ -116,8 +115,26 @@ class Navigator @Inject constructor() {
         }
     }
 
-    private fun isDebugInstance(): Boolean {
-        val debugInstances = listOf("akvoflow-uat1", "akvoflow-uat2", "akvoflow-dev1", "akvoflow-dev2", "akvoflow-dev3")
+    private fun isInternalInstance(): Boolean {
+        val debugInstances = listOf(
+            "akvoflow-uat1",
+            "akvoflow-uat2",
+            "akvoflow-dev1",
+            "akvoflow-dev2",
+            "akvoflow-dev3",
+            "akvoflow-45",
+            "akvoflow-60",
+            "akvoflow-62",
+            "akvoflow-106",
+            "akvoflow-hub2",
+            "akvoflow-internal2",
+            "akvoflow-163",
+            "akvoflow-168",
+            "akvoflow-185",
+            "akvoflow-197",
+            "akvoflow-206",
+            "akvoflow-213",
+        )
         return debugInstances.contains(BuildConfig.AWS_BUCKET)
     }
 

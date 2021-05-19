@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:flowapp="http://schemas.android.com/apk/res-auto" >
+
+    <item
+        android:id="@+id/more_submenu"
+        android:title="@string/more"
+        android:icon="@drawable/ic_more"
+        android:orderInCategory="100"
+        flowapp:showAsAction="always">
+
+        <menu>
+
+            <item
+                android:id="@+id/edit_lang"
+                android:title="@string/langoption"/>
+            <item
+                android:id="@+id/view_map"
+                android:title="@string/view_map"/>
+            <item
+                android:id="@+id/transmission"
+                android:title="@string/transmissionhist"/>
+        </menu>
+
+    </item>
+
+</menu>

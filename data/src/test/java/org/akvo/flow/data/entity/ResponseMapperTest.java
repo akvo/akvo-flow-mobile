@@ -21,14 +21,15 @@ package org.akvo.flow.data.entity;
 
 import android.database.Cursor;
 
+import androidx.core.util.Pair;
+
 import org.akvo.flow.database.ResponseColumns;
+import org.akvo.flow.domain.util.TextValueCleaner;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-
-import androidx.core.util.Pair;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
@@ -39,7 +40,7 @@ public class ResponseMapperTest {
     @Mock
     Cursor mockCursor;
 
-    private final ResponseMapper mapper = new ResponseMapper();
+    private final ResponseMapper mapper = new ResponseMapper(new TextValueCleaner());
 
     @Before
     public void setUp() {

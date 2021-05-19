@@ -30,7 +30,7 @@ class DomainFormMapper @Inject constructor() {
             dataForm.formId,
             dataForm.surveyId,
             dataForm.name,
-            dataForm.version,
+            dataForm.version.toString(),
             dataForm.type,
             dataForm.location,
             dataForm.filename,
@@ -46,5 +46,22 @@ class DomainFormMapper @Inject constructor() {
             domainForms.add(mapForm(f))
         }
         return domainForms
+    }
+
+    fun mapForms(dataForm: DataForm, parseForm: XmlDataForm): DomainForm {
+        return DomainForm(
+            dataForm.id,
+            dataForm.formId,
+            dataForm.surveyId,
+            parseForm.name,
+            parseForm.version,
+            dataForm.type,
+            dataForm.location,
+            dataForm.filename,
+            dataForm.language,
+            dataForm.cascadeDownloaded,
+            dataForm.deleted,
+            groups = parseForm.groups
+        )
     }
 }

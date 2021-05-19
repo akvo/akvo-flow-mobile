@@ -38,6 +38,7 @@ import org.akvo.flow.data.entity.FormInstanceMapper;
 import org.akvo.flow.data.entity.SurveyInstanceIdMapper;
 import org.akvo.flow.data.entity.form.DataForm;
 import org.akvo.flow.data.entity.form.Form;
+import org.akvo.flow.data.entity.form.FormLanguagesMapper;
 import org.akvo.flow.data.entity.form.FormMapper;
 import org.akvo.flow.data.util.FlowFileBrowser;
 import org.akvo.flow.database.Constants;
@@ -78,15 +79,18 @@ public class DatabaseDataSource {
     private final FormMapper formMapper;
     private final FormInstanceMapper formInstanceMapper;
     private final CursorMapper cursorMapper;
+    private final FormLanguagesMapper formLanguagesMapper;
 
     @Inject
     public DatabaseDataSource(BriteDatabase db, SurveyInstanceIdMapper surveyInstanceIdMapper,
-                              FormMapper formMapper, FormInstanceMapper formInstanceMapper, CursorMapper cursorMapper) {
+                              FormMapper formMapper, FormInstanceMapper formInstanceMapper,
+                              CursorMapper cursorMapper, FormLanguagesMapper formLanguagesMapper) {
         this.briteSurveyDbAdapter = new BriteSurveyDbAdapter(db);
         this.surveyInstanceIdMapper = surveyInstanceIdMapper;
         this.formMapper = formMapper;
         this.formInstanceMapper = formInstanceMapper;
         this.cursorMapper = cursorMapper;
+        this.formLanguagesMapper = formLanguagesMapper;
     }
 
     public Observable<Cursor> getSurveys() {
@@ -354,8 +358,8 @@ public class DatabaseDataSource {
         return Completable.complete();
     }
 
-    public Single<Cursor> getResponses(Long surveyInstanceId) {
-        return Single.just(briteSurveyDbAdapter.getResponses(surveyInstanceId));
+    public Cursor getResponses(Long surveyInstanceId) {
+        return briteSurveyDbAdapter.getResponses(surveyInstanceId);
     }
 
     public Completable createTransmissions(final Long instanceId, final String formId,
@@ -486,6 +490,15 @@ public class DatabaseDataSource {
 
     public void cleanDataPoints(Long surveyGroupId) {
         briteSurveyDbAdapter.cleanDataPoints(surveyGroupId);
+    }
+
+    @NotNull
+    public Set<String> getSavedLanguages(long surveyId) {
+        return formLanguagesMapper.transform(briteSurveyDbAdapter.getSavedLanguages(surveyId));
+    }
+
+    public void saveLanguages(long surveyId, @NotNull Set<String> languages) {
+        briteSurveyDbAdapter.saveLanguagePreferences(surveyId, languages);
     }
 
     public long updateFormVersion(long formInstanceId, double formVersion) {

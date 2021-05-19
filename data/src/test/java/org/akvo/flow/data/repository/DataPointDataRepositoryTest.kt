@@ -65,7 +65,7 @@ class DataPointDataRepositoryTest {
     @MockK
     lateinit var spyHttpException: HttpException
 
-    lateinit var repository: DataPointDataRepository
+    private lateinit var repository: DataPointDataRepository
 
     @Before
     fun setUp() {

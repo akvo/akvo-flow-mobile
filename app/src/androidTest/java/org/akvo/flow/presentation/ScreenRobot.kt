@@ -41,6 +41,7 @@ import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.CoreMatchers.allOf
 import org.hamcrest.core.IsNot.not
 
+@Suppress("UNCHECKED_CAST")
 abstract class ScreenRobot<T : ScreenRobot<T>> {
 
     private var activityContext: Activity? = null // Only required for some calls

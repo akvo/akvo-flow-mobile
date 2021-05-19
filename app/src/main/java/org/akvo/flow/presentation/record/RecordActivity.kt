@@ -76,7 +76,7 @@ class RecordActivity : BackActivity(), FormListListener, ResponseListListener, R
         val tabLayout = findViewById<View>(R.id.tabs) as TabLayout
         tabLayout.setupWithViewPager(viewPager)
 
-        surveyGroup = intent.getSerializableExtra(ConstantUtil.SURVEY_GROUP_EXTRA) as SurveyGroup
+        surveyGroup = intent.getSerializableExtra(ConstantUtil.SURVEY_EXTRA) as SurveyGroup
         rootLayout = findViewById(R.id.record_root_layout)
         trackingHelper = TrackingHelper(this)
     }

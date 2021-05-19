@@ -210,7 +210,7 @@ class BootstrapProcessorTest {
         every { (surveyMapper.generateSurveyFolderName(any())) }.returns("folder")
         every { (fileProcessor.createAndCopyNewSurveyFile(any(), any(), any(), any())) }.returns(spyk(File("file.xml")))
         val metadata = SurveyMetadata()
-        metadata.app = "akvoflow-uat1"
+        metadata.app = "uat1"
         every { (fileProcessor.readBasicSurveyData(any())) }.returns(metadata)
         every { (surveyMapper.createOrUpdateSurvey(any(), any(), any(), any(), any())) }.returns(Survey())
 

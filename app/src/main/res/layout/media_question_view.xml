@@ -1,83 +1,45 @@
 <?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="16dp"
+    android:orientation="vertical">
 
-<merge xmlns:android="http://schemas.android.com/apk/res/android">
-
-    <include layout="@layout/question_header" />
-
-    <LinearLayout
+    <TextView
+        android:id="@+id/questionTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:orientation="vertical">
+        android:layout_marginStart="16dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        tools:text="Question 1" />
 
-        <RelativeLayout
-            android:id="@+id/preview_container"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:gravity="center">
+    <org.akvo.flow.presentation.form.view.groups.MediaQuestionLayout
+        android:id="@+id/preview_container"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center">
+    </org.akvo.flow.presentation.form.view.groups.MediaQuestionLayout>
 
-            <ImageView
-                android:id="@+id/image"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:adjustViewBounds="true"
-                android:maxHeight="150dp"
-                android:scaleType="centerInside" />
-
-            <ProgressBar
-                android:id="@+id/media_progress"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:visibility="gone"
-                android:layout_centerInParent="true" />
-
-            <ImageButton
-                android:id="@+id/media_download"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:visibility="gone"
-                android:layout_centerInParent="true"
-                android:background="@android:color/transparent"
-                android:src="@drawable/download" />
-        </RelativeLayout>
-
-        <TextView
-            android:id="@+id/location_info"
-            android:layout_marginTop="4dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:visibility="gone"/>
-
-        <LinearLayout
-                android:id="@+id/acquire_media_ll"
-                android:orientation="horizontal"
-                android:layout_marginTop="16dp"
-                android:layout_marginBottom="16dp"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
-            <Button
-                    android:id="@+id/camera_btn"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    style="@style/FormButtonStyle"
-                    android:text="@string/media_from_camera"
-                    android:layout_marginRight="8dp"
-                    android:layout_marginEnd="8dp"/>
-            <Button
-                    android:id="@+id/gallery_btn"
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
-                    android:layout_height="wrap_content"
-                    style="@style/FormButtonStyle"
-                    android:text="@string/media_from_gallery"
-                    android:layout_marginLeft="8dp"
-                    android:layout_marginStart="8dp"/>
-        </LinearLayout>
-
-
-
-    </LinearLayout>
-
-</merge>
+    <TextView
+        android:id="@+id/location_info"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/image_location_unknown"
+        android:layout_marginTop="8dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        tools:visibility="visible"
+        android:visibility="gone" />
+</LinearLayout>

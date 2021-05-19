@@ -149,7 +149,7 @@ class DataPointsListFragment : Fragment(), LocationListener, AdapterView.OnItemC
         emptySubTitleTv = view.findViewById(R.id.empty_subtitle_tv)
         emptyIv = view.findViewById(R.id.empty_iv)
         val surveyGroup = arguments
-            ?.getSerializable(ConstantUtil.SURVEY_GROUP_EXTRA) as SurveyGroup?
+            ?.getSerializable(ConstantUtil.SURVEY_EXTRA) as SurveyGroup?
         mAdapter = DataPointListAdapter(activity)
         listView.adapter = mAdapter
         listView.onItemClickListener = this
@@ -234,7 +234,7 @@ class DataPointsListFragment : Fragment(), LocationListener, AdapterView.OnItemC
     }
 
     fun onNewSurveySelected(surveyGroup: SurveyGroup?) {
-        arguments!!.putSerializable(ConstantUtil.SURVEY_GROUP_EXTRA, surveyGroup)
+        arguments!!.putSerializable(ConstantUtil.SURVEY_EXTRA, surveyGroup)
         presenter.onNewSurveySelected(surveyGroup)
     }
 
@@ -446,7 +446,7 @@ class DataPointsListFragment : Fragment(), LocationListener, AdapterView.OnItemC
         fun newInstance(surveyGroup: SurveyGroup?): DataPointsListFragment {
             val fragment = DataPointsListFragment()
             val args = Bundle()
-            args.putSerializable(ConstantUtil.SURVEY_GROUP_EXTRA, surveyGroup)
+            args.putSerializable(ConstantUtil.SURVEY_EXTRA, surveyGroup)
             fragment.arguments = args
             return fragment
         }

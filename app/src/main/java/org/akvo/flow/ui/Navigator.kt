@@ -364,19 +364,21 @@ class Navigator @Inject constructor() {
      * @param filename Absolute path to the newer APK
      */
     fun installAppUpdate(context: Context, filename: String?) {
-        val intent = Intent(Intent.ACTION_VIEW)
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        val fileUri: Uri
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            fileUri = FileProvider
-                .getUriForFile(context, ConstantUtil.FILE_PROVIDER_AUTHORITY,
-                    File(filename))
-            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-        } else {
-            fileUri = Uri.fromFile(File(filename))
+        filename?.let {
+            val intent = Intent(Intent.ACTION_VIEW)
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            val fileUri: Uri
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                fileUri = FileProvider
+                    .getUriForFile(context, ConstantUtil.FILE_PROVIDER_AUTHORITY,
+                        File(filename))
+                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            } else {
+                fileUri = Uri.fromFile(File(filename))
+            }
+            intent.setDataAndType(fileUri, "application/vnd.android.package-archive")
+            context.startActivity(intent)
         }
-        intent.setDataAndType(fileUri, "application/vnd.android.package-archive")
-        context.startActivity(intent)
     }
 
     fun navigateToWalkThrough(context: Context?) {

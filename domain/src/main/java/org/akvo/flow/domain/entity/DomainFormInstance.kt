@@ -22,11 +22,6 @@ package org.akvo.flow.domain.entity
 import android.os.Parcel
 import android.os.Parcelable
 
-private fun safeParcel(parcel: Parcel): String {
-    val unParceled = parcel.readString()
-   return unParceled?: unParceled ?: ""
-}
-
 data class DomainFormInstance(
     val formId: String,
     val dataPointId: String,
@@ -39,13 +34,13 @@ data class DomainFormInstance(
     val savedDate: Long
 ) : Parcelable {
     constructor(parcel: Parcel) : this(
-        safeParcel(parcel),
-        safeParcel(parcel),
-        safeParcel(parcel),
-        safeParcel(parcel),
-        safeParcel(parcel),
+        parcel.readStringNonNull(),
+        parcel.readStringNonNull(),
+        parcel.readStringNonNull(),
+        parcel.readStringNonNull(),
+        parcel.readStringNonNull(),
         parcel.readInt(),
-        safeParcel(parcel),
+        parcel.readStringNonNull(),
         parcel.readLong(),
         parcel.readLong()
     )

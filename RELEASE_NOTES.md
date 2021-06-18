@@ -1,5 +1,12 @@
 Akvo FLOW app release notes
 ===========================
+# ver 2.10.1
+Date: 18 June 2021
+
+* **Improve display submitted form instance** - [#1567](https://github.com/akvo/akvo-flow-mobile/issues/1567)
+Released to all instances
+
+---------------
 # ver 2.10.0
 Date: 19 May 2021
 

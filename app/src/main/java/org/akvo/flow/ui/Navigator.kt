@@ -32,7 +32,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.TaskStackBuilder
 import androidx.core.content.FileProvider
 import androidx.fragment.app.FragmentActivity
-import org.akvo.flow.BuildConfig
 import org.akvo.flow.R
 import org.akvo.flow.activity.AddUserActivity
 import org.akvo.flow.activity.AppUpdateActivity
@@ -95,9 +94,9 @@ class Navigator @Inject constructor() {
     //TODO: confusing, too many params, use object
     fun navigateToFormActivity(
         activity: FragmentActivity?, dataPointId: String?, formId: String?,
-        formInstanceId: Long, readOnly: Boolean, survey: SurveyGroup?
+        formInstanceId: Long, readOnly: Boolean, survey: SurveyGroup?,
     ) {
-        if (readOnly && isInternalInstance()) {
+        if (readOnly) {
             val i = Intent(activity, FormViewActivity::class.java)
             i.putExtra(ConstantUtil.FORM_ID_EXTRA, formId)
             i.putExtra(ConstantUtil.SURVEY_EXTRA, survey)
@@ -113,29 +112,6 @@ class Navigator @Inject constructor() {
             i.putExtra(ConstantUtil.READ_ONLY_EXTRA, readOnly)
             activity?.startActivityForResult(i, ConstantUtil.FORM_FILLING_REQUEST)
         }
-    }
-
-    private fun isInternalInstance(): Boolean {
-        val debugInstances = listOf(
-            "akvoflow-uat1",
-            "akvoflow-uat2",
-            "akvoflow-dev1",
-            "akvoflow-dev2",
-            "akvoflow-dev3",
-            "akvoflow-45",
-            "akvoflow-60",
-            "akvoflow-62",
-            "akvoflow-106",
-            "akvoflow-hub2",
-            "akvoflow-internal2",
-            "akvoflow-163",
-            "akvoflow-168",
-            "akvoflow-185",
-            "akvoflow-197",
-            "akvoflow-206",
-            "akvoflow-213",
-        )
-        return debugInstances.contains(BuildConfig.AWS_BUCKET)
     }
 
     /**
@@ -388,19 +364,21 @@ class Navigator @Inject constructor() {
      * @param filename Absolute path to the newer APK
      */
     fun installAppUpdate(context: Context, filename: String?) {
-        val intent = Intent(Intent.ACTION_VIEW)
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        val fileUri: Uri
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            fileUri = FileProvider
-                .getUriForFile(context, ConstantUtil.FILE_PROVIDER_AUTHORITY,
-                    File(filename))
-            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-        } else {
-            fileUri = Uri.fromFile(File(filename))
+        filename?.let {
+            val intent = Intent(Intent.ACTION_VIEW)
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            val fileUri: Uri
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                fileUri = FileProvider
+                    .getUriForFile(context, ConstantUtil.FILE_PROVIDER_AUTHORITY,
+                        File(filename))
+                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            } else {
+                fileUri = Uri.fromFile(File(filename))
+            }
+            intent.setDataAndType(fileUri, "application/vnd.android.package-archive")
+            context.startActivity(intent)
         }
-        intent.setDataAndType(fileUri, "application/vnd.android.package-archive")
-        context.startActivity(intent)
     }
 
     fun navigateToWalkThrough(context: Context?) {

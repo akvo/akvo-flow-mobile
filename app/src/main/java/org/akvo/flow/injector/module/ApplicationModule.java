@@ -48,7 +48,9 @@ import org.akvo.flow.data.repository.DataPointDataRepository;
 import org.akvo.flow.data.repository.FileDataRepository;
 import org.akvo.flow.data.repository.FormDataRepository;
 import org.akvo.flow.data.repository.FormInstanceDataRepository;
+import org.akvo.flow.data.repository.LanguagesDataRepository;
 import org.akvo.flow.data.repository.MissingAndDeletedDataRepository;
+import org.akvo.flow.data.repository.ResponseDataRepository;
 import org.akvo.flow.data.repository.SetupDataRepository;
 import org.akvo.flow.data.repository.SurveyDataRepository;
 import org.akvo.flow.data.repository.TimeDataRepository;
@@ -68,7 +70,9 @@ import org.akvo.flow.domain.repository.DataPointRepository;
 import org.akvo.flow.domain.repository.FileRepository;
 import org.akvo.flow.domain.repository.FormInstanceRepository;
 import org.akvo.flow.domain.repository.FormRepository;
+import org.akvo.flow.domain.repository.LanguagesRepository;
 import org.akvo.flow.domain.repository.MissingAndDeletedRepository;
+import org.akvo.flow.domain.repository.ResponseRepository;
 import org.akvo.flow.domain.repository.SetupRepository;
 import org.akvo.flow.domain.repository.SurveyRepository;
 import org.akvo.flow.domain.repository.TimeRepository;
@@ -136,8 +140,20 @@ public class ApplicationModule {
 
     @Provides
     @Singleton
+    public ResponseRepository provideResponseRepository(ResponseDataRepository responseDataRepository) {
+        return responseDataRepository;
+    }
+
+    @Provides
+    @Singleton
     public TimeRepository provideTimeRepository(TimeDataRepository timeDataRepository) {
         return timeDataRepository;
+    }
+
+    @Provides
+    @Singleton
+    public LanguagesRepository provideLanguagesRepository(LanguagesDataRepository languagesRepo) {
+        return languagesRepo;
     }
 
     @Provides

@@ -32,10 +32,14 @@ public interface ImageLoader {
 
     void loadFromFile(File file, ImageView imageView);
 
-    void loadFromFile(File file, ImageLoaderListener listener);
+    void loadFromFile(File file, BitmapLoaderListener listener);
 
-    void loadFromBase64String(String image, ImageView imageView, ImageLoaderListener listener);
+    void loadFromFile(File file, ImageView imageView, DrawableLoadListener listener);
 
-    void loadFromFile(ImageView imageView, File file, ImageLoaderListener listener,
+    void loadFromBase64String(String image, ImageView imageView, BitmapLoaderListener listener);
+
+    void loadFromFile(ImageView imageView, File file, BitmapLoaderListener listener,
             @NonNull ImageSize size);
+
+    void loadFromBase64String(String image, ImageView imageView);
 }

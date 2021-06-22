@@ -59,7 +59,7 @@ public class GlideImageLoader implements ImageLoader {
     }
 
     @Override
-    public void loadFromFile(File file, final ImageLoaderListener listener) {
+    public void loadFromFile(File file, final BitmapLoaderListener listener) {
         requestManager.asBitmap().load(file)
                 .skipMemoryCache(true)
                 .diskCacheStrategy(DiskCacheStrategy.NONE)
@@ -81,7 +81,7 @@ public class GlideImageLoader implements ImageLoader {
     }
 
     @Override
-    public void loadFromFile(ImageView imageView, File file, ImageLoaderListener listener,
+    public void loadFromFile(ImageView imageView, File file, BitmapLoaderListener listener,
             @NonNull ImageSize size) {
         requestManager.asBitmap().load(file)
                 .skipMemoryCache(true)
@@ -113,8 +113,33 @@ public class GlideImageLoader implements ImageLoader {
     }
 
     @Override
+    public void loadFromFile(File file, ImageView imageView, DrawableLoadListener listener) {
+        requestManager.load(file)
+                .skipMemoryCache(true)
+                .diskCacheStrategy(DiskCacheStrategy.NONE)
+                    .listener(new RequestListener<Drawable>() {
+                        @Override
+                        public boolean onLoadFailed(@Nullable GlideException e,
+                                Object model, Target<Drawable> target, boolean isFirstResource) {
+                            listener.onLoadFailed();
+                            return false;
+                        }
+
+                        @Override
+                        public boolean onResourceReady(Drawable resource, Object model,
+                                Target<Drawable> target, DataSource dataSource,
+                                boolean isFirstResource) {
+                            listener.onLoadSucceeded();
+                            return false;
+                        }
+                    })
+                .override(Target.SIZE_ORIGINAL)
+                .into(imageView);
+    }
+
+    @Override
     public void loadFromBase64String(String image, ImageView imageView,
-            final ImageLoaderListener listener) {
+            final BitmapLoaderListener listener) {
         requestManager
                 .load(Base64.decode(image, Base64.DEFAULT))
                 .listener(new RequestListener<Drawable>() {
@@ -132,6 +157,15 @@ public class GlideImageLoader implements ImageLoader {
                         return false;
                     }
                 })
+                .skipMemoryCache(true)
+                .diskCacheStrategy(DiskCacheStrategy.NONE)
+                .into(imageView);
+    }
+
+    @Override
+    public void loadFromBase64String(String image, ImageView imageView) {
+        requestManager
+                .load(Base64.decode(image, Base64.DEFAULT))
                 .skipMemoryCache(true)
                 .diskCacheStrategy(DiskCacheStrategy.NONE)
                 .into(imageView);

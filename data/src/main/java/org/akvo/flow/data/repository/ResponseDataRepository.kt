@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2019,2021 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2021 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -15,29 +15,19 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 
-package org.akvo.flow.domain.repository;
+package org.akvo.flow.data.repository
 
-import org.akvo.flow.domain.entity.DomainForm;
-import org.jetbrains.annotations.NotNull;
+import org.akvo.flow.data.datasource.DataSourceFactory
+import org.akvo.flow.data.entity.ResponseMapper
+import org.akvo.flow.domain.entity.Response
+import org.akvo.flow.domain.repository.ResponseRepository
+import javax.inject.Inject
 
-import java.util.List;
+class ResponseDataRepository @Inject constructor(private val dataSourceFactory: DataSourceFactory, private val responseMapper: ResponseMapper): ResponseRepository {
 
-import io.reactivex.Observable;
-
-public interface FormRepository {
-
-    Observable<Boolean> loadForm(String formId, String deviceId);
-
-    Observable<Integer> reloadForms(String deviceId);
-
-    Observable<Integer> downloadForms(String deviceId);
-
-    @NotNull
-    DomainForm getForm(@NotNull String formId);
-
-    @NotNull
-    List<DomainForm> getForms(long surveyId);
+    override suspend fun getResponses(instanceId: Long): List<Response> {
+        return responseMapper.extractResponses(dataSourceFactory.dataBaseDataSource.getResponses(instanceId))
+    }
 }

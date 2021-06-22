@@ -31,6 +31,7 @@ import com.squareup.sqlbrite2.BriteDatabase;
 import com.squareup.sqlbrite2.SqlBrite;
 
 import org.akvo.flow.database.DataPointDownloadTable;
+import org.akvo.flow.database.LanguageTable;
 import org.akvo.flow.database.FormUpdateNotifiedTable;
 import org.akvo.flow.database.RecordColumns;
 import org.akvo.flow.database.ResponseColumns;
@@ -822,6 +823,7 @@ public class BriteSurveyDbAdapter {
         briteDatabase.delete(DataPointDownloadTable.TABLE_NAME, DataPointDownloadTable.COLUMN_SURVEY_ID + " = ?", surveyId + "");
     }
 
+
     public void cleanDataPoints(Long surveyGroupId) {
         String where1 = SurveyInstanceColumns._ID + " NOT IN "
                 + "(SELECT DISTINCT " + ResponseColumns.SURVEY_INSTANCE_ID
@@ -834,6 +836,24 @@ public class BriteSurveyDbAdapter {
                         + "(SELECT DISTINCT " + SurveyInstanceColumns.RECORD_ID
                         + " FROM " + Tables.SURVEY_INSTANCE + ")";
         briteDatabase.delete(Tables.RECORD, where, surveyGroupId + "", "0");
+    }
+
+    public Cursor getSavedLanguages(long surveyId) {
+        String sql = "SELECT " + LanguageTable.COLUMN_LANGUAGE_CODE
+                + " FROM " + LanguageTable.TABLE_NAME
+                + " WHERE " + LanguageTable.COLUMN_SURVEY_ID + " = ?";
+        return briteDatabase.query(sql, surveyId + "");
+    }
+
+    public void saveLanguagePreferences(long surveyId, @NonNull Set<String> languageCodes) {
+        ContentValues contentValues = new ContentValues(2);
+        briteDatabase.delete(LanguageTable.TABLE_NAME, LanguageTable.COLUMN_SURVEY_ID + " = ?",
+                surveyId + "");
+        for (String languageCode : languageCodes) {
+            contentValues.put(LanguageTable.COLUMN_SURVEY_ID, surveyId);
+            contentValues.put(LanguageTable.COLUMN_LANGUAGE_CODE, languageCode);
+            briteDatabase.insert(LanguageTable.TABLE_NAME, contentValues);
+        }
     }
 
     public long updateFormVersion(long formInstanceId, double formVersion) {

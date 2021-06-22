@@ -24,7 +24,7 @@ data class DataForm(
     val formId: String,
     val surveyId: Int,
     val name: String,
-    val version: String,
+    val version: Double,
     val type: String,
     val location: String,
     val filename: String,

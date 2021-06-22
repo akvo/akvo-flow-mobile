@@ -21,19 +21,50 @@
 package org.akvo.flow.data.entity;
 
 import android.database.Cursor;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.VisibleForTesting;
 import androidx.core.util.Pair;
 
 import org.akvo.flow.database.ResponseColumns;
 import org.akvo.flow.domain.entity.Response;
+import org.akvo.flow.domain.util.TextValueCleaner;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.inject.Inject;
 
 public class ResponseMapper {
 
+    private final TextValueCleaner textValueCleaner;
+
     @Inject
-    public ResponseMapper() {
+    public ResponseMapper(TextValueCleaner textValueCleaner) {
+        this.textValueCleaner = textValueCleaner;
+    }
+
+    @NonNull
+    public List<Response> extractResponses(Cursor data) {
+        List<Response> responses = new ArrayList<Response>();
+        if (data != null && data.moveToFirst()) {
+            do {
+                responses.add(extractResponse(data));
+            } while (data.moveToNext());
+        }
+        if (data != null) {
+            data.close();
+        }
+        return responses;
+    }
+
+    @NonNull
+    private Response extractResponse(Cursor data) {
+        int answerValueColumn = data.getColumnIndexOrThrow(ResponseColumns.ANSWER);
+        String type = getAnswerType(data);
+        Pair<String, Integer> mappedIdIteration = mapIdIteration(data);
+        String value = textValueCleaner.sanitizeValue(data.getString(answerValueColumn));
+        return new Response(mappedIdIteration.first, type, value, mappedIdIteration.second);
     }
 
     @NonNull

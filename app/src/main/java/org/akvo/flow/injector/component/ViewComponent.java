@@ -33,7 +33,10 @@ import org.akvo.flow.presentation.about.AboutActivity;
 import org.akvo.flow.presentation.datapoints.list.DataPointsListFragment;
 import org.akvo.flow.presentation.datapoints.map.DataPointsMapFragment;
 import org.akvo.flow.presentation.datapoints.map.one.DataPointMapActivity;
+import org.akvo.flow.presentation.form.languages.LanguagesDialogFragment;
 import org.akvo.flow.presentation.form.mobiledata.MobileDataSettingDialog;
+import org.akvo.flow.presentation.form.view.FormViewActivity;
+import org.akvo.flow.presentation.form.view.groups.MediaQuestionLayout;
 import org.akvo.flow.presentation.geoshape.ViewGeoShapeActivity;
 import org.akvo.flow.presentation.geoshape.create.CreateGeoShapeActivity;
 import org.akvo.flow.presentation.geoshape.properties.PropertiesDialog;
@@ -115,6 +118,8 @@ public interface ViewComponent {
 
     void inject(MainActivity mainActivity);
 
+    void inject(FormViewActivity formViewActivity);
+
     void inject(PublishFilesPreferenceView publishFilesPreferenceView);
 
     void inject(MobileDataSettingDialog mobileDataSettingDialog);
@@ -127,5 +132,9 @@ public interface ViewComponent {
 
     void inject(PropertiesDialog propertiesDialog);
 
+    void inject(@NotNull LanguagesDialogFragment languagesDialogFragment);
+
     void inject(@NotNull StatsDialogFragment statsDialogFragment);
+
+    void inject(@NotNull MediaQuestionLayout mediaQuestionLayout);
 }

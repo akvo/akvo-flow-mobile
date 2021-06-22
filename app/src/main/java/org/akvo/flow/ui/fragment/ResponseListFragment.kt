@@ -78,7 +78,7 @@ class ResponseListFragment : ListFragment(), LoaderManager.LoaderCallbacks<Curso
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         val intent = activity?.intent
-        mSurveyGroup = intent?.getSerializableExtra(ConstantUtil.SURVEY_GROUP_EXTRA) as SurveyGroup?
+        mSurveyGroup = intent?.getSerializableExtra(ConstantUtil.SURVEY_EXTRA) as SurveyGroup?
         recordId = intent?.getStringExtra(ConstantUtil.DATA_POINT_ID_EXTRA)
         mAdapter = ResponseListAdapter(activity)
         listAdapter = mAdapter

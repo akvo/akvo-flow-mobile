@@ -86,7 +86,6 @@ public class MediaResolverHelperTest {
             throws FileNotFoundException {
         when(mockContentResolver.openInputStream(any(Uri.class)))
                 .thenThrow(FileNotFoundException.class);
-        when(mockUri.toString()).thenReturn("");
 
         InputStream inputStream = helper.getInputStreamFromUri(mockUri);
         assertNull(inputStream);

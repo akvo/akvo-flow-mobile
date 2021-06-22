@@ -321,11 +321,13 @@ public class SurveyHandler extends DefaultHandler {
 
             currentQuestion.setType(attributes.getValue(TYPE));
             currentQuestion.setId(attributes.getValue(ID));
+            //This validation no longer exists
             String validation = attributes.getValue(VALIDATION_TYPE);
             if (validation != null && validation.trim().length() > 0) {
                 currentQuestion
                         .setValidationRule(new ValidationRule(validation));
             }
+            //strength no longer exists
             if (attributes.getValue(STRENGTH_MAX) != null
                     && currentQuestion.getType().equalsIgnoreCase(
                             ConstantUtil.STRENGTH_QUESTION_TYPE)) {

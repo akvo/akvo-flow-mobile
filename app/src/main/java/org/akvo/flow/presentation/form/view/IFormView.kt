@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2020 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -15,14 +15,20 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 
-package org.akvo.flow.util.image;
+package org.akvo.flow.presentation.form.view
 
-import android.graphics.Bitmap;
+import org.akvo.flow.presentation.form.languages.Language
+import org.akvo.flow.presentation.form.view.entity.ViewForm
 
-public interface ImageLoaderListener {
-
-    void onImageReady(Bitmap bitmap);
+interface IFormView {
+    fun onLanguagesSaved()
+    fun onLanguagesSavedError()
+    fun displayLanguages(languages: List<Language>)
+    fun showLanguagesError()
+    fun displayForm(viewForm: ViewForm)
+    fun showErrorLoadingForm()
+    fun showLoading()
+    fun hideLoading()
 }

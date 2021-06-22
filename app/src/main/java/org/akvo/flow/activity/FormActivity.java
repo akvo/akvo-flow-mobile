@@ -72,8 +72,8 @@ import org.akvo.flow.tracking.TrackingHelper;
 import org.akvo.flow.ui.Navigator;
 import org.akvo.flow.ui.adapter.LanguageAdapter;
 import org.akvo.flow.ui.adapter.SurveyTabAdapter;
-import org.akvo.flow.ui.model.Language;
-import org.akvo.flow.ui.model.LanguageMapper;
+import org.akvo.flow.presentation.form.languages.Language;
+import org.akvo.flow.presentation.form.languages.LanguageMapper;
 import org.akvo.flow.ui.view.QuestionView;
 import org.akvo.flow.ui.view.geolocation.GeoFieldsResetConfirmDialogFragment;
 import org.akvo.flow.ui.view.geolocation.GeoQuestionView;
@@ -245,7 +245,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
         formId = intent.getStringExtra(ConstantUtil.FORM_ID_EXTRA);
         readOnly = intent.getBooleanExtra(ConstantUtil.READ_ONLY_EXTRA, false);
         formInstanceId = intent.getLongExtra(ConstantUtil.RESPONDENT_ID_EXTRA, INVALID_INSTANCE_ID);
-        survey = (SurveyGroup) intent.getSerializableExtra(ConstantUtil.SURVEY_GROUP_EXTRA);
+        survey = (SurveyGroup) intent.getSerializableExtra(ConstantUtil.SURVEY_EXTRA);
         dataPointId = intent.getStringExtra(ConstantUtil.DATA_POINT_ID_EXTRA);
         user = intent.getParcelableExtra(ConstantUtil.VIEW_USER_EXTRA);
     }

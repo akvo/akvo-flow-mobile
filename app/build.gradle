@@ -120,7 +120,7 @@ android {
             }
         }
         debug {
-            minifyEnabled false
+            minifyEnabled true
             multiDexEnabled true
             testCoverageEnabled true
             proguardFile 'proguard-files/proguard-rules.pro'
@@ -186,6 +186,7 @@ android {
         unitTests {
             includeAndroidResources = true
             returnDefaultValues = true
+            defaultConfig.minSdkVersion 21
             all {
                 testLogging {
                     events 'passed', 'skipped', 'failed', 'standardOut', 'standardError'
@@ -235,6 +236,7 @@ dependencies {
     implementation "androidx.exifinterface:exifinterface:${rootProject.ext.exifVersion}"
     implementation "androidx.recyclerview:recyclerview:${rootProject.ext.recyclerVersion}"
     implementation "androidx.annotation:annotation:${rootProject.ext.annotationVersion}"
+    kapt "androidx.annotation:annotation:${rootProject.ext.annotationVersion}"
     implementation "com.google.android.material:material:${rootProject.ext.materialVersion}"
     implementation "androidx.constraintlayout:constraintlayout:${rootProject.ext.constraintLayoutVersion}"
     implementation "androidx.multidex:multidex:${rootProject.ext.multidexVersion}"

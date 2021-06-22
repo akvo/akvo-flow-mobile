@@ -98,7 +98,7 @@ class DataPointsMapFragment : Fragment(), DataPointsMapView, MapReadyCallback {
         super.onActivityCreated(savedInstanceState)
         presenter.setView(this)
         val surveyGroup =
-            arguments?.getSerializable(ConstantUtil.SURVEY_GROUP_EXTRA) as SurveyGroup?
+            arguments?.getSerializable(ConstantUtil.SURVEY_EXTRA) as SurveyGroup?
         presenter.onSurveyGroupReady(surveyGroup)
         activityJustCreated = true
     }
@@ -162,7 +162,7 @@ class DataPointsMapFragment : Fragment(), DataPointsMapView, MapReadyCallback {
         if (arguments == null) {
             arguments = Bundle()
         }
-        arguments.putSerializable(ConstantUtil.SURVEY_GROUP_EXTRA, surveyGroup)
+        arguments.putSerializable(ConstantUtil.SURVEY_EXTRA, surveyGroup)
         setArguments(arguments)
         presenter.onNewSurveySelected(surveyGroup)
     }
@@ -265,7 +265,7 @@ class DataPointsMapFragment : Fragment(), DataPointsMapView, MapReadyCallback {
         fun newInstance(surveyGroup: SurveyGroup?): DataPointsMapFragment {
             val fragment = DataPointsMapFragment()
             val args = Bundle()
-            args.putSerializable(ConstantUtil.SURVEY_GROUP_EXTRA, surveyGroup)
+            args.putSerializable(ConstantUtil.SURVEY_EXTRA, surveyGroup)
             fragment.arguments = args
             return fragment
         }

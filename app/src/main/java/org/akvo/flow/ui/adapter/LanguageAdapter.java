@@ -28,9 +28,9 @@ import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 
 import org.akvo.flow.R;
-import org.akvo.flow.ui.model.Language;
+import org.akvo.flow.presentation.form.languages.Language;
+import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -47,12 +47,13 @@ public class LanguageAdapter extends ArrayAdapter<Language> {
     private final List<Language> languages;
     private final LayoutInflater inflater;
 
-    public LanguageAdapter(Context context, List<Language> languages) {
+    public LanguageAdapter(Context context, @NonNull List<Language> languages) {
         super(context, LAYOUT_RESOURCE_ID, languages);
-        this.languages = languages == null ? new ArrayList<>() : languages;
+        this.languages = languages;
         this.inflater = LayoutInflater.from(context);
     }
 
+    @NonNull
     public Set<String> getSelectedLanguages() {
         Set<String> selectedLanguages = new LinkedHashSet<>(3);
         for (Language language : languages) {
@@ -89,6 +90,12 @@ public class LanguageAdapter extends ArrayAdapter<Language> {
     public void updateSelected(int position) {
         Language language = getItem(position);
         language.setSelected(!language.isSelected());
+        notifyDataSetChanged();
+    }
+
+    public void setLanguages(@NotNull List<Language> languages) {
+        this.languages.clear();
+        this.languages.addAll(languages);
         notifyDataSetChanged();
     }
 }

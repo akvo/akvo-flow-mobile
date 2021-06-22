@@ -80,7 +80,7 @@ class FormListFragment : ListFragment(), LoaderManager.LoaderCallbacks<List<Form
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         val intent = activity!!.intent
-        mSurveyGroup = intent.getSerializableExtra(ConstantUtil.SURVEY_GROUP_EXTRA) as SurveyGroup
+        mSurveyGroup = intent.getSerializableExtra(ConstantUtil.SURVEY_EXTRA) as SurveyGroup
         recordId = intent.getStringExtra(ConstantUtil.DATA_POINT_ID_EXTRA) as String
         setHasOptionsMenu(true)
         mAdapter = SurveyAdapter(activity)

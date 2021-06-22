@@ -50,7 +50,7 @@ class StatsDialogFragment : DialogFragment(), LoaderManager.LoaderCallbacks<Stat
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        mSurveyGroupId = arguments!!.getLong(ConstantUtil.SURVEY_GROUP_ID_EXTRA)
+        mSurveyGroupId = arguments!!.getLong(ConstantUtil.SURVEY_ID_EXTRA)
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -117,7 +117,7 @@ class StatsDialogFragment : DialogFragment(), LoaderManager.LoaderCallbacks<Stat
         fun newInstance(surveyGroupId: Long): StatsDialogFragment {
             val f = StatsDialogFragment()
             val args = Bundle()
-            args.putLong(ConstantUtil.SURVEY_GROUP_ID_EXTRA, surveyGroupId)
+            args.putLong(ConstantUtil.SURVEY_ID_EXTRA, surveyGroupId)
             f.arguments = args
             return f
         }

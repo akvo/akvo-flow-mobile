@@ -84,7 +84,7 @@ public class FormActivityTestUtil {
         Intent result = new Intent(targetContext, FormActivity.class);
         result.putExtra(ConstantUtil.FORM_ID_EXTRA, formId);
         result.putExtra(ConstantUtil.RESPONDENT_ID_EXTRA, dataPointId);
-        result.putExtra(ConstantUtil.SURVEY_GROUP_EXTRA,
+        result.putExtra(ConstantUtil.SURVEY_EXTRA,
                 new SurveyGroup(surveyGroupId, formTitle, null, false));
         result.putExtra(ConstantUtil.DATA_POINT_ID_EXTRA,
                 Constants.TEST_FORM_SURVEY_INSTANCE_ID);

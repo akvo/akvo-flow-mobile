@@ -148,7 +148,6 @@ public class MediaResolverHelperTest {
         verify(helper, times(0)).removeDuplicatedExtraFile(mockUri, "abc");
     }
 
-    @Ignore
     @Test
     public void deleteMediaShouldReturnFalseIfNothingDeleted() {
         when(mockContentResolver.delete(mockUri, null, null)).thenReturn(0);
@@ -158,7 +157,6 @@ public class MediaResolverHelperTest {
         assertFalse(deleted);
     }
 
-    @Ignore
     @Test
     public void deleteMediaShouldReturnTrueIfDeleted() {
         when(mockContentResolver.delete(mockUri, null, null)).thenReturn(1);

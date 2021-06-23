@@ -92,7 +92,6 @@ public class MediaResolverHelperTest {
         assertNull(inputStream);
     }
 
-    @Ignore
     @Test
     public void openFileDescriptorShouldReturnNullWhenUriNotFound() throws FileNotFoundException {
         when(mockContentResolver.openFileDescriptor(any(Uri.class), anyString()))

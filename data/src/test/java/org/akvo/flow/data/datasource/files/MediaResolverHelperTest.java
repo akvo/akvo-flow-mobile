@@ -28,7 +28,6 @@ import android.provider.MediaStore;
 
 import org.akvo.flow.data.util.FileHelper;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -101,11 +100,9 @@ public class MediaResolverHelperTest {
         assertNull(fileDescriptor);
     }
 
-    @Ignore
     @Test
     public void removeDuplicateImageShouldCallRemoveDuplicatedExtraFileIfNonEmptyPath()
             throws FileNotFoundException {
-        when(mockContentResolver.openInputStream(any(Uri.class))).thenReturn(mockInputStream);
         when(mockContentResolver.query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
                 new String[] {
                         MediaStore.Images.ImageColumns.DATA,
@@ -119,6 +116,7 @@ public class MediaResolverHelperTest {
         when(mockCursor.getColumnIndex(anyString())).thenReturn(0);
         when(mockExifHelper.areDatesEqual(any(InputStream.class), any(InputStream.class)))
                 .thenReturn(false);
+        when(mockContentResolver.openInputStream(any(Uri.class))).thenReturn(mockInputStream);
         doNothing().when(mockFileHelper).close(any(Closeable.class));
         when(mockContentResolver.delete(mockUri, null, null)).thenReturn(1);
 

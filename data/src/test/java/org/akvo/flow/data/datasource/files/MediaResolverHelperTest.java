@@ -128,7 +128,6 @@ public class MediaResolverHelperTest {
         verify(helper, times(1)).removeDuplicatedExtraFile(mockUri, "abc");
     }
 
-    @Ignore
     @Test
     public void removeDuplicateImageShouldNotCallRemoveDuplicatedExtraFileIfEmptyPath() {
         when(mockContentResolver.query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,

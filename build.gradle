@@ -60,7 +60,7 @@ buildscript {
 
     dependencies {
         classpath 'com.android.tools.build:gradle:4.2.1'
-        classpath 'com.getkeepsafe.dexcount:dexcount-gradle-plugin:2.0.0'
+        classpath 'com.getkeepsafe.dexcount:dexcount-gradle-plugin:2.1.0-RC01'
         classpath 'com.google.gms:google-services:4.3.5'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
         classpath 'com.google.firebase:firebase-crashlytics-gradle:2.5.2'

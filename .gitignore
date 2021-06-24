@@ -70,3 +70,4 @@ codacy-coverage-reporter
 
 #languages
 .tx
+.bitrise.secrets.yml

@@ -113,7 +113,6 @@ public class MediaResolverHelperTest {
                 MediaStore.Images.ImageColumns.DATE_TAKEN + " DESC")).thenReturn(mockCursor);
         when(mockCursor.moveToFirst()).thenReturn(true);
         when(mockCursor.getString(anyInt())).thenReturn("abc");
-        when(mockCursor.getColumnIndex(anyString())).thenReturn(0);
         when(mockExifHelper.areDatesEqual(any(InputStream.class), any(InputStream.class)))
                 .thenReturn(false);
         when(mockContentResolver.openInputStream(any(Uri.class))).thenReturn(mockInputStream);

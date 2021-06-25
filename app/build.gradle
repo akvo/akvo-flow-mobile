@@ -1,6 +1,7 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'com.getkeepsafe.dexcount'
+apply plugin: 'com.google.gms.google-services'
 apply plugin: 'com.google.firebase.crashlytics'
 apply from: rootProject.file("jacoco.gradle")
 apply plugin: 'kotlin-kapt'
@@ -255,16 +256,16 @@ dependencies {
     implementation "com.google.code.gson:gson:${rootProject.ext.gsonVersion}"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:${rootProject.ext.coroutinesVersion}"
     implementation "androidx.work:work-runtime-ktx:${rootProject.ext.workVersion}"
+    implementation "androidx.work:work-runtime:${rootProject.ext.workVersion}"
+    implementation "androidx.core:core-ktx:${rootProject.ext.coreKtxVersion}"
 
     debugImplementation "com.squareup.leakcanary:leakcanary-android:${rootProject.ext.leakCanaryVersion}"
 
     implementation "com.google.firebase:firebase-analytics:${rootProject.ext.firebaseAnalyticsVersion}"
     implementation "com.google.firebase:firebase-crashlytics:${rootProject.ext.crashlyticsVersion}"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"
-    implementation "androidx.core:core-ktx:${rootProject.ext.coreKtxVersion}"
     implementation "com.mapbox.mapboxsdk:mapbox-android-sdk:${rootProject.ext.mapboxVersion}"
     implementation "com.mapbox.mapboxsdk:mapbox-android-plugin-annotation-v9:${rootProject.ext.mapboxAnnotationsVersion}"
-    implementation "androidx.work:work-runtime:${rootProject.ext.workVersion}"
     implementation "org.slf4j:slf4j-nop:${rootProject.ext.slf4JVersion}"
     implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion"
     implementation platform("com.google.firebase:firebase-bom:${rootProject.ext.firebaseBomVersion}")
@@ -297,6 +298,4 @@ dependencies {
     implementation project(':offlinemaps')
     implementation project(':walkthrough')
     implementation project(':uicomponents')
-
-    apply plugin: 'com.google.gms.google-services'
 }

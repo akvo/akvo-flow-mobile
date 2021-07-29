@@ -196,7 +196,7 @@ class PreferenceActivity : BackActivity(), PreferenceView, DeleteResponsesListen
         finish()
     }
 
-    fun onDeleteCollectedDataTap() {
+    private fun onDeleteCollectedDataTap() {
         trackingHelper.logDeleteDataPressed()
         presenter.deleteCollectedData()
     }
@@ -228,14 +228,14 @@ class PreferenceActivity : BackActivity(), PreferenceView, DeleteResponsesListen
         navigator.navigateToStorageSettings(this)
     }
 
-    fun onDataCheckChanged(checked: Boolean) {
+    private fun onDataCheckChanged(checked: Boolean) {
         if (listenersEnabled) {
             trackingHelper.logMobileDataChanged(checked)
             presenter.saveEnableMobileData(checked)
         }
     }
 
-    fun onScreenOnCheckChanged(checked: Boolean) {
+    private fun onScreenOnCheckChanged(checked: Boolean) {
         if (listenersEnabled) {
             trackingHelper.logScreenOnChanged(checked)
             presenter.saveKeepScreenOn(checked)

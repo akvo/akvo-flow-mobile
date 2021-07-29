@@ -15,14 +15,14 @@ dexcount {
 loadProperties()
 
 def loadProperties() {
-    def file = hasProperty('file') ? file : 'app/survey.properties'
-    project.ext.surveyProps = rootProject.readProperties(file)
+    def file = hasProperty('file') ? file : 'survey.properties'
+    project.ext.surveyProps = readProperties(file)
 }
 
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
 
-    Properties versionProps = rootProject.readProperties('app/version.properties')
+    Properties versionProps = readProperties('version.properties')
 
     def versionMajor = versionProps['VERSION_MAJOR'].toString()
     def versionMinor = versionProps['VERSION_MINOR'].toString()
@@ -215,6 +215,17 @@ android {
         biogas.res.srcDirs = ['src/snv/res', 'src/biogas/res']
         cookstoves.res.srcDirs = ['src/snv/res', 'src/cookstoves/res']
     }
+}
+
+private Properties readProperties(String fileName) {
+    Properties versionProps = new Properties()
+    def versionPropsFile = file(fileName)
+    if (versionPropsFile.canRead()) {
+        versionProps.load(new FileInputStream(versionPropsFile))
+    } else {
+        throw new GradleException("Could not read ${fileName}")
+    }
+    versionProps
 }
 
 private static String getBuildYear() {

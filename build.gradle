@@ -84,18 +84,6 @@ allprojects {
     }
 }
 
-//this is used
-Properties readProperties(String fileName) {
-    Properties versionProps = new Properties()
-    def versionPropsFile = file(fileName)
-    if (versionPropsFile.canRead()) {
-        versionProps.load(new FileInputStream(versionPropsFile))
-    } else {
-        throw new GradleException("Could not read ${fileName}")
-    }
-    versionProps
-}
-
 task checkstyle(type: Checkstyle) {
     configFile file("${project.rootDir}/config/checkstyle.xml")
     source 'src'

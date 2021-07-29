@@ -40,6 +40,10 @@ android {
                 it.buildConfigField "String", "BRAND", "\"${brand}\""
                 it.buildConfigField "String", "USER", "\"${user}\""
                 it.buildConfigField "String", "PASSWORD", "\"${password}\""
+            } else {
+                it.buildConfigField "String", "BRAND", ""
+                it.buildConfigField "String", "USER", ""
+                it.buildConfigField "String", "PASSWORD", ""
             }
         }
         debug {

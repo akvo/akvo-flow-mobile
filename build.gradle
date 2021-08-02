@@ -25,7 +25,7 @@ buildscript {
         leakCanaryVersion = "2.0"
         loggingInterceptorVersion = "3.12.12"
         mapboxAnnotationsVersion = "0.8.0"
-        mapboxMarkerVersion = "0.3.0"
+        mapboxMarkerVersion = "0.4.0"
         mapboxOfflineRxVersion = "1.2.0-alpha04"
         mapboxVersion = "9.6.2"
         prettyTimeVersion = "4.0.5.Final"

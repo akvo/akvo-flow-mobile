@@ -97,12 +97,13 @@ task clean(type: Delete) {
     delete rootProject.buildDir
 }
 
+//otherwise jacoco does not work and the latest version specified in jacoco.gradle seems to be ignored
 subprojects {
     configurations.all {
         resolutionStrategy {
             eachDependency { details ->
                 if ('org.jacoco' == details.requested.group) {
-                    details.useVersion $jacocoVersion
+                    details.useVersion "0.8.7"
                 }
             }
         }

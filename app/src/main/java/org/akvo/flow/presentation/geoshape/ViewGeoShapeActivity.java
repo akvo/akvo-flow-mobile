@@ -31,7 +31,7 @@ import org.akvo.flow.injector.component.ApplicationComponent;
 import org.akvo.flow.uicomponents.BackActivity;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
-import org.akvo.flow.offlinemaps.presentation.geoshapes.GeoShapesMapViewImpl;
+import org.akvo.flow.maps.presentation.geoshapes.GeoShapesMapViewImpl;
 import org.akvo.flow.presentation.geoshape.entities.FeatureMapper;
 import org.akvo.flow.presentation.geoshape.entities.Shape;
 import org.akvo.flow.presentation.geoshape.entities.ViewFeatures;

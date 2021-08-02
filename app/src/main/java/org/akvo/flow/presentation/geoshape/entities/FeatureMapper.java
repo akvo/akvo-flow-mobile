@@ -31,7 +31,7 @@ import com.mapbox.geojson.Point;
 import com.mapbox.geojson.Polygon;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 
-import org.akvo.flow.offlinemaps.presentation.geoshapes.GeoShapeConstants;
+import org.akvo.flow.maps.presentation.geoshapes.GeoShapeConstants;
 
 import java.util.ArrayList;
 import java.util.List;

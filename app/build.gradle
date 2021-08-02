@@ -292,7 +292,7 @@ dependencies {
     implementation project(':domain')
     implementation project(':data')
     implementation project(':database')
-    implementation project(':offlinemaps')
+    implementation project(':maps')
     implementation project(':walkthrough')
     implementation project(':uicomponents')
 }

@@ -1,6 +1,6 @@
 buildscript {
     ext {
-        kotlinVersion = '1.5.20'
+        kotlinVersion = '1.5.21'
         jacocoVersion = '0.8.7'
         annotationVersion = "1.1.0"
         appCompatVersion = "1.2.0"
@@ -27,7 +27,7 @@ buildscript {
         mapboxAnnotationsVersion = "0.8.0"
         mapboxMarkerVersion = "0.3.0"
         mapboxOfflineRxVersion = "1.2.0-alpha04"
-        mapboxVersion = "9.2.0"
+        mapboxVersion = "9.6.2"
         prettyTimeVersion = "4.0.5.Final"
         rxAndroidVersion = "2.1.1"
         rxJavaVersion = "2.2.8"
@@ -55,7 +55,6 @@ buildscript {
     repositories {
         google()
         mavenCentral()
-        jcenter()
     }
 
     dependencies {
@@ -79,8 +78,21 @@ ext {
 allprojects {
     repositories {
         google()
-        jcenter()
         maven { url "https://jitpack.io" }
+        mavenCentral()
+        maven {
+            url 'https://api.mapbox.com/downloads/v2/releases/maven'
+            authentication {
+                basic(BasicAuthentication)
+            }
+            credentials {
+                // Do not change the username below.
+                // This should always be `mapbox` (not your username).
+                username = 'mapbox'
+                // Use the secret token you stored in gradle.properties as the password
+                password = project.properties['MAPBOX_DOWNLOADS_TOKEN'] ?: ""
+            }
+        }
     }
 }
 

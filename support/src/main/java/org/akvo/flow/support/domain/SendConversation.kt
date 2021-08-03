@@ -56,28 +56,16 @@ class SendConversation @Inject constructor(
 
     private suspend fun findConversation(parameters: Map<String, Any>): Conversation? {
         val refId = parameters[PARAM_REF_ID] as Int
-        //load page 0
-        var page = 0
-        var conversationsResult = restApi.fetchConversations(page)
-        var conversations = conversationsResult.conversations
-        val pageCount = conversationsResult.pageCount
-
-        var conversation = findConversation(conversations, refId)
-        if (conversation != null) {
-            return conversation
-        } else {
-            //fetch again until
-                do {
-                    page++
-                    conversationsResult = restApi.fetchConversations(page)
-                    conversations = conversationsResult.conversations
-                    conversation = findConversation(conversations, refId)
-                    if (conversation != null) {
-                        return conversation
-                    }
-                } while (page < pageCount)
-        }
-        return null
+        var page = -1
+        var conversation: Conversation?
+        do {
+            page++
+            val conversationsResult = restApi.fetchConversations(page)
+            val pageCount = conversationsResult.pageCount
+            val conversations = conversationsResult.conversations
+            conversation = findConversation(conversations, refId)
+        } while (conversation == null && page < pageCount)
+        return conversation
     }
 
     private fun findConversation(conversations: List<Conversation>?, refId: Int): Conversation? {

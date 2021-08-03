@@ -53,7 +53,8 @@ import javax.inject.Inject
 import kotlin.math.abs
 
 class PreferenceActivity : BackActivity(), PreferenceView, DeleteResponsesListener,
-    DeleteAllListener, DownloadFormListener, ReloadFormsListener {
+    DeleteAllListener, DownloadFormListener, ReloadFormsListener,
+    SendDeviceInfoDialog.SendDeviceInfoListener {
 
     @Inject
     lateinit var navigator: Navigator
@@ -111,7 +112,7 @@ class PreferenceActivity : BackActivity(), PreferenceView, DeleteResponsesListen
         findViewById<View>(R.id.preference_download_form_subtitle).setOnClickListener { onDownloadFormOptionTap() }
         findViewById<View>(R.id.preference_reload_forms_title).setOnClickListener { onReloadAllFormsOptionTap() }
         findViewById<View>(R.id.preference_reload_forms_subtitle).setOnClickListener { onReloadAllFormsOptionTap() }
-        findViewById<View>(R.id.preference_send_info).setOnClickListener { presenter.sendInfo(deviceIdentifierTv.text.toString()) }
+        findViewById<View>(R.id.preference_send_info).setOnClickListener { onSendInfoTap() }
         enableDataSc.setOnCheckedChangeListener { _, isChecked -> onDataCheckChanged(isChecked) }
         screenOnSc.setOnCheckedChangeListener { _, isChecked -> onScreenOnCheckChanged(isChecked) }
         imageSizeSp.onItemSelectedListener = object: OnItemSelectedListener {
@@ -128,6 +129,10 @@ class PreferenceActivity : BackActivity(), PreferenceView, DeleteResponsesListen
                 //EMPTY
             }
         }
+    }
+
+    private fun onSendInfoTap() {
+       presenter.getUser()
     }
 
     private fun setUpToolBarAnimationListener() {
@@ -242,7 +247,7 @@ class PreferenceActivity : BackActivity(), PreferenceView, DeleteResponsesListen
         }
     }
 
-    fun onImageSizeSelected(position: Int) {
+    private fun onImageSizeSelected(position: Int) {
         if (listenersEnabled) {
             trackingHelper.logImageSizeChanged(position)
             presenter.saveImageSize(position)
@@ -264,6 +269,15 @@ class PreferenceActivity : BackActivity(), PreferenceView, DeleteResponsesListen
         enableDataSc.isChecked = viewUserSettings.isDataEnabled
         imageSizeSp.setSelection(viewUserSettings.imageSize)
         delayListeners()
+    }
+
+    override fun sendDeviceInfo(toInt: Int, body: String) {
+        presenter.sendInfo(toInt, body)
+    }
+
+    override fun showSendInfoDialog(userName: String) {
+        val newFragment: SendDeviceInfoDialog = SendDeviceInfoDialog.newInstance(userName, deviceIdentifierTv.text.toString())
+        newFragment.show(supportFragmentManager, SendDeviceInfoDialog.TAG)
     }
 
     /**

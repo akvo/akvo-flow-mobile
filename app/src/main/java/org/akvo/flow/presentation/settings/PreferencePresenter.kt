@@ -19,13 +19,11 @@
  */
 package org.akvo.flow.presentation.settings
 
-import android.os.Build
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.launch
-import org.akvo.flow.BuildConfig
 import org.akvo.flow.domain.entity.UserSettings
 import org.akvo.flow.domain.interactor.DefaultObserver
 import org.akvo.flow.domain.interactor.SaveEnableMobileData
@@ -198,43 +196,30 @@ class PreferencePresenter @Inject constructor(
         }, null)
     }
 
-    fun sendInfo(deviceId: String) {
+    fun getUser() {
         uiScope.launch {
-
             val userResult = getSelectedUserUseCase.execute()
             val userName = when (userResult.resultCode) {
                 ResultCode.SUCCESS -> userResult.user.name ?: ""
                 else -> ""
             }
+            view?.showSendInfoDialog(userName)
+        }
+    }
 
-            var instance = BuildConfig.INSTANCE_URL
-            instance = instance.removePrefix("https://")
-            instance = instance.removeSuffix(".akvoflow.org")
-            instance = instance.removeSuffix(".appspot.com")
-
-            val version = Build.VERSION.RELEASE
-            val model = Build.MANUFACTURER + Build.MODEL
-
-            val body =
-                "Android Device Info:" + "\r\n" +
-                        "Android Version: $version" + "\r\n" +
-                        "Device model: $model" + "\r\n" +
-                        "App version: ${BuildConfig.VERSION_NAME}" + "\r\n" +
-                        "User name: $userName" + "\r\n" +
-                        "Device Identifier: $deviceId" + "\r\n" +
-                        "Instance: $instance"
-
-
+    fun sendInfo(resId: Int, body: String) {
+        uiScope.launch {
+            view?.showLoading()
             val params = HashMap<String, Any>(4)
-            //val resId = 38964
-            val resId = 3896
             params[SendConversation.PARAM_REF_ID] = resId
             params[SendConversation.PARAM_BODY] = body
-            when(sendConversation.execute(params)) {
-                SendConversation.SendConversationResult.ErrorConversationNotFound -> view?.showConversationNotFound(resId)
+            when (sendConversation.execute(params)) {
+                SendConversation.SendConversationResult.ErrorConversationNotFound -> view?.showConversationNotFound(
+                    resId)
                 SendConversation.SendConversationResult.ErrorSending -> view?.showErrorSending()
                 SendConversation.SendConversationResult.ResultSuccess -> view?.showInformationSent()
             }
+            view?.hideLoading()
         }
     }
 

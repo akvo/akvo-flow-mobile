@@ -185,7 +185,7 @@ android {
         unitTests {
             includeAndroidResources = true
             returnDefaultValues = true
-            defaultConfig.minSdkVersion 21
+            defaultConfig.minSdkVersion rootProject.ext.minSdkVersionDebug
             all {
                 testLogging {
                     events 'passed', 'skipped', 'failed', 'standardOut', 'standardError'

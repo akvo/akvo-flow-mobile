@@ -23,7 +23,6 @@ def loadProperties() {
 
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
-    buildToolsVersion "30.0.2"
 
     Properties versionProps = readProperties('version.properties')
 

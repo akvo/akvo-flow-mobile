@@ -8,8 +8,6 @@ android {
     defaultConfig {
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1
-        versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
@@ -56,7 +54,7 @@ dependencies {
     implementation "com.google.android.material:material:${rootProject.ext.materialVersion}"
     implementation "androidx.constraintlayout:constraintlayout:${rootProject.ext.constraintLayoutVersion}"
     implementation "com.mapbox.mapboxsdk:mapbox-android-sdk:${rootProject.ext.mapboxVersion}"
-    implementation "com.mapbox.mapboxsdk:mapbox-android-plugin-markerview-v8:${rootProject.ext.mapboxMarkerVersion}"
+    implementation "com.mapbox.mapboxsdk:mapbox-android-plugin-markerview-v9:${rootProject.ext.mapboxMarkerVersion}"
     implementation "com.mapbox.mapboxsdk:mapbox-android-plugin-annotation-v9:${rootProject.ext.mapboxAnnotationsVersion}"
     implementation "com.github.akvo:mapbox-offline-reactive:${rootProject.ext.mapboxOfflineRxVersion}"
     implementation "com.jakewharton.timber:timber:${rootProject.ext.timberVersion}"

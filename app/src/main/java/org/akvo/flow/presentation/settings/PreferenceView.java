@@ -45,4 +45,10 @@ public interface PreferenceView {
     void showDownloadFormsError(int numberOfForms);
 
     void showDownloadFormsSuccess(int numberOfForms);
+
+    void showConversationNotFound(int resId);
+
+    void showErrorSending();
+
+    void showInformationSent();
 }

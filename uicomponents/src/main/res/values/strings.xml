@@ -372,6 +372,10 @@
     <string name="time_check_action_fix">Fix it</string>
     <string name="time_check_action_dismiss">Dismiss</string>
     <string name="form_updated">The form version has been updated</string>
+    <string name="preference_send_info">Send device info to support</string>
+    <string name="conversation_not_found">No support ticket was found with this id %1$s</string>
+    <string name="conversation_send_error">Error sending device information, please try again later.</string>
+    <string name="conversation_sent">Device information sent correctly</string>
 
     <plurals name="download_forms_error">
         <item quantity="one">Error downloading form</item>

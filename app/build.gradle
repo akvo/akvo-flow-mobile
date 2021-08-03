@@ -1,12 +1,14 @@
-apply plugin: 'com.android.application'
-apply plugin: 'kotlin-android'
-apply plugin: 'com.getkeepsafe.dexcount'
-apply plugin: 'com.google.gms.google-services'
-apply plugin: 'com.google.firebase.crashlytics'
+plugins {
+    id 'com.android.application'
+    id 'kotlin-android'
+    id 'com.getkeepsafe.dexcount'
+    id 'com.google.gms.google-services'
+    id 'com.google.firebase.crashlytics'
+    id 'kotlin-kapt'
+    id 'com.google.firebase.appdistribution'
+    id 'com.google.firebase.firebase-perf'
+}
 apply from: rootProject.file("jacoco.gradle")
-apply plugin: 'kotlin-kapt'
-apply plugin: 'com.google.firebase.appdistribution'
-apply plugin: 'com.google.firebase.firebase-perf'
 
 dexcount {
     enabled = !project.hasProperty("nodexcount")
@@ -295,4 +297,5 @@ dependencies {
     implementation project(':maps')
     implementation project(':walkthrough')
     implementation project(':uicomponents')
+    implementation project(':support')
 }

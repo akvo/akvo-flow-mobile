@@ -22,6 +22,7 @@ survey.properties
 survey_test/bin
 survey_test/gen
 survey_test/src/com/jayway/test/SurveyDataTest.java
+support/gradle.properties
 
 # Android Studio and Gradle
 local.properties

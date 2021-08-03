@@ -298,4 +298,5 @@ dependencies {
     implementation project(':offlinemaps')
     implementation project(':walkthrough')
     implementation project(':uicomponents')
+    implementation project(':support')
 }

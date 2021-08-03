@@ -111,6 +111,7 @@ class PreferenceActivity : BackActivity(), PreferenceView, DeleteResponsesListen
         findViewById<View>(R.id.preference_download_form_subtitle).setOnClickListener { onDownloadFormOptionTap() }
         findViewById<View>(R.id.preference_reload_forms_title).setOnClickListener { onReloadAllFormsOptionTap() }
         findViewById<View>(R.id.preference_reload_forms_subtitle).setOnClickListener { onReloadAllFormsOptionTap() }
+        findViewById<View>(R.id.preference_send_info).setOnClickListener { presenter.sendInfo(deviceIdentifierTv.text.toString()) }
         enableDataSc.setOnCheckedChangeListener { _, isChecked -> onDataCheckChanged(isChecked) }
         screenOnSc.setOnCheckedChangeListener { _, isChecked -> onScreenOnCheckChanged(isChecked) }
         imageSizeSp.onItemSelectedListener = object: OnItemSelectedListener {
@@ -187,7 +188,7 @@ class PreferenceActivity : BackActivity(), PreferenceView, DeleteResponsesListen
         presenter.destroy()
     }
 
-    fun onDataPointSendTap() {
+    private fun onDataPointSendTap() {
         trackingHelper.logUploadDataEvent()
         Toast.makeText(applicationContext, R.string.data_upload_will_start_message,
             Toast.LENGTH_LONG).show()
@@ -195,7 +196,7 @@ class PreferenceActivity : BackActivity(), PreferenceView, DeleteResponsesListen
         finish()
     }
 
-    fun onDeleteCollectedDataTap() {
+    private fun onDeleteCollectedDataTap() {
         trackingHelper.logDeleteDataPressed()
         presenter.deleteCollectedData()
     }
@@ -227,14 +228,14 @@ class PreferenceActivity : BackActivity(), PreferenceView, DeleteResponsesListen
         navigator.navigateToStorageSettings(this)
     }
 
-    fun onDataCheckChanged(checked: Boolean) {
+    private fun onDataCheckChanged(checked: Boolean) {
         if (listenersEnabled) {
             trackingHelper.logMobileDataChanged(checked)
             presenter.saveEnableMobileData(checked)
         }
     }
 
-    fun onScreenOnCheckChanged(checked: Boolean) {
+    private fun onScreenOnCheckChanged(checked: Boolean) {
         if (listenersEnabled) {
             trackingHelper.logScreenOnChanged(checked)
             presenter.saveKeepScreenOn(checked)
@@ -330,6 +331,20 @@ class PreferenceActivity : BackActivity(), PreferenceView, DeleteResponsesListen
 
     override fun showDownloadFormsSuccess(numberOfForms: Int) {
         showQuantityMessage(R.plurals.download_forms_success, numberOfForms)
+    }
+
+    override fun showConversationNotFound(resId: Int) {
+        snackBarManager.displaySnackBar(instanceNameTv,
+            getString(R.string.conversation_not_found, resId.toString()),
+            this)
+    }
+
+    override fun showErrorSending() {
+        showMessage(R.string.conversation_send_error)
+    }
+
+    override fun showInformationSent() {
+        showMessage(R.string.conversation_sent)
     }
 
     private fun showMessage(@StringRes resId: Int) {

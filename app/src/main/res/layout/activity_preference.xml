@@ -163,6 +163,14 @@
                     android:text="@string/preference_storage"
                     style="@style/PreferenceTitleStyle"
                     android:paddingBottom="8dp"/>
+            <View
+                style="@style/PreferenceItemSeparator"/>
+
+            <TextView
+                android:id="@+id/preference_send_info"
+                android:text="@string/preference_send_info"
+                style="@style/PreferenceTitleStyle"
+                android:paddingBottom="8dp"/>
 
             <View
                     style="@style/PreferenceSectionSeparator"/>

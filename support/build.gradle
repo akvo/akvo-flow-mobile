@@ -1,0 +1,77 @@
+plugins {
+    id 'com.android.library'
+    id 'kotlin-android'
+}
+
+apply plugin: 'kotlin-kapt'
+
+apply from: rootProject.file("jacoco.gradle")
+
+android {
+    compileSdkVersion rootProject.ext.compileSdkVersion
+
+    defaultConfig {
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+        versionCode 1
+        versionName "1.0"
+    }
+    lintOptions {
+        abortOnError false
+        ignore 'InvalidPackage'
+        xmlReport false
+    }
+
+    testOptions {
+        unitTests {
+            returnDefaultValues = true
+            includeAndroidResources = true
+            all {
+                testLogging {
+                    events 'passed', 'skipped', 'failed', 'standardOut', 'standardError'
+                }
+            }
+        }
+    }
+
+    buildTypes {
+        buildTypes.each {
+            if (project.hasProperty('brand')) {
+                it.buildConfigField "String", "BRAND", "\"${brand}\""
+                it.buildConfigField "String", "USER", "\"${user}\""
+                it.buildConfigField "String", "PASSWORD", "\"${password}\""
+            } else {
+                it.buildConfigField "String", "BRAND", "\"\""
+                it.buildConfigField "String", "USER", "\"\""
+                it.buildConfigField "String", "PASSWORD", "\"\""
+            }
+        }
+        debug {
+            testCoverageEnabled true
+        }
+        release {
+            minifyEnabled true
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
+}
+
+dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"
+    implementation "androidx.core:core-ktx:${rootProject.ext.coreKtxVersion}"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:${rootProject.ext.coroutinesVersion}"
+    implementation "com.google.dagger:dagger:${rootProject.ext.daggerVersion}"
+    kapt "com.google.dagger:dagger-compiler:${rootProject.ext.daggerVersion}"
+
+    implementation "com.squareup.okhttp3:logging-interceptor:${rootProject.ext.loggingInterceptorVersion}"
+    implementation "com.squareup.retrofit2:retrofit:${rootProject.ext.retrofitVersion}"
+    implementation "com.squareup.retrofit2:converter-gson:${rootProject.ext.retrofitVersion}"
+
+    implementation "com.jakewharton.timber:timber:${rootProject.ext.timberVersion}"
+}

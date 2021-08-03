@@ -19,6 +19,13 @@
  */
 package org.akvo.flow.presentation.settings
 
+import android.os.Build
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancelChildren
+import kotlinx.coroutines.launch
+import org.akvo.flow.BuildConfig
 import org.akvo.flow.domain.entity.UserSettings
 import org.akvo.flow.domain.interactor.DefaultObserver
 import org.akvo.flow.domain.interactor.SaveEnableMobileData
@@ -26,7 +33,10 @@ import org.akvo.flow.domain.interactor.SaveImageSize
 import org.akvo.flow.domain.interactor.SaveKeepScreenOn
 import org.akvo.flow.domain.interactor.UseCase
 import org.akvo.flow.domain.interactor.forms.DownloadForm
+import org.akvo.flow.domain.interactor.users.GetSelectedUser
+import org.akvo.flow.domain.interactor.users.ResultCode
 import org.akvo.flow.presentation.Presenter
+import org.akvo.flow.support.domain.SendConversation
 import org.akvo.flow.util.logging.LoggingHelper
 import timber.log.Timber
 import java.util.HashMap
@@ -43,10 +53,14 @@ class PreferencePresenter @Inject constructor(
     @param:Named("clearAllData") private val clearAllData: UseCase,
     @param:Named("downloadForm") private val downloadForm: UseCase,
     @param:Named("reloadForms") private val reloadForms: UseCase,
-    private val mapper: ViewUserSettingsMapper, private val helper: LoggingHelper
+    private val getSelectedUserUseCase: GetSelectedUser,
+    private val sendConversation: SendConversation,
+    private val mapper: ViewUserSettingsMapper, private val helper: LoggingHelper,
 ) : Presenter {
 
     private var view: PreferenceView? = null
+    private var job = SupervisorJob()
+    private val uiScope = CoroutineScope(Dispatchers.Main + job)
 
     fun setView(view: PreferenceView?) {
         this.view = view
@@ -104,6 +118,7 @@ class PreferencePresenter @Inject constructor(
         clearResponses.dispose()
         downloadForm.dispose()
         reloadForms.dispose()
+        uiScope.coroutineContext.cancelChildren()
     }
 
     fun deleteCollectedData() {
@@ -181,6 +196,46 @@ class PreferencePresenter @Inject constructor(
                 view?.showDownloadFormsSuccess(numberOfForms)
             }
         }, null)
+    }
+
+    fun sendInfo(deviceId: String) {
+        uiScope.launch {
+
+            val userResult = getSelectedUserUseCase.execute()
+            val userName = when (userResult.resultCode) {
+                ResultCode.SUCCESS -> userResult.user.name ?: ""
+                else -> ""
+            }
+
+            var instance = BuildConfig.INSTANCE_URL
+            instance = instance.removePrefix("https://")
+            instance = instance.removeSuffix(".akvoflow.org")
+            instance = instance.removeSuffix(".appspot.com")
+
+            val version = Build.VERSION.RELEASE
+            val model = Build.MANUFACTURER + Build.MODEL
+
+            val body =
+                "Android Device Info:" + "\r\n" +
+                        "Android Version: $version" + "\r\n" +
+                        "Device model: $model" + "\r\n" +
+                        "App version: ${BuildConfig.VERSION_NAME}" + "\r\n" +
+                        "User name: $userName" + "\r\n" +
+                        "Device Identifier: $deviceId" + "\r\n" +
+                        "Instance: $instance"
+
+
+            val params = HashMap<String, Any>(4)
+            //val resId = 38964
+            val resId = 3896
+            params[SendConversation.PARAM_REF_ID] = resId
+            params[SendConversation.PARAM_BODY] = body
+            when(sendConversation.execute(params)) {
+                SendConversation.SendConversationResult.ErrorConversationNotFound -> view?.showConversationNotFound(resId)
+                SendConversation.SendConversationResult.ErrorSending -> view?.showErrorSending()
+                SendConversation.SendConversationResult.ResultSuccess -> view?.showInformationSent()
+            }
+        }
     }
 
     private inner class ClearDataObserver : DefaultObserver<Boolean?>() {

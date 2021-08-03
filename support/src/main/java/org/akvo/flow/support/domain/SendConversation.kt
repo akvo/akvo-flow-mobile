@@ -67,16 +67,15 @@ class SendConversation @Inject constructor(
             return conversation
         } else {
             //fetch again until
-            page++
-            while (page < pageCount) {
-                conversationsResult = restApi.fetchConversations(page)
-                conversations = conversationsResult.conversations
-                conversation = findConversation(conversations, refId)
-                if (conversation != null) {
-                    return conversation
-                }
-                page++
-            }
+                do {
+                    page++
+                    conversationsResult = restApi.fetchConversations(page)
+                    conversations = conversationsResult.conversations
+                    conversation = findConversation(conversations, refId)
+                    if (conversation != null) {
+                        return conversation
+                    }
+                } while (page < pageCount)
         }
         return null
     }

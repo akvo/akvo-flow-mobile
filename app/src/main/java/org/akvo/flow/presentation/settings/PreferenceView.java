@@ -20,6 +20,8 @@
 
 package org.akvo.flow.presentation.settings;
 
+import org.jetbrains.annotations.NotNull;
+
 public interface PreferenceView {
 
     void showLoading();
@@ -51,4 +53,6 @@ public interface PreferenceView {
     void showErrorSending();
 
     void showInformationSent();
+
+    void showSendInfoDialog(@NotNull String userName);
 }

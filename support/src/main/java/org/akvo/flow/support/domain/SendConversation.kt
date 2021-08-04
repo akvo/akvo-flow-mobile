@@ -40,9 +40,7 @@ class SendConversation @Inject constructor(
             val conversation: Conversation? = findConversation(parameters)
             if (conversation != null) {
                 val body = parameters[PARAM_BODY] as String
-                //val slug = "akvoflow-support-request-number-553027-from-valeria-at-akvo-dot-org"
                 val slug = conversation.slug
-                //RestApi(RestServiceFactory()).postConversationReply(slug, body)
                 try {
                     restApi.postConversationReply(slug, body)
                     SendConversationResult.ResultSuccess
@@ -57,32 +55,17 @@ class SendConversation @Inject constructor(
     }
 
     private suspend fun findConversation(parameters: Map<String, Any>): Conversation? {
-        //load page 0
-        var page = 0
-        var conversationsResult = restApi.fetchConversations(page)
-        var conversations = conversationsResult.conversations
-        var totalCount = conversationsResult.totalCount
-        var countLoaded = conversations?.size ?: 0
-
         val refId = parameters[PARAM_REF_ID] as Int
-        var conversation = findConversation(conversations, refId)
-        if (conversation != null) {
-            return conversation
-        } else {
-            //fetch again
-            while (totalCount < countLoaded) {
-                page ++
-                conversationsResult = restApi.fetchConversations(page)
-                conversations = conversationsResult.conversations
-                totalCount += conversationsResult.totalCount
-                countLoaded = conversations?.size ?: 0
-                conversation = findConversation(conversations, refId)
-                if (conversation != null) {
-                    return conversation
-                }
-            }
-        }
-        return null
+        var page = -1
+        var conversation: Conversation?
+        do {
+            page++
+            val conversationsResult = restApi.fetchConversations(page)
+            val pageCount = conversationsResult.pageCount
+            val conversations = conversationsResult.conversations
+            conversation = findConversation(conversations, refId)
+        } while (conversation == null && page < pageCount)
+        return conversation
     }
 
     private fun findConversation(conversations: List<Conversation>?, refId: Int): Conversation? {

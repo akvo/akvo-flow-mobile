@@ -53,7 +53,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final int VER_DATAPOINT_STATUS = 91;
     public static final int VER_FORM_VERSION_UPDATE = 92;
     public static final int VER_GROUPS = 93;
-    static final int DATABASE_VERSION = VER_CURSOR_ITERATION;
+    static final int DATABASE_VERSION = VER_GROUPS;
 
     private static SQLiteDatabase database;
     private static final Object LOCK_OBJ = new Object();

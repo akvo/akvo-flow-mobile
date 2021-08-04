@@ -20,6 +20,9 @@
 
 package org.akvo.flow.database.upgrade;
 
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertTrue;
+
 import android.database.sqlite.SQLiteDatabase;
 
 import org.akvo.flow.database.DatabaseHelper;
@@ -29,9 +32,6 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.List;
-
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertTrue;
 
 @RunWith(MockitoJUnitRunner.class)
 public class UpgraderFactoryTest {
@@ -48,7 +48,7 @@ public class UpgraderFactoryTest {
         UpgraderVisitor upgrader = (UpgraderVisitor) upgraderFactory
                 .createUpgrader(DatabaseHelper.VER_RESPONSE_ITERATION, mockDbHelper, mockDb);
 
-        assertEquals(7, upgrader.getUpgraders().size());
+        assertEquals(8, upgrader.getUpgraders().size());
         assertTrue(containsResponsesUpgrader(upgrader.getUpgraders()));
     }
 
@@ -58,7 +58,7 @@ public class UpgraderFactoryTest {
         UpgraderVisitor upgrader = (UpgraderVisitor) upgraderFactory
                 .createUpgrader(DatabaseHelper.VER_TRANSMISSION_ITERATION, mockDbHelper, mockDb);
 
-        assertEquals(6, upgrader.getUpgraders().size());
+        assertEquals(7, upgrader.getUpgraders().size());
     }
 
     @Test
@@ -67,7 +67,7 @@ public class UpgraderFactoryTest {
         UpgraderVisitor upgrader = (UpgraderVisitor) upgraderFactory
                 .createUpgrader(DatabaseHelper.VER_DATA_POINT_ASSIGNMENTS_ITERATION, mockDbHelper, mockDb);
 
-        assertEquals(5, upgrader.getUpgraders().size());
+        assertEquals(6, upgrader.getUpgraders().size());
     }
 
     @Test
@@ -77,7 +77,7 @@ public class UpgraderFactoryTest {
                 .createUpgrader(DatabaseHelper.VER_DATA_POINT_ASSIGNMENTS_ITERATION_2, mockDbHelper,
                         mockDb);
 
-        assertEquals(4, upgrader.getUpgraders().size());
+        assertEquals(5, upgrader.getUpgraders().size());
     }
 
     @Test
@@ -87,7 +87,7 @@ public class UpgraderFactoryTest {
                 .createUpgrader(DatabaseHelper.VER_CURSOR_ITERATION, mockDbHelper,
                         mockDb);
 
-        assertEquals(3, upgrader.getUpgraders().size());
+        assertEquals(4, upgrader.getUpgraders().size());
     }
 
     @Test
@@ -97,7 +97,7 @@ public class UpgraderFactoryTest {
                 .createUpgrader(DatabaseHelper.VER_SURVEY_VIEWED, mockDbHelper,
                         mockDb);
 
-        assertEquals(2, upgrader.getUpgraders().size());
+        assertEquals(3, upgrader.getUpgraders().size());
     }
 
     @Test
@@ -107,7 +107,7 @@ public class UpgraderFactoryTest {
                 .createUpgrader(DatabaseHelper.VER_DATAPOINT_STATUS, mockDbHelper,
                         mockDb);
 
-        assertEquals(1, upgrader.getUpgraders().size());
+        assertEquals(2, upgrader.getUpgraders().size());
     }
 
     @Test
@@ -115,6 +115,16 @@ public class UpgraderFactoryTest {
         UpgraderFactory upgraderFactory = new UpgraderFactory();
         UpgraderVisitor upgrader = (UpgraderVisitor) upgraderFactory
                 .createUpgrader(DatabaseHelper.VER_FORM_VERSION_UPDATE, mockDbHelper,
+                        mockDb);
+
+        assertEquals(1, upgrader.getUpgraders().size());
+    }
+
+    @Test
+    public void createUpgraderShouldCreateNoUpgraderWhenGroupsUpdateIteration() {
+        UpgraderFactory upgraderFactory = new UpgraderFactory();
+        UpgraderVisitor upgrader = (UpgraderVisitor) upgraderFactory
+                .createUpgrader(DatabaseHelper.VER_GROUPS, mockDbHelper,
                         mockDb);
 
         assertEquals(0, upgrader.getUpgraders().size());

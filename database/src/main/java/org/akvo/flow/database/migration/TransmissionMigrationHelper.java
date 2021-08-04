@@ -25,7 +25,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.text.TextUtils;
 
-import org.akvo.flow.database.Tables;
+import org.akvo.flow.database.tables.Tables;
 import org.akvo.flow.database.TransmissionColumns;
 
 import java.io.File;

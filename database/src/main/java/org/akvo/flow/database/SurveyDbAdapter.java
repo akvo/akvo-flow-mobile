@@ -26,6 +26,8 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import org.akvo.flow.database.tables.Tables;
+
 /**
  * Database class for the survey db. It can create/upgrade the database as well
  * as select/insert/update survey responses. TODO: break this up into separate

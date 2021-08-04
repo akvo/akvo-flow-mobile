@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010-2018 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2021 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -15,18 +15,17 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 
-package org.akvo.flow.database;
+package org.akvo.flow.database.upgrade
 
-public class Tables {
+import android.database.sqlite.SQLiteDatabase
+import org.akvo.flow.database.tables.QuestionGroupTable
 
-    public static final String SURVEY = "survey";
-    public static final String SURVEY_INSTANCE = "survey_instance";
-    public static final String RESPONSE = "response";
-    public static final String USER = "user";
-    public static final String TRANSMISSION = "transmission";
-    public static final String SURVEY_GROUP = "survey_group";// Introduced in Point Updates
-    public static final String RECORD = "record";// Introduced in Point Updates
+class FormVersionUpgrader(private val db: SQLiteDatabase, private val groupTable: QuestionGroupTable) : DatabaseUpgrader {
+
+    override fun upgrade() {
+        //TODO: for now we just create the table, in the future we need to read the all xml files and insert the actual data
+       groupTable.onCreate(db)
+    }
 }

@@ -25,6 +25,11 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import org.akvo.flow.database.migration.TransmissionMigrationHelper;
+import org.akvo.flow.database.tables.DataPointDownloadTable;
+import org.akvo.flow.database.tables.FormUpdateNotifiedTable;
+import org.akvo.flow.database.tables.LanguageTable;
+import org.akvo.flow.database.tables.QuestionGroupTable;
+import org.akvo.flow.database.tables.Tables;
 import org.akvo.flow.database.upgrade.UpgraderFactory;
 import org.jetbrains.annotations.NotNull;
 
@@ -47,7 +52,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final int VER_SURVEY_VIEWED = 90;
     public static final int VER_DATAPOINT_STATUS = 91;
     public static final int VER_FORM_VERSION_UPDATE = 92;
-    static final int DATABASE_VERSION = VER_FORM_VERSION_UPDATE;
+    public static final int VER_GROUPS = 93;
+    static final int DATABASE_VERSION = VER_CURSOR_ITERATION;
 
     private static SQLiteDatabase database;
     private static final Object LOCK_OBJ = new Object();
@@ -55,12 +61,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private final LanguageTable languageTable;
     private final DataPointDownloadTable dataPointDownloadTable;
     private final FormUpdateNotifiedTable formUpdateNotifiedTable;
+    private final QuestionGroupTable questionGroupTable;
 
-    public DatabaseHelper(Context context, LanguageTable languageTable, DataPointDownloadTable dataPointDownloadTable, FormUpdateNotifiedTable formUpdateNotifiedTable) {
+    public DatabaseHelper(Context context, LanguageTable languageTable, DataPointDownloadTable dataPointDownloadTable, FormUpdateNotifiedTable formUpdateNotifiedTable, QuestionGroupTable questionGroupTable) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
         this.languageTable = languageTable;
         this.dataPointDownloadTable = dataPointDownloadTable;
         this.formUpdateNotifiedTable = formUpdateNotifiedTable;
+        this.questionGroupTable = questionGroupTable;
     }
 
     @Override
@@ -145,6 +153,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         languageTable.onCreate(db);
         dataPointDownloadTable.onCreate(db);
         formUpdateNotifiedTable.onCreate(db);
+        questionGroupTable.onCreate(db);
         createIndexes(db);
     }
 

@@ -20,19 +20,23 @@
 
 package org.akvo.flow.database;
 
-import android.content.Context;
-import android.database.sqlite.SQLiteDatabase;
-
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
-
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.powermock.api.mockito.PowerMockito.doNothing;
 import static org.powermock.api.mockito.PowerMockito.spy;
+
+import android.content.Context;
+import android.database.sqlite.SQLiteDatabase;
+
+import org.akvo.flow.database.tables.DataPointDownloadTable;
+import org.akvo.flow.database.tables.FormUpdateNotifiedTable;
+import org.akvo.flow.database.tables.LanguageTable;
+import org.akvo.flow.database.tables.QuestionGroupTable;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class DatabaseHelperTest {
@@ -52,6 +56,9 @@ public class DatabaseHelperTest {
     @Mock
     private SQLiteDatabase mockDb;
 
+    @Mock
+    private QuestionGroupTable mockQuestionGroupTable;
+
     private void configureDatabaseHelper(DatabaseHelper helper) {
         doNothing().when(helper).upgradeFromResponses(any(SQLiteDatabase.class));
     }
@@ -59,7 +66,7 @@ public class DatabaseHelperTest {
     @Test
     public void onUpgradeShouldUpgradeCorrectlyIfVersionResponseMigrate() {
         DatabaseHelper helper = spy(new DatabaseHelper(mockContext, mockLanguageTable,
-                mockDataPointDownloadTable, mockFormUpdateNotifiedTable));
+                mockDataPointDownloadTable, mockFormUpdateNotifiedTable, mockQuestionGroupTable));
         configureDatabaseHelper(helper);
 
         helper.onUpgrade(mockDb, DatabaseHelper.VER_RESPONSE_ITERATION,
@@ -73,7 +80,7 @@ public class DatabaseHelperTest {
     @Test
     public void onUpgradeShouldUpgradeCorrectlyIfVersionTransmissionMigrate() {
         DatabaseHelper helper = spy(new DatabaseHelper(mockContext, mockLanguageTable,
-                mockDataPointDownloadTable, mockFormUpdateNotifiedTable));
+                mockDataPointDownloadTable, mockFormUpdateNotifiedTable, mockQuestionGroupTable));
         configureDatabaseHelper(helper);
 
         helper.onUpgrade(mockDb, DatabaseHelper.VER_TRANSMISSION_ITERATION,
@@ -86,7 +93,7 @@ public class DatabaseHelperTest {
     @Test
     public void onUpgradeShouldUpgradeCorrectlyIfVersionAssignmentsMigrate() {
         DatabaseHelper helper = spy(new DatabaseHelper(mockContext, mockLanguageTable,
-                mockDataPointDownloadTable, mockFormUpdateNotifiedTable));
+                mockDataPointDownloadTable, mockFormUpdateNotifiedTable, mockQuestionGroupTable));
         configureDatabaseHelper(helper);
 
         helper.onUpgrade(mockDb, DatabaseHelper.VER_DATA_POINT_ASSIGNMENTS_ITERATION,

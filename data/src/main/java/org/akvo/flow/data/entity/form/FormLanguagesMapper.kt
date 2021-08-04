@@ -20,8 +20,7 @@
 package org.akvo.flow.data.entity.form
 
 import android.database.Cursor
-import org.akvo.flow.database.Constants
-import org.akvo.flow.database.LanguageTable
+import org.akvo.flow.database.tables.LanguageTable
 import javax.inject.Inject
 
 class FormLanguagesMapper @Inject constructor() {

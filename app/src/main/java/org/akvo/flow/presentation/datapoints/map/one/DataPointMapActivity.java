@@ -30,8 +30,8 @@ import org.akvo.flow.injector.component.ApplicationComponent;
 import org.akvo.flow.uicomponents.BackActivity;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
-import org.akvo.flow.offlinemaps.presentation.MapBoxMapItemView;
-import org.akvo.flow.offlinemaps.presentation.MapReadyCallback;
+import org.akvo.flow.maps.presentation.MapBoxMapItemView;
+import org.akvo.flow.maps.presentation.MapReadyCallback;
 import org.akvo.flow.util.ConstantUtil;
 
 import javax.inject.Inject;

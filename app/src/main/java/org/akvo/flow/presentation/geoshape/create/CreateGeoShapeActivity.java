@@ -45,8 +45,8 @@ import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.injector.component.ApplicationComponent;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
-import org.akvo.flow.offlinemaps.presentation.geoshapes.GeoShapesClickListener;
-import org.akvo.flow.offlinemaps.presentation.geoshapes.GeoShapesMapViewImpl;
+import org.akvo.flow.maps.presentation.geoshapes.GeoShapesClickListener;
+import org.akvo.flow.maps.presentation.geoshapes.GeoShapesMapViewImpl;
 import org.akvo.flow.presentation.geoshape.DeletePointDialog;
 import org.akvo.flow.presentation.geoshape.DeleteShapeDialog;
 import org.akvo.flow.presentation.geoshape.entities.Shape;
@@ -58,11 +58,11 @@ import org.akvo.flow.util.ConstantUtil;
 
 import javax.inject.Inject;
 
-import static org.akvo.flow.offlinemaps.presentation.geoshapes.GeoShapeConstants.ACCURACY_THRESHOLD;
-import static org.akvo.flow.offlinemaps.presentation.geoshapes.GeoShapeConstants.CIRCLE_SOURCE_ID;
-import static org.akvo.flow.offlinemaps.presentation.geoshapes.GeoShapeConstants.CIRCLE_SOURCE_ID_LABEL;
-import static org.akvo.flow.offlinemaps.presentation.geoshapes.GeoShapeConstants.FILL_SOURCE_ID;
-import static org.akvo.flow.offlinemaps.presentation.geoshapes.GeoShapeConstants.LINE_SOURCE_ID;
+import static org.akvo.flow.maps.presentation.geoshapes.GeoShapeConstants.ACCURACY_THRESHOLD;
+import static org.akvo.flow.maps.presentation.geoshapes.GeoShapeConstants.CIRCLE_SOURCE_ID;
+import static org.akvo.flow.maps.presentation.geoshapes.GeoShapeConstants.CIRCLE_SOURCE_ID_LABEL;
+import static org.akvo.flow.maps.presentation.geoshapes.GeoShapeConstants.FILL_SOURCE_ID;
+import static org.akvo.flow.maps.presentation.geoshapes.GeoShapeConstants.LINE_SOURCE_ID;
 import static org.akvo.flow.presentation.geoshape.create.DrawMode.AREA;
 import static org.akvo.flow.presentation.geoshape.create.DrawMode.LINE;
 import static org.akvo.flow.presentation.geoshape.create.DrawMode.POINT;

@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     tools:context=".presentation.datapoints.map.DataPointsMapFragment">
 
-    <org.akvo.flow.offlinemaps.presentation.MapBoxMapItemListViewImpl
+    <org.akvo.flow.maps.presentation.MapBoxMapItemListViewImpl
         android:id="@+id/mapView"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
@@ -20,7 +20,7 @@
         android:indeterminateDrawable="@drawable/blue_horizontal_progress_background"
         android:visibility="invisible" />
 
-    <org.akvo.flow.offlinemaps.presentation.OfflineMapsFloatingActionButton
+    <org.akvo.flow.maps.presentation.OfflineMapsFloatingActionButton
         android:id="@+id/offline_maps_fab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

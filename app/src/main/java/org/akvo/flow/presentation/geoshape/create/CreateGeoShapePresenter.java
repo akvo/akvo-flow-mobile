@@ -27,7 +27,7 @@ import com.mapbox.geojson.Feature;
 import com.mapbox.geojson.Point;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 
-import org.akvo.flow.offlinemaps.presentation.geoshapes.GeoShapeConstants;
+import org.akvo.flow.maps.presentation.geoshapes.GeoShapeConstants;
 import org.akvo.flow.presentation.Presenter;
 import org.akvo.flow.presentation.geoshape.entities.AreaShape;
 import org.akvo.flow.presentation.geoshape.entities.FeatureMapper;

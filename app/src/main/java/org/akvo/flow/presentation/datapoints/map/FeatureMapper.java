@@ -24,7 +24,7 @@ import com.mapbox.geojson.FeatureCollection;
 import com.mapbox.geojson.Point;
 
 import org.akvo.flow.domain.entity.DataPoint;
-import org.akvo.flow.offlinemaps.Constants;
+import org.akvo.flow.maps.Constants;
 import org.akvo.flow.presentation.datapoints.DisplayNameMapper;
 
 import java.util.ArrayList;

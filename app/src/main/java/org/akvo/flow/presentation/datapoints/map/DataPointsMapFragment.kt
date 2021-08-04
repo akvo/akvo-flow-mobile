@@ -35,8 +35,8 @@ import org.akvo.flow.app.FlowApp
 import org.akvo.flow.domain.SurveyGroup
 import org.akvo.flow.injector.component.ApplicationComponent
 import org.akvo.flow.injector.component.DaggerViewComponent
-import org.akvo.flow.offlinemaps.presentation.MapBoxMapItemListViewImpl
-import org.akvo.flow.offlinemaps.presentation.MapReadyCallback
+import org.akvo.flow.maps.presentation.MapBoxMapItemListViewImpl
+import org.akvo.flow.maps.presentation.MapReadyCallback
 import org.akvo.flow.presentation.datapoints.DataPointSyncSnackBarManager
 import org.akvo.flow.tracking.TrackingListener
 import org.akvo.flow.ui.Navigator

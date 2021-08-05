@@ -37,7 +37,6 @@ import org.akvo.flow.data.entity.CursorMapper;
 import org.akvo.flow.data.entity.FormInstanceMapper;
 import org.akvo.flow.data.entity.SurveyInstanceIdMapper;
 import org.akvo.flow.data.entity.form.DataForm;
-import org.akvo.flow.data.entity.form.Form;
 import org.akvo.flow.data.entity.form.FormLanguagesMapper;
 import org.akvo.flow.data.entity.form.FormMapper;
 import org.akvo.flow.data.util.FlowFileBrowser;
@@ -392,13 +391,11 @@ public class DatabaseDataSource {
         return Observable.just(!surveyUpToDate);
     }
 
-    public Observable<Boolean> insertSurvey(ApiFormHeader formHeader,
-                                            boolean cascadeResourcesDownloaded, Form form) {
+    public Observable<Boolean> saveForm(ApiFormHeader formHeader,
+                                        boolean cascadeResourcesDownloaded, DataForm form) {
         ContentValues updatedValues = new ContentValues();
         updatedValues.put(SurveyColumns.SURVEY_ID, formHeader.getId());
-        String versionValue = form.getVersion() != null && !"0.0".equals(form.getVersion()) ?
-                form.getVersion() :
-                formHeader.getVersion();
+        String versionValue = form.getVersion() != 0.0 ? form.getVersion() + "" : formHeader.getVersion();
         updatedValues.put(SurveyColumns.VERSION, versionValue);
         updatedValues.put(SurveyColumns.TYPE, DEFAULT_SURVEY_TYPE);
         updatedValues.put(SurveyColumns.LOCATION, DEFAULT_SURVEY_LOCATION);

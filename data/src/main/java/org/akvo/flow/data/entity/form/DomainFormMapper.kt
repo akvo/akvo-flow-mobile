@@ -20,6 +20,8 @@
 package org.akvo.flow.data.entity.form
 
 import org.akvo.flow.domain.entity.DomainForm
+import org.akvo.flow.domain.entity.DomainQuestionGroup
+import org.akvo.flow.domain.entity.question.DomainQuestion
 import javax.inject.Inject
 
 class DomainFormMapper @Inject constructor() {
@@ -48,20 +50,64 @@ class DomainFormMapper @Inject constructor() {
         return domainForms
     }
 
-    fun mapForms(dataForm: DataForm, parseForm: XmlDataForm): DomainForm {
+    fun mapForms(dataForm: DataForm, parseForm: DataForm): DomainForm {
         return DomainForm(
             dataForm.id,
             dataForm.formId,
             dataForm.surveyId,
             parseForm.name,
-            parseForm.version,
+            parseForm.version.toString(),
             dataForm.type,
             dataForm.location,
             dataForm.filename,
             dataForm.language,
             dataForm.cascadeDownloaded,
             dataForm.deleted,
-            groups = parseForm.groups
+            groups = mapGroups(parseForm.groups)
         )
+    }
+
+    private fun mapGroups(groups: List<DataQuestionGroup>): List<DomainQuestionGroup> {
+        val domainGroups = mutableListOf<DomainQuestionGroup>()
+        for (group in groups) {
+            domainGroups.add(DomainQuestionGroup(group.heading,
+                group.repeatable,
+                mapQuestions(group.questions)))
+        }
+        return domainGroups
+    }
+
+    private fun mapQuestions(questions: MutableList<DataQuestion>): MutableList<DomainQuestion> {
+        val domainQuestions = mutableListOf<DomainQuestion>()
+        for (question in questions) {
+            domainQuestions.add(DomainQuestion(
+                question.questionId,
+                question.isMandatory,
+                question.text,
+                question.order,
+                question.isAllowOther,
+                question.renderType,
+                question.questionHelp,
+                question.type,
+                question.options,
+                question.isAllowMultiple,
+                question.isLocked,
+                question.languageTranslationMap,
+                question.dependencies,
+                question.useStrength,
+                question.strengthMin,
+                question.strengthMax,
+                question.isLocaleName,
+                question.isLocaleLocation,
+                question.isDoubleEntry,
+                question.isAllowPoints,
+                question.isAllowLine,
+                question.isAllowPolygon,
+                question.caddisflyRes,
+                question.cascadeResource,
+                question.levels
+            ))
+        }
+        return domainQuestions
     }
 }

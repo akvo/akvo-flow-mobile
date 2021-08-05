@@ -20,7 +20,7 @@ package org.akvo.flow.domain.entity.question
 
 import java.util.HashMap
 
-data class Question(
+data class DomainQuestion(
     val questionId: String? = null,
     val isMandatory: Boolean = false,
     var text: String? = null,
@@ -55,18 +55,6 @@ data class Question(
 
     fun addAltText(altText: AltText) {
         languageTranslationMap[altText.languageCode] = altText
-    }
-
-    fun getDependencies(): List<Dependency> {
-        return dependencies
-    }
-
-    fun addDependency(dep: Dependency) {
-        dependencies.add(dep)
-    }
-
-    fun addQuestionHelp(help: QuestionHelp) {
-        questionHelp.add(help)
     }
 
     override fun toString(): String {

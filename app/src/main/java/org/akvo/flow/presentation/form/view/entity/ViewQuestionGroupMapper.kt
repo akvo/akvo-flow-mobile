@@ -32,7 +32,7 @@ import org.akvo.flow.domain.entity.Response
 import org.akvo.flow.domain.entity.question.AltText
 import org.akvo.flow.domain.entity.question.Level
 import org.akvo.flow.domain.entity.question.Option
-import org.akvo.flow.domain.entity.question.Question
+import org.akvo.flow.domain.entity.question.DomainQuestion
 import org.akvo.flow.domain.util.GsonMapper
 import org.akvo.flow.presentation.form.view.groups.entity.ViewCascadeLevel
 import org.akvo.flow.presentation.form.view.groups.entity.ViewLocation
@@ -80,10 +80,10 @@ class ViewQuestionGroupMapper @Inject constructor() {
 
     private fun transform(group: DomainQuestionGroup, responses: List<Response>): ViewQuestionGroup {
         if (group.isRepeatable) {
-            val maxRepsNumber: Int = countRepetitions(group.questions, responses)
+            val maxRepsNumber: Int = countRepetitions(group.domainQuestions, responses)
             return ViewQuestionGroup(
                 group.heading, group.isRepeatable, repetitions = listOfRepetitions(
-                    group.questions,
+                    group.domainQuestions,
                     responses,
                     maxRepsNumber
                 )
@@ -91,7 +91,7 @@ class ViewQuestionGroupMapper @Inject constructor() {
         } else {
             return ViewQuestionGroup(
                 group.heading, group.isRepeatable, questionAnswers = listOfAnswers(
-                    group.questions,
+                    group.domainQuestions,
                     responses,
                     0
                 )
@@ -100,7 +100,7 @@ class ViewQuestionGroupMapper @Inject constructor() {
     }
 
     private fun listOfRepetitions(
-        questions: MutableList<Question>,
+        domainQuestions: MutableList<DomainQuestion>,
         responses: List<Response>,
         maxRepsNumber: Int,
     ): ArrayList<GroupRepetition> {
@@ -109,14 +109,14 @@ class ViewQuestionGroupMapper @Inject constructor() {
             val header = "Repetition " + (repetition + 1)
             Timber.d(header)
             groupRepetitions.add(GroupRepetition(header,
-                listOfAnswers(questions, responses, repetition)))
+                listOfAnswers(domainQuestions, responses, repetition)))
         }
         return groupRepetitions
     }
 
-    private fun countRepetitions(questions: MutableList<Question>, responses: List<Response>): Int {
+    private fun countRepetitions(domainQuestions: MutableList<DomainQuestion>, responses: List<Response>): Int {
         var repetitionsCount = 1
-        questions.forEach { question ->
+        domainQuestions.forEach { question ->
             val listOfResponses: List<Response> = getResponsesForQuestion(
                 question.questionId, responses
             )
@@ -128,12 +128,12 @@ class ViewQuestionGroupMapper @Inject constructor() {
     }
 
     private fun listOfAnswers(
-        questions: MutableList<Question>,
+        domainQuestions: MutableList<DomainQuestion>,
         responses: List<Response>,
         repetition: Int
     ): ArrayList<ViewQuestionAnswer> {
         val answers = arrayListOf<ViewQuestionAnswer>()
-        questions.forEach { question ->
+        domainQuestions.forEach { question ->
             val listOfResponses: List<Response> = getResponsesForQuestion(
                 question.questionId, responses
             )
@@ -143,7 +143,7 @@ class ViewQuestionGroupMapper @Inject constructor() {
     }
 
     private fun createQuestionAnswer(
-        question: Question,
+        domainQuestion: DomainQuestion,
         listOfResponses: List<Response>,
         repetition: Int
     ): ViewQuestionAnswer {
@@ -152,45 +152,45 @@ class ViewQuestionGroupMapper @Inject constructor() {
         } else {
             ""
         }
-        val title = """${question.order}. ${question.text}"""
-        return when (question.type) {
+        val title = """${domainQuestion.order}. ${domainQuestion.text}"""
+        return when (domainQuestion.type) {
             OPTION_QUESTION_TYPE -> {
                 ViewQuestionAnswer.OptionViewQuestionAnswer(
-                    question.questionId ?: "",
+                    domainQuestion.questionId ?: "",
                     title,
-                    question.isMandatory,
-                    mapToBundle(question.languageTranslationMap),
-                    mapToViewOption(question.options, answer, question.isAllowOther),
-                    question.isAllowMultiple,
-                    question.isAllowOther
+                    domainQuestion.isMandatory,
+                    mapToBundle(domainQuestion.languageTranslationMap),
+                    mapToViewOption(domainQuestion.options, answer, domainQuestion.isAllowOther),
+                    domainQuestion.isAllowMultiple,
+                    domainQuestion.isAllowOther
                 )
             }
 
             CASCADE_QUESTION_TYPE -> {
                 ViewQuestionAnswer.CascadeViewQuestionAnswer(
-                    question.questionId ?: "",
+                    domainQuestion.questionId ?: "",
                     title,
-                    question.isMandatory,
-                    mapToBundle(question.languageTranslationMap),
-                    mapToCascadeResponse(answer, question.levels)
+                    domainQuestion.isMandatory,
+                    mapToBundle(domainQuestion.languageTranslationMap),
+                    mapToCascadeResponse(answer, domainQuestion.levels)
                 )
             }
             GEO_QUESTION_TYPE -> {
                 ViewQuestionAnswer.LocationViewQuestionAnswer(
-                    question.questionId ?: "",
+                    domainQuestion.questionId ?: "",
                     title,
-                    question.isMandatory,
-                    mapToBundle(question.languageTranslationMap),
+                    domainQuestion.isMandatory,
+                    mapToBundle(domainQuestion.languageTranslationMap),
                     mapToLocationResponse(answer)
                 )
             }
             PHOTO_QUESTION_TYPE -> {
                 val (media, viewLocation) = mapMediaLocation(answer)
                 ViewQuestionAnswer.PhotoViewQuestionAnswer(
-                    question.questionId ?: "",
+                    domainQuestion.questionId ?: "",
                     title,
-                    question.isMandatory,
-                    mapToBundle(question.languageTranslationMap),
+                    domainQuestion.isMandatory,
+                    mapToBundle(domainQuestion.languageTranslationMap),
                     media.filename,
                     viewLocation
                 )
@@ -198,70 +198,70 @@ class ViewQuestionGroupMapper @Inject constructor() {
             VIDEO_QUESTION_TYPE -> {
                 val media = deserializeMedia(answer)
                 ViewQuestionAnswer.VideoViewQuestionAnswer(
-                    question.questionId ?: "",
+                    domainQuestion.questionId ?: "",
                     title,
-                    question.isMandatory,
-                    mapToBundle(question.languageTranslationMap),
+                    domainQuestion.isMandatory,
+                    mapToBundle(domainQuestion.languageTranslationMap),
                     media.filename
                 )
             }
             DATE_QUESTION_TYPE -> {
                 ViewQuestionAnswer.DateViewQuestionAnswer(
-                    question.questionId ?: "",
+                    domainQuestion.questionId ?: "",
                     title,
-                    question.isMandatory,
-                    mapToBundle(question.languageTranslationMap),
+                    domainQuestion.isMandatory,
+                    mapToBundle(domainQuestion.languageTranslationMap),
                     formatDate(answer)
                 )
             }
             SCAN_QUESTION_TYPE -> {
                 ViewQuestionAnswer.BarcodeViewQuestionAnswer(
-                    question.questionId ?: "",
+                    domainQuestion.questionId ?: "",
                     title,
-                    question.isMandatory,
-                    mapToBundle(question.languageTranslationMap),
+                    domainQuestion.isMandatory,
+                    mapToBundle(domainQuestion.languageTranslationMap),
                     formatBarcode(answer),
-                    question.isAllowMultiple
+                    domainQuestion.isAllowMultiple
                 )
             }
             GEOSHAPE_QUESTION_TYPE -> {
                 ViewQuestionAnswer.GeoShapeViewQuestionAnswer(
-                    question.questionId ?: "",
+                    domainQuestion.questionId ?: "",
                     title,
-                    question.isMandatory,
-                    mapToBundle(question.languageTranslationMap),
+                    domainQuestion.isMandatory,
+                    mapToBundle(domainQuestion.languageTranslationMap),
                     answer, //Unformatted answer
                 )
             }
             SIGNATURE_QUESTION_TYPE -> {
                 val signature: Signature = mapToSignature(answer)
                 ViewQuestionAnswer.SignatureViewQuestionAnswer(
-                    question.questionId ?: "",
+                    domainQuestion.questionId ?: "",
                     title,
-                    question.isMandatory,
-                    mapToBundle(question.languageTranslationMap),
+                    domainQuestion.isMandatory,
+                    mapToBundle(domainQuestion.languageTranslationMap),
                     signature.image,
                     signature.name
                 )
             }
             CADDISFLY_QUESTION_TYPE -> {
                 ViewQuestionAnswer.CaddisflyViewQuestionAnswer(
-                    question.questionId ?: "",
+                    domainQuestion.questionId ?: "",
                     title,
-                    question.isMandatory,
-                    mapToBundle(question.languageTranslationMap),
+                    domainQuestion.isMandatory,
+                    mapToBundle(domainQuestion.languageTranslationMap),
                     mapCaddisfly(answer)
                 )
             }
             else -> {
                 //free text or number
                 ViewQuestionAnswer.FreeTextViewQuestionAnswer(
-                    question.questionId ?: "",
+                    domainQuestion.questionId ?: "",
                     title,
-                    question.isMandatory,
-                    mapToBundle(question.languageTranslationMap),
+                    domainQuestion.isMandatory,
+                    mapToBundle(domainQuestion.languageTranslationMap),
                     answer,
-                    question.isDoubleEntry
+                    domainQuestion.isDoubleEntry
                 )
             }
         }

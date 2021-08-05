@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2021 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -19,10 +19,10 @@
 
 package org.akvo.flow.data.entity.form
 
-import org.akvo.flow.domain.entity.DomainQuestionGroup
-
-data class XmlDataForm(
-    val name: String,
-    val version: String,
-    val groups: List<DomainQuestionGroup> = emptyList()
+data class DataQuestionGroup(
+    val groupId: Long?,
+    var heading: String,
+    val repeatable: Boolean,
+    val formId: String,
+    val questions: MutableList<DataQuestion> = mutableListOf(),
 )

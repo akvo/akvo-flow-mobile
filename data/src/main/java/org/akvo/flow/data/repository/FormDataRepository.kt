@@ -22,11 +22,10 @@ package org.akvo.flow.data.repository
 import io.reactivex.Observable
 import org.akvo.flow.data.datasource.DataSourceFactory
 import org.akvo.flow.data.entity.ApiFormHeader
+import org.akvo.flow.data.entity.form.DataForm
 import org.akvo.flow.data.entity.form.DomainFormMapper
-import org.akvo.flow.data.entity.form.Form
 import org.akvo.flow.data.entity.form.FormHeaderParser
 import org.akvo.flow.data.entity.form.FormIdMapper
-import org.akvo.flow.data.entity.form.XmlDataForm
 import org.akvo.flow.data.entity.form.XmlFormParser
 import org.akvo.flow.data.net.RestApi
 import org.akvo.flow.data.net.s3.S3RestApi
@@ -93,7 +92,7 @@ class FormDataRepository @Inject constructor(
         )
     }
 
-    private fun parseForm(formId: String): XmlDataForm {
+    private fun parseForm(formId: String): DataForm {
         return xmlParser.parseXmlForm(dataSourceFactory.fileDataSource.getFormFile(formId))
     }
 
@@ -154,14 +153,14 @@ class FormDataRepository @Inject constructor(
     }
 
     private fun saveForm(apiFormHeader: ApiFormHeader): Observable<Boolean> {
-        val form = xmlParser.parse(dataSourceFactory.fileDataSource.getFormFile(apiFormHeader.id))
+        val form = xmlParser.parseXmlForm(dataSourceFactory.fileDataSource.getFormFile(apiFormHeader.id))
         return downloadResources(form)
             .concatMap {
-                dataSourceFactory.dataBaseDataSource.insertSurvey(apiFormHeader, true, form)
+                dataSourceFactory.dataBaseDataSource.saveForm(apiFormHeader, true, form)
             }
             .doOnError { throwable ->
                 Timber.e(throwable)
-                dataSourceFactory.dataBaseDataSource.insertSurvey(
+                dataSourceFactory.dataBaseDataSource.saveForm(
                     apiFormHeader,
                     false,
                     form
@@ -169,8 +168,8 @@ class FormDataRepository @Inject constructor(
             }
     }
 
-    private fun downloadResources(form: Form): Observable<Boolean> {
-        return Observable.fromIterable(form.resources)
+    private fun downloadResources(form: DataForm): Observable<Boolean> {
+        return Observable.fromIterable(form.getResources())
             .concatMap { resource ->
                 downloadAndExtractFile(
                     resource + FlowFileBrowser.ZIP_SUFFIX,

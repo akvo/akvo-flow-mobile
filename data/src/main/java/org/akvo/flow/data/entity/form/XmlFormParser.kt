@@ -19,12 +19,10 @@
 package org.akvo.flow.data.entity.form
 
 import org.akvo.flow.data.util.FileHelper
-import org.akvo.flow.domain.entity.DomainQuestionGroup
 import org.akvo.flow.domain.entity.question.AltText
 import org.akvo.flow.domain.entity.question.Dependency
 import org.akvo.flow.domain.entity.question.Level
 import org.akvo.flow.domain.entity.question.Option
-import org.akvo.flow.domain.entity.question.Question
 import org.akvo.flow.domain.entity.question.QuestionHelp
 import org.xmlpull.v1.XmlPullParser
 import org.xmlpull.v1.XmlPullParserException
@@ -32,46 +30,10 @@ import org.xmlpull.v1.XmlPullParserFactory
 import timber.log.Timber
 import java.io.IOException
 import java.io.InputStream
-import java.util.ArrayList
 import java.util.LinkedHashSet
 import javax.inject.Inject
 
 class XmlFormParser @Inject constructor(private val helper: FileHelper) {
-
-    fun parse(input: InputStream?): Form {
-        val resources: MutableList<String> = ArrayList()
-        var version = "0.0"
-        val parserFactory: XmlPullParserFactory
-        try {
-            parserFactory = XmlPullParserFactory.newInstance()
-            val parser = parserFactory.newPullParser()
-            parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false)
-            parser.setInput(input, null)
-            var eventType = parser.eventType
-            while (eventType != XmlPullParser.END_DOCUMENT) {
-                var eltName: String
-                if (eventType == XmlPullParser.START_TAG) {
-                    eltName = parser.name
-                    if (SURVEY == eltName) {
-                        version = parser.getAttributeValue(null, VERSION)
-                    } else if (QUESTION == eltName) {
-                        val resource = parser.getAttributeValue(null, CASCADE_RESOURCE)
-                        if (!resource.isNullOrEmpty()) {
-                            resources.add(resource)
-                        }
-                    }
-                }
-                eventType = parser.next()
-            }
-        } catch (e: XmlPullParserException) {
-            Timber.e(e)
-        } catch (e: IOException) {
-            Timber.e(e)
-        } finally {
-            helper.close(input)
-        }
-        return Form(resources, version)
-    }
 
     fun parseLanguages(input: InputStream?): Set<String> {
         val languageCodes: MutableSet<String> = LinkedHashSet()
@@ -119,13 +81,16 @@ class XmlFormParser @Inject constructor(private val helper: FileHelper) {
         return languageCodes
     }
 
-    fun parseXmlForm(inputStream: InputStream): XmlDataForm {
-        val groups: MutableList<DomainQuestionGroup> = mutableListOf()
-        var version = "0.0"
+    fun parseXmlForm(inputStream: InputStream): DataForm {
+        val groups: MutableList<DataQuestionGroup> = mutableListOf()
+        var version = 0.0
         var name = ""
+        var formId = -1
+        var surveyId = -1
+        var defaultLanguage = ""
         val parserFactory: XmlPullParserFactory
-        var currentQuestionGroup: DomainQuestionGroup? = null
-        var currentQuestion: Question? = null
+        var currentQuestionGroup: DataQuestionGroup? = null
+        var currentDataQuestion: DataQuestion? = null
         var currentOptions = mutableListOf<Option>()
         var currentOption: Option? = null
         var currentLevels = mutableListOf<Level>()
@@ -148,18 +113,19 @@ class XmlFormParser @Inject constructor(private val helper: FileHelper) {
                     XmlPullParser.START_TAG -> {
                         when (parser.name) {
                             SURVEY -> {
-                                val attributeValue = getStringAttribute(parser, VERSION)
-                                if (attributeValue != null) {
-                                    version = attributeValue
-                                }
-                                val attributeValue1 = getStringAttribute(parser, NAME)
-                                if (attributeValue1 != null) {
-                                    name = attributeValue1
+                                version = getDoubleAttribute(parser, VERSION)
+                                name = getNonNullStringAttribute(parser, NAME)
+                                formId = getIntAttribute(parser, FORM_ID)
+                                surveyId = getIntAttribute(parser, SURVEY_ID)
+                                val parsedAttribute = parser.getAttributeValue(null, DEFAULT_LANG)
+                                if (!parsedAttribute.isNullOrEmpty()) {
+                                    defaultLanguage = parsedAttribute
                                 }
                             }
                             QUESTION_GROUP -> {
                                 val repeatable = "true" == getStringAttribute(parser, REPEATABLE)
-                                currentQuestionGroup = DomainQuestionGroup("", repeatable)
+                                val groupId = getLongAttribute(parser, "groupId")
+                                currentQuestionGroup = DataQuestionGroup(groupId, "", repeatable = repeatable, formId.toString())
                             }
                             QUESTION_GROUP_HEADING -> {
                                 currentQuestionGroup?.heading = parser.nextText()
@@ -174,7 +140,7 @@ class XmlFormParser @Inject constructor(private val helper: FileHelper) {
                                     }
                                 }
 
-                                currentQuestion = Question(
+                                currentDataQuestion = DataQuestion(
                                     cascadeResource = resource,
                                     order = order,
                                     isMandatory = getBooleanAttribute(parser, MANDATORY),
@@ -193,12 +159,12 @@ class XmlFormParser @Inject constructor(private val helper: FileHelper) {
                             }
                             OPTIONS -> {
                                 currentOptions = mutableListOf()
-                                if (currentQuestion != null) {
-                                    currentQuestion.isAllowOther = getBooleanAttribute(
+                                if (currentDataQuestion != null) {
+                                    currentDataQuestion.isAllowOther = getBooleanAttribute(
                                         parser,
                                         ALLOW_OTHER
                                     )
-                                    currentQuestion.isAllowMultiple = getBooleanAttribute(
+                                    currentDataQuestion.isAllowMultiple = getBooleanAttribute(
                                         parser,
                                         ALLOW_MULT
                                     )
@@ -214,7 +180,7 @@ class XmlFormParser @Inject constructor(private val helper: FileHelper) {
                                 currentLevel = Level()
                             }
                             DEPENDENCY -> {
-                                currentQuestion?.addDependency(
+                                currentDataQuestion?.dependencies?.add(
                                     Dependency(
                                         question = getStringAttribute(parser, QUESTION),
                                         answer = getStringAttribute(parser, ANSWER)
@@ -248,21 +214,21 @@ class XmlFormParser @Inject constructor(private val helper: FileHelper) {
                                 }
                             }
                             QUESTION -> {
-                                if (currentQuestionGroup != null && currentQuestion != null) {
+                                if (currentQuestionGroup != null && currentDataQuestion != null) {
                                     if (lastText!= null) {
-                                        currentQuestion.text = lastText
+                                        currentDataQuestion.text = lastText
                                         lastText = null
                                     }
-                                    currentQuestionGroup.questions.add(currentQuestion)
-                                    currentQuestion = null
+                                    currentQuestionGroup.questions.add(currentDataQuestion)
+                                    currentDataQuestion = null
                                 }
                             }
                             OPTIONS -> {
-                                if (currentQuestion !=null) {
-                                    if (currentQuestion.options == null) {
-                                        currentQuestion.options = mutableListOf()
+                                if (currentDataQuestion !=null) {
+                                    if (currentDataQuestion.options == null) {
+                                        currentDataQuestion.options = mutableListOf()
                                     }
-                                    currentQuestion.options?.addAll(currentOptions)
+                                    currentDataQuestion.options?.addAll(currentOptions)
                                     currentOptions = mutableListOf()
                                 }
                             }
@@ -277,7 +243,7 @@ class XmlFormParser @Inject constructor(private val helper: FileHelper) {
                                 }
                             }
                             LEVELS -> {
-                                currentQuestion?.levels?.addAll(currentLevels)
+                                currentDataQuestion?.levels?.addAll(currentLevels)
                                 currentLevels = mutableListOf()
                             }
                             LEVEL -> {
@@ -303,8 +269,8 @@ class XmlFormParser @Inject constructor(private val helper: FileHelper) {
                                         currentHelp != null -> {
                                             currentHelp.addAltText(currentAltText)
                                         }
-                                        currentQuestion != null -> {
-                                            currentQuestion.addAltText(currentAltText)
+                                        currentDataQuestion != null -> {
+                                            currentDataQuestion.addAltText(currentAltText)
                                         }
                                     }
                                     currentAltText = null
@@ -316,7 +282,7 @@ class XmlFormParser @Inject constructor(private val helper: FileHelper) {
                                         currentHelp.text = lastText
                                         lastText = null
                                     }
-                                    currentQuestion?.questionHelp?.add(currentHelp)
+                                    currentDataQuestion?.questionHelp?.add(currentHelp)
                                     currentHelp = null
                                 }
 
@@ -340,7 +306,17 @@ class XmlFormParser @Inject constructor(private val helper: FileHelper) {
         } finally {
             helper.close(inputStream)
         }
-        return XmlDataForm(name = name, version = version, groups = groups)
+        return DataForm(formId, formId.toString(),
+            surveyId,
+            name = name,
+            version = version,
+            filename = "$formId.xml",
+            language = defaultLanguage,
+            groups = groups)
+    }
+
+    private fun getNonNullStringAttribute(parser: XmlPullParser, attributeName: String): String {
+        return parser.getAttributeValue(null, attributeName)?:""
     }
 
     private fun getIntAttribute(parser: XmlPullParser, attributeName: String) =
@@ -348,6 +324,12 @@ class XmlFormParser @Inject constructor(private val helper: FileHelper) {
 
     private fun getStringAttribute(parser: XmlPullParser, attributeName: String) =
         parser.getAttributeValue(null, attributeName)
+
+    private fun getDoubleAttribute(parser: XmlPullParser, attributeName: String) =
+        parser.getAttributeValue(null, attributeName)?.toDouble() ?: 0.0
+
+    private fun getLongAttribute(parser: XmlPullParser, attributeName: String) =
+        parser.getAttributeValue(null, attributeName)?.toLong()
 
     private fun getBooleanAttribute(parser: XmlPullParser, attributeName: String) =
         parser.getAttributeValue(null, attributeName)?.toBoolean() ?: false
@@ -394,6 +376,7 @@ class XmlFormParser @Inject constructor(private val helper: FileHelper) {
         private const val ALLOW_DEC = "allowDecimal"
         private const val ALLOW_SIGN = "signed"
         private const val HELP = "help"
-
+        private const val FORM_ID = "surveyId"
+        private const val SURVEY_ID = "surveyGroupId"
     }
 }

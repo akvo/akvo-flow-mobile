@@ -38,7 +38,7 @@ open class QuestionGroupTable {
 
         private const val CREATE_TABLE = ("CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " ("
                 + COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
-                + COLUMN_GROUP_ID + " INTEGER DEFAULT -1"
+                + COLUMN_GROUP_ID + " INTEGER DEFAULT -1,"
                 + COLUMN_HEADING + " TEXT NOT NULL,"
                 + COLUMN_REPEATABLE + " INTEGER DEFAULT 0,"
                 + COLUMN_FORM_ID + " TEXT NOT NULL,"

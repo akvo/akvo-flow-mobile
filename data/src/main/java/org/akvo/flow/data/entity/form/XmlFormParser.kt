@@ -321,15 +321,15 @@ class XmlFormParser @Inject constructor(private val helper: FileHelper) {
             groups = groups)
     }
 
-    private fun getNonNullStringAttribute(parser: XmlPullParser, attributeName: String): String {
-        return parser.getAttributeValue(null, attributeName)?:""
-    }
-
     private fun getIntAttribute(parser: XmlPullParser, attributeName: String) =
         parser.getAttributeValue(null, attributeName)?.toInt() ?: -1
 
     private fun getStringAttribute(parser: XmlPullParser, attributeName: String) =
         parser.getAttributeValue(null, attributeName)
+
+    private fun getNonNullStringAttribute(parser: XmlPullParser, attributeName: String): String {
+        return parser.getAttributeValue(null, attributeName) ?: ""
+    }
 
     private fun getDoubleAttribute(parser: XmlPullParser, attributeName: String) =
         parser.getAttributeValue(null, attributeName)?.toDouble() ?: 0.0

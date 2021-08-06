@@ -31,7 +31,7 @@ data class DataForm(
     val language: String = "en",
     val cascadeDownloaded: Boolean = true,
     val deleted: Boolean = false,
-    val groups: List<DataQuestionGroup> = emptyList(),
+    val groups: MutableList<DataQuestionGroup> = mutableListOf()
 ) {
 
     fun getResources(): List<String> {

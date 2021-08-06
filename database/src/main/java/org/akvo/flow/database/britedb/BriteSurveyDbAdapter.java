@@ -890,4 +890,8 @@ public class BriteSurveyDbAdapter {
             briteDatabase.insert(QuestionGroupTable.TABLE_NAME, values);
         }
     }
+
+    public Cursor getGroups(String formId) {
+        return briteDatabase.query("SELECT * FROM " + QuestionGroupTable.TABLE_NAME + " WHERE " + QuestionGroupTable.COLUMN_FORM_ID + " =? ", formId);
+    }
 }

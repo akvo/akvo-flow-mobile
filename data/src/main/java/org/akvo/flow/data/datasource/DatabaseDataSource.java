@@ -45,6 +45,7 @@ import org.akvo.flow.data.entity.form.DataForm;
 import org.akvo.flow.data.entity.form.DataQuestionGroup;
 import org.akvo.flow.data.entity.form.FormLanguagesMapper;
 import org.akvo.flow.data.entity.form.FormMapper;
+import org.akvo.flow.data.entity.form.QuestionGroupMapper;
 import org.akvo.flow.data.util.FlowFileBrowser;
 import org.akvo.flow.database.Constants;
 import org.akvo.flow.database.RecordColumns;
@@ -86,17 +87,20 @@ public class DatabaseDataSource {
     private final FormInstanceMapper formInstanceMapper;
     private final CursorMapper cursorMapper;
     private final FormLanguagesMapper formLanguagesMapper;
+    private final QuestionGroupMapper questionGroupMapper;
 
     @Inject
     public DatabaseDataSource(BriteDatabase db, SurveyInstanceIdMapper surveyInstanceIdMapper,
                               FormMapper formMapper, FormInstanceMapper formInstanceMapper,
-                              CursorMapper cursorMapper, FormLanguagesMapper formLanguagesMapper) {
+                              CursorMapper cursorMapper, FormLanguagesMapper formLanguagesMapper,
+                              QuestionGroupMapper questionGroupMapper) {
         this.briteSurveyDbAdapter = new BriteSurveyDbAdapter(db);
         this.surveyInstanceIdMapper = surveyInstanceIdMapper;
         this.formMapper = formMapper;
         this.formInstanceMapper = formInstanceMapper;
         this.cursorMapper = cursorMapper;
         this.formLanguagesMapper = formLanguagesMapper;
+        this.questionGroupMapper = questionGroupMapper;
     }
 
     public Observable<Cursor> getSurveys() {
@@ -447,6 +451,14 @@ public class DatabaseDataSource {
     @NotNull
     public DataForm getForm(String formId) {
         return formMapper.mapForm(briteSurveyDbAdapter.getForm(formId));
+    }
+
+    @NotNull
+    public DataForm getFormWithGroups(String formId) {
+        DataForm dataForm = formMapper.mapForm(briteSurveyDbAdapter.getForm(formId));
+        List<DataQuestionGroup> groups = questionGroupMapper.mapGroups(briteSurveyDbAdapter.getGroups(formId));
+        dataForm.getGroups().addAll(groups);
+        return dataForm;
     }
 
     public List<DataForm> getForms(long surveyId) {

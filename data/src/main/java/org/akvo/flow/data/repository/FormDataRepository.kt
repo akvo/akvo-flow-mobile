@@ -84,8 +84,9 @@ class FormDataRepository @Inject constructor(
     }
 
     override suspend fun getFormWithGroups(formId: String): DomainForm {
+        //TODO: once questions are in database we need to parse from db everything without opening xml form
         return domainFormMapper.mapForms(
-            dataSourceFactory.dataBaseDataSource.getForm(formId),
+            dataSourceFactory.dataBaseDataSource.getFormWithGroups(formId),
             parseForm(formId)
         )
     }

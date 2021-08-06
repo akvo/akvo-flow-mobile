@@ -24,5 +24,6 @@ data class DataQuestionGroup(
     var heading: String,
     val repeatable: Boolean,
     val formId: String,
+    val order: Int,
     val questions: MutableList<DataQuestion> = mutableListOf(),
 )

@@ -18,6 +18,7 @@
  */
 package org.akvo.flow.data.entity.form
 
+import org.akvo.flow.data.entity.ApiFormHeader
 import org.akvo.flow.data.util.FileHelper
 import org.akvo.flow.domain.entity.question.AltText
 import org.akvo.flow.domain.entity.question.Dependency
@@ -81,9 +82,9 @@ class XmlFormParser @Inject constructor(private val helper: FileHelper) {
         return languageCodes
     }
 
-    fun parseXmlForm(inputStream: InputStream): DataForm {
+    fun parseXmlForm(inputStream: InputStream, apiFormHeader: ApiFormHeader? = null): DataForm {
         val groups: MutableList<DataQuestionGroup> = mutableListOf()
-        var version = 0.0
+        var version = apiFormHeader?.version?.toDouble() ?: 0.0
         var name = ""
         var formId = -1
         var surveyId = -1
@@ -98,6 +99,7 @@ class XmlFormParser @Inject constructor(private val helper: FileHelper) {
         var currentAltText: AltText? = null
         var currentHelp: QuestionHelp? = null
         var lastText: String? = null
+        var groupOrder = 0
         try {
             parserFactory = XmlPullParserFactory.newInstance()
             val parser = parserFactory.newPullParser()
@@ -123,9 +125,13 @@ class XmlFormParser @Inject constructor(private val helper: FileHelper) {
                                 }
                             }
                             QUESTION_GROUP -> {
+                                groupOrder++
                                 val repeatable = "true" == getStringAttribute(parser, REPEATABLE)
                                 val groupId = getLongAttribute(parser, "groupId")
-                                currentQuestionGroup = DataQuestionGroup(groupId, "", repeatable = repeatable, formId.toString())
+                                currentQuestionGroup = DataQuestionGroup(groupId,
+                                    "",
+                                    repeatable = repeatable,
+                                    formId.toString(), groupOrder)
                             }
                             QUESTION_GROUP_HEADING -> {
                                 currentQuestionGroup?.heading = parser.nextText()
@@ -215,7 +221,7 @@ class XmlFormParser @Inject constructor(private val helper: FileHelper) {
                             }
                             QUESTION -> {
                                 if (currentQuestionGroup != null && currentDataQuestion != null) {
-                                    if (lastText!= null) {
+                                    if (lastText != null) {
                                         currentDataQuestion.text = lastText
                                         lastText = null
                                     }
@@ -224,7 +230,7 @@ class XmlFormParser @Inject constructor(private val helper: FileHelper) {
                                 }
                             }
                             OPTIONS -> {
-                                if (currentDataQuestion !=null) {
+                                if (currentDataQuestion != null) {
                                     if (currentDataQuestion.options == null) {
                                         currentDataQuestion.options = mutableListOf()
                                     }
@@ -234,12 +240,12 @@ class XmlFormParser @Inject constructor(private val helper: FileHelper) {
                             }
                             OPTION -> {
                                 if (currentOption != null) {
-                                    if (lastText!= null) {
+                                    if (lastText != null) {
                                         currentOption.text = lastText
                                         lastText = null
                                     }
                                     currentOptions.add(currentOption)
-                                    currentOption  = null
+                                    currentOption = null
                                 }
                             }
                             LEVELS -> {
@@ -247,14 +253,14 @@ class XmlFormParser @Inject constructor(private val helper: FileHelper) {
                                 currentLevels = mutableListOf()
                             }
                             LEVEL -> {
-                               if (currentLevel != null) {
-                                   if (lastText!= null) {
-                                       currentLevel.text = lastText
-                                       lastText = null
-                                   }
-                                   currentLevels.add(currentLevel)
-                                   currentLevel = null
-                               }
+                                if (currentLevel != null) {
+                                    if (lastText != null) {
+                                        currentLevel.text = lastText
+                                        lastText = null
+                                    }
+                                    currentLevels.add(currentLevel)
+                                    currentLevel = null
+                                }
                             }
                             DEPENDENCY -> {
                                 //nothing to do
@@ -278,7 +284,7 @@ class XmlFormParser @Inject constructor(private val helper: FileHelper) {
                             }
                             HELP -> {
                                 if (currentHelp != null) {
-                                    if (lastText!= null) {
+                                    if (lastText != null) {
                                         currentHelp.text = lastText
                                         lastText = null
                                     }

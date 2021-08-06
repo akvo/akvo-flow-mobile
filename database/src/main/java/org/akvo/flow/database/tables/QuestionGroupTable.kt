@@ -29,19 +29,14 @@ open class QuestionGroupTable {
 
     companion object {
         const val TABLE_NAME = "question_group"
-        const val COLUMN_ID = "_id"
+        private const val COLUMN_ID = "_id"
         const val COLUMN_GROUP_ID = "group_id"
         const val COLUMN_HEADING = "heading"
         const val COLUMN_REPEATABLE = "repeatable"
         const val COLUMN_FORM_ID = "form_id"
-        const val COLUMN_ORDER = "order"
+        const val COLUMN_ORDER = "group_order"
 
-        private const val CREATE_TABLE = ("CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " ("
-                + COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
-                + COLUMN_GROUP_ID + " INTEGER DEFAULT -1,"
-                + COLUMN_HEADING + " TEXT NOT NULL,"
-                + COLUMN_REPEATABLE + " INTEGER DEFAULT 0,"
-                + COLUMN_FORM_ID + " TEXT NOT NULL,"
-                + COLUMN_ORDER + "INTEGER)")
+        private const val CREATE_TABLE: String =
+            "CREATE TABLE IF NOT EXISTS $TABLE_NAME ($COLUMN_ID INTEGER PRIMARY KEY AUTOINCREMENT, $COLUMN_GROUP_ID INTEGER DEFAULT -1, $COLUMN_HEADING TEXT NOT NULL, $COLUMN_REPEATABLE INTEGER DEFAULT 0, $COLUMN_FORM_ID TEXT NOT NULL, $COLUMN_ORDER INTEGER NOT NULL DEFAULT 0)"
     }
 }

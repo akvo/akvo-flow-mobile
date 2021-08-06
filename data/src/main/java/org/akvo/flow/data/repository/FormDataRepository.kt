@@ -45,10 +45,8 @@ class FormDataRepository @Inject constructor(
     private val s3RestApi: S3RestApi,
     private val domainFormMapper: DomainFormMapper,
 ) : FormRepository {
-    override fun loadForm(
-        formId: String?,
-        deviceId: String?,
-    ): Observable<Boolean?>? {
+
+    override fun loadForm(formId: String?, deviceId: String?): Observable<Boolean?>? {
         val dataBaseDataSource = dataSourceFactory.dataBaseDataSource
         return if (TEST_FORM_ID == formId) {
             dataBaseDataSource.installTestForm()
@@ -153,19 +151,22 @@ class FormDataRepository @Inject constructor(
     }
 
     private fun saveForm(apiFormHeader: ApiFormHeader): Observable<Boolean> {
-        val form = xmlParser.parseXmlForm(dataSourceFactory.fileDataSource.getFormFile(apiFormHeader.id))
+        val form = xmlParser.parseXmlForm(dataSourceFactory.fileDataSource.getFormFile(apiFormHeader.id), apiFormHeader)
         return downloadResources(form)
             .concatMap {
-                dataSourceFactory.dataBaseDataSource.saveForm(apiFormHeader, true, form)
+                saveFormAndGroups(form, true)
             }
             .doOnError { throwable ->
                 Timber.e(throwable)
-                dataSourceFactory.dataBaseDataSource.saveForm(
-                    apiFormHeader,
-                    false,
-                    form
-                )
+                saveFormAndGroups(form, false)
             }
+    }
+
+    private fun saveFormAndGroups(form: DataForm, resourcesDownloaded: Boolean): Observable<Boolean> {
+        val dataBaseDataSource = dataSourceFactory.dataBaseDataSource
+        dataBaseDataSource.saveForm(resourcesDownloaded, form)
+        dataBaseDataSource.saveGroups(form)
+        return Observable.just(true)
     }
 
     private fun downloadResources(form: DataForm): Observable<Boolean> {

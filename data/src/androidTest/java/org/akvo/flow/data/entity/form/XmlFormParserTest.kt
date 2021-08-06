@@ -38,7 +38,7 @@ class XmlFormParserTest {
         val input: InputStream =
             InstrumentationRegistry.getInstrumentation().targetContext.resources
             .openRawResource(R.raw.date_form)
-        val result: DataForm = parser.parseXmlForm(input)
+        val result: DataForm = parser.parseXmlForm(input, apiFormHeader)
 
         assertEquals("1.0", result.version)
         assertEquals("DateForm", result.name)
@@ -54,7 +54,7 @@ class XmlFormParserTest {
         val input: InputStream =
             InstrumentationRegistry.getInstrumentation().targetContext.resources
                 .openRawResource(R.raw.empty_form)
-        val result: DataForm = parser.parseXmlForm(input)
+        val result: DataForm = parser.parseXmlForm(input, apiFormHeader)
 
         assertEquals("0.0", result.version)
         assertEquals("", result.name)

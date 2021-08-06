@@ -20,6 +20,11 @@
 
 package org.akvo.flow.database.britedb;
 
+import static org.akvo.flow.database.Constants.ORDER_BY_DATE;
+import static org.akvo.flow.database.Constants.ORDER_BY_DISTANCE;
+import static org.akvo.flow.database.Constants.ORDER_BY_NAME;
+import static org.akvo.flow.database.Constants.ORDER_BY_STATUS;
+
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.text.TextUtils;
@@ -30,19 +35,20 @@ import androidx.annotation.Nullable;
 import com.squareup.sqlbrite2.BriteDatabase;
 import com.squareup.sqlbrite2.SqlBrite;
 
-import org.akvo.flow.database.tables.DataPointDownloadTable;
-import org.akvo.flow.database.tables.LanguageTable;
-import org.akvo.flow.database.tables.FormUpdateNotifiedTable;
 import org.akvo.flow.database.RecordColumns;
 import org.akvo.flow.database.ResponseColumns;
 import org.akvo.flow.database.SurveyColumns;
 import org.akvo.flow.database.SurveyGroupColumns;
 import org.akvo.flow.database.SurveyInstanceColumns;
 import org.akvo.flow.database.SurveyInstanceStatus;
-import org.akvo.flow.database.tables.Tables;
 import org.akvo.flow.database.TransmissionColumns;
 import org.akvo.flow.database.TransmissionStatus;
 import org.akvo.flow.database.UserColumns;
+import org.akvo.flow.database.tables.DataPointDownloadTable;
+import org.akvo.flow.database.tables.FormUpdateNotifiedTable;
+import org.akvo.flow.database.tables.LanguageTable;
+import org.akvo.flow.database.tables.QuestionGroupTable;
+import org.akvo.flow.database.tables.Tables;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,11 +59,6 @@ import io.reactivex.ObservableSource;
 import io.reactivex.Single;
 import io.reactivex.functions.Function;
 import timber.log.Timber;
-
-import static org.akvo.flow.database.Constants.ORDER_BY_DATE;
-import static org.akvo.flow.database.Constants.ORDER_BY_DISTANCE;
-import static org.akvo.flow.database.Constants.ORDER_BY_NAME;
-import static org.akvo.flow.database.Constants.ORDER_BY_STATUS;
 
 public class BriteSurveyDbAdapter {
 
@@ -882,4 +883,11 @@ public class BriteSurveyDbAdapter {
         briteDatabase.insert(FormUpdateNotifiedTable.TABLE_NAME, contentValues);
     }
 
+    public void saveGroup(List<ContentValues> groupValues, String formId) {
+        String where = QuestionGroupTable.COLUMN_FORM_ID + " =? ";
+        briteDatabase.delete(QuestionGroupTable.TABLE_NAME, where, formId);
+        for (ContentValues values: groupValues) {
+            briteDatabase.insert(QuestionGroupTable.TABLE_NAME, values);
+        }
+    }
 }

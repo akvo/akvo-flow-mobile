@@ -22,6 +22,7 @@ package org.akvo.flow.data.repository;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
@@ -127,9 +128,7 @@ public class FormDataRepositoryTest {
                 .thenReturn("123");
         when(mockDatabaseDataSource.insertSurveyGroup(any(ApiFormHeader.class)))
                 .thenReturn(Observable.just(true));
-        when(mockDatabaseDataSource
-                .saveForm(any(ApiFormHeader.class), anyBoolean(), any(DataForm.class)))
-                .thenReturn(Observable.just(true));
+        doNothing().when(mockDatabaseDataSource).saveForm(anyBoolean(), any(DataForm.class));
         when(mockFileDataSource.extractRemoteArchive(any(ResponseBody.class), anyString()))
                 .thenReturn(Observable.just(true));
         when(mockFileDataSource.getFormFile(anyString()))
@@ -174,7 +173,7 @@ public class FormDataRepositoryTest {
         when(mockDatabaseDataSource.formNeedsUpdate(any(ApiFormHeader.class)))
                 .thenReturn(Observable.just(true));
 
-        when(mockXmlParser.parseXmlForm(mockInputStream)).thenReturn(mockForm);
+        when(mockXmlParser.parseXmlForm(mockInputStream, null)).thenReturn(mockForm);
 
         mockWebServer.enqueue(new MockResponse().setResponseCode(200)
                 .setBody(",1,cde,abc,cde,6.0,cde,true,33"));
@@ -203,7 +202,7 @@ public class FormDataRepositoryTest {
         when(mockDatabaseDataSource.formNeedsUpdate(any(ApiFormHeader.class)))
                 .thenReturn(Observable.just(true));
         when(mockDatabaseDataSource.deleteAllForms()).thenReturn(Observable.just(true));
-        when(mockXmlParser.parseXmlForm(mockInputStream)).thenReturn(mockForm);
+        when(mockXmlParser.parseXmlForm(mockInputStream, null)).thenReturn(mockForm);
 
         mockWebServer.enqueue(new MockResponse().setResponseCode(200).setBody(
                 ",1,cde,abc,cde,6.0,cde,true,33\n"));

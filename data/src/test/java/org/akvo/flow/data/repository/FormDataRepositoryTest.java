@@ -172,8 +172,7 @@ public class FormDataRepositoryTest {
 
         when(mockDatabaseDataSource.formNeedsUpdate(any(ApiFormHeader.class)))
                 .thenReturn(Observable.just(true));
-
-        when(mockXmlParser.parseXmlForm(mockInputStream, null)).thenReturn(mockForm);
+        when(mockXmlParser.parseXmlForm(any(InputStream.class), any(ApiFormHeader.class))).thenReturn(mockForm);
 
         mockWebServer.enqueue(new MockResponse().setResponseCode(200)
                 .setBody(",1,cde,abc,cde,6.0,cde,true,33"));
@@ -202,7 +201,7 @@ public class FormDataRepositoryTest {
         when(mockDatabaseDataSource.formNeedsUpdate(any(ApiFormHeader.class)))
                 .thenReturn(Observable.just(true));
         when(mockDatabaseDataSource.deleteAllForms()).thenReturn(Observable.just(true));
-        when(mockXmlParser.parseXmlForm(mockInputStream, null)).thenReturn(mockForm);
+        when(mockXmlParser.parseXmlForm(any(InputStream.class), any(ApiFormHeader.class))).thenReturn(mockForm);
 
         mockWebServer.enqueue(new MockResponse().setResponseCode(200).setBody(
                 ",1,cde,abc,cde,6.0,cde,true,33\n"));

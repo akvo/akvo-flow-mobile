@@ -91,7 +91,7 @@ class XmlFormParser @Inject constructor(private val helper: FileHelper) {
         var defaultLanguage = ""
         val parserFactory: XmlPullParserFactory
         var currentQuestionGroup: DataQuestionGroup? = null
-        var currentDataQuestion: DataQuestion? = null
+        var currentQuestion: DataQuestion? = null
         var currentOptions = mutableListOf<Option>()
         var currentOption: Option? = null
         var currentLevels = mutableListOf<Level>()
@@ -146,7 +146,7 @@ class XmlFormParser @Inject constructor(private val helper: FileHelper) {
                                     }
                                 }
 
-                                currentDataQuestion = DataQuestion(
+                                currentQuestion = DataQuestion(
                                     cascadeResource = resource,
                                     order = order,
                                     isMandatory = getBooleanAttribute(parser, MANDATORY),
@@ -165,12 +165,12 @@ class XmlFormParser @Inject constructor(private val helper: FileHelper) {
                             }
                             OPTIONS -> {
                                 currentOptions = mutableListOf()
-                                if (currentDataQuestion != null) {
-                                    currentDataQuestion.isAllowOther = getBooleanAttribute(
+                                if (currentQuestion != null) {
+                                    currentQuestion.isAllowOther = getBooleanAttribute(
                                         parser,
                                         ALLOW_OTHER
                                     )
-                                    currentDataQuestion.isAllowMultiple = getBooleanAttribute(
+                                    currentQuestion.isAllowMultiple = getBooleanAttribute(
                                         parser,
                                         ALLOW_MULT
                                     )
@@ -186,7 +186,7 @@ class XmlFormParser @Inject constructor(private val helper: FileHelper) {
                                 currentLevel = Level()
                             }
                             DEPENDENCY -> {
-                                currentDataQuestion?.dependencies?.add(
+                                currentQuestion?.dependencies?.add(
                                     Dependency(
                                         question = getStringAttribute(parser, QUESTION),
                                         answer = getStringAttribute(parser, ANSWER)
@@ -220,21 +220,21 @@ class XmlFormParser @Inject constructor(private val helper: FileHelper) {
                                 }
                             }
                             QUESTION -> {
-                                if (currentQuestionGroup != null && currentDataQuestion != null) {
+                                if (currentQuestionGroup != null && currentQuestion != null) {
                                     if (lastText != null) {
-                                        currentDataQuestion.text = lastText
+                                        currentQuestion.text = lastText
                                         lastText = null
                                     }
-                                    currentQuestionGroup.questions.add(currentDataQuestion)
-                                    currentDataQuestion = null
+                                    currentQuestionGroup.questions.add(currentQuestion)
+                                    currentQuestion = null
                                 }
                             }
                             OPTIONS -> {
-                                if (currentDataQuestion != null) {
-                                    if (currentDataQuestion.options == null) {
-                                        currentDataQuestion.options = mutableListOf()
+                                if (currentQuestion != null) {
+                                    if (currentQuestion.options == null) {
+                                        currentQuestion.options = mutableListOf()
                                     }
-                                    currentDataQuestion.options?.addAll(currentOptions)
+                                    currentQuestion.options?.addAll(currentOptions)
                                     currentOptions = mutableListOf()
                                 }
                             }
@@ -249,7 +249,7 @@ class XmlFormParser @Inject constructor(private val helper: FileHelper) {
                                 }
                             }
                             LEVELS -> {
-                                currentDataQuestion?.levels?.addAll(currentLevels)
+                                currentQuestion?.levels?.addAll(currentLevels)
                                 currentLevels = mutableListOf()
                             }
                             LEVEL -> {
@@ -275,8 +275,8 @@ class XmlFormParser @Inject constructor(private val helper: FileHelper) {
                                         currentHelp != null -> {
                                             currentHelp.addAltText(currentAltText)
                                         }
-                                        currentDataQuestion != null -> {
-                                            currentDataQuestion.addAltText(currentAltText)
+                                        currentQuestion != null -> {
+                                            currentQuestion.addAltText(currentAltText)
                                         }
                                     }
                                     currentAltText = null
@@ -288,7 +288,7 @@ class XmlFormParser @Inject constructor(private val helper: FileHelper) {
                                         currentHelp.text = lastText
                                         lastText = null
                                     }
-                                    currentDataQuestion?.questionHelp?.add(currentHelp)
+                                    currentQuestion?.questionHelp?.add(currentHelp)
                                     currentHelp = null
                                 }
 

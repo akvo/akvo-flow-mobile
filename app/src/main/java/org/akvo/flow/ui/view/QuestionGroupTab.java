@@ -31,7 +31,6 @@ import android.widget.TextView;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
 import org.akvo.flow.R;
-import org.akvo.flow.domain.Dependency;
 import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionGroup;
 import org.akvo.flow.domain.QuestionResponse;
@@ -44,6 +43,7 @@ import org.akvo.flow.ui.view.media.video.VideoQuestionView;
 import org.akvo.flow.ui.view.option.OptionQuestionFactory;
 import org.akvo.flow.ui.view.signature.SignatureQuestionView;
 import org.akvo.flow.util.ConstantUtil;
+import org.akvo.flow.utils.entity.Dependency;
 
 import java.util.ArrayList;
 import java.util.Collection;

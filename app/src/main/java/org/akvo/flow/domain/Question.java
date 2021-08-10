@@ -20,6 +20,11 @@
 package org.akvo.flow.domain;
 
 import org.akvo.flow.util.ConstantUtil;
+import org.akvo.flow.utils.entity.AltText;
+import org.akvo.flow.utils.entity.Dependency;
+import org.akvo.flow.utils.entity.Level;
+import org.akvo.flow.utils.entity.Option;
+import org.akvo.flow.utils.entity.QuestionHelp;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -135,7 +140,7 @@ public class Question {
     }
 
     public void addAltText(AltText altText) {
-        languageTranslationMap.put(altText.getLanguage(), altText);
+        languageTranslationMap.put(altText.getLanguageCode(), altText);
     }
 
     public boolean isAllowMultiple() {
@@ -225,9 +230,7 @@ public class Question {
         List<QuestionHelp> help = new ArrayList<>();
         if (questionHelp != null && type != null) {
             for (int i = 0; i < questionHelp.size(); i++) {
-                if (type.equalsIgnoreCase(questionHelp.get(i).getType())) {
-                    help.add(questionHelp.get(i));
-                }
+                help.add(questionHelp.get(i));
             }
         }
         return help;
@@ -365,7 +368,7 @@ public class Question {
         if (question.dependencies != null) {
             q.dependencies = new ArrayList<>();
             for (Dependency d : question.getDependencies()) {
-                q.dependencies.add(new Dependency(d));
+                q.dependencies.add(new Dependency(d.getQuestion(), d.getAnswer()));
             }
         }
 
@@ -373,7 +376,7 @@ public class Question {
         if (question.options != null) {
             q.options = new ArrayList<>();
             for (Option o : question.options) {
-                q.options.add(new Option(o));
+                q.options.add(new Option(o.getText(), o.getCode(), o.isOther(), o.getAltTextMap()));
             }
         }
         return q;

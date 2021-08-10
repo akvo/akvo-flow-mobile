@@ -2,9 +2,6 @@ package org.akvo.flow.serialization.response.value;
 
 import junit.framework.TestCase;
 
-import org.akvo.flow.domain.Dependency;
-import org.akvo.flow.domain.Option;
-
 import java.util.ArrayList;
 import java.util.List;
 

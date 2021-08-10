@@ -34,7 +34,6 @@ import com.google.android.material.textfield.TextInputLayout;
 
 import org.akvo.flow.R;
 import org.akvo.flow.data.database.cascade.CascadeDB;
-import org.akvo.flow.domain.Level;
 import org.akvo.flow.domain.Node;
 import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionResponse;
@@ -45,6 +44,7 @@ import org.akvo.flow.injector.component.ViewComponent;
 import org.akvo.flow.serialization.response.value.CascadeValue;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.files.FormResourcesFileBrowser;
+import org.akvo.flow.utils.entity.Level;
 
 import java.io.File;
 import java.util.ArrayList;

@@ -21,12 +21,13 @@ package org.akvo.flow.serialization.response.value;
 
 import android.text.TextUtils;
 
-import org.akvo.flow.domain.Option;
+import org.akvo.flow.utils.entity.Option;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import timber.log.Timber;
@@ -60,10 +61,10 @@ public class OptionValue {
             JSONArray jOptions = new JSONArray(data);
             for (int i=0; i<jOptions.length(); i++) {
                 JSONObject jOption = jOptions.getJSONObject(i);
-                Option option = new Option();
-                option.setText(jOption.optString(Attrs.TEXT));
-                option.setCode(jOption.optString(Attrs.CODE, null));
-                option.setIsOther(jOption.optBoolean(Attrs.IS_OTHER));
+                Option option = new Option(jOption.optString(Attrs.TEXT),
+                        jOption.optString(Attrs.CODE),
+                        jOption.optBoolean(Attrs.IS_OTHER),
+                        new HashMap<>());
                 options.add(option);
             }
             return options;
@@ -75,8 +76,7 @@ public class OptionValue {
         List<Option> options = new ArrayList<>();
         String[] tokens = data.split("\\|", -1);
         for (String token : tokens) {
-            Option o = new Option();
-            o.setText(token);
+            Option o = new Option(token, null, false, new HashMap<>());
             options.add(o);
         }
         return options;

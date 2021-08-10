@@ -26,7 +26,7 @@ package org.akvo.flow.utils.entity
  * A question can have 0 or 1 dependencies.
  *
  */
-data class Dependency(val question: String?, var answer: String?) {
+data class Dependency(var question: String?, var answer: String?) {
 
     fun isMatch(value: String?): Boolean {
         if (answer == null || value == null) {

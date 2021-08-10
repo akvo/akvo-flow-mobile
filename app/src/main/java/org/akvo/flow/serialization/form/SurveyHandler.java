@@ -19,23 +19,23 @@
 
 package org.akvo.flow.serialization.form;
 
-import org.akvo.flow.domain.AltText;
-import org.akvo.flow.domain.Dependency;
-import org.akvo.flow.domain.Level;
-import org.akvo.flow.domain.Option;
 import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionGroup;
-import org.akvo.flow.domain.QuestionHelp;
 import org.akvo.flow.domain.Survey;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.domain.ValidationRule;
 import org.akvo.flow.util.ConstantUtil;
-import org.akvo.flow.util.StringUtil;
+import org.akvo.flow.utils.entity.AltText;
+import org.akvo.flow.utils.entity.Dependency;
+import org.akvo.flow.utils.entity.Level;
+import org.akvo.flow.utils.entity.Option;
+import org.akvo.flow.utils.entity.QuestionHelp;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import timber.log.Timber;
@@ -161,9 +161,6 @@ public class SurveyHandler extends DefaultHandler {
                 currentValidation = null;
             } else if (localName.equalsIgnoreCase(HELP)) {
                 if (currentHelp.isValid()) {
-                    if (StringUtil.isNullOrEmpty(currentHelp.getType())) {
-                        currentHelp.setType(ConstantUtil.TIP_HELP_TYPE);
-                    }
                     currentQuestion.addQuestionHelp(currentHelp);
                 }
                 currentHelp = null;
@@ -391,16 +388,13 @@ public class SurveyHandler extends DefaultHandler {
                 }
             }
         } else if (localName.equalsIgnoreCase(OPTION)) {
-            currentOption = new Option();
-            currentOption.setCode(attributes.getValue(CODE));
+            currentOption = new Option(null, attributes.getValue(CODE), false, new HashMap<>());
         } else if (localName.equalsIgnoreCase(LEVELS)) {
             currentLevels = new ArrayList<>();
         } else if (localName.equalsIgnoreCase(LEVEL)) {
             currentLevel = new Level();
         } else if (localName.equalsIgnoreCase(DEPENDENCY)) {
-            Dependency currentDependency = new Dependency();
-            currentDependency.setQuestion(attributes.getValue(QUESTION));
-            currentDependency.setAnswer(attributes.getValue(ANSWER));
+            Dependency currentDependency = new Dependency(attributes.getValue(QUESTION), attributes.getValue(ANSWER));
             if (currentQuestion != null) {
                 currentQuestion.addDependency(currentDependency);
             }
@@ -413,13 +407,9 @@ public class SurveyHandler extends DefaultHandler {
             currentValidation.setMinVal(attributes.getValue(MIN_VAL));
             currentValidation.setMaxVal(attributes.getValue(MAX_VAL));
         } else if (localName.equalsIgnoreCase(ALT_TEXT)) {
-            currentAltText = new AltText();
-            currentAltText.setLanguage(attributes.getValue(LANG));
-            currentAltText.setType(attributes.getValue(TYPE));
+            currentAltText = new AltText(attributes.getValue(LANG), attributes.getValue(TYPE), null);
         } else if (localName.equalsIgnoreCase(HELP)) {
             currentHelp = new QuestionHelp();
-            currentHelp.setType(attributes.getValue(TYPE));
-            currentHelp.setValue(attributes.getValue(VALUE));
         }
     }
 }

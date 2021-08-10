@@ -20,39 +20,6 @@
 
 package org.akvo.flow.activity.form.formfill;
 
-import android.content.Context;
-import android.content.Intent;
-import android.util.SparseArray;
-
-import androidx.test.espresso.ViewInteraction;
-import androidx.test.espresso.matcher.RootMatchers;
-import androidx.test.ext.junit.runners.AndroidJUnit4;
-import androidx.test.filters.LargeTest;
-import androidx.test.platform.app.InstrumentationRegistry;
-import androidx.test.rule.ActivityTestRule;
-
-import org.akvo.flow.R;
-import org.akvo.flow.activity.FormActivity;
-import org.akvo.flow.activity.form.data.SurveyInstaller;
-import org.akvo.flow.activity.form.data.SurveyRequisite;
-import org.akvo.flow.domain.Level;
-import org.akvo.flow.domain.Node;
-import org.akvo.flow.domain.Question;
-import org.akvo.flow.domain.QuestionGroup;
-import org.akvo.flow.domain.Survey;
-import org.hamcrest.Description;
-import org.hamcrest.Matcher;
-import org.hamcrest.TypeSafeMatcher;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-
-import java.util.List;
-import java.util.Random;
-
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.action.ViewActions.scrollTo;
@@ -69,6 +36,39 @@ import static org.akvo.flow.activity.form.FormActivityTestUtil.verifyCascadeLeve
 import static org.akvo.flow.tests.R.raw.cascade_form;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.allOf;
+
+import android.content.Context;
+import android.content.Intent;
+import android.util.SparseArray;
+
+import androidx.test.espresso.ViewInteraction;
+import androidx.test.espresso.matcher.RootMatchers;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
+import androidx.test.filters.LargeTest;
+import androidx.test.platform.app.InstrumentationRegistry;
+import androidx.test.rule.ActivityTestRule;
+
+import org.akvo.flow.R;
+import org.akvo.flow.activity.FormActivity;
+import org.akvo.flow.activity.form.data.SurveyInstaller;
+import org.akvo.flow.activity.form.data.SurveyRequisite;
+import org.akvo.flow.domain.Node;
+import org.akvo.flow.domain.Question;
+import org.akvo.flow.domain.QuestionGroup;
+import org.akvo.flow.domain.Survey;
+import org.akvo.flow.utils.entity.Level;
+import org.hamcrest.Description;
+import org.hamcrest.Matcher;
+import org.hamcrest.TypeSafeMatcher;
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
+import java.util.List;
+import java.util.Random;
 
 @LargeTest
 @RunWith(AndroidJUnit4.class)

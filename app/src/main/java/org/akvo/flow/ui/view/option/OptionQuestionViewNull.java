@@ -23,9 +23,9 @@ package org.akvo.flow.ui.view.option;
 import android.content.Context;
 
 import org.akvo.flow.R;
-import org.akvo.flow.domain.Option;
 import org.akvo.flow.domain.Question;
 import org.akvo.flow.event.SurveyListener;
+import org.akvo.flow.utils.entity.Option;
 
 import java.util.Collections;
 import java.util.List;

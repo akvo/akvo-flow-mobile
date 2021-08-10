@@ -23,7 +23,7 @@ import java.util.HashMap
 data class Option(
     var text: String? = null,
     var code: String?,
-    val isOther: Boolean = false,
+    var isOther: Boolean = false,
     val altTextMap: HashMap<String?, AltText> = HashMap<String?, AltText>()
 ) {
 

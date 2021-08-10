@@ -20,6 +20,8 @@
 
 package org.akvo.flow.ui.view.signature;
 
+import static org.akvo.flow.util.files.SignatureFileBrowser.RESIZED_SUFFIX;
+
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
@@ -28,6 +30,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import org.akvo.flow.R;
 import org.akvo.flow.domain.Question;
@@ -49,10 +53,6 @@ import org.akvo.flow.util.image.ImageLoader;
 import java.io.File;
 
 import javax.inject.Inject;
-
-import androidx.appcompat.app.AppCompatActivity;
-
-import static org.akvo.flow.util.files.SignatureFileBrowser.RESIZED_SUFFIX;
 
 public class SignatureQuestionView extends QuestionView {
 

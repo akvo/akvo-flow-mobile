@@ -38,10 +38,7 @@ import androidx.annotation.Nullable;
 
 import org.akvo.flow.R;
 import org.akvo.flow.app.FlowApp;
-import org.akvo.flow.domain.AltText;
-import org.akvo.flow.domain.Dependency;
 import org.akvo.flow.domain.Question;
-import org.akvo.flow.domain.QuestionHelp;
 import org.akvo.flow.domain.QuestionResponse;
 import org.akvo.flow.event.QuestionInteractionEvent;
 import org.akvo.flow.event.QuestionInteractionListener;
@@ -49,6 +46,9 @@ import org.akvo.flow.event.SurveyListener;
 import org.akvo.flow.injector.component.ApplicationComponent;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.ViewUtil;
+import org.akvo.flow.utils.entity.AltText;
+import org.akvo.flow.utils.entity.Dependency;
+import org.akvo.flow.utils.entity.QuestionHelp;
 
 import java.util.ArrayList;
 import java.util.List;

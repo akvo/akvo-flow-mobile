@@ -60,11 +60,6 @@ public class ConstantUtil {
     public static final String CADDISFLY_QUESTION_TYPE = "caddisfly";
 
     /**
-     * help types
-     */
-    public static final String TIP_HELP_TYPE = "tip";
-
-    /**
      * response types
      */
     public static final String VALUE_RESPONSE_TYPE = "VALUE";

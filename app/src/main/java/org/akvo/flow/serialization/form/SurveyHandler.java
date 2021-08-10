@@ -58,7 +58,6 @@ public class SurveyHandler extends DefaultHandler {
     private static final String ANSWER = "answer-value";
     private static final String TEXT = "text";
     private static final String OPTION = "option";
-    private static final String VALUE = "value";
     private static final String CODE = "code";
     private static final String OPTIONS = "options";
     private static final String ALLOW_OTHER = "allowOther";
@@ -75,13 +74,10 @@ public class SurveyHandler extends DefaultHandler {
     private static final String LANG = "language";
     private static final String LOCKED = "locked";
     private static final String HELP = "help";
-    private static final String STRENGTH_MIN = "strengthMin";
-    private static final String STRENGTH_MAX = "strengthMax";
     private static final String NAME = "name";
     private static final String VERSION = "version";
     private static final String LOCALE_NAME = "localeNameFlag";
     private static final String LOCALE_LOCATION = "localeLocationFlag";
-    private static final String SOURCE_QUESTION_ID = "sourceId";
     private static final String SOURCE_SURVEY_ID = "sourceSurveyId";
     private static final String DOUBLE_ENTRY = "requireDoubleEntry";
     private static final String REPEATABLE = "repeatable";

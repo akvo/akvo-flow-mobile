@@ -20,15 +20,6 @@
 
 package org.akvo.flow.data.entity;
 
-import org.akvo.flow.data.util.FileHelper;
-import org.akvo.flow.data.util.FlowFileBrowser;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
-
-import java.io.File;
-
 import static junit.framework.TestCase.assertNotNull;
 import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertEquals;
@@ -37,6 +28,15 @@ import static org.junit.Assert.assertNull;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
+
+import org.akvo.flow.data.util.FlowFileBrowser;
+import org.akvo.flow.utils.FileHelper;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
+
+import java.io.File;
 
 @RunWith(MockitoJUnitRunner.class)
 public class S3FileMapperTest {

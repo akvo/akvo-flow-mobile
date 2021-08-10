@@ -20,8 +20,8 @@
 package org.akvo.flow.data.datasource.files
 
 import io.reactivex.observers.TestObserver
-import org.akvo.flow.data.util.FileHelper
 import org.akvo.flow.data.util.FlowFileBrowser
+import org.akvo.flow.utils.FileHelper
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.ArgumentMatchers.any

@@ -19,9 +19,16 @@
 
 package org.akvo.flow.data.datasource.files;
 
+import static junit.framework.Assert.assertFalse;
+import static junit.framework.Assert.assertTrue;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyInt;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.when;
+
 import android.graphics.Bitmap;
 
-import org.akvo.flow.data.util.FileHelper;
+import org.akvo.flow.utils.FileHelper;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -30,13 +37,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import java.io.Closeable;
 import java.io.OutputStream;
-
-import static junit.framework.Assert.assertFalse;
-import static junit.framework.Assert.assertTrue;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyInt;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class BitmapHelperTest {

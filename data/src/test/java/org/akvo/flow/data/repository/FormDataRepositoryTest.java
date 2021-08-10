@@ -36,15 +36,17 @@ import org.akvo.flow.data.datasource.DatabaseDataSource;
 import org.akvo.flow.data.datasource.files.FileDataSource;
 import org.akvo.flow.data.entity.ApiFormHeader;
 import org.akvo.flow.data.entity.form.DataForm;
+import org.akvo.flow.data.entity.form.DataFormMapper;
 import org.akvo.flow.data.entity.form.DomainFormMapper;
 import org.akvo.flow.data.entity.form.FormHeaderParser;
 import org.akvo.flow.data.entity.form.FormIdMapper;
-import org.akvo.flow.data.entity.form.XmlFormParser;
 import org.akvo.flow.data.net.RestApi;
 import org.akvo.flow.data.net.s3.AmazonAuthHelper;
 import org.akvo.flow.data.net.s3.BodyCreator;
 import org.akvo.flow.data.net.s3.S3RestApi;
 import org.akvo.flow.domain.util.DeviceHelper;
+import org.akvo.flow.utils.XmlFormParser;
+import org.akvo.flow.utils.entity.Form;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -99,10 +101,13 @@ public class FormDataRepositoryTest {
     Cursor mockCursor;
 
     @Mock
-    DataForm mockForm;
+    Form mockForm;
 
     @Mock
     DomainFormMapper mockDomainFormMapper;
+
+    @Mock
+    DataFormMapper mockDataFormMapper;
 
     private MockWebServer mockWebServer;
     private FormDataRepository formDataRepository;
@@ -121,7 +126,7 @@ public class FormDataRepositoryTest {
         DataSourceFactory dataSourceFactory = new DataSourceFactory(null, null,
                 mockDatabaseDataSource, null, mockFileDataSource, null);
         formDataRepository = new FormDataRepository(mockFormHeaderParser, mockXmlParser,
-                restApi, dataSourceFactory, mockFormIdMapper, s3RestApi, mockDomainFormMapper);
+                restApi, dataSourceFactory, mockFormIdMapper, s3RestApi, mockDomainFormMapper, mockDataFormMapper);
         ApiFormHeader apiFormHeader = new ApiFormHeader("123456", "", "", "", 1.0, "", true, "");
         when(mockFormHeaderParser.parseOne(anyString())).thenReturn(apiFormHeader);
         when(mockAmazonAuth.getAmazonAuthForGet(anyString(), anyString(), anyString()))
@@ -172,7 +177,7 @@ public class FormDataRepositoryTest {
 
         when(mockDatabaseDataSource.formNeedsUpdate(any(ApiFormHeader.class)))
                 .thenReturn(Observable.just(true));
-        when(mockXmlParser.parseXmlForm(any(InputStream.class), any(ApiFormHeader.class))).thenReturn(mockForm);
+        when(mockXmlParser.parseXmlForm(any(InputStream.class), any(Double.class))).thenReturn(mockForm);
 
         mockWebServer.enqueue(new MockResponse().setResponseCode(200)
                 .setBody(",1,cde,abc,cde,6.0,cde,true,33"));
@@ -201,7 +206,7 @@ public class FormDataRepositoryTest {
         when(mockDatabaseDataSource.formNeedsUpdate(any(ApiFormHeader.class)))
                 .thenReturn(Observable.just(true));
         when(mockDatabaseDataSource.deleteAllForms()).thenReturn(Observable.just(true));
-        when(mockXmlParser.parseXmlForm(any(InputStream.class), any(ApiFormHeader.class))).thenReturn(mockForm);
+        when(mockXmlParser.parseXmlForm(any(InputStream.class), any(Double.class))).thenReturn(mockForm);
 
         mockWebServer.enqueue(new MockResponse().setResponseCode(200).setBody(
                 ",1,cde,abc,cde,6.0,cde,true,33\n"));

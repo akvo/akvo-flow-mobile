@@ -21,7 +21,21 @@ package org.akvo.flow.data.entity.form
 
 import org.akvo.flow.domain.entity.DomainForm
 import org.akvo.flow.domain.entity.DomainQuestionGroup
+import org.akvo.flow.domain.entity.question.DomainAltText
+import org.akvo.flow.domain.entity.question.DomainDependency
+import org.akvo.flow.domain.entity.question.DomainLevel
+import org.akvo.flow.domain.entity.question.DomainOption
 import org.akvo.flow.domain.entity.question.DomainQuestion
+import org.akvo.flow.domain.entity.question.DomainQuestionHelp
+import org.akvo.flow.utils.entity.AltText
+import org.akvo.flow.utils.entity.Dependency
+import org.akvo.flow.utils.entity.Form
+import org.akvo.flow.utils.entity.Level
+import org.akvo.flow.utils.entity.Option
+import org.akvo.flow.utils.entity.Question
+import org.akvo.flow.utils.entity.QuestionGroup
+import org.akvo.flow.utils.entity.QuestionHelp
+import java.util.HashMap
 import javax.inject.Inject
 
 class DomainFormMapper @Inject constructor() {
@@ -50,7 +64,7 @@ class DomainFormMapper @Inject constructor() {
         return domainForms
     }
 
-    fun mapForms(dataForm: DataForm, parseForm: DataForm): DomainForm {
+    fun mapForm(dataForm: DataForm, parseForm: Form): DomainForm {
         return DomainForm(
             dataForm.id,
             dataForm.formId,
@@ -67,7 +81,7 @@ class DomainFormMapper @Inject constructor() {
         )
     }
 
-    private fun mapGroups(groups: List<DataQuestionGroup>): List<DomainQuestionGroup> {
+    private fun mapGroups(groups: List<QuestionGroup>): List<DomainQuestionGroup> {
         val domainGroups = mutableListOf<DomainQuestionGroup>()
         for (group in groups) {
             domainGroups.add(DomainQuestionGroup(group.heading,
@@ -77,7 +91,7 @@ class DomainFormMapper @Inject constructor() {
         return domainGroups
     }
 
-    private fun mapQuestions(questions: MutableList<DataQuestion>): MutableList<DomainQuestion> {
+    private fun mapQuestions(questions: MutableList<Question>): MutableList<DomainQuestion> {
         val domainQuestions = mutableListOf<DomainQuestion>()
         for (question in questions) {
             domainQuestions.add(DomainQuestion(
@@ -87,13 +101,13 @@ class DomainFormMapper @Inject constructor() {
                 question.order,
                 question.isAllowOther,
                 question.renderType,
-                question.questionHelp,
+                mapHelps(question.questionHelp),
                 question.type,
-                question.options,
+                mapOptions(question.options),
                 question.isAllowMultiple,
                 question.isLocked,
-                question.languageTranslationMap,
-                question.dependencies,
+                mapAltText(question.languageTranslationMap),
+                mapDependencies(question.dependencies),
                 question.useStrength,
                 question.strengthMin,
                 question.strengthMax,
@@ -105,9 +119,55 @@ class DomainFormMapper @Inject constructor() {
                 question.isAllowPolygon,
                 question.caddisflyRes,
                 question.cascadeResource,
-                question.levels
+                mapLevels(question.levels)
             ))
         }
         return domainQuestions
     }
+
+    private fun mapLevels(levels: MutableList<Level>): MutableList<DomainLevel> {
+        val domainLevels = mutableListOf<DomainLevel>()
+        for (level in levels) {
+            domainLevels.add(DomainLevel(level.text, mapAltText(level.altTextMap)))
+        }
+        return domainLevels
+    }
+
+    private fun mapDependencies(dependencies: MutableList<Dependency>): MutableList<DomainDependency> {
+        val domainDependencies = mutableListOf<DomainDependency>()
+        for (dependency in dependencies) {
+            domainDependencies.add(DomainDependency(dependency.question, dependency.answer))
+        }
+        return domainDependencies
+    }
+
+    private fun mapOptions(options: MutableList<Option>?): MutableList<DomainOption> {
+        val domainOptions = mutableListOf<DomainOption>()
+        if (options != null) {
+            for (option in options) {
+                domainOptions.add(DomainOption(option.text, option.code, option.isOther, mapAltText(option.altTextMap)))
+            }
+        }
+        return domainOptions
+    }
+
+    private fun mapHelps(questionHelp: MutableList<QuestionHelp>): MutableList<DomainQuestionHelp> {
+        val domainHelps = mutableListOf<DomainQuestionHelp>()
+        for (help in questionHelp) {
+            domainHelps.add(DomainQuestionHelp(mapAltText(help.altTextMap), help.text))
+        }
+        return domainHelps
+    }
+
+    private fun mapAltText(altTextMap: HashMap<String?, AltText>): HashMap<String?, DomainAltText> {
+        val domainAltTextMap = HashMap<String?, DomainAltText>()
+        for(language in altTextMap.keys) {
+            val altText = altTextMap[language]
+            if (altText != null) {
+                domainAltTextMap[language] = DomainAltText(altText.languageCode, altText.type, altText.text)
+            }
+        }
+        return domainAltTextMap
+    }
+
 }

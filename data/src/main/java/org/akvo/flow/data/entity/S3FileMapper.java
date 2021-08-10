@@ -22,16 +22,16 @@ package org.akvo.flow.data.entity;
 
 import android.text.TextUtils;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 import org.akvo.flow.data.util.Constants;
-import org.akvo.flow.data.util.FileHelper;
 import org.akvo.flow.data.util.FlowFileBrowser;
+import org.akvo.flow.utils.FileHelper;
 
 import java.io.File;
 
 import javax.inject.Inject;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 
 public class S3FileMapper {
 

@@ -27,13 +27,13 @@ data class DomainQuestion(
     val order: Int = 0,
     var isAllowOther: Boolean = false,
     val renderType: String? = null,
-    var questionHelp: MutableList<QuestionHelp> = mutableListOf(),
+    var questionHelp: MutableList<DomainQuestionHelp> = mutableListOf(),
     val type: String? = null,
-    var options: MutableList<Option>? = null,
+    var options: MutableList<DomainOption>? = null,
     var isAllowMultiple: Boolean = false,
     val isLocked: Boolean = false,
-    val languageTranslationMap: HashMap<String?, AltText> = HashMap(),
-    private val dependencies: MutableList<Dependency> = mutableListOf(),
+    val languageTranslationMap: HashMap<String?, DomainAltText> = HashMap(),
+    private val dependencies: MutableList<DomainDependency> = mutableListOf(),
     val useStrength: Boolean = false,
     val strengthMin: Int = 0,
     val strengthMax: Int = 0,
@@ -45,15 +45,15 @@ data class DomainQuestion(
     val isAllowPolygon: Boolean = false,
     val caddisflyRes: String? = null,
     val cascadeResource: String? = null,
-    val levels: MutableList<Level> = mutableListOf()
+    val levels: MutableList<DomainLevel> = mutableListOf()
 ) {
 
 
-    fun getAltText(lang: String?): AltText? {
+    fun getAltText(lang: String?): DomainAltText? {
         return languageTranslationMap[lang]
     }
 
-    fun addAltText(altText: AltText) {
+    fun addAltText(altText: DomainAltText) {
         languageTranslationMap[altText.languageCode] = altText
     }
 

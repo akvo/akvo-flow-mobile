@@ -14,6 +14,7 @@ android {
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
     }
+
     lintOptions {
         abortOnError false
         ignore 'InvalidPackage'
@@ -32,26 +33,6 @@ android {
         }
     }
 
-    buildTypes {
-        buildTypes.each {
-            if (project.hasProperty('brand')) {
-                it.buildConfigField "String", "BRAND", "\"${brand}\""
-                it.buildConfigField "String", "USER", "\"${user}\""
-                it.buildConfigField "String", "PASSWORD", "\"${password}\""
-            } else {
-                it.buildConfigField "String", "BRAND", "\"\""
-                it.buildConfigField "String", "USER", "\"\""
-                it.buildConfigField "String", "PASSWORD", "\"\""
-            }
-        }
-        debug {
-            testCoverageEnabled true
-        }
-        release {
-            minifyEnabled true
-        }
-    }
-
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
@@ -60,18 +41,24 @@ android {
     kotlinOptions {
         jvmTarget = '1.8'
     }
+
+    buildTypes {
+        debug {
+            testCoverageEnabled true
+        }
+        release {
+            minifyEnabled true
+        }
+    }
 }
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"
     implementation "androidx.core:core-ktx:${rootProject.ext.coreKtxVersion}"
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:${rootProject.ext.coroutinesVersion}"
+    implementation "com.jakewharton.timber:timber:${rootProject.ext.timberVersion}"
     implementation "com.google.dagger:dagger:${rootProject.ext.daggerVersion}"
     kapt "com.google.dagger:dagger-compiler:${rootProject.ext.daggerVersion}"
+    implementation "com.squareup.okhttp3:okhttp:${rootProject.ext.loggingInterceptorVersion}"
 
-    implementation "com.squareup.okhttp3:logging-interceptor:${rootProject.ext.loggingInterceptorVersion}"
-    implementation "com.squareup.retrofit2:retrofit:${rootProject.ext.retrofitVersion}"
-    implementation "com.squareup.retrofit2:converter-gson:${rootProject.ext.retrofitVersion}"
-
-    implementation "com.jakewharton.timber:timber:${rootProject.ext.timberVersion}"
+    testImplementation "junit:junit:${rootProject.ext.jUnitVersion}"
 }

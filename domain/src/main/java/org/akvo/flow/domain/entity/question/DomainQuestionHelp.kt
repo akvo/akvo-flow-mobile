@@ -20,18 +20,26 @@ package org.akvo.flow.domain.entity.question
 
 import java.util.HashMap
 
-/**
- * Level represents a cascading question level. It just holds the level name (multilingual)
- */
-data class Level(
-    var text: String? = null,
-    val altTextMap: HashMap<String?, AltText> = HashMap<String?, AltText>()
+data class DomainQuestionHelp(
+    val altTextMap: HashMap<String?, DomainAltText> = HashMap<String?, DomainAltText>(),
+    var text: String? = null
 ) {
-    fun addAltText(altText: AltText) {
+    fun getAltText(lang: String?): DomainAltText? {
+        return altTextMap[lang]
+    }
+
+    fun addAltText(altText: DomainAltText) {
         altTextMap[altText.languageCode] = altText
     }
 
-    fun getAltText(lang: String?): AltText? {
-        return altTextMap[lang]
+    /**
+     * checks whether this help object is well formed
+     */
+    fun isValid(): Boolean {
+        return if (text == null || text!!.trim { it <= ' ' }.isEmpty()) {
+            false
+        } else {
+            !"null".equals(text!!.trim { it <= ' ' }, ignoreCase = true)
+        }
     }
 }

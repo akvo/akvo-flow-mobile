@@ -58,8 +58,9 @@ android {
 }
 
 dependencies {
-    implementation project(path: ':domain')
+    implementation project(path: ':util')
     implementation project(path: ':database')
+    implementation project(path: ':domain')
     implementation "com.google.dagger:dagger:${rootProject.ext.daggerVersion}"
     annotationProcessor "com.google.dagger:dagger-compiler:${rootProject.ext.daggerVersion}"
     implementation "androidx.annotation:annotation:${rootProject.ext.annotationVersion}"

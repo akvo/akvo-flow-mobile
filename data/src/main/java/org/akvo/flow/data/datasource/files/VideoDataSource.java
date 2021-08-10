@@ -22,8 +22,8 @@ package org.akvo.flow.data.datasource.files;
 
 import android.net.Uri;
 
-import org.akvo.flow.data.util.FileHelper;
 import org.akvo.flow.data.util.FlowFileBrowser;
+import org.akvo.flow.utils.FileHelper;
 
 import java.io.File;
 import java.io.InputStream;

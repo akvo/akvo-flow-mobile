@@ -23,7 +23,7 @@ import android.content.Context
 import android.database.Cursor
 import android.net.Uri
 import android.provider.MediaStore
-import org.akvo.flow.data.util.FileHelper
+import org.akvo.flow.utils.FileHelper
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith

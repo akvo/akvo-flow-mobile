@@ -21,7 +21,9 @@ package org.akvo.flow.data.entity.form
 
 import androidx.test.platform.app.InstrumentationRegistry
 import org.akvo.flow.data.tests.R
-import org.akvo.flow.data.util.FileHelper
+import org.akvo.flow.utils.FileHelper
+import org.akvo.flow.utils.XmlFormParser
+import org.akvo.flow.utils.entity.Form
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -38,7 +40,7 @@ class XmlFormParserTest {
         val input: InputStream =
             InstrumentationRegistry.getInstrumentation().targetContext.resources
             .openRawResource(R.raw.date_form)
-        val result: DataForm = parser.parseXmlForm(input)
+        val result: Form = parser.parseXmlForm(input)
 
         assertEquals("1.0", result.version)
         assertEquals("DateForm", result.name)
@@ -54,7 +56,7 @@ class XmlFormParserTest {
         val input: InputStream =
             InstrumentationRegistry.getInstrumentation().targetContext.resources
                 .openRawResource(R.raw.empty_form)
-        val result: DataForm = parser.parseXmlForm(input)
+        val result: Form = parser.parseXmlForm(input)
 
         assertEquals("0.0", result.version)
         assertEquals("", result.name)

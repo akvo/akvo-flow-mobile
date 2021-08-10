@@ -48,7 +48,6 @@ data class DomainQuestion(
     val levels: MutableList<DomainLevel> = mutableListOf()
 ) {
 
-
     fun getAltText(lang: String?): DomainAltText? {
         return languageTranslationMap[lang]
     }

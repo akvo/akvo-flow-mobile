@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2021 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -16,17 +16,16 @@
  * You should have received a copy of the GNU General Public License
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.akvo.flow.database.upgrade
 
-import android.database.sqlite.SQLiteDatabase
-import org.akvo.flow.database.tables.DataPointDownloadTable
+package org.akvo.flow.database.tables;
 
-class Assignments2Upgrader(
-    private val db: SQLiteDatabase,
-    private val dataPointDownloadTable: DataPointDownloadTable
-) : DatabaseUpgrader {
+public class Tables {
 
-    override fun upgrade() {
-        dataPointDownloadTable.onCreate(db)
-    }
+    public static final String SURVEY = "survey";
+    public static final String SURVEY_INSTANCE = "survey_instance";
+    public static final String RESPONSE = "response";
+    public static final String USER = "user";
+    public static final String TRANSMISSION = "transmission";
+    public static final String SURVEY_GROUP = "survey_group";// Introduced in Point Updates
+    public static final String RECORD = "record";// Introduced in Point Updates
 }

@@ -29,7 +29,7 @@ import org.akvo.flow.data.loader.models.Stats;
 import org.akvo.flow.database.RecordColumns;
 import org.akvo.flow.database.SurveyDbAdapter;
 import org.akvo.flow.database.SurveyDbAdapter.RecordQuery;
-import org.akvo.flow.database.Tables;
+import org.akvo.flow.database.tables.Tables;
 
 import java.util.Calendar;
 

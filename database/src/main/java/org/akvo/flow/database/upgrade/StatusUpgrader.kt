@@ -19,7 +19,7 @@
 package org.akvo.flow.database.upgrade
 
 import android.database.sqlite.SQLiteDatabase
-import org.akvo.flow.database.FormUpdateNotifiedTable
+import org.akvo.flow.database.tables.FormUpdateNotifiedTable
 
 class StatusUpgrader(
     private val db: SQLiteDatabase,

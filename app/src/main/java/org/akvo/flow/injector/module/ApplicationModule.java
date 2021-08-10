@@ -55,12 +55,13 @@ import org.akvo.flow.data.repository.SetupDataRepository;
 import org.akvo.flow.data.repository.SurveyDataRepository;
 import org.akvo.flow.data.repository.TimeDataRepository;
 import org.akvo.flow.data.repository.UserDataRepository;
-import org.akvo.flow.database.DataPointDownloadTable;
+import org.akvo.flow.database.tables.DataPointDownloadTable;
 import org.akvo.flow.database.DatabaseHelper;
-import org.akvo.flow.database.FormUpdateNotifiedTable;
-import org.akvo.flow.database.LanguageTable;
+import org.akvo.flow.database.tables.FormUpdateNotifiedTable;
+import org.akvo.flow.database.tables.LanguageTable;
 import org.akvo.flow.database.SurveyLanguagesDataSource;
 import org.akvo.flow.database.SurveyLanguagesDbDataSource;
+import org.akvo.flow.database.tables.QuestionGroupTable;
 import org.akvo.flow.domain.executor.CoroutineDispatcher;
 import org.akvo.flow.domain.executor.PostExecutionThread;
 import org.akvo.flow.domain.executor.SchedulerCreator;
@@ -212,7 +213,7 @@ public class ApplicationModule {
     @Provides
     @Singleton
     public SQLiteOpenHelper provideOpenHelper() {
-        return new DatabaseHelper(application, new LanguageTable(), new DataPointDownloadTable(), new FormUpdateNotifiedTable());
+        return new DatabaseHelper(application, new LanguageTable(), new DataPointDownloadTable(), new FormUpdateNotifiedTable(), new QuestionGroupTable());
     }
 
     @Provides

@@ -20,7 +20,7 @@
 package org.akvo.flow.data.entity
 
 import android.database.Cursor
-import org.akvo.flow.database.DataPointDownloadTable
+import org.akvo.flow.database.tables.DataPointDownloadTable
 import javax.inject.Inject
 
 class CursorMapper @Inject constructor() {

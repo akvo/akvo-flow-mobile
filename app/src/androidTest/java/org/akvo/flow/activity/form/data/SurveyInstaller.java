@@ -34,10 +34,11 @@ import com.squareup.sqlbrite2.SqlBrite;
 
 import org.akvo.flow.data.database.SurveyDbDataSource;
 import org.akvo.flow.data.database.cascade.CascadeDB;
-import org.akvo.flow.database.DataPointDownloadTable;
+import org.akvo.flow.database.tables.DataPointDownloadTable;
 import org.akvo.flow.database.DatabaseHelper;
-import org.akvo.flow.database.FormUpdateNotifiedTable;
-import org.akvo.flow.database.LanguageTable;
+import org.akvo.flow.database.tables.FormUpdateNotifiedTable;
+import org.akvo.flow.database.tables.LanguageTable;
+import org.akvo.flow.database.tables.QuestionGroupTable;
 import org.akvo.flow.domain.Node;
 import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionGroup;
@@ -81,7 +82,7 @@ public class SurveyInstaller {
 
     public SurveyInstaller(Context context) {
         SqlBrite sqlBrite = new SqlBrite.Builder().build();
-        DatabaseHelper databaseHelper = new DatabaseHelper(context, new LanguageTable(), new DataPointDownloadTable(), new FormUpdateNotifiedTable());
+        DatabaseHelper databaseHelper = new DatabaseHelper(context, new LanguageTable(), new DataPointDownloadTable(), new FormUpdateNotifiedTable(), new QuestionGroupTable());
         BriteDatabase db = sqlBrite
                 .wrapDatabaseHelper(databaseHelper, AndroidSchedulers.mainThread());
         this.adapter = new SurveyDbDataSource(db, databaseHelper);

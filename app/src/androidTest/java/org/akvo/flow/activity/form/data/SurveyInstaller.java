@@ -34,13 +34,12 @@ import com.squareup.sqlbrite2.SqlBrite;
 
 import org.akvo.flow.data.database.SurveyDbDataSource;
 import org.akvo.flow.data.database.cascade.CascadeDB;
-import org.akvo.flow.database.tables.DataPointDownloadTable;
 import org.akvo.flow.database.DatabaseHelper;
+import org.akvo.flow.database.tables.DataPointDownloadTable;
 import org.akvo.flow.database.tables.FormUpdateNotifiedTable;
 import org.akvo.flow.database.tables.LanguageTable;
 import org.akvo.flow.database.tables.QuestionGroupTable;
 import org.akvo.flow.domain.Node;
-import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionGroup;
 import org.akvo.flow.domain.QuestionResponse;
 import org.akvo.flow.domain.Survey;
@@ -55,6 +54,7 @@ import org.akvo.flow.util.FileUtil;
 import org.akvo.flow.util.files.FileBrowser;
 import org.akvo.flow.util.files.FormFileBrowser;
 import org.akvo.flow.util.files.FormResourcesFileBrowser;
+import org.akvo.flow.utils.entity.Question;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -195,7 +195,7 @@ public class SurveyInstaller {
     }
 
     public SparseArray<List<Node>> getAllNodes(Question question, Context context) {
-        String src = question.getSrc();
+        String src = question.getCascadeResource();
         FormResourcesFileBrowser formResourcesFileUtil = new FormResourcesFileBrowser(
                 new FileBrowser());
         File cascadeFolder = formResourcesFileUtil
@@ -222,7 +222,7 @@ public class SurveyInstaller {
                         InstrumentationRegistry.getInstrumentation().getTargetContext());
         for (QuestionGroup group : survey.getQuestionGroups()) {
             for (Question question : group.getQuestions()) {
-                String cascadeFileName = question.getSrc();
+                String cascadeFileName = question.getCascadeResource();
                 if (!TextUtils.isEmpty(cascadeFileName)) {
                     String cascadeResourceName = cascadeFileName.replace(".sqlite", "");
                     cascadeResourceName = cascadeResourceName.replaceAll("-", "_");

@@ -31,7 +31,6 @@ import android.widget.TextView;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
 import org.akvo.flow.R;
-import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionGroup;
 import org.akvo.flow.domain.QuestionResponse;
 import org.akvo.flow.event.QuestionInteractionListener;
@@ -44,6 +43,7 @@ import org.akvo.flow.ui.view.option.OptionQuestionFactory;
 import org.akvo.flow.ui.view.signature.SignatureQuestionView;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.utils.entity.Dependency;
+import org.akvo.flow.utils.entity.Question;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -302,7 +302,7 @@ public class QuestionGroupTab extends ConstraintLayout
         final Context context = getContext();
         for (Question q : mQuestionGroup.getQuestions()) {
             if (mQuestionGroup.isRepeatable()) {
-                q = Question.copy(q, q.getId() + "|" + repetitionId);
+                q = q.copy(q, q.getId() + "|" + repetitionId);
             }
 
             QuestionView questionView;

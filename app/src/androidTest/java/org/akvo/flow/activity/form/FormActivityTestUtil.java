@@ -59,7 +59,6 @@ import androidx.test.rule.ActivityTestRule;
 import org.akvo.flow.R;
 import org.akvo.flow.activity.Constants;
 import org.akvo.flow.activity.FormActivity;
-import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionGroup;
 import org.akvo.flow.domain.SurveyGroup;
 import org.akvo.flow.ui.view.DateQuestionView;
@@ -69,6 +68,7 @@ import org.akvo.flow.ui.view.geolocation.GeoQuestionView;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.utils.entity.Level;
 import org.akvo.flow.utils.entity.Option;
+import org.akvo.flow.utils.entity.Question;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.core.AllOf;
@@ -167,7 +167,7 @@ public class FormActivityTestUtil {
     }
 
     public static void verifyHelpTip(Question question) {
-        if (question.getHelpTypeCount() > 0) {
+        if (question.getQuestionHelp().size() > 0) {
             ViewInteraction questionHelpTip = onView(
                     allOf(withId(R.id.tip_ib),
                             withQuestionViewParent(question, QuestionView.class)));

@@ -95,7 +95,7 @@ class DomainFormMapper @Inject constructor() {
         val domainQuestions = mutableListOf<DomainQuestion>()
         for (question in questions) {
             domainQuestions.add(DomainQuestion(
-                question.questionId,
+                question.id,
                 question.isMandatory,
                 question.text,
                 question.order,
@@ -108,9 +108,6 @@ class DomainFormMapper @Inject constructor() {
                 question.isLocked,
                 mapAltText(question.languageTranslationMap),
                 mapDependencies(question.dependencies),
-                question.useStrength,
-                question.strengthMin,
-                question.strengthMax,
                 question.isLocaleName,
                 question.isLocaleLocation,
                 question.isDoubleEntry,

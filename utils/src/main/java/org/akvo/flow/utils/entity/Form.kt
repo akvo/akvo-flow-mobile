@@ -38,8 +38,9 @@ data class Form(
         val formResources = mutableListOf<String>()
         for (group in groups) {
             for (question in group.questions) {
-                if (!question.cascadeResource.isNullOrEmpty()) {
-                    formResources.add(question.cascadeResource)
+                val cascadeResource = question.cascadeResource
+                if (!cascadeResource.isNullOrEmpty()) {
+                    formResources.add(cascadeResource)
                 }
             }
         }

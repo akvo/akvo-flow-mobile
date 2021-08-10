@@ -36,7 +36,6 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import org.akvo.flow.R;
 import org.akvo.flow.activity.FormActivity;
-import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionResponse;
 import org.akvo.flow.domain.response.value.Location;
 import org.akvo.flow.domain.response.value.Media;
@@ -53,6 +52,7 @@ import org.akvo.flow.util.ImageUtil;
 import org.akvo.flow.util.StoragePermissionsHelper;
 import org.akvo.flow.util.image.GlideImageLoader;
 import org.akvo.flow.util.image.ImageLoader;
+import org.akvo.flow.utils.entity.Question;
 
 import java.io.File;
 
@@ -149,7 +149,7 @@ public class PhotoQuestionView extends QuestionView implements IPhotoQuestionVie
     private void requestStoragePermissions() {
         final FormActivity activity = (FormActivity) getContext();
         activity.requestPermissions(new String[] { Manifest.permission.WRITE_EXTERNAL_STORAGE },
-                ConstantUtil.STORAGE_PERMISSION_CODE, getQuestion().getQuestionId());
+                ConstantUtil.STORAGE_PERMISSION_CODE, getQuestion().getId());
     }
 
     @Override
@@ -271,7 +271,7 @@ public class PhotoQuestionView extends QuestionView implements IPhotoQuestionVie
             response = new QuestionResponse.QuestionResponseBuilder()
                     .setValue(value)
                     .setType(ConstantUtil.IMAGE_RESPONSE_TYPE)
-                    .setQuestionId(question.getQuestionId())
+                    .setQuestionId(question.getId())
                     .setIteration(question.getIteration())
                     .setFilename(mMedia.getFilename())
                     .createQuestionResponse();

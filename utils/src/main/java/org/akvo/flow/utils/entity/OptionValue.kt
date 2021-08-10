@@ -18,7 +18,6 @@
  */
 package org.akvo.flow.utils.entity
 
-import android.text.TextUtils
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
@@ -26,13 +25,15 @@ import timber.log.Timber
 import java.util.ArrayList
 
 object OptionValue {
+
+    @JvmStatic
     fun serialize(values: List<Option>): String {
         try {
             val jOptions = JSONArray()
             for (option in values) {
                 val jOption = JSONObject()
                 jOption.put(Attrs.TEXT, option.text)
-                if (!TextUtils.isEmpty(option.code)) {
+                if (!option.code.isNullOrEmpty()) {
                     jOption.put(Attrs.CODE, option.code)
                 }
                 if (option.isOther) {
@@ -47,13 +48,18 @@ object OptionValue {
         return ""
     }
 
+    @JvmStatic
     fun deserialize(data: String): List<Option> {
         try {
             val options: MutableList<Option> = ArrayList()
             val jOptions = JSONArray(data)
             for (i in 0 until jOptions.length()) {
                 val jOption = jOptions.getJSONObject(i)
-                val option = Option(jOption.optString(Attrs.TEXT), jOption.optString(Attrs.CODE, ""), jOption.optBoolean(Attrs.IS_OTHER))
+                var code: String? = jOption.optString(Attrs.CODE)
+                if (code.isNullOrEmpty()) {
+                    code = null
+                }
+                val option = Option(jOption.optString(Attrs.TEXT), code, jOption.optBoolean(Attrs.IS_OTHER))
                 options.add(option)
             }
             return options
@@ -71,6 +77,7 @@ object OptionValue {
         return options
     }
 
+    @JvmStatic
     fun getDatapointName(value: String): String {
         val builder = StringBuilder()
         var first = true

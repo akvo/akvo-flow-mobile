@@ -20,6 +20,8 @@
 
 package org.akvo.flow.activity;
 
+import static org.akvo.flow.util.ViewUtil.showConfirmDialog;
+
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
@@ -66,14 +68,14 @@ import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
 import org.akvo.flow.presentation.form.FormPresenter;
 import org.akvo.flow.presentation.form.FormView;
+import org.akvo.flow.presentation.form.languages.Language;
+import org.akvo.flow.presentation.form.languages.LanguageMapper;
 import org.akvo.flow.presentation.form.mobiledata.MobileDataSettingDialog;
 import org.akvo.flow.service.DataPointUploadWorker;
 import org.akvo.flow.tracking.TrackingHelper;
 import org.akvo.flow.ui.Navigator;
 import org.akvo.flow.ui.adapter.LanguageAdapter;
 import org.akvo.flow.ui.adapter.SurveyTabAdapter;
-import org.akvo.flow.presentation.form.languages.Language;
-import org.akvo.flow.presentation.form.languages.LanguageMapper;
 import org.akvo.flow.ui.view.QuestionView;
 import org.akvo.flow.ui.view.geolocation.GeoFieldsResetConfirmDialogFragment;
 import org.akvo.flow.ui.view.geolocation.GeoQuestionView;
@@ -99,8 +101,6 @@ import java.util.Set;
 import javax.inject.Inject;
 
 import timber.log.Timber;
-
-import static org.akvo.flow.util.ViewUtil.showConfirmDialog;
 
 public class FormActivity extends BackActivity implements SurveyListener,
         QuestionInteractionListener, FormView,

@@ -35,7 +35,6 @@ import androidx.core.content.FileProvider;
 
 import org.akvo.flow.R;
 import org.akvo.flow.activity.FormActivity;
-import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionResponse;
 import org.akvo.flow.domain.response.value.Media;
 import org.akvo.flow.event.QuestionInteractionEvent;
@@ -51,6 +50,7 @@ import org.akvo.flow.util.MediaFileHelper;
 import org.akvo.flow.util.StoragePermissionsHelper;
 import org.akvo.flow.util.image.GlideImageLoader;
 import org.akvo.flow.util.image.ImageLoader;
+import org.akvo.flow.utils.entity.Question;
 
 import java.io.File;
 
@@ -149,7 +149,7 @@ public class VideoQuestionView extends QuestionView implements IVideoQuestionVie
     private void requestStoragePermissions() {
         final FormActivity activity = (FormActivity) getContext();
         activity.requestPermissions(new String[] { Manifest.permission.WRITE_EXTERNAL_STORAGE },
-                ConstantUtil.STORAGE_PERMISSION_CODE, getQuestion().getQuestionId());
+                ConstantUtil.STORAGE_PERMISSION_CODE, getQuestion().getId());
     }
 
     @Override
@@ -287,7 +287,7 @@ public class VideoQuestionView extends QuestionView implements IVideoQuestionVie
             response = new QuestionResponse.QuestionResponseBuilder()
                     .setValue(value)
                     .setType(ConstantUtil.VIDEO_RESPONSE_TYPE)
-                    .setQuestionId(question.getQuestionId())
+                    .setQuestionId(question.getId())
                     .setIteration(question.getIteration())
                     .setFilename(filePath)
                     .createQuestionResponse();

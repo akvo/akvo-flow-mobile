@@ -34,7 +34,6 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 
 import org.akvo.flow.R;
-import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionResponse;
 import org.akvo.flow.domain.response.value.Signature;
 import org.akvo.flow.domain.util.ImageSize;
@@ -49,6 +48,7 @@ import org.akvo.flow.util.ImageUtil;
 import org.akvo.flow.util.files.SignatureFileBrowser;
 import org.akvo.flow.util.image.GlideImageLoader;
 import org.akvo.flow.util.image.ImageLoader;
+import org.akvo.flow.utils.entity.Question;
 
 import java.io.File;
 

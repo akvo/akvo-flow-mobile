@@ -19,6 +19,8 @@
 
 package org.akvo.flow.domain;
 
+import org.akvo.flow.utils.entity.Question;
+
 import java.util.ArrayList;
 import java.util.List;
 

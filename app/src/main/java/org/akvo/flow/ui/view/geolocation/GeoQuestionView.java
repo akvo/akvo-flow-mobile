@@ -34,7 +34,6 @@ import androidx.fragment.app.FragmentManager;
 
 import org.akvo.flow.BuildConfig;
 import org.akvo.flow.R;
-import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionResponse;
 import org.akvo.flow.event.PermissionAwareLocationListener;
 import org.akvo.flow.event.SurveyListener;
@@ -47,6 +46,7 @@ import org.akvo.flow.ui.view.QuestionView;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.LocationValidator;
 import org.akvo.flow.util.PlatformUtil;
+import org.akvo.flow.utils.entity.Question;
 
 import javax.inject.Inject;
 
@@ -83,7 +83,7 @@ public class GeoQuestionView extends QuestionView
     public GeoQuestionView(Context context, Question q, SurveyListener surveyListener) {
         super(context, q, surveyListener);
         mLocationListener = new PermissionAwareLocationListener(context, this,
-                allowMockLocations(q), q.getQuestionId(), this);
+                allowMockLocations(q), q.getId(), this);
         init();
     }
 

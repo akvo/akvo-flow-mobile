@@ -24,12 +24,12 @@ import android.content.Context;
 import android.os.Bundle;
 
 import org.akvo.flow.R;
-import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionResponse;
 import org.akvo.flow.event.QuestionInteractionEvent;
 import org.akvo.flow.event.SurveyListener;
 import org.akvo.flow.ui.view.QuestionView;
 import org.akvo.flow.util.ConstantUtil;
+import org.akvo.flow.utils.entity.Question;
 
 public class BarcodeQuestionViewSingle extends QuestionView implements
         ScanButtonListener, BarcodeQuestionInput.BarcodeEditListener {

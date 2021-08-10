@@ -1,4 +1,4 @@
 include ':domain', ':data', ':database', ':maps', ':walkthrough', ':uicomponents'
 include 'app'
 include ':support'
-include ':util'
+include ':utils'

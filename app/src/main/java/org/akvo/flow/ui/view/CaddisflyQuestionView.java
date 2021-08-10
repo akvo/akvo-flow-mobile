@@ -33,7 +33,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import org.akvo.flow.BuildConfig;
 import org.akvo.flow.R;
 import org.akvo.flow.activity.FormActivity;
-import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionResponse;
 import org.akvo.flow.event.QuestionInteractionEvent;
 import org.akvo.flow.event.SurveyListener;
@@ -48,6 +47,7 @@ import org.akvo.flow.ui.model.caddisfly.CaddisflyTestResult;
 import org.akvo.flow.uicomponents.SnackBarManager;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.StoragePermissionsHelper;
+import org.akvo.flow.utils.entity.Question;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -122,7 +122,7 @@ public class CaddisflyQuestionView extends QuestionView implements View.OnClickL
         QuestionResponse r = new QuestionResponse.QuestionResponseBuilder()
                 .setValue(mValue)
                 .setType(ConstantUtil.CADDISFLY_RESPONSE_TYPE)
-                .setQuestionId(question.getQuestionId())
+                .setQuestionId(question.getId())
                 .setIteration(question.getIteration())
                 .setFilename(mImage)
                 .createQuestionResponse();
@@ -177,7 +177,7 @@ public class CaddisflyQuestionView extends QuestionView implements View.OnClickL
     private void requestStoragePermissions() {
         final FormActivity activity = (FormActivity) getContext();
         activity.requestPermissions(new String[] { Manifest.permission.WRITE_EXTERNAL_STORAGE },
-                ConstantUtil.STORAGE_PERMISSION_CODE, getQuestion().getQuestionId());
+                ConstantUtil.STORAGE_PERMISSION_CODE, getQuestion().getId());
     }
 
     @Override

@@ -75,14 +75,12 @@ import org.akvo.flow.R;
 import org.akvo.flow.activity.FormActivity;
 import org.akvo.flow.activity.form.data.SurveyInstaller;
 import org.akvo.flow.activity.form.data.SurveyRequisite;
-import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionGroup;
 import org.akvo.flow.domain.QuestionResponse;
 import org.akvo.flow.domain.Survey;
 import org.akvo.flow.domain.response.value.CascadeNode;
 import org.akvo.flow.domain.response.value.Signature;
 import org.akvo.flow.serialization.response.value.CascadeValue;
-import org.akvo.flow.serialization.response.value.OptionValue;
 import org.akvo.flow.serialization.response.value.SignatureValue;
 import org.akvo.flow.ui.model.caddisfly.CaddisflyJsonMapper;
 import org.akvo.flow.ui.model.caddisfly.CaddisflyTestResult;
@@ -95,6 +93,8 @@ import org.akvo.flow.ui.view.signature.SignatureQuestionView;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.utils.entity.Level;
 import org.akvo.flow.utils.entity.Option;
+import org.akvo.flow.utils.entity.OptionValue;
+import org.akvo.flow.utils.entity.Question;
 import org.junit.AfterClass;
 import org.junit.Rule;
 import org.junit.Test;
@@ -462,7 +462,7 @@ public class FormActivityReadOnlyTest {
     }
 
     private String getResponseValue(Question question) {
-        QuestionResponse questionResponse = responseMap.get(question.getQuestionId());
+        QuestionResponse questionResponse = responseMap.get(question.getId());
         if (questionResponse == null) {
             return null;
         }

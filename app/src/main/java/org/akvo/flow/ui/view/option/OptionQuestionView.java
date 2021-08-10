@@ -33,14 +33,14 @@ import android.widget.TextView;
 import androidx.annotation.Nullable;
 
 import org.akvo.flow.R;
-import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionResponse;
 import org.akvo.flow.event.SurveyListener;
-import org.akvo.flow.serialization.response.value.OptionValue;
 import org.akvo.flow.ui.view.QuestionView;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.utils.entity.AltText;
 import org.akvo.flow.utils.entity.Option;
+import org.akvo.flow.utils.entity.OptionValue;
+import org.akvo.flow.utils.entity.Question;
 
 import java.util.HashMap;
 import java.util.List;
@@ -226,7 +226,7 @@ public abstract class OptionQuestionView extends QuestionView {
         }
 
         List<Option> selectedOptions = OptionValue.deserialize(resp.getValue());
-        if (selectedOptions == null || selectedOptions.isEmpty()) {
+        if (selectedOptions.isEmpty()) {
             return;
         }
 

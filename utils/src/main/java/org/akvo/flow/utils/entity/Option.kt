@@ -20,7 +20,7 @@ package org.akvo.flow.utils.entity
 
 import java.util.HashMap
 
-data class Option(
+data class Option @JvmOverloads constructor(
     var text: String? = null,
     var code: String?,
     var isOther: Boolean = false,

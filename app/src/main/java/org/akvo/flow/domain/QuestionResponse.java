@@ -22,8 +22,8 @@ package org.akvo.flow.domain;
 import androidx.annotation.Nullable;
 
 import org.akvo.flow.serialization.response.value.CascadeValue;
-import org.akvo.flow.serialization.response.value.OptionValue;
 import org.akvo.flow.util.ConstantUtil;
+import org.akvo.flow.utils.entity.OptionValue;
 
 public class QuestionResponse {
 

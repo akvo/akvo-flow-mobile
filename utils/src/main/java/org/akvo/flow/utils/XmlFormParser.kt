@@ -155,7 +155,7 @@ class XmlFormParser @Inject constructor(private val helper: FileHelper) {
                                     isDoubleEntry = getBooleanAttribute(parser, DOUBLE_ENTRY),
                                     isAllowMultiple = getBooleanAttribute(parser, ALLOW_MULT),
                                     type = parser.getAttributeValue(null, TYPE),
-                                    questionId = parser.getAttributeValue(null, ID),
+                                    id = parser.getAttributeValue(null, ID),
                                     isLocaleName = getBooleanAttribute(parser, LOCALE_NAME),
                                     isLocaleLocation = getBooleanAttribute(parser, LOCALE_LOCATION),
                                     caddisflyRes = getStringAttribute(parser, CADDISFLY_RESOURCE),

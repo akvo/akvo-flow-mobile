@@ -19,16 +19,16 @@
 
 package org.akvo.flow.serialization.form;
 
-import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionGroup;
 import org.akvo.flow.domain.Survey;
 import org.akvo.flow.domain.SurveyGroup;
-import org.akvo.flow.domain.ValidationRule;
+import org.akvo.flow.utils.entity.ValidationRule;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.utils.entity.AltText;
 import org.akvo.flow.utils.entity.Dependency;
 import org.akvo.flow.utils.entity.Level;
 import org.akvo.flow.utils.entity.Option;
+import org.akvo.flow.utils.entity.Question;
 import org.akvo.flow.utils.entity.QuestionHelp;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -37,8 +37,6 @@ import org.xml.sax.helpers.DefaultHandler;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-
-import timber.log.Timber;
 
 /**
  * Handler for sax-based xml parser for Survey files
@@ -161,7 +159,7 @@ public class SurveyHandler extends DefaultHandler {
                 currentValidation = null;
             } else if (localName.equalsIgnoreCase(HELP)) {
                 if (currentHelp.isValid()) {
-                    currentQuestion.addQuestionHelp(currentHelp);
+                    currentQuestion.getQuestionHelp().add(currentHelp);
                 }
                 currentHelp = null;
             }
@@ -306,10 +304,10 @@ public class SurveyHandler extends DefaultHandler {
             
             // Double Entry flag
             if (attributes.getValue(DOUBLE_ENTRY) != null) {
-                currentQuestion.setIsDoubleEntry(Boolean.parseBoolean(attributes
+                currentQuestion.setDoubleEntry(Boolean.parseBoolean(attributes
                         .getValue(DOUBLE_ENTRY)));
             } else {
-                currentQuestion.setIsDoubleEntry(false);
+                currentQuestion.setDoubleEntry(false);
             }
 
             // 'allowMultiple' flag can be found at the <question> and <options> scopes. In option
@@ -324,45 +322,19 @@ public class SurveyHandler extends DefaultHandler {
                 currentQuestion
                         .setValidationRule(new ValidationRule(validation));
             }
-            //strength no longer exists
-            if (attributes.getValue(STRENGTH_MAX) != null
-                    && currentQuestion.getType().equalsIgnoreCase(
-                            ConstantUtil.STRENGTH_QUESTION_TYPE)) {
-                currentQuestion.setUseStrength(true);
-                try {
-                    currentQuestion.setStrengthMax(Integer.parseInt(attributes
-                            .getValue(STRENGTH_MAX).trim()));
-                    if (attributes.getValue(STRENGTH_MIN) != null) {
-                        currentQuestion.setStrengthMin(Integer
-                                .parseInt(attributes.getValue(STRENGTH_MIN)
-                                        .trim()));
-                    } else {
-                        currentQuestion.setStrengthMin(0);
-                    }
-                } catch (NumberFormatException e) {
-                    currentQuestion.setUseStrength(false);
-                    currentQuestion.setType(ConstantUtil.OPTION_QUESTION_TYPE);
-                    Timber.e(e, "Could not parse strength values");
-                }
-            } else {
-                currentQuestion.setUseStrength(false);
-            }
-            
+
             // Locale Flags
             if (attributes.getValue(LOCALE_NAME) != null) {
-                currentQuestion.setIsLocaleName(Boolean.parseBoolean(attributes
+                currentQuestion.setLocaleName(Boolean.parseBoolean(attributes
                         .getValue(LOCALE_NAME)));
             }
             if (attributes.getValue(LOCALE_LOCATION) != null) {
-                currentQuestion.setIsLocaleLocation(Boolean.parseBoolean(attributes
+                currentQuestion.setLocaleLocation(Boolean.parseBoolean(attributes
                         .getValue(LOCALE_LOCATION)));
-            }
-            if (attributes.getValue(SOURCE_QUESTION_ID) != null) {
-                currentQuestion.setSourceQuestionId(attributes.getValue(SOURCE_QUESTION_ID));
             }
 
             // Question src. Added in cascading question implementation.
-            currentQuestion.setSrc(attributes.getValue(CASCADE_RESOURCE));
+            currentQuestion.setCascadeResource(attributes.getValue(CASCADE_RESOURCE));
 
             currentQuestion.setCaddisflyRes(attributes.getValue(CADDISFLY_RESOURCE));
 
@@ -396,7 +368,7 @@ public class SurveyHandler extends DefaultHandler {
         } else if (localName.equalsIgnoreCase(DEPENDENCY)) {
             Dependency currentDependency = new Dependency(attributes.getValue(QUESTION), attributes.getValue(ANSWER));
             if (currentQuestion != null) {
-                currentQuestion.addDependency(currentDependency);
+                currentQuestion.getDependencies().add(currentDependency);
             }
         } else if (localName.equalsIgnoreCase(VALIDATION_RULE)) {
             currentValidation = new ValidationRule(

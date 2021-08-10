@@ -35,12 +35,16 @@ import androidx.annotation.Nullable;
 import com.squareup.sqlbrite2.BriteDatabase;
 import com.squareup.sqlbrite2.SqlBrite;
 
+import org.akvo.flow.database.tables.DataPointDownloadTable;
+import org.akvo.flow.database.tables.LanguageTable;
+import org.akvo.flow.database.tables.FormUpdateNotifiedTable;
 import org.akvo.flow.database.RecordColumns;
 import org.akvo.flow.database.ResponseColumns;
 import org.akvo.flow.database.SurveyColumns;
 import org.akvo.flow.database.SurveyGroupColumns;
 import org.akvo.flow.database.SurveyInstanceColumns;
 import org.akvo.flow.database.SurveyInstanceStatus;
+import org.akvo.flow.database.tables.Tables;
 import org.akvo.flow.database.TransmissionColumns;
 import org.akvo.flow.database.TransmissionStatus;
 import org.akvo.flow.database.UserColumns;

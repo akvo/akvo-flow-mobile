@@ -52,7 +52,7 @@ public class QuestionHeaderView extends QuestionView implements View.OnClickList
 
     @Override
     public void onClick(View v) {
-        mSurveyListener.openQuestion(getQuestion().getId());
+        mSurveyListener.openQuestion(getQuestion().getQuestionId());
     }
 
     @Override

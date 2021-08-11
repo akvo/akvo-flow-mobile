@@ -90,7 +90,7 @@ public class SignatureQuestionView extends QuestionView {
                 String name = mSignature.getName();
                 Bundle data = new Bundle();
                 data.putString(ConstantUtil.SIGNATURE_NAME_EXTRA, name);
-                data.putString(ConstantUtil.SIGNATURE_QUESTION_ID_EXTRA, mQuestion.getId());
+                data.putString(ConstantUtil.SIGNATURE_QUESTION_ID_EXTRA, mQuestion.getQuestionId());
                 data.putString(ConstantUtil.SIGNATURE_DATAPOINT_ID_EXTRA,
                         mSurveyListener.getDataPointId());
                 notifyQuestionListeners(QuestionInteractionEvent.ADD_SIGNATURE_EVENT, data);
@@ -112,7 +112,7 @@ public class SignatureQuestionView extends QuestionView {
             mSignature.setName(name);
             setUpName(name);
             File imageFile = signatureFileBrowser
-                    .getSignatureImageFile(RESIZED_SUFFIX, mQuestion.getId(),
+                    .getSignatureImageFile(RESIZED_SUFFIX, mQuestion.getQuestionId(),
                             mSurveyListener.getDataPointId());
             imageLoader.loadFromFile(mImage, imageFile,
                     bitmap -> ((AppCompatActivity) getContext()).runOnUiThread(() -> {

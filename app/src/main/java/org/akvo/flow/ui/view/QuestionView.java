@@ -84,7 +84,7 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
             sColors = context.getResources().getStringArray(R.array.colors);
         }
         mQuestion = q;
-        setTag(q.getId());
+        setTag(q.getQuestionId());
         mSurveyListener = surveyListener;
         mError = null;
     }
@@ -345,7 +345,7 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
                 for (int i = 0; i < dependencies.size(); i++) {
                     Dependency d = dependencies.get(i);
                     if (d.getQuestion().equalsIgnoreCase(
-                            event.getSource().getQuestion().getId())) {
+                            event.getSource().getQuestion().getQuestionId())) {
                         if (handleDependencyParentResponse(d, event.getSource().getResponse())) {
                             break;
                         }
@@ -563,7 +563,7 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
         return new QuestionResponse.QuestionResponseBuilder()
                 .setValue(value)
                 .setType(type)
-                .setQuestionId(question.getId())
+                .setQuestionId(question.getQuestionId())
                 .setIteration(question.getIteration())
                 .createQuestionResponse();
     }

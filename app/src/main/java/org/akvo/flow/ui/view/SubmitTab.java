@@ -144,7 +144,7 @@ public class SubmitTab extends ListView implements OnClickListener {
             }
             // force the view to be visible (if the question has
             // dependencies, it'll be hidden by default)
-            qv.setTag(question.getId());
+            qv.setTag(question.getQuestionId());
             qv.setVisibility(View.VISIBLE);
             return qv;
         }

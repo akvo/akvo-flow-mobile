@@ -462,7 +462,7 @@ public class FormActivityReadOnlyTest {
     }
 
     private String getResponseValue(Question question) {
-        QuestionResponse questionResponse = responseMap.get(question.getId());
+        QuestionResponse questionResponse = responseMap.get(question.getQuestionId());
         if (questionResponse == null) {
             return null;
         }

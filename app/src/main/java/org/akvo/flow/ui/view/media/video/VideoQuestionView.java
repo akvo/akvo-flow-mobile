@@ -149,7 +149,7 @@ public class VideoQuestionView extends QuestionView implements IVideoQuestionVie
     private void requestStoragePermissions() {
         final FormActivity activity = (FormActivity) getContext();
         activity.requestPermissions(new String[] { Manifest.permission.WRITE_EXTERNAL_STORAGE },
-                ConstantUtil.STORAGE_PERMISSION_CODE, getQuestion().getId());
+                ConstantUtil.STORAGE_PERMISSION_CODE, getQuestion().getQuestionId());
     }
 
     @Override
@@ -287,7 +287,7 @@ public class VideoQuestionView extends QuestionView implements IVideoQuestionVie
             response = new QuestionResponse.QuestionResponseBuilder()
                     .setValue(value)
                     .setType(ConstantUtil.VIDEO_RESPONSE_TYPE)
-                    .setQuestionId(question.getId())
+                    .setQuestionId(question.getQuestionId())
                     .setIteration(question.getIteration())
                     .setFilename(filePath)
                     .createQuestionResponse();

@@ -180,7 +180,7 @@ public class FormActivityTestUtil {
     @NonNull
     public static <T extends View> Matcher<View> withQuestionViewParent(Question question,
             Class<T> parentClass) {
-        return withQuestionViewParent(parentClass, question.getId());
+        return withQuestionViewParent(parentClass, question.getQuestionId());
     }
 
     public static <T extends View> Matcher<View> withQuestionViewParent(Class<T> parentClass,

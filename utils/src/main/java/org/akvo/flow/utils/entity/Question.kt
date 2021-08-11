@@ -22,7 +22,7 @@ package org.akvo.flow.utils.entity
 import java.util.HashMap
 
 data class Question(
-    var id: String? = null,
+    var questionId: String? = null,
     var isMandatory: Boolean = false,
     var text: String? = null,
     var order: Int = 0,
@@ -54,7 +54,7 @@ data class Question(
     //TODO: remove
     fun getIteration(): Int {
         return if (isRepeatable()) {
-            val questionIdAndIteration: List<String> = id?.split("\\|") ?: emptyList()
+            val questionIdAndIteration: List<String> = questionId?.split("\\|") ?: emptyList()
             val iteration = questionIdAndIteration[1]
             iteration.toInt()
         } else {
@@ -64,7 +64,7 @@ data class Question(
 
     //TODO: remove
     fun isRepeatable(): Boolean {
-        return id?.let { questionId ->
+        return questionId?.let { questionId ->
             questionId.contains("|")
         } ?: false
     }
@@ -77,7 +77,7 @@ data class Question(
      */
     fun copy(question: Question, questionId: String): Question {
         val q = Question(
-            id = questionId,
+            questionId = questionId,
             text = question.text,
             order = question.order,
             renderType = question.renderType,

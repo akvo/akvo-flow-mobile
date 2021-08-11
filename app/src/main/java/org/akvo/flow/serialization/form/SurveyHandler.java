@@ -311,7 +311,7 @@ public class SurveyHandler extends DefaultHandler {
             currentQuestion.setAllowMultiple(Boolean.parseBoolean(attributes.getValue(ALLOW_MULT)));
 
             currentQuestion.setType(attributes.getValue(TYPE));
-            currentQuestion.setId(attributes.getValue(ID));
+            currentQuestion.setQuestionId(attributes.getValue(ID));
             //This validation no longer exists
             String validation = attributes.getValue(VALIDATION_TYPE);
             if (validation != null && validation.trim().length() > 0) {

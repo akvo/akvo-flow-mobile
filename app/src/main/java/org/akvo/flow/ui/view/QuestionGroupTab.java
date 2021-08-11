@@ -84,7 +84,7 @@ public class QuestionGroupTab extends ConstraintLayout
         mLoaded = false;
         mQuestions = new HashSet<>();
         for (Question q : mQuestionGroup.getQuestions()) {
-            mQuestions.add(q.getId());
+            mQuestions.add(q.getQuestionId());
         }
         init();
     }
@@ -204,7 +204,7 @@ public class QuestionGroupTab extends ConstraintLayout
     private void displayResponses() {
         Map<String, QuestionResponse> responses = mSurveyListener.getResponses();
         for (QuestionView qv : mQuestionViews.values()) {
-            String questionId = qv.getQuestion().getId();
+            String questionId = qv.getQuestion().getQuestionId();
             /*
              * This works for questions without repetitions in format 123456
              * or the questions whose repetition is not 0 the the key is 123456|1
@@ -302,7 +302,7 @@ public class QuestionGroupTab extends ConstraintLayout
         final Context context = getContext();
         for (Question q : mQuestionGroup.getQuestions()) {
             if (mQuestionGroup.isRepeatable()) {
-                q = q.copy(q, q.getId() + "|" + repetitionId);
+                q = q.copy(q, q.getQuestionId() + "|" + repetitionId);
             }
 
             QuestionView questionView;
@@ -337,7 +337,7 @@ public class QuestionGroupTab extends ConstraintLayout
             // Add question interaction listener
             questionView.addQuestionInteractionListener(mQuestionListener);
 
-            mQuestionViews.put(q.getId(), questionView);// Store the reference to the View
+            mQuestionViews.put(q.getQuestionId(), questionView);// Store the reference to the View
 
             mContainer.addView(questionView, generateLayoutParamsForQuestionView());
         }
@@ -426,7 +426,7 @@ public class QuestionGroupTab extends ConstraintLayout
             String parentQId = dependency.getQuestion();
             if (mQuestionGroup.isRepeatable() && mQuestions.contains(parentQId)) {
                 // Internal dependencies need to compound the inner question ID (questionId|iteration)
-                parentQId += "|" + parseRepetitionId(qv.getQuestion().getId());
+                parentQId += "|" + parseRepetitionId(qv.getQuestion().getQuestionId());
                 dependency.setQuestion(parentQId);
                 parentQ = getQuestionView(parentQId);// Local search
             } else {

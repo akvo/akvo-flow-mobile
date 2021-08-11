@@ -95,7 +95,7 @@ class DomainFormMapper @Inject constructor() {
         val domainQuestions = mutableListOf<DomainQuestion>()
         for (question in questions) {
             domainQuestions.add(DomainQuestion(
-                question.id,
+                question.questionId,
                 question.isMandatory,
                 question.text,
                 question.order,

@@ -849,17 +849,17 @@ public class FormActivity extends BackActivity implements SurveyListener,
     }
 
     private void navigateToSignatureActivity(QuestionInteractionEvent event) {
-        mRequestQuestionId = event.getSource().getQuestion().getId();
+        mRequestQuestionId = event.getSource().getQuestion().getQuestionId();
         navigator.navigateToSignatureActivity(this, event.getData());
     }
 
     private void navigateToGeoShapeActivity(QuestionInteractionEvent event) {
-        mRequestQuestionId = event.getSource().getQuestion().getId();
+        mRequestQuestionId = event.getSource().getQuestion().getQuestionId();
         navigator.navigateToCreateGeoShapeActivity(this, event.getData());
     }
 
     private void navigateToCaddisfly(QuestionInteractionEvent event) {
-        mRequestQuestionId = event.getSource().getQuestion().getId();
+        mRequestQuestionId = event.getSource().getQuestion().getQuestionId();
         navigator.navigateToCaddisfly(this, event.getData(), getString(R.string.caddisfly_test));
     }
 
@@ -872,7 +872,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
         } else if (formInstanceId == INVALID_INSTANCE_ID) {
             formInstanceId = mDatabase.createSurveyRespondent(form.getId(), form.getVersion(), user, dataPointId);
         }
-        String questionIdKey = event.getSource().getQuestion().getId();
+        String questionIdKey = event.getSource().getQuestion().getQuestionId();
         QuestionResponse eventResponse = event.getSource().getResponse();
 
         // Store the response if it contains a value. Otherwise, delete it
@@ -898,7 +898,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
     }
 
     private void clearQuestion(QuestionInteractionEvent event) {
-        String questionId = event.getSource().getQuestion().getId();
+        String questionId = event.getSource().getQuestion().getQuestionId();
         deleteResponse(questionId);
     }
 
@@ -909,7 +909,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
 
     private void recordSourceId(QuestionInteractionEvent event) {
         if (event.getSource() != null) {
-            mRequestQuestionId = event.getSource().getQuestion().getId();
+            mRequestQuestionId = event.getSource().getQuestion().getQuestionId();
         } else {
             Timber.e("Question source was null in the event");
         }

@@ -122,7 +122,7 @@ public class CaddisflyQuestionView extends QuestionView implements View.OnClickL
         QuestionResponse r = new QuestionResponse.QuestionResponseBuilder()
                 .setValue(mValue)
                 .setType(ConstantUtil.CADDISFLY_RESPONSE_TYPE)
-                .setQuestionId(question.getId())
+                .setQuestionId(question.getQuestionId())
                 .setIteration(question.getIteration())
                 .setFilename(mImage)
                 .createQuestionResponse();
@@ -177,7 +177,7 @@ public class CaddisflyQuestionView extends QuestionView implements View.OnClickL
     private void requestStoragePermissions() {
         final FormActivity activity = (FormActivity) getContext();
         activity.requestPermissions(new String[] { Manifest.permission.WRITE_EXTERNAL_STORAGE },
-                ConstantUtil.STORAGE_PERMISSION_CODE, getQuestion().getId());
+                ConstantUtil.STORAGE_PERMISSION_CODE, getQuestion().getQuestionId());
     }
 
     @Override
@@ -211,7 +211,7 @@ public class CaddisflyQuestionView extends QuestionView implements View.OnClickL
         Question q = getQuestion();
         Bundle data = new Bundle();
         data.putString(ConstantUtil.CADDISFLY_RESOURCE_ID, q.getCaddisflyRes());
-        data.putString(ConstantUtil.CADDISFLY_QUESTION_ID, q.getId());
+        data.putString(ConstantUtil.CADDISFLY_QUESTION_ID, q.getQuestionId());
         data.putString(ConstantUtil.CADDISFLY_QUESTION_TITLE, q.getText());
         data.putString(ConstantUtil.CADDISFLY_DATAPOINT_ID, mSurveyListener.getDataPointId());
         data.putString(ConstantUtil.CADDISFLY_FORM_ID, mSurveyListener.getFormId());

@@ -83,7 +83,7 @@ public class GeoQuestionView extends QuestionView
     public GeoQuestionView(Context context, Question q, SurveyListener surveyListener) {
         super(context, q, surveyListener);
         mLocationListener = new PermissionAwareLocationListener(context, this,
-                allowMockLocations(q), q.getId(), this);
+                allowMockLocations(q), q.getQuestionId(), this);
         init();
     }
 
@@ -142,7 +142,7 @@ public class GeoQuestionView extends QuestionView
             FragmentManager fragmentManager = ((AppCompatActivity) context)
                     .getSupportFragmentManager();
             DialogFragment newFragment = GeoFieldsResetConfirmDialogFragment
-                    .newInstance(getQuestion().getId());
+                    .newInstance(getQuestion().getQuestionId());
             newFragment.show(fragmentManager, GeoFieldsResetConfirmDialogFragment.GEO_DIALOG_TAG);
         }
     }

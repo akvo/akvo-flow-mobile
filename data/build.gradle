@@ -58,7 +58,7 @@ android {
 }
 
 dependencies {
-    implementation project(path: ':util')
+    implementation project(path: ':utils')
     implementation project(path: ':database')
     implementation project(path: ':domain')
     implementation "com.google.dagger:dagger:${rootProject.ext.daggerVersion}"

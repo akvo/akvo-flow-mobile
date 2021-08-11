@@ -231,7 +231,7 @@ private static String getBuildYear() {
 }
 
 dependencies {
-    api project(':util')
+    api project(':utils')
     implementation "androidx.appcompat:appcompat:${rootProject.ext.appCompatVersion}"
     implementation "androidx.exifinterface:exifinterface:${rootProject.ext.exifVersion}"
     implementation "androidx.recyclerview:recyclerview:${rootProject.ext.recyclerVersion}"

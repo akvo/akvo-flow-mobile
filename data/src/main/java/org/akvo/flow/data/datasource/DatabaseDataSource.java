@@ -417,6 +417,7 @@ public class DatabaseDataSource {
     }
 
     public void saveGroups(@NotNull DataForm form) {
+        briteSurveyDbAdapter.deleteGroups(form.getFormId());
         List<DataQuestionGroup> groups = form.getGroups();
         List<ContentValues> groupValues = new ArrayList<>();
         for (DataQuestionGroup group: groups) {

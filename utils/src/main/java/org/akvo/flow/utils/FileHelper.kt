@@ -225,11 +225,12 @@ class FileHelper @Inject constructor() {
         var zis: ZipInputStream? = null
         try {
             zis = ZipInputStream(input)
-            var entry: ZipEntry
-            while (zis.nextEntry.also { entry = it } != null && !entry.isDirectory) {
+            var entry: ZipEntry? = zis.nextEntry
+            while (entry != null && !entry.isDirectory) {
                 val f = File(destinationFolder, entry.name)
                 copyStream(zis, f)
                 zis.closeEntry()
+                entry = zis.nextEntry
             }
         } catch (e: IOException) {
             Timber.e(e)

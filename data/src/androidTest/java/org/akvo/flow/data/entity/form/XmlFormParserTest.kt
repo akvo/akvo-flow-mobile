@@ -38,13 +38,13 @@ class XmlFormParserTest {
         val input: InputStream =
             InstrumentationRegistry.getInstrumentation().targetContext.resources
             .openRawResource(R.raw.date_form)
-        val result: XmlDataForm = parser.parseXmlForm(input)
+        val result: DataForm = parser.parseXmlForm(input)
 
         assertEquals("1.0", result.version)
         assertEquals("DateForm", result.name)
         assertEquals(1, result.groups.size)
         assertEquals("DateFormGroup", result.groups[0].heading)
-        assertEquals(true, result.groups[0].isRepeatable)
+        assertEquals(true, result.groups[0].repeatable)
     }
 
     @Test
@@ -54,13 +54,12 @@ class XmlFormParserTest {
         val input: InputStream =
             InstrumentationRegistry.getInstrumentation().targetContext.resources
                 .openRawResource(R.raw.empty_form)
-        val result: XmlDataForm = parser.parseXmlForm(input)
+        val result: DataForm = parser.parseXmlForm(input)
 
         assertEquals("0.0", result.version)
         assertEquals("", result.name)
         assertEquals(1, result.groups.size)
         assertEquals("", result.groups[0].heading)
-        assertEquals(false, result.groups[0].isRepeatable)
+        assertEquals(false, result.groups[0].repeatable)
     }
-
 }

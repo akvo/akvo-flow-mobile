@@ -30,9 +30,9 @@ import com.google.gson.reflect.TypeToken
 import org.akvo.flow.domain.entity.DomainQuestionGroup
 import org.akvo.flow.domain.entity.Response
 import org.akvo.flow.domain.entity.question.AltText
+import org.akvo.flow.domain.entity.question.DomainQuestion
 import org.akvo.flow.domain.entity.question.Level
 import org.akvo.flow.domain.entity.question.Option
-import org.akvo.flow.domain.entity.question.Question
 import org.akvo.flow.domain.util.GsonMapper
 import org.akvo.flow.presentation.form.view.groups.entity.ViewCascadeLevel
 import org.akvo.flow.presentation.form.view.groups.entity.ViewLocation
@@ -100,7 +100,7 @@ class ViewQuestionGroupMapper @Inject constructor() {
     }
 
     private fun listOfRepetitions(
-        questions: MutableList<Question>,
+        questions: MutableList<DomainQuestion>,
         responses: List<Response>,
         maxRepsNumber: Int,
     ): ArrayList<GroupRepetition> {
@@ -114,7 +114,7 @@ class ViewQuestionGroupMapper @Inject constructor() {
         return groupRepetitions
     }
 
-    private fun countRepetitions(questions: MutableList<Question>, responses: List<Response>): Int {
+    private fun countRepetitions(questions: MutableList<DomainQuestion>, responses: List<Response>): Int {
         var repetitionsCount = 1
         questions.forEach { question ->
             val listOfResponses: List<Response> = getResponsesForQuestion(
@@ -128,12 +128,12 @@ class ViewQuestionGroupMapper @Inject constructor() {
     }
 
     private fun listOfAnswers(
-        questions: MutableList<Question>,
+        questions: MutableList<DomainQuestion>,
         responses: List<Response>,
         repetition: Int
     ): ArrayList<ViewQuestionAnswer> {
         val answers = arrayListOf<ViewQuestionAnswer>()
-        questions.forEach { question ->
+       questions.forEach { question ->
             val listOfResponses: List<Response> = getResponsesForQuestion(
                 question.questionId, responses
             )
@@ -143,7 +143,7 @@ class ViewQuestionGroupMapper @Inject constructor() {
     }
 
     private fun createQuestionAnswer(
-        question: Question,
+        question: DomainQuestion,
         listOfResponses: List<Response>,
         repetition: Int
     ): ViewQuestionAnswer {

@@ -20,9 +20,14 @@
 
 package org.akvo.flow.data.datasource;
 
+import static org.akvo.flow.database.tables.QuestionGroupTable.COLUMN_FORM_ID;
+import static org.akvo.flow.database.tables.QuestionGroupTable.COLUMN_GROUP_ID;
+import static org.akvo.flow.database.tables.QuestionGroupTable.COLUMN_HEADING;
+import static org.akvo.flow.database.tables.QuestionGroupTable.COLUMN_ORDER;
+import static org.akvo.flow.database.tables.QuestionGroupTable.COLUMN_REPEATABLE;
+
 import android.content.ContentValues;
 import android.database.Cursor;
-import android.text.TextUtils;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -37,9 +42,10 @@ import org.akvo.flow.data.entity.CursorMapper;
 import org.akvo.flow.data.entity.FormInstanceMapper;
 import org.akvo.flow.data.entity.SurveyInstanceIdMapper;
 import org.akvo.flow.data.entity.form.DataForm;
-import org.akvo.flow.data.entity.form.Form;
+import org.akvo.flow.data.entity.form.DataQuestionGroup;
 import org.akvo.flow.data.entity.form.FormLanguagesMapper;
 import org.akvo.flow.data.entity.form.FormMapper;
+import org.akvo.flow.data.entity.form.QuestionGroupMapper;
 import org.akvo.flow.data.util.FlowFileBrowser;
 import org.akvo.flow.database.Constants;
 import org.akvo.flow.database.RecordColumns;
@@ -54,6 +60,7 @@ import org.akvo.flow.domain.entity.DomainFormInstance;
 import org.akvo.flow.domain.entity.User;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -80,17 +87,20 @@ public class DatabaseDataSource {
     private final FormInstanceMapper formInstanceMapper;
     private final CursorMapper cursorMapper;
     private final FormLanguagesMapper formLanguagesMapper;
+    private final QuestionGroupMapper questionGroupMapper;
 
     @Inject
     public DatabaseDataSource(BriteDatabase db, SurveyInstanceIdMapper surveyInstanceIdMapper,
                               FormMapper formMapper, FormInstanceMapper formInstanceMapper,
-                              CursorMapper cursorMapper, FormLanguagesMapper formLanguagesMapper) {
+                              CursorMapper cursorMapper, FormLanguagesMapper formLanguagesMapper,
+                              QuestionGroupMapper questionGroupMapper) {
         this.briteSurveyDbAdapter = new BriteSurveyDbAdapter(db);
         this.surveyInstanceIdMapper = surveyInstanceIdMapper;
         this.formMapper = formMapper;
         this.formInstanceMapper = formInstanceMapper;
         this.cursorMapper = cursorMapper;
         this.formLanguagesMapper = formLanguagesMapper;
+        this.questionGroupMapper = questionGroupMapper;
     }
 
     public Observable<Cursor> getSurveys() {
@@ -392,34 +402,42 @@ public class DatabaseDataSource {
         return Observable.just(!surveyUpToDate);
     }
 
-    public Observable<Boolean> insertSurvey(ApiFormHeader formHeader,
-                                            boolean cascadeResourcesDownloaded, Form form) {
+    public void saveForm(boolean resourcesDownloaded, DataForm form) {
         ContentValues updatedValues = new ContentValues();
-        updatedValues.put(SurveyColumns.SURVEY_ID, formHeader.getId());
-        String versionValue = form.getVersion() != null && !"0.0".equals(form.getVersion()) ?
-                form.getVersion() :
-                formHeader.getVersion();
-        updatedValues.put(SurveyColumns.VERSION, versionValue);
+        updatedValues.put(SurveyColumns.SURVEY_ID, form.getFormId());
+        updatedValues.put(SurveyColumns.VERSION, form.getVersion() + "");
         updatedValues.put(SurveyColumns.TYPE, DEFAULT_SURVEY_TYPE);
         updatedValues.put(SurveyColumns.LOCATION, DEFAULT_SURVEY_LOCATION);
-        updatedValues.put(SurveyColumns.FILENAME, formHeader.getId() + FlowFileBrowser.XML_SUFFIX);
-        updatedValues.put(SurveyColumns.NAME, formHeader.getName());
-        updatedValues.put(SurveyColumns.LANGUAGE, getFormLanguage(formHeader));
-        updatedValues.put(SurveyColumns.SURVEY_GROUP_ID, formHeader.getGroupId());
-        updatedValues.put(SurveyColumns.HELP_DOWNLOADED, cascadeResourcesDownloaded ? 1 : 0);
-        briteSurveyDbAdapter.updateSurvey(updatedValues, formHeader.getId());
-        return Observable.just(true);
+        updatedValues.put(SurveyColumns.FILENAME, form.getFormId() + FlowFileBrowser.XML_SUFFIX);
+        updatedValues.put(SurveyColumns.NAME, form.getName());
+        updatedValues.put(SurveyColumns.LANGUAGE, form.getLanguage());
+        updatedValues.put(SurveyColumns.SURVEY_GROUP_ID, form.getSurveyId());
+        updatedValues.put(SurveyColumns.HELP_DOWNLOADED, resourcesDownloaded ? 1 : 0);
+        briteSurveyDbAdapter.updateSurvey(updatedValues, form.getFormId());
+    }
+
+    public void saveGroups(@NotNull DataForm form) {
+        List<DataQuestionGroup> groups = form.getGroups();
+        List<ContentValues> groupValues = new ArrayList<>();
+        for (DataQuestionGroup group: groups) {
+            ContentValues values = new ContentValues();
+            Long groupId = group.getGroupId();
+            if (groupId == null) {
+                groupId = -1L;
+            }
+            values.put(COLUMN_GROUP_ID, groupId);
+            values.put(COLUMN_HEADING, group.getHeading());
+            values.put(COLUMN_REPEATABLE, group.getRepeatable() ? 1 : 0);
+            values.put(COLUMN_FORM_ID, group.getFormId());
+            values.put(COLUMN_ORDER, group.getOrder());
+            groupValues.add(values);
+        }
+        briteSurveyDbAdapter.saveGroup(groupValues, form.getFormId());
     }
 
     public Observable<Boolean> deleteAllForms() {
         briteSurveyDbAdapter.deleteAllSurveys();
         return Observable.just(true);
-    }
-
-    @NonNull
-    private String getFormLanguage(ApiFormHeader formHeader) {
-        final String language = formHeader != null ? formHeader.getLanguage() : "";
-        return TextUtils.isEmpty(language) ? DEFAULTS_SURVEY_LANGUAGE : language.toLowerCase();
     }
 
     public Observable<Boolean> saveMissingFiles(Set<String> missingFiles) {
@@ -433,6 +451,14 @@ public class DatabaseDataSource {
     @NotNull
     public DataForm getForm(String formId) {
         return formMapper.mapForm(briteSurveyDbAdapter.getForm(formId));
+    }
+
+    @NotNull
+    public DataForm getFormWithGroups(String formId) {
+        DataForm dataForm = formMapper.mapForm(briteSurveyDbAdapter.getForm(formId));
+        List<DataQuestionGroup> groups = questionGroupMapper.mapGroups(briteSurveyDbAdapter.getGroups(formId));
+        dataForm.getGroups().addAll(groups);
+        return dataForm;
     }
 
     public List<DataForm> getForms(long surveyId) {

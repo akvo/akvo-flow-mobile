@@ -18,7 +18,7 @@
  */
 
 package org.akvo.flow.domain.entity
-//TODO: this is not right separate between 2 different objects: Form from database, form from xml??
+
 data class DomainForm(
     val id: Int = 0,
     val formId: String = "",

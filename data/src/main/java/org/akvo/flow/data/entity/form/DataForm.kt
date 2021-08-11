@@ -25,10 +25,24 @@ data class DataForm(
     val surveyId: Int,
     val name: String,
     val version: Double,
-    val type: String,
-    val location: String,
+    val type: String = "survey",
+    val location: String = "sdcard",
     val filename: String,
-    val language: String,
-    val cascadeDownloaded: Boolean,
-    val deleted: Boolean
-)
+    val language: String = "en",
+    val cascadeDownloaded: Boolean = true,
+    val deleted: Boolean = false,
+    val groups: MutableList<DataQuestionGroup> = mutableListOf()
+) {
+
+    fun getResources(): List<String> {
+        val formResources = mutableListOf<String>()
+        for (group in groups) {
+            for (question in group.questions) {
+                if (!question.cascadeResource.isNullOrEmpty()) {
+                    formResources.add(question.cascadeResource)
+                }
+            }
+        }
+        return formResources
+    }
+}

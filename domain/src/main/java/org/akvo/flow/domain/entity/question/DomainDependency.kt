@@ -32,7 +32,7 @@ data class DomainDependency(val question: String?, var answer: String?) {
         if (answer == null || value == null) {
             return answer === value
         }
-        val values = OptionValue.deserialize(value)
+        val values = DomainOptionSerializer.deserialize(value)
         for (o in values) {
             for (a in answer!!.split("\\|".toRegex()).dropLastWhile { it.isEmpty() }
                 .toTypedArray()) {

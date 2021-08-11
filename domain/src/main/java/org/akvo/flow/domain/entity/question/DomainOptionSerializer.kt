@@ -25,7 +25,7 @@ import org.json.JSONObject
 import timber.log.Timber
 import java.util.ArrayList
 
-object OptionValue {
+object DomainOptionSerializer {
     fun serialize(values: List<DomainOption>): String {
         try {
             val jOptions = JSONArray()

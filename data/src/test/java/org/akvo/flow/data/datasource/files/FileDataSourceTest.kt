@@ -39,16 +39,16 @@ import kotlin.test.assertEquals
 class FileDataSourceTest {
 
     @Mock
-    internal var mockFileHelper: FileHelper? = null
+    lateinit var mockFileHelper: FileHelper
 
     @Mock
-    internal var mockFlowFileBrowser: FlowFileBrowser? = null
+    lateinit var mockFlowFileBrowser: FlowFileBrowser
 
     @Mock
-    internal var mockFolder: File? = null
+    lateinit var mockFolder: File
 
     @Mock
-    internal var mockFile: File? = null
+    lateinit var mockFile: File
 
     @Test
     fun moveZipFilesShouldCompleteSuccessfully() {
@@ -58,7 +58,7 @@ class FileDataSourceTest {
 
         fileDataSource.moveZipFiles().subscribe(observer)
 
-        verify(fileDataSource, times(1))!!.moveFilesInFolder("akvoflow/data/files")
+        verify(fileDataSource, times(1)).moveFilesInFolder("akvoflow/data/files")
         observer.assertNoErrors()
     }
 
@@ -70,61 +70,61 @@ class FileDataSourceTest {
 
         fileDataSource.moveMediaFiles().subscribe(observer)
 
-        verify(fileDataSource, times(1))!!.moveFilesInFolder("akvoflow/data/media/result-images")
-        verify(fileDataSource, times(1))!!.moveFilesInFolder("akvoflow/data/media")
+        verify(fileDataSource, times(1)).moveFilesInFolder("akvoflow/data/media/result-images")
+        verify(fileDataSource, times(1)).moveFilesInFolder("akvoflow/data/media")
         observer.assertNoErrors()
     }
 
     @Test
     fun moveFilesInFolderShouldCompleteSuccessfully() {
-        `when`(mockFlowFileBrowser!!.getPublicFolder(anyString())).thenReturn(mockFolder)
-        `when`(mockFolder!!.exists()).thenReturn(true)
+        `when`(mockFlowFileBrowser.getPublicFolder(anyString())).thenReturn(mockFolder)
+        `when`(mockFolder.exists()).thenReturn(true)
         val listOfFiles = emptyArray<File>()
-        `when`(mockFolder!!.listFiles()).thenReturn(listOfFiles)
+        `when`(mockFolder.listFiles()).thenReturn(listOfFiles)
 
         val fileDataSource = spy(FileDataSource(mockFileHelper, mockFlowFileBrowser, null))
 
         fileDataSource.moveFilesInFolder("abc")
 
-        verify(fileDataSource, times(1))!!.moveAndDeleteFolder("abc", mockFolder, listOfFiles)
+        verify(fileDataSource, times(1)).moveAndDeleteFolder("abc", mockFolder, listOfFiles)
     }
 
     @Test
     fun moveFilesInFolderShouldNotMoveAndDeleteIfNullFolder() {
-        `when`(mockFlowFileBrowser!!.getPublicFolder(anyString())).thenReturn(null)
+        `when`(mockFlowFileBrowser.getPublicFolder(anyString())).thenReturn(null)
         val listOfFiles = emptyArray<File>()
 
         val fileDataSource = spy(FileDataSource(mockFileHelper, mockFlowFileBrowser, null))
 
         fileDataSource.moveFilesInFolder("abc")
 
-        verify(fileDataSource, times(0))!!.moveAndDeleteFolder("abc", mockFolder, listOfFiles)
+        verify(fileDataSource, times(0)).moveAndDeleteFolder("abc", mockFolder, listOfFiles)
     }
 
     @Test
     fun moveFilesInFolderShouldNotMoveAndDeleteIfFolderDoesNotExist() {
-        `when`(mockFlowFileBrowser!!.getPublicFolder(anyString())).thenReturn(mockFolder)
-        `when`(mockFolder!!.exists()).thenReturn(false)
+        `when`(mockFlowFileBrowser.getPublicFolder(anyString())).thenReturn(mockFolder)
+        `when`(mockFolder.exists()).thenReturn(false)
         val listOfFiles = emptyArray<File>()
 
         val fileDataSource = spy(FileDataSource(mockFileHelper, mockFlowFileBrowser, null))
 
         fileDataSource.moveFilesInFolder("abc")
 
-        verify(fileDataSource, times(0))!!.moveAndDeleteFolder("abc", mockFolder, listOfFiles)
+        verify(fileDataSource, times(0)).moveAndDeleteFolder("abc", mockFolder, listOfFiles)
     }
 
     @Test(expected = SecurityException::class)
     fun moveFilesInFolderShouldFailIfSecurityException() {
-        `when`(mockFlowFileBrowser!!.getPublicFolder(anyString())).thenReturn(mockFolder)
-        `when`(mockFolder!!.exists()).thenThrow(SecurityException())
+        `when`(mockFlowFileBrowser.getPublicFolder(anyString())).thenReturn(mockFolder)
+        `when`(mockFolder.exists()).thenThrow(SecurityException())
         val listOfFiles = emptyArray<File>()
 
         val fileDataSource = spy(FileDataSource(mockFileHelper, mockFlowFileBrowser, null))
 
         fileDataSource.moveFilesInFolder("abc")
 
-        verify(fileDataSource, times(0))!!.moveAndDeleteFolder("abc", mockFolder, listOfFiles)
+        verify(fileDataSource, times(0)).moveAndDeleteFolder("abc", mockFolder, listOfFiles)
     }
 
     @Test
@@ -133,8 +133,8 @@ class FileDataSourceTest {
 
         fileDataSource.moveAndDeleteFolder("abc", mockFolder, null)
 
-        verify(fileDataSource, times(0))!!.moveFiles(any(), anyString())
-        verify(mockFolder, times(0))!!.delete()
+        verify(fileDataSource, times(0)).moveFiles(any(), anyString())
+        verify(mockFolder, times(0)).delete()
     }
 
     @Test
@@ -145,8 +145,8 @@ class FileDataSourceTest {
 
         fileDataSource.moveAndDeleteFolder("abc", mockFolder, listOfFiles)
 
-        verify(fileDataSource, times(1))!!.moveFiles(any(), anyString())
-        verify(mockFolder, times(1))!!.delete()
+        verify(fileDataSource, times(1)).moveFiles(any(), anyString())
+        verify(mockFolder, times(1)).delete()
     }
 
     @Test
@@ -154,12 +154,12 @@ class FileDataSourceTest {
         val listOfFiles = arrayOf(mockFile, mockFile)
 
         val fileDataSource = spy(FileDataSource(mockFileHelper, mockFlowFileBrowser, null))
-        `when`(fileDataSource!!.moveFiles(any(), anyString())).thenReturn(1)
+        `when`(fileDataSource.moveFiles(any(), anyString())).thenReturn(1)
 
         fileDataSource.moveAndDeleteFolder("abc", mockFolder, listOfFiles)
 
-        verify(fileDataSource, times(1))!!.moveFiles(any(), anyString())
-        verify(mockFolder, times(0))!!.delete()
+        verify(fileDataSource, times(1)).moveFiles(any(), anyString())
+        verify(mockFolder, times(0)).delete()
     }
 
     @Test
@@ -167,12 +167,12 @@ class FileDataSourceTest {
         val listOfFiles = arrayOf(mockFile, mockFile)
 
         val fileDataSource = spy(FileDataSource(mockFileHelper, mockFlowFileBrowser, null))
-        `when`(fileDataSource!!.moveFiles(any(), anyString())).thenReturn(2)
+        `when`(fileDataSource.moveFiles(any(), anyString())).thenReturn(2)
 
         fileDataSource.moveAndDeleteFolder("abc", mockFolder, listOfFiles)
 
-        verify(fileDataSource, times(1))!!.moveFiles(any(), anyString())
-        verify(mockFolder, times(1))!!.delete()
+        verify(fileDataSource, times(1)).moveFiles(any(), anyString())
+        verify(mockFolder, times(1)).delete()
     }
 
     @Test
@@ -182,7 +182,7 @@ class FileDataSourceTest {
         val moved = fileDataSource.moveFiles(null, "abc")
 
         assertEquals(0, moved)
-        verify(mockFlowFileBrowser, times(0))!!.getExistingInternalFolder(anyString())
+        verify(mockFlowFileBrowser, times(0)).getExistingInternalFolder(anyString())
     }
 
     @Test
@@ -192,36 +192,38 @@ class FileDataSourceTest {
         val moved = fileDataSource.moveFiles(emptyArray<File>(), "abc")
 
         assertEquals(0, moved)
-        verify(mockFlowFileBrowser, times(0))!!.getExistingInternalFolder(anyString())
+        verify(mockFlowFileBrowser, times(0)).getExistingInternalFolder(anyString())
     }
 
     @Test
     fun moveFilesShouldIgnoreNonDeletedFiles() {
-        `when`(mockFile!!.isDirectory).thenReturn(false)
-        `when`(mockFileHelper!!.copyFileToFolder(any(), any())).thenReturn(null)
+        `when`(mockFile.isDirectory).thenReturn(false)
+        `when`(mockFlowFileBrowser.getExistingInternalFolder(anyString())).thenReturn(mockFolder)
+        `when`(mockFileHelper.copyFileToFolder(mockFile, mockFolder)).thenReturn(null)
         val fileDataSource = spy(FileDataSource(mockFileHelper, mockFlowFileBrowser, null))
 
         val moved = fileDataSource.moveFiles(arrayOf(mockFile), "abc")
 
         assertEquals(0, moved)
-        verify(mockFlowFileBrowser, times(1))!!.getExistingInternalFolder(anyString())
+        verify(mockFlowFileBrowser, times(1)).getExistingInternalFolder(anyString())
     }
 
     @Test
     fun moveFilesShouldReturnCorrectNumberOfMovedFiles() {
-        `when`(mockFile!!.isDirectory).thenReturn(false)
-        `when`(mockFileHelper!!.copyFileToFolder(any(), any())).thenReturn("abc")
+        `when`(mockFile.isDirectory).thenReturn(false)
+        `when`(mockFlowFileBrowser.getExistingInternalFolder(anyString())).thenReturn(mockFolder)
+        `when`(mockFileHelper.copyFileToFolder(mockFile, mockFolder)).thenReturn("abc")
         val fileDataSource = spy(FileDataSource(mockFileHelper, mockFlowFileBrowser, null))
 
         val moved = fileDataSource.moveFiles(arrayOf(mockFile, mockFile), "abc")
 
         assertEquals(2, moved)
-        verify(mockFlowFileBrowser, times(1))!!.getExistingInternalFolder(anyString())
+        verify(mockFlowFileBrowser, times(1)).getExistingInternalFolder(anyString())
     }
 
     @Test
     fun copyFileOrDirShouldCallDeleteDirectoryIfNeeded() {
-        `when`(mockFolder!!.isDirectory).thenReturn(true)
+        `when`(mockFolder.isDirectory).thenReturn(true)
 
         val fileDataSource = spy(FileDataSource(mockFileHelper, mockFlowFileBrowser, null))
 
@@ -233,7 +235,7 @@ class FileDataSourceTest {
 
     @Test
     fun copyFileOrDirShouldCallMoveAndDeleteFileIfNotFilesFolder() {
-        `when`(mockFolder!!.isDirectory).thenReturn(true)
+        `when`(mockFolder.isDirectory).thenReturn(true)
 
         val fileDataSource = spy(FileDataSource(mockFileHelper, mockFlowFileBrowser, null))
 
@@ -245,7 +247,7 @@ class FileDataSourceTest {
 
     @Test
     fun copyFileOrDirShouldCallMoveAndDeleteFileIfFile() {
-        `when`(mockFolder!!.isDirectory).thenReturn(false)
+        `when`(mockFolder.isDirectory).thenReturn(false)
 
         val fileDataSource = spy(FileDataSource(mockFileHelper, mockFlowFileBrowser, null))
 

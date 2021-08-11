@@ -58,6 +58,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -104,6 +105,9 @@ public class FormDataRepositoryTest {
     Form mockForm;
 
     @Mock
+    DataForm mockDataForm;
+
+    @Mock
     DomainFormMapper mockDomainFormMapper;
 
     @Mock
@@ -127,7 +131,7 @@ public class FormDataRepositoryTest {
                 mockDatabaseDataSource, null, mockFileDataSource, null);
         formDataRepository = new FormDataRepository(mockFormHeaderParser, mockXmlParser,
                 restApi, dataSourceFactory, mockFormIdMapper, s3RestApi, mockDomainFormMapper, mockDataFormMapper);
-        ApiFormHeader apiFormHeader = new ApiFormHeader("123456", "", "", "", 1.0, "", true, "");
+        ApiFormHeader apiFormHeader = new ApiFormHeader("123456", "", "", "1.0", 1.0, "", true, "");
         when(mockFormHeaderParser.parseOne(anyString())).thenReturn(apiFormHeader);
         when(mockAmazonAuth.getAmazonAuthForGet(anyString(), anyString(), anyString()))
                 .thenReturn("123");
@@ -138,6 +142,8 @@ public class FormDataRepositoryTest {
                 .thenReturn(Observable.just(true));
         when(mockFileDataSource.getFormFile(anyString()))
                 .thenReturn(mockInputStream);
+        when(mockDataForm.getResources()).thenReturn(Collections.emptyList());
+        when(mockDataFormMapper.mapForm(mockForm)).thenReturn(mockDataForm);
     }
 
     @Test

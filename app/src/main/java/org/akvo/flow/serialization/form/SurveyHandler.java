@@ -44,56 +44,63 @@ import java.util.List;
  * @author Christopher Fagiani
  **/
 public class SurveyHandler extends DefaultHandler {
-    private static final String DEFAULT_LANG = "defaultLanguageCode";
+    private static final String OPTIONS = "options";
+    private static final String QUESTION = "question";
     private static final String QUESTION_GROUP = "questionGroup";
     private static final String HEADING = "heading";
-    private static final String QUESTION = "question";
     private static final String SURVEY = "survey";
-    private static final String APP = "app";
+    private static final String CASCADE_RESOURCE = "cascadeResource";
     private static final String ORDER = "order";
     private static final String MANDATORY = "mandatory";
-    private static final String TYPE = "type";
-    private static final String ID = "id";
-    private static final String DEPENDENCY = "dependency";
-    private static final String ANSWER = "answer-value";
-    private static final String TEXT = "text";
-    private static final String OPTION = "option";
-    private static final String CODE = "code";
-    private static final String OPTIONS = "options";
-    private static final String ALLOW_OTHER = "allowOther";
-    private static final String VALIDATION_TYPE = "validationType";
-    private static final String VALIDATION_RULE = "validationRule";
-    private static final String MAX_LENGTH = "maxLength";
-    private static final String ALLOW_DEC = "allowDecimal";
-    private static final String ALLOW_SIGN = "signed";
-    private static final String RENDER_TYPE = "renderType";
-    private static final String ALLOW_MULT = "allowMultiple";
-    private static final String MIN_VAL = "minVal";
-    private static final String MAX_VAL = "maxVal";
-    private static final String ALT_TEXT = "altText";
-    private static final String LANG = "language";
     private static final String LOCKED = "locked";
-    private static final String HELP = "help";
-    private static final String NAME = "name";
-    private static final String VERSION = "version";
+    private static final String DOUBLE_ENTRY = "requireDoubleEntry";
     private static final String LOCALE_NAME = "localeNameFlag";
     private static final String LOCALE_LOCATION = "localeLocationFlag";
-    private static final String SOURCE_SURVEY_ID = "sourceSurveyId";
-    private static final String DOUBLE_ENTRY = "requireDoubleEntry";
-    private static final String REPEATABLE = "repeatable";
-
-    private static final String SURVEY_GROUP_ID = "surveyGroupId";
-    private static final String SURVEY_GROUP_NAME = "surveyGroupName";
-    private static final String REGISTRATION_SURVEY = "registrationSurvey";
-
-    private static final String CASCADE_RESOURCE = "cascadeResource";
     private static final String CADDISFLY_RESOURCE = "caddisflyResourceUuid";
-    private static final String LEVELS = "levels";
-    private static final String LEVEL = "level";
-
+    private static final String ALLOW_OTHER = "allowOther";
+    private static final String ALLOW_MULT = "allowMultiple";
+    private static final String OPTION = "option";
+    private static final String CODE = "code";
     private static final String ALLOW_POINTS = "allowPoints";
     private static final String ALLOW_LINE = "allowLine";
     private static final String ALLOW_POLYGON = "allowPolygon";
+    private static final String TYPE = "type";
+    private static final String ID = "id";
+    private static final String VERSION = "version";
+    private static final String DEFAULT_LANG = "defaultLanguageCode";
+    private static final String ALT_TEXT = "altText";
+    private static final String LANG = "language";
+    private static final String NAME = "name";
+    private static final String REPEATABLE = "repeatable";
+    private static final String LEVELS = "levels";
+    private static final String LEVEL = "level";
+    private static final String DEPENDENCY = "dependency";
+    private static final String ANSWER = "answer-value";
+    private static final String VALIDATION_RULE = "validationRule";
+    private static final String MIN_VAL = "minVal";
+    private static final String MAX_VAL = "maxVal";
+    private static final String VALIDATION_TYPE = "validationType";
+    private static final String MAX_LENGTH = "maxLength";
+    private static final String ALLOW_DEC = "allowDecimal";
+    private static final String ALLOW_SIGN = "signed";
+    private static final String HELP = "help";
+    private static final String SURVEY_GROUP_ID = "surveyGroupId";
+
+    private static final String APP = "app";
+    private static final String TEXT = "text";
+    private static final String RENDER_TYPE = "renderType";
+
+
+    private static final String SOURCE_SURVEY_ID = "sourceSurveyId";
+
+
+    private static final String SURVEY_GROUP_NAME = "surveyGroupName";
+    private static final String REGISTRATION_SURVEY = "registrationSurvey";
+
+
+
+
+
 
     @SuppressWarnings("unused")
     private static final String TRANSLATION = "translation";
@@ -347,7 +354,6 @@ public class SurveyHandler extends DefaultHandler {
                 } else {
                     currentQuestion.setAllowOther(false);
                 }
-                currentQuestion.setRenderType(attributes.getValue(RENDER_TYPE));
                 if (attributes.getValue(ALLOW_MULT) != null) {
                     currentQuestion.setAllowMultiple(Boolean
                             .parseBoolean(attributes.getValue(ALLOW_MULT)));

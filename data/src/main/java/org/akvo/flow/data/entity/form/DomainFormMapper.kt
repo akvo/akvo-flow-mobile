@@ -106,7 +106,6 @@ class DomainFormMapper @Inject constructor() {
                 question.text,
                 question.order,
                 question.isAllowOther,
-                question.renderType,
                 mapHelps(question.questionHelp),
                 question.type,
                 mapOptions(question.options),

@@ -32,7 +32,6 @@ data class DataQuestion(
     var text: String? = null,
     val order: Int = 0,
     var isAllowOther: Boolean = false,
-    val renderType: String? = null,
     var questionHelp: MutableList<DomainQuestionHelp> = mutableListOf(), //TODO: use specific object
     val type: String? = null,
     var options: MutableList<DomainOption>? = null, //TODO: use specific object

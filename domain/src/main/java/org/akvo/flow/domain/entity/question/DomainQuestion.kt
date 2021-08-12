@@ -26,7 +26,6 @@ data class DomainQuestion(
     var text: String? = null,
     val order: Int = 0,
     var isAllowOther: Boolean = false,
-    val renderType: String? = null,
     var questionHelp: MutableList<DomainQuestionHelp> = mutableListOf(),
     val type: String? = null,
     var options: MutableList<DomainOption>? = null,

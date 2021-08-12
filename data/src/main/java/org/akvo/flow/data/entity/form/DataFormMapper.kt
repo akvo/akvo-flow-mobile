@@ -78,7 +78,6 @@ class DataFormMapper @Inject constructor() {
                 question.text,
                 question.order,
                 question.isAllowOther,
-                question.renderType,
                 mapQuestionHelp(question.questionHelp),
                 question.type,
                 mapOptions(question.options),

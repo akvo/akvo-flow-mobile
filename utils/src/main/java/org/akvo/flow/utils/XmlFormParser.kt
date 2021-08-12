@@ -26,6 +26,8 @@ import org.akvo.flow.utils.entity.Option
 import org.akvo.flow.utils.entity.Question
 import org.akvo.flow.utils.entity.QuestionGroup
 import org.akvo.flow.utils.entity.QuestionHelp
+import org.akvo.flow.utils.entity.ValidationRule
+import org.akvo.flow.utils.entity.ValidationRule.DEFAULT_MAX_LENGTH
 import org.xmlpull.v1.XmlPullParser
 import org.xmlpull.v1.XmlPullParserException
 import org.xmlpull.v1.XmlPullParserFactory
@@ -118,8 +120,8 @@ class XmlFormParser @Inject constructor(private val helper: FileHelper) {
                             SURVEY -> {
                                 version = getDoubleAttribute(parser, VERSION)
                                 name = getNonNullStringAttribute(parser, NAME)
-                                formId = getIntAttribute(parser, FORM_ID)
-                                surveyId = getIntAttribute(parser, SURVEY_ID)
+                                formId = getIntAttribute(parser, FORM_ID, -1)
+                                surveyId = getIntAttribute(parser, SURVEY_ID, -1)
                                 val parsedAttribute = parser.getAttributeValue(null, DEFAULT_LANG)
                                 if (!parsedAttribute.isNullOrEmpty()) {
                                     defaultLanguage = parsedAttribute
@@ -139,7 +141,7 @@ class XmlFormParser @Inject constructor(private val helper: FileHelper) {
                             }
                             QUESTION -> {
                                 val resource = getStringAttribute(parser, CASCADE_RESOURCE)
-                                var order = getIntAttribute(parser, ORDER)
+                                var order = getIntAttribute(parser, ORDER, -1)
                                 if (order == -1) {
                                     order = 1
                                     if (currentQuestionGroup != null) {
@@ -195,13 +197,12 @@ class XmlFormParser @Inject constructor(private val helper: FileHelper) {
                                 )
                             }
                             VALIDATION_RULE -> {
-                                //currentValidation = ValidationRule()
-                                //TODO: added later, not needed for read only
+                                currentQuestion?.validationRule = parseValidationValue(parser)
                             }
                             ALT_TEXT -> {
                                 currentAltText = AltText(
                                     languageCode = getStringAttribute(parser, LANG),
-                                    type = getStringAttribute(parser, VALUE)
+                                    type = getStringAttribute(parser, TYPE)
                                 )
                             }
                             HELP -> {
@@ -355,7 +356,7 @@ class XmlFormParser @Inject constructor(private val helper: FileHelper) {
                             }
                             QUESTION -> {
                                 val resource = getStringAttribute(parser, CASCADE_RESOURCE)
-                                var order = getIntAttribute(parser, ORDER)
+                                var order = getIntAttribute(parser, ORDER, -1)
                                 if (order == -1) {
                                     order = 1
                                 }
@@ -408,19 +409,17 @@ class XmlFormParser @Inject constructor(private val helper: FileHelper) {
                                 )
                             }
                             VALIDATION_RULE -> {
-                                //currentValidation = ValidationRule()
-                                //TODO: add
+                                currentQuestion?.validationRule = parseValidationValue(parser)
                             }
                             ALT_TEXT -> {
                                 currentAltText = AltText(
                                     languageCode = getStringAttribute(parser, LANG),
-                                    type = getStringAttribute(parser, VALUE)
+                                    type = getStringAttribute(parser, TYPE)
                                 )
                             }
                             HELP -> {
                                 currentHelp = QuestionHelp()
                             }
-
                         }
                     }
                     /**
@@ -527,8 +526,24 @@ class XmlFormParser @Inject constructor(private val helper: FileHelper) {
         return map
     }
 
-    private fun getIntAttribute(parser: XmlPullParser, attributeName: String) =
-        parser.getAttributeValue(null, attributeName)?.toInt() ?: -1
+    private fun parseValidationValue(parser: XmlPullParser): ValidationRule {
+       val currentValidation = ValidationRule(getStringAttribute(parser, VALIDATION_TYPE))
+        currentValidation.allowDecimal = getBooleanAttribute(parser, ALLOW_DEC)
+        currentValidation.allowSigned = getBooleanAttribute(parser, ALLOW_SIGN)
+        currentValidation.maxLength = getIntAttribute(parser, MAX_LENGTH, DEFAULT_MAX_LENGTH)
+        val minValue: Double? = parser.getAttributeValue(null, MIN_VAL)?.toDouble()
+        val maxValue: Double? = parser.getAttributeValue(null, MAX_VAL)?.toDouble()
+        if (minValue != null) {
+            currentValidation.minVal = minValue
+        }
+        if (maxValue != null) {
+            currentValidation.maxVal = maxValue
+        }
+        return currentValidation
+    }
+
+    private fun getIntAttribute(parser: XmlPullParser, attributeName: String, defaultValue: Int) =
+        parser.getAttributeValue(null, attributeName)?.toInt() ?: defaultValue
 
     private fun getStringAttribute(parser: XmlPullParser, attributeName: String) =
         parser.getAttributeValue(null, attributeName)
@@ -563,7 +578,6 @@ class XmlFormParser @Inject constructor(private val helper: FileHelper) {
         private const val ALLOW_OTHER = "allowOther"
         private const val ALLOW_MULT = "allowMultiple"
         private const val OPTION = "option"
-        private const val VALUE = "value"
         private const val CODE = "code"
         private const val ALLOW_POINTS = "allowPoints"
         private const val ALLOW_LINE = "allowLine"
@@ -590,5 +604,9 @@ class XmlFormParser @Inject constructor(private val helper: FileHelper) {
         private const val HELP = "help"
         private const val FORM_ID = "surveyId"
         private const val SURVEY_ID = "surveyGroupId"
+        private const val APP = "app"
+        private const val SURVEY_GROUP_NAME = "surveyGroupName"
+        private const val REGISTRATION_SURVEY = "registrationSurvey"
+        private const val ALIAS = "alias"
     }
 }

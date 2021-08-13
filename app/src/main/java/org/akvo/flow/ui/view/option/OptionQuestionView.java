@@ -23,7 +23,6 @@ package org.akvo.flow.ui.view.option;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import androidx.annotation.Nullable;
 import android.text.Html;
 import android.text.Spanned;
 import android.text.TextUtils;
@@ -31,16 +30,19 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.annotation.Nullable;
+
 import org.akvo.flow.R;
-import org.akvo.flow.domain.AltText;
-import org.akvo.flow.domain.Option;
-import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionResponse;
 import org.akvo.flow.event.SurveyListener;
-import org.akvo.flow.serialization.response.value.OptionValue;
 import org.akvo.flow.ui.view.QuestionView;
 import org.akvo.flow.util.ConstantUtil;
+import org.akvo.flow.utils.entity.AltText;
+import org.akvo.flow.utils.entity.Option;
+import org.akvo.flow.utils.entity.OptionValue;
+import org.akvo.flow.utils.entity.Question;
 
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -89,8 +91,7 @@ public abstract class OptionQuestionView extends QuestionView {
 
     private void appendOtherOption() {
         if (mQuestion.isAllowOther()) {
-            Option other = new Option();
-            other.setIsOther(true);
+            Option other = new Option(null, null, true, new HashMap<>());
             // Only add code if codes are defined
             if (mOptions != null) {
                 if (!mOptions.isEmpty() && !TextUtils.isEmpty(mOptions.get(0).getCode())) {
@@ -225,7 +226,7 @@ public abstract class OptionQuestionView extends QuestionView {
         }
 
         List<Option> selectedOptions = OptionValue.deserialize(resp.getValue());
-        if (selectedOptions == null || selectedOptions.isEmpty()) {
+        if (selectedOptions.isEmpty()) {
             return;
         }
 

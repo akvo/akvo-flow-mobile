@@ -53,17 +53,11 @@ public class ConstantUtil {
     public static final String VIDEO_QUESTION_TYPE = "video";
     public static final String PHOTO_QUESTION_TYPE = "photo";
     public static final String SCAN_QUESTION_TYPE = "scan";
-    public static final String STRENGTH_QUESTION_TYPE = "strength";
     public static final String DATE_QUESTION_TYPE = "date";
     public static final String CASCADE_QUESTION_TYPE = "cascade";
     public static final String GEOSHAPE_QUESTION_TYPE = "geoshape";
     public static final String SIGNATURE_QUESTION_TYPE = "signature";
     public static final String CADDISFLY_QUESTION_TYPE = "caddisfly";
-
-    /**
-     * help types
-     */
-    public static final String TIP_HELP_TYPE = "tip";
 
     /**
      * response types

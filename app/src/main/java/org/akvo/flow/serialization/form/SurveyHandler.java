@@ -19,26 +19,24 @@
 
 package org.akvo.flow.serialization.form;
 
-import org.akvo.flow.domain.AltText;
-import org.akvo.flow.domain.Dependency;
-import org.akvo.flow.domain.Level;
-import org.akvo.flow.domain.Option;
-import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionGroup;
-import org.akvo.flow.domain.QuestionHelp;
 import org.akvo.flow.domain.Survey;
 import org.akvo.flow.domain.SurveyGroup;
-import org.akvo.flow.domain.ValidationRule;
+import org.akvo.flow.utils.entity.ValidationRule;
 import org.akvo.flow.util.ConstantUtil;
-import org.akvo.flow.util.StringUtil;
+import org.akvo.flow.utils.entity.AltText;
+import org.akvo.flow.utils.entity.Dependency;
+import org.akvo.flow.utils.entity.Level;
+import org.akvo.flow.utils.entity.Option;
+import org.akvo.flow.utils.entity.Question;
+import org.akvo.flow.utils.entity.QuestionHelp;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-
-import timber.log.Timber;
 
 /**
  * Handler for sax-based xml parser for Survey files
@@ -60,7 +58,6 @@ public class SurveyHandler extends DefaultHandler {
     private static final String ANSWER = "answer-value";
     private static final String TEXT = "text";
     private static final String OPTION = "option";
-    private static final String VALUE = "value";
     private static final String CODE = "code";
     private static final String OPTIONS = "options";
     private static final String ALLOW_OTHER = "allowOther";
@@ -77,13 +74,10 @@ public class SurveyHandler extends DefaultHandler {
     private static final String LANG = "language";
     private static final String LOCKED = "locked";
     private static final String HELP = "help";
-    private static final String STRENGTH_MIN = "strengthMin";
-    private static final String STRENGTH_MAX = "strengthMax";
     private static final String NAME = "name";
     private static final String VERSION = "version";
     private static final String LOCALE_NAME = "localeNameFlag";
     private static final String LOCALE_LOCATION = "localeLocationFlag";
-    private static final String SOURCE_QUESTION_ID = "sourceId";
     private static final String SOURCE_SURVEY_ID = "sourceSurveyId";
     private static final String DOUBLE_ENTRY = "requireDoubleEntry";
     private static final String REPEATABLE = "repeatable";
@@ -161,10 +155,7 @@ public class SurveyHandler extends DefaultHandler {
                 currentValidation = null;
             } else if (localName.equalsIgnoreCase(HELP)) {
                 if (currentHelp.isValid()) {
-                    if (StringUtil.isNullOrEmpty(currentHelp.getType())) {
-                        currentHelp.setType(ConstantUtil.TIP_HELP_TYPE);
-                    }
-                    currentQuestion.addQuestionHelp(currentHelp);
+                    currentQuestion.getQuestionHelp().add(currentHelp);
                 }
                 currentHelp = null;
             }
@@ -309,10 +300,10 @@ public class SurveyHandler extends DefaultHandler {
             
             // Double Entry flag
             if (attributes.getValue(DOUBLE_ENTRY) != null) {
-                currentQuestion.setIsDoubleEntry(Boolean.parseBoolean(attributes
+                currentQuestion.setDoubleEntry(Boolean.parseBoolean(attributes
                         .getValue(DOUBLE_ENTRY)));
             } else {
-                currentQuestion.setIsDoubleEntry(false);
+                currentQuestion.setDoubleEntry(false);
             }
 
             // 'allowMultiple' flag can be found at the <question> and <options> scopes. In option
@@ -320,52 +311,26 @@ public class SurveyHandler extends DefaultHandler {
             currentQuestion.setAllowMultiple(Boolean.parseBoolean(attributes.getValue(ALLOW_MULT)));
 
             currentQuestion.setType(attributes.getValue(TYPE));
-            currentQuestion.setId(attributes.getValue(ID));
+            currentQuestion.setQuestionId(attributes.getValue(ID));
             //This validation no longer exists
             String validation = attributes.getValue(VALIDATION_TYPE);
             if (validation != null && validation.trim().length() > 0) {
                 currentQuestion
                         .setValidationRule(new ValidationRule(validation));
             }
-            //strength no longer exists
-            if (attributes.getValue(STRENGTH_MAX) != null
-                    && currentQuestion.getType().equalsIgnoreCase(
-                            ConstantUtil.STRENGTH_QUESTION_TYPE)) {
-                currentQuestion.setUseStrength(true);
-                try {
-                    currentQuestion.setStrengthMax(Integer.parseInt(attributes
-                            .getValue(STRENGTH_MAX).trim()));
-                    if (attributes.getValue(STRENGTH_MIN) != null) {
-                        currentQuestion.setStrengthMin(Integer
-                                .parseInt(attributes.getValue(STRENGTH_MIN)
-                                        .trim()));
-                    } else {
-                        currentQuestion.setStrengthMin(0);
-                    }
-                } catch (NumberFormatException e) {
-                    currentQuestion.setUseStrength(false);
-                    currentQuestion.setType(ConstantUtil.OPTION_QUESTION_TYPE);
-                    Timber.e(e, "Could not parse strength values");
-                }
-            } else {
-                currentQuestion.setUseStrength(false);
-            }
-            
+
             // Locale Flags
             if (attributes.getValue(LOCALE_NAME) != null) {
-                currentQuestion.setIsLocaleName(Boolean.parseBoolean(attributes
+                currentQuestion.setLocaleName(Boolean.parseBoolean(attributes
                         .getValue(LOCALE_NAME)));
             }
             if (attributes.getValue(LOCALE_LOCATION) != null) {
-                currentQuestion.setIsLocaleLocation(Boolean.parseBoolean(attributes
+                currentQuestion.setLocaleLocation(Boolean.parseBoolean(attributes
                         .getValue(LOCALE_LOCATION)));
-            }
-            if (attributes.getValue(SOURCE_QUESTION_ID) != null) {
-                currentQuestion.setSourceQuestionId(attributes.getValue(SOURCE_QUESTION_ID));
             }
 
             // Question src. Added in cascading question implementation.
-            currentQuestion.setSrc(attributes.getValue(CASCADE_RESOURCE));
+            currentQuestion.setCascadeResource(attributes.getValue(CASCADE_RESOURCE));
 
             currentQuestion.setCaddisflyRes(attributes.getValue(CADDISFLY_RESOURCE));
 
@@ -391,18 +356,15 @@ public class SurveyHandler extends DefaultHandler {
                 }
             }
         } else if (localName.equalsIgnoreCase(OPTION)) {
-            currentOption = new Option();
-            currentOption.setCode(attributes.getValue(CODE));
+            currentOption = new Option(null, attributes.getValue(CODE), false, new HashMap<>());
         } else if (localName.equalsIgnoreCase(LEVELS)) {
             currentLevels = new ArrayList<>();
         } else if (localName.equalsIgnoreCase(LEVEL)) {
             currentLevel = new Level();
         } else if (localName.equalsIgnoreCase(DEPENDENCY)) {
-            Dependency currentDependency = new Dependency();
-            currentDependency.setQuestion(attributes.getValue(QUESTION));
-            currentDependency.setAnswer(attributes.getValue(ANSWER));
+            Dependency currentDependency = new Dependency(attributes.getValue(QUESTION), attributes.getValue(ANSWER));
             if (currentQuestion != null) {
-                currentQuestion.addDependency(currentDependency);
+                currentQuestion.getDependencies().add(currentDependency);
             }
         } else if (localName.equalsIgnoreCase(VALIDATION_RULE)) {
             currentValidation = new ValidationRule(
@@ -413,13 +375,9 @@ public class SurveyHandler extends DefaultHandler {
             currentValidation.setMinVal(attributes.getValue(MIN_VAL));
             currentValidation.setMaxVal(attributes.getValue(MAX_VAL));
         } else if (localName.equalsIgnoreCase(ALT_TEXT)) {
-            currentAltText = new AltText();
-            currentAltText.setLanguage(attributes.getValue(LANG));
-            currentAltText.setType(attributes.getValue(TYPE));
+            currentAltText = new AltText(attributes.getValue(LANG), attributes.getValue(TYPE), null);
         } else if (localName.equalsIgnoreCase(HELP)) {
             currentHelp = new QuestionHelp();
-            currentHelp.setType(attributes.getValue(TYPE));
-            currentHelp.setValue(attributes.getValue(VALUE));
         }
     }
 }

@@ -20,10 +20,10 @@ package org.akvo.flow.utils.entity
 
 import java.util.HashMap
 
-data class Option(
+data class Option @JvmOverloads constructor(
     var text: String? = null,
     var code: String?,
-    val isOther: Boolean = false,
+    var isOther: Boolean = false,
     val altTextMap: HashMap<String?, AltText> = HashMap<String?, AltText>()
 ) {
 

@@ -21,16 +21,17 @@
 package org.akvo.flow.ui.view.option;
 
 import android.content.Context;
-import androidx.annotation.Nullable;
 import android.view.View;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
+import androidx.annotation.Nullable;
+
 import org.akvo.flow.R;
-import org.akvo.flow.domain.Option;
-import org.akvo.flow.domain.Question;
 import org.akvo.flow.event.SurveyListener;
+import org.akvo.flow.utils.entity.Option;
+import org.akvo.flow.utils.entity.Question;
 
 import java.util.ArrayList;
 import java.util.List;

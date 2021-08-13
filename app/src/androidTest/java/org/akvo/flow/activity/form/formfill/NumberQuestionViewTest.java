@@ -28,7 +28,6 @@ import org.akvo.flow.activity.FormActivity;
 import org.akvo.flow.activity.form.data.SurveyInstaller;
 import org.akvo.flow.activity.form.data.SurveyRequisite;
 import org.akvo.flow.domain.Survey;
-import org.akvo.flow.domain.ValidationRule;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;

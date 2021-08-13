@@ -20,58 +20,6 @@
 
 package org.akvo.flow.activity.form.submittedformsview;
 
-import android.Manifest;
-import android.content.Context;
-import android.content.Intent;
-import android.text.TextUtils;
-
-import androidx.core.util.Pair;
-import androidx.test.espresso.ViewInteraction;
-import androidx.test.ext.junit.runners.AndroidJUnit4;
-import androidx.test.filters.LargeTest;
-import androidx.test.platform.app.InstrumentationRegistry;
-import androidx.test.rule.ActivityTestRule;
-import androidx.test.rule.GrantPermissionRule;
-
-import com.google.gson.Gson;
-
-import org.akvo.flow.R;
-import org.akvo.flow.activity.FormActivity;
-import org.akvo.flow.activity.form.data.SurveyInstaller;
-import org.akvo.flow.activity.form.data.SurveyRequisite;
-import org.akvo.flow.domain.Level;
-import org.akvo.flow.domain.Option;
-import org.akvo.flow.domain.Question;
-import org.akvo.flow.domain.QuestionGroup;
-import org.akvo.flow.domain.QuestionResponse;
-import org.akvo.flow.domain.Survey;
-import org.akvo.flow.domain.response.value.CascadeNode;
-import org.akvo.flow.domain.response.value.Signature;
-import org.akvo.flow.serialization.response.value.CascadeValue;
-import org.akvo.flow.serialization.response.value.OptionValue;
-import org.akvo.flow.serialization.response.value.SignatureValue;
-import org.akvo.flow.ui.model.caddisfly.CaddisflyJsonMapper;
-import org.akvo.flow.ui.model.caddisfly.CaddisflyTestResult;
-import org.akvo.flow.ui.view.CaddisflyQuestionView;
-import org.akvo.flow.ui.view.GeoshapeQuestionView;
-import org.akvo.flow.ui.view.QuestionView;
-import org.akvo.flow.ui.view.barcode.BarcodeQuestionViewReadOnly;
-import org.akvo.flow.ui.view.geolocation.GeoQuestionView;
-import org.akvo.flow.ui.view.signature.SignatureQuestionView;
-import org.akvo.flow.util.ConstantUtil;
-import org.junit.AfterClass;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.TimeZone;
-
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.scrollTo;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
@@ -107,6 +55,58 @@ import static org.akvo.flow.tests.R.raw.data;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.core.IsNot.not;
+
+import android.Manifest;
+import android.content.Context;
+import android.content.Intent;
+import android.text.TextUtils;
+
+import androidx.core.util.Pair;
+import androidx.test.espresso.ViewInteraction;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
+import androidx.test.filters.LargeTest;
+import androidx.test.platform.app.InstrumentationRegistry;
+import androidx.test.rule.ActivityTestRule;
+import androidx.test.rule.GrantPermissionRule;
+
+import com.google.gson.Gson;
+
+import org.akvo.flow.R;
+import org.akvo.flow.activity.FormActivity;
+import org.akvo.flow.activity.form.data.SurveyInstaller;
+import org.akvo.flow.activity.form.data.SurveyRequisite;
+import org.akvo.flow.domain.QuestionGroup;
+import org.akvo.flow.domain.QuestionResponse;
+import org.akvo.flow.domain.Survey;
+import org.akvo.flow.domain.response.value.CascadeNode;
+import org.akvo.flow.domain.response.value.Signature;
+import org.akvo.flow.serialization.response.value.CascadeValue;
+import org.akvo.flow.serialization.response.value.SignatureValue;
+import org.akvo.flow.ui.model.caddisfly.CaddisflyJsonMapper;
+import org.akvo.flow.ui.model.caddisfly.CaddisflyTestResult;
+import org.akvo.flow.ui.view.CaddisflyQuestionView;
+import org.akvo.flow.ui.view.GeoshapeQuestionView;
+import org.akvo.flow.ui.view.QuestionView;
+import org.akvo.flow.ui.view.barcode.BarcodeQuestionViewReadOnly;
+import org.akvo.flow.ui.view.geolocation.GeoQuestionView;
+import org.akvo.flow.ui.view.signature.SignatureQuestionView;
+import org.akvo.flow.util.ConstantUtil;
+import org.akvo.flow.utils.entity.Level;
+import org.akvo.flow.utils.entity.Option;
+import org.akvo.flow.utils.entity.OptionValue;
+import org.akvo.flow.utils.entity.Question;
+import org.junit.AfterClass;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.TimeZone;
 
 @LargeTest
 @RunWith(AndroidJUnit4.class)

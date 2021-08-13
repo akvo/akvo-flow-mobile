@@ -20,6 +20,8 @@
 
 package org.akvo.flow.activity;
 
+import static org.akvo.flow.util.ViewUtil.showConfirmDialog;
+
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
@@ -66,14 +68,14 @@ import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
 import org.akvo.flow.presentation.form.FormPresenter;
 import org.akvo.flow.presentation.form.FormView;
+import org.akvo.flow.presentation.form.languages.Language;
+import org.akvo.flow.presentation.form.languages.LanguageMapper;
 import org.akvo.flow.presentation.form.mobiledata.MobileDataSettingDialog;
 import org.akvo.flow.service.DataPointUploadWorker;
 import org.akvo.flow.tracking.TrackingHelper;
 import org.akvo.flow.ui.Navigator;
 import org.akvo.flow.ui.adapter.LanguageAdapter;
 import org.akvo.flow.ui.adapter.SurveyTabAdapter;
-import org.akvo.flow.presentation.form.languages.Language;
-import org.akvo.flow.presentation.form.languages.LanguageMapper;
 import org.akvo.flow.ui.view.QuestionView;
 import org.akvo.flow.ui.view.geolocation.GeoFieldsResetConfirmDialogFragment;
 import org.akvo.flow.ui.view.geolocation.GeoQuestionView;
@@ -99,8 +101,6 @@ import java.util.Set;
 import javax.inject.Inject;
 
 import timber.log.Timber;
-
-import static org.akvo.flow.util.ViewUtil.showConfirmDialog;
 
 public class FormActivity extends BackActivity implements SurveyListener,
         QuestionInteractionListener, FormView,
@@ -849,17 +849,17 @@ public class FormActivity extends BackActivity implements SurveyListener,
     }
 
     private void navigateToSignatureActivity(QuestionInteractionEvent event) {
-        mRequestQuestionId = event.getSource().getQuestion().getId();
+        mRequestQuestionId = event.getSource().getQuestion().getQuestionId();
         navigator.navigateToSignatureActivity(this, event.getData());
     }
 
     private void navigateToGeoShapeActivity(QuestionInteractionEvent event) {
-        mRequestQuestionId = event.getSource().getQuestion().getId();
+        mRequestQuestionId = event.getSource().getQuestion().getQuestionId();
         navigator.navigateToCreateGeoShapeActivity(this, event.getData());
     }
 
     private void navigateToCaddisfly(QuestionInteractionEvent event) {
-        mRequestQuestionId = event.getSource().getQuestion().getId();
+        mRequestQuestionId = event.getSource().getQuestion().getQuestionId();
         navigator.navigateToCaddisfly(this, event.getData(), getString(R.string.caddisfly_test));
     }
 
@@ -872,7 +872,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
         } else if (formInstanceId == INVALID_INSTANCE_ID) {
             formInstanceId = mDatabase.createSurveyRespondent(form.getId(), form.getVersion(), user, dataPointId);
         }
-        String questionIdKey = event.getSource().getQuestion().getId();
+        String questionIdKey = event.getSource().getQuestion().getQuestionId();
         QuestionResponse eventResponse = event.getSource().getResponse();
 
         // Store the response if it contains a value. Otherwise, delete it
@@ -898,7 +898,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
     }
 
     private void clearQuestion(QuestionInteractionEvent event) {
-        String questionId = event.getSource().getQuestion().getId();
+        String questionId = event.getSource().getQuestion().getQuestionId();
         deleteResponse(questionId);
     }
 
@@ -909,7 +909,7 @@ public class FormActivity extends BackActivity implements SurveyListener,
 
     private void recordSourceId(QuestionInteractionEvent event) {
         if (event.getSource() != null) {
-            mRequestQuestionId = event.getSource().getQuestion().getId();
+            mRequestQuestionId = event.getSource().getQuestion().getQuestionId();
         } else {
             Timber.e("Question source was null in the event");
         }

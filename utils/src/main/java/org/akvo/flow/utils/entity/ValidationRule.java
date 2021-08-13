@@ -1,26 +1,23 @@
 /*
- *  Copyright (C) 2010-2012,2017 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2021 Stichting Akvo (Akvo Foundation)
  *
- *  This file is part of Akvo Flow.
+ * This file is part of Akvo Flow.
  *
- *  Akvo Flow is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
+ * Akvo Flow is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- *  Akvo Flow is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ * Akvo Flow is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License
+ * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.akvo.flow.domain;
-
-import org.akvo.flow.exception.ValidationException;
-import org.akvo.flow.util.ConstantUtil;
+package org.akvo.flow.utils.entity;
 
 /**
  * data structure defining what rules should be used to validate question
@@ -30,6 +27,7 @@ import org.akvo.flow.util.ConstantUtil;
  */
 public class ValidationRule {
     public static final int DEFAULT_MAX_LENGTH = 9999;
+    public static final String NUMERIC_VALIDATION_TYPE = "numeric";
 
     private String validationType;
     private Integer maxLength;
@@ -168,7 +166,7 @@ public class ValidationRule {
      * validation rules, a ValidationException is thrown
      */
     public String performValidation(String val) throws ValidationException {
-        if (val != null && ConstantUtil.NUMERIC_VALIDATION_TYPE.equalsIgnoreCase(validationType)) {
+        if (val != null && NUMERIC_VALIDATION_TYPE.equalsIgnoreCase(validationType)) {
                 Double numVal;
                 try {
                     numVal = Double.valueOf(val.trim());

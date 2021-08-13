@@ -36,7 +36,6 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import org.akvo.flow.R;
 import org.akvo.flow.activity.FormActivity;
-import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionResponse;
 import org.akvo.flow.domain.response.value.Location;
 import org.akvo.flow.domain.response.value.Media;
@@ -53,6 +52,7 @@ import org.akvo.flow.util.ImageUtil;
 import org.akvo.flow.util.StoragePermissionsHelper;
 import org.akvo.flow.util.image.GlideImageLoader;
 import org.akvo.flow.util.image.ImageLoader;
+import org.akvo.flow.utils.entity.Question;
 
 import java.io.File;
 

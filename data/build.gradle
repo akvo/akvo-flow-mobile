@@ -8,8 +8,6 @@ android {
     defaultConfig {
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        testApplicationId "org.akvo.flow.data.tests"
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
     packagingOptions {
@@ -87,15 +85,6 @@ dependencies {
     testImplementation "com.nhaarman.mockitokotlin2:mockito-kotlin:${rootProject.ext.mockitoKotlinVersion}"
     testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:${rootProject.ext.coroutinesVersion}"
     testImplementation "io.mockk:mockk:${rootProject.ext.mockkVersion}"
-
-    androidTestImplementation "androidx.test.ext:junit:${rootProject.ext.androidXJunit}"
-    androidTestImplementation "androidx.test:core:${rootProject.ext.androidXCore}"
-    androidTestImplementation "com.github.fabioCollini.daggermock:daggermock:${rootProject.ext.daggermockVersion}"
-    androidTestImplementation "com.github.fabioCollini.daggermock:daggermock-kotlin:${rootProject.ext.daggermockVersion}"
-    androidTestImplementation "com.google.dexmaker:dexmaker:${rootProject.ext.dexMakerVersion}"
-    androidTestImplementation "com.google.dexmaker:dexmaker-mockito:${rootProject.ext.dexMakerVersion}"
-    androidTestImplementation "androidx.test:rules:${rootProject.ext.rulesVersion}"
-    androidTestImplementation "androidx.test.espresso:espresso-core:${rootProject.ext.espressoVersion}"
 }
 
 repositories {

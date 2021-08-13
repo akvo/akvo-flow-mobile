@@ -17,7 +17,7 @@
  *  along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.akvo.flow.exception;
+package org.akvo.flow.utils.entity;
 
 /**
  * Exception to be thrown if data provided by the user is invalid

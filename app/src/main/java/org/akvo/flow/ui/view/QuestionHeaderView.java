@@ -23,8 +23,8 @@ import android.content.Context;
 import android.view.View;
 
 import org.akvo.flow.R;
-import org.akvo.flow.domain.Question;
 import org.akvo.flow.event.SurveyListener;
+import org.akvo.flow.utils.entity.Question;
 
 public class QuestionHeaderView extends QuestionView implements View.OnClickListener {
     private boolean mDisplayShortcut;
@@ -34,7 +34,7 @@ public class QuestionHeaderView extends QuestionView implements View.OnClickList
     }
 
     public QuestionHeaderView(Context context, Question q, SurveyListener surveyListener,
-            boolean displayShortcut) {
+                              boolean displayShortcut) {
         super(context, q, surveyListener);
         mDisplayShortcut = displayShortcut;
         init();
@@ -52,7 +52,7 @@ public class QuestionHeaderView extends QuestionView implements View.OnClickList
 
     @Override
     public void onClick(View v) {
-        mSurveyListener.openQuestion(getQuestion().getId());
+        mSurveyListener.openQuestion(getQuestion().getQuestionId());
     }
 
     @Override

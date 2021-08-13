@@ -20,48 +20,6 @@
 
 package org.akvo.flow.activity.form.formsview;
 
-import android.Manifest;
-import android.content.Context;
-import android.content.Intent;
-
-import androidx.test.espresso.DataInteraction;
-import androidx.test.espresso.ViewInteraction;
-import androidx.test.ext.junit.runners.AndroidJUnit4;
-import androidx.test.filters.LargeTest;
-import androidx.test.platform.app.InstrumentationRegistry;
-import androidx.test.rule.ActivityTestRule;
-import androidx.test.rule.GrantPermissionRule;
-
-import org.akvo.flow.R;
-import org.akvo.flow.activity.FormActivity;
-import org.akvo.flow.activity.form.data.SurveyInstaller;
-import org.akvo.flow.activity.form.data.SurveyRequisite;
-import org.akvo.flow.domain.Level;
-import org.akvo.flow.domain.Option;
-import org.akvo.flow.domain.Question;
-import org.akvo.flow.domain.QuestionGroup;
-import org.akvo.flow.domain.Survey;
-import org.akvo.flow.ui.view.CaddisflyQuestionView;
-import org.akvo.flow.ui.view.CascadeQuestionView;
-import org.akvo.flow.ui.view.GeoshapeQuestionView;
-import org.akvo.flow.ui.view.QuestionView;
-import org.akvo.flow.ui.view.SubmitTab;
-import org.akvo.flow.ui.view.barcode.BarcodeQuestionViewMultiple;
-import org.akvo.flow.ui.view.barcode.BarcodeQuestionViewSingle;
-import org.akvo.flow.ui.view.geolocation.GeoQuestionView;
-import org.akvo.flow.ui.view.signature.SignatureQuestionView;
-import org.akvo.flow.util.ConstantUtil;
-import org.hamcrest.Matcher;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import static androidx.test.espresso.Espresso.onData;
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
@@ -100,6 +58,48 @@ import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.core.AllOf.allOf;
 import static org.hamcrest.core.IsNot.not;
+
+import android.Manifest;
+import android.content.Context;
+import android.content.Intent;
+
+import androidx.test.espresso.DataInteraction;
+import androidx.test.espresso.ViewInteraction;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
+import androidx.test.filters.LargeTest;
+import androidx.test.platform.app.InstrumentationRegistry;
+import androidx.test.rule.ActivityTestRule;
+import androidx.test.rule.GrantPermissionRule;
+
+import org.akvo.flow.R;
+import org.akvo.flow.activity.FormActivity;
+import org.akvo.flow.activity.form.data.SurveyInstaller;
+import org.akvo.flow.activity.form.data.SurveyRequisite;
+import org.akvo.flow.domain.QuestionGroup;
+import org.akvo.flow.domain.Survey;
+import org.akvo.flow.ui.view.CaddisflyQuestionView;
+import org.akvo.flow.ui.view.CascadeQuestionView;
+import org.akvo.flow.ui.view.GeoshapeQuestionView;
+import org.akvo.flow.ui.view.QuestionView;
+import org.akvo.flow.ui.view.SubmitTab;
+import org.akvo.flow.ui.view.barcode.BarcodeQuestionViewMultiple;
+import org.akvo.flow.ui.view.barcode.BarcodeQuestionViewSingle;
+import org.akvo.flow.ui.view.geolocation.GeoQuestionView;
+import org.akvo.flow.ui.view.signature.SignatureQuestionView;
+import org.akvo.flow.util.ConstantUtil;
+import org.akvo.flow.utils.entity.Level;
+import org.akvo.flow.utils.entity.Option;
+import org.akvo.flow.utils.entity.Question;
+import org.hamcrest.Matcher;
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @LargeTest
 @RunWith(AndroidJUnit4.class)

@@ -38,17 +38,16 @@ import androidx.annotation.Nullable;
 
 import org.akvo.flow.R;
 import org.akvo.flow.app.FlowApp;
-import org.akvo.flow.domain.AltText;
-import org.akvo.flow.domain.Dependency;
-import org.akvo.flow.domain.Question;
-import org.akvo.flow.domain.QuestionHelp;
 import org.akvo.flow.domain.QuestionResponse;
 import org.akvo.flow.event.QuestionInteractionEvent;
 import org.akvo.flow.event.QuestionInteractionListener;
 import org.akvo.flow.event.SurveyListener;
 import org.akvo.flow.injector.component.ApplicationComponent;
-import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.ViewUtil;
+import org.akvo.flow.utils.entity.AltText;
+import org.akvo.flow.utils.entity.Dependency;
+import org.akvo.flow.utils.entity.Question;
+import org.akvo.flow.utils.entity.QuestionHelp;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -85,7 +84,7 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
             sColors = context.getResources().getStringArray(R.array.colors);
         }
         mQuestion = q;
-        setTag(q.getId());
+        setTag(q.getQuestionId());
         mSurveyListener = surveyListener;
         mError = null;
     }
@@ -141,13 +140,13 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
 
     private void displayTip() {
         // if there is a tip for this question, construct an alert dialog box with the data
-        final int tips = mQuestion.getHelpTypeCount();
+        final int tips = mQuestion.getQuestionHelp().size();
         if (tips > 0) {
             mTipImage.setVisibility(View.VISIBLE);
             mTipImage.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                        if (mQuestion.getHelpByType(ConstantUtil.TIP_HELP_TYPE).size() > 0) {
+                        if (mQuestion.getQuestionHelp().size() > 0) {
                             displayHelp();
                     }
                 }
@@ -195,7 +194,7 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
                 }
                 text.append(mQuestion.getText());
             } else {
-                AltText txt = mQuestion.getAltText(langs[i]);
+                AltText txt = mQuestion.getLanguageTranslationMap().get(langs[i]);
                 if (txt != null) {
                     if (!isFirst) {
                         text.append(" / ");
@@ -224,11 +223,11 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
     private void displayHelp() {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         StringBuilder textBuilder = new StringBuilder();
-        List<QuestionHelp> helpItems = mQuestion.getHelpByType(ConstantUtil.TIP_HELP_TYPE);
+        List<QuestionHelp> helpItems = mQuestion.getQuestionHelp();
         boolean isFirst = true;
         String[] langs = getLanguages();
         String language = getDefaultLang();
-        if (helpItems != null) {
+        if (helpItems.size() > 0) {
             for (int i = 0; i < helpItems.size(); i++) {
                 if (i > 0) {
                     textBuilder.append("<br>");
@@ -346,7 +345,7 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
                 for (int i = 0; i < dependencies.size(); i++) {
                     Dependency d = dependencies.get(i);
                     if (d.getQuestion().equalsIgnoreCase(
-                            event.getSource().getQuestion().getId())) {
+                            event.getSource().getQuestion().getQuestionId())) {
                         if (handleDependencyParentResponse(d, event.getSource().getResponse())) {
                             break;
                         }

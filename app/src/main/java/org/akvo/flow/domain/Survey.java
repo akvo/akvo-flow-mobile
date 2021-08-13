@@ -22,6 +22,8 @@ package org.akvo.flow.domain;
 import android.text.TextUtils;
 
 import org.akvo.flow.util.ConstantUtil;
+import org.akvo.flow.utils.entity.AltText;
+import org.akvo.flow.utils.entity.Question;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -229,9 +231,7 @@ public class Survey {
                     for (Question question : questions) {
                         Map<String, AltText> questionAltTextMap = question
                                 .getLanguageTranslationMap();
-                        if (questionAltTextMap != null) {
-                            languageCodes.addAll(questionAltTextMap.keySet());
-                        }
+                        languageCodes.addAll(questionAltTextMap.keySet());
                     }
                 }
             }

@@ -34,9 +34,7 @@ import com.google.android.material.textfield.TextInputLayout;
 
 import org.akvo.flow.R;
 import org.akvo.flow.data.database.cascade.CascadeDB;
-import org.akvo.flow.domain.Level;
 import org.akvo.flow.domain.Node;
-import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionResponse;
 import org.akvo.flow.domain.response.value.CascadeNode;
 import org.akvo.flow.event.SurveyListener;
@@ -45,6 +43,8 @@ import org.akvo.flow.injector.component.ViewComponent;
 import org.akvo.flow.serialization.response.value.CascadeValue;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.files.FormResourcesFileBrowser;
+import org.akvo.flow.utils.entity.Level;
+import org.akvo.flow.utils.entity.Question;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -89,7 +89,7 @@ public class CascadeQuestionView extends QuestionView {
         }
 
         // Construct local filename (src refers to remote location of the resource)
-        String src = getQuestion().getSrc();
+        String src = getQuestion().getCascadeResource();
         if (!TextUtils.isEmpty(src)) {
             File db = resourcesFileUtil.findFile(getContext().getApplicationContext(), src);
             if (db.exists()) {
@@ -291,7 +291,7 @@ public class CascadeQuestionView extends QuestionView {
         }
         if (mDatabase == null) {
             String error = getContext()
-                    .getString(R.string.cascade_error_message, getQuestion().getSrc());
+                    .getString(R.string.cascade_error_message, getQuestion().getCascadeResource());
             Timber.e(new IllegalStateException(error));
             setError(error);
         }

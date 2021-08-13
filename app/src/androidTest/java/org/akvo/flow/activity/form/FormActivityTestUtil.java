@@ -20,38 +20,6 @@
 
 package org.akvo.flow.activity.form;
 
-import android.content.Context;
-import android.content.Intent;
-import android.view.View;
-import android.widget.EditText;
-import android.widget.RadioGroup;
-
-import org.akvo.flow.R;
-import org.akvo.flow.activity.Constants;
-import org.akvo.flow.activity.FormActivity;
-import org.akvo.flow.domain.Level;
-import org.akvo.flow.domain.Option;
-import org.akvo.flow.domain.Question;
-import org.akvo.flow.domain.QuestionGroup;
-import org.akvo.flow.domain.SurveyGroup;
-import org.akvo.flow.ui.view.DateQuestionView;
-import org.akvo.flow.ui.view.FreetextQuestionView;
-import org.akvo.flow.ui.view.QuestionView;
-import org.akvo.flow.ui.view.geolocation.GeoQuestionView;
-import org.akvo.flow.util.ConstantUtil;
-import org.hamcrest.Description;
-import org.hamcrest.Matcher;
-import org.hamcrest.core.AllOf;
-import org.hamcrest.core.IsInstanceOf;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.StringRes;
-import androidx.test.platform.app.InstrumentationRegistry;
-import androidx.test.espresso.Espresso;
-import androidx.test.espresso.ViewInteraction;
-import androidx.test.espresso.matcher.BoundedMatcher;
-import androidx.test.rule.ActivityTestRule;
-
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.action.ViewActions.scrollTo;
@@ -73,6 +41,38 @@ import static org.akvo.flow.activity.ToolBarTitleSubtitleMatcher.withToolbarTitl
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.not;
+
+import android.content.Context;
+import android.content.Intent;
+import android.view.View;
+import android.widget.EditText;
+import android.widget.RadioGroup;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.StringRes;
+import androidx.test.espresso.Espresso;
+import androidx.test.espresso.ViewInteraction;
+import androidx.test.espresso.matcher.BoundedMatcher;
+import androidx.test.platform.app.InstrumentationRegistry;
+import androidx.test.rule.ActivityTestRule;
+
+import org.akvo.flow.R;
+import org.akvo.flow.activity.Constants;
+import org.akvo.flow.activity.FormActivity;
+import org.akvo.flow.domain.QuestionGroup;
+import org.akvo.flow.domain.SurveyGroup;
+import org.akvo.flow.ui.view.DateQuestionView;
+import org.akvo.flow.ui.view.FreetextQuestionView;
+import org.akvo.flow.ui.view.QuestionView;
+import org.akvo.flow.ui.view.geolocation.GeoQuestionView;
+import org.akvo.flow.util.ConstantUtil;
+import org.akvo.flow.utils.entity.Level;
+import org.akvo.flow.utils.entity.Option;
+import org.akvo.flow.utils.entity.Question;
+import org.hamcrest.Description;
+import org.hamcrest.Matcher;
+import org.hamcrest.core.AllOf;
+import org.hamcrest.core.IsInstanceOf;
 
 public class FormActivityTestUtil {
 
@@ -167,7 +167,7 @@ public class FormActivityTestUtil {
     }
 
     public static void verifyHelpTip(Question question) {
-        if (question.getHelpTypeCount() > 0) {
+        if (question.getQuestionHelp().size() > 0) {
             ViewInteraction questionHelpTip = onView(
                     allOf(withId(R.id.tip_ib),
                             withQuestionViewParent(question, QuestionView.class)));
@@ -180,7 +180,7 @@ public class FormActivityTestUtil {
     @NonNull
     public static <T extends View> Matcher<View> withQuestionViewParent(Question question,
             Class<T> parentClass) {
-        return withQuestionViewParent(parentClass, question.getId());
+        return withQuestionViewParent(parentClass, question.getQuestionId());
     }
 
     public static <T extends View> Matcher<View> withQuestionViewParent(Class<T> parentClass,

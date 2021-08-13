@@ -19,6 +19,8 @@
 
 package org.akvo.flow.domain;
 
+import org.akvo.flow.utils.entity.Question;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -74,7 +76,7 @@ public class QuestionGroup {
         if (questions != null) {
             for (Question q : questions) {
                 if (q.isLocaleName()) {
-                    localeNameQuestions.add(q.getId());
+                    localeNameQuestions.add(q.getQuestionId());
                 }
             }
         }
@@ -86,7 +88,7 @@ public class QuestionGroup {
         if (questions != null) {
             for (Question q : questions) {
                 if (q.isLocaleLocation()) {
-                    return q.getId();
+                    return q.getQuestionId();
                 }
             }
         }

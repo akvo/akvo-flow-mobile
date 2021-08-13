@@ -27,7 +27,6 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 
 import org.akvo.flow.R;
-import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionResponse;
 import org.akvo.flow.event.QuestionInteractionEvent;
 import org.akvo.flow.event.SurveyListener;
@@ -35,6 +34,7 @@ import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
 import org.akvo.flow.ui.Navigator;
 import org.akvo.flow.util.ConstantUtil;
+import org.akvo.flow.utils.entity.Question;
 
 import javax.inject.Inject;
 

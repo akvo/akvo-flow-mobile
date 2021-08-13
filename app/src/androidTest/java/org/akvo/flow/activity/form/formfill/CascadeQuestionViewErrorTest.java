@@ -20,18 +20,29 @@
 
 package org.akvo.flow.activity.form.formfill;
 
+import static androidx.test.espresso.Espresso.onView;
+import static androidx.test.espresso.assertion.ViewAssertions.matches;
+import static androidx.test.espresso.matcher.ViewMatchers.withId;
+import static org.akvo.flow.activity.form.FormActivityTestUtil.getFormActivityIntent;
+import static org.akvo.flow.tests.R.raw.cascade_error_form;
+
 import android.content.Context;
 import android.content.Intent;
 import android.view.View;
 import android.widget.TextView;
 
+import androidx.test.ext.junit.runners.AndroidJUnit4;
+import androidx.test.filters.MediumTest;
+import androidx.test.platform.app.InstrumentationRegistry;
+import androidx.test.rule.ActivityTestRule;
+
 import org.akvo.flow.R;
 import org.akvo.flow.activity.FormActivity;
 import org.akvo.flow.activity.form.data.SurveyInstaller;
 import org.akvo.flow.activity.form.data.SurveyRequisite;
-import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionGroup;
 import org.akvo.flow.domain.Survey;
+import org.akvo.flow.utils.entity.Question;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
@@ -43,17 +54,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.util.List;
-
-import androidx.test.platform.app.InstrumentationRegistry;
-import androidx.test.filters.MediumTest;
-import androidx.test.rule.ActivityTestRule;
-import androidx.test.ext.junit.runners.AndroidJUnit4;
-
-import static androidx.test.espresso.Espresso.onView;
-import static androidx.test.espresso.assertion.ViewAssertions.matches;
-import static androidx.test.espresso.matcher.ViewMatchers.withId;
-import static org.akvo.flow.activity.form.FormActivityTestUtil.getFormActivityIntent;
-import static org.akvo.flow.tests.R.raw.cascade_error_form;
 
 @MediumTest
 @RunWith(AndroidJUnit4.class)
@@ -97,7 +97,7 @@ public class CascadeQuestionViewErrorTest {
 
         onView(withId(R.id.question_tv)).check(matches(withError(
                 InstrumentationRegistry.getInstrumentation().getTargetContext()
-                        .getString(R.string.cascade_error_message, question.getSrc()))));
+                        .getString(R.string.cascade_error_message, question.getCascadeResource()))));
     }
 
     private static Matcher<View> withError(final String expected) {

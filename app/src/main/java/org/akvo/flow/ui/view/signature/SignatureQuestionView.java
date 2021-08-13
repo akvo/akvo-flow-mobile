@@ -20,6 +20,8 @@
 
 package org.akvo.flow.ui.view.signature;
 
+import static org.akvo.flow.util.files.SignatureFileBrowser.RESIZED_SUFFIX;
+
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
@@ -29,8 +31,9 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.appcompat.app.AppCompatActivity;
+
 import org.akvo.flow.R;
-import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionResponse;
 import org.akvo.flow.domain.response.value.Signature;
 import org.akvo.flow.domain.util.ImageSize;
@@ -45,14 +48,11 @@ import org.akvo.flow.util.ImageUtil;
 import org.akvo.flow.util.files.SignatureFileBrowser;
 import org.akvo.flow.util.image.GlideImageLoader;
 import org.akvo.flow.util.image.ImageLoader;
+import org.akvo.flow.utils.entity.Question;
 
 import java.io.File;
 
 import javax.inject.Inject;
-
-import androidx.appcompat.app.AppCompatActivity;
-
-import static org.akvo.flow.util.files.SignatureFileBrowser.RESIZED_SUFFIX;
 
 public class SignatureQuestionView extends QuestionView {
 
@@ -90,7 +90,7 @@ public class SignatureQuestionView extends QuestionView {
                 String name = mSignature.getName();
                 Bundle data = new Bundle();
                 data.putString(ConstantUtil.SIGNATURE_NAME_EXTRA, name);
-                data.putString(ConstantUtil.SIGNATURE_QUESTION_ID_EXTRA, mQuestion.getId());
+                data.putString(ConstantUtil.SIGNATURE_QUESTION_ID_EXTRA, mQuestion.getQuestionId());
                 data.putString(ConstantUtil.SIGNATURE_DATAPOINT_ID_EXTRA,
                         mSurveyListener.getDataPointId());
                 notifyQuestionListeners(QuestionInteractionEvent.ADD_SIGNATURE_EVENT, data);
@@ -112,7 +112,7 @@ public class SignatureQuestionView extends QuestionView {
             mSignature.setName(name);
             setUpName(name);
             File imageFile = signatureFileBrowser
-                    .getSignatureImageFile(RESIZED_SUFFIX, mQuestion.getId(),
+                    .getSignatureImageFile(RESIZED_SUFFIX, mQuestion.getQuestionId(),
                             mSurveyListener.getDataPointId());
             imageLoader.loadFromFile(mImage, imageFile,
                     bitmap -> ((AppCompatActivity) getContext()).runOnUiThread(() -> {

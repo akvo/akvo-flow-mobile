@@ -33,7 +33,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import org.akvo.flow.BuildConfig;
 import org.akvo.flow.R;
 import org.akvo.flow.activity.FormActivity;
-import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionResponse;
 import org.akvo.flow.event.QuestionInteractionEvent;
 import org.akvo.flow.event.SurveyListener;
@@ -48,6 +47,7 @@ import org.akvo.flow.ui.model.caddisfly.CaddisflyTestResult;
 import org.akvo.flow.uicomponents.SnackBarManager;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.StoragePermissionsHelper;
+import org.akvo.flow.utils.entity.Question;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -211,7 +211,7 @@ public class CaddisflyQuestionView extends QuestionView implements View.OnClickL
         Question q = getQuestion();
         Bundle data = new Bundle();
         data.putString(ConstantUtil.CADDISFLY_RESOURCE_ID, q.getCaddisflyRes());
-        data.putString(ConstantUtil.CADDISFLY_QUESTION_ID, q.getId());
+        data.putString(ConstantUtil.CADDISFLY_QUESTION_ID, q.getQuestionId());
         data.putString(ConstantUtil.CADDISFLY_QUESTION_TITLE, q.getText());
         data.putString(ConstantUtil.CADDISFLY_DATAPOINT_ID, mSurveyListener.getDataPointId());
         data.putString(ConstantUtil.CADDISFLY_FORM_ID, mSurveyListener.getFormId());

@@ -20,7 +20,6 @@
 package org.akvo.flow.ui.view;
 
 import android.content.Context;
-import androidx.annotation.Nullable;
 import android.text.Editable;
 import android.text.InputFilter;
 import android.text.InputType;
@@ -32,13 +31,15 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
+import androidx.annotation.Nullable;
+
 import org.akvo.flow.R;
-import org.akvo.flow.domain.Question;
 import org.akvo.flow.domain.QuestionResponse;
-import org.akvo.flow.domain.ValidationRule;
 import org.akvo.flow.event.SurveyListener;
-import org.akvo.flow.exception.ValidationException;
 import org.akvo.flow.util.ConstantUtil;
+import org.akvo.flow.utils.entity.Question;
+import org.akvo.flow.utils.entity.ValidationException;
+import org.akvo.flow.utils.entity.ValidationRule;
 
 /**
  * Question that supports free-text input via the keyboard

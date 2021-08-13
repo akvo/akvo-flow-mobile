@@ -81,8 +81,8 @@ public class CaddisflyQuestionView extends QuestionView implements View.OnClickL
     private CaddisflyResultsAdapter caddisflyResultsAdapter;
     private List<CaddisflyTestResult> caddisflyTestResults = new ArrayList<>();
 
-    public CaddisflyQuestionView(Context context, Question q, SurveyListener surveyListener) {
-        super(context, q, surveyListener);
+    public CaddisflyQuestionView(Context context, Question q, SurveyListener surveyListener, int repetition) {
+        super(context, q, surveyListener, repetition);
         init();
     }
 
@@ -119,7 +119,7 @@ public class CaddisflyQuestionView extends QuestionView implements View.OnClickL
                 .setValue(mValue)
                 .setType(ConstantUtil.CADDISFLY_RESPONSE_TYPE)
                 .setQuestionId(question.getQuestionId())
-                .setIteration(question.getIteration())
+                .setIteration(repetition)
                 .setFilename(mImage)
                 .createQuestionResponse();
         setResponse(r);

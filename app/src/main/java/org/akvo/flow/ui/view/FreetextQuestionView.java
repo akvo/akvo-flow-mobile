@@ -52,8 +52,8 @@ public class FreetextQuestionView extends QuestionView {
 
     private boolean mCaptureResponse;
 
-    public FreetextQuestionView(Context context, Question q, SurveyListener surveyListener) {
-        super(context, q, surveyListener);
+    public FreetextQuestionView(Context context, Question q, SurveyListener surveyListener, int repetition) {
+        super(context, q, surveyListener, repetition);
         init();
     }
 

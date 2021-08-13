@@ -42,8 +42,8 @@ public class OptionQuestionViewMultiple extends OptionQuestionView {
     private List<CheckBox> mCheckBoxes;
 
     public OptionQuestionViewMultiple(Context context, Question q,
-            SurveyListener surveyListener) {
-        super(context, q, surveyListener);
+            SurveyListener surveyListener, int repetition) {
+        super(context, q, surveyListener, repetition);
     }
 
     @Override

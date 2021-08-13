@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2018 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2010-2018,2021 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo Flow.
  *
@@ -27,15 +27,16 @@ import org.akvo.flow.event.SurveyListener;
 import org.akvo.flow.utils.entity.Question;
 
 public class QuestionHeaderView extends QuestionView implements View.OnClickListener {
-    private boolean mDisplayShortcut;
 
-    public QuestionHeaderView(Context context, Question q, SurveyListener surveyListener) {
-        this(context, q, surveyListener, false);
+    private final boolean mDisplayShortcut;
+
+    public QuestionHeaderView(Context context, Question q, SurveyListener surveyListener, int repetition) {
+        this(context, q, surveyListener, false, repetition);
     }
 
     public QuestionHeaderView(Context context, Question q, SurveyListener surveyListener,
-                              boolean displayShortcut) {
-        super(context, q, surveyListener);
+                              boolean displayShortcut, int repetition) {
+        super(context, q, surveyListener, repetition);
         mDisplayShortcut = displayShortcut;
         init();
     }
@@ -57,5 +58,6 @@ public class QuestionHeaderView extends QuestionView implements View.OnClickList
 
     @Override
     public void captureResponse(boolean suppressListeners) {
+        //EMPTY
     }
 }

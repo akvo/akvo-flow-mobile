@@ -136,7 +136,7 @@ public class SubmitTab extends ListView implements OnClickListener {
                     throw new IllegalArgumentException("Activity must implement SurveyListener");
                 }
                 SurveyListener listener = (SurveyListener) context;
-                qv = new QuestionHeaderView(context, question, listener, true);
+                qv = new QuestionHeaderView(context, question, listener, true, 0); //TODO: will this work?
             } else {
                 qv = (QuestionHeaderView) convertView;
                 qv.mQuestion = question;

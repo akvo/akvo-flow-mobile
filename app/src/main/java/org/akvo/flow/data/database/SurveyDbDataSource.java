@@ -84,27 +84,6 @@ public class SurveyDbDataSource {
         surveyDbAdapter.close();
     }
 
-    public Map<String, QuestionResponse> getResponses(long surveyInstanceId) {
-        Map<String, QuestionResponse> responses = new HashMap<>();
-
-        Cursor cursor = surveyDbAdapter.getResponses(surveyInstanceId);
-
-        if (cursor != null) {
-            if (cursor.moveToFirst()) {
-                QuestionResponseColumns columns = new QuestionResponseColumns(cursor);
-                do {
-                    QuestionResponse response = getQuestionResponseBuilder(cursor,columns)
-                            .setSurveyInstanceId(surveyInstanceId)
-                            .createQuestionResponse();
-                    responses.put(response.getResponseKey(), response);
-                } while (cursor.moveToNext());
-            }
-            cursor.close();
-        }
-
-        return responses;
-    }
-
     private QuestionResponse.QuestionResponseBuilder getQuestionResponseBuilder(Cursor cursor,
           QuestionResponseColumns columns) {
         return new QuestionResponse.QuestionResponseBuilder()

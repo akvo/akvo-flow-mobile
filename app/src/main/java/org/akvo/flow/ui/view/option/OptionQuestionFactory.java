@@ -28,13 +28,13 @@ import org.akvo.flow.utils.entity.Question;
 public class OptionQuestionFactory {
 
     public static OptionQuestionView createOptionQuestion(Context context, Question question,
-            SurveyListener surveyListener) {
+                                                          SurveyListener surveyListener, int iteration) {
         if (question.getOptions() == null) {
-            return new OptionQuestionViewNull(context, question, surveyListener);
+            return new OptionQuestionViewNull(context, question, surveyListener, iteration);
         } else if (question.isAllowMultiple()) {
-            return new OptionQuestionViewMultiple(context, question, surveyListener);
+            return new OptionQuestionViewMultiple(context, question, surveyListener, iteration);
         } else {
-            return new OptionQuestionViewSingle(context, question, surveyListener);
+            return new OptionQuestionViewSingle(context, question, surveyListener, iteration);
         }
     }
 }

@@ -65,8 +65,8 @@ public abstract class OptionQuestionView extends QuestionView {
     private TextView mOtherText;
     private String mLatestOtherText;
 
-    OptionQuestionView(Context context, Question q, SurveyListener surveyListener) {
-        super(context, q, surveyListener);
+    OptionQuestionView(Context context, Question q, SurveyListener surveyListener, int repetition) {
+        super(context, q, surveyListener, repetition);
         otherOptionText = getResources().getString(R.string.othertext);
         init();
     }

@@ -36,8 +36,8 @@ public class BarcodeQuestionViewSingle extends QuestionView implements
 
     private BarcodeQuestionInput questionInput;
 
-    public BarcodeQuestionViewSingle(Context context, Question q, SurveyListener surveyListener) {
-        super(context, q, surveyListener);
+    public BarcodeQuestionViewSingle(Context context, Question q, SurveyListener surveyListener, int repetition) {
+        super(context, q, surveyListener, repetition);
         init();
     }
 

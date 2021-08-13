@@ -50,27 +50,6 @@ data class Question(
         languageTranslationMap[altText.languageCode] = altText
     }
 
-    //TODO: remove
-    //TODO: check how to see iterations
-    fun getIteration(): Int {
-        return if (isRepeatable()) {
-            val questionIdAndIteration: List<String> = questionId?.split("\\|") ?: emptyList()
-            val iteration = if (questionIdAndIteration.size > 1) {
-                questionIdAndIteration[1].toInt()
-            } else {
-                0
-            }
-            iteration
-        } else {
-            -1
-        }
-    }
-
-    //TODO: remove
-    fun isRepeatable(): Boolean {
-        return questionId?.contains("|") ?: false
-    }
-
     //TODO: this is only useful for repeated question groups, should be removed
     /**
      * Clone a question and update the question ID. This is only relevant for repeat-question-groups,

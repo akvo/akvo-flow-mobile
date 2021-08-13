@@ -26,7 +26,6 @@ import org.akvo.flow.utils.entity.AltText;
 import org.akvo.flow.utils.entity.Question;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -41,11 +40,13 @@ public class Survey {
     private SurveyGroup surveyGroup;
     private String name;
     private String id;
-    private Date startDate;
-    private Date endDate;
     private List<QuestionGroup> questionGroups;
     private double version;
+
+    @Deprecated
     private String type;
+
+    @Deprecated
     private String location;
     private String fileName;
     private boolean helpDownloaded;
@@ -54,8 +55,6 @@ public class Survey {
      * Main language code
      */
     private String language;
-    private String sourceSurveyId;// "Copied-from" survey Id
-    private String app;// FLOW instance ID
 
     public Survey() {
         questionGroups = new ArrayList<>();
@@ -146,44 +145,12 @@ public class Survey {
         this.id = id;
     }
 
-    public Date getStartDate() {
-        return startDate;
-    }
-
-    public void setStartDate(Date startDate) {
-        this.startDate = startDate;
-    }
-
-    public Date getEndDate() {
-        return endDate;
-    }
-
-    public void setEndDate(Date endDate) {
-        this.endDate = endDate;
-    }
-
     public List<QuestionGroup> getQuestionGroups() {
         return questionGroups;
     }
 
     public void setQuestionGroups(List<QuestionGroup> questionGroups) {
         this.questionGroups = questionGroups;
-    }
-
-    public void setSourceSurveyId(String sourceSurveyId) {
-        this.sourceSurveyId = sourceSurveyId;
-    }
-
-    public String getSourceSurveyId() {
-        return this.sourceSurveyId;
-    }
-
-    public void setApp(String app) {
-        this.app = app;
-    }
-    
-    public String getApp() {
-        return this.app;
     }
 
     /**

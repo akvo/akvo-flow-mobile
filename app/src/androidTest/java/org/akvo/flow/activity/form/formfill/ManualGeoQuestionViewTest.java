@@ -82,7 +82,7 @@ public class ManualGeoQuestionViewTest {
             FormActivity.class) {
         @Override
         protected Intent getActivityIntent() {
-            return getFormActivityIntent(155852013L, "156792013", "GeoForm", 0L, false);
+            return getFormActivityIntent(155852013L, "156792013", "GeoForm", 0L);
         }
     };
 

@@ -107,7 +107,6 @@ public class ConstantUtil {
      */
     public static final String FORM_ID_EXTRA = "SID";
     public static final String RESPONDENT_ID_EXTRA = "survey_respondent_id";
-    public static final String READ_ONLY_EXTRA = "readonly";
     public static final String SURVEY_EXTRA = "survey_group";
     public static final String DATA_POINT_ID_EXTRA = "datapoint_id";
     public static final String SURVEY_ID_EXTRA = "survey_group_id";

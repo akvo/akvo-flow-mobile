@@ -67,7 +67,7 @@ public class CascadeQuestionViewErrorTest {
             FormActivity.class) {
         @Override
         protected Intent getActivityIntent() {
-            return getFormActivityIntent(155852013L, "156792013", "CascadeForm", 0L, false);
+            return getFormActivityIntent(155852013L, "156792013", "CascadeForm", 0L);
         }
     };
 

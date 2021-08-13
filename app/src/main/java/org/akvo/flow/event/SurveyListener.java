@@ -19,18 +19,14 @@
 
 package org.akvo.flow.event;
 
-import org.akvo.flow.domain.QuestionGroup;
 import org.akvo.flow.domain.QuestionResponse;
 import org.akvo.flow.ui.view.QuestionView;
 
-import java.util.List;
 import java.util.Map;
 
 public interface SurveyListener {
-    List<QuestionGroup> getQuestionGroups();
     String getDefaultLanguage();
     String[] getLanguages();
-    boolean isReadOnly();
     void onSurveySubmit();
     void openQuestion(String questionId);
     Map<String, QuestionResponse> getResponses();

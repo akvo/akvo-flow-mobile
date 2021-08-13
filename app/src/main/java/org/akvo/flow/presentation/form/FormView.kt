@@ -19,6 +19,10 @@
  */
 package org.akvo.flow.presentation.form
 
+import org.akvo.flow.domain.QuestionResponse
+import org.akvo.flow.domain.Survey
+import java.util.HashMap
+
 interface FormView {
     fun showLoading()
     fun hideLoading()
@@ -29,4 +33,6 @@ interface FormView {
     fun goToListOfForms()
     fun showFormUpdated()
     fun trackDraftFormVersionUpdated()
+    fun showErrorLoadingForm()
+    fun displayFormAndResponses(form: Survey, responses: HashMap<String, QuestionResponse>)
 }

@@ -27,7 +27,6 @@ data class Question(
     var text: String? = null,
     var order: Int = 0,
     var isAllowOther: Boolean = false,
-    var renderType: String? = null,
     var questionHelp: MutableList<QuestionHelp> = mutableListOf(),
     var type: String? = null,
     var options: MutableList<Option>? = null,
@@ -64,9 +63,7 @@ data class Question(
 
     //TODO: remove
     fun isRepeatable(): Boolean {
-        return questionId?.let { questionId ->
-            questionId.contains("|")
-        } ?: false
+        return questionId?.contains("|") ?: false
     }
 
     //TODO: this is only useful for repeated question groups, should be removed
@@ -80,7 +77,6 @@ data class Question(
             questionId = questionId,
             text = question.text,
             order = question.order,
-            renderType = question.renderType,
             isMandatory = question.isMandatory,
             type = question.type,
             isAllowOther = question.isAllowOther,

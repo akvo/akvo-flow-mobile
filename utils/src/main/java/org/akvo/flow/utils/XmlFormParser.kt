@@ -26,6 +26,8 @@ import org.akvo.flow.utils.entity.Option
 import org.akvo.flow.utils.entity.Question
 import org.akvo.flow.utils.entity.QuestionGroup
 import org.akvo.flow.utils.entity.QuestionHelp
+import org.akvo.flow.utils.entity.ValidationRule
+import org.akvo.flow.utils.entity.ValidationRule.DEFAULT_MAX_LENGTH
 import org.xmlpull.v1.XmlPullParser
 import org.xmlpull.v1.XmlPullParserException
 import org.xmlpull.v1.XmlPullParserFactory
@@ -118,8 +120,8 @@ class XmlFormParser @Inject constructor(private val helper: FileHelper) {
                             SURVEY -> {
                                 version = getDoubleAttribute(parser, VERSION)
                                 name = getNonNullStringAttribute(parser, NAME)
-                                formId = getIntAttribute(parser, FORM_ID)
-                                surveyId = getIntAttribute(parser, SURVEY_ID)
+                                formId = getIntAttribute(parser, FORM_ID, -1)
+                                surveyId = getIntAttribute(parser, SURVEY_ID, -1)
                                 val parsedAttribute = parser.getAttributeValue(null, DEFAULT_LANG)
                                 if (!parsedAttribute.isNullOrEmpty()) {
                                     defaultLanguage = parsedAttribute
@@ -139,7 +141,7 @@ class XmlFormParser @Inject constructor(private val helper: FileHelper) {
                             }
                             QUESTION -> {
                                 val resource = getStringAttribute(parser, CASCADE_RESOURCE)
-                                var order = getIntAttribute(parser, ORDER)
+                                var order = getIntAttribute(parser, ORDER, -1)
                                 if (order == -1) {
                                     order = 1
                                     if (currentQuestionGroup != null) {
@@ -195,13 +197,12 @@ class XmlFormParser @Inject constructor(private val helper: FileHelper) {
                                 )
                             }
                             VALIDATION_RULE -> {
-                                //currentValidation = ValidationRule()
-                                //TODO: added later, not needed for read only
+                                currentQuestion?.validationRule = parseValidationValue(parser)
                             }
                             ALT_TEXT -> {
                                 currentAltText = AltText(
                                     languageCode = getStringAttribute(parser, LANG),
-                                    type = getStringAttribute(parser, VALUE)
+                                    type = getStringAttribute(parser, TYPE)
                                 )
                             }
                             HELP -> {
@@ -322,8 +323,227 @@ class XmlFormParser @Inject constructor(private val helper: FileHelper) {
             groups = groups)
     }
 
-    private fun getIntAttribute(parser: XmlPullParser, attributeName: String) =
-        parser.getAttributeValue(null, attributeName)?.toInt() ?: -1
+    fun parseXmlQuestions(inputStream: InputStream): HashMap<Int, MutableList<Question>> {
+        val parserFactory: XmlPullParserFactory
+        var currentQuestion: Question? = null
+        var currentOptions = mutableListOf<Option>()
+        var currentOption: Option? = null
+        var currentLevels = mutableListOf<Level>()
+        var currentLevel: Level? = null
+        var currentAltText: AltText? = null
+        var currentHelp: QuestionHelp? = null
+        var lastText: String? = null
+        var groupOrder = 0
+        var currentQuestions = mutableListOf<Question>()
+        val map = HashMap<Int, MutableList<Question>>()
+        try {
+            parserFactory = XmlPullParserFactory.newInstance()
+            val parser = parserFactory.newPullParser()
+            parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false)
+            parser.setInput(inputStream, null)
+            var eventType = parser.eventType
+            while (eventType != XmlPullParser.END_DOCUMENT) {
+
+                when (eventType) {
+                    /**
+                     * Beginning of a tag for example <question>
+                     */
+                    XmlPullParser.START_TAG -> {
+                        when (parser.name) {
+                            QUESTION_GROUP -> {
+                                groupOrder++
+                                currentQuestions = mutableListOf()
+                            }
+                            QUESTION -> {
+                                val resource = getStringAttribute(parser, CASCADE_RESOURCE)
+                                var order = getIntAttribute(parser, ORDER, -1)
+                                if (order == -1) {
+                                    order = 1
+                                }
+
+                                currentQuestion = Question(
+                                    cascadeResource = resource,
+                                    order = order,
+                                    isMandatory = getBooleanAttribute(parser, MANDATORY),
+                                    isLocked = getBooleanAttribute(parser, LOCKED),
+                                    isDoubleEntry = getBooleanAttribute(parser, DOUBLE_ENTRY),
+                                    isAllowMultiple = getBooleanAttribute(parser, ALLOW_MULT),
+                                    type = parser.getAttributeValue(null, TYPE),
+                                    questionId = parser.getAttributeValue(null, ID),
+                                    isLocaleName = getBooleanAttribute(parser, LOCALE_NAME),
+                                    isLocaleLocation = getBooleanAttribute(parser, LOCALE_LOCATION),
+                                    caddisflyRes = getStringAttribute(parser, CADDISFLY_RESOURCE),
+                                    isAllowPoints = getBooleanAttribute(parser, ALLOW_POINTS),
+                                    isAllowLine = getBooleanAttribute(parser, ALLOW_LINE),
+                                    isAllowPolygon = getBooleanAttribute(parser, ALLOW_POLYGON)
+                                )
+                            }
+                            OPTIONS -> {
+                                currentOptions = mutableListOf()
+                                if (currentQuestion != null) {
+                                    currentQuestion.isAllowOther = getBooleanAttribute(
+                                        parser,
+                                        ALLOW_OTHER
+                                    )
+                                    currentQuestion.isAllowMultiple = getBooleanAttribute(
+                                        parser,
+                                        ALLOW_MULT
+                                    )
+                                }
+                            }
+                            OPTION -> {
+                                currentOption = Option(code = getStringAttribute(parser, CODE))
+                            }
+                            LEVELS -> {
+                                currentLevels = mutableListOf()
+                            }
+                            LEVEL -> {
+                                currentLevel = Level()
+                            }
+                            DEPENDENCY -> {
+                                currentQuestion?.dependencies?.add(
+                                    Dependency(
+                                        question = getStringAttribute(parser, QUESTION),
+                                        answer = getStringAttribute(parser, ANSWER)
+                                    )
+                                )
+                            }
+                            VALIDATION_RULE -> {
+                                currentQuestion?.validationRule = parseValidationValue(parser)
+                            }
+                            ALT_TEXT -> {
+                                currentAltText = AltText(
+                                    languageCode = getStringAttribute(parser, LANG),
+                                    type = getStringAttribute(parser, TYPE)
+                                )
+                            }
+                            HELP -> {
+                                currentHelp = QuestionHelp()
+                            }
+                        }
+                    }
+                    /**
+                     * End of a tag for example </question>
+                     */
+                    XmlPullParser.END_TAG -> {
+                        when (parser.name) {
+                            QUESTION_GROUP -> {
+                                map[groupOrder] = currentQuestions
+                            }
+                            QUESTION -> {
+                                if (currentQuestion != null) {
+                                    if (lastText != null) {
+                                        currentQuestion.text = lastText
+                                        lastText = null
+                                    }
+                                    currentQuestions.add(currentQuestion)
+                                    currentQuestion = null
+                                }
+                            }
+                            OPTIONS -> {
+                                if (currentQuestion != null) {
+                                    if (currentQuestion.options == null) {
+                                        currentQuestion.options = mutableListOf()
+                                    }
+                                    currentQuestion.options?.addAll(currentOptions)
+                                    currentOptions = mutableListOf()
+                                }
+                            }
+                            OPTION -> {
+                                if (currentOption != null) {
+                                    if (lastText != null) {
+                                        currentOption.text = lastText
+                                        lastText = null
+                                    }
+                                    currentOptions.add(currentOption)
+                                    currentOption = null
+                                }
+                            }
+                            LEVELS -> {
+                                currentQuestion?.levels?.addAll(currentLevels)
+                                currentLevels = mutableListOf()
+                            }
+                            LEVEL -> {
+                                if (currentLevel != null) {
+                                    if (lastText != null) {
+                                        currentLevel.text = lastText
+                                        lastText = null
+                                    }
+                                    currentLevels.add(currentLevel)
+                                    currentLevel = null
+                                }
+                            }
+                            DEPENDENCY -> {
+                                //TODO: add dependency
+                            }
+                            ALT_TEXT -> {
+                                //can be inside question, help or option
+                                if (currentAltText != null) {
+                                    when {
+                                        currentOption != null -> {
+                                            currentOption.addAltText(currentAltText)
+                                        }
+                                        currentHelp != null -> {
+                                            currentHelp.addAltText(currentAltText)
+                                        }
+                                        currentQuestion != null -> {
+                                            currentQuestion.addAltText(currentAltText)
+                                        }
+                                    }
+                                    currentAltText = null
+                                }
+                            }
+                            HELP -> {
+                                if (currentHelp != null) {
+                                    if (lastText != null) {
+                                        currentHelp.text = lastText
+                                        lastText = null
+                                    }
+                                    currentQuestion?.questionHelp?.add(currentHelp)
+                                    currentHelp = null
+                                }
+
+                            }
+                        }
+                    }
+                    /**
+                     * this is the <text>some text</text> content
+                     * <text> can appear in multiple places: inside question, option, level, help
+                     */
+                    XmlPullParser.TEXT -> {
+                        lastText = parser.text
+                    }
+                }
+                eventType = parser.next()
+            }
+        } catch (e: XmlPullParserException) {
+            Timber.e(e)
+        } catch (e: IOException) {
+            Timber.e(e)
+        } finally {
+            helper.close(inputStream)
+        }
+        return map
+    }
+
+    private fun parseValidationValue(parser: XmlPullParser): ValidationRule {
+       val currentValidation = ValidationRule(getStringAttribute(parser, VALIDATION_TYPE))
+        currentValidation.allowDecimal = getBooleanAttribute(parser, ALLOW_DEC)
+        currentValidation.allowSigned = getBooleanAttribute(parser, ALLOW_SIGN)
+        currentValidation.maxLength = getIntAttribute(parser, MAX_LENGTH, DEFAULT_MAX_LENGTH)
+        val minValue: Double? = parser.getAttributeValue(null, MIN_VAL)?.toDouble()
+        val maxValue: Double? = parser.getAttributeValue(null, MAX_VAL)?.toDouble()
+        if (minValue != null) {
+            currentValidation.minVal = minValue
+        }
+        if (maxValue != null) {
+            currentValidation.maxVal = maxValue
+        }
+        return currentValidation
+    }
+
+    private fun getIntAttribute(parser: XmlPullParser, attributeName: String, defaultValue: Int) =
+        parser.getAttributeValue(null, attributeName)?.toInt() ?: defaultValue
 
     private fun getStringAttribute(parser: XmlPullParser, attributeName: String) =
         parser.getAttributeValue(null, attributeName)
@@ -358,7 +578,6 @@ class XmlFormParser @Inject constructor(private val helper: FileHelper) {
         private const val ALLOW_OTHER = "allowOther"
         private const val ALLOW_MULT = "allowMultiple"
         private const val OPTION = "option"
-        private const val VALUE = "value"
         private const val CODE = "code"
         private const val ALLOW_POINTS = "allowPoints"
         private const val ALLOW_LINE = "allowLine"
@@ -385,5 +604,9 @@ class XmlFormParser @Inject constructor(private val helper: FileHelper) {
         private const val HELP = "help"
         private const val FORM_ID = "surveyId"
         private const val SURVEY_ID = "surveyGroupId"
+        private const val APP = "app"
+        private const val SURVEY_GROUP_NAME = "surveyGroupName"
+        private const val REGISTRATION_SURVEY = "registrationSurvey"
+        private const val ALIAS = "alias"
     }
 }

@@ -55,7 +55,7 @@ public class OptionQuestionViewMultiple extends OptionQuestionView {
                 View view = newCheckbox(option, i);
                 mCheckBoxes.add((CheckBox) view);
                 addView(view);
-                view.setEnabled(!isReadOnly());
+                view.setEnabled(true);
                 view.setId(i); // View ID will match option position within the array
             }
         }

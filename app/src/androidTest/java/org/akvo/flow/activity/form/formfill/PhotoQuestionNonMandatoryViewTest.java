@@ -54,7 +54,7 @@ public class PhotoQuestionNonMandatoryViewTest {
             FormActivity.class) {
         @Override
         protected Intent getActivityIntent() {
-            return getFormActivityIntent(311169115L, "318939116", FORM_TITLE, 0L, false);
+            return getFormActivityIntent(311169115L, "318939116", FORM_TITLE, 0L);
         }
     };
 

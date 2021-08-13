@@ -64,7 +64,7 @@ public class OptionQuestionViewSingle extends OptionQuestionView {
                 View view;
                 view = newRadioButton(option, i);
                 mOptionGroup.addView(view);
-                view.setEnabled(!isReadOnly());
+                view.setEnabled(true);
                 view.setId(i); // View ID will match option position within the array
             }
         }

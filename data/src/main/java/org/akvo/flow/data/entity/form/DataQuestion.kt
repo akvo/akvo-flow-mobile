@@ -32,17 +32,13 @@ data class DataQuestion(
     var text: String? = null,
     val order: Int = 0,
     var isAllowOther: Boolean = false,
-    val renderType: String? = null,
-    var questionHelp: MutableList<DomainQuestionHelp> = mutableListOf(),
+    var questionHelp: MutableList<DomainQuestionHelp> = mutableListOf(), //TODO: use specific object
     val type: String? = null,
-    var options: MutableList<DomainOption>? = null,
+    var options: MutableList<DomainOption>? = null, //TODO: use specific object
     var isAllowMultiple: Boolean = false,
     val isLocked: Boolean = false,
-    val languageTranslationMap: HashMap<String?, DomainAltText> = HashMap(),
-    val dependencies: MutableList<DomainDependency> = mutableListOf(),
-    val useStrength: Boolean = false,
-    val strengthMin: Int = 0,
-    val strengthMax: Int = 0,
+    val languageTranslationMap: HashMap<String?, DomainAltText> = HashMap(), //TODO: use specific object
+    val dependencies: MutableList<DomainDependency> = mutableListOf(), //TODO: use specific object
     val isLocaleName: Boolean = false,
     val isLocaleLocation: Boolean = false,
     val isDoubleEntry: Boolean = false,
@@ -51,7 +47,7 @@ data class DataQuestion(
     val isAllowPolygon: Boolean = false,
     val caddisflyRes: String? = null,
     val cascadeResource: String? = null,
-    val levels: MutableList<DomainLevel> = mutableListOf(),
+    val levels: MutableList<DomainLevel> = mutableListOf(),//TODO: use specific object
 ) {
 
     fun addAltText(altText: DomainAltText) {

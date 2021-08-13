@@ -126,7 +126,7 @@ public class FormActivityTest {
             FormActivity.class) {
         @Override
         protected Intent getActivityIntent() {
-            return getFormActivityIntent(155852013L, "156792013", FORM_TITLE, 0L, false);
+            return getFormActivityIntent(155852013L, "156792013", FORM_TITLE, 0L);
         }
     };
 

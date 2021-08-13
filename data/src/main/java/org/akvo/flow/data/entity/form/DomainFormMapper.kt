@@ -29,13 +29,10 @@ import org.akvo.flow.domain.entity.question.DomainQuestion
 import org.akvo.flow.domain.entity.question.DomainQuestionHelp
 import org.akvo.flow.utils.entity.AltText
 import org.akvo.flow.utils.entity.Dependency
-import org.akvo.flow.utils.entity.Form
 import org.akvo.flow.utils.entity.Level
 import org.akvo.flow.utils.entity.Option
 import org.akvo.flow.utils.entity.Question
-import org.akvo.flow.utils.entity.QuestionGroup
 import org.akvo.flow.utils.entity.QuestionHelp
-import java.util.HashMap
 import javax.inject.Inject
 
 class DomainFormMapper @Inject constructor() {
@@ -64,29 +61,38 @@ class DomainFormMapper @Inject constructor() {
         return domainForms
     }
 
-    fun mapForm(dataForm: DataForm, parseForm: Form): DomainForm {
+    fun mapForm(dataForm: DataForm, parsedQuestions: HashMap<Int, MutableList<Question>>): DomainForm {
         return DomainForm(
             dataForm.id,
             dataForm.formId,
             dataForm.surveyId,
-            parseForm.name,
-            parseForm.version.toString(),
+            dataForm.name,
+            dataForm.version.toString(),
             dataForm.type,
             dataForm.location,
             dataForm.filename,
             dataForm.language,
             dataForm.cascadeDownloaded,
             dataForm.deleted,
-            groups = mapGroups(parseForm.groups)
+            groups = mapGroups(dataForm.groups, parsedQuestions)
         )
     }
 
-    private fun mapGroups(groups: List<QuestionGroup>): List<DomainQuestionGroup> {
+    private fun mapGroups(
+        groups: MutableList<DataQuestionGroup>,
+        parsedQuestions: HashMap<Int, MutableList<Question>>
+    ): List<DomainQuestionGroup> {
         val domainGroups = mutableListOf<DomainQuestionGroup>()
         for (group in groups) {
+            val questionsForGroup = parsedQuestions[group.order]
+            val questions = if (questionsForGroup != null) {
+                mapQuestions(questionsForGroup)
+            } else {
+                mutableListOf()
+            }
             domainGroups.add(DomainQuestionGroup(group.heading,
                 group.repeatable,
-                mapQuestions(group.questions)))
+                questions))
         }
         return domainGroups
     }
@@ -100,7 +106,6 @@ class DomainFormMapper @Inject constructor() {
                 question.text,
                 question.order,
                 question.isAllowOther,
-                question.renderType,
                 mapHelps(question.questionHelp),
                 question.type,
                 mapOptions(question.options),
@@ -166,5 +171,4 @@ class DomainFormMapper @Inject constructor() {
         }
         return domainAltTextMap
     }
-
 }

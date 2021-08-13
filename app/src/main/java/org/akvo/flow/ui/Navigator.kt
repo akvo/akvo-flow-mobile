@@ -109,7 +109,6 @@ class Navigator @Inject constructor() {
             i.putExtra(ConstantUtil.SURVEY_EXTRA, survey)
             i.putExtra(ConstantUtil.DATA_POINT_ID_EXTRA, dataPointId)
             i.putExtra(ConstantUtil.RESPONDENT_ID_EXTRA, formInstanceId)
-            i.putExtra(ConstantUtil.READ_ONLY_EXTRA, readOnly)
             activity?.startActivityForResult(i, ConstantUtil.FORM_FILLING_REQUEST)
         }
     }
@@ -126,7 +125,6 @@ class Navigator @Inject constructor() {
         val i = Intent(activity, FormActivity::class.java)
         i.putExtra(ConstantUtil.FORM_ID_EXTRA, formId)
         i.putExtra(ConstantUtil.SURVEY_EXTRA, mSurveyGroup)
-        i.putExtra(ConstantUtil.READ_ONLY_EXTRA, false)
         i.putExtra(ConstantUtil.VIEW_USER_EXTRA, user)
         activity.startActivityForResult(i, ConstantUtil.FORM_FILLING_REQUEST)
     }
@@ -141,7 +139,6 @@ class Navigator @Inject constructor() {
         val i = Intent(activity, FormActivity::class.java)
         i.putExtra(ConstantUtil.FORM_ID_EXTRA, formId)
         i.putExtra(ConstantUtil.SURVEY_EXTRA, mSurveyGroup)
-        i.putExtra(ConstantUtil.READ_ONLY_EXTRA, false)
         i.putExtra(ConstantUtil.VIEW_USER_EXTRA, user)
         i.putExtra(ConstantUtil.DATA_POINT_ID_EXTRA, dataPointId)
         activity.startActivityForResult(i, ConstantUtil.FORM_FILLING_REQUEST)

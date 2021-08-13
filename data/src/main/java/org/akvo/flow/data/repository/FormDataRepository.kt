@@ -33,7 +33,7 @@ import org.akvo.flow.data.util.FlowFileBrowser
 import org.akvo.flow.domain.entity.DomainForm
 import org.akvo.flow.domain.repository.FormRepository
 import org.akvo.flow.utils.XmlFormParser
-import org.akvo.flow.utils.entity.Form
+import org.akvo.flow.utils.entity.Question
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -90,12 +90,12 @@ class FormDataRepository @Inject constructor(
         //TODO: once questions are in database we need to parse from db everything without opening xml form
         return domainFormMapper.mapForm(
             dataSourceFactory.dataBaseDataSource.getFormWithGroups(formId),
-            parseForm(formId)
+            parseFormQuestions(formId)
         )
     }
 
-    private fun parseForm(formId: String): Form {
-        return xmlParser.parseXmlForm(dataSourceFactory.fileDataSource.getFormFile(formId))
+    private fun parseFormQuestions(formId: String): HashMap<Int, MutableList<Question>> {
+        return xmlParser.parseXmlQuestions(dataSourceFactory.fileDataSource.getFormFile(formId))
     }
 
     private fun downloadFormHeader(formId: String?, deviceId: String?): Observable<Boolean?> {

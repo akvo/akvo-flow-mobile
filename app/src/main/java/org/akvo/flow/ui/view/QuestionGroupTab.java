@@ -105,7 +105,7 @@ public class QuestionGroupTab extends ConstraintLayout
 
         if (mQuestionGroup.isRepeatable()) {
             mRepetitionsText.setVisibility(VISIBLE);
-            repeatButton.setVisibility(mSurveyListener.isReadOnly() ? GONE : VISIBLE);
+            repeatButton.setVisibility(VISIBLE);
             repeatButton.setOnClickListener(v -> {
                 loadGroup();
                 setupDependencies();
@@ -293,8 +293,7 @@ public class QuestionGroupTab extends ConstraintLayout
             updateRepetitionsHeader();
             QuestionGroupIterationHeader header =
                     new QuestionGroupIterationHeader(getContext(), mQuestionGroup.getHeading(),
-                            repetitionId, visualIndicator,
-                            mSurveyListener.isReadOnly() ? null : this);
+                            repetitionId, visualIndicator, this);
             groupIterationHeaders.put(repetitionId, header);
             mContainer.addView(header);
         }
@@ -397,7 +396,7 @@ public class QuestionGroupTab extends ConstraintLayout
             setupDependencies(qv);
         }
 
-        if (!mSurveyListener.isReadOnly() && mQuestionGroup.isRepeatable()) {
+        if (mQuestionGroup.isRepeatable()) {
             boolean containsVisibleQuestions = false;
             for (QuestionView qv : mQuestionViews.values()) {
                 if (qv.getVisibility() == VISIBLE) {

@@ -45,9 +45,9 @@ import timber.log.Timber;
 public class SurveyTabAdapter extends PagerAdapter implements ViewPager.OnPageChangeListener {
 
     private final ViewPager mPager;
-    private List<QuestionGroup> mQuestionGroups;
-    private List<QuestionGroupTab> mQuestionGroupTabs;
-    private SubmitTab mSubmitTab;
+    private final List<QuestionGroup> mQuestionGroups;
+    private final List<QuestionGroupTab> mQuestionGroupTabs;
+    private final SubmitTab mSubmitTab;
     private OnTabLoadedListener mOnTabLoadedListener;
 
     public interface OnTabLoadedListener {
@@ -58,28 +58,19 @@ public class SurveyTabAdapter extends PagerAdapter implements ViewPager.OnPageCh
         mOnTabLoadedListener = listener;
     }
 
-    public SurveyTabAdapter(Context context, ViewPager pager, SurveyListener surveyListener,
-            QuestionInteractionListener questionListener) {
+    public SurveyTabAdapter(Context context, ViewPager pager, List<QuestionGroup> questionGroups,
+                            SurveyListener surveyListener, QuestionInteractionListener questionListener) {
         mPager = pager;
-        init(context, surveyListener, questionListener);
-    }
-
-    private void init(Context context, SurveyListener surveyListener,
-            QuestionInteractionListener questionListener) {
-        mQuestionGroups = surveyListener.getQuestionGroups();
+        mSubmitTab = new SubmitTab(context);
+        mPager.addOnPageChangeListener(this);
+        mQuestionGroups = questionGroups;
         mQuestionGroupTabs = new ArrayList<>();
 
         for (QuestionGroup group : mQuestionGroups) {
-            QuestionGroupTab questionGroupTab =
-                    new QuestionGroupTab(context, group, surveyListener, questionListener);
+            QuestionGroupTab questionGroupTab = new QuestionGroupTab(mPager.getContext(), group,
+                    surveyListener, questionListener);
             mQuestionGroupTabs.add(questionGroupTab);
         }
-
-        if (!surveyListener.isReadOnly()) {
-            mSubmitTab = new SubmitTab(context);
-        }
-
-        mPager.addOnPageChangeListener(this);
     }
 
     public void notifyOptionsChanged() {
@@ -214,12 +205,12 @@ public class SurveyTabAdapter extends PagerAdapter implements ViewPager.OnPageCh
     }
 
     @Override
-    public void destroyItem(ViewGroup container, int position, Object view) {
+    public void destroyItem(ViewGroup container, int position, @NonNull Object view) {
         container.removeView((View) view);
     }
 
     @Override
-    public boolean isViewFromObject(View view, Object object) {
+    public boolean isViewFromObject(@NonNull View view, @NonNull Object object) {
         return view == object;
     }
 

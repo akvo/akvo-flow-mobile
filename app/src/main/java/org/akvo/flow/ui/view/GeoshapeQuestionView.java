@@ -71,38 +71,21 @@ public class GeoshapeQuestionView extends QuestionView implements OnClickListene
     private void displayResponseView() {
         boolean empty = TextUtils.isEmpty(mValue);
         mResponseView.setVisibility(empty ? GONE : VISIBLE);
-        if (isReadOnly()) {
-            if (empty) {
-                mMapBtn.setVisibility(GONE);
-            } else {
-                mMapBtn.setVisibility(VISIBLE);
-                mMapBtn.setText(R.string.view_shape);
-            }
-        } else {
-            mMapBtn.setText(empty ? R.string.capture_shape : R.string.edit_shape);
-        }
+        mMapBtn.setText(empty ? R.string.capture_shape : R.string.edit_shape);
     }
 
     @Override
     public void onClick(View v) {
         if (v.getId() == R.id.capture_shape_btn) {
             Bundle data = new Bundle();
-            if (isReadOnly()) {
-                if (!TextUtils.isEmpty(mValue)) {
-                    data.putString(ConstantUtil.GEOSHAPE_RESULT, mValue);
-                }
-                navigator.navigateToViewGeoShapeActivity(getContext(), data);
-            } else {
-                data.putBoolean(ConstantUtil.EXTRA_ALLOW_POINTS, getQuestion().isAllowPoints());
-                data.putBoolean(ConstantUtil.EXTRA_ALLOW_LINE, getQuestion().isAllowLine());
-                data.putBoolean(ConstantUtil.EXTRA_ALLOW_POLYGON, getQuestion().isAllowPolygon());
-                data.putBoolean(ConstantUtil.EXTRA_MANUAL_INPUT, !getQuestion().isLocked());
-                data.putBoolean(ConstantUtil.READ_ONLY_EXTRA, isReadOnly());
-                if (!TextUtils.isEmpty(mValue)) {
-                    data.putString(ConstantUtil.GEOSHAPE_RESULT, mValue);
-                }
-                notifyQuestionListeners(QuestionInteractionEvent.PLOTTING_EVENT, data);
+            data.putBoolean(ConstantUtil.EXTRA_ALLOW_POINTS, getQuestion().isAllowPoints());
+            data.putBoolean(ConstantUtil.EXTRA_ALLOW_LINE, getQuestion().isAllowLine());
+            data.putBoolean(ConstantUtil.EXTRA_ALLOW_POLYGON, getQuestion().isAllowPolygon());
+            data.putBoolean(ConstantUtil.EXTRA_MANUAL_INPUT, !getQuestion().isLocked());
+            if (!TextUtils.isEmpty(mValue)) {
+                data.putString(ConstantUtil.GEOSHAPE_RESULT, mValue);
             }
+            notifyQuestionListeners(QuestionInteractionEvent.PLOTTING_EVENT, data);
         }
     }
 
@@ -120,10 +103,6 @@ public class GeoshapeQuestionView extends QuestionView implements OnClickListene
         super.rehydrate(resp);
         mValue = resp.getValue();
         displayResponseView();
-
-        if (isReadOnly() && !TextUtils.isEmpty(mValue)) {
-            mMapBtn.setVisibility(VISIBLE);
-        }
     }
 
     @Override
@@ -131,9 +110,6 @@ public class GeoshapeQuestionView extends QuestionView implements OnClickListene
         super.resetQuestion(fireEvent);
         mValue = null;
         displayResponseView();
-        if (isReadOnly()) {
-            mMapBtn.setVisibility(GONE);
-        }
     }
 
     @Override

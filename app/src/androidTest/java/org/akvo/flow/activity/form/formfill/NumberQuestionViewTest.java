@@ -71,7 +71,7 @@ public class NumberQuestionViewTest {
             FormActivity.class) {
         @Override
         protected Intent getActivityIntent() {
-            return getFormActivityIntent(47323002L, "49783002", "NumberForm", 0L, false);
+            return getFormActivityIntent(47323002L, "49783002", "NumberForm", 0L);
         }
     };
 

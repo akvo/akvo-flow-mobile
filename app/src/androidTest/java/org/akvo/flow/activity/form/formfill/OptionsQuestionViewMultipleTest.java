@@ -70,7 +70,7 @@ public class OptionsQuestionViewMultipleTest {
             FormActivity.class) {
         @Override
         protected Intent getActivityIntent() {
-            return getFormActivityIntent(42573002L, "43623002", FORM_TITLE, 0L, false);
+            return getFormActivityIntent(42573002L, "43623002", FORM_TITLE, 0L);
         }
     };
 

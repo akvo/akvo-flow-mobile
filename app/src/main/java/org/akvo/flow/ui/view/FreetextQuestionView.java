@@ -69,11 +69,6 @@ public class FreetextQuestionView extends QuestionView {
             mEditText.setInputType(mEditText.getInputType() & ~InputType.TYPE_TEXT_FLAG_MULTI_LINE);
         }
 
-        if (isReadOnly()) {
-            mEditText.setEnabled(false);
-            mDoubleEntryText.setEnabled(false);
-        }
-
         int maxLength = ValidationRule.DEFAULT_MAX_LENGTH;
         ValidationRule rule = getQuestion().getValidationRule();
         if (rule != null) {

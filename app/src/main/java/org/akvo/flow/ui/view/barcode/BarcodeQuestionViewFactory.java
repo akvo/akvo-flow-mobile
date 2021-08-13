@@ -30,9 +30,7 @@ public class BarcodeQuestionViewFactory {
 
     public static QuestionView createBarcodeQuestion(Context context, Question q,
             SurveyListener surveyListener) {
-        if (surveyListener.isReadOnly()) {
-            return new BarcodeQuestionViewReadOnly(context, q, surveyListener);
-        } else if (q.isAllowMultiple()) {
+       if (q.isAllowMultiple()) {
             return new BarcodeQuestionViewMultiple(context, q, surveyListener);
         } else {
             return new BarcodeQuestionViewSingle(context, q, surveyListener);

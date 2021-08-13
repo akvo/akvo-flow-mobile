@@ -78,7 +78,7 @@ public class FormActivityTestUtil {
 
     @NonNull
     public static Intent getFormActivityIntent(long surveyGroupId, String formId,
-            String formTitle, long dataPointId, boolean readOnly) {
+                                               String formTitle, long dataPointId) {
         Context targetContext = InstrumentationRegistry.getInstrumentation()
                 .getTargetContext();
         Intent result = new Intent(targetContext, FormActivity.class);
@@ -88,7 +88,6 @@ public class FormActivityTestUtil {
                 new SurveyGroup(surveyGroupId, formTitle, null, false));
         result.putExtra(ConstantUtil.DATA_POINT_ID_EXTRA,
                 Constants.TEST_FORM_SURVEY_INSTANCE_ID);
-        result.putExtra(ConstantUtil.READ_ONLY_EXTRA, readOnly);
         return result;
     }
 

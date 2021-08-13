@@ -84,7 +84,7 @@ public class CascadeQuestionViewTest {
             FormActivity.class) {
         @Override
         protected Intent getActivityIntent() {
-            return getFormActivityIntent(155852013L, "156792013", "CascadeForm", 231L, false);
+            return getFormActivityIntent(155852013L, "156792013", "CascadeForm", 231L);
         }
     };
 

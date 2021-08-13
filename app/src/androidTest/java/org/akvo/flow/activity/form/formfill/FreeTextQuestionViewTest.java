@@ -56,7 +56,7 @@ public class FreeTextQuestionViewTest {
     public ActivityTestRule<FormActivity> rule = new ActivityTestRule<FormActivity>(FormActivity.class) {
         @Override
         protected Intent getActivityIntent() {
-            return getFormActivityIntent(44173002L, "47313002", "FreeTextForm", 0L, false);
+            return getFormActivityIntent(44173002L, "47313002", "FreeTextForm", 0L);
         }
     };
 

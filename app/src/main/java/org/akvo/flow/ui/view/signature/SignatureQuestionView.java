@@ -83,19 +83,15 @@ public class SignatureQuestionView extends QuestionView {
         signButton = findViewById(R.id.sign_btn);
         imageLoader = new GlideImageLoader((Activity) getContext());
 
-        if (isReadOnly()) {
-            signButton.setVisibility(GONE);
-        } else {
-            signButton.setOnClickListener(v -> {
-                String name = mSignature.getName();
-                Bundle data = new Bundle();
-                data.putString(ConstantUtil.SIGNATURE_NAME_EXTRA, name);
-                data.putString(ConstantUtil.SIGNATURE_QUESTION_ID_EXTRA, mQuestion.getQuestionId());
-                data.putString(ConstantUtil.SIGNATURE_DATAPOINT_ID_EXTRA,
-                        mSurveyListener.getDataPointId());
-                notifyQuestionListeners(QuestionInteractionEvent.ADD_SIGNATURE_EVENT, data);
-            });
-        }
+        signButton.setOnClickListener(v -> {
+            String name = mSignature.getName();
+            Bundle data = new Bundle();
+            data.putString(ConstantUtil.SIGNATURE_NAME_EXTRA, name);
+            data.putString(ConstantUtil.SIGNATURE_QUESTION_ID_EXTRA, mQuestion.getQuestionId());
+            data.putString(ConstantUtil.SIGNATURE_DATAPOINT_ID_EXTRA,
+                    mSurveyListener.getDataPointId());
+            notifyQuestionListeners(QuestionInteractionEvent.ADD_SIGNATURE_EVENT, data);
+        });
     }
 
     private void initialiseInjector() {

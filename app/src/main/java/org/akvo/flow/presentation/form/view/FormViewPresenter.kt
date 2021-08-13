@@ -56,10 +56,7 @@ class FormViewPresenter @Inject constructor(
         uiScope.coroutineContext.cancelChildren()
     }
 
-    fun loadForm(
-        formId: String,
-        formInstanceId: Long,
-    ) {
+    fun loadForm(formId: String, formInstanceId: Long) {
         val params: MutableMap<String, Any> = HashMap(2)
         params[GetFormWithGroups.PARAM_FORM_ID] = formId
 
@@ -107,7 +104,6 @@ class FormViewPresenter @Inject constructor(
         }
     }
 
-    //TODO: use the loaded form
     fun loadLanguages(surveyId: Long, formId: String) {
         val params: MutableMap<String, Any> = HashMap(2)
         params[LoadLanguages.PARAM_SURVEY_ID] = surveyId

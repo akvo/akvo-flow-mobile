@@ -120,17 +120,15 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
         mQuestionText.setText(formText(), BufferType.SPANNABLE);
         displayTip();
 
-        if (!isReadOnly()) {
-            mQuestionText.setLongClickable(true);
-            mQuestionText.setOnLongClickListener(new OnLongClickListener() {
+        mQuestionText.setLongClickable(true);
+        mQuestionText.setOnLongClickListener(new OnLongClickListener() {
 
-                @Override
-                public boolean onLongClick(View v) {
-                    onClearAnswer();
-                    return true;
-                }
-            });
-        }
+            @Override
+            public boolean onLongClick(View v) {
+                onClearAnswer();
+                return true;
+            }
+        });
 
         // if this question has 1 or more dependencies, then it needs to be invisible initially
         if (mQuestion.getDependencies() != null && mQuestion.getDependencies().size() > 0) {
@@ -489,10 +487,6 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
 
     protected String[] getLanguages() {
         return mSurveyListener.getLanguages();
-    }
-
-    protected boolean isReadOnly() {
-        return mSurveyListener.isReadOnly();
     }
 
     public void setError(String error) {

@@ -23,6 +23,8 @@ package org.akvo.flow.ui.view.media.photo;
 import android.net.Uri;
 import android.text.TextUtils;
 
+import androidx.annotation.Nullable;
+
 import org.akvo.flow.domain.entity.DomainImageMetadata;
 import org.akvo.flow.domain.interactor.DefaultObserver;
 import org.akvo.flow.domain.interactor.SaveResizedImage;
@@ -38,7 +40,6 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import androidx.annotation.Nullable;
 import io.reactivex.observers.DisposableCompletableObserver;
 import timber.log.Timber;
 
@@ -134,14 +135,8 @@ public class PhotoQuestionPresenter implements Presenter {
         }
     }
 
-    void onFilenameAvailable(String filename, boolean readOnly) {
+    void onFilenameAvailable(String filename) {
         if (!TextUtils.isEmpty(filename)) {
-            File file = new File(filename);
-            if (!file.exists() && readOnly) {
-                // Looks like the image is not present in the filesystem (i.e. remote URL)
-                File localFile = mediaFileHelper.getMediaFile(file.getName());
-                view.updateResponse(localFile.getAbsolutePath());
-            }
             view.displayLocationInfo();
         }
     }

@@ -24,7 +24,7 @@ data class DomainOption(
     var text: String? = null,
     var code: String?,
     val isOther: Boolean = false,
-    private val altTextMap: HashMap<String?, DomainAltText> = HashMap<String?, DomainAltText>()
+    val altTextMap: HashMap<String?, DomainAltText> = HashMap<String?, DomainAltText>()
 ) {
 
     fun addAltText(altText: DomainAltText) {

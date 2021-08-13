@@ -86,7 +86,7 @@ class RepeatedGroupsFormActivityTest {
                     survey.surveyGroup,
                     *generateRepeatedOneGroupResponseData()
                 ).first!!
-            return getFormActivityIntent(207569117L, "200389118", SURVEY_TITLE, id, false)
+            return getFormActivityIntent(207569117L, "200389118", SURVEY_TITLE, id)
         }
     }
 

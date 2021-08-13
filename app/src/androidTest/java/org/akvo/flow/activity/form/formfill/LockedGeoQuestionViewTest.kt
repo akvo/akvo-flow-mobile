@@ -57,7 +57,6 @@ import org.akvo.flow.activity.form.FormActivityTestUtil.getString
 import org.akvo.flow.activity.form.data.SurveyInstaller
 import org.akvo.flow.activity.form.data.SurveyRequisite
 import org.akvo.flow.event.TimedLocationListener
-import org.akvo.flow.tests.R.raw
 import org.hamcrest.Description
 import org.hamcrest.Matcher
 import org.hamcrest.core.AllOf.allOf
@@ -99,8 +98,7 @@ class LockedGeoQuestionViewTest {
                 155852019L,
                 "156792019",
                 "LockedGeoForm",
-                123L,
-                false
+                123L
             )
         }
     }

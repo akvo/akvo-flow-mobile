@@ -86,23 +86,11 @@ public class SurveyHandler extends DefaultHandler {
     private static final String HELP = "help";
     private static final String SURVEY_GROUP_ID = "surveyGroupId";
 
-    private static final String APP = "app";
     private static final String TEXT = "text";
-    private static final String RENDER_TYPE = "renderType";
-
-
-    private static final String SOURCE_SURVEY_ID = "sourceSurveyId";
-
 
     private static final String SURVEY_GROUP_NAME = "surveyGroupName";
     private static final String REGISTRATION_SURVEY = "registrationSurvey";
 
-
-
-
-
-
-    @SuppressWarnings("unused")
     private static final String TRANSLATION = "translation";
 
     private Survey survey;
@@ -253,9 +241,6 @@ public class SurveyHandler extends DefaultHandler {
             } else {
                 survey.setLanguage(ConstantUtil.ENGLISH_CODE);
             }
-            if (attributes.getValue(SOURCE_SURVEY_ID) != null) {
-                survey.setSourceSurveyId(attributes.getValue(SOURCE_SURVEY_ID));
-            }
             // SurveyGroup info, if exists
             if (attributes.getValue(SURVEY_GROUP_ID) != null &&
                     attributes.getValue(SURVEY_GROUP_NAME) != null) {
@@ -264,7 +249,6 @@ public class SurveyHandler extends DefaultHandler {
                 String regform = attributes.getValue(REGISTRATION_SURVEY);
                 survey.setSurveyGroup(new SurveyGroup(sgid, sgname, regform, regform != null));
             }
-            survey.setApp(attributes.getValue(APP));
         } else if (localName.equalsIgnoreCase(QUESTION_GROUP)) {
             currentQuestionGroup = new QuestionGroup();
             if (attributes.getValue(ORDER) != null) {

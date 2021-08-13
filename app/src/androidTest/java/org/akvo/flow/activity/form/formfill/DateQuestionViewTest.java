@@ -70,7 +70,7 @@ public class DateQuestionViewTest {
             FormActivity.class) {
         @Override
         protected Intent getActivityIntent() {
-            return getFormActivityIntent(41713002L, "49803002", "DateForm", 0L, false);
+            return getFormActivityIntent(41713002L, "49803002", "DateForm", 0L);
         }
     };
 

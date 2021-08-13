@@ -108,9 +108,6 @@ public class VideoQuestionView extends QuestionView implements IVideoQuestionVie
         presenter.setView(this);
 
         imageLoader = new GlideImageLoader(getContext());
-        if (isReadOnly()) {
-            mediaLayout.setVisibility(GONE);
-        }
     }
 
     private void initialiseInjector() {
@@ -251,17 +248,6 @@ public class VideoQuestionView extends QuestionView implements IVideoQuestionVie
         displayThumbnail();
         if (TextUtils.isEmpty(filePath)) {
             return;
-        }
-
-        // We now check whether the file is found in the local filesystem, and update the path if it's not
-        File file = new File(filePath);
-        if (!file.exists() && isReadOnly()) {
-            // Looks like the image is not present in the filesystem (i.e. remote URL)
-            // Update response, matching the local path. Note: In the future, media responses should
-            // not leak filesystem paths, for these are not guaranteed to be homogeneous in all devices.
-            file = mediaFileHelper.getMediaFile(file.getName());
-            filePath = file.getAbsolutePath();
-            captureResponse();
         }
     }
 

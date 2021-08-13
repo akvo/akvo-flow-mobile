@@ -388,10 +388,6 @@ public class SurveyDbDataSource {
         return surveyDbAdapter.getLastSurveyInstance(mRecordId, id);
     }
 
-    public Cursor getFormInstance(long mSurveyInstanceId) {
-        return surveyDbAdapter.getFormInstance(mSurveyInstanceId);
-    }
-
     public void updateSurveyInstanceStatus(long surveyInstanceId, int status) {
         briteSurveyDbAdapter.updateSurveyInstanceStatus(surveyInstanceId, status);
     }

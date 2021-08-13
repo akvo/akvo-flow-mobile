@@ -112,9 +112,6 @@ public class PhotoQuestionView extends QuestionView implements IPhotoQuestionVie
         presenter.setView(this);
 
         imageLoader = new GlideImageLoader(getContext());
-        if (isReadOnly()) {
-            mediaLayout.setVisibility(GONE);
-        }
 
         mMedia = null;
     }
@@ -246,7 +243,7 @@ public class PhotoQuestionView extends QuestionView implements IPhotoQuestionVie
         if (!TextUtils.isEmpty(value)) {
             mMedia = MediaValue.deserialize(value);
             displayThumbnail();
-            presenter.onFilenameAvailable(mMedia.getFilename(), isReadOnly());
+            presenter.onFilenameAvailable(mMedia.getFilename());
         }
     }
 

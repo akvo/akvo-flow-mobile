@@ -68,7 +68,7 @@ public class FreeTextDoubleQuestionViewTest {
             FormActivity.class) {
         @Override
         protected Intent getActivityIntent() {
-            return getFormActivityIntent(44173002L, "47313002", FORM_TITLE, 0L, false);
+            return getFormActivityIntent(44173002L, "47313002", FORM_TITLE, 0L);
         }
     };
 

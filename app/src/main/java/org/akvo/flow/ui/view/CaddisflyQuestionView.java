@@ -120,7 +120,6 @@ public class CaddisflyQuestionView extends QuestionView implements View.OnClickL
                 .setType(ConstantUtil.CADDISFLY_RESPONSE_TYPE)
                 .setQuestionId(question.getQuestionId())
                 .setIteration(repetition)
-                .setFilename(mImage)
                 .createQuestionResponse();
         setResponse(r);
     }

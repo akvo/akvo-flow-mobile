@@ -270,7 +270,6 @@ public class PhotoQuestionView extends QuestionView implements IPhotoQuestionVie
                     .setType(ConstantUtil.IMAGE_RESPONSE_TYPE)
                     .setQuestionId(question.getQuestionId())
                     .setIteration(repetition)
-                    .setFilename(mMedia.getFilename())
                     .createQuestionResponse();
         }
         setResponse(response);

@@ -18,7 +18,7 @@
  *
  */
 
-package org.akvo.flow.domain.entity;
+package org.akvo.flow.data.entity;
 
 public class Response {
     private final String questionId;

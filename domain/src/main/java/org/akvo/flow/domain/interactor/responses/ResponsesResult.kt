@@ -19,10 +19,10 @@
 
 package org.akvo.flow.domain.interactor.responses
 
-import org.akvo.flow.domain.entity.Response
+import org.akvo.flow.domain.entity.DomainResponse
 
 sealed class ResponsesResult {
-    data class Success(val responses: List<Response>): ResponsesResult()
+    data class Success(val responses: List<DomainResponse>): ResponsesResult()
     data class ParamError(val message: String): ResponsesResult()
     object GenericError : ResponsesResult()
 }

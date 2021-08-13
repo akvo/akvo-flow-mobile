@@ -19,8 +19,8 @@
 
 package org.akvo.flow.domain.repository
 
-import org.akvo.flow.domain.entity.Response
+import org.akvo.flow.domain.entity.DomainResponse
 
 interface ResponseRepository {
-    suspend fun getResponses(instanceId: Long): List<Response>
+    suspend fun getResponses(instanceId: Long): List<DomainResponse>
 }

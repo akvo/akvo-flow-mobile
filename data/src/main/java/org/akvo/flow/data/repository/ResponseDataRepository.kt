@@ -20,14 +20,15 @@
 package org.akvo.flow.data.repository
 
 import org.akvo.flow.data.datasource.DataSourceFactory
-import org.akvo.flow.data.entity.ResponseMapper
-import org.akvo.flow.domain.entity.Response
+import org.akvo.flow.data.entity.DomainResponseMapper
+import org.akvo.flow.domain.entity.DomainResponse
 import org.akvo.flow.domain.repository.ResponseRepository
 import javax.inject.Inject
 
-class ResponseDataRepository @Inject constructor(private val dataSourceFactory: DataSourceFactory, private val responseMapper: ResponseMapper): ResponseRepository {
+class ResponseDataRepository @Inject constructor(private val dataSourceFactory: DataSourceFactory,
+                                                 private val responseMapper: DomainResponseMapper): ResponseRepository {
 
-    override suspend fun getResponses(instanceId: Long): List<Response> {
-        return responseMapper.extractResponses(dataSourceFactory.dataBaseDataSource.getResponses(instanceId))
+    override suspend fun getResponses(instanceId: Long): List<DomainResponse> {
+        return responseMapper.extractResponses(dataSourceFactory.dataBaseDataSource.getResponsesToDisplay(instanceId))
     }
 }

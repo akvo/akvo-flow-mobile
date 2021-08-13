@@ -371,6 +371,10 @@ public class DatabaseDataSource {
         return briteSurveyDbAdapter.getResponses(surveyInstanceId);
     }
 
+    public Cursor getResponsesToDisplay(Long surveyInstanceId) {
+        return briteSurveyDbAdapter.getResponsesToDisplay(surveyInstanceId);
+    }
+
     public Completable createTransmissions(final Long instanceId, final String formId,
                                            Set<String> filenames) {
         if (filenames == null || filenames.isEmpty()) {

@@ -25,7 +25,7 @@ import org.akvo.flow.domain.Survey
 import org.akvo.flow.domain.SurveyGroup
 import org.akvo.flow.domain.entity.DomainForm
 import org.akvo.flow.domain.entity.DomainQuestionGroup
-import org.akvo.flow.domain.entity.Response
+import org.akvo.flow.domain.entity.DomainResponse
 import org.akvo.flow.domain.entity.question.DomainAltText
 import org.akvo.flow.domain.entity.question.DomainDependency
 import org.akvo.flow.domain.entity.question.DomainLevel
@@ -151,18 +151,15 @@ class OldFormMapper @Inject constructor() {
     }
 
     fun mapResponses(
-        responses: List<Response>,
+        responses: List<DomainResponse>,
         formInstanceId: Long?,
     ): HashMap<String, QuestionResponse> {
-        // QuestionId - QuestionResponse
         val questionResponses: HashMap<String, QuestionResponse> = HashMap()
         for (response in responses) {
-            //TODO: check if id is needed
-            //check if filename is needed
-            //check include flag
-            val questionResponse = QuestionResponse(response.value, response.answerType, null,
-                formInstanceId, response.questionId, null, true, response.iteration)
-            questionResponses[questionResponse.responseKey] = questionResponse
+            val questionResponse =
+                QuestionResponse(response.value, response.answerType, response.id,
+                    formInstanceId, response.questionId, response.isIncludeFlag, response.iteration)
+            questionResponses[questionResponse.responseMapKey()] = questionResponse
         }
         return questionResponses
     }

@@ -275,7 +275,6 @@ public class VideoQuestionView extends QuestionView implements IVideoQuestionVie
                     .setType(ConstantUtil.VIDEO_RESPONSE_TYPE)
                     .setQuestionId(question.getQuestionId())
                     .setIteration(repetition)
-                    .setFilename(filePath)
                     .createQuestionResponse();
         }
         setResponse(response);

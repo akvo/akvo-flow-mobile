@@ -27,7 +27,6 @@ import androidx.annotation.VisibleForTesting;
 import androidx.core.util.Pair;
 
 import org.akvo.flow.database.ResponseColumns;
-import org.akvo.flow.domain.entity.Response;
 import org.akvo.flow.domain.util.TextValueCleaner;
 
 import java.util.ArrayList;

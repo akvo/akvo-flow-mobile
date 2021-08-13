@@ -35,7 +35,6 @@ import android.database.Cursor;
 import androidx.core.util.Pair;
 
 import org.akvo.flow.domain.entity.InstanceIdUuid;
-import org.akvo.flow.domain.entity.Response;
 import org.akvo.flow.domain.util.TextValueCleaner;
 import org.akvo.flow.utils.FileHelper;
 import org.junit.Before;

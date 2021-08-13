@@ -28,11 +28,11 @@ import com.google.gson.JsonSyntaxException
 import com.google.gson.annotations.SerializedName
 import com.google.gson.reflect.TypeToken
 import org.akvo.flow.domain.entity.DomainQuestionGroup
-import org.akvo.flow.domain.entity.Response
+import org.akvo.flow.domain.entity.DomainResponse
 import org.akvo.flow.domain.entity.question.DomainAltText
-import org.akvo.flow.domain.entity.question.DomainQuestion
 import org.akvo.flow.domain.entity.question.DomainLevel
 import org.akvo.flow.domain.entity.question.DomainOption
+import org.akvo.flow.domain.entity.question.DomainQuestion
 import org.akvo.flow.domain.util.GsonMapper
 import org.akvo.flow.presentation.form.view.groups.entity.ViewCascadeLevel
 import org.akvo.flow.presentation.form.view.groups.entity.ViewLocation
@@ -70,7 +70,7 @@ class ViewQuestionGroupMapper @Inject constructor() {
         userDisplayedDateFormat.timeZone = TimeZone.getDefault()
     }
 
-    fun transform(groups: List<DomainQuestionGroup>, responses: List<Response>): List<ViewQuestionGroup> {
+    fun transform(groups: List<DomainQuestionGroup>, responses: List<DomainResponse>): List<ViewQuestionGroup> {
         val viewGroups: MutableList<ViewQuestionGroup> = mutableListOf()
         for (g in groups) {
             viewGroups.add(transform(g, responses))
@@ -78,7 +78,7 @@ class ViewQuestionGroupMapper @Inject constructor() {
         return viewGroups
     }
 
-    private fun transform(group: DomainQuestionGroup, responses: List<Response>): ViewQuestionGroup {
+    private fun transform(group: DomainQuestionGroup, responses: List<DomainResponse>): ViewQuestionGroup {
         if (group.isRepeatable) {
             val maxRepsNumber: Int = countRepetitions(group.questions, responses)
             return ViewQuestionGroup(
@@ -101,7 +101,7 @@ class ViewQuestionGroupMapper @Inject constructor() {
 
     private fun listOfRepetitions(
         questions: MutableList<DomainQuestion>,
-        responses: List<Response>,
+        responses: List<DomainResponse>,
         maxRepsNumber: Int,
     ): ArrayList<GroupRepetition> {
         val groupRepetitions = arrayListOf<GroupRepetition>()
@@ -114,10 +114,10 @@ class ViewQuestionGroupMapper @Inject constructor() {
         return groupRepetitions
     }
 
-    private fun countRepetitions(questions: MutableList<DomainQuestion>, responses: List<Response>): Int {
+    private fun countRepetitions(questions: MutableList<DomainQuestion>, responses: List<DomainResponse>): Int {
         var repetitionsCount = 1
         questions.forEach { question ->
-            val listOfResponses: List<Response> = getResponsesForQuestion(
+            val listOfResponses: List<DomainResponse> = getResponsesForQuestion(
                 question.questionId, responses
             )
             if (listOfResponses.size > repetitionsCount) {
@@ -129,12 +129,12 @@ class ViewQuestionGroupMapper @Inject constructor() {
 
     private fun listOfAnswers(
         questions: MutableList<DomainQuestion>,
-        responses: List<Response>,
+        responses: List<DomainResponse>,
         repetition: Int
     ): ArrayList<ViewQuestionAnswer> {
         val answers = arrayListOf<ViewQuestionAnswer>()
        questions.forEach { question ->
-            val listOfResponses: List<Response> = getResponsesForQuestion(
+            val listOfResponses: List<DomainResponse> = getResponsesForQuestion(
                 question.questionId, responses
             )
             answers.add(createQuestionAnswer(question, listOfResponses, repetition))
@@ -144,7 +144,7 @@ class ViewQuestionGroupMapper @Inject constructor() {
 
     private fun createQuestionAnswer(
         question: DomainQuestion,
-        listOfResponses: List<Response>,
+        listOfResponses: List<DomainResponse>,
         repetition: Int
     ): ViewQuestionAnswer {
         val answer = if (listOfResponses.isNotEmpty() && listOfResponses.size > repetition) {
@@ -475,8 +475,8 @@ class ViewQuestionGroupMapper @Inject constructor() {
     /**
      * There may be a list of responses if the question is repeatable
      */
-    private fun getResponsesForQuestion(questionId: String?, responses: List<Response>): List<Response> {
-        val questionResponses = mutableListOf<Response>()
+    private fun getResponsesForQuestion(questionId: String?, responses: List<DomainResponse>): List<DomainResponse> {
+        val questionResponses = mutableListOf<DomainResponse>()
         for (r in responses) {
             if (r.questionId == questionId) {
                 questionResponses.add(r)

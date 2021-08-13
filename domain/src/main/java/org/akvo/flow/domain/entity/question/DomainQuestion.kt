@@ -33,7 +33,7 @@ data class DomainQuestion(
     var isAllowMultiple: Boolean = false,
     val isLocked: Boolean = false,
     val languageTranslationMap: HashMap<String?, DomainAltText> = HashMap(),
-    private val dependencies: MutableList<DomainDependency> = mutableListOf(),
+    val dependencies: MutableList<DomainDependency> = mutableListOf(),
     val isLocaleName: Boolean = false,
     val isLocaleLocation: Boolean = false,
     val isDoubleEntry: Boolean = false,

@@ -115,5 +115,4 @@ data class Question(
         }
         return q
     }
-
 }

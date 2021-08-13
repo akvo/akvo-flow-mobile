@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2020,2021 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -21,6 +21,9 @@ package org.akvo.flow.utils.tests
 
 import androidx.test.platform.app.InstrumentationRegistry
 import org.akvo.flow.utils.entity.Form
+import org.akvo.flow.data.tests.R
+import org.akvo.flow.utils.FileHelper
+import org.akvo.flow.utils.XmlFormParser
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.junit.runner.RunWith

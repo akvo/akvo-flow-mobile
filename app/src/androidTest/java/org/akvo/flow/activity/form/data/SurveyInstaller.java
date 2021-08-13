@@ -195,14 +195,14 @@ public class SurveyInstaller {
     }
 
     public SparseArray<List<Node>> getAllNodes(Question question, Context context) {
-        String src = question.getCascadeResource();
+        String cascadeFileName = question.getCascadeResource();
         FormResourcesFileBrowser formResourcesFileUtil = new FormResourcesFileBrowser(
                 new FileBrowser());
         File cascadeFolder = formResourcesFileUtil
                 .getExistingAppInternalFolder(
                         InstrumentationRegistry.getInstrumentation().getTargetContext());
-        if (!TextUtils.isEmpty(src)) {
-            File db = new File(cascadeFolder, src);
+        if (!TextUtils.isEmpty(cascadeFileName)) {
+            File db = new File(cascadeFolder, cascadeFileName);
             if (db.exists()) {
                 CascadeDB cascadeDB = new CascadeDB(context, db.getAbsolutePath());
                 cascadeDB.open();

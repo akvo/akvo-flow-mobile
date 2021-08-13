@@ -23,15 +23,17 @@ import io.reactivex.Observable
 import org.akvo.flow.data.datasource.DataSourceFactory
 import org.akvo.flow.data.entity.ApiFormHeader
 import org.akvo.flow.data.entity.form.DataForm
+import org.akvo.flow.data.entity.form.DataFormMapper
 import org.akvo.flow.data.entity.form.DomainFormMapper
 import org.akvo.flow.data.entity.form.FormHeaderParser
 import org.akvo.flow.data.entity.form.FormIdMapper
-import org.akvo.flow.data.entity.form.XmlFormParser
 import org.akvo.flow.data.net.RestApi
 import org.akvo.flow.data.net.s3.S3RestApi
 import org.akvo.flow.data.util.FlowFileBrowser
 import org.akvo.flow.domain.entity.DomainForm
 import org.akvo.flow.domain.repository.FormRepository
+import org.akvo.flow.utils.XmlFormParser
+import org.akvo.flow.utils.entity.Form
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -44,6 +46,7 @@ class FormDataRepository @Inject constructor(
     private val formIdMapper: FormIdMapper,
     private val s3RestApi: S3RestApi,
     private val domainFormMapper: DomainFormMapper,
+    private val dataFormMapper: DataFormMapper
 ) : FormRepository {
 
     override fun loadForm(formId: String?, deviceId: String?): Observable<Boolean?>? {
@@ -85,13 +88,13 @@ class FormDataRepository @Inject constructor(
 
     override suspend fun getFormWithGroups(formId: String): DomainForm {
         //TODO: once questions are in database we need to parse from db everything without opening xml form
-        return domainFormMapper.mapForms(
+        return domainFormMapper.mapForm(
             dataSourceFactory.dataBaseDataSource.getFormWithGroups(formId),
             parseForm(formId)
         )
     }
 
-    private fun parseForm(formId: String): DataForm {
+    private fun parseForm(formId: String): Form {
         return xmlParser.parseXmlForm(dataSourceFactory.fileDataSource.getFormFile(formId))
     }
 
@@ -152,7 +155,7 @@ class FormDataRepository @Inject constructor(
     }
 
     private fun saveForm(apiFormHeader: ApiFormHeader): Observable<Boolean> {
-        val form = xmlParser.parseXmlForm(dataSourceFactory.fileDataSource.getFormFile(apiFormHeader.id), apiFormHeader)
+        val form = dataFormMapper.mapForm(xmlParser.parseXmlForm(dataSourceFactory.fileDataSource.getFormFile(apiFormHeader.id), apiFormHeader.version.toDouble()))
         return downloadResources(form)
             .concatMap {
                 saveFormAndGroups(form, true)

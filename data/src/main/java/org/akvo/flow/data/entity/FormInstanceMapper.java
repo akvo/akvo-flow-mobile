@@ -26,13 +26,13 @@ import android.text.TextUtils;
 import androidx.annotation.NonNull;
 import androidx.core.util.Pair;
 
-import org.akvo.flow.data.util.FileHelper;
 import org.akvo.flow.database.ResponseColumns;
 import org.akvo.flow.database.SurveyInstanceColumns;
 import org.akvo.flow.database.UserColumns;
 import org.akvo.flow.domain.entity.InstanceIdUuid;
 import org.akvo.flow.domain.entity.Response;
 import org.akvo.flow.domain.util.TextValueCleaner;
+import org.akvo.flow.utils.FileHelper;
 
 import java.util.ArrayList;
 import java.util.HashSet;

@@ -16,34 +16,22 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.akvo.flow.domain.entity.question
+package org.akvo.flow.utils.entity
 
 import java.util.HashMap
 
-data class Option(
+/**
+ * Level represents a cascading question level. It just holds the level name (multilingual)
+ */
+data class Level(
     var text: String? = null,
-    var code: String?,
-    val isOther: Boolean = false,
-    private val altTextMap: HashMap<String?, AltText> = HashMap<String?, AltText>()
+    val altTextMap: HashMap<String?, AltText> = HashMap<String?, AltText>()
 ) {
-
     fun addAltText(altText: AltText) {
         altTextMap[altText.languageCode] = altText
     }
 
     fun getAltText(lang: String?): AltText? {
         return altTextMap[lang]
-    }
-
-    override fun hashCode(): Int {
-        return super.hashCode()
-    }
-
-    override fun equals(other: Any?): Boolean {
-        return if (other !is Option) {
-            false
-        } else {
-            text != null && text == other.text
-        }
     }
 }

@@ -16,7 +16,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.akvo.flow.domain.entity.question
+package org.akvo.flow.utils.entity
 
 /**
  * data structure representing a dependency between questions. A dependency

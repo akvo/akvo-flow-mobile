@@ -27,8 +27,11 @@ import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
 import android.text.TextUtils;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 import org.akvo.flow.data.entity.images.DataImageLocation;
-import org.akvo.flow.data.util.FileHelper;
+import org.akvo.flow.utils.FileHelper;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -36,8 +39,6 @@ import java.io.InputStream;
 
 import javax.inject.Inject;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import timber.log.Timber;
 
 public class MediaResolverHelper {

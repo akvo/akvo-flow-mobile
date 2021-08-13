@@ -17,29 +17,24 @@
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.akvo.flow.data.entity.form
+package org.akvo.flow.utils.entity
 
-import org.akvo.flow.domain.entity.question.DomainAltText
-import org.akvo.flow.domain.entity.question.DomainDependency
-import org.akvo.flow.domain.entity.question.DomainLevel
-import org.akvo.flow.domain.entity.question.DomainOption
-import org.akvo.flow.domain.entity.question.DomainQuestionHelp
 import java.util.HashMap
 
-data class DataQuestion(
+data class Question(
     val questionId: String? = null,
     val isMandatory: Boolean = false,
     var text: String? = null,
     val order: Int = 0,
     var isAllowOther: Boolean = false,
     val renderType: String? = null,
-    var questionHelp: MutableList<DomainQuestionHelp> = mutableListOf(),
+    var questionHelp: MutableList<QuestionHelp> = mutableListOf(),
     val type: String? = null,
-    var options: MutableList<DomainOption>? = null,
+    var options: MutableList<Option>? = null,
     var isAllowMultiple: Boolean = false,
     val isLocked: Boolean = false,
-    val languageTranslationMap: HashMap<String?, DomainAltText> = HashMap(),
-    val dependencies: MutableList<DomainDependency> = mutableListOf(),
+    val languageTranslationMap: HashMap<String?, AltText> = HashMap(),
+    val dependencies: MutableList<Dependency> = mutableListOf(),
     val useStrength: Boolean = false,
     val strengthMin: Int = 0,
     val strengthMax: Int = 0,
@@ -51,10 +46,10 @@ data class DataQuestion(
     val isAllowPolygon: Boolean = false,
     val caddisflyRes: String? = null,
     val cascadeResource: String? = null,
-    val levels: MutableList<DomainLevel> = mutableListOf(),
+    val levels: MutableList<Level> = mutableListOf(),
 ) {
 
-    fun addAltText(altText: DomainAltText) {
+    fun addAltText(altText: AltText) {
         languageTranslationMap[altText.languageCode] = altText
     }
 }

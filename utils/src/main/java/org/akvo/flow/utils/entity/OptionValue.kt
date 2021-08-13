@@ -16,7 +16,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.akvo.flow.domain.entity.question
+package org.akvo.flow.utils.entity
 
 import android.text.TextUtils
 import org.json.JSONArray
@@ -26,7 +26,7 @@ import timber.log.Timber
 import java.util.ArrayList
 
 object OptionValue {
-    fun serialize(values: List<DomainOption>): String {
+    fun serialize(values: List<Option>): String {
         try {
             val jOptions = JSONArray()
             for (option in values) {
@@ -47,13 +47,13 @@ object OptionValue {
         return ""
     }
 
-    fun deserialize(data: String): List<DomainOption> {
+    fun deserialize(data: String): List<Option> {
         try {
-            val options: MutableList<DomainOption> = ArrayList()
+            val options: MutableList<Option> = ArrayList()
             val jOptions = JSONArray(data)
             for (i in 0 until jOptions.length()) {
                 val jOption = jOptions.getJSONObject(i)
-                val option = DomainOption(jOption.optString(Attrs.TEXT), jOption.optString(Attrs.CODE, ""), jOption.optBoolean(Attrs.IS_OTHER))
+                val option = Option(jOption.optString(Attrs.TEXT), jOption.optString(Attrs.CODE, ""), jOption.optBoolean(Attrs.IS_OTHER))
                 options.add(option)
             }
             return options
@@ -62,10 +62,10 @@ object OptionValue {
         }
 
         // Default to old format
-        val options: MutableList<DomainOption> = ArrayList()
+        val options: MutableList<Option> = ArrayList()
         val tokens = data.split("\\|".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
         for (token in tokens) {
-            val o = DomainOption(code = token)
+            val o = Option(code = token)
             options.add(o)
         }
         return options

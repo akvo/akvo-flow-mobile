@@ -33,6 +33,4 @@ public class Constants {
     public static final String VERSION = "ver";
     public static final String HTTPS_PREFIX = "https";
     public static final String HTTP_PREFIX = "http";
-    static final String SURVEY_DATA_FILE_JSON = "data.json";
-    static final String UTF_8_CHARSET = "UTF-8";
 }

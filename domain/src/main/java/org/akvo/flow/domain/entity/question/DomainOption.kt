@@ -20,26 +20,30 @@ package org.akvo.flow.domain.entity.question
 
 import java.util.HashMap
 
-data class QuestionHelp(
-    val altTextMap: HashMap<String?, AltText> = HashMap<String?, AltText>(),
-    var text: String? = null
+data class DomainOption(
+    var text: String? = null,
+    var code: String?,
+    val isOther: Boolean = false,
+    private val altTextMap: HashMap<String?, DomainAltText> = HashMap<String?, DomainAltText>()
 ) {
-    fun getAltText(lang: String?): AltText? {
-        return altTextMap[lang]
-    }
 
-    fun addAltText(altText: AltText) {
+    fun addAltText(altText: DomainAltText) {
         altTextMap[altText.languageCode] = altText
     }
 
-    /**
-     * checks whether this help object is well formed
-     */
-    fun isValid(): Boolean {
-        return if (text == null || text!!.trim { it <= ' ' }.isEmpty()) {
+    fun getAltText(lang: String?): DomainAltText? {
+        return altTextMap[lang]
+    }
+
+    override fun hashCode(): Int {
+        return super.hashCode()
+    }
+
+    override fun equals(other: Any?): Boolean {
+        return if (other !is DomainOption) {
             false
         } else {
-            !"null".equals(text!!.trim { it <= ' ' }, ignoreCase = true)
+            text != null && text == other.text
         }
     }
 }

@@ -16,10 +16,30 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.akvo.flow.domain.entity.question
+package org.akvo.flow.utils.entity
 
-data class AltText(
-    var languageCode: String?,
-    var type: String?,
+import java.util.HashMap
+
+data class QuestionHelp(
+    val altTextMap: HashMap<String?, AltText> = HashMap<String?, AltText>(),
     var text: String? = null
-)
+) {
+    fun getAltText(lang: String?): AltText? {
+        return altTextMap[lang]
+    }
+
+    fun addAltText(altText: AltText) {
+        altTextMap[altText.languageCode] = altText
+    }
+
+    /**
+     * checks whether this help object is well formed
+     */
+    fun isValid(): Boolean {
+        return if (text == null || text!!.trim { it <= ' ' }.isEmpty()) {
+            false
+        } else {
+            !"null".equals(text!!.trim { it <= ' ' }, ignoreCase = true)
+        }
+    }
+}

@@ -26,11 +26,12 @@ import android.graphics.Matrix;
 import android.graphics.RectF;
 import android.os.Build;
 import android.os.ParcelFileDescriptor;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import org.akvo.flow.data.util.FileHelper;
 import org.akvo.flow.domain.util.ImageSize;
+import org.akvo.flow.utils.FileHelper;
 
 import java.io.BufferedOutputStream;
 import java.io.FileDescriptor;

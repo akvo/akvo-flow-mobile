@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2020 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2021 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -16,15 +16,16 @@
  * You should have received a copy of the GNU General Public License
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.akvo.flow.data.entity.form
+package org.akvo.flow.utils
 
-import org.akvo.flow.data.entity.ApiFormHeader
-import org.akvo.flow.data.util.FileHelper
-import org.akvo.flow.domain.entity.question.AltText
-import org.akvo.flow.domain.entity.question.Dependency
-import org.akvo.flow.domain.entity.question.Level
-import org.akvo.flow.domain.entity.question.Option
-import org.akvo.flow.domain.entity.question.QuestionHelp
+import org.akvo.flow.utils.entity.AltText
+import org.akvo.flow.utils.entity.Dependency
+import org.akvo.flow.utils.entity.Form
+import org.akvo.flow.utils.entity.Level
+import org.akvo.flow.utils.entity.Option
+import org.akvo.flow.utils.entity.Question
+import org.akvo.flow.utils.entity.QuestionGroup
+import org.akvo.flow.utils.entity.QuestionHelp
 import org.xmlpull.v1.XmlPullParser
 import org.xmlpull.v1.XmlPullParserException
 import org.xmlpull.v1.XmlPullParserFactory
@@ -82,16 +83,16 @@ class XmlFormParser @Inject constructor(private val helper: FileHelper) {
         return languageCodes
     }
 
-    fun parseXmlForm(inputStream: InputStream, apiFormHeader: ApiFormHeader? = null): DataForm {
-        val groups: MutableList<DataQuestionGroup> = mutableListOf()
-        var version = apiFormHeader?.version?.toDouble() ?: 0.0
+    fun parseXmlForm(inputStream: InputStream, backUpVersion: Double? = null): Form {
+        val groups: MutableList<QuestionGroup> = mutableListOf()
+        var version = backUpVersion ?: 0.0
         var name = ""
         var formId = -1
         var surveyId = -1
         var defaultLanguage = ""
         val parserFactory: XmlPullParserFactory
-        var currentQuestionGroup: DataQuestionGroup? = null
-        var currentQuestion: DataQuestion? = null
+        var currentQuestionGroup: QuestionGroup? = null
+        var currentQuestion: Question? = null
         var currentOptions = mutableListOf<Option>()
         var currentOption: Option? = null
         var currentLevels = mutableListOf<Level>()
@@ -128,7 +129,7 @@ class XmlFormParser @Inject constructor(private val helper: FileHelper) {
                                 groupOrder++
                                 val repeatable = "true" == getStringAttribute(parser, REPEATABLE)
                                 val groupId = getLongAttribute(parser, "groupId")
-                                currentQuestionGroup = DataQuestionGroup(groupId,
+                                currentQuestionGroup = QuestionGroup(groupId,
                                     "",
                                     repeatable = repeatable,
                                     formId.toString(), groupOrder)
@@ -146,7 +147,7 @@ class XmlFormParser @Inject constructor(private val helper: FileHelper) {
                                     }
                                 }
 
-                                currentQuestion = DataQuestion(
+                                currentQuestion = Question(
                                     cascadeResource = resource,
                                     order = order,
                                     isMandatory = getBooleanAttribute(parser, MANDATORY),
@@ -312,7 +313,7 @@ class XmlFormParser @Inject constructor(private val helper: FileHelper) {
         } finally {
             helper.close(inputStream)
         }
-        return DataForm(formId, formId.toString(),
+        return Form(formId, formId.toString(),
             surveyId,
             name = name,
             version = version,

@@ -44,8 +44,8 @@ import org.akvo.flow.data.entity.SurveyInstanceIdMapper;
 import org.akvo.flow.data.entity.form.DataForm;
 import org.akvo.flow.data.entity.form.DataQuestionGroup;
 import org.akvo.flow.data.entity.form.FormLanguagesMapper;
-import org.akvo.flow.data.entity.form.FormMapper;
 import org.akvo.flow.data.entity.form.QuestionGroupMapper;
+import org.akvo.flow.data.entity.form.DataFormMapper;
 import org.akvo.flow.data.util.FlowFileBrowser;
 import org.akvo.flow.database.Constants;
 import org.akvo.flow.database.RecordColumns;
@@ -83,7 +83,7 @@ public class DatabaseDataSource {
 
     private final BriteSurveyDbAdapter briteSurveyDbAdapter;
     private final SurveyInstanceIdMapper surveyInstanceIdMapper;
-    private final FormMapper formMapper;
+    private final DataFormMapper formMapper;
     private final FormInstanceMapper formInstanceMapper;
     private final CursorMapper cursorMapper;
     private final FormLanguagesMapper formLanguagesMapper;
@@ -91,7 +91,7 @@ public class DatabaseDataSource {
 
     @Inject
     public DatabaseDataSource(BriteDatabase db, SurveyInstanceIdMapper surveyInstanceIdMapper,
-                              FormMapper formMapper, FormInstanceMapper formInstanceMapper,
+                              DataFormMapper formMapper, FormInstanceMapper formInstanceMapper,
                               CursorMapper cursorMapper, FormLanguagesMapper formLanguagesMapper,
                               QuestionGroupMapper questionGroupMapper) {
         this.briteSurveyDbAdapter = new BriteSurveyDbAdapter(db);

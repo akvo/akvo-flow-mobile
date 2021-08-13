@@ -21,9 +21,26 @@ package org.akvo.flow.data.entity.form
 
 import android.database.Cursor
 import org.akvo.flow.database.SurveyColumns
+import org.akvo.flow.utils.entity.Form
 import javax.inject.Inject
 
-class FormMapper @Inject constructor() {
+class DataFormMapper @Inject constructor() {
+
+    fun mapForm(xmlForm: Form): DataForm {
+        return DataForm(
+            xmlForm.id,
+            xmlForm.formId,
+            xmlForm.surveyId,
+            xmlForm.name,
+            xmlForm.version,
+            xmlForm.type,
+            xmlForm.location,
+            xmlForm.filename,
+            xmlForm.language,
+            xmlForm.cascadeDownloaded,
+            xmlForm.deleted
+        )
+    }
 
     fun mapForms(cursor: Cursor?): List<DataForm> {
         val forms = mutableListOf<DataForm>()

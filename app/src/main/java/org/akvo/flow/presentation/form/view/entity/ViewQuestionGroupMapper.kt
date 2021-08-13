@@ -29,10 +29,10 @@ import com.google.gson.annotations.SerializedName
 import com.google.gson.reflect.TypeToken
 import org.akvo.flow.domain.entity.DomainQuestionGroup
 import org.akvo.flow.domain.entity.Response
-import org.akvo.flow.domain.entity.question.AltText
+import org.akvo.flow.domain.entity.question.DomainAltText
 import org.akvo.flow.domain.entity.question.DomainQuestion
-import org.akvo.flow.domain.entity.question.Level
-import org.akvo.flow.domain.entity.question.Option
+import org.akvo.flow.domain.entity.question.DomainLevel
+import org.akvo.flow.domain.entity.question.DomainOption
 import org.akvo.flow.domain.util.GsonMapper
 import org.akvo.flow.presentation.form.view.groups.entity.ViewCascadeLevel
 import org.akvo.flow.presentation.form.view.groups.entity.ViewLocation
@@ -375,7 +375,7 @@ class ViewQuestionGroupMapper @Inject constructor() {
     }
 
     private fun mapToViewOption(
-        options: MutableList<Option>?,
+        options: MutableList<DomainOption>?,
         response: String, allowOther: Boolean
     ): MutableList<ViewOption> {
         val viewOptions = mutableListOf<ViewOption>()
@@ -406,7 +406,7 @@ class ViewQuestionGroupMapper @Inject constructor() {
         return viewOptions
     }
 
-    private fun mapToBundle(languageTranslationMap: HashMap<String?, AltText>): Bundle {
+    private fun mapToBundle(languageTranslationMap: HashMap<String?, DomainAltText>): Bundle {
         val bundle = Bundle()
         for (key in languageTranslationMap.keys) {
             val text = languageTranslationMap[key]?.text
@@ -441,7 +441,7 @@ class ViewQuestionGroupMapper @Inject constructor() {
 
     private fun mapToCascadeResponse(
         data: String,
-        levels: MutableList<Level>
+        levels: MutableList<DomainLevel>
     ): List<ViewCascadeLevel> {
         val values: MutableList<ViewCascadeLevel> = ArrayList()
         val cascadeLevels: ArrayList<CascadeLevel> = ArrayList()

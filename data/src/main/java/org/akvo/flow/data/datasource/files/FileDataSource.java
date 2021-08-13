@@ -28,8 +28,8 @@ import androidx.annotation.VisibleForTesting;
 
 import org.akvo.flow.data.util.Constants;
 import org.akvo.flow.data.util.ExternalStorageHelper;
-import org.akvo.flow.data.util.FileHelper;
 import org.akvo.flow.data.util.FlowFileBrowser;
+import org.akvo.flow.utils.FileHelper;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
@@ -58,7 +58,7 @@ public class FileDataSource {
 
     @Inject
     public FileDataSource(FileHelper fileHelper, FlowFileBrowser flowFileBrowser,
-            ExternalStorageHelper externalStorageHelper) {
+                          ExternalStorageHelper externalStorageHelper) {
         this.fileHelper = fileHelper;
         this.flowFileBrowser = flowFileBrowser;
         this.externalStorageHelper = externalStorageHelper;

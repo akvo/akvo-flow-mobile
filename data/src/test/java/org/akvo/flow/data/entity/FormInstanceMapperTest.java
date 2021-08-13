@@ -19,23 +19,6 @@
 
 package org.akvo.flow.data.entity;
 
-import android.database.Cursor;
-
-import org.akvo.flow.data.util.FileHelper;
-import org.akvo.flow.domain.entity.InstanceIdUuid;
-import org.akvo.flow.domain.entity.Response;
-import org.akvo.flow.domain.util.TextValueCleaner;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
-
-import java.util.List;
-import java.util.Set;
-
-import androidx.core.util.Pair;
-
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertNull;
@@ -46,6 +29,23 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
+import android.database.Cursor;
+
+import androidx.core.util.Pair;
+
+import org.akvo.flow.domain.entity.InstanceIdUuid;
+import org.akvo.flow.domain.entity.Response;
+import org.akvo.flow.domain.util.TextValueCleaner;
+import org.akvo.flow.utils.FileHelper;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
+
+import java.util.List;
+import java.util.Set;
 
 @RunWith(MockitoJUnitRunner.class)
 public class FormInstanceMapperTest {

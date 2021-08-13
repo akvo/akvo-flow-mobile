@@ -102,8 +102,6 @@ public class GeoQuestionView extends QuestionView
         geoInputContainer.setTextWatchers(this);
         mGeoButton.setOnClickListener(this);
 
-        geoInputContainer.disableManualInputs();
-        mGeoButton.setVisibility(View.GONE);
         if (mQuestion.isLocked()) {
             geoInputContainer.disableManualInputs();
         }

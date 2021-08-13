@@ -141,7 +141,7 @@ class OldFormMapper @Inject constructor() {
 
     private fun mapAltText(domainAltText: HashMap<String?, DomainAltText>): HashMap<String?, AltText> {
         val textMap = HashMap<String?, AltText>()
-        for(language in domainAltText.keys) {
+        for (language in domainAltText.keys) {
             val altText = domainAltText[language]
             if (altText != null) {
                 textMap[language] = AltText(altText.languageCode, altText.type, altText.text)
@@ -150,9 +150,20 @@ class OldFormMapper @Inject constructor() {
         return textMap
     }
 
-    fun mapResponses(responses: List<Response>): HashMap<String, QuestionResponse> {
+    fun mapResponses(
+        responses: List<Response>,
+        formInstanceId: Long?,
+    ): HashMap<String, QuestionResponse> {
         // QuestionId - QuestionResponse
         val questionResponses: HashMap<String, QuestionResponse> = HashMap()
+        for (response in responses) {
+            //TODO: check if id is needed
+            //check if filename is needed
+            //check include flag
+            val questionResponse = QuestionResponse(response.value, response.answerType, null,
+                formInstanceId, response.questionId, null, true, response.iteration)
+            questionResponses[questionResponse.responseKey] = questionResponse
+        }
         return questionResponses
     }
 }

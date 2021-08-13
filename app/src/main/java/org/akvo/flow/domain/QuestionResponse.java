@@ -39,7 +39,7 @@ public class QuestionResponse {
     private final boolean includeFlag;
     private final int iteration;
 
-    private QuestionResponse(String value, String type, Long id, Long surveyInstanceId,
+    public QuestionResponse(String value, String type, Long id, Long surveyInstanceId,
             String questionId, String filename, boolean includeFlag, int iteration) {
         this.value = value;
         this.type = type;

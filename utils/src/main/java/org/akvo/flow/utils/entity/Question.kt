@@ -51,11 +51,16 @@ data class Question(
     }
 
     //TODO: remove
+    //TODO: check how to see iterations
     fun getIteration(): Int {
         return if (isRepeatable()) {
             val questionIdAndIteration: List<String> = questionId?.split("\\|") ?: emptyList()
-            val iteration = questionIdAndIteration[1]
-            iteration.toInt()
+            val iteration = if (questionIdAndIteration.size > 1) {
+                questionIdAndIteration[1].toInt()
+            } else {
+                0
+            }
+            iteration
         } else {
             -1
         }

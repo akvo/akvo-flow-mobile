@@ -184,7 +184,7 @@ class FormPresenter @Inject constructor(
                         is FormResult.Success -> {
                             val form = oldFormMapper.mapForm(surveyGroup, formResult.domainForm)
                             val responses: HashMap<String, QuestionResponse> = if (responsesResult is ResponsesResult.Success) {
-                                oldFormMapper.mapResponses(responsesResult.responses)
+                                oldFormMapper.mapResponses(responsesResult.responses, formInstanceId)
                             } else {
                                 HashMap<String, QuestionResponse>()
                             }

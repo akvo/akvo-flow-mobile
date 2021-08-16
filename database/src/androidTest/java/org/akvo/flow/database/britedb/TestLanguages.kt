@@ -23,34 +23,36 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import org.akvo.flow.database.R
 import org.junit.Assert.assertEquals
+import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class TestLanguages {
 
+    lateinit var languages: Array<String>
+    lateinit var codes: Array<String>
+
+    @Before
+    fun setUp() {
+        val resources = InstrumentationRegistry.getInstrumentation().targetContext.resources
+        languages = resources.getStringArray(R.array.alllanguages)
+        codes = resources.getStringArray(R.array.alllanguagecodes)
+    }
+
     @Test
     fun bothLanguageArraysHaveSameSize() {
-        val languages = InstrumentationRegistry.getInstrumentation().targetContext.resources.getStringArray(R.array.alllanguages)
-        val codes = InstrumentationRegistry.getInstrumentation().targetContext.resources.getStringArray(R.array.alllanguagecodes)
-
         assertEquals(languages.size, codes.size)
     }
 
     @Test
     fun checkBembaLanguage() {
-        val languages = InstrumentationRegistry.getInstrumentation().targetContext.resources.getStringArray(R.array.alllanguages)
-        val codes = InstrumentationRegistry.getInstrumentation().targetContext.resources.getStringArray(R.array.alllanguagecodes)
-
         assertEquals("bem", codes[186])
         assertEquals("Bemba", languages[186])
     }
 
     @Test
     fun checkEnglishLanguage() {
-        val languages = InstrumentationRegistry.getInstrumentation().targetContext.resources.getStringArray(R.array.alllanguages)
-        val codes = InstrumentationRegistry.getInstrumentation().targetContext.resources.getStringArray(R.array.alllanguagecodes)
-
         assertEquals("en", codes[0])
         assertEquals("English", languages[0])
     }

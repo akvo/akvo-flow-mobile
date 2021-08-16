@@ -25,6 +25,7 @@ import io.reactivex.Single
 import io.reactivex.observers.TestObserver
 import org.akvo.flow.domain.entity.FormInstanceMetadata
 import org.akvo.flow.domain.repository.FileRepository
+import org.akvo.flow.domain.repository.SurveyRepository
 import org.akvo.flow.domain.repository.UserRepository
 import org.akvo.flow.domain.util.TextValueCleaner
 import org.junit.Before

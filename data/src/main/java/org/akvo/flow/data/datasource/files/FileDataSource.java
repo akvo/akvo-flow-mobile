@@ -35,6 +35,7 @@ import org.jetbrains.annotations.NotNull;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
@@ -51,6 +52,7 @@ import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.functions.Predicate;
 import okhttp3.ResponseBody;
+import timber.log.Timber;
 
 @Singleton
 public class FileDataSource {
@@ -281,5 +283,11 @@ public class FileDataSource {
     public void extractZipEntry(@NotNull ZipFile zipFile, @NotNull ZipEntry entry, String folderName) throws IOException {
         File resFolder = flowFileBrowser.getExistingInternalFolder(folderName);
         fileHelper.extractInputStream(new ZipInputStream(zipFile.getInputStream(entry)), resFolder);
+    }
+
+    public void copyFormFile(@NotNull ZipFile zipFile, @NotNull ZipEntry entry, String formId) throws IOException {
+        File resFolder = flowFileBrowser.getExistingInternalFolder(FlowFileBrowser.DIR_FORMS);
+        File surveyFile = new File(resFolder, formId + ".xml");
+        fileHelper.copyFile(zipFile.getInputStream(entry), new FileOutputStream(surveyFile));
     }
 }

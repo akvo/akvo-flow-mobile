@@ -148,7 +148,7 @@ class FormDataRepository @Inject constructor(
         }
 
         //extract form to app folder
-        dataSourceFactory.fileDataSource.extractZipEntry(zipFile, entry, DIR_FORMS)
+        dataSourceFactory.fileDataSource.copyFormFile(zipFile, entry, formAndMeta.first.formId)
         dataSourceFactory.dataBaseDataSource.insertSurveyGroup(surveyMetadata.survey)
         saveFormAndGroups(formAndMeta.first, true)
     }

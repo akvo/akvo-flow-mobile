@@ -41,6 +41,7 @@ import java.util.zip.ZipInputStream
 import java.util.zip.ZipOutputStream
 import javax.inject.Inject
 
+
 class FileHelper @Inject constructor() {
     /**
      * Compute MD5 checksum of the given file
@@ -240,6 +241,14 @@ class FileHelper @Inject constructor() {
             Timber.e(e)
         } finally {
             close(zis)
+        }
+    }
+
+    fun copyFile(inputStream: InputStream, fileOutputStream: FileOutputStream) {
+        val buffer = ByteArray(BUFFER_SIZE)
+        var size: Int
+        while (inputStream.read(buffer, 0, buffer.size).also { size = it } != -1) {
+            fileOutputStream.write(buffer, 0, size)
         }
     }
 

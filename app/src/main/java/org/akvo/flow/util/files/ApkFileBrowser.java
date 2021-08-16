@@ -21,12 +21,14 @@
 package org.akvo.flow.util.files;
 
 import android.content.Context;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
 
 import org.akvo.flow.BuildConfig;
 import org.akvo.flow.domain.util.VersionHelper;
+import org.akvo.flow.util.FileUtil;
 
 import java.io.File;
 import java.util.List;

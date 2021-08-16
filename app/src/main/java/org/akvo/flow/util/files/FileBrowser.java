@@ -24,6 +24,8 @@ import android.content.Context;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import org.akvo.flow.util.FileUtil;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;

@@ -20,7 +20,7 @@
 package org.akvo.flow.service.bootstrap
 
 import android.os.Environment
-import org.akvo.flow.util.files.FileUtil
+import org.akvo.flow.util.FileUtil
 import java.io.File
 import java.util.ArrayList
 import java.util.Locale

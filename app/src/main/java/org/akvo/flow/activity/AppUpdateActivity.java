@@ -28,6 +28,9 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+
 import org.akvo.flow.R;
 import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.domain.util.VersionHelper;
@@ -35,7 +38,7 @@ import org.akvo.flow.injector.component.ApplicationComponent;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
 import org.akvo.flow.ui.Navigator;
-import org.akvo.flow.util.files.FileUtil;
+import org.akvo.flow.util.FileUtil;
 import org.akvo.flow.util.files.ApkFileBrowser;
 import org.akvo.flow.util.files.FileBrowser;
 
@@ -53,8 +56,6 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 import timber.log.Timber;
 
 public class AppUpdateActivity extends AppCompatActivity {

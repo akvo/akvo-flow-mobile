@@ -17,7 +17,7 @@
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.akvo.flow.util.files;
+package org.akvo.flow.util;
 
 import android.content.Context;
 import android.os.Environment;

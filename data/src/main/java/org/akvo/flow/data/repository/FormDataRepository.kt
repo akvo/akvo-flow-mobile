@@ -181,7 +181,8 @@ class FormDataRepository @Inject constructor(
     }
 
     private fun insertAndDownload(apiFormHeader: ApiFormHeader): Observable<Boolean> {
-        return dataSourceFactory.dataBaseDataSource.insertSurveyGroup(dataSurveyMapper.map(apiFormHeader))
+        val map = dataSurveyMapper.map(apiFormHeader)
+        return dataSourceFactory.dataBaseDataSource.insertSurveyGroup(map)
             .concatMap { downloadForm(apiFormHeader) }
     }
 

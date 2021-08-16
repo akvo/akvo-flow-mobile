@@ -40,7 +40,7 @@ class DisplayNameMapperTest {
 
     @Test
     fun createDisplayNameShouldReturnCorrectName() {
-        val displayNameMapper = DisplayNameMapper(mockContext);
+        val displayNameMapper = DisplayNameMapper(mockContext)
 
         val name = displayNameMapper.createDisplayName("datapoint1")
 
@@ -49,7 +49,7 @@ class DisplayNameMapperTest {
 
     @Test
     fun createDisplayNameShouldReturnCorrectNameForNullName() {
-        val displayNameMapper = DisplayNameMapper(mockContext);
+        val displayNameMapper = DisplayNameMapper(mockContext)
 
         val name = displayNameMapper.createDisplayName(null)
 
@@ -58,7 +58,7 @@ class DisplayNameMapperTest {
 
     @Test
     fun createDisplayNameShouldReturnCorrectNameForEmptyName() {
-        val displayNameMapper = DisplayNameMapper(mockContext);
+        val displayNameMapper = DisplayNameMapper(mockContext)
 
         val name = displayNameMapper.createDisplayName("")
 

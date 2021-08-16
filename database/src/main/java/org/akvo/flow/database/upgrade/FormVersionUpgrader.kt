@@ -20,20 +20,16 @@
 package org.akvo.flow.database.upgrade
 
 import android.database.sqlite.SQLiteDatabase
+import org.akvo.flow.database.DatabaseHelper
 import org.akvo.flow.database.tables.QuestionGroupTable
 
 class FormVersionUpgrader(
     private val db: SQLiteDatabase,
     private val groupTable: QuestionGroupTable,
+    private val helper: DatabaseHelper
 ) : DatabaseUpgrader {
 
     override fun upgrade() {
-        //TODO: for now we just create the table, in the future we need to read the all xml files and insert the actual data
-        groupTable.onCreate(db)
-        //fetch all forms with ids
-        //foreach read xml file
-        //insert groups
-
-        //when question table also add questions into table
+        helper.upgradeFromVersionUpgrader(db)
     }
 }

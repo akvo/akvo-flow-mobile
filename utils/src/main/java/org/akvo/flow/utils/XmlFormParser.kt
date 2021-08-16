@@ -87,6 +87,7 @@ class XmlFormParser @Inject constructor(private val helper: FileHelper) {
         return languageCodes
     }
 
+    @JvmOverloads
     fun parseXmlForm(inputStream: InputStream, backUpVersion: Double? = null): Form {
         val groups: MutableList<QuestionGroup> = mutableListOf()
         var version = backUpVersion ?: 0.0

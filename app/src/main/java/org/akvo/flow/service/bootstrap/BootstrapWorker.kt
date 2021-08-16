@@ -31,7 +31,6 @@ import org.akvo.flow.util.NotificationHelper
 import timber.log.Timber
 import java.io.File
 import java.util.concurrent.TimeUnit
-import java.util.zip.ZipFile
 import javax.inject.Inject
 
 /**
@@ -67,7 +66,25 @@ class BootstrapWorker(context: Context, workerParams: WorkerParameters) :
     }
 
     override fun doWork(): Result {
-        checkAndInstall()
+        val zipFiles = zipFileLister.listSortedZipFiles()
+        if (zipFiles.isEmpty()) {
+            return Result.success()
+        }
+        displayBootstrapStartNotification()
+        val processingResult = execute(zipFiles)
+        when (processingResult) {
+            is ProcessingResult.ProcessingErrorWrongDashboard -> {
+                displayErrorNotification(applicationContext.getString(R.string.bootstrap_invalid_app_title),
+                    applicationContext.getString(R.string.bootstrap_invalid_app_message))
+            }
+            is ProcessingResult.ProcessingError -> {
+                displayErrorNotification(applicationContext.getString(R.string.bootstraperror),
+                    "")
+            }
+            else -> {
+                displayNotification(applicationContext.getString(R.string.bootstrapcomplete))
+            }
+        }
         return Result.success()
     }
 
@@ -78,46 +95,33 @@ class BootstrapWorker(context: Context, workerParams: WorkerParameters) :
      * multiple zips in the directory) just in case data in a later zip depends
      * on the previous one being there.
      */
-    private fun checkAndInstall() {
+    private fun execute(zipFiles: List<File>):  ProcessingResult{
+        var processingResult: ProcessingResult = ProcessingResult.ProcessingSuccess
         try {
-            val zipFiles = zipFileLister.listSortedZipFiles()
-            if (zipFiles.isEmpty()) {
-                return
-            }
-            val startMessage = applicationContext.getString(R.string.bootstrapstart)
-            displayNotification(startMessage)
             bootstrapProcessor.openDb()
 
-            loop@ for (file in zipFiles) {
-                val zipFile = ZipFile(file)
-                val result = bootstrapProcessor.processZipFile(zipFile)
-                zipFile.close()
-                when (result) {
-                    is ProcessingResult.ProcessingSuccess -> {
-                        file.renameTo(File(file.absolutePath + ConstantUtil.PROCESSED_OK_SUFFIX))
-                        displayNotification(applicationContext.getString(R.string.bootstrapcomplete))
-                    }
-                    is ProcessingResult.ProcessingErrorWrongDashboard -> {
-                        file.renameTo(File(file.absolutePath + ConstantUtil.PROCESSED_ERROR_SUFFIX))
-                        displayErrorNotification(applicationContext.getString(R.string.bootstrap_invalid_app_title),
-                            applicationContext.getString(R.string.bootstrap_invalid_app_message))
-                        break@loop
-                    }
-                    else -> {
-                        file.renameTo(File(file.absolutePath + ConstantUtil.PROCESSED_ERROR_SUFFIX))
-                        displayErrorNotification(applicationContext.getString(R.string.bootstraperror),
-                            "")
-                        break@loop
-                    }
+            for (file in zipFiles) {
+                processingResult = bootstrapProcessor.processZipFile(file)
+                if (processingResult is ProcessingResult.ProcessingSuccess) {
+                    break
                 }
             }
         } catch (e: Exception) {
             val errorMessage = applicationContext.getString(R.string.bootstraperror)
             displayErrorNotification(errorMessage, "")
             Timber.e(e, "Bootstrap error")
+            processingResult = ProcessingResult.ProcessingError
         } finally {
             bootstrapProcessor.closeDb()
         }
+
+        return processingResult
+
+    }
+
+    private fun displayBootstrapStartNotification() {
+        val startMessage = applicationContext.getString(R.string.bootstrapstart)
+        displayNotification(startMessage)
     }
 
     private fun displayErrorNotification(errorTitle: String, errorMessage: String) {
@@ -136,7 +140,7 @@ class BootstrapWorker(context: Context, workerParams: WorkerParameters) :
 
 
     companion object {
-        private const val TAG = "BootstrapService"
+        private const val TAG = "BootstrapWorker"
 
         @JvmStatic
         fun scheduleWork(context: Context) {

@@ -38,7 +38,8 @@ class BootstrapProcessor @Inject constructor(
     private val fileProcessor: FileProcessor
 ) {
 
-    fun processZipFile(zipFile: ZipFile): ProcessingResult {
+    fun processZipFile(file: File): ProcessingResult {
+        val zipFile = ZipFile(file)
         val entries: Enumeration<out ZipEntry> = zipFile.entries()
         while (entries.hasMoreElements()) {
             val entry = entries.nextElement()
@@ -47,6 +48,7 @@ class BootstrapProcessor @Inject constructor(
                 entryName.endsWith(ConstantUtil.CASCADE_RES_SUFFIX) -> {
                     val result = processCascadeResource(zipFile, entry)
                     if (result is ProcessingResult.ProcessingError) {
+                        file.renameTo(File(file.absolutePath + ConstantUtil.PROCESSED_ERROR_SUFFIX))
                         return result
                     }
                 }
@@ -54,11 +56,14 @@ class BootstrapProcessor @Inject constructor(
                     val result = processSurveyFile(zipFile, entry, entryName)
                     if (result is ProcessingResult.ProcessingError ||
                         result is ProcessingResult.ProcessingErrorWrongDashboard) {
+                        file.renameTo(File(file.absolutePath + ConstantUtil.PROCESSED_ERROR_SUFFIX))
                         return result
                     }
                 }
             }
         }
+        zipFile.close()
+        file.renameTo(File(file.absolutePath + ConstantUtil.PROCESSED_OK_SUFFIX))
         return ProcessingResult.ProcessingSuccess
     }
 

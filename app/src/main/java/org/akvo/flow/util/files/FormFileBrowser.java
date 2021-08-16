@@ -43,9 +43,4 @@ public class FormFileBrowser {
         return fileBrowser.getExistingAppInternalFolder(context, DIR_FORMS);
     }
 
-    @NonNull
-    public File findFile(Context context, String fileName) {
-        return fileBrowser.findFile(context, DIR_FORMS, fileName);
-    }
-
 }

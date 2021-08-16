@@ -20,8 +20,6 @@
 
 package org.akvo.flow.data.entity;
 
-import org.akvo.flow.domain.entity.Response;
-
 import java.util.ArrayList;
 import java.util.List;
 

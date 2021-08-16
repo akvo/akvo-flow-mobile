@@ -39,16 +39,14 @@ import org.akvo.flow.utils.entity.Question;
 import javax.inject.Inject;
 
 public class GeoshapeQuestionView extends QuestionView implements OnClickListener {
+
     private View mResponseView;
     private Button mMapBtn;
 
     private String mValue;
 
-    @Inject
-    Navigator navigator;
-
-    public GeoshapeQuestionView(Context context, Question q, SurveyListener surveyListener) {
-        super(context, q, surveyListener);
+    public GeoshapeQuestionView(Context context, Question q, SurveyListener surveyListener, int repetition) {
+        super(context, q, surveyListener, repetition);
         init();
     }
 

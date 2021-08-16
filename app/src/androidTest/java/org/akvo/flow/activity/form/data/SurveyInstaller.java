@@ -116,7 +116,7 @@ public class SurveyInstaller {
                 QuestionResponse responseToSave = responseBuilder
                         .setSurveyInstanceId(surveyInstanceId)
                         .createQuestionResponse();
-                questionResponseMap.put(responseToSave.getResponseKey(), responseToSave);
+                questionResponseMap.put(responseToSave.responseMapKey(), responseToSave);
                 adapter.createOrUpdateSurveyResponse(responseToSave);
             }
         }

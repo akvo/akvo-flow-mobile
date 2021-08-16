@@ -68,8 +68,8 @@ public class CascadeQuestionView extends QuestionView {
     private boolean mFinished;
     private CascadeDB mDatabase;
 
-    public CascadeQuestionView(Context context, Question q, SurveyListener surveyListener) {
-        super(context, q, surveyListener);
+    public CascadeQuestionView(Context context, Question q, SurveyListener surveyListener, int repetition) {
+        super(context, q, surveyListener, repetition);
         init();
     }
 
@@ -81,7 +81,7 @@ public class CascadeQuestionView extends QuestionView {
 
         // Load level names
         List<Level> levels = getQuestion().getLevels();
-        if (levels != null) {
+        if (!levels.isEmpty()) {
             mLevels = new String[levels.size()];
             for (int i = 0; i < levels.size(); i++) {
                 mLevels[i] = levels.get(i).getText();

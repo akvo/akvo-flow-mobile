@@ -45,8 +45,8 @@ public class BarcodeQuestionViewMultiple extends QuestionView implements
     private BarcodeQuestionAdapter barcodeQuestionAdapter;
     private BarcodeQuestionInput questionInput;
 
-    public BarcodeQuestionViewMultiple(Context context, Question q, SurveyListener surveyListener) {
-        super(context, q, surveyListener);
+    public BarcodeQuestionViewMultiple(Context context, Question q, SurveyListener surveyListener, int repetition) {
+        super(context, q, surveyListener, repetition);
         init();
     }
 

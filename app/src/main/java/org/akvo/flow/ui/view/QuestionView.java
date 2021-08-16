@@ -57,6 +57,7 @@ import java.util.StringTokenizer;
 public abstract class QuestionView extends LinearLayout implements QuestionInteractionListener {
     protected static String[] sColors = null;
     final ErrorMessageFormatter errorMessageFormatter = new ErrorMessageFormatter();
+    protected final int repetition;
 
     protected Question mQuestion;
     private QuestionResponse mResponse;
@@ -73,8 +74,9 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
      */
     private String mError;
 
-    public QuestionView(final Context context, Question q, SurveyListener surveyListener) {
+    public QuestionView(final Context context, Question q, SurveyListener surveyListener, int repetition) {
         super(context);
+        this.repetition = repetition;
         setOrientation(VERTICAL);
         final int topBottomPadding = getDimension(R.dimen.small_padding);
         final int leftRightPadding = getDimension(R.dimen.form_left_right_padding);
@@ -413,8 +415,7 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
      */
     public abstract void captureResponse(boolean suppressListeners);
 
-    public void setResponse(boolean suppressListeners, Question question, String value,
-            String type) {
+    public void setResponse(boolean suppressListeners, Question question, String value, String type) {
         setResponse(createResponse(question, value, type), suppressListeners);
     }
 
@@ -558,7 +559,7 @@ public abstract class QuestionView extends LinearLayout implements QuestionInter
                 .setValue(value)
                 .setType(type)
                 .setQuestionId(question.getQuestionId())
-                .setIteration(question.getIteration())
+                .setIteration(repetition)
                 .createQuestionResponse();
     }
 }

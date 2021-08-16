@@ -897,6 +897,12 @@ public class BriteSurveyDbAdapter {
     }
 
     public void deleteGroups(String formId) {
-        briteDatabase.delete(QuestionGroupTable.TABLE_NAME, QuestionGroupTable.COLUMN_FORM_ID + " =? ", formId);
+        briteDatabase.delete(QuestionGroupTable.TABLE_NAME,
+                QuestionGroupTable.COLUMN_FORM_ID + " =? ", formId);
+    }
+
+    public Cursor getResponsesToDisplay(Long surveyInstanceId) {
+        return briteDatabase.query("SELECT * FROM " + Tables.RESPONSE + " WHERE " +
+                        ResponseColumns.SURVEY_INSTANCE_ID + " = ?", surveyInstanceId + "");
     }
 }

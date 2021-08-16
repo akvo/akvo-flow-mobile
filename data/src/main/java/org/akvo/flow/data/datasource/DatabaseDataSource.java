@@ -77,7 +77,6 @@ import kotlin.Pair;
 
 public class DatabaseDataSource {
 
-    private static final String DEFAULTS_SURVEY_LANGUAGE = "en";
     private static final String DEFAULT_SURVEY_TYPE = "survey";
     private static final String DEFAULT_SURVEY_LOCATION = "sdcard";
 
@@ -370,6 +369,10 @@ public class DatabaseDataSource {
 
     public Cursor getResponses(Long surveyInstanceId) {
         return briteSurveyDbAdapter.getResponses(surveyInstanceId);
+    }
+
+    public Cursor getResponsesToDisplay(Long surveyInstanceId) {
+        return briteSurveyDbAdapter.getResponsesToDisplay(surveyInstanceId);
     }
 
     public Completable createTransmissions(final Long instanceId, final String formId,

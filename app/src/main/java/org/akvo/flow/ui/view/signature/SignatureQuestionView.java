@@ -66,8 +66,8 @@ public class SignatureQuestionView extends QuestionView {
     private ImageLoader imageLoader;
     private Signature mSignature;
 
-    public SignatureQuestionView(Context context, Question q, SurveyListener surveyListener) {
-        super(context, q, surveyListener);
+    public SignatureQuestionView(Context context, Question q, SurveyListener surveyListener, int repetition) {
+        super(context, q, surveyListener, repetition);
         init();
     }
 

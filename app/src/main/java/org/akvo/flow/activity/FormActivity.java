@@ -103,8 +103,6 @@ public class FormActivity extends BackActivity implements SurveyListener,
         MobileDataSettingDialog.MobileDataSettingListener {
 
     public static final int INVALID_INSTANCE_ID = -1;
-    @Inject
-    FormFileBrowser formFileBrowser;
 
     @Inject
     MediaFileHelper mediaFileHelper;
@@ -801,7 +799,6 @@ public class FormActivity extends BackActivity implements SurveyListener,
                     .setId(id)
                     .setSurveyInstanceId(formInstanceId)
                     .setQuestionId(eventResponse.getQuestionId())
-                    .setFilename(eventResponse.getFilename())
                     .setIncludeFlag(eventResponse.getIncludeFlag())
                     .setIteration(eventResponse.getIteration())
                     .createQuestionResponse();

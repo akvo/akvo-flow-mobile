@@ -37,9 +37,6 @@ import org.akvo.flow.database.tables.Tables;
  */
 public class SurveyDbAdapter {
 
-    private static final String SURVEY_INSTANCE_JOIN_SURVEY = "survey_instance "
-            + "JOIN survey ON survey_instance.survey_id = survey.survey_id "
-            + "JOIN survey_group ON survey.survey_group_id=survey_group.survey_group_id";
     private static final String SURVEY_INSTANCE_JOIN_SURVEY_AND_RESPONSE = "survey_instance "
             + "JOIN survey ON survey_instance.survey_id = survey.survey_id "
             + "JOIN survey_group ON survey.survey_group_id=survey_group.survey_group_id "
@@ -291,14 +288,6 @@ public class SurveyDbAdapter {
         database.insert(Tables.RECORD, null, values);
 
         return recordUid;
-    }
-
-    public Cursor getFormInstance(long formInstanceId) {
-        return database.query(SURVEY_INSTANCE_JOIN_SURVEY,
-                FormInstanceQuery.PROJECTION,
-                Tables.SURVEY_INSTANCE + "." + SurveyInstanceColumns._ID + "= ?",
-                new String[] { String.valueOf(formInstanceId) },
-                null, null, null);
     }
 
     /**

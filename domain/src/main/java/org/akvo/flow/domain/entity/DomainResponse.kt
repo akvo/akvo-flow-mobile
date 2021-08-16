@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2018 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -15,21 +15,15 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
+ *
  */
+package org.akvo.flow.domain.entity
 
-package org.akvo.flow.presentation.form.view.entity
-
-import org.akvo.flow.domain.entity.DomainForm
-import org.akvo.flow.domain.entity.DomainResponse
-import javax.inject.Inject
-
-class ViewFormMapper @Inject constructor(private val viewQuestionGroupMapper: ViewQuestionGroupMapper) {
-
-    fun transform(domainForm: DomainForm, responses: List<DomainResponse>): ViewForm {
-        return ViewForm(
-            domainForm.name,
-            domainForm.version,
-            viewQuestionGroupMapper.transform(domainForm.groups, responses)
-        )
-    }
-}
+data class DomainResponse(
+    val id: Long,
+    val questionId: String,
+    val answerType: String,
+    val value: String,
+    val iteration: Int,
+    val isIncludeFlag: Boolean
+)

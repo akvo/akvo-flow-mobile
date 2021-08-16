@@ -29,11 +29,11 @@ import org.akvo.flow.utils.entity.Question;
 public class BarcodeQuestionViewFactory {
 
     public static QuestionView createBarcodeQuestion(Context context, Question q,
-            SurveyListener surveyListener) {
+                                                     SurveyListener surveyListener, int repetition) {
        if (q.isAllowMultiple()) {
-            return new BarcodeQuestionViewMultiple(context, q, surveyListener);
+            return new BarcodeQuestionViewMultiple(context, q, surveyListener,repetition);
         } else {
-            return new BarcodeQuestionViewSingle(context, q, surveyListener);
+            return new BarcodeQuestionViewSingle(context, q, surveyListener, repetition);
         }
     }
 }

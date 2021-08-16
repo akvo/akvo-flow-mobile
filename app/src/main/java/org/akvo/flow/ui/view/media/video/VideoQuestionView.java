@@ -96,8 +96,8 @@ public class VideoQuestionView extends QuestionView implements IVideoQuestionVie
     private ImageLoader imageLoader;
     private String filePath;
 
-    public VideoQuestionView(Context context, Question q, SurveyListener surveyListener) {
-        super(context, q, surveyListener);
+    public VideoQuestionView(Context context, Question q, SurveyListener surveyListener, int repetition) {
+        super(context, q, surveyListener, repetition);
         init();
     }
 
@@ -274,8 +274,7 @@ public class VideoQuestionView extends QuestionView implements IVideoQuestionVie
                     .setValue(value)
                     .setType(ConstantUtil.VIDEO_RESPONSE_TYPE)
                     .setQuestionId(question.getQuestionId())
-                    .setIteration(question.getIteration())
-                    .setFilename(filePath)
+                    .setIteration(repetition)
                     .createQuestionResponse();
         }
         setResponse(response);

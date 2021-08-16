@@ -211,13 +211,15 @@ public class QuestionGroupTab extends ConstraintLayout
              */
             if (responses.containsKey(questionId)) {
                 qv.rehydrate(responses.get(questionId));
-            } else if (qv.getQuestion().isRepeatable() && !TextUtils.isEmpty(questionId)) {
-                String[] questionIdRepetition = questionId.split("\\|");
+            } else if (mQuestionGroup.isRepeatable() && !TextUtils.isEmpty(questionId)) {
+                //TODO: fix this repetitions are now broken
+                int repetition = qv.repetition;
+         /*       String[] questionIdRepetition = questionId.split("\\|");
                 questionId = questionIdRepetition[0];
                 int repetition = 0;
                 if (questionIdRepetition.length > 1) {
                     repetition = Integer.parseInt(questionIdRepetition[1]);
-                }
+                }*/
                 /*
                  * First rep (or rep 0), its questionId is in format 123456
                  * after the second rep, the questionId format is 123451|1 etc...
@@ -286,51 +288,51 @@ public class QuestionGroupTab extends ConstraintLayout
     }
 
     private void loadGroup(int index) {
-        final int repetitionId = getRepetitionId(index);
+        final int repetition = getRepetition(index);
         final int visualIndicator = index + 1;
 
         if (mQuestionGroup.isRepeatable()) {
             updateRepetitionsHeader();
             QuestionGroupIterationHeader header =
                     new QuestionGroupIterationHeader(getContext(), mQuestionGroup.getHeading(),
-                            repetitionId, visualIndicator, this);
-            groupIterationHeaders.put(repetitionId, header);
+                            repetition, visualIndicator, this);
+            groupIterationHeaders.put(repetition, header);
             mContainer.addView(header);
         }
 
         final Context context = getContext();
         for (Question q : mQuestionGroup.getQuestions()) {
             if (mQuestionGroup.isRepeatable()) {
-                q = q.copy(q, q.getQuestionId() + "|" + repetitionId);
+                q = q.copy(q, q.getQuestionId() + "|" + repetition);
             }
 
             QuestionView questionView;
             if (ConstantUtil.OPTION_QUESTION_TYPE.equalsIgnoreCase(q.getType())) {
                 questionView = OptionQuestionFactory
-                        .createOptionQuestion(context, q, mSurveyListener);
+                        .createOptionQuestion(context, q, mSurveyListener, repetition);
             } else if (ConstantUtil.FREE_QUESTION_TYPE.equalsIgnoreCase(q.getType())) {
-                questionView = new FreetextQuestionView(context, q, mSurveyListener);
+                questionView = new FreetextQuestionView(context, q, mSurveyListener, repetition);
             } else if (ConstantUtil.PHOTO_QUESTION_TYPE.equalsIgnoreCase(q.getType())) {
-                questionView = new PhotoQuestionView(context, q, mSurveyListener);
+                questionView = new PhotoQuestionView(context, q, mSurveyListener, repetition);
             } else if (ConstantUtil.VIDEO_QUESTION_TYPE.equalsIgnoreCase(q.getType())) {
-                questionView = new VideoQuestionView(context, q, mSurveyListener);
+                questionView = new VideoQuestionView(context, q, mSurveyListener, repetition);
             } else if (ConstantUtil.GEO_QUESTION_TYPE.equalsIgnoreCase(q.getType())) {
-                questionView = new GeoQuestionView(context, q, mSurveyListener);
+                questionView = new GeoQuestionView(context, q, mSurveyListener, repetition);
             } else if (ConstantUtil.SCAN_QUESTION_TYPE.equalsIgnoreCase(q.getType())) {
                 questionView = BarcodeQuestionViewFactory
-                        .createBarcodeQuestion(context, q, mSurveyListener);
+                        .createBarcodeQuestion(context, q, mSurveyListener, repetition);
             } else if (ConstantUtil.DATE_QUESTION_TYPE.equalsIgnoreCase(q.getType())) {
-                questionView = new DateQuestionView(context, q, mSurveyListener);
+                questionView = new DateQuestionView(context, q, mSurveyListener, repetition);
             } else if (ConstantUtil.CASCADE_QUESTION_TYPE.equalsIgnoreCase(q.getType())) {
-                questionView = new CascadeQuestionView(context, q, mSurveyListener);
+                questionView = new CascadeQuestionView(context, q, mSurveyListener, repetition);
             } else if (ConstantUtil.GEOSHAPE_QUESTION_TYPE.equalsIgnoreCase(q.getType())) {
-                questionView = new GeoshapeQuestionView(context, q, mSurveyListener);
+                questionView = new GeoshapeQuestionView(context, q, mSurveyListener, repetition);
             } else if (ConstantUtil.SIGNATURE_QUESTION_TYPE.equalsIgnoreCase(q.getType())) {
-                questionView = new SignatureQuestionView(context, q, mSurveyListener);
+                questionView = new SignatureQuestionView(context, q, mSurveyListener, repetition);
             } else if (ConstantUtil.CADDISFLY_QUESTION_TYPE.equalsIgnoreCase(q.getType())) {
-                questionView = new CaddisflyQuestionView(context, q, mSurveyListener);
+                questionView = new CaddisflyQuestionView(context, q, mSurveyListener, repetition);
             } else {
-                questionView = new QuestionHeaderView(context, q, mSurveyListener);
+                questionView = new QuestionHeaderView(context, q, mSurveyListener, repetition);
             }
 
             // Add question interaction listener
@@ -353,7 +355,7 @@ public class QuestionGroupTab extends ConstraintLayout
         return layoutParams;
     }
 
-    private int getRepetitionId(int index) {
+    private int getRepetition(int index) {
         return groupIterations.size() <= index ?
                 groupIterations.next() :
                 groupIterations.getRepetitionId(index);

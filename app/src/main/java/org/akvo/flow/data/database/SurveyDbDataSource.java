@@ -84,27 +84,6 @@ public class SurveyDbDataSource {
         surveyDbAdapter.close();
     }
 
-    public Map<String, QuestionResponse> getResponses(long surveyInstanceId) {
-        Map<String, QuestionResponse> responses = new HashMap<>();
-
-        Cursor cursor = surveyDbAdapter.getResponses(surveyInstanceId);
-
-        if (cursor != null) {
-            if (cursor.moveToFirst()) {
-                QuestionResponseColumns columns = new QuestionResponseColumns(cursor);
-                do {
-                    QuestionResponse response = getQuestionResponseBuilder(cursor,columns)
-                            .setSurveyInstanceId(surveyInstanceId)
-                            .createQuestionResponse();
-                    responses.put(response.getResponseKey(), response);
-                } while (cursor.moveToNext());
-            }
-            cursor.close();
-        }
-
-        return responses;
-    }
-
     private QuestionResponse.QuestionResponseBuilder getQuestionResponseBuilder(Cursor cursor,
           QuestionResponseColumns columns) {
         return new QuestionResponse.QuestionResponseBuilder()
@@ -112,7 +91,6 @@ public class SurveyDbDataSource {
                 .setType(cursor.getString(columns.getTypeColumn()))
                 .setId(cursor.getLong(columns.getIdColumn()))
                 .setQuestionId(cursor.getString(columns.getQuestionIdColumn()))
-                .setFilename(cursor.getString(columns.getFilenameColumn()))
                 .setIncludeFlag(cursor.getInt(columns.getIncludeColumn()) == 1)
                 .setIteration(cursor.getInt(columns.getIterationColumn()));
     }
@@ -135,7 +113,7 @@ public class SurveyDbDataSource {
                             .setId(null)
                             .setSurveyInstanceId(newSurveyInstanceId)
                             .createQuestionResponse();
-                    responses.put(response.getResponseKey(), response);
+                    responses.put(response.responseMapKey(), response);
                 } while (cursor.moveToNext());
             }
             cursor.close();
@@ -188,7 +166,6 @@ public class SurveyDbDataSource {
                     .setId(id)
                     .setSurveyInstanceId(surveyInstanceId)
                     .setQuestionId(questionId)
-                    .setFilename(newResponse.getFilename())
                     .setIncludeFlag(newResponse.getIncludeFlag())
                     .setIteration(iteration)
                     .createQuestionResponse();
@@ -217,7 +194,6 @@ public class SurveyDbDataSource {
         initialValues.put(ResponseColumns.TYPE, responseToSave.getType());
         initialValues.put(ResponseColumns.QUESTION_ID, responseToSave.getQuestionId());
         initialValues.put(ResponseColumns.SURVEY_INSTANCE_ID, responseToSave.getSurveyInstanceId());
-        initialValues.put(ResponseColumns.FILENAME, responseToSave.getFilename());
         initialValues.put(ResponseColumns.INCLUDE, responseToSave.getIncludeFlag() ? 1 : 0);
         initialValues.put(ResponseColumns.ITERATION, responseToSave.getIteration());
         long id = surveyDbAdapter.updateSurveyResponse(responseToSave.getId(), initialValues);

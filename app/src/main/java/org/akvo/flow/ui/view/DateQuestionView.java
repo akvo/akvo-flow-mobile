@@ -59,8 +59,8 @@ public class DateQuestionView extends QuestionView implements View.OnClickListen
 
     private EditText mDateTextEdit;
 
-    public DateQuestionView(Context context, Question q, SurveyListener surveyListener) {
-        super(context, q, surveyListener);
+    public DateQuestionView(Context context, Question q, SurveyListener surveyListener, int repetition) {
+        super(context, q, surveyListener, repetition);
         mLocalCalendar = GregorianCalendar.getInstance(Locale.getDefault());
         mLocalCalendar.setTimeInMillis(System.currentTimeMillis());
         userDisplayedDateFormat = SimpleDateFormat.getDateInstance();
@@ -71,7 +71,7 @@ public class DateQuestionView extends QuestionView implements View.OnClickListen
     private void init() {
         setQuestionView(R.layout.date_question_view);
 
-        mDateTextEdit = (EditText) findViewById(R.id.date_et);
+        mDateTextEdit = findViewById(R.id.date_et);
 
         View pickButton = findViewById(R.id.date_btn);
         pickButton.setOnClickListener(this);

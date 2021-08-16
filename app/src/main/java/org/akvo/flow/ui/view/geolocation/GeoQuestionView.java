@@ -80,8 +80,8 @@ public class GeoQuestionView extends QuestionView
     private View geoLoading;
     private GeoInputContainer geoInputContainer;
 
-    public GeoQuestionView(Context context, Question q, SurveyListener surveyListener) {
-        super(context, q, surveyListener);
+    public GeoQuestionView(Context context, Question q, SurveyListener surveyListener, int repetition) {
+        super(context, q, surveyListener, repetition);
         mLocationListener = new PermissionAwareLocationListener(context, this,
                 allowMockLocations(q), q.getQuestionId(), this);
         init();
@@ -102,8 +102,6 @@ public class GeoQuestionView extends QuestionView
         geoInputContainer.setTextWatchers(this);
         mGeoButton.setOnClickListener(this);
 
-        geoInputContainer.disableManualInputs();
-        mGeoButton.setVisibility(View.GONE);
         if (mQuestion.isLocked()) {
             geoInputContainer.disableManualInputs();
         }

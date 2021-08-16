@@ -99,8 +99,8 @@ public class PhotoQuestionView extends QuestionView implements IPhotoQuestionVie
     private Media mMedia;
     private ImageLoader imageLoader;
 
-    public PhotoQuestionView(Context context, Question q, SurveyListener surveyListener) {
-        super(context, q, surveyListener);
+    public PhotoQuestionView(Context context, Question q, SurveyListener surveyListener, int repetition) {
+        super(context, q, surveyListener, repetition);
         init();
     }
 
@@ -269,8 +269,7 @@ public class PhotoQuestionView extends QuestionView implements IPhotoQuestionVie
                     .setValue(value)
                     .setType(ConstantUtil.IMAGE_RESPONSE_TYPE)
                     .setQuestionId(question.getQuestionId())
-                    .setIteration(question.getIteration())
-                    .setFilename(mMedia.getFilename())
+                    .setIteration(repetition)
                     .createQuestionResponse();
         }
         setResponse(response);

@@ -25,7 +25,7 @@ import org.akvo.flow.domain.Survey
 import org.akvo.flow.domain.SurveyGroup
 import org.akvo.flow.domain.entity.DomainForm
 import org.akvo.flow.domain.entity.DomainQuestionGroup
-import org.akvo.flow.domain.entity.Response
+import org.akvo.flow.domain.entity.DomainResponse
 import org.akvo.flow.domain.entity.question.DomainAltText
 import org.akvo.flow.domain.entity.question.DomainDependency
 import org.akvo.flow.domain.entity.question.DomainLevel
@@ -141,7 +141,7 @@ class OldFormMapper @Inject constructor() {
 
     private fun mapAltText(domainAltText: HashMap<String?, DomainAltText>): HashMap<String?, AltText> {
         val textMap = HashMap<String?, AltText>()
-        for(language in domainAltText.keys) {
+        for (language in domainAltText.keys) {
             val altText = domainAltText[language]
             if (altText != null) {
                 textMap[language] = AltText(altText.languageCode, altText.type, altText.text)
@@ -150,9 +150,17 @@ class OldFormMapper @Inject constructor() {
         return textMap
     }
 
-    fun mapResponses(responses: List<Response>): HashMap<String, QuestionResponse> {
-        // QuestionId - QuestionResponse
+    fun mapResponses(
+        responses: List<DomainResponse>,
+        formInstanceId: Long?,
+    ): HashMap<String, QuestionResponse> {
         val questionResponses: HashMap<String, QuestionResponse> = HashMap()
+        for (response in responses) {
+            val questionResponse =
+                QuestionResponse(response.value, response.answerType, response.id,
+                    formInstanceId, response.questionId, response.isIncludeFlag, response.iteration)
+            questionResponses[questionResponse.responseMapKey()] = questionResponse
+        }
         return questionResponses
     }
 }

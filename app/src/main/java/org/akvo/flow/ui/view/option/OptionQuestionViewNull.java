@@ -33,8 +33,8 @@ import java.util.List;
 public class OptionQuestionViewNull extends OptionQuestionView {
 
     public OptionQuestionViewNull(Context context, Question q,
-            SurveyListener surveyListener) {
-        super(context, q, surveyListener);
+            SurveyListener surveyListener, int repetition) {
+        super(context, q, surveyListener, repetition);
     }
 
     @Override

@@ -35,18 +35,16 @@ public class QuestionResponse {
     private final Long id;
     private final Long surveyInstanceId;
     private final String questionId;
-    private final String filename;
     private final boolean includeFlag;
     private final int iteration;
 
-    private QuestionResponse(String value, String type, Long id, Long surveyInstanceId,
-            String questionId, String filename, boolean includeFlag, int iteration) {
+    public QuestionResponse(String value, String type, Long id, Long surveyInstanceId,
+                            String questionId, boolean includeFlag, int iteration) {
         this.value = value;
         this.type = type;
         this.id = id;
         this.surveyInstanceId = surveyInstanceId;
         this.questionId = questionId;
-        this.filename = filename;
         this.includeFlag = includeFlag;
         this.iteration = iteration;
     }
@@ -104,10 +102,6 @@ public class QuestionResponse {
         return id;
     }
 
-    public String getFilename() {
-        return filename;
-    }
-
     public boolean hasValue() {
         boolean hasVal = false;
         if (value != null && value.trim().length() > 0) {
@@ -152,7 +146,7 @@ public class QuestionResponse {
      * The key is usually the questionId except for questions that belong to a repeatable group
      * whose key is composed by questionId|iteration
      */
-    public String getResponseKey() {
+    public String responseMapKey() {
         String responseKey = getQuestionId();
         if (getIteration() > ONE_ITERATION) {
             responseKey = responseKey + "|" + getIteration();
@@ -171,7 +165,6 @@ public class QuestionResponse {
         private Long id;
         private Long surveyInstanceId;
         private String questionId;
-        private String filename;
         private boolean includeFlag = true;
         private int iteration = NO_ITERATION;
 
@@ -200,11 +193,6 @@ public class QuestionResponse {
             return this;
         }
 
-        public QuestionResponseBuilder setFilename(String filename) {
-            this.filename = filename;
-            return this;
-        }
-
         public QuestionResponseBuilder setIncludeFlag(boolean includeFlag) {
             this.includeFlag = includeFlag;
             return this;
@@ -216,8 +204,8 @@ public class QuestionResponse {
         }
 
         public QuestionResponse createQuestionResponse() {
-            return new QuestionResponse(value, type, id, surveyInstanceId, questionId, filename,
-                    includeFlag, iteration);
+            return new QuestionResponse(value, type, id, surveyInstanceId, questionId, includeFlag,
+                    iteration);
         }
 
         @Nullable
@@ -230,7 +218,6 @@ public class QuestionResponse {
             return setId(id)
                     .setValue(questionResponse.getValue())
                     .setIteration(questionResponse.getIteration())
-                    .setFilename(questionResponse.getFilename())
                     .setIncludeFlag(questionResponse.getIncludeFlag())
                     .setQuestionId(questionResponse.getQuestionId())
                     .setSurveyInstanceId(questionResponse.getSurveyInstanceId())
@@ -248,7 +235,6 @@ public class QuestionResponse {
             return setId(questionResponse.getId())
                     .setValue(questionResponse.getValue())
                     .setIteration(questionResponse.getIteration())
-                    .setFilename(questionResponse.getFilename())
                     .setIncludeFlag(includeFlag)
                     .setQuestionId(questionResponse.getQuestionId())
                     .setSurveyInstanceId(questionResponse.getSurveyInstanceId())
@@ -271,7 +257,6 @@ public class QuestionResponse {
                 return setId(oldResponse.getId())
                         .setValue(newResponse.getValue())
                         .setIteration(oldResponse.getIteration())
-                        .setFilename(newResponse.getFilename())
                         .setIncludeFlag(oldResponse.getIncludeFlag())
                         .setQuestionId(oldResponse.getQuestionId())
                         .setSurveyInstanceId(oldResponse.getSurveyInstanceId())
@@ -284,7 +269,6 @@ public class QuestionResponse {
             if (newResponse != null) {
                 return setValue(newResponse.getValue())
                         .setIteration(newResponse.getIteration())
-                        .setFilename(newResponse.getFilename())
                         .setIncludeFlag(newResponse.getIncludeFlag())
                         .setQuestionId(newResponse.getQuestionId())
                         .setSurveyInstanceId(newResponse.getSurveyInstanceId())

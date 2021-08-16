@@ -19,17 +19,19 @@
 package org.akvo.flow.service.bootstrap
 
 import android.content.Context
+import androidx.work.CoroutineWorker
 import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
-import androidx.work.Worker
 import androidx.work.WorkerParameters
+import org.akvo.flow.BuildConfig.AWS_BUCKET
+import org.akvo.flow.BuildConfig.INSTANCE_URL
 import org.akvo.flow.R
 import org.akvo.flow.app.FlowApp
+import org.akvo.flow.domain.interactor.bootstrap.BootstrapProcessor
+import org.akvo.flow.domain.interactor.bootstrap.ProcessingResult
 import org.akvo.flow.util.ConstantUtil
 import org.akvo.flow.util.NotificationHelper
-import timber.log.Timber
-import java.io.File
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -52,7 +54,7 @@ import javax.inject.Inject
  *
  */
 class BootstrapWorker(context: Context, workerParams: WorkerParameters) :
-    Worker(context, workerParams) {
+    CoroutineWorker(context, workerParams) {
 
     @Inject
     lateinit var zipFileLister: ZipFileLister
@@ -65,14 +67,13 @@ class BootstrapWorker(context: Context, workerParams: WorkerParameters) :
         application.getApplicationComponent().inject(this)
     }
 
-    override fun doWork(): Result {
+    override suspend fun doWork(): Result {
         val zipFiles = zipFileLister.listSortedZipFiles()
         if (zipFiles.isEmpty()) {
             return Result.success()
         }
         displayBootstrapStartNotification()
-        val processingResult = execute(zipFiles)
-        when (processingResult) {
+        when (bootstrapProcessor.execute(zipFiles, INSTANCE_URL, AWS_BUCKET)) {
             is ProcessingResult.ProcessingErrorWrongDashboard -> {
                 displayErrorNotification(applicationContext.getString(R.string.bootstrap_invalid_app_title),
                     applicationContext.getString(R.string.bootstrap_invalid_app_message))
@@ -86,37 +87,6 @@ class BootstrapWorker(context: Context, workerParams: WorkerParameters) :
             }
         }
         return Result.success()
-    }
-
-    /**
-     * Checks the bootstrap directory for unprocessed zip files. If they are
-     * found, they're processed one at a time. If an error occurs, all
-     * processing stops (subsequent zips won't be processed if there are
-     * multiple zips in the directory) just in case data in a later zip depends
-     * on the previous one being there.
-     */
-    private fun execute(zipFiles: List<File>):  ProcessingResult{
-        var processingResult: ProcessingResult = ProcessingResult.ProcessingSuccess
-        try {
-            bootstrapProcessor.openDb()
-
-            for (file in zipFiles) {
-                processingResult = bootstrapProcessor.processZipFile(file)
-                if (processingResult is ProcessingResult.ProcessingSuccess) {
-                    break
-                }
-            }
-        } catch (e: Exception) {
-            val errorMessage = applicationContext.getString(R.string.bootstraperror)
-            displayErrorNotification(errorMessage, "")
-            Timber.e(e, "Bootstrap error")
-            processingResult = ProcessingResult.ProcessingError
-        } finally {
-            bootstrapProcessor.closeDb()
-        }
-
-        return processingResult
-
     }
 
     private fun displayBootstrapStartNotification() {

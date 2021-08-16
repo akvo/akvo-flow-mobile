@@ -23,9 +23,9 @@ package org.akvo.flow.domain.repository;
 import androidx.annotation.NonNull;
 
 import org.akvo.flow.domain.entity.DataPoint;
+import org.akvo.flow.domain.entity.DomainSurvey;
 import org.akvo.flow.domain.entity.FormInstanceMetadata;
 import org.akvo.flow.domain.entity.InstanceIdUuid;
-import org.akvo.flow.domain.entity.Survey;
 import org.akvo.flow.domain.entity.User;
 import org.jetbrains.annotations.Nullable;
 
@@ -38,7 +38,7 @@ import io.reactivex.Single;
 
 public interface SurveyRepository {
 
-    Observable<List<Survey>> getSurveys();
+    Observable<List<DomainSurvey>> getSurveys();
 
     Observable<List<DataPoint>> getDataPoints(Long surveyGroupId, Double latitude,
             Double longitude, Integer orderBy);
@@ -85,6 +85,4 @@ public interface SurveyRepository {
 
     @Nullable
     Completable setSurveyViewed(long surveyId);
-
-    Completable cleanDataPoints(Long surveyGroupId);
 }

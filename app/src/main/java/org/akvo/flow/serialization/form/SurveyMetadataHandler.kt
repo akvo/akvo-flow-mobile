@@ -19,8 +19,8 @@
  */
 package org.akvo.flow.serialization.form
 
-import org.akvo.flow.domain.SurveyGroup
-import org.akvo.flow.domain.SurveyMetadata
+import org.akvo.flow.utils.entity.SurveyGroup
+import org.akvo.flow.utils.entity.SurveyMetadata
 import org.xml.sax.Attributes
 import org.xml.sax.SAXException
 import org.xml.sax.helpers.DefaultHandler
@@ -56,7 +56,9 @@ class SurveyMetadataHandler : DefaultHandler() {
                 val surveyGroupName = attributes.getValue(SURVEY_GROUP_NAME)
                 val surveyGroupForm = attributes.getValue(REGISTRATION_SURVEY)
                 surveyMetadata.surveyGroup =
-                    SurveyGroup(surveyGroupId, surveyGroupName, surveyGroupForm,
+                    SurveyGroup(surveyGroupId,
+                        surveyGroupName,
+                        surveyGroupForm,
                         surveyGroupForm != null)
             }
             surveyMetadata.app = attributes.getValue(APP)

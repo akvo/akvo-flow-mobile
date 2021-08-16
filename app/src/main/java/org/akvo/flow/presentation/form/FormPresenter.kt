@@ -29,7 +29,6 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import org.akvo.flow.domain.QuestionResponse
 import org.akvo.flow.domain.Survey
-import org.akvo.flow.domain.SurveyGroup
 import org.akvo.flow.domain.interactor.DefaultObserver
 import org.akvo.flow.domain.interactor.ExportSurveyInstance
 import org.akvo.flow.domain.interactor.UseCase
@@ -42,6 +41,7 @@ import org.akvo.flow.domain.interactor.responses.ResponsesResult
 import org.akvo.flow.domain.interactor.settings.FormVersionUpdateNotified
 import org.akvo.flow.domain.interactor.settings.SetFormVersionUpdateNotified
 import org.akvo.flow.presentation.Presenter
+import org.akvo.flow.utils.entity.SurveyGroup
 import org.jetbrains.annotations.NotNull
 import timber.log.Timber
 import java.util.HashMap

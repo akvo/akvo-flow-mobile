@@ -37,6 +37,7 @@ import org.akvo.flow.data.datasource.files.FileDataSource;
 import org.akvo.flow.data.entity.ApiFormHeader;
 import org.akvo.flow.data.entity.form.DataForm;
 import org.akvo.flow.data.entity.form.DataFormMapper;
+import org.akvo.flow.data.entity.form.DataSurvey;
 import org.akvo.flow.data.entity.form.DomainFormMapper;
 import org.akvo.flow.data.entity.form.FormHeaderParser;
 import org.akvo.flow.data.entity.form.FormIdMapper;
@@ -135,7 +136,7 @@ public class FormDataRepositoryTest {
         when(mockFormHeaderParser.parseOne(anyString())).thenReturn(apiFormHeader);
         when(mockAmazonAuth.getAmazonAuthForGet(anyString(), anyString(), anyString()))
                 .thenReturn("123");
-        when(mockDatabaseDataSource.insertSurveyGroup(any(ApiFormHeader.class)))
+        when(mockDatabaseDataSource.insertSurveyGroup(any(DataSurvey.class)))
                 .thenReturn(Observable.just(true));
         doNothing().when(mockDatabaseDataSource).saveForm(anyBoolean(), any(DataForm.class));
         when(mockFileDataSource.extractRemoteArchive(any(ResponseBody.class), anyString()))

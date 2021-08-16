@@ -22,7 +22,6 @@ package org.akvo.flow.presentation.form
 import org.akvo.flow.domain.QuestionGroup
 import org.akvo.flow.domain.QuestionResponse
 import org.akvo.flow.domain.Survey
-import org.akvo.flow.domain.SurveyGroup
 import org.akvo.flow.domain.entity.DomainForm
 import org.akvo.flow.domain.entity.DomainQuestionGroup
 import org.akvo.flow.domain.entity.DomainResponse
@@ -38,6 +37,7 @@ import org.akvo.flow.utils.entity.Level
 import org.akvo.flow.utils.entity.Option
 import org.akvo.flow.utils.entity.Question
 import org.akvo.flow.utils.entity.QuestionHelp
+import org.akvo.flow.utils.entity.SurveyGroup
 import java.util.ArrayList
 import java.util.HashMap
 import javax.inject.Inject

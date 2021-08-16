@@ -22,7 +22,7 @@ package org.akvo.flow.utils.entity
 data class Form(
     val id: Int,
     val formId: String,
-    val surveyId: Int,
+    val surveyId: Long,
     val name: String,
     val version: Double,
     val type: String = "survey",

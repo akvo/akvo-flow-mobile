@@ -22,7 +22,7 @@ package org.akvo.flow.presentation.navigation;
 
 import androidx.annotation.NonNull;
 
-import org.akvo.flow.domain.SurveyGroup;
+import org.akvo.flow.utils.entity.SurveyGroup;
 
 import javax.inject.Inject;
 

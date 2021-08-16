@@ -27,7 +27,6 @@ import androidx.annotation.VisibleForTesting;
 
 import org.akvo.flow.BuildConfig;
 import org.akvo.flow.domain.util.VersionHelper;
-import org.akvo.flow.util.FileUtil;
 
 import java.io.File;
 import java.util.List;

@@ -60,7 +60,7 @@ import org.akvo.flow.R;
 import org.akvo.flow.activity.Constants;
 import org.akvo.flow.activity.FormActivity;
 import org.akvo.flow.domain.QuestionGroup;
-import org.akvo.flow.domain.SurveyGroup;
+import org.akvo.flow.utils.entity.SurveyGroup;
 import org.akvo.flow.ui.view.DateQuestionView;
 import org.akvo.flow.ui.view.FreetextQuestionView;
 import org.akvo.flow.ui.view.QuestionView;

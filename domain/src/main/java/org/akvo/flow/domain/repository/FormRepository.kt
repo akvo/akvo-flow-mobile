@@ -21,6 +21,7 @@ package org.akvo.flow.domain.repository
 
 import io.reactivex.Observable
 import org.akvo.flow.domain.entity.DomainForm
+import java.io.File
 
 
 interface FormRepository {
@@ -31,4 +32,5 @@ interface FormRepository {
     fun getForms(surveyId: Long): List<DomainForm>
     suspend fun loadFormLanguages(formId: String): Set<String>
     suspend fun getFormWithGroups(formId: String): DomainForm
+    suspend fun processZipFile(file: File, instanceUrl: String, awsBucket: String)
 }

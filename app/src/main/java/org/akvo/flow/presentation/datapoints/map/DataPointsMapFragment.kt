@@ -32,7 +32,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.mapbox.geojson.FeatureCollection
 import org.akvo.flow.R
 import org.akvo.flow.app.FlowApp
-import org.akvo.flow.domain.SurveyGroup
+import org.akvo.flow.utils.entity.SurveyGroup
 import org.akvo.flow.injector.component.ApplicationComponent
 import org.akvo.flow.injector.component.DaggerViewComponent
 import org.akvo.flow.maps.presentation.MapBoxMapItemListViewImpl

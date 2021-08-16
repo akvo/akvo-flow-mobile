@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2021 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -17,10 +17,6 @@
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.akvo.flow.service.bootstrap
+package org.akvo.flow.domain.exception
 
-sealed class ProcessingResult {
-    object ProcessingSuccess: ProcessingResult()
-    object ProcessingErrorWrongDashboard: ProcessingResult()
-    object ProcessingError: ProcessingResult()
-}
+class WrongDashboardError(): Exception()

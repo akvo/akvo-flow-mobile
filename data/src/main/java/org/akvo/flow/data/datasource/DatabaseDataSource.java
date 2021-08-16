@@ -44,6 +44,7 @@ import org.akvo.flow.data.entity.SurveyInstanceIdMapper;
 import org.akvo.flow.data.entity.form.DataForm;
 import org.akvo.flow.data.entity.form.DataFormMapper;
 import org.akvo.flow.data.entity.form.DataQuestionGroup;
+import org.akvo.flow.data.entity.form.DataSurvey;
 import org.akvo.flow.data.entity.form.FormLanguagesMapper;
 import org.akvo.flow.data.entity.form.QuestionGroupMapper;
 import org.akvo.flow.data.util.FlowFileBrowser;
@@ -389,12 +390,12 @@ public class DatabaseDataSource {
         return Observable.just(true);
     }
 
-    public Observable<Boolean> insertSurveyGroup(ApiFormHeader apiFormHeader) {
+    public Observable<Boolean> insertSurveyGroup(DataSurvey dataSurvey) {
         ContentValues values = new ContentValues();
-        values.put(SurveyGroupColumns.SURVEY_GROUP_ID, apiFormHeader.getGroupId());
-        values.put(SurveyGroupColumns.NAME, apiFormHeader.getGroupName());
-        values.put(SurveyGroupColumns.REGISTER_SURVEY_ID, apiFormHeader.getRegistrationSurveyId());
-        values.put(SurveyGroupColumns.MONITORED, apiFormHeader.isMonitored() ? 1 : 0);
+        values.put(SurveyGroupColumns.SURVEY_GROUP_ID, dataSurvey.getId());
+        values.put(SurveyGroupColumns.NAME, dataSurvey.getName());
+        values.put(SurveyGroupColumns.REGISTER_SURVEY_ID, dataSurvey.getRegistrationFormId());
+        values.put(SurveyGroupColumns.MONITORED, dataSurvey.getMonitored() ? 1 : 0);
         briteSurveyDbAdapter.addSurveyGroup(values);
         return Observable.just(true);
     }

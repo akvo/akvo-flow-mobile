@@ -21,7 +21,7 @@
 package org.akvo.flow.ui.model;
 
 import org.akvo.flow.data.loader.models.FormInfo;
-import org.akvo.flow.domain.SurveyGroup;
+import org.akvo.flow.utils.entity.SurveyGroup;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;

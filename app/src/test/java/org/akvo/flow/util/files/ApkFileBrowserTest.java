@@ -24,7 +24,6 @@ import android.content.Context;
 
 import org.akvo.flow.BuildConfig;
 import org.akvo.flow.domain.util.VersionHelper;
-import org.akvo.flow.util.FileUtil;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

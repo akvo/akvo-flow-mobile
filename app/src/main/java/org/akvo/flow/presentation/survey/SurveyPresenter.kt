@@ -25,7 +25,7 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.launch
 import org.akvo.flow.BuildConfig
-import org.akvo.flow.domain.SurveyGroup
+import org.akvo.flow.utils.entity.SurveyGroup
 import org.akvo.flow.domain.entity.ApkData
 import org.akvo.flow.domain.entity.DomainForm
 import org.akvo.flow.domain.interactor.apk.GetApkDataPreferences

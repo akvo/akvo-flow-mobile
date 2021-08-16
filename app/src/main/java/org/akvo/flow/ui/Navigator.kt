@@ -38,7 +38,7 @@ import org.akvo.flow.activity.AppUpdateActivity
 import org.akvo.flow.activity.FormActivity
 import org.akvo.flow.activity.SurveyActivity
 import org.akvo.flow.activity.TransmissionHistoryActivity
-import org.akvo.flow.domain.SurveyGroup
+import org.akvo.flow.utils.entity.SurveyGroup
 import org.akvo.flow.domain.entity.User
 import org.akvo.flow.maps.presentation.list.OfflineAreasListActivity
 import org.akvo.flow.presentation.AppDownloadDialogFragment

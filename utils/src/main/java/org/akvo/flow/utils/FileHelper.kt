@@ -182,6 +182,10 @@ class FileHelper @Inject constructor() {
 
     fun extractOnlineArchive(responseBody: ResponseBody, targetFolder: File) {
         val inputStream = responseBody.byteStream()
+        extractInputStream(inputStream, targetFolder)
+    }
+
+    fun extractInputStream(inputStream: InputStream, targetFolder: File) {
         extractZipContent(inputStream, targetFolder)
         close(inputStream)
     }

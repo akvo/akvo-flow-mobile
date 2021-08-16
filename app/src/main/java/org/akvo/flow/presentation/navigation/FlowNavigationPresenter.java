@@ -22,7 +22,7 @@ package org.akvo.flow.presentation.navigation;
 
 import androidx.core.util.Pair;
 
-import org.akvo.flow.domain.entity.Survey;
+import org.akvo.flow.domain.entity.DomainSurvey;
 import org.akvo.flow.domain.interactor.DefaultObserver;
 import org.akvo.flow.domain.entity.User;
 import org.akvo.flow.domain.interactor.users.CreateUser;
@@ -105,7 +105,7 @@ public class FlowNavigationPresenter implements Presenter {
     }
 
     private void loadSurveys() {
-        getAllSurveys.execute(new DefaultObserver<Pair<List<Survey>, Long>>() {
+        getAllSurveys.execute(new DefaultObserver<Pair<List<DomainSurvey>, Long>>() {
             @Override
             public void onError(Throwable e) {
                 Timber.e(e, "Error getting all surveys");
@@ -113,7 +113,7 @@ public class FlowNavigationPresenter implements Presenter {
             }
 
             @Override
-            public void onNext(Pair<List<Survey>, Long> result) {
+            public void onNext(Pair<List<DomainSurvey>, Long> result) {
                 view.displaySurveys(surveyMapper.transform(result.first), result.second);
             }
         }, null);

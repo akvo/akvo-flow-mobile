@@ -21,7 +21,7 @@ package org.akvo.flow.serialization.form;
 
 import org.akvo.flow.domain.QuestionGroup;
 import org.akvo.flow.domain.Survey;
-import org.akvo.flow.domain.SurveyGroup;
+import org.akvo.flow.utils.entity.SurveyGroup;
 import org.akvo.flow.utils.entity.ValidationRule;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.utils.entity.AltText;

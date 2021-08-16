@@ -22,7 +22,7 @@ package org.akvo.flow.domain.interactor;
 
 import androidx.core.util.Pair;
 
-import org.akvo.flow.domain.entity.Survey;
+import org.akvo.flow.domain.entity.DomainSurvey;
 import org.akvo.flow.domain.executor.PostExecutionThread;
 import org.akvo.flow.domain.executor.ThreadExecutor;
 import org.akvo.flow.domain.repository.SurveyRepository;
@@ -53,19 +53,19 @@ public class GetAllSurveys extends UseCase {
     @Override
     protected <T> Observable buildUseCaseObservable(Map<String, T> parameters) {
         return surveyRepository.getSurveys()
-                .concatMap(new Function<List<Survey>, Observable<Pair<List<Survey>, Long>>>() {
+                .concatMap(new Function<List<DomainSurvey>, Observable<Pair<List<DomainSurvey>, Long>>>() {
                     @Override
-                    public Observable<Pair<List<Survey>, Long>> apply(final List<Survey> surveys) {
+                    public Observable<Pair<List<DomainSurvey>, Long>> apply(final List<DomainSurvey> surveys) {
                         return getSelectedSurvey(surveys);
                     }
                 });
     }
 
-    private Observable<Pair<List<Survey>, Long>> getSelectedSurvey(final List<Survey> surveys) {
+    private Observable<Pair<List<DomainSurvey>, Long>> getSelectedSurvey(final List<DomainSurvey> surveys) {
         return userRepository.getSelectedSurvey()
-                .concatMap(new Function<Long, Observable<Pair<List<Survey>, Long>>>() {
+                .concatMap(new Function<Long, Observable<Pair<List<DomainSurvey>, Long>>>() {
                     @Override
-                    public Observable<Pair<List<Survey>, Long>> apply(Long selectedSurvey) {
+                    public Observable<Pair<List<DomainSurvey>, Long>> apply(Long selectedSurvey) {
                         return Observable.just(new Pair<>(surveys, selectedSurvey));
                     }
                 });

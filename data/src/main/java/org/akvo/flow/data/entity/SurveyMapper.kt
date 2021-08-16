@@ -21,14 +21,14 @@ package org.akvo.flow.data.entity
 
 import android.database.Cursor
 import org.akvo.flow.database.SurveyGroupColumns
-import org.akvo.flow.domain.entity.Survey
+import org.akvo.flow.domain.entity.DomainSurvey
 import java.util.ArrayList
 import javax.inject.Inject
 
 class SurveyMapper @Inject constructor() {
 
-    fun getSurveys(cursor: Cursor?): List<Survey> {
-        val surveys: MutableList<Survey> = ArrayList()
+    fun getSurveys(cursor: Cursor?): List<DomainSurvey> {
+        val surveys: MutableList<DomainSurvey> = ArrayList()
         if (cursor != null) {
             if (cursor.moveToFirst()) {
                 do {
@@ -41,13 +41,13 @@ class SurveyMapper @Inject constructor() {
         return surveys
     }
 
-    private fun getSurvey(cursor: Cursor): Survey {
+    private fun getSurvey(cursor: Cursor): DomainSurvey {
         val id = cursor.getLong(cursor.getColumnIndexOrThrow(SurveyGroupColumns.SURVEY_GROUP_ID))
         val name = getString(cursor, SurveyGroupColumns.NAME)
         val registerSurveyId = getString(cursor, SurveyGroupColumns.REGISTER_SURVEY_ID)
         val monitored = getBoolean(cursor, SurveyGroupColumns.MONITORED)
         val viewed = getBoolean(cursor, SurveyGroupColumns.VIEWED)
-        return Survey(id, name, monitored, registerSurveyId, viewed)
+        return DomainSurvey(id, name, monitored, registerSurveyId, viewed)
     }
 
     private fun getBoolean(cursor: Cursor, columnName: String) =

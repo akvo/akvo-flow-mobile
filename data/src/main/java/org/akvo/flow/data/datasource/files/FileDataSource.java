@@ -38,6 +38,9 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
+import java.util.zip.ZipInputStream;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -273,5 +276,10 @@ public class FileDataSource {
     public boolean fileExists(@NotNull String imageName) {
         File folder = flowFileBrowser.getInternalFolder(FlowFileBrowser.DIR_MEDIA);
         return folder.exists() && new File(folder, imageName).exists();
+    }
+
+    public void extractZipEntry(@NotNull ZipFile zipFile, @NotNull ZipEntry entry, String folderName) throws IOException {
+        File resFolder = flowFileBrowser.getExistingInternalFolder(folderName);
+        fileHelper.extractInputStream(new ZipInputStream(zipFile.getInputStream(entry)), resFolder);
     }
 }

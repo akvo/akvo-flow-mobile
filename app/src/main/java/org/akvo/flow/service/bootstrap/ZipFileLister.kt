@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2021 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -16,13 +16,14 @@
  * You should have received a copy of the GNU General Public License
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package org.akvo.flow.service.bootstrap
 
 import android.os.Environment
-import org.akvo.flow.util.ConstantUtil
-import org.akvo.flow.util.FileUtil
+import org.akvo.flow.util.files.FileUtil
 import java.io.File
 import java.util.ArrayList
+import java.util.Locale
 import javax.inject.Inject
 
 class ZipFileLister @Inject constructor() {
@@ -41,7 +42,8 @@ class ZipFileLister @Inject constructor() {
     fun listZipFiles(): MutableList<File> {
         val zipFiles: MutableList<File> = ArrayList()
         if (Environment.MEDIA_MOUNTED == Environment.getExternalStorageState()) {
-            val dir = FileUtil.getFilesDir(FileUtil.FileType.INBOX)
+            val dir =
+                FileUtil.getFilesDir(FileUtil.FileType.INBOX)
             val fileList = dir.listFiles()
             if (fileList != null) {
                 for (file in fileList) {
@@ -55,6 +57,10 @@ class ZipFileLister @Inject constructor() {
     }
 
     private fun isZipFile(file: File): Boolean {
-        return file.isFile && file.name.toLowerCase().endsWith(ConstantUtil.ARCHIVE_SUFFIX)
+        return file.isFile && file.name.lowercase(Locale.getDefault()).endsWith(ARCHIVE_SUFFIX)
+    }
+
+    companion object {
+        const val ARCHIVE_SUFFIX = ".zip"
     }
 }

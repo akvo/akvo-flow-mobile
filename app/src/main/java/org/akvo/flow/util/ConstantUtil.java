@@ -30,12 +30,7 @@ public class ConstantUtil {
     /**
      * file system constants
      */
-    public static final String ARCHIVE_SUFFIX = ".zip";
     public static final String XML_SUFFIX = ".xml";
-    public static final String PROCESSED_OK_SUFFIX = ".processed";
-    public static final String PROCESSED_ERROR_SUFFIX = ".error";
-    public static final String CASCADE_RES_SUFFIX = ".sqlite.zip";
-    public static final String DOT_SEPARATOR = ".";
 
     public static final String FILE_LOCATION = "sdcard";
 
@@ -77,10 +72,6 @@ public class ConstantUtil {
      */
     public static final String NUMERIC_VALIDATION_TYPE = "numeric";
 
-    /**
-     * survey types
-     */
-    public static final String SURVEY_TYPE = "survey";
 
     /**
      * media question support
@@ -153,7 +144,7 @@ public class ConstantUtil {
 
     public static final int NOTIFICATION_FORM = 106;
 
-    public static final int NOTIFICATION_BOOTSTRAP = 106;
+    public static final int NOTIFICATION_BOOTSTRAP = 108;
     public static final int NOTIFICATION_TIME = 107;
 
     public static final String NOTIFICATION_CHANNEL_ID = "1";

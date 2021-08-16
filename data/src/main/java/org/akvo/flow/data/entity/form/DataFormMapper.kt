@@ -34,6 +34,8 @@ import org.akvo.flow.utils.entity.Option
 import org.akvo.flow.utils.entity.Question
 import org.akvo.flow.utils.entity.QuestionGroup
 import org.akvo.flow.utils.entity.QuestionHelp
+import org.akvo.flow.utils.entity.SurveyGroup
+import org.akvo.flow.utils.entity.SurveyMetadata
 import java.util.HashMap
 import javax.inject.Inject
 
@@ -147,31 +149,7 @@ class DataFormMapper @Inject constructor() {
         val forms = mutableListOf<DataForm>()
         if (cursor != null && cursor.moveToFirst()) {
             do {
-                val id = getIntColumnValue(cursor, SurveyColumns._ID)
-                val formId = getStringColumnValue(cursor, SurveyColumns.SURVEY_ID)
-                val surveyId = getIntColumnValue(cursor, SurveyColumns.SURVEY_GROUP_ID)
-                val formVersion = getDoubleColumnValue(cursor, SurveyColumns.VERSION)
-                val name = getStringColumnValue(cursor, SurveyColumns.NAME)
-                val type = getStringColumnValue(cursor, SurveyColumns.TYPE)
-                val location = getStringColumnValue(cursor, SurveyColumns.LOCATION)
-                val filename = getStringColumnValue(cursor, SurveyColumns.FILENAME)
-                val language = getStringColumnValue(cursor, SurveyColumns.LANGUAGE)
-                val resourcesDownloaded =
-                    getIntColumnValue(cursor, SurveyColumns.HELP_DOWNLOADED) == 1
-                val deleted = getIntColumnValue(cursor, SurveyColumns.DELETED) == 1
-                val dataForm = DataForm(
-                    id,
-                    formId,
-                    surveyId,
-                    name,
-                    formVersion,
-                    type,
-                    location,
-                    filename,
-                    language,
-                    resourcesDownloaded,
-                    deleted
-                )
+                val dataForm = mapOneForm(cursor)
                 forms.add(dataForm)
             } while (cursor.moveToNext())
         }
@@ -181,36 +159,41 @@ class DataFormMapper @Inject constructor() {
 
 
     fun mapForm(cursor: Cursor?): DataForm? {
-        if (cursor != null && cursor.moveToFirst()) {
-            val id = getIntColumnValue(cursor, SurveyColumns._ID)
-            val formId = getStringColumnValue(cursor, SurveyColumns.SURVEY_ID)
-            val surveyId = getIntColumnValue(cursor, SurveyColumns.SURVEY_GROUP_ID)
-            val formVersion = getDoubleColumnValue(cursor, SurveyColumns.VERSION)
-            val name = getStringColumnValue(cursor, SurveyColumns.NAME)
-            val type = getStringColumnValue(cursor, SurveyColumns.TYPE)
-            val location = getStringColumnValue(cursor, SurveyColumns.LOCATION)
-            val filename = getStringColumnValue(cursor, SurveyColumns.FILENAME)
-            val language = getStringColumnValue(cursor, SurveyColumns.LANGUAGE)
-            val resourcesDownloaded = getIntColumnValue(cursor, SurveyColumns.HELP_DOWNLOADED) == 1
-            val deleted = getIntColumnValue(cursor, SurveyColumns.DELETED) == 1
+        return if (cursor != null && cursor.moveToFirst()) {
+            val dataForm = mapOneForm(cursor)
             cursor.close()
-            return DataForm(
-                id,
-                formId,
-                surveyId,
-                name,
-                formVersion,
-                type,
-                location,
-                filename,
-                language,
-                resourcesDownloaded,
-                deleted
-            )
+            dataForm
         } else {
             cursor?.close()
-            return null
+            null
         }
+    }
+
+    private fun mapOneForm(cursor: Cursor): DataForm {
+        val id = getIntColumnValue(cursor, SurveyColumns._ID)
+        val formId = getStringColumnValue(cursor, SurveyColumns.SURVEY_ID)
+        val surveyId = cursor.getLong(cursor.getColumnIndexOrThrow(SurveyColumns.SURVEY_GROUP_ID))
+        val formVersion = getDoubleColumnValue(cursor, SurveyColumns.VERSION)
+        val name = getStringColumnValue(cursor, SurveyColumns.NAME)
+        val type = getStringColumnValue(cursor, SurveyColumns.TYPE)
+        val location = getStringColumnValue(cursor, SurveyColumns.LOCATION)
+        val filename = getStringColumnValue(cursor, SurveyColumns.FILENAME)
+        val language = getStringColumnValue(cursor, SurveyColumns.LANGUAGE)
+        val resourcesDownloaded = getIntColumnValue(cursor, SurveyColumns.HELP_DOWNLOADED) == 1
+        val deleted = getIntColumnValue(cursor, SurveyColumns.DELETED) == 1
+        return DataForm(
+            id,
+            formId,
+            surveyId,
+            name,
+            formVersion,
+            type,
+            location,
+            filename,
+            language,
+            resourcesDownloaded,
+            deleted
+        )
     }
 
     private fun getDoubleColumnValue(cursor: Cursor, columnName: String) =
@@ -221,4 +204,22 @@ class DataFormMapper @Inject constructor() {
 
     private fun getIntColumnValue(cursor: Cursor, columnName: String) =
         cursor.getInt(cursor.getColumnIndexOrThrow(columnName))
+
+    fun mapFormAndMetadata(formAndMeta: Pair<Form, SurveyMetadata>): Pair<DataForm, DataSurveyMetadata> {
+        val second = formAndMeta.second
+        val dataSurveyMetadata =
+            DataSurveyMetadata(second.app, mapSurvey(second.surveyGroup), second.alias)
+        return Pair(mapForm(formAndMeta.first), dataSurveyMetadata)
+    }
+
+    private fun mapSurvey(surveyGroup: SurveyGroup?): DataSurvey {
+        return if (surveyGroup == null) {
+            DataSurvey(-1L, "", false, "")
+        } else {
+            DataSurvey(surveyGroup.id,
+                surveyGroup.name,
+                surveyGroup.isMonitored,
+                surveyGroup.registerSurveyId ?: "")
+        }
+    }
 }

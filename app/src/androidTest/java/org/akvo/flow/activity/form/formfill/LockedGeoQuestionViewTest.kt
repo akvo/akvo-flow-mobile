@@ -50,6 +50,8 @@ import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.ActivityTestRule
 import androidx.test.rule.GrantPermissionRule
 import org.akvo.flow.R
+import org.akvo.flow.tests.R.raw.locked_geo_form
+
 import org.akvo.flow.activity.FormActivity
 import org.akvo.flow.activity.form.FormActivityTestUtil.addExecutionDelay
 import org.akvo.flow.activity.form.FormActivityTestUtil.getFormActivityIntent
@@ -92,7 +94,7 @@ class LockedGeoQuestionViewTest {
             val installer = TestSurveyInstaller(
                 targetContext)
             installer.installSurvey(
-                raw.locked_geo_form,
+                locked_geo_form,
                 InstrumentationRegistry.getInstrumentation().context
             )
             return getFormActivityIntent(

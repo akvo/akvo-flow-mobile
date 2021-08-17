@@ -38,11 +38,11 @@ import androidx.test.rule.ActivityTestRule;
 
 import org.akvo.flow.R;
 import org.akvo.flow.activity.FormActivity;
-import org.akvo.flow.activity.form.data.TestSurveyInstaller;
 import org.akvo.flow.activity.form.data.SurveyRequisite;
-import org.akvo.flow.domain.QuestionGroup;
-import org.akvo.flow.domain.Survey;
+import org.akvo.flow.activity.form.data.TestSurveyInstaller;
+import org.akvo.flow.utils.entity.Form;
 import org.akvo.flow.utils.entity.Question;
+import org.akvo.flow.utils.entity.QuestionGroup;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
@@ -60,7 +60,7 @@ import java.util.List;
 public class CascadeQuestionViewErrorTest {
 
     private static TestSurveyInstaller installer;
-    private static Survey survey;
+    private static Form survey;
 
     @Rule
     public ActivityTestRule<FormActivity> rule = new ActivityTestRule<FormActivity>(
@@ -76,7 +76,7 @@ public class CascadeQuestionViewErrorTest {
         Context targetContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
         SurveyRequisite.setRequisites(targetContext);
         installer = new TestSurveyInstaller(targetContext);
-        survey = installer.installSurvey(cascade_error_form, InstrumentationRegistry.getInstrumentation().getContext());
+        survey = installer.installSurvey(cascade_error_form, InstrumentationRegistry.getInstrumentation().getContext()).first;
     }
 
     @After
@@ -92,7 +92,7 @@ public class CascadeQuestionViewErrorTest {
 
     @Test
     public void ensureCascadesErrorDisplayed() {
-        final List<QuestionGroup> questionGroups = survey.getQuestionGroups();
+        final List<QuestionGroup> questionGroups = survey.getGroups();
         final Question question = questionGroups.get(0).getQuestions().get(0);
 
         onView(withId(R.id.question_tv)).check(matches(withError(

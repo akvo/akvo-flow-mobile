@@ -38,6 +38,7 @@ import org.akvo.flow.utils.entity.SurveyGroup
 import org.akvo.flow.utils.entity.SurveyMetadata
 import java.util.HashMap
 import javax.inject.Inject
+import androidx.core.util.Pair
 
 class DataFormMapper @Inject constructor() {
 

@@ -20,6 +20,12 @@
 
 package org.akvo.flow.data.database;
 
+import static org.akvo.flow.database.tables.QuestionGroupTable.COLUMN_FORM_ID;
+import static org.akvo.flow.database.tables.QuestionGroupTable.COLUMN_GROUP_ID;
+import static org.akvo.flow.database.tables.QuestionGroupTable.COLUMN_HEADING;
+import static org.akvo.flow.database.tables.QuestionGroupTable.COLUMN_ORDER;
+import static org.akvo.flow.database.tables.QuestionGroupTable.COLUMN_REPEATABLE;
+
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.SQLException;
@@ -41,11 +47,14 @@ import org.akvo.flow.database.britedb.BriteSurveyDbAdapter;
 import org.akvo.flow.domain.FileTransmission;
 import org.akvo.flow.domain.QuestionResponse;
 import org.akvo.flow.domain.Survey;
-import org.akvo.flow.utils.entity.SurveyGroup;
 import org.akvo.flow.domain.entity.User;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.util.PlatformUtil;
+import org.akvo.flow.utils.entity.Form;
+import org.akvo.flow.utils.entity.QuestionGroup;
+import org.akvo.flow.utils.entity.SurveyGroup;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -223,24 +232,20 @@ public class SurveyDbDataSource {
      * updates a survey in the db and resets the deleted flag to "N"
      *
      */
-    public void saveSurvey(Survey survey) {
-
-        final long surveyGroupId = survey.getSurveyGroup() != null ?
-                survey.getSurveyGroup().getId()
-                : SurveyGroup.ID_NONE;
-
+    public void saveSurvey(Form form) {
+        final long surveyGroupId = form.getSurveyId();
         ContentValues updatedValues = new ContentValues();
-        updatedValues.put(SurveyColumns.SURVEY_ID, survey.getId());
-        updatedValues.put(SurveyColumns.VERSION, survey.getVersion());
-        updatedValues.put(SurveyColumns.TYPE, survey.getType());
-        updatedValues.put(SurveyColumns.LOCATION, survey.getLocation());
-        updatedValues.put(SurveyColumns.FILENAME, survey.getFileName());
-        updatedValues.put(SurveyColumns.NAME, survey.getName());
-        updatedValues.put(SurveyColumns.LANGUAGE, survey.getDefaultLanguageCode());
+        updatedValues.put(SurveyColumns.SURVEY_ID, form.getId());
+        updatedValues.put(SurveyColumns.VERSION, form.getVersion());
+        updatedValues.put(SurveyColumns.TYPE, form.getType());
+        updatedValues.put(SurveyColumns.LOCATION, form.getLocation());
+        updatedValues.put(SurveyColumns.FILENAME, form.getFilename());
+        updatedValues.put(SurveyColumns.NAME, form.getName());
+        updatedValues.put(SurveyColumns.LANGUAGE, form.getLanguage());
         updatedValues.put(SurveyColumns.SURVEY_GROUP_ID, surveyGroupId);
-        updatedValues.put(SurveyColumns.HELP_DOWNLOADED, survey.isHelpDownloaded() ? 1 : 0);
+        updatedValues.put(SurveyColumns.HELP_DOWNLOADED, form.getCascadeDownloaded() ? 1 : 0);
 
-        briteSurveyDbAdapter.updateSurvey(updatedValues, survey.getId());
+        briteSurveyDbAdapter.updateSurvey(updatedValues, form.getFormId());
     }
 
     /**
@@ -406,5 +411,25 @@ public class SurveyDbDataSource {
 
     public void deleteAllResponses() {
         surveyDbAdapter.deleteAllResponses();
+    }
+
+    public void addQuestionGroups(Form form) {
+        briteSurveyDbAdapter.deleteQuestionGroups(form.getFormId());
+        List<QuestionGroup> groups = form.getGroups();
+        List<ContentValues> groupValues = new ArrayList<>();
+        for (QuestionGroup group: groups) {
+            ContentValues values = new ContentValues();
+            Long groupId = group.getGroupId();
+            if (groupId == null) {
+                groupId = -1L;
+            }
+            values.put(COLUMN_GROUP_ID, groupId);
+            values.put(COLUMN_HEADING, group.getHeading());
+            values.put(COLUMN_REPEATABLE, group.getRepeatable() ? 1 : 0);
+            values.put(COLUMN_FORM_ID, group.getFormId());
+            values.put(COLUMN_ORDER, group.getOrder());
+            groupValues.add(values);
+        }
+        briteSurveyDbAdapter.saveQuestionGroup(groupValues, form.getFormId());
     }
 }

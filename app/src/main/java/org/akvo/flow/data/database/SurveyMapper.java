@@ -24,6 +24,7 @@ import android.database.Cursor;
 
 import org.akvo.flow.database.SurveyColumns;
 import org.akvo.flow.domain.Survey;
+import org.akvo.flow.utils.entity.Form;
 
 import javax.inject.Inject;
 
@@ -47,5 +48,23 @@ public class SurveyMapper {
                 .getInt(cursor.getColumnIndexOrThrow(SurveyColumns.HELP_DOWNLOADED));
         survey.setHelpDownloaded(helpDownloaded == 1);
         return survey;
+    }
+
+    public Form getForm(Cursor cursor) {
+        int id = cursor.getInt(cursor.getColumnIndexOrThrow(SurveyColumns._ID));
+        String formId = cursor.getString(cursor.getColumnIndexOrThrow(SurveyColumns.SURVEY_ID));
+        long surveyId = cursor.getLong(cursor.getColumnIndexOrThrow(SurveyColumns.SURVEY_GROUP_ID));
+        String name = cursor.getString(cursor.getColumnIndexOrThrow(SurveyColumns.NAME));
+        String location = cursor.getString(cursor.getColumnIndexOrThrow(SurveyColumns.LOCATION));
+        String filename = cursor.getString(cursor.getColumnIndexOrThrow(SurveyColumns.FILENAME));
+        String type = cursor.getString(cursor.getColumnIndexOrThrow(SurveyColumns.TYPE));
+        String language = cursor.getString(cursor.getColumnIndexOrThrow(SurveyColumns.LANGUAGE));
+        double version = cursor.getDouble(cursor.getColumnIndexOrThrow(SurveyColumns.VERSION));
+
+        int helpDownloaded = cursor
+                .getInt(cursor.getColumnIndexOrThrow(SurveyColumns.HELP_DOWNLOADED));
+
+        return new Form(id, formId, surveyId, name, version, type, location, filename, language,
+                helpDownloaded == 1, false);
     }
 }

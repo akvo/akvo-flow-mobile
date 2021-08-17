@@ -84,7 +84,7 @@ class RepeatedGroupsFormActivityTest {
                 installer.installSurvey(repeated_one_group_form, getInstrumentation().context)
             val id =
                 installer.createDataPoint(
-                    survey.surveyGroup,
+                    survey.second,
                     *generateRepeatedOneGroupResponseData()
                 ).first!!
             return getFormActivityIntent(207569117L, "200389118", SURVEY_TITLE, id)

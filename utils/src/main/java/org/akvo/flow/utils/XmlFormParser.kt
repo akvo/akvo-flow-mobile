@@ -38,6 +38,8 @@ import java.io.IOException
 import java.io.InputStream
 import java.util.LinkedHashSet
 import javax.inject.Inject
+import androidx.core.util.Pair
+
 
 class XmlFormParser @Inject constructor(private val helper: FileHelper) {
 
@@ -529,6 +531,7 @@ class XmlFormParser @Inject constructor(private val helper: FileHelper) {
         return map
     }
 
+    @JvmOverloads
     fun parseXmlFormWithMeta(inputStream: InputStream, backUpVersion: Double? = null): Pair<Form, SurveyMetadata> {
         val groups: MutableList<QuestionGroup> = mutableListOf()
         var version = backUpVersion ?: 0.0

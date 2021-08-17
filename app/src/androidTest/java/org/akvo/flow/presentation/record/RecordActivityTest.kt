@@ -44,6 +44,7 @@ import org.akvo.flow.domain.executor.CoroutineDispatcher
 import org.akvo.flow.domain.executor.SchedulerCreator
 import org.akvo.flow.domain.repository.FormInstanceRepository
 import org.akvo.flow.domain.repository.FormRepository
+import org.akvo.flow.domain.repository.SurveyRepository
 import org.akvo.flow.domain.repository.UserRepository
 import org.akvo.flow.injector.component.ApplicationComponent
 import org.akvo.flow.injector.module.ApplicationModule
@@ -284,12 +285,12 @@ class RecordActivityTest {
                 getInstrumentation().context
             )
         installer.createDataPoint(
-            survey.surveyGroup,
+            survey.second,
             *TestSurveyInstaller.generateRepeatedOneGroupResponseData()
         ).first!!
         val dataPointFromFile =
             installer
-                .createDataPointFromFile(survey.surveyGroup, getInstrumentation().context, data)
+                .createDataPointFromFile(survey.second, getInstrumentation().context, data)
         return dataPointFromFile.first!!
     }
 

@@ -76,7 +76,7 @@ class RepeatedGroupFormViewTest {
                 )
             val id =
                 installer.createDataPoint(
-                    survey.surveyGroup,
+                    survey.second,
                     *generatePartialRepeatedGroupResponseData()
                 ).first!!
             return getFormActivityIntent(207569117L, "200389118", SURVEY_TITLE, id)

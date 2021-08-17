@@ -40,22 +40,23 @@ import org.akvo.flow.database.tables.FormUpdateNotifiedTable;
 import org.akvo.flow.database.tables.LanguageTable;
 import org.akvo.flow.database.tables.QuestionGroupTable;
 import org.akvo.flow.domain.Node;
-import org.akvo.flow.domain.QuestionGroup;
 import org.akvo.flow.domain.QuestionResponse;
 import org.akvo.flow.domain.Survey;
 import org.akvo.flow.domain.entity.User;
 import org.akvo.flow.domain.util.GsonMapper;
-import org.akvo.flow.serialization.form.SaxSurveyParser;
-import org.akvo.flow.serialization.form.SurveyMetadataParser;
 import org.akvo.flow.util.ConstantUtil;
+import org.akvo.flow.util.FileUtil;
 import org.akvo.flow.util.files.FileBrowser;
 import org.akvo.flow.util.files.FormFileBrowser;
 import org.akvo.flow.util.files.FormResourcesFileBrowser;
+import org.akvo.flow.utils.FileHelper;
+import org.akvo.flow.utils.XmlFormParser;
+import org.akvo.flow.utils.entity.Form;
 import org.akvo.flow.utils.entity.Question;
+import org.akvo.flow.utils.entity.QuestionGroup;
 import org.akvo.flow.utils.entity.SurveyGroup;
 import org.akvo.flow.utils.entity.SurveyMetadata;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
@@ -81,19 +82,20 @@ public class TestSurveyInstaller {
 
     public TestSurveyInstaller(Context context) {
         SqlBrite sqlBrite = new SqlBrite.Builder().build();
-        DatabaseHelper databaseHelper = new DatabaseHelper(context, new LanguageTable(), new DataPointDownloadTable(), new FormUpdateNotifiedTable(), new QuestionGroupTable());
+        DatabaseHelper databaseHelper = new DatabaseHelper(context, new LanguageTable(),
+                new DataPointDownloadTable(), new FormUpdateNotifiedTable(), new QuestionGroupTable());
         BriteDatabase db = sqlBrite
                 .wrapDatabaseHelper(databaseHelper, AndroidSchedulers.mainThread());
         this.adapter = new SurveyDbDataSource(db, databaseHelper);
     }
 
-    public Survey installSurvey(int resId, Context context) {
+    public Pair<Form, SurveyGroup> installSurvey(int resId, Context context) {
         InputStream input = context.getResources()
                 .openRawResource(resId);
-        Survey survey = null;
+        Pair<Form, SurveyGroup> survey = null;
         try {
-            survey = persistSurvey(FileUtil.readText(input));
-            installCascades(survey, context);
+            survey = persistSurvey(input);
+            installCascades(survey.first, context);
         } catch (IOException e) {
             Log.e(TAG, "Error installing survey");
         }
@@ -213,13 +215,13 @@ public class TestSurveyInstaller {
         return new SparseArray<>(0);
     }
 
-    private void installCascades(Survey survey, Context context) throws IOException {
+    private void installCascades(Form survey, Context context) throws IOException {
         FormResourcesFileBrowser formResourcesFileUtil = new FormResourcesFileBrowser(
                 new FileBrowser());
         File cascadeFolder = formResourcesFileUtil
                 .getExistingAppInternalFolder(
                         InstrumentationRegistry.getInstrumentation().getTargetContext());
-        for (QuestionGroup group : survey.getQuestionGroups()) {
+        for (QuestionGroup group : survey.getGroups()) {
             for (Question question : group.getQuestions()) {
                 String cascadeFileName = question.getCascadeResource();
                 if (!TextUtils.isEmpty(cascadeFileName)) {
@@ -240,28 +242,29 @@ public class TestSurveyInstaller {
      * Creates a survey object out of an XML string and persists the .xml file in the surveys/
      * directory of the phone
      *
-     * @param xml of the survey
      * @return survey
      * @throws IOException if string cannot be written to file
      */
-    private Survey persistSurvey(String xml) throws IOException {
-        Survey survey = parseSurvey(xml);
+    private Pair<Form, SurveyGroup> persistSurvey(InputStream input) throws IOException {
+        String xml = FileUtil.readText(input);
+        Pair<Form, SurveyMetadata> result = parseSurvey(input);
+        Form form = result.first;
+        SurveyGroup group = result.second.getSurveyGroup();
         FormFileBrowser formFileBrowser = new FormFileBrowser(new FileBrowser());
         File surveyFile = new File(
                 formFileBrowser.getExistingAppInternalFolder(
                         InstrumentationRegistry.getInstrumentation().getTargetContext()),
-                survey.getId() + ConstantUtil.XML_SUFFIX);
+                form.getId() + ConstantUtil.XML_SUFFIX);
         writeString(surveyFile, xml);
 
         surveyFiles.add(surveyFile);
+        form.setFilename(form.getId() + ConstantUtil.XML_SUFFIX);
+        form.setType("Survey");
+        form.setLocation(ConstantUtil.FILE_LOCATION);
+        form.setCascadeDownloaded(true);
 
-        survey.setFileName(survey.getId() + ConstantUtil.XML_SUFFIX);
-        survey.setType("Survey");
-        survey.setLocation(ConstantUtil.FILE_LOCATION);
-        survey.setHelpDownloaded(true);
-
-        saveSurvey(survey);
-        return survey;
+        saveSurvey(form, group);
+        return new Pair<>(form, group);
     }
 
     private void writeString(File file, String data) throws IOException {
@@ -270,25 +273,18 @@ public class TestSurveyInstaller {
         writer.close();
     }
 
-    private Survey parseSurvey(String xml) {
-        SurveyMetadataParser surveyMetaData = new SurveyMetadataParser();
-        ByteArrayInputStream metaInputStream = new ByteArrayInputStream(xml.getBytes());
-
-        ByteArrayInputStream inputStream = new ByteArrayInputStream(xml.getBytes());
-
-        SaxSurveyParser parser = new SaxSurveyParser();
-        SurveyMetadata surveyMeta = surveyMetaData.parse(metaInputStream);
-        Survey survey = parser.parse(inputStream);
-
-        survey.setId(surveyMeta.getId());
-
-        return survey;
+    private Pair<Form, SurveyMetadata> parseSurvey(InputStream input) {
+        XmlFormParser parser = new XmlFormParser(new FileHelper());
+        Pair<Form, SurveyMetadata> result = parser.parseXmlFormWithMeta(input);
+        return result;
     }
 
-    private void saveSurvey(Survey survey) {
+    private void saveSurvey(Form form, SurveyGroup group) {
         adapter.open();
-        adapter.saveSurvey(survey);
-        adapter.addSurveyGroup(survey.getSurveyGroup());
+        adapter.saveSurvey(form);
+        adapter.addSurveyGroup(group);
+        adapter.addQuestionGroups(form);
+        //TODO: insert questions when also in db
         adapter.close();
     }
 

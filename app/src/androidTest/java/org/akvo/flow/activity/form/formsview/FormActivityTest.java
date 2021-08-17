@@ -73,10 +73,8 @@ import androidx.test.rule.GrantPermissionRule;
 
 import org.akvo.flow.R;
 import org.akvo.flow.activity.FormActivity;
-import org.akvo.flow.activity.form.data.TestSurveyInstaller;
 import org.akvo.flow.activity.form.data.SurveyRequisite;
-import org.akvo.flow.domain.QuestionGroup;
-import org.akvo.flow.domain.Survey;
+import org.akvo.flow.activity.form.data.TestSurveyInstaller;
 import org.akvo.flow.ui.view.CaddisflyQuestionView;
 import org.akvo.flow.ui.view.CascadeQuestionView;
 import org.akvo.flow.ui.view.GeoshapeQuestionView;
@@ -87,9 +85,11 @@ import org.akvo.flow.ui.view.barcode.BarcodeQuestionViewSingle;
 import org.akvo.flow.ui.view.geolocation.GeoQuestionView;
 import org.akvo.flow.ui.view.signature.SignatureQuestionView;
 import org.akvo.flow.util.ConstantUtil;
+import org.akvo.flow.utils.entity.Form;
 import org.akvo.flow.utils.entity.Level;
 import org.akvo.flow.utils.entity.Option;
 import org.akvo.flow.utils.entity.Question;
+import org.akvo.flow.utils.entity.QuestionGroup;
 import org.hamcrest.Matcher;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -107,7 +107,7 @@ public class FormActivityTest {
 
     private static final String FORM_TITLE = "Test form";
     private static TestSurveyInstaller installer;
-    private static Survey survey;
+    private static Form survey;
 
     @Rule
     public GrantPermissionRule permissionRule = GrantPermissionRule
@@ -135,7 +135,7 @@ public class FormActivityTest {
         Context targetContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
         SurveyRequisite.setRequisites(targetContext);
         installer = new TestSurveyInstaller(targetContext);
-        survey = installer.installSurvey(all_questions_form, InstrumentationRegistry.getInstrumentation().getContext());
+        survey = installer.installSurvey(all_questions_form, InstrumentationRegistry.getInstrumentation().getContext()).first;
     }
 
     @After
@@ -153,7 +153,7 @@ public class FormActivityTest {
     public void testViewNonFilledForm() {
         verifyToolBar(survey.getName(), survey.getVersion());
 
-        List<QuestionGroup> questionGroups = survey.getQuestionGroups();
+        List<QuestionGroup> questionGroups = survey.getGroups();
         List<Question> mandatoryQuestions = new ArrayList<>();
         for (int i = 0; i < questionGroups.size(); i++) {
             QuestionGroup group = questionGroups.get(i);

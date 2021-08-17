@@ -19,17 +19,17 @@
 
 package org.akvo.flow.utils.entity
 
-data class Form(
+data class Form @JvmOverloads constructor(
     val id: Int,
     val formId: String,
     val surveyId: Long,
     val name: String,
     val version: Double,
-    val type: String = "survey",
-    val location: String = "sdcard",
-    val filename: String,
+    var type: String = "survey",
+    var location: String = "sdcard",
+    var filename: String,
     val language: String = "en",
-    val cascadeDownloaded: Boolean = true,
+    var cascadeDownloaded: Boolean = true,
     val deleted: Boolean = false,
     val groups: MutableList<QuestionGroup> = mutableListOf()
 ) {

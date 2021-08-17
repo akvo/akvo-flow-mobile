@@ -188,6 +188,7 @@
         <item>Zhuang</item>
         <item>K\'iche\'</item>
         <item>Tetum</item>
+        <item>Bemba</item>
     </string-array>
     <string-array name="alllanguagecodes">
         <item>en</item>
@@ -376,6 +377,7 @@
         <item>za</item>
         <item>quc</item>
         <item>tet</item>
+        <item>bem</item>
     </string-array>
 
 </resources>

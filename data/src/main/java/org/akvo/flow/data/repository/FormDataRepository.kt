@@ -237,7 +237,7 @@ class FormDataRepository @Inject constructor(
     private fun saveFormAndGroups(form: DataForm, resourcesDownloaded: Boolean): Observable<Boolean> {
         val dataBaseDataSource = dataSourceFactory.dataBaseDataSource
         dataBaseDataSource.saveForm(resourcesDownloaded, form)
-        dataBaseDataSource.saveGroups(form)
+        dataBaseDataSource.saveQuestionGroups(form)
         return Observable.just(true)
     }
 

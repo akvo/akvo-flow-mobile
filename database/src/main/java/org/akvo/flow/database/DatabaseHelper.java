@@ -21,10 +21,10 @@
 package org.akvo.flow.database;
 
 import android.content.Context;
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import org.akvo.flow.database.migration.GroupsMigrationHelper;
 import org.akvo.flow.database.migration.TransmissionMigrationHelper;
 import org.akvo.flow.database.tables.DataPointDownloadTable;
 import org.akvo.flow.database.tables.FormUpdateNotifiedTable;
@@ -32,15 +32,7 @@ import org.akvo.flow.database.tables.LanguageTable;
 import org.akvo.flow.database.tables.QuestionGroupTable;
 import org.akvo.flow.database.tables.Tables;
 import org.akvo.flow.database.upgrade.UpgraderFactory;
-import org.akvo.flow.utils.FileHelper;
-import org.akvo.flow.utils.XmlFormParser;
-import org.akvo.flow.utils.entity.Form;
 import org.jetbrains.annotations.NotNull;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.util.ArrayList;
 
 import timber.log.Timber;
 
@@ -202,34 +194,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     public void upgradeFromVersionUpgrader(SQLiteDatabase db) {
-        //TODO: for now we just create the table, in the future we need to read the all xml files and insert the actual data
         questionGroupTable.onCreate(db);
-        //fetch all forms with ids
-        Cursor cursor = db.rawQuery("SELECT " + SurveyColumns._ID + " FROM " + Tables.SURVEY, new String[]{});
-        ArrayList<String> formIds = new ArrayList<>();
-        if (cursor != null && cursor.moveToFirst()) {
-            int columnIndex = cursor.getColumnIndex(QuestionGroupTable.COLUMN_FORM_ID);
-            do {
-                formIds.add(cursor.getString(columnIndex));
-            } while (cursor.moveToNext());
-        }
-        if (cursor != null) {
-            cursor.close();
-        }
-        //foreach read xml file
-        for (String formId : formIds) {
-            String formFolder = context.getFilesDir().getAbsolutePath() + File.separator + "forms";
-            FileInputStream fileInputStream;
-            try {
-                fileInputStream = new FileInputStream(new File(formFolder, formId + ".xml"));
-                Form form = new XmlFormParser(new FileHelper()).parseXmlForm(fileInputStream);
-                //insert groups
-
-                //when question table also add questions into table
-            } catch (FileNotFoundException e) {
-                Timber.e(e);
-            }
-        }
+        GroupsMigrationHelper groupsMigrationHelper = new GroupsMigrationHelper();
+        groupsMigrationHelper.migrateGroups(db, context);
     }
 
     /**

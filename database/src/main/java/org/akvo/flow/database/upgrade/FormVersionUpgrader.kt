@@ -21,11 +21,9 @@ package org.akvo.flow.database.upgrade
 
 import android.database.sqlite.SQLiteDatabase
 import org.akvo.flow.database.DatabaseHelper
-import org.akvo.flow.database.tables.QuestionGroupTable
 
 class FormVersionUpgrader(
     private val db: SQLiteDatabase,
-    private val groupTable: QuestionGroupTable,
     private val helper: DatabaseHelper
 ) : DatabaseUpgrader {
 

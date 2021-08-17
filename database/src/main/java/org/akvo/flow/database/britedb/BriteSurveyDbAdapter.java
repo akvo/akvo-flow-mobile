@@ -565,6 +565,9 @@ public class BriteSurveyDbAdapter {
     public void deleteAllSurveys() {
         briteDatabase.delete(Tables.SURVEY, null);
         briteDatabase.delete(Tables.SURVEY_GROUP, null);
+        briteDatabase.delete(QuestionGroupTable.TABLE_NAME, null);
+        briteDatabase.delete(FormUpdateNotifiedTable.TABLE_NAME, null);
+        briteDatabase.delete(LanguageTable.TABLE_NAME, null);
     }
 
     public Cursor getSurveys(String surveyId, String surveyVersion) {

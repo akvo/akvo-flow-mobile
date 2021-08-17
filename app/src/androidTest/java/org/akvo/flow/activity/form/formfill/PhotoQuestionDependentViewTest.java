@@ -28,7 +28,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import org.akvo.flow.R;
 import org.akvo.flow.activity.FormActivity;
-import org.akvo.flow.activity.form.data.SurveyInstaller;
+import org.akvo.flow.activity.form.data.TestSurveyInstaller;
 import org.akvo.flow.activity.form.data.SurveyRequisite;
 import org.akvo.flow.ui.view.QuestionView;
 import org.junit.After;
@@ -56,7 +56,7 @@ import static org.akvo.flow.tests.R.raw.photo_form_dependent;
 public class PhotoQuestionDependentViewTest {
 
     private static final String FORM_TITLE = "New form";
-    private static SurveyInstaller installer;
+    private static TestSurveyInstaller installer;
 
     @Rule
     public ActivityTestRule<FormActivity> rule = new ActivityTestRule<FormActivity>(
@@ -71,7 +71,7 @@ public class PhotoQuestionDependentViewTest {
     public static void beforeClass() {
         Context targetContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
         SurveyRequisite.setRequisites(targetContext);
-        installer = new SurveyInstaller(targetContext);
+        installer = new TestSurveyInstaller(targetContext);
         installer.installSurvey(photo_form_dependent, InstrumentationRegistry.getInstrumentation().getContext());
     }
 

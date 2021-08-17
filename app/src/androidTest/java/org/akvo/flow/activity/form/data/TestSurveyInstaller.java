@@ -48,6 +48,7 @@ import org.akvo.flow.domain.util.GsonMapper;
 import org.akvo.flow.serialization.form.SaxSurveyParser;
 import org.akvo.flow.serialization.form.SurveyMetadataParser;
 import org.akvo.flow.util.ConstantUtil;
+import org.akvo.flow.util.FileUtil;
 import org.akvo.flow.util.files.FileBrowser;
 import org.akvo.flow.util.files.FormFileBrowser;
 import org.akvo.flow.util.files.FormResourcesFileBrowser;
@@ -72,14 +73,14 @@ import java.util.Queue;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import timber.log.Timber;
 
-public class SurveyInstaller {
+public class TestSurveyInstaller {
 
-    private static final String TAG = "SurveyInstaller";
+    private static final String TAG = "TestSurveyInstaller";
     private final SurveyDbDataSource adapter;
     //Need an array that holds every File so we can delete them in the end
     private final Queue<File> surveyFiles = new ArrayDeque<>();
 
-    public SurveyInstaller(Context context) {
+    public TestSurveyInstaller(Context context) {
         SqlBrite sqlBrite = new SqlBrite.Builder().build();
         DatabaseHelper databaseHelper = new DatabaseHelper(context, new LanguageTable(), new DataPointDownloadTable(), new FormUpdateNotifiedTable(), new QuestionGroupTable());
         BriteDatabase db = sqlBrite

@@ -54,7 +54,7 @@ import org.akvo.flow.activity.FormActivity
 import org.akvo.flow.activity.form.FormActivityTestUtil.addExecutionDelay
 import org.akvo.flow.activity.form.FormActivityTestUtil.getFormActivityIntent
 import org.akvo.flow.activity.form.FormActivityTestUtil.getString
-import org.akvo.flow.activity.form.data.SurveyInstaller
+import org.akvo.flow.activity.form.data.TestSurveyInstaller
 import org.akvo.flow.activity.form.data.SurveyRequisite
 import org.akvo.flow.event.TimedLocationListener
 import org.hamcrest.Description
@@ -89,7 +89,8 @@ class LockedGeoQuestionViewTest {
 
             val targetContext = InstrumentationRegistry.getInstrumentation().targetContext
             SurveyRequisite.setRequisites(targetContext)
-            val installer = SurveyInstaller(targetContext)
+            val installer = TestSurveyInstaller(
+                targetContext)
             installer.installSurvey(
                 raw.locked_geo_form,
                 InstrumentationRegistry.getInstrumentation().context
@@ -344,7 +345,8 @@ class LockedGeoQuestionViewTest {
         fun afterClass() {
             val targetContext = InstrumentationRegistry.getInstrumentation().targetContext
             SurveyRequisite.resetRequisites(targetContext)
-            val installer = SurveyInstaller(targetContext)
+            val installer = TestSurveyInstaller(
+                targetContext)
             installer.clearSurveys()
         }
     }

@@ -26,7 +26,7 @@ import android.content.Intent;
 
 import org.akvo.flow.R;
 import org.akvo.flow.activity.FormActivity;
-import org.akvo.flow.activity.form.data.SurveyInstaller;
+import org.akvo.flow.activity.form.data.TestSurveyInstaller;
 import org.akvo.flow.activity.form.data.SurveyRequisite;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -63,7 +63,7 @@ public class ManualGeoQuestionViewTest {
     private static final double MOCK_LATITUDE = 10.0;
     private static final double MOCK_LONGITUDE = 20.0;
 
-    private static SurveyInstaller installer;
+    private static TestSurveyInstaller installer;
 
     @Rule
     public GrantPermissionRule permissionRule = GrantPermissionRule
@@ -90,7 +90,7 @@ public class ManualGeoQuestionViewTest {
     public static void beforeClass() {
         Context targetContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
         SurveyRequisite.setRequisites(targetContext);
-        installer = new SurveyInstaller(targetContext);
+        installer = new TestSurveyInstaller(targetContext);
         installer.installSurvey(geo_form, InstrumentationRegistry.getInstrumentation().getContext());
     }
 

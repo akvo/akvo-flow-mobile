@@ -29,7 +29,7 @@ import androidx.test.rule.ActivityTestRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import org.akvo.flow.activity.FormActivity;
-import org.akvo.flow.activity.form.data.SurveyInstaller;
+import org.akvo.flow.activity.form.data.TestSurveyInstaller;
 import org.akvo.flow.activity.form.data.SurveyRequisite;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -55,7 +55,7 @@ import static org.hamcrest.core.IsNot.not;
 public class OptionsQuestionViewSingleTest {
 
     private static final String FORM_TITLE = "OptionsQuestionForm";
-    private static SurveyInstaller installer;
+    private static TestSurveyInstaller installer;
 
     @Rule
     public ActivityTestRule<FormActivity> rule = new ActivityTestRule<FormActivity>(
@@ -70,7 +70,7 @@ public class OptionsQuestionViewSingleTest {
     public static void beforeClass() {
         Context targetContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
         SurveyRequisite.setRequisites(targetContext);
-        installer = new SurveyInstaller(targetContext);
+        installer = new TestSurveyInstaller(targetContext);
         installer.installSurvey(option_form, InstrumentationRegistry.getInstrumentation().getContext());
     }
 

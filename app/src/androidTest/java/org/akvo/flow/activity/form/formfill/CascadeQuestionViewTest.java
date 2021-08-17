@@ -50,7 +50,7 @@ import androidx.test.rule.ActivityTestRule;
 
 import org.akvo.flow.R;
 import org.akvo.flow.activity.FormActivity;
-import org.akvo.flow.activity.form.data.SurveyInstaller;
+import org.akvo.flow.activity.form.data.TestSurveyInstaller;
 import org.akvo.flow.activity.form.data.SurveyRequisite;
 import org.akvo.flow.domain.Node;
 import org.akvo.flow.domain.QuestionGroup;
@@ -74,7 +74,7 @@ import java.util.Random;
 @RunWith(AndroidJUnit4.class)
 public class CascadeQuestionViewTest {
 
-    private static SurveyInstaller installer;
+    private static TestSurveyInstaller installer;
     private static Survey survey;
 
     private final Random random = new Random();
@@ -92,7 +92,7 @@ public class CascadeQuestionViewTest {
     public static void beforeClass() {
         Context targetContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
         SurveyRequisite.setRequisites(targetContext);
-        installer = new SurveyInstaller(targetContext);
+        installer = new TestSurveyInstaller(targetContext);
         survey = installer.installSurvey(cascade_form, InstrumentationRegistry.getInstrumentation().getContext());
     }
 

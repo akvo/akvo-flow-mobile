@@ -25,7 +25,7 @@ import android.content.Intent;
 
 import org.akvo.flow.R;
 import org.akvo.flow.activity.FormActivity;
-import org.akvo.flow.activity.form.data.SurveyInstaller;
+import org.akvo.flow.activity.form.data.TestSurveyInstaller;
 import org.akvo.flow.activity.form.data.SurveyRequisite;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -61,7 +61,7 @@ import static org.hamcrest.Matchers.is;
 public class FreeTextDoubleQuestionViewTest {
 
     private static final String FORM_TITLE = "FreeTextForm";
-    private static SurveyInstaller installer;
+    private static TestSurveyInstaller installer;
 
     @Rule
     public ActivityTestRule<FormActivity> rule = new ActivityTestRule<FormActivity>(
@@ -76,7 +76,7 @@ public class FreeTextDoubleQuestionViewTest {
     public static void beforeClass() {
         Context targetContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
         SurveyRequisite.setRequisites(targetContext);
-        installer = new SurveyInstaller(targetContext);
+        installer = new TestSurveyInstaller(targetContext);
         installer.installSurvey(freetext_double_entry_form, InstrumentationRegistry.getInstrumentation().getContext());
     }
 

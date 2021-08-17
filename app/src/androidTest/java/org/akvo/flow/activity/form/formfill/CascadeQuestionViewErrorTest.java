@@ -38,7 +38,7 @@ import androidx.test.rule.ActivityTestRule;
 
 import org.akvo.flow.R;
 import org.akvo.flow.activity.FormActivity;
-import org.akvo.flow.activity.form.data.SurveyInstaller;
+import org.akvo.flow.activity.form.data.TestSurveyInstaller;
 import org.akvo.flow.activity.form.data.SurveyRequisite;
 import org.akvo.flow.domain.QuestionGroup;
 import org.akvo.flow.domain.Survey;
@@ -59,7 +59,7 @@ import java.util.List;
 @RunWith(AndroidJUnit4.class)
 public class CascadeQuestionViewErrorTest {
 
-    private static SurveyInstaller installer;
+    private static TestSurveyInstaller installer;
     private static Survey survey;
 
     @Rule
@@ -75,7 +75,7 @@ public class CascadeQuestionViewErrorTest {
     public static void beforeClass() {
         Context targetContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
         SurveyRequisite.setRequisites(targetContext);
-        installer = new SurveyInstaller(targetContext);
+        installer = new TestSurveyInstaller(targetContext);
         survey = installer.installSurvey(cascade_error_form, InstrumentationRegistry.getInstrumentation().getContext());
     }
 

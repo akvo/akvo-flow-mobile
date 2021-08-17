@@ -37,8 +37,8 @@ import org.akvo.flow.activity.form.FormActivityTestUtil.addExecutionDelay
 import org.akvo.flow.activity.form.FormActivityTestUtil.getFormActivityIntent
 import org.akvo.flow.activity.form.FormActivityTestUtil.verifyRepeatHeaderText
 import org.akvo.flow.activity.form.FormActivityTestUtil.withQuestionViewParent
-import org.akvo.flow.activity.form.data.SurveyInstaller
-import org.akvo.flow.activity.form.data.SurveyInstaller.generatePartialRepeatedGroupResponseData
+import org.akvo.flow.activity.form.data.TestSurveyInstaller
+import org.akvo.flow.activity.form.data.TestSurveyInstaller.generatePartialRepeatedGroupResponseData
 import org.akvo.flow.activity.form.data.SurveyRequisite
 import org.akvo.flow.tests.R.raw.repeated_one_group_form_2questions
 import org.akvo.flow.ui.view.FreetextQuestionView
@@ -67,7 +67,8 @@ class RepeatedGroupFormViewTest {
         override fun getActivityIntent(): Intent {
             val targetContext = getInstrumentation().targetContext
             SurveyRequisite.setRequisites(targetContext)
-            val installer = SurveyInstaller(targetContext)
+            val installer = TestSurveyInstaller(
+                targetContext)
             val survey =
                 installer.installSurvey(
                     repeated_one_group_form_2questions,
@@ -90,7 +91,8 @@ class RepeatedGroupFormViewTest {
         fun afterClass() {
             val targetContext = getInstrumentation().targetContext
             SurveyRequisite.resetRequisites(targetContext)
-            val installer = SurveyInstaller(targetContext)
+            val installer = TestSurveyInstaller(
+                targetContext)
             installer.clearSurveys()
         }
     }

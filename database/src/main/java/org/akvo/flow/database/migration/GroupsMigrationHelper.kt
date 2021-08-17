@@ -36,8 +36,6 @@ import java.util.ArrayList
 class GroupsMigrationHelper {
 
     fun migrateGroups(db: SQLiteDatabase, context: Context) {
-        //fetch all forms with ids
-        //fetch all forms with ids
         val cursor =
             db.query(Tables.SURVEY, arrayOf(SurveyColumns._ID), null, null, null, null, null)
         val formIds = ArrayList<String>()
@@ -48,7 +46,7 @@ class GroupsMigrationHelper {
             } while (cursor.moveToNext())
         }
         cursor?.close()
-        //foreach read xml file
+
         for (formId in formIds) {
             val formFolder: String = context.filesDir.absolutePath + File.separator + "forms"
             var fileInputStream: FileInputStream

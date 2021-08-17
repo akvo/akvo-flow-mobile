@@ -24,7 +24,7 @@ import android.content.Context;
 import android.content.Intent;
 
 import org.akvo.flow.activity.FormActivity;
-import org.akvo.flow.activity.form.data.SurveyInstaller;
+import org.akvo.flow.activity.form.data.TestSurveyInstaller;
 import org.akvo.flow.activity.form.data.SurveyRequisite;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -50,7 +50,7 @@ import static org.akvo.flow.tests.R.raw.freetext_form;
 @RunWith(AndroidJUnit4.class)
 public class FreeTextQuestionViewTest {
 
-    private static SurveyInstaller installer;
+    private static TestSurveyInstaller installer;
 
     @Rule
     public ActivityTestRule<FormActivity> rule = new ActivityTestRule<FormActivity>(FormActivity.class) {
@@ -64,7 +64,7 @@ public class FreeTextQuestionViewTest {
     public static void beforeClass() {
         Context targetContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
         SurveyRequisite.setRequisites(targetContext);
-        installer = new SurveyInstaller(targetContext);
+        installer = new TestSurveyInstaller(targetContext);
         installer.installSurvey(freetext_form, InstrumentationRegistry.getInstrumentation().getContext());
     }
 

@@ -49,8 +49,8 @@ import org.akvo.flow.activity.FormActivity
 import org.akvo.flow.activity.form.FormActivityTestUtil.getFormActivityIntent
 import org.akvo.flow.activity.form.FormActivityTestUtil.verifyQuestionIteration
 import org.akvo.flow.activity.form.FormActivityTestUtil.verifyRepeatHeaderText
-import org.akvo.flow.activity.form.data.SurveyInstaller
-import org.akvo.flow.activity.form.data.SurveyInstaller.generateRepeatedOneGroupResponseData
+import org.akvo.flow.activity.form.data.TestSurveyInstaller
+import org.akvo.flow.activity.form.data.TestSurveyInstaller.generateRepeatedOneGroupResponseData
 import org.akvo.flow.activity.form.data.SurveyRequisite
 import org.akvo.flow.tests.R.raw.repeated_one_group_form
 import org.hamcrest.CoreMatchers.allOf
@@ -78,7 +78,8 @@ class RepeatedGroupsFormActivityTest {
         override fun getActivityIntent(): Intent {
             val targetContext = getInstrumentation().targetContext
             SurveyRequisite.setRequisites(targetContext)
-            val installer = SurveyInstaller(targetContext)
+            val installer = TestSurveyInstaller(
+                targetContext)
             val survey =
                 installer.installSurvey(repeated_one_group_form, getInstrumentation().context)
             val id =
@@ -98,7 +99,8 @@ class RepeatedGroupsFormActivityTest {
         fun afterClass() {
             val targetContext = getInstrumentation().targetContext
             SurveyRequisite.resetRequisites(targetContext)
-            val installer = SurveyInstaller(targetContext)
+            val installer = TestSurveyInstaller(
+                targetContext)
             installer.clearSurveys()
         }
     }

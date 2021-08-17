@@ -565,6 +565,9 @@ public class BriteSurveyDbAdapter {
     public void deleteAllSurveys() {
         briteDatabase.delete(Tables.SURVEY, null);
         briteDatabase.delete(Tables.SURVEY_GROUP, null);
+        briteDatabase.delete(QuestionGroupTable.TABLE_NAME, null);
+        briteDatabase.delete(FormUpdateNotifiedTable.TABLE_NAME, null);
+        briteDatabase.delete(LanguageTable.TABLE_NAME, null);
     }
 
     public Cursor getSurveys(String surveyId, String surveyVersion) {
@@ -883,7 +886,7 @@ public class BriteSurveyDbAdapter {
         briteDatabase.insert(FormUpdateNotifiedTable.TABLE_NAME, contentValues);
     }
 
-    public void saveGroup(List<ContentValues> groupValues, String formId) {
+    public void saveQuestionGroup(List<ContentValues> groupValues, String formId) {
         String where = QuestionGroupTable.COLUMN_FORM_ID + " =? ";
         briteDatabase.delete(QuestionGroupTable.TABLE_NAME, where, formId);
         for (ContentValues values: groupValues) {
@@ -896,7 +899,7 @@ public class BriteSurveyDbAdapter {
                 + QuestionGroupTable.COLUMN_FORM_ID + " =? ", formId);
     }
 
-    public void deleteGroups(String formId) {
+    public void deleteQuestionGroups(String formId) {
         briteDatabase.delete(QuestionGroupTable.TABLE_NAME,
                 QuestionGroupTable.COLUMN_FORM_ID + " =? ", formId);
     }

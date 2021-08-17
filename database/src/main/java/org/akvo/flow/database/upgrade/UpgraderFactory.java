@@ -24,10 +24,9 @@ import android.database.sqlite.SQLiteDatabase;
 
 import androidx.annotation.Nullable;
 
-import org.akvo.flow.database.tables.DataPointDownloadTable;
 import org.akvo.flow.database.DatabaseHelper;
+import org.akvo.flow.database.tables.DataPointDownloadTable;
 import org.akvo.flow.database.tables.FormUpdateNotifiedTable;
-import org.akvo.flow.database.tables.QuestionGroupTable;
 
 public class UpgraderFactory {
 
@@ -51,7 +50,7 @@ public class UpgraderFactory {
             case DatabaseHelper.VER_DATAPOINT_STATUS:
                 databaseUpgrader.addUpgrader(new StatusUpgrader(db, new FormUpdateNotifiedTable()));
                 case DatabaseHelper.VER_FORM_VERSION_UPDATE:
-                    databaseUpgrader.addUpgrader(new FormVersionUpgrader(db, new QuestionGroupTable()));
+                    databaseUpgrader.addUpgrader(new FormVersionUpgrader(db, helper));
             default:
                 break;
         }

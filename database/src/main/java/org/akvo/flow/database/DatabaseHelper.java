@@ -24,6 +24,7 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import org.akvo.flow.database.migration.GroupsMigrationHelper;
 import org.akvo.flow.database.migration.TransmissionMigrationHelper;
 import org.akvo.flow.database.tables.DataPointDownloadTable;
 import org.akvo.flow.database.tables.FormUpdateNotifiedTable;
@@ -62,13 +63,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private final DataPointDownloadTable dataPointDownloadTable;
     private final FormUpdateNotifiedTable formUpdateNotifiedTable;
     private final QuestionGroupTable questionGroupTable;
+    private final Context context;
 
-    public DatabaseHelper(Context context, LanguageTable languageTable, DataPointDownloadTable dataPointDownloadTable, FormUpdateNotifiedTable formUpdateNotifiedTable, QuestionGroupTable questionGroupTable) {
+    public DatabaseHelper(Context context, LanguageTable languageTable,
+                          DataPointDownloadTable dataPointDownloadTable,
+                          FormUpdateNotifiedTable formUpdateNotifiedTable,
+                          QuestionGroupTable questionGroupTable) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
         this.languageTable = languageTable;
         this.dataPointDownloadTable = dataPointDownloadTable;
         this.formUpdateNotifiedTable = formUpdateNotifiedTable;
         this.questionGroupTable = questionGroupTable;
+        this.context = context;
     }
 
     @Override
@@ -185,6 +191,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void upgradeFromSurveyViewed(@NotNull SQLiteDatabase db) {
         db.execSQL("ALTER TABLE " + Tables.RECORD + " ADD COLUMN " + RecordColumns.STATUS
                 + " INTEGER NOT NULL DEFAULT 0");
+    }
+
+    public void upgradeFromVersionUpgrader(SQLiteDatabase db) {
+        questionGroupTable.onCreate(db);
+        GroupsMigrationHelper groupsMigrationHelper = new GroupsMigrationHelper();
+        groupsMigrationHelper.migrateGroups(db, context);
     }
 
     /**

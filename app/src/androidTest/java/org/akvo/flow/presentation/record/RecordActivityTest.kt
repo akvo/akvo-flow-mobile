@@ -32,7 +32,7 @@ import kotlinx.coroutines.Dispatchers
 import org.akvo.flow.R
 import org.akvo.flow.activity.FormActivity
 import org.akvo.flow.activity.form.FormActivityTestUtil.addExecutionDelay
-import org.akvo.flow.activity.form.data.SurveyInstaller
+import org.akvo.flow.activity.form.data.TestSurveyInstaller
 import org.akvo.flow.activity.form.data.SurveyRequisite
 import org.akvo.flow.app.FlowApp
 import org.akvo.flow.utils.entity.SurveyGroup
@@ -276,7 +276,8 @@ class RecordActivityTest {
     //TODO: remove once formActivity can have mocked dependencies
     private fun setUpFormData(targetContext: Context): Long {
         SurveyRequisite.setRequisites(targetContext)
-        val installer = SurveyInstaller(targetContext)
+        val installer =
+            TestSurveyInstaller(targetContext)
         val survey =
             installer.installSurvey(
                 org.akvo.flow.tests.R.raw.all_questions_form,
@@ -284,7 +285,7 @@ class RecordActivityTest {
             )
         installer.createDataPoint(
             survey.surveyGroup,
-            *SurveyInstaller.generateRepeatedOneGroupResponseData()
+            *TestSurveyInstaller.generateRepeatedOneGroupResponseData()
         ).first!!
         val dataPointFromFile =
             installer

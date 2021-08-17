@@ -26,7 +26,7 @@ import android.widget.CheckBox;
 
 import org.akvo.flow.R;
 import org.akvo.flow.activity.FormActivity;
-import org.akvo.flow.activity.form.data.SurveyInstaller;
+import org.akvo.flow.activity.form.data.TestSurveyInstaller;
 import org.akvo.flow.activity.form.data.SurveyRequisite;
 import org.hamcrest.core.IsInstanceOf;
 import org.junit.After;
@@ -63,7 +63,7 @@ import static org.hamcrest.Matchers.allOf;
 public class OptionsQuestionViewMultipleTest {
 
     private static final String FORM_TITLE = "OptionsQuestionForm";
-    private static SurveyInstaller installer;
+    private static TestSurveyInstaller installer;
 
     @Rule
     public ActivityTestRule<FormActivity> rule = new ActivityTestRule<FormActivity>(
@@ -78,7 +78,7 @@ public class OptionsQuestionViewMultipleTest {
     public static void beforeClass() {
         Context targetContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
         SurveyRequisite.setRequisites(targetContext);
-        installer = new SurveyInstaller(targetContext);
+        installer = new TestSurveyInstaller(targetContext);
         installer.installSurvey(option_multiple_other_form, InstrumentationRegistry.getInstrumentation().getContext());
     }
 

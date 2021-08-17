@@ -420,8 +420,8 @@ public class DatabaseDataSource {
         briteSurveyDbAdapter.updateSurvey(updatedValues, form.getFormId());
     }
 
-    public void saveGroups(@NotNull DataForm form) {
-        briteSurveyDbAdapter.deleteGroups(form.getFormId());
+    public void saveQuestionGroups(@NotNull DataForm form) {
+        briteSurveyDbAdapter.deleteQuestionGroups(form.getFormId());
         List<DataQuestionGroup> groups = form.getGroups();
         List<ContentValues> groupValues = new ArrayList<>();
         for (DataQuestionGroup group: groups) {
@@ -437,7 +437,7 @@ public class DatabaseDataSource {
             values.put(COLUMN_ORDER, group.getOrder());
             groupValues.add(values);
         }
-        briteSurveyDbAdapter.saveGroup(groupValues, form.getFormId());
+        briteSurveyDbAdapter.saveQuestionGroup(groupValues, form.getFormId());
     }
 
     public Observable<Boolean> deleteAllForms() {

@@ -25,7 +25,7 @@ import android.content.Intent;
 
 import org.akvo.flow.R;
 import org.akvo.flow.activity.FormActivity;
-import org.akvo.flow.activity.form.data.SurveyInstaller;
+import org.akvo.flow.activity.form.data.TestSurveyInstaller;
 import org.akvo.flow.activity.form.data.SurveyRequisite;
 import org.akvo.flow.domain.Survey;
 import org.junit.After;
@@ -63,7 +63,7 @@ import static org.hamcrest.CoreMatchers.is;
 @RunWith(AndroidJUnit4.class)
 public class NumberQuestionViewTest {
 
-    private static SurveyInstaller installer;
+    private static TestSurveyInstaller installer;
     private static Survey survey;
 
     @Rule
@@ -79,7 +79,7 @@ public class NumberQuestionViewTest {
     public static void beforeClass() {
         Context targetContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
         SurveyRequisite.setRequisites(targetContext);
-        installer = new SurveyInstaller(targetContext);
+        installer = new TestSurveyInstaller(targetContext);
         survey = installer.installSurvey(number_form, InstrumentationRegistry.getInstrumentation().getContext());
     }
 

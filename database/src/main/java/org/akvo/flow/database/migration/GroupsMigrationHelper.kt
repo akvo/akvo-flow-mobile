@@ -31,14 +31,13 @@ import timber.log.Timber
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileNotFoundException
-import java.util.ArrayList
 
 class GroupsMigrationHelper {
 
     fun migrateGroups(db: SQLiteDatabase, context: Context) {
         val cursor =
             db.query(Tables.SURVEY, arrayOf(SurveyColumns._ID), null, null, null, null, null)
-        val formIds = ArrayList<String>()
+        val formIds = HashSet<String>()
         if (cursor != null && cursor.moveToFirst()) {
             val columnIndex = cursor.getColumnIndex(QuestionGroupTable.COLUMN_FORM_ID)
             do {

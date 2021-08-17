@@ -246,7 +246,8 @@ public class TestSurveyInstaller {
      * @throws IOException if string cannot be written to file
      */
     private Pair<Form, SurveyGroup> persistSurvey(InputStream input) throws IOException {
-        String xml = FileUtil.readText(input);
+        String xml = FileUtil.readTextWithoutClosing(input);
+        input.reset();
         Pair<Form, SurveyMetadata> result = parseSurvey(input);
         Form form = result.first;
         SurveyGroup group = result.second.getSurveyGroup();

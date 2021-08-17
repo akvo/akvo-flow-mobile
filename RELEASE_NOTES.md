@@ -1,5 +1,11 @@
 Akvo FLOW app release notes
 ===========================
+# ver 2.10.2
+Date: 17 August 2021
+
+* **Add new language: Bemba** - [#1567](https://github.com/akvo/akvo-flow-mobile/issues/1865)
+
+---------------
 # ver 2.10.1
 Date: 18 June 2021
 

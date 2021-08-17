@@ -37,10 +37,10 @@ class GroupsMigrationHelper {
 
     fun migrateGroups(db: SQLiteDatabase, context: Context) {
         val cursor =
-            db.query(Tables.SURVEY, arrayOf(SurveyColumns._ID), null, null, null, null, null)
-        val formIds = ArrayList<String>()
+            db.query(Tables.SURVEY, arrayOf(SurveyColumns.SURVEY_ID), null, null, null, null, null)
+        val formIds = HashSet<String>()
         if (cursor != null && cursor.moveToFirst()) {
-            val columnIndex = cursor.getColumnIndex(QuestionGroupTable.COLUMN_FORM_ID)
+            val columnIndex = cursor.getColumnIndex(SurveyColumns.SURVEY_ID)
             do {
                 formIds.add(cursor.getString(columnIndex))
             } while (cursor.moveToNext())

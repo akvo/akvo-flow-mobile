@@ -37,6 +37,8 @@ import org.akvo.flow.data.datasource.files.FileDataSource;
 import org.akvo.flow.data.entity.ApiFormHeader;
 import org.akvo.flow.data.entity.form.DataForm;
 import org.akvo.flow.data.entity.form.DataFormMapper;
+import org.akvo.flow.data.entity.form.DataSurvey;
+import org.akvo.flow.data.entity.form.DataSurveyMapper;
 import org.akvo.flow.data.entity.form.DomainFormMapper;
 import org.akvo.flow.data.entity.form.FormHeaderParser;
 import org.akvo.flow.data.entity.form.FormIdMapper;
@@ -113,6 +115,9 @@ public class FormDataRepositoryTest {
     @Mock
     DataFormMapper mockDataFormMapper;
 
+    @Mock
+    DataSurveyMapper mockDataSurveyMapper;
+
     private MockWebServer mockWebServer;
     private FormDataRepository formDataRepository;
     private RestApi restApi;
@@ -130,12 +135,13 @@ public class FormDataRepositoryTest {
         DataSourceFactory dataSourceFactory = new DataSourceFactory(null, null,
                 mockDatabaseDataSource, null, mockFileDataSource, null);
         formDataRepository = new FormDataRepository(mockFormHeaderParser, mockXmlParser,
-                restApi, dataSourceFactory, mockFormIdMapper, s3RestApi, mockDomainFormMapper, mockDataFormMapper);
+                restApi, dataSourceFactory, mockFormIdMapper, s3RestApi, mockDomainFormMapper,
+                mockDataFormMapper, mockDataSurveyMapper);
         ApiFormHeader apiFormHeader = new ApiFormHeader("123456", "", "", "1.0", 1.0, "", true, "");
         when(mockFormHeaderParser.parseOne(anyString())).thenReturn(apiFormHeader);
         when(mockAmazonAuth.getAmazonAuthForGet(anyString(), anyString(), anyString()))
                 .thenReturn("123");
-        when(mockDatabaseDataSource.insertSurveyGroup(any(ApiFormHeader.class)))
+        when(mockDatabaseDataSource.insertSurveyGroup(any(DataSurvey.class)))
                 .thenReturn(Observable.just(true));
         doNothing().when(mockDatabaseDataSource).saveForm(anyBoolean(), any(DataForm.class));
         when(mockFileDataSource.extractRemoteArchive(any(ResponseBody.class), anyString()))
@@ -144,6 +150,7 @@ public class FormDataRepositoryTest {
                 .thenReturn(mockInputStream);
         when(mockDataForm.getResources()).thenReturn(Collections.emptyList());
         when(mockDataFormMapper.mapForm(mockForm)).thenReturn(mockDataForm);
+        when(mockDataSurveyMapper.map(any(ApiFormHeader.class))).thenReturn(new DataSurvey(1L, "", true, ""));
     }
 
     @Test

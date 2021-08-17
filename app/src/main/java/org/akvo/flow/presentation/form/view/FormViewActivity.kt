@@ -31,7 +31,7 @@ import androidx.viewpager.widget.ViewPager
 import com.google.android.material.tabs.TabLayout
 import org.akvo.flow.R
 import org.akvo.flow.app.FlowApp
-import org.akvo.flow.domain.SurveyGroup
+import org.akvo.flow.utils.entity.SurveyGroup
 import org.akvo.flow.injector.component.DaggerViewComponent
 import org.akvo.flow.presentation.form.languages.Language
 import org.akvo.flow.presentation.form.languages.LanguagesDialogFragment

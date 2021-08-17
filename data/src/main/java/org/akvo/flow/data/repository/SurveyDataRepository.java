@@ -44,9 +44,9 @@ import org.akvo.flow.data.entity.form.FormIdMapper;
 import org.akvo.flow.data.net.RestApi;
 import org.akvo.flow.data.net.s3.S3RestApi;
 import org.akvo.flow.domain.entity.DataPoint;
+import org.akvo.flow.domain.entity.DomainSurvey;
 import org.akvo.flow.domain.entity.FormInstanceMetadata;
 import org.akvo.flow.domain.entity.InstanceIdUuid;
-import org.akvo.flow.domain.entity.Survey;
 import org.akvo.flow.domain.entity.User;
 import org.akvo.flow.domain.repository.SurveyRepository;
 import org.jetbrains.annotations.Nullable;
@@ -104,14 +104,9 @@ public class SurveyDataRepository implements SurveyRepository {
     }
 
     @Override
-    public Observable<List<Survey>> getSurveys() {
+    public Observable<List<DomainSurvey>> getSurveys() {
         return dataSourceFactory.getDataBaseDataSource().getSurveys()
-                .map(new Function<Cursor, List<Survey>>() {
-                    @Override
-                    public List<Survey> apply(Cursor cursor) {
-                        return surveyMapper.getSurveys(cursor);
-                    }
-                });
+                .map(surveyMapper::getSurveys);
     }
 
     @Override
@@ -255,12 +250,6 @@ public class SurveyDataRepository implements SurveyRepository {
     @Override
     public Completable setSurveyViewed(long surveyId) {
         dataSourceFactory.getDataBaseDataSource().setSurveyViewed(surveyId);
-        return Completable.complete();
-    }
-
-    @Override
-    public Completable cleanDataPoints(Long surveyGroupId) {
-        dataSourceFactory.getDataBaseDataSource().cleanDataPoints(surveyGroupId);
         return Completable.complete();
     }
 

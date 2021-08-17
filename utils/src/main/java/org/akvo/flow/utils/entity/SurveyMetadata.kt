@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Stichting Akvo (Akvo Foundation)
+ * Copyright (C) 2021 Stichting Akvo (Akvo Foundation)
  *
  * This file is part of Akvo Flow.
  *
@@ -17,20 +17,13 @@
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.akvo.flow.domain.entity
+package org.akvo.flow.utils.entity
 
-data class DomainForm(
-    val id: Int = 0,
-    val formId: String = "",
-    val surveyId: Long = 0,
-    val name: String,
-    val version: String,
-    val type: String = "",
-    val location: String = "",
-    val filename: String = "",
-    val language: String = "en",
-    val cascadeDownloaded: Boolean = true,
-    val deleted: Boolean = false,
-    val title: String = "",
-    val groups: List<DomainQuestionGroup> = emptyList()
+data class SurveyMetadata (
+    var id: String? = null,
+    var app: String = "",
+    var name: String? = null,
+    var surveyGroup: SurveyGroup? = null,
+    var version: Double = 0.0,
+    var alias: String = ""
 )

@@ -47,7 +47,7 @@ import org.akvo.flow.R;
 import org.akvo.flow.app.FlowApp;
 import org.akvo.flow.data.database.SurveyDbDataSource;
 import org.akvo.flow.data.preference.Prefs;
-import org.akvo.flow.domain.SurveyGroup;
+import org.akvo.flow.utils.entity.SurveyGroup;
 import org.akvo.flow.domain.entity.User;
 import org.akvo.flow.injector.component.ApplicationComponent;
 import org.akvo.flow.injector.component.DaggerViewComponent;

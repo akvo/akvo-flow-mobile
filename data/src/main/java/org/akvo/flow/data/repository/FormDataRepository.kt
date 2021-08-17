@@ -24,17 +24,27 @@ import org.akvo.flow.data.datasource.DataSourceFactory
 import org.akvo.flow.data.entity.ApiFormHeader
 import org.akvo.flow.data.entity.form.DataForm
 import org.akvo.flow.data.entity.form.DataFormMapper
+import org.akvo.flow.data.entity.form.DataSurveyMapper
 import org.akvo.flow.data.entity.form.DomainFormMapper
 import org.akvo.flow.data.entity.form.FormHeaderParser
 import org.akvo.flow.data.entity.form.FormIdMapper
 import org.akvo.flow.data.net.RestApi
 import org.akvo.flow.data.net.s3.S3RestApi
-import org.akvo.flow.data.util.FlowFileBrowser
+import org.akvo.flow.data.util.FlowFileBrowser.DIR_FORMS
+import org.akvo.flow.data.util.FlowFileBrowser.DIR_RES
+import org.akvo.flow.data.util.FlowFileBrowser.ZIP_SUFFIX
 import org.akvo.flow.domain.entity.DomainForm
+import org.akvo.flow.domain.exception.CascadeProcessingError
+import org.akvo.flow.domain.exception.WrongDashboardError
+import org.akvo.flow.domain.interactor.bootstrap.BootstrapProcessor
 import org.akvo.flow.domain.repository.FormRepository
 import org.akvo.flow.utils.XmlFormParser
 import org.akvo.flow.utils.entity.Question
 import timber.log.Timber
+import java.io.File
+import java.util.Enumeration
+import java.util.zip.ZipEntry
+import java.util.zip.ZipFile
 import javax.inject.Inject
 
 
@@ -46,7 +56,8 @@ class FormDataRepository @Inject constructor(
     private val formIdMapper: FormIdMapper,
     private val s3RestApi: S3RestApi,
     private val domainFormMapper: DomainFormMapper,
-    private val dataFormMapper: DataFormMapper
+    private val dataFormMapper: DataFormMapper,
+    private val dataSurveyMapper: DataSurveyMapper
 ) : FormRepository {
 
     override fun loadForm(formId: String?, deviceId: String?): Observable<Boolean?>? {
@@ -94,6 +105,63 @@ class FormDataRepository @Inject constructor(
         )
     }
 
+    override suspend fun processZipFile(file: File, instanceUrl: String, awsBucket: String) {
+        val zipFile = ZipFile(file)
+        val entries: Enumeration<out ZipEntry> = zipFile.entries()
+        while (entries.hasMoreElements()) {
+            val entry = entries.nextElement()
+            val entryName = entry.name ?: ""
+            when {
+                entryName.endsWith(BootstrapProcessor.CASCADE_RES_SUFFIX) -> {
+                    processCascadeResource(zipFile, entry)
+                }
+                entryName.endsWith(BootstrapProcessor.XML_SUFFIX) -> {
+                    processSurveyFile(zipFile, entry, instanceUrl, awsBucket)
+                }
+            }
+        }
+        zipFile.close()
+        file.renameTo(File(file.absolutePath + BootstrapProcessor.PROCESSED_OK_SUFFIX))
+    }
+
+    private fun processSurveyFile(
+        zipFile: ZipFile,
+        entry: ZipEntry,
+        instanceUrl: String,
+        awsBucket: String,
+    ) {
+        val inputStream = zipFile.getInputStream(entry)
+        val formAndMeta = dataFormMapper.mapFormAndMetadata(xmlParser.parseXmlFormWithMeta(inputStream))
+
+        //verify form
+        val surveyMetadata = formAndMeta.second
+        if (surveyMetadata.alias.isNotEmpty()) {
+            if (!instanceUrl.contains(surveyMetadata.alias)) {
+                throw WrongDashboardError()
+            }
+        } else if (surveyMetadata.app.isNotEmpty()) {
+            if (!awsBucket.contains(surveyMetadata.app)) {
+                throw WrongDashboardError()
+            }
+        } else {
+            throw WrongDashboardError()
+        }
+
+        //extract form to app folder
+        dataSourceFactory.fileDataSource.copyFormFile(zipFile, entry, formAndMeta.first.formId)
+        dataSourceFactory.dataBaseDataSource.insertSurveyGroup(surveyMetadata.survey)
+        saveFormAndGroups(formAndMeta.first, true)
+    }
+
+    private fun processCascadeResource(zipFile: ZipFile, entry: ZipEntry) {
+        return try {
+            dataSourceFactory.fileDataSource.extractZipEntry(zipFile, entry, DIR_RES)
+        } catch (e: Exception) {
+            Timber.e(e)
+            throw CascadeProcessingError(e)
+        }
+    }
+
     private fun parseFormQuestions(formId: String): HashMap<Int, MutableList<Question>> {
         return xmlParser.parseXmlQuestions(dataSourceFactory.fileDataSource.getFormFile(formId))
     }
@@ -113,7 +181,8 @@ class FormDataRepository @Inject constructor(
     }
 
     private fun insertAndDownload(apiFormHeader: ApiFormHeader): Observable<Boolean> {
-        return dataSourceFactory.dataBaseDataSource.insertSurveyGroup(apiFormHeader)
+        val map = dataSurveyMapper.map(apiFormHeader)
+        return dataSourceFactory.dataBaseDataSource.insertSurveyGroup(map)
             .concatMap { downloadForm(apiFormHeader) }
     }
 
@@ -137,10 +206,7 @@ class FormDataRepository @Inject constructor(
     }
 
     private fun downloadAndSaveForm(apiFormHeader: ApiFormHeader): Observable<Boolean> {
-        return downloadAndExtractFile(
-            apiFormHeader.id + FlowFileBrowser.ZIP_SUFFIX,
-            FlowFileBrowser.DIR_FORMS
-        )
+        return downloadAndExtractFile(apiFormHeader.id + ZIP_SUFFIX, DIR_FORMS)
             .concatMap { saveForm(apiFormHeader) }
     }
 
@@ -155,7 +221,9 @@ class FormDataRepository @Inject constructor(
     }
 
     private fun saveForm(apiFormHeader: ApiFormHeader): Observable<Boolean> {
-        val form = dataFormMapper.mapForm(xmlParser.parseXmlForm(dataSourceFactory.fileDataSource.getFormFile(apiFormHeader.id), apiFormHeader.version.toDouble()))
+        val inputStream = dataSourceFactory.fileDataSource.getFormFile(apiFormHeader.id)
+        val backUpVersion = apiFormHeader.version.toDouble()
+        val form = dataFormMapper.mapForm(xmlParser.parseXmlForm(inputStream, backUpVersion))
         return downloadResources(form)
             .concatMap {
                 saveFormAndGroups(form, true)
@@ -176,10 +244,7 @@ class FormDataRepository @Inject constructor(
     private fun downloadResources(form: DataForm): Observable<Boolean> {
         return Observable.fromIterable(form.getResources())
             .concatMap { resource ->
-                downloadAndExtractFile(
-                    resource + FlowFileBrowser.ZIP_SUFFIX,
-                    FlowFileBrowser.DIR_RES
-                )
+                downloadAndExtractFile(resource + ZIP_SUFFIX, DIR_RES)
             }
             .toList()
             .toObservable()

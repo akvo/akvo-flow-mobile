@@ -17,28 +17,12 @@
  * along with Akvo Flow.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package org.akvo.flow.presentation.navigation
+package org.akvo.flow.domain.entity
 
-import org.akvo.flow.domain.entity.DomainSurvey
-import java.util.ArrayList
-import javax.inject.Inject
-
-class SurveyMapper @Inject constructor() {
-
-    fun transform(surveys: List<DomainSurvey>?): List<ViewSurvey> {
-        val viewSurveys: MutableList<ViewSurvey> = ArrayList()
-        if (surveys != null) {
-            for (s in surveys) {
-                viewSurveys.add(transform(s))
-            }
-        }
-        return viewSurveys
-    }
-
-    private fun transform(survey: DomainSurvey): ViewSurvey {
-        return ViewSurvey(
-            survey.id, survey.name, survey.isMonitored,
-            survey.registrationSurveyId, survey.viewed
-        )
-    }
-}
+data class DomainSurvey(
+    val id: Long,
+    val name: String,
+    val isMonitored: Boolean,
+    val registrationSurveyId: String?,
+    val viewed: Boolean
+)

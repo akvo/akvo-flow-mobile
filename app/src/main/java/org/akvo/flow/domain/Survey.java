@@ -24,6 +24,7 @@ import android.text.TextUtils;
 import org.akvo.flow.util.ConstantUtil;
 import org.akvo.flow.utils.entity.AltText;
 import org.akvo.flow.utils.entity.Question;
+import org.akvo.flow.utils.entity.SurveyGroup;
 
 import java.util.ArrayList;
 import java.util.LinkedHashSet;

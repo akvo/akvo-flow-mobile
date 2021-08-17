@@ -35,9 +35,13 @@ import org.jetbrains.annotations.NotNull;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
+import java.util.zip.ZipInputStream;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -48,6 +52,7 @@ import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.functions.Predicate;
 import okhttp3.ResponseBody;
+import timber.log.Timber;
 
 @Singleton
 public class FileDataSource {
@@ -273,5 +278,16 @@ public class FileDataSource {
     public boolean fileExists(@NotNull String imageName) {
         File folder = flowFileBrowser.getInternalFolder(FlowFileBrowser.DIR_MEDIA);
         return folder.exists() && new File(folder, imageName).exists();
+    }
+
+    public void extractZipEntry(@NotNull ZipFile zipFile, @NotNull ZipEntry entry, String folderName) throws IOException {
+        File resFolder = flowFileBrowser.getExistingInternalFolder(folderName);
+        fileHelper.extractInputStream(new ZipInputStream(zipFile.getInputStream(entry)), resFolder);
+    }
+
+    public void copyFormFile(@NotNull ZipFile zipFile, @NotNull ZipEntry entry, String formId) throws IOException {
+        File resFolder = flowFileBrowser.getExistingInternalFolder(FlowFileBrowser.DIR_FORMS);
+        File surveyFile = new File(resFolder, formId + ".xml");
+        fileHelper.copyFile(zipFile.getInputStream(entry), new FileOutputStream(surveyFile));
     }
 }

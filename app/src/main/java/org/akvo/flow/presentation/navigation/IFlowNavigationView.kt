@@ -19,7 +19,7 @@
  */
 package org.akvo.flow.presentation.navigation
 
-import org.akvo.flow.domain.SurveyGroup
+import org.akvo.flow.utils.entity.SurveyGroup
 
 interface IFlowNavigationView {
     fun notifySurveyDeleted(surveyGroupId: Long)

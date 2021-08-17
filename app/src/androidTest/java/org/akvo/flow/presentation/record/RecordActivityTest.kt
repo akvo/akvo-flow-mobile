@@ -35,7 +35,7 @@ import org.akvo.flow.activity.form.FormActivityTestUtil.addExecutionDelay
 import org.akvo.flow.activity.form.data.SurveyInstaller
 import org.akvo.flow.activity.form.data.SurveyRequisite
 import org.akvo.flow.app.FlowApp
-import org.akvo.flow.domain.SurveyGroup
+import org.akvo.flow.utils.entity.SurveyGroup
 import org.akvo.flow.domain.entity.DataPoint
 import org.akvo.flow.domain.entity.DomainForm
 import org.akvo.flow.domain.entity.DomainFormInstance
@@ -44,7 +44,6 @@ import org.akvo.flow.domain.executor.CoroutineDispatcher
 import org.akvo.flow.domain.executor.SchedulerCreator
 import org.akvo.flow.domain.repository.FormInstanceRepository
 import org.akvo.flow.domain.repository.FormRepository
-import org.akvo.flow.domain.repository.SurveyRepository
 import org.akvo.flow.domain.repository.UserRepository
 import org.akvo.flow.injector.component.ApplicationComponent
 import org.akvo.flow.injector.module.ApplicationModule
@@ -78,7 +77,11 @@ class RecordActivityTest {
         override fun getActivityIntent(): Intent {
             val targetContext: Context = getInstrumentation().targetContext
             val result = Intent(targetContext, RecordActivity::class.java)
-            result.putExtra(ConstantUtil.SURVEY_EXTRA, SurveyGroup(155852013L, "", FORM_ID, true))
+            result.putExtra(ConstantUtil.SURVEY_EXTRA,
+                SurveyGroup(155852013L,
+                    "",
+                    FORM_ID,
+                    true))
 
             val dataPointId = setUpFormData(targetContext)
             result.putExtra(ConstantUtil.DATA_POINT_ID_EXTRA, dataPointId.toString())

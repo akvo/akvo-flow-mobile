@@ -22,7 +22,7 @@ package org.akvo.flow.serialization.form;
 
 import android.util.Xml;
 
-import org.akvo.flow.domain.SurveyMetadata;
+import org.akvo.flow.utils.entity.SurveyMetadata;
 
 import java.io.InputStream;
 

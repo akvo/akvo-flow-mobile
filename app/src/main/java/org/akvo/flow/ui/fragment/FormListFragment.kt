@@ -38,7 +38,7 @@ import org.akvo.flow.R
 import org.akvo.flow.app.FlowApp
 import org.akvo.flow.data.loader.FormInfoLoader
 import org.akvo.flow.data.loader.models.FormInfo
-import org.akvo.flow.domain.SurveyGroup
+import org.akvo.flow.utils.entity.SurveyGroup
 import org.akvo.flow.injector.component.ApplicationComponent
 import org.akvo.flow.injector.component.DaggerViewComponent
 import org.akvo.flow.ui.model.ViewForm

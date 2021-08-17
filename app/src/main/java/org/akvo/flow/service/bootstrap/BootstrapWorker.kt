@@ -19,19 +19,20 @@
 package org.akvo.flow.service.bootstrap
 
 import android.content.Context
+import androidx.work.CoroutineWorker
 import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
-import androidx.work.Worker
 import androidx.work.WorkerParameters
+import org.akvo.flow.BuildConfig.AWS_BUCKET
+import org.akvo.flow.BuildConfig.INSTANCE_URL
 import org.akvo.flow.R
 import org.akvo.flow.app.FlowApp
+import org.akvo.flow.domain.interactor.bootstrap.BootstrapProcessor
+import org.akvo.flow.domain.interactor.bootstrap.ProcessingResult
 import org.akvo.flow.util.ConstantUtil
 import org.akvo.flow.util.NotificationHelper
-import timber.log.Timber
-import java.io.File
 import java.util.concurrent.TimeUnit
-import java.util.zip.ZipFile
 import javax.inject.Inject
 
 /**
@@ -53,7 +54,7 @@ import javax.inject.Inject
  *
  */
 class BootstrapWorker(context: Context, workerParams: WorkerParameters) :
-    Worker(context, workerParams) {
+    CoroutineWorker(context, workerParams) {
 
     @Inject
     lateinit var zipFileLister: ZipFileLister
@@ -66,58 +67,31 @@ class BootstrapWorker(context: Context, workerParams: WorkerParameters) :
         application.getApplicationComponent().inject(this)
     }
 
-    override fun doWork(): Result {
-        checkAndInstall()
+    override suspend fun doWork(): Result {
+        val zipFiles = zipFileLister.listSortedZipFiles()
+        if (zipFiles.isEmpty()) {
+            return Result.success()
+        }
+        displayBootstrapStartNotification()
+        when (bootstrapProcessor.execute(zipFiles, INSTANCE_URL, AWS_BUCKET)) {
+            is ProcessingResult.ProcessingErrorWrongDashboard -> {
+                displayErrorNotification(applicationContext.getString(R.string.bootstrap_invalid_app_title),
+                    applicationContext.getString(R.string.bootstrap_invalid_app_message))
+            }
+            is ProcessingResult.ProcessingError -> {
+                displayErrorNotification(applicationContext.getString(R.string.bootstraperror),
+                    "")
+            }
+            else -> {
+                displayNotification(applicationContext.getString(R.string.bootstrapcomplete))
+            }
+        }
         return Result.success()
     }
 
-    /**
-     * Checks the bootstrap directory for unprocessed zip files. If they are
-     * found, they're processed one at a time. If an error occurs, all
-     * processing stops (subsequent zips won't be processed if there are
-     * multiple zips in the directory) just in case data in a later zip depends
-     * on the previous one being there.
-     */
-    private fun checkAndInstall() {
-        try {
-            val zipFiles = zipFileLister.listSortedZipFiles()
-            if (zipFiles.isEmpty()) {
-                return
-            }
-            val startMessage = applicationContext.getString(R.string.bootstrapstart)
-            displayNotification(startMessage)
-            bootstrapProcessor.openDb()
-
-            loop@ for (file in zipFiles) {
-                val zipFile = ZipFile(file)
-                val result = bootstrapProcessor.processZipFile(zipFile)
-                zipFile.close()
-                when (result) {
-                    is ProcessingResult.ProcessingSuccess -> {
-                        file.renameTo(File(file.absolutePath + ConstantUtil.PROCESSED_OK_SUFFIX))
-                        displayNotification(applicationContext.getString(R.string.bootstrapcomplete))
-                    }
-                    is ProcessingResult.ProcessingErrorWrongDashboard -> {
-                        file.renameTo(File(file.absolutePath + ConstantUtil.PROCESSED_ERROR_SUFFIX))
-                        displayErrorNotification(applicationContext.getString(R.string.bootstrap_invalid_app_title),
-                            applicationContext.getString(R.string.bootstrap_invalid_app_message))
-                        break@loop
-                    }
-                    else -> {
-                        file.renameTo(File(file.absolutePath + ConstantUtil.PROCESSED_ERROR_SUFFIX))
-                        displayErrorNotification(applicationContext.getString(R.string.bootstraperror),
-                            "")
-                        break@loop
-                    }
-                }
-            }
-        } catch (e: Exception) {
-            val errorMessage = applicationContext.getString(R.string.bootstraperror)
-            displayErrorNotification(errorMessage, "")
-            Timber.e(e, "Bootstrap error")
-        } finally {
-            bootstrapProcessor.closeDb()
-        }
+    private fun displayBootstrapStartNotification() {
+        val startMessage = applicationContext.getString(R.string.bootstrapstart)
+        displayNotification(startMessage)
     }
 
     private fun displayErrorNotification(errorTitle: String, errorMessage: String) {
@@ -136,7 +110,7 @@ class BootstrapWorker(context: Context, workerParams: WorkerParameters) :
 
 
     companion object {
-        private const val TAG = "BootstrapService"
+        private const val TAG = "BootstrapWorker"
 
         @JvmStatic
         fun scheduleWork(context: Context) {

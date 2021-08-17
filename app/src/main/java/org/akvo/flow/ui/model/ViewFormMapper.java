@@ -26,7 +26,7 @@ import androidx.annotation.VisibleForTesting;
 import android.text.TextUtils;
 
 import org.akvo.flow.data.loader.models.FormInfo;
-import org.akvo.flow.domain.SurveyGroup;
+import org.akvo.flow.utils.entity.SurveyGroup;
 import org.ocpsoft.prettytime.PrettyTime;
 
 import java.util.ArrayList;

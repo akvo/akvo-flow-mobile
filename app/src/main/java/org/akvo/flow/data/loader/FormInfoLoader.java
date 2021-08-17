@@ -31,7 +31,7 @@ import org.akvo.flow.data.loader.models.FormInfo;
 import org.akvo.flow.database.SurveyDbAdapter;
 import org.akvo.flow.database.SurveyInstanceColumns;
 import org.akvo.flow.database.SurveyInstanceStatus;
-import org.akvo.flow.domain.SurveyGroup;
+import org.akvo.flow.utils.entity.SurveyGroup;
 
 import java.util.ArrayList;
 import java.util.List;

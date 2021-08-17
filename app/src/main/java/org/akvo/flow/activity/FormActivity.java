@@ -56,7 +56,7 @@ import org.akvo.flow.database.SurveyInstanceStatus;
 import org.akvo.flow.database.SurveyLanguagesDataSource;
 import org.akvo.flow.domain.QuestionResponse;
 import org.akvo.flow.domain.Survey;
-import org.akvo.flow.domain.SurveyGroup;
+import org.akvo.flow.utils.entity.SurveyGroup;
 import org.akvo.flow.domain.entity.User;
 import org.akvo.flow.event.QuestionInteractionEvent;
 import org.akvo.flow.event.QuestionInteractionListener;
@@ -84,7 +84,6 @@ import org.akvo.flow.util.MediaFileHelper;
 import org.akvo.flow.util.PlatformUtil;
 import org.akvo.flow.util.StorageHelper;
 import org.akvo.flow.util.ViewUtil;
-import org.akvo.flow.util.files.FormFileBrowser;
 
 import java.io.File;
 import java.util.Collections;

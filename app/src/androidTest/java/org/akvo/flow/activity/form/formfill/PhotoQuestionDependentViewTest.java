@@ -19,18 +19,35 @@
 
 package org.akvo.flow.activity.form.formfill;
 
+import static androidx.test.espresso.Espresso.onView;
+import static androidx.test.espresso.assertion.ViewAssertions.matches;
+import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
+import static androidx.test.espresso.matcher.ViewMatchers.withId;
+import static org.akvo.flow.activity.form.FormActivityTestUtil.addExecutionDelay;
+import static org.akvo.flow.activity.form.FormActivityTestUtil.clickNext;
+import static org.akvo.flow.activity.form.FormActivityTestUtil.fillSingleOptionsQuestion;
+import static org.akvo.flow.activity.form.FormActivityTestUtil.getFormActivityIntent;
+import static org.akvo.flow.activity.form.FormActivityTestUtil.verifySubmitButtonDisabled;
+import static org.akvo.flow.activity.form.FormActivityTestUtil.verifySubmitButtonEnabled;
+import static org.akvo.flow.activity.form.FormActivityTestUtil.withQuestionViewParent;
+import static org.akvo.flow.tests.R.raw.photo_form_dependent;
+import static org.hamcrest.Matchers.allOf;
+
 import android.content.Context;
 import android.content.Intent;
-import androidx.test.platform.app.InstrumentationRegistry;
-import androidx.test.filters.MediumTest;
-import androidx.test.rule.ActivityTestRule;
+
 import androidx.test.ext.junit.runners.AndroidJUnit4;
+import androidx.test.filters.MediumTest;
+import androidx.test.platform.app.InstrumentationRegistry;
+import androidx.test.rule.ActivityTestRule;
 
 import org.akvo.flow.R;
 import org.akvo.flow.activity.FormActivity;
-import org.akvo.flow.activity.form.data.TestSurveyInstaller;
 import org.akvo.flow.activity.form.data.SurveyRequisite;
+import org.akvo.flow.activity.form.data.TestSurveyInstaller;
 import org.akvo.flow.ui.view.QuestionView;
+import org.akvo.flow.utils.entity.Form;
+import org.akvo.flow.utils.entity.Question;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -38,18 +55,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import static androidx.test.espresso.Espresso.onView;
-import static androidx.test.espresso.assertion.ViewAssertions.matches;
-import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
-import static androidx.test.espresso.matcher.ViewMatchers.withId;
-import static org.akvo.flow.activity.form.FormActivityTestUtil.verifySubmitButtonEnabled;
-import static org.hamcrest.Matchers.allOf;
-import static org.akvo.flow.activity.form.FormActivityTestUtil.clickNext;
-import static org.akvo.flow.activity.form.FormActivityTestUtil.fillSingleOptionsQuestion;
-import static org.akvo.flow.activity.form.FormActivityTestUtil.getFormActivityIntent;
-import static org.akvo.flow.activity.form.FormActivityTestUtil.verifySubmitButtonDisabled;
-import static org.akvo.flow.activity.form.FormActivityTestUtil.withQuestionViewParent;
-import static org.akvo.flow.tests.R.raw.photo_form_dependent;
+import java.util.List;
 
 @MediumTest
 @RunWith(AndroidJUnit4.class)

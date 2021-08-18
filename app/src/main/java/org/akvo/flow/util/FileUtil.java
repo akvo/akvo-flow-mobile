@@ -108,14 +108,6 @@ public class FileUtil {
         }
     }
 
-    /**
-     * reads data from an InputStream into a string.
-     */
-    public static String readTextWithoutClosing(InputStream is) throws IOException {
-        ByteArrayOutputStream out = read(is);
-        return out.toString();
-    }
-
     public static void copy(InputStream in, OutputStream out) throws IOException {
         byte[] buffer = new byte[BUFFER_SIZE];
         int size;

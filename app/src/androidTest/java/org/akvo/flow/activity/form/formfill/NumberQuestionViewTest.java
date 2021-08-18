@@ -25,6 +25,7 @@ import static androidx.test.espresso.action.ViewActions.typeText;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
+import static org.akvo.flow.activity.form.FormActivityTestUtil.addExecutionDelay;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.clickNext;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.fillFreeTextQuestion;
 import static org.akvo.flow.activity.form.FormActivityTestUtil.getFormActivityIntent;
@@ -50,6 +51,7 @@ import org.akvo.flow.activity.FormActivity;
 import org.akvo.flow.activity.form.data.SurveyRequisite;
 import org.akvo.flow.activity.form.data.TestSurveyInstaller;
 import org.akvo.flow.utils.entity.Form;
+import org.akvo.flow.utils.entity.Question;
 import org.akvo.flow.utils.entity.ValidationRule;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -82,6 +84,7 @@ public class NumberQuestionViewTest {
         SurveyRequisite.setRequisites(targetContext);
         installer = new TestSurveyInstaller(targetContext);
         survey = installer.installSurvey(number_form, InstrumentationRegistry.getInstrumentation().getContext()).first;
+        Question question = survey.getGroups().get(0).getQuestions().get(0);
     }
 
     @After
@@ -97,6 +100,7 @@ public class NumberQuestionViewTest {
 
     @Test
     public void ensureCanFillNumberQuestion() throws IOException {
+        addExecutionDelay(300);
         fillNumberQuestion(50);
         clickNext();
         verifySubmitButtonEnabled();
@@ -105,6 +109,7 @@ public class NumberQuestionViewTest {
 
     @Test
     public void ensureCanNotifyWrongMaxInputNumberQuestion() throws Exception {
+        addExecutionDelay(300);
         fillNumberQuestion(2000);
 
         verifyNumberTooLargeErrorShown();
@@ -114,6 +119,7 @@ public class NumberQuestionViewTest {
 
     @Test
     public void ensureCanNotifyWrongMinInputNumberQuestion() throws Exception {
+        addExecutionDelay(300);
         fillNumberQuestion(0);
 
         verifyNumberTooSmallErrorShown();
@@ -123,6 +129,7 @@ public class NumberQuestionViewTest {
 
     @Test
     public void ensureCannotEnterText() {
+        addExecutionDelay(300);
         fillFreeTextQuestion("This is an answer to your question");
 
         onView(withId(R.id.input_et)).check(matches(withText("")));
@@ -130,6 +137,7 @@ public class NumberQuestionViewTest {
 
     @Test
     public void ensureCannotEnterSigned() {
+        addExecutionDelay(300);
         fillFreeTextQuestion("-1");
 
         onView(withId(R.id.input_et)).check(matches(withText("1")));
@@ -137,6 +145,7 @@ public class NumberQuestionViewTest {
 
     @Test
     public void ensureCannotEnterDecimal() {
+        addExecutionDelay(300);
         fillFreeTextQuestion("1.1");
 
         onView(withId(R.id.input_et)).check(matches(withText("11")));

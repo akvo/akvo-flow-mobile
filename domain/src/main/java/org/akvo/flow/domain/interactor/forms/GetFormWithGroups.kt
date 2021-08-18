@@ -28,7 +28,6 @@ import javax.inject.Inject
 class GetFormWithGroups@Inject constructor(private val formRepository: FormRepository) {
 
     suspend fun execute(parameters: Map<String, Any>): FormResult {
-        Timber.d("Started getting forms")
         if (!parameters.containsKey(PARAM_FORM_ID)) {
             return FormResult.ParamError("Missing form id")
         }
@@ -36,7 +35,6 @@ class GetFormWithGroups@Inject constructor(private val formRepository: FormRepos
             try {
                 val domainForm =
                     formRepository.getFormWithGroups(parameters[PARAM_FORM_ID] as String)
-                Timber.d("Ended getting forms")
                 FormResult.Success(domainForm)
             } catch (e: Exception) {
                 Timber.e(e)

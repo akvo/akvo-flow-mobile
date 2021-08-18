@@ -57,12 +57,13 @@ import org.akvo.flow.utils.entity.QuestionGroup;
 import org.akvo.flow.utils.entity.SurveyGroup;
 import org.akvo.flow.utils.entity.SurveyMetadata;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.Writer;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -90,11 +91,9 @@ public class TestSurveyInstaller {
     }
 
     public Pair<Form, SurveyGroup> installSurvey(int resId, Context context) {
-        InputStream input = context.getResources()
-                .openRawResource(resId);
         Pair<Form, SurveyGroup> survey = null;
         try {
-            survey = persistSurvey(input);
+            survey = persistSurvey(resId, context);
             installCascades(survey.first, context);
         } catch (IOException e) {
             Log.e(TAG, "Error installing survey");
@@ -244,22 +243,31 @@ public class TestSurveyInstaller {
      *
      * @return survey
      * @throws IOException if string cannot be written to file
+     * @param input
+     * @param context
      */
-    private Pair<Form, SurveyGroup> persistSurvey(InputStream input) throws IOException {
-        String xml = FileUtil.readTextWithoutClosing(input);
-        input.reset();
+    private Pair<Form, SurveyGroup> persistSurvey(int resId, Context context) throws IOException {
+        InputStream input = context.getResources().openRawResource(resId);
         Pair<Form, SurveyMetadata> result = parseSurvey(input);
         Form form = result.first;
         SurveyGroup group = result.second.getSurveyGroup();
+
+        //save form file
         FormFileBrowser formFileBrowser = new FormFileBrowser(new FileBrowser());
-        File surveyFile = new File(
-                formFileBrowser.getExistingAppInternalFolder(
-                        InstrumentationRegistry.getInstrumentation().getTargetContext()),
-                form.getId() + ConstantUtil.XML_SUFFIX);
-        writeString(surveyFile, xml);
+        Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
+        File folder = formFileBrowser.getExistingAppInternalFolder(appContext);
+        String filename = form.getId() + ConstantUtil.XML_SUFFIX;
+        File surveyFile = new File(folder, filename);
+        input = context.getResources().openRawResource(resId);
+        //String xml = readRawTextFile(context, resId);
+        FileOutputStream output = new FileOutputStream(surveyFile);
+        FileUtil.copy(input, output);
+        input.close();
+        output.close();
+        //writeString(surveyFile, xml);
 
         surveyFiles.add(surveyFile);
-        form.setFilename(form.getId() + ConstantUtil.XML_SUFFIX);
+        form.setFilename(filename);
         form.setType("Survey");
         form.setLocation(ConstantUtil.FILE_LOCATION);
         form.setCascadeDownloaded(true);
@@ -269,15 +277,45 @@ public class TestSurveyInstaller {
     }
 
     private void writeString(File file, String data) throws IOException {
-        Writer writer = new FileWriter(file);
+       /* Writer writer = new FileWriter(file);
         writer.write(data);
-        writer.close();
+        writer.close();*/
+
+        FileOutputStream outPutStream = new FileOutputStream(file);
+        //Create Writer to write STream to file Path
+        OutputStreamWriter outPutStreamWriter = new OutputStreamWriter(outPutStream);
+        // Stream Byte Data to the file
+        outPutStreamWriter.append(data);
+        //Close Writer
+        outPutStreamWriter.close();
+        //Clear Stream
+        outPutStream.flush();
+        //Terminate STream
+        outPutStream.close();
+    }
+
+    public static String readRawTextFile(Context ctx, int resId) {
+        InputStream inputStream = ctx.getResources().openRawResource(resId);
+
+        InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
+        BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+        String line;
+        StringBuilder text = new StringBuilder();
+
+        try {
+            while ((line = bufferedReader.readLine()) != null) {
+                text.append(line);
+                text.append('\n');
+            }
+        } catch (IOException e) {
+            return null;
+        }
+        return text.toString();
     }
 
     private Pair<Form, SurveyMetadata> parseSurvey(InputStream input) {
         XmlFormParser parser = new XmlFormParser(new FileHelper());
-        Pair<Form, SurveyMetadata> result = parser.parseXmlFormWithMeta(input);
-        return result;
+        return parser.parseXmlFormWithMeta(input);
     }
 
     private void saveSurvey(Form form, SurveyGroup group) {

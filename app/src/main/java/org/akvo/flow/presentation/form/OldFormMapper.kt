@@ -31,6 +31,7 @@ import org.akvo.flow.domain.entity.question.DomainLevel
 import org.akvo.flow.domain.entity.question.DomainOption
 import org.akvo.flow.domain.entity.question.DomainQuestion
 import org.akvo.flow.domain.entity.question.DomainQuestionHelp
+import org.akvo.flow.domain.entity.question.DomainValidationRule
 import org.akvo.flow.utils.entity.AltText
 import org.akvo.flow.utils.entity.Dependency
 import org.akvo.flow.utils.entity.Level
@@ -38,6 +39,7 @@ import org.akvo.flow.utils.entity.Option
 import org.akvo.flow.utils.entity.Question
 import org.akvo.flow.utils.entity.QuestionHelp
 import org.akvo.flow.utils.entity.SurveyGroup
+import org.akvo.flow.utils.entity.ValidationRule
 import java.util.ArrayList
 import java.util.HashMap
 import javax.inject.Inject
@@ -96,10 +98,24 @@ class OldFormMapper @Inject constructor() {
                 question.isAllowPolygon,
                 question.caddisflyRes,
                 question.cascadeResource,
-                mapLevels(question.levels)
+                mapLevels(question.levels),
+                mapValidation(question.validationRule)
             ))
         }
         return questions
+    }
+
+    private fun mapValidation(domainValidationRule: DomainValidationRule?): ValidationRule? {
+        if (domainValidationRule == null) {
+            return null
+        }
+        val validationRule = ValidationRule(domainValidationRule.validationType)
+        validationRule.maxVal = domainValidationRule.maxVal
+        validationRule.minVal = domainValidationRule.minVal
+        validationRule.allowSigned = domainValidationRule.allowSigned
+        validationRule.allowDecimal = domainValidationRule.allowDecimal
+        validationRule.maxLength = domainValidationRule.maxLength
+        return validationRule
     }
 
     private fun mapLevels(domainLevels: MutableList<DomainLevel>): MutableList<Level> {

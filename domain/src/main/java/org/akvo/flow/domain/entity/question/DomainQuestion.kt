@@ -41,7 +41,8 @@ data class DomainQuestion(
     val isAllowPolygon: Boolean = false,
     val caddisflyRes: String? = null,
     val cascadeResource: String? = null,
-    val levels: MutableList<DomainLevel> = mutableListOf()
+    val levels: MutableList<DomainLevel> = mutableListOf(),
+    var validationRule: DomainValidationRule? = null,
 ) {
 
     fun getAltText(lang: String?): DomainAltText? {

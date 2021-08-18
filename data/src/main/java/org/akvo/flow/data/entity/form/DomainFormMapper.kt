@@ -27,12 +27,14 @@ import org.akvo.flow.domain.entity.question.DomainLevel
 import org.akvo.flow.domain.entity.question.DomainOption
 import org.akvo.flow.domain.entity.question.DomainQuestion
 import org.akvo.flow.domain.entity.question.DomainQuestionHelp
+import org.akvo.flow.domain.entity.question.DomainValidationRule
 import org.akvo.flow.utils.entity.AltText
 import org.akvo.flow.utils.entity.Dependency
 import org.akvo.flow.utils.entity.Level
 import org.akvo.flow.utils.entity.Option
 import org.akvo.flow.utils.entity.Question
 import org.akvo.flow.utils.entity.QuestionHelp
+import org.akvo.flow.utils.entity.ValidationRule
 import javax.inject.Inject
 
 class DomainFormMapper @Inject constructor() {
@@ -121,10 +123,23 @@ class DomainFormMapper @Inject constructor() {
                 question.isAllowPolygon,
                 question.caddisflyRes,
                 question.cascadeResource,
-                mapLevels(question.levels)
+                mapLevels(question.levels),
+                mapValidation(question.validationRule)
             ))
         }
         return domainQuestions
+    }
+
+    private fun mapValidation(validationRule: ValidationRule?): DomainValidationRule? {
+        if (validationRule == null) {
+            return null
+        }
+        return DomainValidationRule(validationRule.validationType,
+            validationRule.maxLength,
+            validationRule.allowSigned,
+            validationRule.allowDecimal,
+            validationRule.minVal,
+            validationRule.maxVal)
     }
 
     private fun mapLevels(levels: MutableList<Level>): MutableList<DomainLevel> {

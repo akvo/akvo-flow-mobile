@@ -185,4 +185,16 @@ public class ValidationRule {
         }
         return val;
     }
+
+    @Override
+    public String toString() {
+        return "ValidationRule{" +
+                "validationType='" + validationType + '\'' +
+                ", maxLength=" + maxLength +
+                ", allowSigned=" + allowSigned +
+                ", allowDecimal=" + allowDecimal +
+                ", minVal=" + minVal +
+                ", maxVal=" + maxVal +
+                '}';
+    }
 }

@@ -18,6 +18,7 @@
  */
 package org.akvo.flow.utils
 
+import androidx.core.util.Pair
 import org.akvo.flow.utils.entity.AltText
 import org.akvo.flow.utils.entity.Dependency
 import org.akvo.flow.utils.entity.Form
@@ -38,7 +39,6 @@ import java.io.IOException
 import java.io.InputStream
 import java.util.LinkedHashSet
 import javax.inject.Inject
-import androidx.core.util.Pair
 
 
 class XmlFormParser @Inject constructor(private val helper: FileHelper) {
@@ -785,7 +785,7 @@ class XmlFormParser @Inject constructor(private val helper: FileHelper) {
     }
 
     private fun parseValidationValue(parser: XmlPullParser): ValidationRule {
-       val currentValidation = ValidationRule(getStringAttribute(parser, VALIDATION_TYPE))
+        val currentValidation = ValidationRule(getStringAttribute(parser, VALIDATION_TYPE))
         currentValidation.allowDecimal = getBooleanAttribute(parser, ALLOW_DEC)
         currentValidation.allowSigned = getBooleanAttribute(parser, ALLOW_SIGN)
         currentValidation.maxLength = getIntAttribute(parser, MAX_LENGTH, DEFAULT_MAX_LENGTH)
@@ -797,6 +797,7 @@ class XmlFormParser @Inject constructor(private val helper: FileHelper) {
         if (maxValue != null) {
             currentValidation.maxVal = maxValue
         }
+        Timber.e(currentValidation.toString())
         return currentValidation
     }
 
@@ -820,7 +821,7 @@ class XmlFormParser @Inject constructor(private val helper: FileHelper) {
         getLongAttribute(parser, attributeName) ?: -1L
 
     private fun getBooleanAttribute(parser: XmlPullParser, attributeName: String) =
-        parser.getAttributeValue(null, attributeName)?.toBoolean() ?: false
+        parser.getAttributeValue(null, attributeName)?.equals("true") ?: false
 
     companion object {
         private const val OPTIONS = "options"

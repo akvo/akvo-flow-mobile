@@ -29,7 +29,7 @@ public class ValidationRule {
     public static final int DEFAULT_MAX_LENGTH = 9999;
     public static final String NUMERIC_VALIDATION_TYPE = "numeric";
 
-    private String validationType;
+    private final String validationType;
     private Integer maxLength;
 
     private Boolean allowSigned;
@@ -50,10 +50,6 @@ public class ValidationRule {
 
     public String getValidationType() {
         return validationType;
-    }
-
-    public void setValidationType(String validationType) {
-        this.validationType = validationType;
     }
 
     public Integer getMaxLength() {
@@ -80,49 +76,12 @@ public class ValidationRule {
         this.allowDecimal = allowDecimal;
     }
 
-    public void setAllowDecimal(String val) {
-        if (val != null) {
-            allowDecimal = new Boolean(val.trim());
-        } else {
-            allowDecimal = true;
-        }
-    }
-
-    public void setAllowSigned(String val) {
-        if (val != null) {
-            allowSigned = new Boolean(val.trim());
-
-        } else {
-            allowSigned = true;
-        }
-    }
-
-    public void setMaxLength(String val) {
-        if (val != null) {
-            maxLength = new Integer(val.trim());
-        } else {
-            maxLength = DEFAULT_MAX_LENGTH;
-        }
-    }
-
     public void setMinVal(Double minVal) {
         this.minVal = minVal;
     }
 
     public void setMaxVal(Double maxVal) {
         this.maxVal = maxVal;
-    }
-
-    public void setMinVal(String val) {
-        if (val != null) {
-            minVal = Double.parseDouble(val.trim());
-        }
-    }
-
-    public void setMaxVal(String val) {
-        if (val != null) {
-            maxVal = Double.parseDouble(val.trim());
-        }
     }
 
     public Double getMinVal() {
@@ -184,17 +143,5 @@ public class ValidationRule {
                 }
         }
         return val;
-    }
-
-    @Override
-    public String toString() {
-        return "ValidationRule{" +
-                "validationType='" + validationType + '\'' +
-                ", maxLength=" + maxLength +
-                ", allowSigned=" + allowSigned +
-                ", allowDecimal=" + allowDecimal +
-                ", minVal=" + minVal +
-                ", maxVal=" + maxVal +
-                '}';
     }
 }

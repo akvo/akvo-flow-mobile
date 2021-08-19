@@ -797,7 +797,6 @@ class XmlFormParser @Inject constructor(private val helper: FileHelper) {
         if (maxValue != null) {
             currentValidation.maxVal = maxValue
         }
-        Timber.e(currentValidation.toString())
         return currentValidation
     }
 

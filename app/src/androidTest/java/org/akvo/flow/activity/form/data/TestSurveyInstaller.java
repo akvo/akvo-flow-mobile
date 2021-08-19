@@ -151,16 +151,6 @@ public class TestSurveyInstaller {
     }
 
     @NonNull
-    public static QuestionResponse.QuestionResponseBuilder[] generateRepeatedTwoGroupsResponseData() {
-        return new QuestionResponse.QuestionResponseBuilder[] {
-                generateResponse("123456", ConstantUtil.VALUE_RESPONSE_TYPE, "205929117", 0),
-                generateResponse("test1", ConstantUtil.VALUE_RESPONSE_TYPE, "205929118", 0),
-                generateResponse("test2", ConstantUtil.VALUE_RESPONSE_TYPE, "205929118", 1),
-                generateResponse("test3", ConstantUtil.VALUE_RESPONSE_TYPE, "205929118", 2)
-        };
-    }
-
-    @NonNull
     public static QuestionResponse.QuestionResponseBuilder[] generateRepeatedOneGroupResponseData() {
         return new QuestionResponse.QuestionResponseBuilder[] {
                 generateResponse("test1", ConstantUtil.VALUE_RESPONSE_TYPE, "205929118", 0),

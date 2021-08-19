@@ -46,6 +46,7 @@ import androidx.test.rule.ActivityTestRule
 import androidx.test.rule.GrantPermissionRule
 import org.akvo.flow.R
 import org.akvo.flow.activity.FormActivity
+import org.akvo.flow.activity.form.FormActivityTestUtil.addExecutionDelay
 import org.akvo.flow.activity.form.FormActivityTestUtil.getFormActivityIntent
 import org.akvo.flow.activity.form.FormActivityTestUtil.verifyQuestionIteration
 import org.akvo.flow.activity.form.FormActivityTestUtil.verifyRepeatHeaderText

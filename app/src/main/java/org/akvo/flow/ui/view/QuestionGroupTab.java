@@ -213,13 +213,12 @@ public class QuestionGroupTab extends ConstraintLayout
                 qv.rehydrate(responses.get(questionId));
             } else if (mQuestionGroup.isRepeatable() && !TextUtils.isEmpty(questionId)) {
                 //TODO: fix this repetitions are now broken
-                int repetition = qv.repetition;
-         /*       String[] questionIdRepetition = questionId.split("\\|");
-                questionId = questionIdRepetition[0];
                 int repetition = 0;
+                String[] questionIdRepetition = questionId.split("\\|");
+                questionId = questionIdRepetition[0];
                 if (questionIdRepetition.length > 1) {
                     repetition = Integer.parseInt(questionIdRepetition[1]);
-                }*/
+                }
                 /*
                  * First rep (or rep 0), its questionId is in format 123456
                  * after the second rep, the questionId format is 123451|1 etc...
@@ -418,7 +417,7 @@ public class QuestionGroupTab extends ConstraintLayout
 
     private void setupDependencies(QuestionView qv) {
         final List<Dependency> dependencies = qv.getQuestion().getDependencies();
-        if (dependencies == null) {
+        if (dependencies.isEmpty()) {
             return;// No dependencies for this question
         }
 

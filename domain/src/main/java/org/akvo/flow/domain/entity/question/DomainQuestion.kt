@@ -44,16 +44,4 @@ data class DomainQuestion(
     val levels: MutableList<DomainLevel> = mutableListOf(),
     var validationRule: DomainValidationRule? = null,
 ) {
-
-    fun getAltText(lang: String?): DomainAltText? {
-        return languageTranslationMap[lang]
-    }
-
-    fun addAltText(altText: DomainAltText) {
-        languageTranslationMap[altText.languageCode] = altText
-    }
-
-    override fun toString(): String {
-        return text!!
-    }
 }

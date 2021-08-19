@@ -95,4 +95,8 @@ data class Question(
         }
         return q
     }
+
+    override fun toString(): String {
+        return text!!
+    }
 }

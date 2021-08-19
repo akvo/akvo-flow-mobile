@@ -67,7 +67,7 @@ import java.io.IOException;
 public class NumberQuestionViewTest {
 
     private static TestSurveyInstaller installer;
-    private static Form survey;
+    private static Form form;
 
     @Rule
     public ActivityTestRule<FormActivity> rule = new ActivityTestRule<FormActivity>(
@@ -83,8 +83,7 @@ public class NumberQuestionViewTest {
         Context targetContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
         SurveyRequisite.setRequisites(targetContext);
         installer = new TestSurveyInstaller(targetContext);
-        survey = installer.installSurvey(number_form, InstrumentationRegistry.getInstrumentation().getContext()).first;
-        Question question = survey.getGroups().get(0).getQuestions().get(0);
+        form = installer.installSurvey(number_form, InstrumentationRegistry.getInstrumentation().getContext()).first;
     }
 
     @After
@@ -100,7 +99,6 @@ public class NumberQuestionViewTest {
 
     @Test
     public void ensureCanFillNumberQuestion() throws IOException {
-        addExecutionDelay(300);
         fillNumberQuestion(50);
         clickNext();
         verifySubmitButtonEnabled();
@@ -109,7 +107,6 @@ public class NumberQuestionViewTest {
 
     @Test
     public void ensureCanNotifyWrongMaxInputNumberQuestion() throws Exception {
-        addExecutionDelay(300);
         fillNumberQuestion(2000);
 
         verifyNumberTooLargeErrorShown();
@@ -119,7 +116,6 @@ public class NumberQuestionViewTest {
 
     @Test
     public void ensureCanNotifyWrongMinInputNumberQuestion() throws Exception {
-        addExecutionDelay(300);
         fillNumberQuestion(0);
 
         verifyNumberTooSmallErrorShown();
@@ -129,7 +125,6 @@ public class NumberQuestionViewTest {
 
     @Test
     public void ensureCannotEnterText() {
-        addExecutionDelay(300);
         fillFreeTextQuestion("This is an answer to your question");
 
         onView(withId(R.id.input_et)).check(matches(withText("")));
@@ -145,7 +140,6 @@ public class NumberQuestionViewTest {
 
     @Test
     public void ensureCannotEnterDecimal() {
-        addExecutionDelay(300);
         fillFreeTextQuestion("1.1");
 
         onView(withId(R.id.input_et)).check(matches(withText("11")));
@@ -170,7 +164,7 @@ public class NumberQuestionViewTest {
     }
 
     private ValidationRule getValidationRule() {
-        return survey.getGroups().get(0).getQuestions().get(0).getValidationRule();
+        return form.getGroups().get(0).getQuestions().get(0).getValidationRule();
     }
 
     private void fillNumberQuestion(int firstValue) {

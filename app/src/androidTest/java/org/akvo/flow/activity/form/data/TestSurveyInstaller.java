@@ -57,13 +57,10 @@ import org.akvo.flow.utils.entity.QuestionGroup;
 import org.akvo.flow.utils.entity.SurveyGroup;
 import org.akvo.flow.utils.entity.SurveyMetadata;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -233,28 +230,15 @@ public class TestSurveyInstaller {
      *
      * @return survey
      * @throws IOException if string cannot be written to file
-     * @param input
      * @param context
      */
     private Pair<Form, SurveyGroup> persistSurvey(int resId, Context context) throws IOException {
-        InputStream input = context.getResources().openRawResource(resId);
-        Pair<Form, SurveyMetadata> result = parseSurvey(input);
+        Pair<Form, SurveyMetadata> result = parseFormXml(resId, context);
         Form form = result.first;
         SurveyGroup group = result.second.getSurveyGroup();
-
-        //save form file
-        FormFileBrowser formFileBrowser = new FormFileBrowser(new FileBrowser());
-        Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
-        File folder = formFileBrowser.getExistingAppInternalFolder(appContext);
         String filename = form.getId() + ConstantUtil.XML_SUFFIX;
-        File surveyFile = new File(folder, filename);
-        input = context.getResources().openRawResource(resId);
-        //String xml = readRawTextFile(context, resId);
-        FileOutputStream output = new FileOutputStream(surveyFile);
-        FileUtil.copy(input, output);
-        input.close();
-        output.close();
-        //writeString(surveyFile, xml);
+
+        File surveyFile = saveFormToDevice(resId, context, filename);
 
         surveyFiles.add(surveyFile);
         form.setFilename(filename);
@@ -266,41 +250,26 @@ public class TestSurveyInstaller {
         return new Pair<>(form, group);
     }
 
-    private void writeString(File file, String data) throws IOException {
-       /* Writer writer = new FileWriter(file);
-        writer.write(data);
-        writer.close();*/
+    @NonNull
+    private File saveFormToDevice(int resId, Context context, String filename) throws IOException {
+        //save form file
+        FormFileBrowser formFileBrowser = new FormFileBrowser(new FileBrowser());
+        Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
+        File folder = formFileBrowser.getExistingAppInternalFolder(appContext);
+        File surveyFile = new File(folder, filename);
 
-        FileOutputStream outPutStream = new FileOutputStream(file);
-        //Create Writer to write STream to file Path
-        OutputStreamWriter outPutStreamWriter = new OutputStreamWriter(outPutStream);
-        // Stream Byte Data to the file
-        outPutStreamWriter.append(data);
-        //Close Writer
-        outPutStreamWriter.close();
-        //Clear Stream
-        outPutStream.flush();
-        //Terminate STream
-        outPutStream.close();
+        InputStream input = context.getResources().openRawResource(resId);
+        FileOutputStream output = new FileOutputStream(surveyFile);
+        FileUtil.copy(input, output);
+        input.close();
+        output.close();
+        return surveyFile;
     }
 
-    public static String readRawTextFile(Context ctx, int resId) {
-        InputStream inputStream = ctx.getResources().openRawResource(resId);
-
-        InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
-        BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-        String line;
-        StringBuilder text = new StringBuilder();
-
-        try {
-            while ((line = bufferedReader.readLine()) != null) {
-                text.append(line);
-                text.append('\n');
-            }
-        } catch (IOException e) {
-            return null;
-        }
-        return text.toString();
+    @NonNull
+    private Pair<Form, SurveyMetadata> parseFormXml(int resId, Context context) {
+        InputStream input = context.getResources().openRawResource(resId);
+        return parseSurvey(input);
     }
 
     private Pair<Form, SurveyMetadata> parseSurvey(InputStream input) {

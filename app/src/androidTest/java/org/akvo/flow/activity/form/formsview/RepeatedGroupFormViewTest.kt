@@ -67,16 +67,15 @@ class RepeatedGroupFormViewTest {
         override fun getActivityIntent(): Intent {
             val targetContext = getInstrumentation().targetContext
             SurveyRequisite.setRequisites(targetContext)
-            val installer = TestSurveyInstaller(
-                targetContext)
-            val survey =
+            val installer = TestSurveyInstaller(targetContext)
+            val result =
                 installer.installSurvey(
                     repeated_one_group_form_2questions,
                     getInstrumentation().context
                 )
             val id =
                 installer.createDataPoint(
-                    survey.second,
+                    result.second,
                     *generatePartialRepeatedGroupResponseData()
                 ).first!!
             return getFormActivityIntent(207569117L, "200389118", SURVEY_TITLE, id)
@@ -91,8 +90,7 @@ class RepeatedGroupFormViewTest {
         fun afterClass() {
             val targetContext = getInstrumentation().targetContext
             SurveyRequisite.resetRequisites(targetContext)
-            val installer = TestSurveyInstaller(
-                targetContext)
+            val installer = TestSurveyInstaller(targetContext)
             installer.clearSurveys()
         }
     }

@@ -107,7 +107,7 @@ public class FormActivityTest {
 
     private static final String FORM_TITLE = "Test form";
     private static TestSurveyInstaller installer;
-    private static Form survey;
+    private static Form form;
 
     @Rule
     public GrantPermissionRule permissionRule = GrantPermissionRule
@@ -135,7 +135,7 @@ public class FormActivityTest {
         Context targetContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
         SurveyRequisite.setRequisites(targetContext);
         installer = new TestSurveyInstaller(targetContext);
-        survey = installer.installSurvey(all_questions_form, InstrumentationRegistry.getInstrumentation().getContext()).first;
+        form = installer.installSurvey(all_questions_form, InstrumentationRegistry.getInstrumentation().getContext()).first;
     }
 
     @After
@@ -151,9 +151,9 @@ public class FormActivityTest {
 
     @Test
     public void testViewNonFilledForm() {
-        verifyToolBar(survey.getName(), survey.getVersion());
+        verifyToolBar(form.getName(), form.getVersion());
 
-        List<QuestionGroup> questionGroups = survey.getGroups();
+        List<QuestionGroup> questionGroups = form.getGroups();
         List<Question> mandatoryQuestions = new ArrayList<>();
         for (int i = 0; i < questionGroups.size(); i++) {
             QuestionGroup group = questionGroups.get(i);

@@ -46,7 +46,6 @@ import androidx.test.rule.ActivityTestRule
 import androidx.test.rule.GrantPermissionRule
 import org.akvo.flow.R
 import org.akvo.flow.activity.FormActivity
-import org.akvo.flow.activity.form.FormActivityTestUtil.addExecutionDelay
 import org.akvo.flow.activity.form.FormActivityTestUtil.getFormActivityIntent
 import org.akvo.flow.activity.form.FormActivityTestUtil.verifyQuestionIteration
 import org.akvo.flow.activity.form.FormActivityTestUtil.verifyRepeatHeaderText
@@ -81,11 +80,11 @@ class RepeatedGroupsFormActivityTest {
             SurveyRequisite.setRequisites(targetContext)
             val installer = TestSurveyInstaller(
                 targetContext)
-            val survey =
+            val result =
                 installer.installSurvey(repeated_one_group_form, getInstrumentation().context)
             val id =
                 installer.createDataPoint(
-                    survey.second,
+                    result.second,
                     *generateRepeatedOneGroupResponseData()
                 ).first!!
             return getFormActivityIntent(207569117L, "200389118", SURVEY_TITLE, id)
@@ -100,8 +99,7 @@ class RepeatedGroupsFormActivityTest {
         fun afterClass() {
             val targetContext = getInstrumentation().targetContext
             SurveyRequisite.resetRequisites(targetContext)
-            val installer = TestSurveyInstaller(
-                targetContext)
+            val installer = TestSurveyInstaller(targetContext)
             installer.clearSurveys()
         }
     }

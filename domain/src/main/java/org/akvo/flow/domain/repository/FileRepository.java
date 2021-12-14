@@ -47,6 +47,8 @@ public interface FileRepository {
 
     Observable<Boolean> copyFile(String originFilePath, String destinationFilePath);
 
+    Observable<Boolean> saveByteArrayToFile(byte[] imageByteArray, String destinationFilePath);
+
     Observable<Boolean> unPublishData();
 
     Observable<Boolean> clearResponseFiles();

@@ -151,13 +151,13 @@ public class CaddisflyQuestionView extends QuestionView implements View.OnClickL
             mValue = data.getString(ConstantUtil.CADDISFLY_RESPONSE);
             caddisflyTestResults = caddisflyJsonMapper.transform(mValue);
             // Get optional image and store it as part of the response
-            String image = data.getString(ConstantUtil.CADDISFLY_IMAGE);
+            String imageName = data.getString(ConstantUtil.CADDISFLY_IMAGE);
 
-            Timber.d("caddisflyTestComplete - Response: %s . Image: %s", mValue, image);
+            Timber.d("caddisflyTestComplete - Response: %s . Image: %s", mValue, imageName);
 
-            File src = !TextUtils.isEmpty(image) ? new File(image) : null;
-            if (src != null && src.exists() && !src.isDirectory()) {
-                presenter.onImageReady(src);
+            byte[] imageByteArray = data.getByteArray(ConstantUtil.CADDISFLY_IMAGE_BITMAP);
+            if (imageName != null && imageByteArray!= null && imageByteArray.length > 0) {
+                presenter.onImageReady(imageName, imageByteArray);
             } else {
                 captureResponse();
             }

@@ -1,5 +1,11 @@
 Akvo FLOW app release notes
 ===========================
+# ver 2.10.3
+Date: 14 December 2021
+
+* **Resolve Caddisfly image scoped storage access issue** - [#1882](https://github.com/akvo/akvo-flow-mobile/issues/1882)
+
+---------------
 # ver 2.10.2
 Date: 17 August 2021
 

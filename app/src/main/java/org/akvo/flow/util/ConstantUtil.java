@@ -180,6 +180,7 @@ public class ConstantUtil {
     public static final String CADDISFLY_LANGUAGE = "language";
     public static final String CADDISFLY_RESPONSE = "response";
     public static final String CADDISFLY_IMAGE = "image";
+    public static final String CADDISFLY_IMAGE_BITMAP = "imageBitmap";
     public static final String CADDISFLY_MIME = "text/plain";
     public static final String CADDISFLY_INSTANCE_NAME = "instanceName";
 

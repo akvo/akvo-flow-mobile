@@ -34,6 +34,7 @@ import org.akvo.flow.domain.interactor.MobileUploadSet;
 import org.akvo.flow.domain.interactor.PublishData;
 import org.akvo.flow.domain.interactor.SaveEnableMobileData;
 import org.akvo.flow.domain.interactor.SaveImage;
+import org.akvo.flow.domain.interactor.SaveByteArrayToFile;
 import org.akvo.flow.domain.interactor.SaveImageSize;
 import org.akvo.flow.domain.interactor.SaveKeepScreenOn;
 import org.akvo.flow.domain.interactor.SaveResizedImage;
@@ -203,6 +204,12 @@ public class ViewModule {
     @Named("copyFile")
     UseCase provideCopyFile(CopyFile copyFile) {
         return copyFile;
+    }
+
+    @Provides
+    @Named("saveByteArrayToFile")
+    UseCase provideSaveByteArrayToFile(SaveByteArrayToFile saveByteArrayToFile) {
+        return saveByteArrayToFile;
     }
 
     @Provides

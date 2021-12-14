@@ -85,6 +85,14 @@ public class FileDataSource {
         return Observable.just(true);
     }
 
+    public Observable<Boolean> saveByteArrayToFile(byte[] bytes, String destinationFilePath) {
+        File destinationFile = new File(destinationFilePath);
+        if (fileHelper.saveByteArrayToFile(bytes, destinationFile) == null) {
+            return Observable.error(new Exception("Error saving file to: " + destinationFile));
+        }
+        return Observable.just(true);
+    }
+
     @NotNull
     public Completable saveRemoteMediaFile(@NotNull String filename,
             @NotNull ResponseBody responseBody) {

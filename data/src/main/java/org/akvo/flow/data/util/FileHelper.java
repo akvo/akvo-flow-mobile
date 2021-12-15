@@ -128,6 +128,18 @@ public class FileHelper {
     }
 
     @Nullable
+    public String saveByteArrayToFile(byte[] bytes, File destinationFile) {
+        if (bytes != null) {
+            try (FileOutputStream fos = new FileOutputStream(destinationFile)) {
+                fos.write(bytes);
+            } catch (Exception e) {
+                Timber.e(e);
+            }
+        }
+        return destinationFile.getAbsolutePath();
+    }
+
+    @Nullable
     public String saveStreamToFile(InputStream inputStream, File destinationFile) {
         copyStream(inputStream, destinationFile);
         close(inputStream);

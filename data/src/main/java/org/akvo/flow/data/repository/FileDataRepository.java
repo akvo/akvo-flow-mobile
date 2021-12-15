@@ -79,6 +79,11 @@ public class FileDataRepository implements FileRepository {
     }
 
     @Override
+    public Observable<Boolean> saveByteArrayToFile(byte[] bytes, String destinationFilePath) {
+        return dataSourceFactory.getFileDataSource().saveByteArrayToFile(bytes, destinationFilePath);
+    }
+
+    @Override
     public Observable<Boolean> unPublishData() {
         return dataSourceFactory.getFileDataSource().removePublishedFiles();
     }

@@ -22,13 +22,12 @@ package org.akvo.flow.presentation.form.caddisfly;
 
 import androidx.annotation.NonNull;
 
-import org.akvo.flow.domain.interactor.CopyFile;
 import org.akvo.flow.domain.interactor.DefaultObserver;
+import org.akvo.flow.domain.interactor.SaveByteArrayToFile;
 import org.akvo.flow.domain.interactor.UseCase;
 import org.akvo.flow.presentation.Presenter;
 import org.akvo.flow.util.MediaFileHelper;
 
-import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -37,14 +36,14 @@ import javax.inject.Named;
 
 public class CaddisflyPresenter implements Presenter {
 
-    private final UseCase copyFile;
+    private final UseCase saveByteArrayToFile;
     private final MediaFileHelper mediaFileHelper;
 
     private CaddisflyView view;
 
     @Inject
-    public CaddisflyPresenter(@Named("copyFile") UseCase copyFile, MediaFileHelper mediaFileHelper) {
-        this.copyFile = copyFile;
+    public CaddisflyPresenter(@Named("saveByteArrayToFile") UseCase saveByteArrayToFile, MediaFileHelper mediaFileHelper) {
+        this.saveByteArrayToFile = saveByteArrayToFile;
         this.mediaFileHelper = mediaFileHelper;
     }
 
@@ -52,14 +51,13 @@ public class CaddisflyPresenter implements Presenter {
         this.view = view;
     }
 
-    public void onImageReady(@NonNull final File originalImageFile) {
-        final String copiedImagePath = mediaFileHelper.getMediaFile(originalImageFile.getName())
+    public void onImageReady(@NonNull final String imageFileName, byte[] imageByteArray) {
+        final String destinationFilePath = mediaFileHelper.getMediaFile(imageFileName)
                 .getAbsolutePath();
-        String originalImagePath = originalImageFile.getAbsolutePath();
-        Map<String, Object> params = new HashMap<>(4);
-        params.put(CopyFile.ORIGINAL_FILE_NAME_PARAM, originalImagePath);
-        params.put(CopyFile.RESIZED_FILE_NAME_PARAM, copiedImagePath);
-        copyFile.execute(new DefaultObserver<Boolean>() {
+        Map<String, Object> params = new HashMap<>(2);
+        params.put(SaveByteArrayToFile.FILE_BYTE_ARRAY_PARAM, imageByteArray);
+        params.put(SaveByteArrayToFile.DESTINATION_FILE_PATH_PARAM, destinationFilePath);
+        saveByteArrayToFile.execute(new DefaultObserver<Boolean>() {
             @Override
             public void onError(Throwable e) {
                 view.showErrorGettingMedia();
@@ -67,14 +65,14 @@ public class CaddisflyPresenter implements Presenter {
             }
 
             @Override
-            public void onNext(Boolean ignored) {
-                view.updateResponse(copiedImagePath);
+            public void onNext(@NonNull Boolean ignored) {
+                view.updateResponse(destinationFilePath);
             }
         }, params);
     }
 
     @Override
     public void destroy() {
-        copyFile.dispose();
+        saveByteArrayToFile.dispose();
     }
 }

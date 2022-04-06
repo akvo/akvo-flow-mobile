@@ -1,7 +1,7 @@
 buildscript {
     ext {
         kotlinVersion = '1.5.21'
-        jacocoVersion = '0.8.7'
+        jacocoVersion = '0.8.8'
         annotationVersion = "1.1.0"
         appCompatVersion = "1.2.0"
         crashlyticsVersion = "17.1.1"

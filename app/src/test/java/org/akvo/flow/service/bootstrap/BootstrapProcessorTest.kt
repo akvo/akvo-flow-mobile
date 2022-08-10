@@ -154,7 +154,7 @@ class BootstrapProcessorTest {
         every { (surveyMapper.generateFileName(any())) }.returns("file.xml")
         every { (surveyMapper.getSurveyIdFromFilePath(any())) }.returns("id")
         every { (surveyMapper.generateSurveyFolderName(any())) }.returns("folder")
-        every { (fileProcessor.createAndCopyNewSurveyFile(any(), any(), any(), any())) }.returns(spyk(File("file.xml")))
+        every { (fileProcessor.createAndCopyNewSurveyFile(any(), any(), any())) }.returns(spyk(File("file.xml")))
         val metadata = SurveyMetadata()
         metadata.app = ""
         metadata.alias = ""
@@ -172,7 +172,7 @@ class BootstrapProcessorTest {
         every { (surveyMapper.generateFileName(any())) }.returns("file.xml")
         every { (surveyMapper.getSurveyIdFromFilePath(any())) }.returns("id")
         every { (surveyMapper.generateSurveyFolderName(any())) }.returns("folder")
-        every { (fileProcessor.createAndCopyNewSurveyFile(any(), any(), any(), any())) }.returns(spyk(File("file.xml")))
+        every { (fileProcessor.createAndCopyNewSurveyFile(any(), any(), any())) }.returns(spyk(File("file.xml")))
         val metadata = SurveyMetadata()
         metadata.app = "dev"
         every { (fileProcessor.readBasicSurveyData(any())) }.returns(metadata)
@@ -189,7 +189,7 @@ class BootstrapProcessorTest {
         every { (surveyMapper.generateFileName(any())) }.returns("file.xml")
         every { (surveyMapper.getSurveyIdFromFilePath(any())) }.returns("id")
         every { (surveyMapper.generateSurveyFolderName(any())) }.returns("folder")
-        every { (fileProcessor.createAndCopyNewSurveyFile(any(), any(), any(), any())) }.returns(spyk(File("file.xml")))
+        every { (fileProcessor.createAndCopyNewSurveyFile(any(), any(), any())) }.returns(spyk(File("file.xml")))
         val metadata = SurveyMetadata()
         metadata.alias = "uat1.akvoflow.org"
         metadata.app = "akvoflow-uat"
@@ -208,7 +208,7 @@ class BootstrapProcessorTest {
         every { (surveyMapper.generateFileName(any())) }.returns("file.xml")
         every { (surveyMapper.getSurveyIdFromFilePath(any())) }.returns("id")
         every { (surveyMapper.generateSurveyFolderName(any())) }.returns("folder")
-        every { (fileProcessor.createAndCopyNewSurveyFile(any(), any(), any(), any())) }.returns(spyk(File("file.xml")))
+        every { (fileProcessor.createAndCopyNewSurveyFile(any(), any(), any())) }.returns(spyk(File("file.xml")))
         val metadata = SurveyMetadata()
         metadata.app = "uat1"
         every { (fileProcessor.readBasicSurveyData(any())) }.returns(metadata)

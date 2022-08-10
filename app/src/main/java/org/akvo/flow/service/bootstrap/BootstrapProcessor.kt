@@ -81,7 +81,7 @@ class BootstrapProcessor @Inject constructor(
             val surveyFolderName = surveyMapper.generateSurveyFolderName(entryName)
 
             // in both cases (new survey and existing), we need to update the xml
-            val surveyFile: File = fileProcessor.createAndCopyNewSurveyFile(filename, surveyFolderName, zipFile, entry)
+            val surveyFile: File = fileProcessor.createAndCopyNewSurveyFile(idFromFolderName, zipFile, entry)
             // now read the survey XML back into memory to see if there is a version
             val surveyMetadata = fileProcessor.readBasicSurveyData(surveyFile)
 
@@ -96,7 +96,7 @@ class BootstrapProcessor @Inject constructor(
             } else {
                 return ProcessingResult.ProcessingErrorWrongDashboard
             }
-            val survey = surveyMapper.createOrUpdateSurvey(filename,
+            val survey = surveyMapper.createOrUpdateSurvey(surveyFile.name,
                 idFromFolderName,
                 databaseAdapter.getSurvey(idFromFolderName),
                 surveyFolderName,

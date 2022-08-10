@@ -81,7 +81,7 @@ class SurveyMapper @Inject constructor() {
 
         val survey = dbSurvey ?: createSurvey(idFromFolderName, surveyMetadata, filename)
         survey.location = ConstantUtil.FILE_LOCATION
-        survey.fileName = generateSurveyFileName(filename, surveyFolderName)
+        survey.fileName = filename
         survey.name = generateSurveyName(surveyMetadata, survey.name)
         survey.surveyGroup = surveyMetadata.surveyGroup
         survey.version = generateSurveyVersion(surveyMetadata)

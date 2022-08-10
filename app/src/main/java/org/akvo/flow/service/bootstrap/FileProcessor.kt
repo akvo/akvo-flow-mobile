@@ -20,9 +20,9 @@
 package org.akvo.flow.service.bootstrap
 
 import android.content.Context
-import android.text.TextUtils
 import org.akvo.flow.domain.SurveyMetadata
 import org.akvo.flow.serialization.form.SurveyMetadataParser
+import org.akvo.flow.util.ConstantUtil
 import org.akvo.flow.util.FileUtil
 import org.akvo.flow.util.files.FormFileBrowser
 import org.akvo.flow.util.files.FormResourcesFileBrowser
@@ -50,12 +50,11 @@ class FileProcessor @Inject constructor(
     }
 
     fun createAndCopyNewSurveyFile(
-        filename: String,
-        surveyFolderName: String,
+        formId: String,
         zipFile: ZipFile,
         entry: ZipEntry
     ): File {
-        val surveyFile = createNewSurveyFile(filename, surveyFolderName)
+        val surveyFile = createNewSurveyFile(formId)
         FileUtil.copy(zipFile.getInputStream(entry), FileOutputStream(surveyFile))
         return surveyFile
     }
@@ -67,19 +66,8 @@ class FileProcessor @Inject constructor(
         )
     }
 
-    private fun createNewSurveyFile(filename: String, surveyFolderName: String): File {
+    private fun createNewSurveyFile(formId: String): File {
         val formsFolder = formFileBrowser.getExistingAppInternalFolder(applicationContext)
-        return when {
-            TextUtils.isEmpty(surveyFolderName) -> {
-                File(formsFolder, filename)
-            }
-            else -> {
-                val surveyFolder = File(formsFolder, surveyFolderName)
-                if (!surveyFolder.exists()) {
-                    surveyFolder.mkdir()
-                }
-                File(surveyFolder, filename)
-            }
-        }
+        return File(formsFolder, formId + ConstantUtil.XML_SUFFIX)
     }
 }

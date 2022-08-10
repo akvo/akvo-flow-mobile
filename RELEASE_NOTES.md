@@ -1,5 +1,11 @@
 Akvo FLOW app release notes
 ===========================
+# ver 2.10.4
+Date: 8 August 2022
+
+* **Resolve Reviewing submitted data-points for manually transferred surveys** - [#1899](https://github.com/akvo/akvo-flow-mobile/issues/1899)
+
+---------------
 # ver 2.10.3
 Date: 14 December 2021
 

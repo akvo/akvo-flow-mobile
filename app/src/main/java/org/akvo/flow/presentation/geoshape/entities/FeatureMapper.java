@@ -29,7 +29,7 @@ import com.mapbox.geojson.LineString;
 import com.mapbox.geojson.MultiPoint;
 import com.mapbox.geojson.Point;
 import com.mapbox.geojson.Polygon;
-import com.mapbox.mapboxsdk.geometry.LatLng;
+//import com.mapbox.mapboxsdk.geometry.LatLng;
 
 import org.akvo.flow.offlinemaps.presentation.geoshapes.GeoShapeConstants;
 
@@ -41,15 +41,15 @@ import javax.inject.Inject;
 
 public class FeatureMapper {
 
-    private final CoordinatesMapper coordinatesMapper;
+//    private final CoordinatesMapper coordinatesMapper;
     private final PointsLatLngMapper pointsLatLngMapper;
     private final LengthCounter lengthCounter;
     private final AreaCounter areaCounter;
 
     @Inject
-    public FeatureMapper(CoordinatesMapper coordinatesMapper, PointsLatLngMapper pointsLatLngMapper,
+    public FeatureMapper(/*CoordinatesMapper coordinatesMapper, */PointsLatLngMapper pointsLatLngMapper,
                          LengthCounter lengthCounter, AreaCounter areaCounter) {
-        this.coordinatesMapper = coordinatesMapper;
+//        this.coordinatesMapper = coordinatesMapper;
         this.pointsLatLngMapper = pointsLatLngMapper;
         this.lengthCounter = lengthCounter;
         this.areaCounter = areaCounter;
@@ -108,30 +108,29 @@ public class FeatureMapper {
     public ViewFeatures toViewFeatures(@NonNull List<Shape> shapes) {
         final List<Feature> features = new ArrayList<>(shapes.size());
         final List<Feature> pointFeatures = new ArrayList<>();
-        final List<LatLng> listOfCoordinates = new ArrayList<>();
+        final List<Point> listOfCoordinates = new ArrayList<>();
         if (!shapes.isEmpty()) {
             for (Shape shape : shapes) {
                 Feature feature;
-                List<LatLng> shapeCoordinates = pointsLatLngMapper.transform(shape.getPoints());
-                List<Point> points = coordinatesMapper.toPointList(shapeCoordinates);
+                List<Point> shapeCoordinates = pointsLatLngMapper.transform(shape.getPoints());
                 if (shape instanceof AreaShape) {
                     // to close the shape we need to add the extra point
-                    if (points.size() > 2) {
-                        points.add(points.get(0));
+                    if (shapeCoordinates.size() > 2) {
+                        shapeCoordinates.add(shapeCoordinates.get(0));
                     }
                     List<List<Point>> es = new ArrayList<>();
-                    es.add(points);
+                    es.add(shapeCoordinates);
                     feature = Feature.fromGeometry(Polygon.fromLngLats(es));
                     feature.addBooleanProperty(GeoShapeConstants.FEATURE_POLYGON, true);
                     feature.addStringProperty(GeoShapeConstants.FEATURE_ID, shape.getFeatureId());
                     features.add(feature);
                 } else if (shape instanceof LineShape) {
-                    feature = Feature.fromGeometry(LineString.fromLngLats(points));
+                    feature = Feature.fromGeometry(LineString.fromLngLats(shapeCoordinates));
                     feature.addBooleanProperty(GeoShapeConstants.FEATURE_LINE, true);
                     feature.addStringProperty(GeoShapeConstants.FEATURE_ID, shape.getFeatureId());
                     features.add(feature);
                 } else if (shape instanceof PointShape) {
-                    feature = Feature.fromGeometry(MultiPoint.fromLngLats(points));
+                    feature = Feature.fromGeometry(MultiPoint.fromLngLats(shapeCoordinates));
                     feature.addBooleanProperty(GeoShapeConstants.FEATURE_POINT, true);
                     features.add(feature);
                 }
@@ -145,23 +144,23 @@ public class FeatureMapper {
     @NonNull
     private Shape createArea(String featureId, Polygon geometry) {
         List<ShapePoint> shapePoints = new ArrayList<>();
-        List<LatLng> latLngs = coordinatesMapper.toLatLng(geometry.coordinates().get(0));
-        int size = latLngs.size();
+        List<Point> points = geometry.coordinates().get(0);
+        int size = points.size();
         if (size > 2) {
             // for viewing, an extra point is added to "close" the shape. That extra point cannot
             //be removed, added, selected, moved... so we need to remove it from the actual list
             //of shape points
-            LatLng firstPoint = latLngs.get(0);
-            LatLng lastPoint = latLngs.get(size - 1);
-            if (firstPoint.getLatitude() == lastPoint.getLatitude()
-                    && firstPoint.getLongitude() == lastPoint.getLongitude()) {
-                latLngs.remove(size - 1);
+            Point firstPoint = points.get(0);
+            Point lastPoint = points.get(size - 1);
+            if (firstPoint.latitude() == lastPoint.latitude()
+                    && firstPoint.longitude() == lastPoint.longitude()) {
+                points.remove(size - 1);
             }
         }
-        for (LatLng latLng : latLngs) {
+        for (Point latLng : points) {
             String pointId = UUID.randomUUID().toString();
-            double latitude = latLng.getLatitude();
-            double longitude = latLng.getLongitude();
+            double latitude = latLng.latitude();
+            double longitude = latLng.longitude();
             shapePoints.add(new ShapePoint(pointId, featureId, latitude, longitude));
         }
         return new AreaShape(featureId, shapePoints);
@@ -170,11 +169,11 @@ public class FeatureMapper {
     @NonNull
     private LineShape createLine(String featureId, LineString geometry) {
         List<ShapePoint> shapePoints = new ArrayList<>();
-        List<LatLng> latLngs = coordinatesMapper.toLatLng(geometry.coordinates());
-        for (LatLng latLng : latLngs) {
+        List<Point> latLngs = geometry.coordinates();
+        for (Point latLng : latLngs) {
             String pointId = UUID.randomUUID().toString();
-            double latitude = latLng.getLatitude();
-            double longitude = latLng.getLongitude();
+            double latitude = latLng.latitude();
+            double longitude = latLng.longitude();
             shapePoints.add(new ShapePoint(pointId, featureId, latitude, longitude));
         }
         return new LineShape(featureId, shapePoints);
@@ -183,11 +182,11 @@ public class FeatureMapper {
     @NonNull
     private PointShape createPoint(String featureId, MultiPoint geometry) {
         List<ShapePoint> shapePoints = new ArrayList<>();
-        List<LatLng> latLngs = coordinatesMapper.toLatLng(geometry.coordinates());
-        for (LatLng latLng : latLngs) {
+        List<Point> latLngs = geometry.coordinates();
+        for (Point latLng : latLngs) {
             String pointId = UUID.randomUUID().toString();
-            double latitude = latLng.getLatitude();
-            double longitude = latLng.getLongitude();
+            double latitude = latLng.latitude();
+            double longitude = latLng.longitude();
             shapePoints.add(new ShapePoint(pointId, featureId, latitude, longitude));
         }
         return new PointShape(featureId, shapePoints);
@@ -205,7 +204,7 @@ public class FeatureMapper {
 
     public Feature createPointFeature(ShapePoint point, boolean isShapeSelected) {
         Feature feature = Feature
-                .fromGeometry(coordinatesMapper.toPoint(pointsLatLngMapper.transform(point)));
+                .fromGeometry(pointsLatLngMapper.transform(point));
         feature.addStringProperty(GeoShapeConstants.LAT_LNG_PROPERTY,
                 point.getLatitude() + ", " + point.getLongitude());
         feature.addStringProperty(GeoShapeConstants.FEATURE_ID, point.getFeatureId());
@@ -234,17 +233,16 @@ public class FeatureMapper {
     public String createFeaturesToSave(List<Shape> shapes) {
         final List<Feature> features = new ArrayList<>(shapes.size());
         for (Shape shape : shapes) {
-            List<LatLng> shapeCoordinates = pointsLatLngMapper.transform(shape.getPoints());
-            List<Point> points = coordinatesMapper.toPointList(shapeCoordinates);
+            List<Point> shapeCoordinates = pointsLatLngMapper.transform(shape.getPoints());
             if (shape instanceof AreaShape) {
-                int count = points.size();
+                int count = shapeCoordinates.size();
                 // to close the shape we need to add the extra point
                 // the extra point should not be counted as point
                 if (count > 2) {
-                    points.add(points.get(0));
+                    shapeCoordinates.add(shapeCoordinates.get(0));
                 }
                 List<List<Point>> es = new ArrayList<>();
-                es.add(points);
+                es.add(shapeCoordinates);
                 Feature feature = Feature.fromGeometry(Polygon.fromLngLats(es));
                 feature.addStringProperty(GeoShapeConstants.PROPERTY_POINT_COUNT,
                         count + "");
@@ -254,16 +252,16 @@ public class FeatureMapper {
                         areaCounter.computeArea(shape.getPoints()) + "");
                 features.add(feature);
             } else if (shape instanceof LineShape) {
-                Feature feature = Feature.fromGeometry(LineString.fromLngLats(points));
+                Feature feature = Feature.fromGeometry(LineString.fromLngLats(shapeCoordinates));
                 feature.addStringProperty(GeoShapeConstants.PROPERTY_POINT_COUNT,
-                        points.size() + "");
+                        shapeCoordinates.size() + "");
                 feature.addStringProperty(GeoShapeConstants.PROPERTY_LENGTH,
                         lengthCounter.computeLength(shape.getPoints()) + "");
                 features.add(feature);
             } else if (shape instanceof PointShape) {
-                Feature feature = Feature.fromGeometry(MultiPoint.fromLngLats(points));
+                Feature feature = Feature.fromGeometry(MultiPoint.fromLngLats(shapeCoordinates));
                 feature.addStringProperty(GeoShapeConstants.PROPERTY_POINT_COUNT,
-                        points.size() + "");
+                        shapeCoordinates.size() + "");
                 features.add(feature);
             }
         }

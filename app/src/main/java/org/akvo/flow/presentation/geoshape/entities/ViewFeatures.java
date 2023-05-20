@@ -20,7 +20,8 @@
 package org.akvo.flow.presentation.geoshape.entities;
 
 import com.mapbox.geojson.Feature;
-import com.mapbox.mapboxsdk.geometry.LatLng;
+import com.mapbox.geojson.Point;
+//import com.mapbox.mapboxsdk.geometry.LatLng;
 
 import java.util.List;
 
@@ -30,10 +31,10 @@ public class ViewFeatures {
 
     private final List<Feature> features;
     private final List<Feature> pointFeatures;
-    private final List<LatLng> listOfCoordinates;
+    private final List<Point> listOfCoordinates;
 
     public ViewFeatures(@NonNull List<Feature> features, @NonNull  List<Feature> pointFeatures,
-            @NonNull List<LatLng> listOfCoordinates) {
+            @NonNull List<Point> listOfCoordinates) {
         this.features = features;
         this.pointFeatures = pointFeatures;
         this.listOfCoordinates = listOfCoordinates;
@@ -47,7 +48,7 @@ public class ViewFeatures {
         return pointFeatures;
     }
 
-    public List<LatLng> getListOfCoordinates() {
+    public List<Point> getListOfCoordinates() {
         return listOfCoordinates;
     }
 }

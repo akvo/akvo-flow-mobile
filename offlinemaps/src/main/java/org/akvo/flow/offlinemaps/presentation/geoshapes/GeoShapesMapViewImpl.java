@@ -362,6 +362,7 @@ public class GeoShapesMapViewImpl extends MapView implements OnMapReadyCallback,
     }
 
     public void displaySelectedPoint(LatLng point) {
+        // TODO: change LatLng to Point and use CircleOptions.withGeometry
         circleManager.deleteAll();
         circleManager.create(
                     new CircleOptions()

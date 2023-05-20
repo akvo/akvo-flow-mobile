@@ -25,7 +25,7 @@ import androidx.annotation.Nullable;
 
 import com.mapbox.geojson.Feature;
 import com.mapbox.geojson.Point;
-import com.mapbox.mapboxsdk.geometry.LatLng;
+//import com.mapbox.mapboxsdk.geometry.LatLng;
 
 import org.akvo.flow.offlinemaps.presentation.geoshapes.GeoShapeConstants;
 import org.akvo.flow.presentation.Presenter;
@@ -131,22 +131,22 @@ public class CreateGeoShapePresenter implements Presenter {
         updateSources();
     }
 
-    public void onAddPointRequested(LatLng latLng, DrawMode drawMode) {
-        Shape shape = getSelectedShape();
-        if (shape != null) {
-            shape.addPoint(latLng);
-        } else {
-            unSelectAllFeatures();
-            Shape createdShape = createShape(drawMode);
-            if (createdShape != null) {
-                createdShape.setSelected(true);
-                createdShape.addPoint(latLng);
-                shapes.add(createdShape);
-            }
-        }
-        view.updateMenu();
-        updateSources();
-    }
+//    public void onAddPointRequested(LatLng latLng, DrawMode drawMode) {
+//        Shape shape = getSelectedShape();
+//        if (shape != null) {
+//            shape.addPoint(latLng);
+//        } else {
+//            unSelectAllFeatures();
+//            Shape createdShape = createShape(drawMode);
+//            if (createdShape != null) {
+//                createdShape.setSelected(true);
+//                createdShape.addPoint(latLng);
+//                shapes.add(createdShape);
+//            }
+//        }
+//        view.updateMenu();
+//        updateSources();
+//    }
 
     @Nullable
     private Shape createShape(DrawMode drawMode) {

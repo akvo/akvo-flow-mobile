@@ -37,8 +37,8 @@ import androidx.core.content.PermissionChecker;
 import com.google.android.material.bottomappbar.BottomAppBar;
 import com.mapbox.geojson.Feature;
 import com.mapbox.geojson.Point;
-import com.mapbox.mapboxsdk.geometry.LatLng;
-import com.mapbox.mapboxsdk.maps.Style;
+//import com.mapbox.mapboxsdk.geometry.LatLng;
+//import com.mapbox.mapboxsdk.maps.Style;
 
 import org.akvo.flow.R;
 import org.akvo.flow.app.FlowApp;
@@ -299,7 +299,7 @@ public class CreateGeoShapeActivity extends BackActivity implements
     }
 
     @Override
-    public void updateSelected(LatLng coordinates) {
+    public void updateSelected(Point coordinates) {
 //        mapView.displaySelectedPoint(coordinates);
     }
 

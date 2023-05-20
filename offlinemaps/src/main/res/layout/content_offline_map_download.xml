@@ -9,14 +9,14 @@
     tools:context=".presentation.download.OfflineMapDownloadActivity"
     tools:showIn="@layout/activity_offline_map_download">
 
-    <com.mapbox.mapboxsdk.maps.MapView
+    <!--com.mapbox.mapboxsdk.maps.MapView
         android:id="@+id/mapView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent" /-->
 
     <TextView
         android:id="@+id/offline_map_hint"

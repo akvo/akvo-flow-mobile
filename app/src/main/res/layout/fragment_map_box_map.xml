@@ -6,10 +6,10 @@
     android:layout_height="match_parent"
     tools:context=".presentation.datapoints.map.DataPointsMapFragment">
 
-    <org.akvo.flow.offlinemaps.presentation.MapBoxMapItemListViewImpl
+    <!--org.akvo.flow.offlinemaps.presentation.MapBoxMapItemListViewImpl
         android:id="@+id/mapView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent" /-->
 
     <ProgressBar
         android:id="@+id/progressBar"

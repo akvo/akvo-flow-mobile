@@ -55,7 +55,7 @@ class DataPointsMapFragment : Fragment(), DataPointsMapView, MapReadyCallback {
 
     private lateinit var progressBar: ProgressBar
     private lateinit var offlineMapsFab: FloatingActionButton
-    private lateinit var mapView: MapBoxMapItemListViewImpl
+//    private lateinit var mapView: MapBoxMapItemListViewImpl
 
     private var activityJustCreated = false
     private var menuRes: Int? = null
@@ -89,9 +89,9 @@ class DataPointsMapFragment : Fragment(), DataPointsMapView, MapReadyCallback {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        mapView = view.findViewById(R.id.mapView)
-        mapView.onCreate(savedInstanceState)
-        mapView.getMapAsyncWithCallback(this)
+//        mapView = view.findViewById(R.id.mapView)
+//        mapView.onCreate(savedInstanceState)
+//        mapView.getMapAsyncWithCallback(this)
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -115,41 +115,41 @@ class DataPointsMapFragment : Fragment(), DataPointsMapView, MapReadyCallback {
 
     override fun onResume() {
         super.onResume()
-        mapView.onResume()
+//        mapView.onResume()
         if (!activityJustCreated) {
-            mapView.getMapAsyncWithCallback(this)
+//            mapView.getMapAsyncWithCallback(this)
         }
         activityJustCreated = false
     }
 
     override fun onStart() {
         super.onStart()
-        mapView.onStart()
+//        mapView.onStart()
     }
 
     override fun onStop() {
         super.onStop()
-        mapView.onStop()
+//        mapView.onStop()
     }
 
     override fun onPause() {
         super.onPause()
-        mapView.onPause()
+//        mapView.onPause()
     }
 
     override fun onLowMemory() {
         super.onLowMemory()
-        mapView.onLowMemory()
+//        mapView.onLowMemory()
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-        mapView.onDestroy()
+//        mapView.onDestroy()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        mapView.onSaveInstanceState(outState)
+//        mapView.onSaveInstanceState(outState)
     }
 
     override fun onDestroy() {
@@ -199,7 +199,7 @@ class DataPointsMapFragment : Fragment(), DataPointsMapView, MapReadyCallback {
     }
 
     override fun displayDataPoints(dataPoints: FeatureCollection?) {
-        mapView.displayDataPoints(dataPoints)
+//        mapView.displayDataPoints(dataPoints)
     }
 
     override fun showNonMonitoredMenu() {
@@ -251,7 +251,7 @@ class DataPointsMapFragment : Fragment(), DataPointsMapView, MapReadyCallback {
     }
 
     fun refreshView() {
-        mapView.refreshSelectedArea()
+//        mapView.refreshSelectedArea()
     }
 
     override fun onMapReady() {

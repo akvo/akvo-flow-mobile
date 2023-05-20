@@ -71,7 +71,7 @@ public class CreateGeoShapeActivity extends BackActivity implements
         DeletePointDialog.PointDeleteListener, DeleteShapeDialog.ShapeDeleteListener,
         CreateGeoShapeView {
 
-    private GeoShapesMapViewImpl mapView;
+//    private GeoShapesMapViewImpl mapView;
     private boolean changed = false;
     private boolean allowPoints;
     private boolean allowLine;
@@ -99,7 +99,7 @@ public class CreateGeoShapeActivity extends BackActivity implements
         setUpBottomBar();
         presenter.setView(this);
         presenter.setUpFeatures(getIntent().getStringExtra(ConstantUtil.GEOSHAPE_RESULT));
-        setUpMapView(savedInstanceState);
+//        setUpMapView(savedInstanceState);
 
         allowPoints = getIntent().getBooleanExtra(ConstantUtil.EXTRA_ALLOW_POINTS, true);
         allowLine = getIntent().getBooleanExtra(ConstantUtil.EXTRA_ALLOW_LINE, true);
@@ -136,7 +136,7 @@ public class CreateGeoShapeActivity extends BackActivity implements
                     break;
                 case R.id.add_point:
                     if (drawMode != DrawMode.NONE) {
-                        addLocationPoint();
+//                        addLocationPoint();
                     } else {
                         showMessage(R.string.geoshapes_error_select_shape);
                     }
@@ -172,42 +172,42 @@ public class CreateGeoShapeActivity extends BackActivity implements
         dialog.show(getSupportFragmentManager(), PropertiesDialog.TAG);
     }
 
-    private void addLocationPoint() {
-        //TODO: if location permission lacking we should prompt the used to give them
-        Location location = isLocationAllowed() ? mapView.getLocation() : null;
-        if (location != null && location.getAccuracy() <= ACCURACY_THRESHOLD) {
-            presenter.onAddPointRequested(
-                    new LatLng(location.getLatitude(), location.getLongitude()), drawMode);
-        } else {
-            int messageId = location != null ?
-                    R.string.location_inaccurate :
-                    R.string.location_unknown;
-            showMessage(messageId);
-        }
-    }
+//    private void addLocationPoint() {
+//        //TODO: if location permission lacking we should prompt the used to give them
+//        Location location = isLocationAllowed() ? mapView.getLocation() : null;
+//        if (location != null && location.getAccuracy() <= ACCURACY_THRESHOLD) {
+//            presenter.onAddPointRequested(
+//                    new LatLng(location.getLatitude(), location.getLongitude()), drawMode);
+//        } else {
+//            int messageId = location != null ?
+//                    R.string.location_inaccurate :
+//                    R.string.location_unknown;
+//            showMessage(messageId);
+//        }
+//    }
 
-    private void setUpMapView(Bundle savedInstanceState) {
-        mapView = findViewById(R.id.mapView);
-        mapView.onCreate(savedInstanceState);
-        mapView.getMapAsyncWithCallback(presenter::onMapReady);
-    }
+//    private void setUpMapView(Bundle savedInstanceState) {
+//        mapView = findViewById(R.id.mapView);
+//        mapView.onCreate(savedInstanceState);
+//        mapView.getMapAsyncWithCallback(presenter::onMapReady);
+//    }
 
     @Override
     public void displayMapItems(ViewFeatures viewFeatures) {
         updateAttributionMargin();
-        mapView.centerMap(viewFeatures.getListOfCoordinates());
-        mapView.initSources(viewFeatures.getFeatures(),
-                viewFeatures.getPointFeatures());
-        mapView.initCircleSelectionSources();
-        displayUserLocation();
-        setMapClicks();
+//        mapView.centerMap(viewFeatures.getListOfCoordinates());
+//        mapView.initSources(viewFeatures.getFeatures(),
+//                viewFeatures.getPointFeatures());
+//        mapView.initCircleSelectionSources();
+//        displayUserLocation();
+//        setMapClicks();
     }
 
     private void updateAttributionMargin() {
         View view = findViewById(R.id.toolbar);
         int height = view.getHeight();
         if (height > 0) {
-            mapView.setBottomMargin(height);
+//            mapView.setBottomMargin(height);
         } else {
             view.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
                 @Override
@@ -216,38 +216,38 @@ public class CreateGeoShapeActivity extends BackActivity implements
                     int toolBarHeight = bottom - top;
                     if (toolBarHeight > 0) {
                         view.removeOnLayoutChangeListener(this);
-                        mapView.setBottomMargin(toolBarHeight);
+//                        mapView.setBottomMargin(toolBarHeight);
                     }
                 }
             });
         }
     }
 
-    @SuppressLint("MissingPermission")
-    public void displayUserLocation() {
-        if (isLocationAllowed()) {
-            mapView.displayUserLocation();
-        }
-    }
+//    @SuppressLint("MissingPermission")
+//    public void displayUserLocation() {
+//        if (isLocationAllowed()) {
+//            mapView.displayUserLocation();
+//        }
+//    }
 
     protected boolean isLocationAllowed() {
         return ContextCompat.checkSelfPermission(this,
                 Manifest.permission.ACCESS_FINE_LOCATION) == PermissionChecker.PERMISSION_GRANTED;
     }
 
-    private void setMapClicks() {
-        mapView.setMapClicks(this::onMapLongClick, new GeoShapesClickListener() {
-            @Override
-            public void onGeoShapeSelected(@NonNull Feature feature) {
-                presenter.onGeoshapeSelected(feature);
-            }
-
-            @Override
-            public void onGeoShapeMoved(Point point) {
-                presenter.onGeoshapeMoved(point);
-            }
-        });
-    }
+//    private void setMapClicks() {
+//        mapView.setMapClicks(this::onMapLongClick, new GeoShapesClickListener() {
+//            @Override
+//            public void onGeoShapeSelected(@NonNull Feature feature) {
+//                presenter.onGeoshapeSelected(feature);
+//            }
+//
+//            @Override
+//            public void onGeoShapeMoved(Point point) {
+//                presenter.onGeoshapeMoved(point);
+//            }
+//        });
+//    }
 
     @Override
     public void enableAreaDrawMode() {
@@ -264,21 +264,21 @@ public class CreateGeoShapeActivity extends BackActivity implements
         enableShapeDrawMode(R.string.geoshape_points, POINT);
     }
 
-    private boolean onMapLongClick(LatLng point) {
-        if (mapView.clicksAllowed()) {
-            if (!manualInputEnabled) {
-                showMessage(R.string.geoshapes_error_manual_disabled);
-                return false;
-            }
-            if (drawMode != DrawMode.NONE) {
-                presenter.onAddPointRequested(point, drawMode);
-            } else {
-                showMessage(R.string.geoshapes_error_select_shape);
-            }
-            return true;
-        }
-        return false;
-    }
+//    private boolean onMapLongClick(LatLng point) {
+//        if (mapView.clicksAllowed()) {
+//            if (!manualInputEnabled) {
+//                showMessage(R.string.geoshapes_error_manual_disabled);
+//                return false;
+//            }
+//            if (drawMode != DrawMode.NONE) {
+//                presenter.onAddPointRequested(point, drawMode);
+//            } else {
+//                showMessage(R.string.geoshapes_error_select_shape);
+//            }
+//            return true;
+//        }
+//        return false;
+//    }
 
     private void showMessage(@StringRes int messageResId) {
         snackBarManager.displaySnackBar(bottomAppBar, messageResId, this);
@@ -292,20 +292,20 @@ public class CreateGeoShapeActivity extends BackActivity implements
 
     @Override
     public void updateSources(ViewFeatures viewFeatures) {
-        mapView.setSource(viewFeatures.getPointFeatures(), CIRCLE_SOURCE_ID);
-        mapView.setSource(viewFeatures.getPointFeatures(), CIRCLE_SOURCE_ID_LABEL);
-        mapView.setSource(viewFeatures.getFeatures(), LINE_SOURCE_ID);
-        mapView.setSource(viewFeatures.getFeatures(), FILL_SOURCE_ID);
+//        mapView.setSource(viewFeatures.getPointFeatures(), CIRCLE_SOURCE_ID);
+//        mapView.setSource(viewFeatures.getPointFeatures(), CIRCLE_SOURCE_ID_LABEL);
+//        mapView.setSource(viewFeatures.getFeatures(), LINE_SOURCE_ID);
+//        mapView.setSource(viewFeatures.getFeatures(), FILL_SOURCE_ID);
     }
 
     @Override
     public void updateSelected(LatLng coordinates) {
-        mapView.displaySelectedPoint(coordinates);
+//        mapView.displaySelectedPoint(coordinates);
     }
 
     @Override
     public void clearSelected() {
-        mapView.clearSelected();
+//        mapView.clearSelected();
     }
 
     @Override
@@ -354,13 +354,13 @@ public class CreateGeoShapeActivity extends BackActivity implements
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.map_normal:
-                updateMapStyle(Style.MAPBOX_STREETS);
+//                updateMapStyle(Style.MAPBOX_STREETS);
                 break;
             case R.id.map_satellite:
-                updateMapStyle(Style.SATELLITE_STREETS);
+//                updateMapStyle(Style.SATELLITE_STREETS);
                 break;
             case R.id.map_terrain:
-                updateMapStyle(Style.OUTDOORS);
+//                updateMapStyle(Style.OUTDOORS);
                 break;
             case android.R.id.home:
                 onBackPressed();
@@ -400,15 +400,15 @@ public class CreateGeoShapeActivity extends BackActivity implements
         drawMode = point;
     }
 
-    private void updateMapStyle(String style) {
-        mapView.updateMapStyle(style, callback -> presenter.onMapStyleUpdated());
-    }
+//    private void updateMapStyle(String style) {
+//        mapView.updateMapStyle(style, callback -> presenter.onMapStyleUpdated());
+//    }
 
     @Override
     public void displayNewMapStyle(ViewFeatures viewFeatures) {
-        mapView.initSources(viewFeatures.getFeatures(), viewFeatures.getPointFeatures());
-        mapView.initCircleSelectionSources();
-        mapView.centerMap(viewFeatures.getListOfCoordinates());
+//        mapView.initSources(viewFeatures.getFeatures(), viewFeatures.getPointFeatures());
+//        mapView.initCircleSelectionSources();
+//        mapView.centerMap(viewFeatures.getListOfCoordinates());
     }
 
     @Override
@@ -429,43 +429,43 @@ public class CreateGeoShapeActivity extends BackActivity implements
     @Override
     public void onResume() {
         super.onResume();
-        mapView.onResume();
+//        mapView.onResume();
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        mapView.onStart();
+//        mapView.onStart();
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        mapView.onStop();
+//        mapView.onStop();
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        mapView.onPause();
+//        mapView.onPause();
     }
 
     @Override
     public void onLowMemory() {
         super.onLowMemory();
-        mapView.onLowMemory();
+//        mapView.onLowMemory();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        mapView.onDestroy();
+//        mapView.onDestroy();
     }
 
     @Override
     protected void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
-        mapView.onSaveInstanceState(outState);
+//        mapView.onSaveInstanceState(outState);
     }
 
     @Override

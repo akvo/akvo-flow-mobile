@@ -19,12 +19,12 @@
 
 package org.akvo.flow.offlinemaps.presentation;
 
-import com.mapbox.geojson.Feature;
-import com.mapbox.mapboxsdk.geometry.LatLng;
-import com.mapbox.mapboxsdk.maps.MapView;
-import com.mapbox.mapboxsdk.maps.MapboxMap;
-import com.mapbox.mapboxsdk.plugins.markerview.MarkerView;
-import com.mapbox.mapboxsdk.plugins.markerview.MarkerViewManager;
+//import com.mapbox.geojson.Feature;
+//import com.mapbox.mapboxsdk.geometry.LatLng;
+//import com.mapbox.mapboxsdk.maps.MapView;
+//import com.mapbox.mapboxsdk.maps.MapboxMap;
+//import com.mapbox.mapboxsdk.plugins.markerview.MarkerView;
+//import com.mapbox.mapboxsdk.plugins.markerview.MarkerViewManager;
 
 import org.akvo.flow.offlinemaps.presentation.infowindow.InfoWindowLayout;
 
@@ -36,74 +36,74 @@ import static org.akvo.flow.offlinemaps.Constants.LONGITUDE_PROPERTY;
 import static org.akvo.flow.offlinemaps.Constants.NAME_PROPERTY;
 
 public class SelectionManager {
-    private final InfoWindowLayout markerLayout;
-    private final MarkerViewManager markerViewManager;
-    private final MarkerView markerView;
+//    private final InfoWindowLayout markerLayout;
+//    private final MarkerViewManager markerViewManager;
+//    private final MarkerView markerView;
 
-    private Feature currentSelected;
+//    private Feature currentSelected;
 
-    public SelectionManager(MapView mapView, MapboxMap mapboxMap,
-            InfoWindowLayout.InfoWindowSelectionListener listener) {
-        markerViewManager = new MarkerViewManager(mapView, mapboxMap);
-        markerLayout = new InfoWindowLayout(mapView.getContext());
-        markerLayout.setSelectionListener(listener);
-        markerView = new MarkerView(new LatLng(), markerLayout);
-    }
+//    public SelectionManager(MapView mapView, MapboxMap mapboxMap,
+//            InfoWindowLayout.InfoWindowSelectionListener listener) {
+//        markerViewManager = new MarkerViewManager(mapView, mapboxMap);
+//        markerLayout = new InfoWindowLayout(mapView.getContext());
+//        markerLayout.setSelectionListener(listener);
+//        markerView = new MarkerView(new LatLng(), markerLayout);
+//    }
 
-    public boolean handleFeatureClick(Feature feature) {
-        if (featureSelected(feature)) {
-            return true;
-        }
-        if (currentSelected != null) {
-            unSelectFeature();
-            return true;
-        }
-        return false;
-    }
+//    public boolean handleFeatureClick(Feature feature) {
+//        if (featureSelected(feature)) {
+//            return true;
+//        }
+//        if (currentSelected != null) {
+//            unSelectFeature();
+//            return true;
+//        }
+//        return false;
+//    }
 
-    private boolean featureSelected(@Nullable Feature feature) {
-        if (feature != null && feature.hasNonNullValueForProperty(ID_PROPERTY)) {
-            if (selectedFeatureClicked(feature)) {
-                unSelectFeature();
-            } else {
-                selectFeature(feature);
-            }
-            return true;
-        }
-        return false;
-    }
+//    private boolean featureSelected(@Nullable Feature feature) {
+//        if (feature != null && feature.hasNonNullValueForProperty(ID_PROPERTY)) {
+//            if (selectedFeatureClicked(feature)) {
+//                unSelectFeature();
+//            } else {
+//                selectFeature(feature);
+//            }
+//            return true;
+//        }
+//        return false;
+//    }
 
-    private void selectFeature(Feature feature) {
-        if (currentSelected != null) {
-            markerViewManager.removeMarker(markerView);
-        }
-        markerViewManager.addMarker(markerView);
-        updateSelectedFeature(feature);
-        currentSelected = feature;
-    }
+//    private void selectFeature(Feature feature) {
+//        if (currentSelected != null) {
+//            markerViewManager.removeMarker(markerView);
+//        }
+//        markerViewManager.addMarker(markerView);
+//        updateSelectedFeature(feature);
+//        currentSelected = feature;
+//    }
 
-    private boolean selectedFeatureClicked(Feature feature) {
-        return currentSelected != null && currentSelected.getStringProperty(ID_PROPERTY)
-                .equals(feature.getStringProperty(ID_PROPERTY));
-    }
+//    private boolean selectedFeatureClicked(Feature feature) {
+//        return currentSelected != null && currentSelected.getStringProperty(ID_PROPERTY)
+//                .equals(feature.getStringProperty(ID_PROPERTY));
+//    }
 
-    void unSelectFeature() {
-        if (markerView != null) {
-            markerViewManager.removeMarker(markerView);
-        }
-        currentSelected = null;
-    }
+//    void unSelectFeature() {
+//        if (markerView != null) {
+//            markerViewManager.removeMarker(markerView);
+//        }
+//        currentSelected = null;
+//    }
 
-    private void updateSelectedFeature(Feature feature) {
-        markerLayout.setUpMarkerInfo(feature.getStringProperty(ID_PROPERTY),
-                feature.getStringProperty(NAME_PROPERTY));
-        double latitude = feature.getNumberProperty(LATITUDE_PROPERTY).doubleValue();
-        double longitude = feature.getNumberProperty(LONGITUDE_PROPERTY).doubleValue();
-        LatLng latLng = new LatLng(latitude, longitude);
-        markerView.setLatLng(latLng);
-    }
+//    private void updateSelectedFeature(Feature feature) {
+//        markerLayout.setUpMarkerInfo(feature.getStringProperty(ID_PROPERTY),
+//                feature.getStringProperty(NAME_PROPERTY));
+//        double latitude = feature.getNumberProperty(LATITUDE_PROPERTY).doubleValue();
+//        double longitude = feature.getNumberProperty(LONGITUDE_PROPERTY).doubleValue();
+//        LatLng latLng = new LatLng(latitude, longitude);
+//        markerView.setLatLng(latLng);
+//    }
 
     public void destroy() {
-        markerViewManager.onDestroy();
+        /*markerViewManager.onDestroy();*/
     }
 }

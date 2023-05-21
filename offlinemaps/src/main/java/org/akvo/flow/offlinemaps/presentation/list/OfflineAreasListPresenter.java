@@ -19,8 +19,8 @@
 
 package org.akvo.flow.offlinemaps.presentation.list;
 
-import org.akvo.flow.mapbox.offline.reactive.DeleteOfflineRegion;
-import org.akvo.flow.mapbox.offline.reactive.RenameOfflineRegion;
+//import org.akvo.flow.mapbox.offline.reactive.DeleteOfflineRegion;
+//import org.akvo.flow.mapbox.offline.reactive.RenameOfflineRegion;
 import org.akvo.flow.offlinemaps.domain.entity.DomainOfflineArea;
 import org.akvo.flow.offlinemaps.domain.interactor.GetSelectedOfflineRegionId;
 import org.akvo.flow.offlinemaps.domain.interactor.LoadOfflineRegions;
@@ -42,22 +42,22 @@ public class OfflineAreasListPresenter {
 
     private final LoadOfflineRegions loadOfflineRegions;
     private final CompositeDisposable disposables;
-    private final RenameOfflineRegion renameOfflineRegion;
-    private final DeleteOfflineRegion deleteOfflineRegion;
+//    private final RenameOfflineRegion renameOfflineRegion;
+//    private final DeleteOfflineRegion deleteOfflineRegion;
     private final SaveSelectedOfflineArea saveSelectedOfflineArea;
     private final GetSelectedOfflineRegionId getSelectedOfflineRegion;
 
     private OfflineAreasListView view;
 
     @Inject
-    public OfflineAreasListPresenter(RenameOfflineRegion renameOfflineRegion,
-            DeleteOfflineRegion deleteOfflineRegion,
+    public OfflineAreasListPresenter(/*RenameOfflineRegion renameOfflineRegion,
+            DeleteOfflineRegion deleteOfflineRegion,*/
             SaveSelectedOfflineArea saveSelectedOfflineArea,
             GetSelectedOfflineRegionId getSelectedOfflineRegion,
             LoadOfflineRegions loadOfflineRegions) {
         this.loadOfflineRegions = loadOfflineRegions;
-        this.renameOfflineRegion = renameOfflineRegion;
-        this.deleteOfflineRegion = deleteOfflineRegion;
+//        this.renameOfflineRegion = renameOfflineRegion;
+//        this.deleteOfflineRegion = deleteOfflineRegion;
         this.saveSelectedOfflineArea = saveSelectedOfflineArea;
         this.getSelectedOfflineRegion = getSelectedOfflineRegion;
         disposables = new CompositeDisposable();
@@ -120,58 +120,58 @@ public class OfflineAreasListPresenter {
     }
 
     public void renameArea(long areaId, String newName) {
-        view.showLoading();
-        DisposableCompletableObserver subscribeWith = renameOfflineRegion.execute(areaId, newName)
-                .subscribeWith(new DisposableCompletableObserver() {
-                    @Override
-                    public void onComplete() {
-                        loadAreas();
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        view.hideLoading();
-                        view.showRenameError();
-                    }
-                });
-        disposables.add(subscribeWith);
+//        view.showLoading();
+//        DisposableCompletableObserver subscribeWith = renameOfflineRegion.execute(areaId, newName)
+//                .subscribeWith(new DisposableCompletableObserver() {
+//                    @Override
+//                    public void onComplete() {
+//                        loadAreas();
+//                    }
+//
+//                    @Override
+//                    public void onError(Throwable e) {
+//                        view.hideLoading();
+//                        view.showRenameError();
+//                    }
+//                });
+//        disposables.add(subscribeWith);
     }
 
     public void deleteArea(long areaId) {
-        view.showLoading();
-        DisposableCompletableObserver subscribeWith = deleteOfflineRegion.execute(areaId)
-                .subscribeWith(new DisposableCompletableObserver() {
-                    @Override
-                    public void onComplete() {
-                        getSelectedOfflineRegion.execute(new DisposableMaybeObserver<Long>() {
-                            @Override
-                            public void onSuccess(Long selectedAreaId) {
-                                if (areaId == selectedAreaId) {
-                                    resetSelectedArea();
-                                } else {
-                                    loadAreas();
-                                }
-                            }
-
-                            @Override
-                            public void onError(Throwable e) {
-                                loadAreas();
-                            }
-
-                            @Override
-                            public void onComplete() {
-                                loadAreas();
-                            }
-                        });
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        view.hideLoading();
-                        view.showDeleteError();
-                    }
-                });
-        disposables.add(subscribeWith);
+//        view.showLoading();
+//        DisposableCompletableObserver subscribeWith = deleteOfflineRegion.execute(areaId)
+//                .subscribeWith(new DisposableCompletableObserver() {
+//                    @Override
+//                    public void onComplete() {
+//                        getSelectedOfflineRegion.execute(new DisposableMaybeObserver<Long>() {
+//                            @Override
+//                            public void onSuccess(Long selectedAreaId) {
+//                                if (areaId == selectedAreaId) {
+//                                    resetSelectedArea();
+//                                } else {
+//                                    loadAreas();
+//                                }
+//                            }
+//
+//                            @Override
+//                            public void onError(Throwable e) {
+//                                loadAreas();
+//                            }
+//
+//                            @Override
+//                            public void onComplete() {
+//                                loadAreas();
+//                            }
+//                        });
+//                    }
+//
+//                    @Override
+//                    public void onError(Throwable e) {
+//                        view.hideLoading();
+//                        view.showDeleteError();
+//                    }
+//                });
+//        disposables.add(subscribeWith);
     }
 
     private void resetSelectedArea() {

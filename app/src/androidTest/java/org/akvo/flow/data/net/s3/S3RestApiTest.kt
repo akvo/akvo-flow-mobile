@@ -20,6 +20,7 @@
 package org.akvo.flow.data.net.s3
 
 import io.reactivex.observers.TestObserver
+import okhttp3.ConnectionSpec
 import okhttp3.OkHttpClient
 import okhttp3.ResponseBody
 import okhttp3.logging.HttpLoggingInterceptor
@@ -33,6 +34,7 @@ import org.junit.runner.RunWith
 import org.mockito.runners.MockitoJUnitRunner
 import java.text.DateFormat
 import java.text.SimpleDateFormat
+import java.util.Arrays
 import java.util.Locale
 import java.util.TimeZone
 
@@ -88,6 +90,7 @@ class S3RestApiTest {
     private fun createHttpClient(loggingInterceptor: HttpLoggingInterceptor): OkHttpClient.Builder {
         val httpClient = OkHttpClient.Builder()
         httpClient.addInterceptor(loggingInterceptor)
+        httpClient.connectionSpecs(listOf(ConnectionSpec.MODERN_TLS, ConnectionSpec.COMPATIBLE_TLS));
         return httpClient
     }
 

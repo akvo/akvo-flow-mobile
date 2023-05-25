@@ -1,6 +1,6 @@
 buildscript {
     ext {
-        kotlinVersion = '1.4.32'
+        kotlinVersion = '1.6.20'
         jacocoVersion = '0.8.7'
         annotationVersion = "1.1.0"
         appCompatVersion = "1.2.0"
@@ -18,12 +18,12 @@ buildscript {
 
         retrofitVersion = "2.6.0"
         butterKnifeVersion = "10.2.1"
-        daggerVersion = "2.28"
+        daggerVersion = "2.39"
         glideVersion = "4.11.0"
         gmsVersion = "15.0.1"
         gsonVersion = "2.8.2"
         leakCanaryVersion = "2.0"
-        loggingInterceptorVersion = "3.12.12"
+        loggingInterceptorVersion = "4.10.0"
         mapboxAnnotationsVersion = "0.8.0"
         mapboxMarkerVersion = "0.3.0"
         mapboxOfflineRxVersion = "1.2.0-alpha04"
@@ -37,7 +37,7 @@ buildscript {
 
         jUnitVersion = "4.13"
         kotlintestVerion = "3.1.5"
-        mockServerVersion = "3.12.12"
+        mockServerVersion = "4.10.0"
         mockitoCoreVersion = "2.28.2"
         mockitoInlineVersion = "2.8.47"
         mockitoKotlinVersion = "2.2.0"

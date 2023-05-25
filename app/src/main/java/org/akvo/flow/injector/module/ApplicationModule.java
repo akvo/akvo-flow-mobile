@@ -86,6 +86,7 @@ import org.akvo.flow.util.logging.ReleaseLoggingHelper;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Locale;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
@@ -95,6 +96,7 @@ import javax.inject.Singleton;
 import dagger.Module;
 import dagger.Provides;
 import io.reactivex.schedulers.Schedulers;
+import okhttp3.ConnectionSpec;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 
@@ -335,6 +337,10 @@ public class ApplicationModule {
         httpClient.addInterceptor(loggingInterceptor);
         httpClient.connectTimeout(CONNECTION_TIMEOUT, TimeUnit.SECONDS);
         httpClient.readTimeout(NO_TIMEOUT, TimeUnit.SECONDS);
+        // Use modern TLS (v1.3 or v1.2) and allow fallbacks if it fails.
+        // https://square.github.io/okhttp/features/https/
+        // https://square.github.io/okhttp/security/tls_configuration_history/
+        httpClient.connectionSpecs(Arrays.asList(ConnectionSpec.MODERN_TLS, ConnectionSpec.COMPATIBLE_TLS));
         return httpClient;
     }
 }

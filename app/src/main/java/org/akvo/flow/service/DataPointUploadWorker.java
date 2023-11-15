@@ -25,6 +25,7 @@ import android.content.Intent;
 
 import org.akvo.flow.R;
 import org.akvo.flow.app.FlowApp;
+import org.akvo.flow.domain.entity.TransmissionResult;
 import org.akvo.flow.domain.interactor.AllDeviceNotifications;
 import org.akvo.flow.domain.interactor.DefaultObserver;
 import org.akvo.flow.domain.interactor.UploadAllDataPoints;
@@ -116,7 +117,7 @@ public class DataPointUploadWorker extends Worker {
     }
 
     private void uploadFiles() {
-        upload.execute(new DefaultObserver<Set<String>>() {
+        upload.execute(new DefaultObserver<Set<TransmissionResult>>() {
             @Override
             public void onError(Throwable e) {
                 Timber.e(e);
@@ -124,9 +125,13 @@ public class DataPointUploadWorker extends Worker {
             }
 
             @Override
-            public void onNext(Set<String> errorForms) {
-                for (String formId : errorForms) {
-                    displayErrorNotification(formId);
+            public void onNext(Set<TransmissionResult> results) {
+                for (TransmissionResult result : results) {
+                    if (result.getType() == TransmissionResult.ResultType.ERROR) {
+                        displayErrorNotification(result.getBriefMessage(), result.getFullMessage(), result.getResultId());
+                    } else {
+                        displayNotification(result.getBriefMessage(), result.getFullMessage(), result.getResultId());
+                    }
                 }
                 broadcastDataPointStatusChange();
             }
@@ -149,11 +154,14 @@ public class DataPointUploadWorker extends Worker {
         return getApplicationContext().getString(resId);
     }
 
-    private void displayErrorNotification(String formId) {
+    private void displayErrorNotification(String title, String body, int id) {
         Context applicationContext = getApplicationContext();
-        NotificationHelper.displayErrorNotification(
-                applicationContext.getString(R.string.sync_error_title, formId),
-                getString(R.string.sync_error_message), applicationContext, formId(formId));
+        NotificationHelper.displayErrorNotification(title, body, applicationContext, id);
+    }
+
+    private void displayNotification(String title, String body, int id) {
+        Context applicationContext = getApplicationContext();
+        NotificationHelper.displayNotification(title, body, applicationContext, id);
     }
 
     /**

@@ -36,9 +36,10 @@ import org.akvo.flow.data.entity.Transmission;
 import org.akvo.flow.data.entity.TransmissionFilenameMapper;
 import org.akvo.flow.data.entity.TransmissionMapper;
 import org.akvo.flow.data.entity.UploadError;
-import org.akvo.flow.data.entity.UploadFormDeletedError;
+import org.akvo.flow.data.entity.UploadErrorWithMessage;
 import org.akvo.flow.data.entity.UploadResult;
 import org.akvo.flow.data.entity.UploadSuccess;
+import org.akvo.flow.data.entity.UploadWarning;
 import org.akvo.flow.data.entity.UserMapper;
 import org.akvo.flow.data.entity.form.FormIdMapper;
 import org.akvo.flow.data.net.RestApi;
@@ -47,13 +48,17 @@ import org.akvo.flow.domain.entity.DataPoint;
 import org.akvo.flow.domain.entity.FormInstanceMetadata;
 import org.akvo.flow.domain.entity.InstanceIdUuid;
 import org.akvo.flow.domain.entity.Survey;
+import org.akvo.flow.domain.entity.TransmissionResult;
 import org.akvo.flow.domain.entity.User;
 import org.akvo.flow.domain.repository.SurveyRepository;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.inject.Inject;
 
@@ -116,7 +121,7 @@ public class SurveyDataRepository implements SurveyRepository {
 
     @Override
     public Observable<List<DataPoint>> getDataPoints(Long surveyGroupId,
-            Double latitude, Double longitude, Integer orderBy) {
+                                                     Double latitude, Double longitude, Integer orderBy) {
         return dataSourceFactory.getDataBaseDataSource()
                 .getDataPoints(surveyGroupId, latitude, longitude, orderBy).concatMap(
                         new Function<Cursor, Observable<List<DataPoint>>>() {
@@ -229,23 +234,23 @@ public class SurveyDataRepository implements SurveyRepository {
     }
 
     @Override
-    public Observable<Set<String>> processTransmissions(final String deviceId,
-            @NonNull String surveyId) {
+    public Observable<Set<TransmissionResult>> processTransmissions(final String deviceId,
+                                                                    @NonNull String surveyId) {
         return getSurveyTransmissions(surveyId)
-                .concatMap(new Function<List<Transmission>, Observable<Set<String>>>() {
+                .concatMap(new Function<List<Transmission>, Observable<Set<TransmissionResult>>>() {
                     @Override
-                    public Observable<Set<String>> apply(List<Transmission> transmissions) {
+                    public Observable<Set<TransmissionResult>> apply(List<Transmission> transmissions) {
                         return syncTransmissions(transmissions, deviceId);
                     }
                 });
     }
 
     @Override
-    public Observable<Set<String>> processTransmissions(final String deviceId) {
+    public Observable<Set<TransmissionResult>> processTransmissions(final String deviceId) {
         return getAllTransmissions()
-                .concatMap(new Function<List<Transmission>, Observable<Set<String>>>() {
+                .concatMap(new Function<List<Transmission>, Observable<Set<TransmissionResult>>>() {
                     @Override
-                    public Observable<Set<String>> apply(List<Transmission> transmissions) {
+                    public Observable<Set<TransmissionResult>> apply(List<Transmission> transmissions) {
                         return syncTransmissions(transmissions, deviceId);
                     }
                 });
@@ -341,7 +346,7 @@ public class SurveyDataRepository implements SurveyRepository {
 
     @Override
     public Single<FormInstanceMetadata> getFormInstanceData(final Long instanceId,
-            final String deviceId) {
+                                                            final String deviceId) {
         Cursor cursor = dataSourceFactory.getDataBaseDataSource().getResponses(instanceId);
         FormInstanceMetadata formInstanceMetadata = formInstanceMetadataMapper.transform(cursor, deviceId);
         if (!formInstanceMetadata.isValid()) {
@@ -353,41 +358,54 @@ public class SurveyDataRepository implements SurveyRepository {
 
     @Override
     public Completable createTransmissions(final Long instanceId, final String formId,
-            Set<String> fileNames) {
+                                           Set<String> fileNames) {
         final DatabaseDataSource dataBaseDataSource = dataSourceFactory.getDataBaseDataSource();
         return dataBaseDataSource
                 .createTransmissions(instanceId, formId, fileNames)
                 .andThen(dataBaseDataSource.setInstanceStatusToSubmitted(instanceId));
     }
 
-    private Observable<Set<String>> updateSurveyInstance(List<UploadResult> list) {
+    private Observable<Set<TransmissionResult>> updateSurveyInstance(List<UploadResult> list) {
         DatabaseDataSource dataBaseDataSource = dataSourceFactory.getDataBaseDataSource();
         Set<Long> failedTransmissions = new HashSet<>();
         Set<Long> successFullTransmissions = new HashSet<>();
-        final Set<String> deletedFormsTransmissions = new HashSet<>();
+        final Set<TransmissionResult> results = new HashSet<>();
         for (UploadResult result : list) {
             if (result instanceof UploadSuccess) {
                 successFullTransmissions.add(result.getSurveyInstanceId());
+                if (result instanceof UploadWarning) {
+                    UploadWarning warning = (UploadWarning) result;
+                    results.add(new TransmissionResult(
+                            TransmissionResult.ResultType.WARNING,
+                            warning.getWarning(),
+                            warning.getMessage(),
+                            warning.getFormId()));
+                }
             } else {
                 failedTransmissions.add(result.getSurveyInstanceId());
-                if (result instanceof UploadFormDeletedError) {
-                    deletedFormsTransmissions.add(((UploadFormDeletedError) result).getFormId());
+                if (result instanceof UploadErrorWithMessage) {
+                    UploadErrorWithMessage error = (UploadErrorWithMessage) result;
+                    results.add(new TransmissionResult(
+                            TransmissionResult.ResultType.ERROR,
+                            error.getError(),
+                            error.getMessage(),
+                            error.getFormId()));
                 }
             }
         }
         successFullTransmissions.removeAll(failedTransmissions);
         return Observable.zip(dataBaseDataSource.updateFailedSubmissions(failedTransmissions),
                 dataBaseDataSource.updateSuccessfulSubmissions(successFullTransmissions),
-                new BiFunction<Boolean, Boolean, Set<String>>() {
+                new BiFunction<Boolean, Boolean, Set<TransmissionResult>>() {
                     @Override
-                    public Set<String> apply(Boolean ignored, Boolean ignored2) {
-                        return deletedFormsTransmissions;
+                    public Set<TransmissionResult> apply(Boolean ignored, Boolean ignored2) {
+                        return results;
                     }
                 });
     }
 
-    private Observable<Set<String>> syncTransmissions(List<Transmission> transmissions,
-            final String deviceId) {
+    private Observable<Set<TransmissionResult>> syncTransmissions(List<Transmission> transmissions,
+                                                                  final String deviceId) {
         return Observable.fromIterable(transmissions)
                 .concatMap(new Function<Transmission, Observable<UploadResult>>() {
                     @Override
@@ -396,9 +414,9 @@ public class SurveyDataRepository implements SurveyRepository {
                     }
                 })
                 .toList().toObservable()
-                .concatMap(new Function<List<UploadResult>, Observable<Set<String>>>() {
+                .concatMap(new Function<List<UploadResult>, Observable<Set<TransmissionResult>>>() {
                     @Override
-                    public Observable<Set<String>> apply(List<UploadResult> list) {
+                    public Observable<Set<TransmissionResult>> apply(List<UploadResult> list) {
                         return updateSurveyInstance(list);
                     }
                 });
@@ -406,7 +424,7 @@ public class SurveyDataRepository implements SurveyRepository {
 
     @VisibleForTesting
     Observable<UploadResult> syncTransmission(final Transmission transmission,
-            final String deviceId) {
+                                              final String deviceId) {
         final DatabaseDataSource dataBaseDataSource = dataSourceFactory.getDataBaseDataSource();
         final long transmissionId = transmission.getId();
         final long surveyInstanceId = transmission.getRespondentId();
@@ -429,23 +447,76 @@ public class SurveyDataRepository implements SurveyRepository {
                 .map(new Function<Object, UploadResult>() {
                     @Override
                     public UploadResult apply(Object ignored) {
-                        return new UploadSuccess(surveyInstanceId);
+                        String responseBody = (ignored instanceof ResponseBody) ? getResponseBody((ResponseBody) ignored) : "";
+                        String warning = findByRegex(makePattern("warning"), responseBody);
+                        String message = findByRegex(makePattern("message"), responseBody);
+                        if (warning.isEmpty()) {
+                            return new UploadSuccess(surveyInstanceId);
+                        } else {
+                            return new UploadWarning(surveyInstanceId, parseInt(formId), warning, message);
+                        }
                     }
                 })
                 .onErrorReturn(new Function<Throwable, UploadResult>() {
                     @Override
                     public UploadResult apply(Throwable throwable) {
-                        boolean formNotFound = throwable instanceof HttpException && (
-                                ((HttpException) throwable).code() == 404);
-                        if (formNotFound) {
-                            dataBaseDataSource.setFileTransmissionFormDeleted(transmissionId);
-                            return new UploadFormDeletedError(surveyInstanceId, formId);
+                        if (throwable instanceof HttpException) {
+                            String responseBody = getErrorResponseBody((HttpException) throwable);
+                            String error = findByRegex(makePattern("error"), responseBody);
+                            String message = findByRegex(makePattern("message"), responseBody);
+                            int code = ((HttpException) throwable).code();
+                            if (code == 404) {
+                                dataBaseDataSource.setFileTransmissionFormDeleted(transmissionId);
+                            } else {
+                                dataBaseDataSource.setFileTransmissionFailed(transmissionId);
+                            }
+                            if (!error.isEmpty()) {
+                                return new UploadErrorWithMessage(surveyInstanceId, parseInt(formId), error, message);
+                            }
                         } else {
-                            Timber.e(throwable);
                             dataBaseDataSource.setFileTransmissionFailed(transmissionId);
-                            return new UploadError(surveyInstanceId);
                         }
+                        return new UploadError(surveyInstanceId);
                     }
                 });
+    }
+
+    private static String makePattern(String label) {
+        return String.format("^\\{.*\"%s\":\\s+\"([^\"]+)\".*\\}$", label);
+    }
+
+    private static String findByRegex(String pattern, String text) {
+        Pattern p = Pattern.compile(pattern, Pattern.CASE_INSENSITIVE);
+        Matcher m = p.matcher(text);
+        return (m.find()) ? m.group(1) : "";
+    }
+
+    private static int parseInt(String number) {
+        try {
+            return Integer.parseInt(number);
+        } catch (NumberFormatException e) {
+            Timber.e("%s is not a valid form id", number);
+            return 0;
+        }
+    }
+
+    private static String getErrorResponseBody(HttpException throwable) {
+        Response<?> res = throwable.response();
+        if (res != null) {
+            try {
+                assert res.errorBody() != null;
+                return res.errorBody().string();
+            } catch (IOException ignored) {
+            }
+        }
+        return "";
+    }
+
+    private static String getResponseBody(ResponseBody response) {
+        try {
+            return response.string();
+        } catch (IOException ignored) {
+        }
+        return "";
     }
 }

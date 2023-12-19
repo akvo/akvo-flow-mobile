@@ -26,6 +26,7 @@ import org.akvo.flow.domain.entity.DataPoint;
 import org.akvo.flow.domain.entity.FormInstanceMetadata;
 import org.akvo.flow.domain.entity.InstanceIdUuid;
 import org.akvo.flow.domain.entity.Survey;
+import org.akvo.flow.domain.entity.TransmissionResult;
 import org.akvo.flow.domain.entity.User;
 import org.jetbrains.annotations.Nullable;
 
@@ -65,9 +66,9 @@ public interface SurveyRepository {
 
     Observable<List<String>> getAllTransmissionFileNames();
 
-    Observable<Set<String>> processTransmissions(String deviceId, @NonNull String surveyId);
+    Observable<Set<TransmissionResult>> processTransmissions(String deviceId, @NonNull String surveyId);
 
-    Observable<Set<String>> processTransmissions(String deviceId);
+    Observable<Set<TransmissionResult>> processTransmissions(String deviceId);
 
     Single<List<InstanceIdUuid>> getSubmittedInstances();
 

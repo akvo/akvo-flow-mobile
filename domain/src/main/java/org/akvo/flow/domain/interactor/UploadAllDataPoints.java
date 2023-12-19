@@ -20,6 +20,7 @@
 
 package org.akvo.flow.domain.interactor;
 
+import org.akvo.flow.domain.entity.TransmissionResult;
 import org.akvo.flow.domain.repository.SurveyRepository;
 import org.akvo.flow.domain.repository.UserRepository;
 
@@ -69,9 +70,9 @@ public class UploadAllDataPoints {
 
     private Observable buildUseCaseObservable() {
         return userRepository.getDeviceId()
-                .concatMap(new Function<String, Observable<Set<String>>>() {
+                .concatMap(new Function<String, Observable<Set<TransmissionResult>>>() {
                     @Override
-                    public Observable<Set<String>> apply(final String deviceId) {
+                    public Observable<Set<TransmissionResult>> apply(final String deviceId) {
                         return surveyRepository.processTransmissions(deviceId);
                     }
                 });

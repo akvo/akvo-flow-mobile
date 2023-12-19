@@ -28,7 +28,9 @@ import org.akvo.flow.data.entity.S3File;
 import org.akvo.flow.data.entity.Transmission;
 import org.akvo.flow.data.entity.TransmissionMapper;
 import org.akvo.flow.data.entity.UploadError;
+import org.akvo.flow.data.entity.UploadErrorWithMessage;
 import org.akvo.flow.data.entity.UploadFormDeletedError;
+import org.akvo.flow.data.entity.UploadResult;
 import org.akvo.flow.data.entity.UploadSuccess;
 import org.akvo.flow.data.entity.form.FormIdMapper;
 import org.akvo.flow.data.net.RestApi;
@@ -201,12 +203,12 @@ public class SurveyDataRepositoryTest {
 
     @Test
     public void shouldReturnFormDeletedErrorWhenFormDeleted() {
-        TestObserver observer = new TestObserver<Set<String>>();
+        TestObserver observer = new TestObserver<Set<UploadResult>>();
         MockResponse s3Response = new MockResponse().setResponseCode(200);
         s3Response.addHeader("ETag", "\"123\"");
         s3Response.setBody("{}");
 
-        MockResponse gaeResponse = new MockResponse().setResponseCode(404);
+        MockResponse gaeResponse = new MockResponse().setResponseCode(404).setBody("{\"error\": \"error\", \"message\": \"message\"}");
         mockWebServer.enqueue(s3Response);
         mockWebServer.enqueue(gaeResponse);
 
@@ -218,7 +220,7 @@ public class SurveyDataRepositoryTest {
 
         observer.assertNoErrors();
         observer.assertValueCount(1);
-        assertTrue(observer.values().get(0) instanceof UploadFormDeletedError);
+        assertTrue(observer.values().get(0) instanceof UploadErrorWithMessage);
         verify(mockDataBaseDataSource, times(0)).setFileTransmissionSucceeded(anyLong());
         verify(mockDataBaseDataSource, times(1)).setFileTransmissionFormDeleted(anyLong());
         verify(mockDataBaseDataSource, times(0)).setFileTransmissionFailed(anyLong());

@@ -1,9 +1,14 @@
 Akvo FLOW app release notes
 ===========================
+# ver 2.10.6
+Date: 20 Dec 2023
+
+* **Handle basic instance form submission restriction**
+
 # ver 2.10.5
 Date: 26 May 2023
 
-* **Upgrade OkHttp and use latest TLS version
+* **Upgrade OkHttp and use latest TLS version**
 
 # ver 2.10.4
 Date: 8 August 2022

@@ -20,6 +20,10 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
 
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+
     lintOptions {
         abortOnError false
         ignore 'InvalidPackage'
@@ -55,10 +59,11 @@ dependencies {
     implementation "androidx.annotation:annotation:${rootProject.ext.annotationVersion}"
     implementation "com.google.android.material:material:${rootProject.ext.materialVersion}"
     implementation "androidx.constraintlayout:constraintlayout:${rootProject.ext.constraintLayoutVersion}"
-    implementation "com.mapbox.mapboxsdk:mapbox-android-sdk:${rootProject.ext.mapboxVersion}"
-    implementation "com.mapbox.mapboxsdk:mapbox-android-plugin-markerview-v8:${rootProject.ext.mapboxMarkerVersion}"
-    implementation "com.mapbox.mapboxsdk:mapbox-android-plugin-annotation-v9:${rootProject.ext.mapboxAnnotationsVersion}"
-    implementation "com.github.akvo:mapbox-offline-reactive:${rootProject.ext.mapboxOfflineRxVersion}"
+//    implementation "com.mapbox.mapboxsdk:mapbox-android-sdk:${rootProject.ext.mapboxVersion}"
+//    implementation "com.mapbox.mapboxsdk:mapbox-android-plugin-markerview-v8:${rootProject.ext.mapboxMarkerVersion}"
+//    implementation "com.mapbox.mapboxsdk:mapbox-android-plugin-annotation-v9:${rootProject.ext.mapboxAnnotationsVersion}"
+//    implementation "com.github.akvo:mapbox-offline-reactive:${rootProject.ext.mapboxOfflineRxVersion}"
+    implementation 'com.mapbox.maps:android:10.13.0'
     implementation "com.jakewharton.timber:timber:${rootProject.ext.timberVersion}"
     implementation "io.reactivex.rxjava2:rxandroid:${rootProject.ext.rxAndroidVersion}"
     implementation "io.reactivex.rxjava2:rxjava:${rootProject.ext.rxJavaVersion}"

@@ -10,7 +10,7 @@ Akvo Flow was built specially for international development teams to monitor and
 
 To set up your development environment you'll need:
 
-* [Oracle Java 8 SDK](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html) is recommended, but open JDK 8 may also work.
+* JDK 11
 * Before installing Android Studio, please see [Installation Requirements](https://developer.android.com/studio/install.html) for your OS.
 * Download [Android Studio](http://developer.android.com/sdk/index.html). The first time you launch Android Studio you will be required to download the Android SDK, ensure you have the latest version of the **Android SDK Tools** and the **Android SDK Build-Tools**. You will also need to check out the **Android Support Library**, **Android Support Repository** and **Google Play Services**.
 

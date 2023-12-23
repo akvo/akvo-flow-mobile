@@ -19,7 +19,8 @@
 
 package org.akvo.flow.presentation.geoshape.entities;
 
-import com.mapbox.mapboxsdk.geometry.LatLng;
+import com.mapbox.geojson.Point;
+//import com.mapbox.mapboxsdk.geometry.LatLng;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,8 +36,8 @@ public class PointsLatLngMapper {
     }
 
     @NonNull
-    public List<LatLng> transform(@NonNull List<ShapePoint> points) {
-        List<LatLng> latLngs = new ArrayList<>();
+    public List<Point> transform(@NonNull List<ShapePoint> points) {
+        List<Point> latLngs = new ArrayList<>();
         for (ShapePoint p: points) {
             latLngs.add(transform(p));
         }
@@ -44,7 +45,7 @@ public class PointsLatLngMapper {
     }
 
     @NonNull
-    public LatLng transform(ShapePoint p) {
-        return new LatLng(p.getLatitude(), p.getLongitude());
+    public Point transform(ShapePoint p) {
+        return Point.fromLngLat(p.getLongitude(), p.getLatitude());
     }
 }

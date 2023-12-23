@@ -8,9 +8,9 @@
 
     <include layout="@layout/app_bar_layout"/>
 
-    <org.akvo.flow.offlinemaps.presentation.MapBoxMapItemView
+    <!--org.akvo.flow.offlinemaps.presentation.MapBoxMapItemView
         android:id="@+id/mapView"
         android:layout_marginTop="?actionBarSize"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent"/-->
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -19,11 +19,11 @@
 
 package org.akvo.flow.offlinemaps;
 
-import com.mapbox.mapboxsdk.maps.Style;
+//import com.mapbox.mapboxsdk.maps.Style;
 
 public class Constants {
 
-    public static final String MAPBOX_MAP_STYLE = Style.MAPBOX_STREETS;
+    public static final String MAPBOX_MAP_STYLE = ""; //Style.MAPBOX_STREETS;
     public static final int MAP_BOX_ZOOM_MAX = 2;
     public static final String LATITUDE_PROPERTY = "latitude";
     public static final String LONGITUDE_PROPERTY = "longitude";

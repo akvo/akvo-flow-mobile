@@ -19,10 +19,10 @@
 
 package org.akvo.flow.offlinemaps.domain.entity;
 
-import com.mapbox.mapboxsdk.offline.OfflineRegion;
-import com.mapbox.mapboxsdk.offline.OfflineRegionStatus;
+//import com.mapbox.mapboxsdk.offline.OfflineRegion;
+//import com.mapbox.mapboxsdk.offline.OfflineRegionStatus;
 
-import org.akvo.flow.mapbox.offline.reactive.RegionNameMapper;
+//import org.akvo.flow.mapbox.offline.reactive.RegionNameMapper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,29 +36,30 @@ public class DomainOfflineAreaMapper {
 
     private static final long MEGABYTE = 1024L * 1024L;
 
-    private final RegionNameMapper regionNameMapper;
+//    private final RegionNameMapper regionNameMapper;
     private final MapInfoMapper mapInfoMapper;
 
     @Inject
-    public DomainOfflineAreaMapper(RegionNameMapper regionNameMapper, MapInfoMapper mapInfoMapper) {
-        this.regionNameMapper = regionNameMapper;
+    public DomainOfflineAreaMapper(/*RegionNameMapper regionNameMapper, */MapInfoMapper mapInfoMapper) {
+//        this.regionNameMapper = regionNameMapper;
         this.mapInfoMapper = mapInfoMapper;
     }
 
-    public DomainOfflineArea transform(OfflineRegion region, OfflineRegionStatus status) {
-        return new DomainOfflineArea(region.getID(),
-                regionNameMapper.getRegionName(region),
-                status.getCompletedResourceSize() / MEGABYTE + " MB",
-                status.getDownloadState() == OfflineRegion.STATE_ACTIVE, status.isComplete(),
-                mapInfoMapper.getMapInfo(region));
-    }
+//    public DomainOfflineArea transform(OfflineRegion region, OfflineRegionStatus status) {
+//        return new DomainOfflineArea(region.getID(),
+//                regionNameMapper.getRegionName(region),
+//                status.getCompletedResourceSize() / MEGABYTE + " MB",
+//                status.getDownloadState() == OfflineRegion.STATE_ACTIVE, status.isComplete(),
+////                mapInfoMapper.getMapInfo(region));
+//                new MapInfo(0, 0, 0));
+//    }
 
-    @NonNull
-    public List<DomainOfflineArea> transform(List<Pair<OfflineRegion, OfflineRegionStatus>> pairs) {
-        List<DomainOfflineArea> areas = new ArrayList<>();
-        for (Pair<OfflineRegion, OfflineRegionStatus> p: pairs ) {
-            areas.add(transform(p.getFirst(), p.getSecond()));
-        }
-        return areas;
-    }
+//    @NonNull
+//    public List<DomainOfflineArea> transform(List<Pair<OfflineRegion, OfflineRegionStatus>> pairs) {
+//        List<DomainOfflineArea> areas = new ArrayList<>();
+//        for (Pair<OfflineRegion, OfflineRegionStatus> p: pairs ) {
+//            areas.add(transform(p.getFirst(), p.getSecond()));
+//        }
+//        return areas;
+//    }
 }

@@ -19,8 +19,8 @@
 
 package org.akvo.flow.offlinemaps.data;
 
-import org.akvo.flow.mapbox.offline.reactive.GetOfflineRegion;
-import org.akvo.flow.mapbox.offline.reactive.GetOfflineRegions;
+//import org.akvo.flow.mapbox.offline.reactive.GetOfflineRegion;
+//import org.akvo.flow.mapbox.offline.reactive.GetOfflineRegions;
 import org.akvo.flow.offlinemaps.domain.RegionRepository;
 import org.akvo.flow.offlinemaps.domain.entity.DomainOfflineArea;
 import org.akvo.flow.offlinemaps.domain.entity.DomainOfflineAreaMapper;
@@ -34,26 +34,28 @@ import io.reactivex.Single;
 
 public class DataRegionRepository implements RegionRepository {
 
-    private final GetOfflineRegions getOfflineRegions;
+//    private final GetOfflineRegions getOfflineRegions;
     private final DomainOfflineAreaMapper mapper;
-    private final GetOfflineRegion getOfflineRegion;
+//    private final GetOfflineRegion getOfflineRegion;
     private final MapInfoMapper mapInfoMapper;
 
-    public DataRegionRepository(GetOfflineRegions getOfflineRegions, DomainOfflineAreaMapper mapper,
-            GetOfflineRegion getOfflineRegion, MapInfoMapper mapInfoMapper) {
-        this.getOfflineRegions = getOfflineRegions;
+    public DataRegionRepository(/*GetOfflineRegions getOfflineRegions,*/ DomainOfflineAreaMapper mapper,
+            /*GetOfflineRegion getOfflineRegion,*/ MapInfoMapper mapInfoMapper) {
+//        this.getOfflineRegions = getOfflineRegions;
         this.mapper = mapper;
-        this.getOfflineRegion = getOfflineRegion;
+//        this.getOfflineRegion = getOfflineRegion;
         this.mapInfoMapper = mapInfoMapper;
     }
 
     @Override
     public Single<List<DomainOfflineArea>> getOfflineRegions() {
-        return getOfflineRegions.execute().map(mapper::transform);
+//        return getOfflineRegions.execute().map(mapper::transform);
+        return null;
     }
 
     @Override
     public Maybe<MapInfo> getOfflineRegion(Long regionId) {
-        return getOfflineRegion.execute(regionId).map(mapInfoMapper::getMapInfo);
+//        return getOfflineRegion.execute(regionId).map(mapInfoMapper::getMapInfo);
+        return null;
     }
 }

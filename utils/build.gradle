@@ -78,7 +78,7 @@ dependencies {
     testImplementation "com.nhaarman.mockitokotlin2:mockito-kotlin:${rootProject.ext.mockitoKotlinVersion}"
     testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:${rootProject.ext.coroutinesVersion}"
     testImplementation "io.mockk:mockk:${rootProject.ext.mockkVersion}"
-    testImplementation 'org.json:json:20180813'
+    testImplementation 'org.json:json:20240303'
 
     androidTestImplementation "androidx.test.ext:junit:${rootProject.ext.androidXJunit}"
     androidTestImplementation "androidx.test:core:${rootProject.ext.androidXCore}"

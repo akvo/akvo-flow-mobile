@@ -41,7 +41,6 @@ import org.akvo.flow.data.net.RestServiceFactory;
 import org.akvo.flow.data.net.S3User;
 import org.akvo.flow.data.net.SignatureHelper;
 import org.akvo.flow.data.net.s3.AmazonAuthHelper;
-import org.akvo.flow.data.net.s3.BodyCreator;
 import org.akvo.flow.data.net.s3.S3RestApi;
 import org.akvo.flow.data.repository.ApkDataRepository;
 import org.akvo.flow.data.repository.DataPointDataRepository;
@@ -90,6 +89,8 @@ import java.util.Arrays;
 import java.util.Locale;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.inject.Singleton;
 
@@ -302,12 +303,14 @@ public class ApplicationModule {
 
     @Provides
     @Singleton
-    public S3RestApi provideS3RestApi(RestServiceFactory serviceFactory, AmazonAuthHelper amazonAuthHelper,
-            BodyCreator bodyCreator) {
-        final DateFormat df = new SimpleDateFormat(REST_API_DATE_PATTERN, Locale.US);
-        df.setTimeZone(TimeZone.getTimeZone(TIMEZONE_GMT));
-        return new S3RestApi(serviceFactory, amazonAuthHelper, df, bodyCreator,
-                "https://" + BuildConfig.AWS_BUCKET + ".s3.amazonaws.com");
+    public S3RestApi provideS3RestApi(RestServiceFactory serviceFactory) {
+        Pattern p = Pattern.compile("^(https?://)?(.+)+\\.(akvoflow\\.org|appspot\\.com)$");
+        Matcher m = p.matcher(BuildConfig.INSTANCE_URL);
+        String instanceId = "";
+        if (m.matches() && m.group(2) != null) {
+            instanceId = m.group(2);
+        }
+        return new S3RestApi(serviceFactory, BuildConfig.S3_PROXY_URL, instanceId);
     }
 
     @Provides

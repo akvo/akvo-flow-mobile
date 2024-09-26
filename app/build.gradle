@@ -73,10 +73,8 @@ android {
     buildTypes {
         buildTypes.each {
             def serverBase = surveyProps['serverBase'].toString()
-            def awsBucket = surveyProps['awsBucket'].toString()
-            def awsAccessKeyId = surveyProps['awsAccessKeyId'].toString()
-            def awsSecretKey = surveyProps['awsSecretKey'].toString()
             def apiKey = surveyProps['apiKey'].toString()
+            def s3ProxyUrl = surveyProps['s3ProxyUrl'].toString()
 
             def instanceUrl = surveyProps['instanceUrl'].toString()
             if ("null" == instanceUrl) {
@@ -85,12 +83,13 @@ android {
 
             it.buildConfigField "String", "SERVER_BASE", "\"${serverBase}\""
             it.buildConfigField "String", "INSTANCE_URL", "\"${instanceUrl}\""
-            it.buildConfigField "String", "AWS_BUCKET", "\"${awsBucket}\""
-            it.buildConfigField "String", "AWS_ACCESS_KEY_ID", "\"${awsAccessKeyId}\""
-            it.buildConfigField "String", "AWS_SECRET_KEY", "\"${awsSecretKey}\""
+            it.buildConfigField "String", "AWS_BUCKET", "\"\""
+            it.buildConfigField "String", "AWS_ACCESS_KEY_ID", "\"\""
+            it.buildConfigField "String", "AWS_SECRET_KEY", "\"\""
             it.buildConfigField "String", "API_KEY", "\"${apiKey}\""
             it.buildConfigField "String", "SIGNING_KEY", "\"\""
             it.buildConfigField "String", "BUILD_YEAR", "\"${buildYear}\""
+            it.buildConfigField "String", "S3_PROXY_URL", "\"${s3ProxyUrl}\""
         }
 
         release {

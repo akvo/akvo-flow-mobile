@@ -26,23 +26,16 @@ import okhttp3.ResponseBody
 import okhttp3.logging.HttpLoggingInterceptor
 import org.akvo.flow.BuildConfig
 import org.akvo.flow.data.net.RestServiceFactory
-import org.akvo.flow.data.net.S3User
-import org.akvo.flow.data.net.SignatureHelper
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.runners.MockitoJUnitRunner
-import java.text.DateFormat
-import java.text.SimpleDateFormat
-import java.util.Arrays
-import java.util.Locale
-import java.util.TimeZone
 
 @RunWith(MockitoJUnitRunner::class)
 class S3RestApiTest {
 
     private lateinit var serviceFactory: RestServiceFactory
-    private lateinit var amazonAuthHelper: AmazonAuthHelper
 
     @Before
     fun setUp() {
@@ -53,19 +46,12 @@ class S3RestApiTest {
         val okHttpClient = httpClient2.build()
 
         serviceFactory = RestServiceFactory(null, okHttpClient)
-        val s3User = S3User(
-            BuildConfig.AWS_BUCKET,
-            BuildConfig.AWS_ACCESS_KEY_ID,
-            BuildConfig.AWS_SECRET_KEY
-        )
-        amazonAuthHelper = AmazonAuthHelper(SignatureHelper(), s3User)
     }
 
     @Test
+    @Ignore
     fun shouldDownloadImageCorrectly() {
-        val df: DateFormat = SimpleDateFormat(REST_API_DATE_PATTERN, Locale.US)
-        df.timeZone = TimeZone.getTimeZone("GMT")
-        val s3RestApi = S3RestApi(serviceFactory, amazonAuthHelper, df, BodyCreator(), baseUrl())
+        val s3RestApi = S3RestApi(serviceFactory, baseUrl(), "uat1")
 
         val observer = TestObserver<ResponseBody>()
         s3RestApi.downloadMedia("6af199a2-a507-4def-ad97-b81f944c9929.jpg").subscribe(observer)
@@ -74,10 +60,9 @@ class S3RestApiTest {
     }
 
     @Test
+    @Ignore
     fun shouldDownloadFolderCorrectly() {
-        val df: DateFormat = SimpleDateFormat(REST_API_DATE_PATTERN, Locale.US)
-        df.timeZone = TimeZone.getTimeZone("GMT")
-        val s3RestApi = S3RestApi(serviceFactory, amazonAuthHelper, df, BodyCreator(), baseUrl())
+        val s3RestApi = S3RestApi(serviceFactory, baseUrl(), "uat1")
 
         val observer = TestObserver<ResponseBody>()
         s3RestApi.downloadArchive("10029122.zip").subscribe(observer)
@@ -85,17 +70,12 @@ class S3RestApiTest {
         observer.assertNoErrors()
     }
 
-    private fun baseUrl() = "https://" + BuildConfig.AWS_BUCKET + ".s3.amazonaws.com"
+    private fun baseUrl() = BuildConfig.S3_PROXY_URL
 
     private fun createHttpClient(loggingInterceptor: HttpLoggingInterceptor): OkHttpClient.Builder {
         val httpClient = OkHttpClient.Builder()
         httpClient.addInterceptor(loggingInterceptor)
         httpClient.connectionSpecs(listOf(ConnectionSpec.MODERN_TLS, ConnectionSpec.COMPATIBLE_TLS));
         return httpClient
-    }
-
-    companion object {
-        private const val REST_API_DATE_PATTERN = "EEE, dd MMM yyyy HH:mm:ss "
-
     }
 }

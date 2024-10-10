@@ -18,9 +18,11 @@
  */
 package org.akvo.flow.data.net.s3
 
-import android.text.TextUtils
 import io.reactivex.Observable
 import io.reactivex.Single
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.ResponseBody
 import org.akvo.flow.data.entity.S3File
 import org.akvo.flow.data.entity.Transmission
@@ -28,36 +30,25 @@ import org.akvo.flow.data.net.RestServiceFactory
 import retrofit2.HttpException
 import retrofit2.Response
 import timber.log.Timber
-import java.text.DateFormat
-import java.util.Date
 import javax.inject.Singleton
 
 @Singleton
 open class S3RestApi(
     private val serviceFactory: RestServiceFactory,
-    private val amazonAuthHelper: AmazonAuthHelper, private val dateFormat: DateFormat,
-    private val bodyCreator: BodyCreator,
-    private val baseUrl: String
+    private val baseUrl: String,
+    private val instanceId: String
 ) {
 
     fun uploadFile(transmission: Transmission): Observable<Response<ResponseBody>> {
         val s3File = transmission.s3File
-        val date = formattedDate()
-        return when {
-            s3File.isPublic -> {
-                uploadPublicFile(date, s3File)
-            }
-            else -> {
-                uploadPrivateFile(date, s3File)
-            }
-        }
+        val formId = transmission.formId
+        val file = MultipartBody.Part.createFormData("file", s3File.filename, s3File.file.asRequestBody(s3File.contentType.toMediaType()))
+        return createRetrofitService().upload(instanceId, s3File.dir, formId, s3File.filename, file)
+            .concatMap { response -> verifyResponse(response) }
     }
 
     fun downloadArchive(fileName: String): Observable<ResponseBody> {
-        val date = formattedDate()
-        val authorization = amazonAuthHelper
-            .getAmazonAuthForGet(date, PAYLOAD_GET, "$SURVEYS_FOLDER/$fileName")
-        return createRetrofitService().getSurvey(SURVEYS_FOLDER, fileName, date, authorization)
+        return createRetrofitService().getSurvey(instanceId, SURVEYS_FOLDER, fileName)
             .onErrorResumeNext(fun(throwable: Throwable): Observable<ResponseBody> {
                 Timber.e(Exception(throwable), "Error downloading $fileName from s3")
                 return Observable.error(throwable)
@@ -65,10 +56,7 @@ open class S3RestApi(
     }
 
     fun downloadMedia(fileName: String): Single<ResponseBody> {
-        val date = formattedDate()
-        val authorization = amazonAuthHelper
-            .getAmazonAuthForGet(date, PAYLOAD_GET, "$IMAGES_FOLDER/$fileName")
-        return createRetrofitService().downloadImage(IMAGES_FOLDER, fileName, date, authorization)
+        return createRetrofitService().downloadMedia(instanceId, IMAGES_FOLDER, fileName)
             .onErrorResumeNext(fun(throwable: Throwable): Single<ResponseBody> {
                 Timber.e(Exception(throwable), "Error downloading $fileName from s3")
                 return Single.error(throwable)
@@ -76,61 +64,18 @@ open class S3RestApi(
     }
 
     suspend fun downloadImage(fileName: String): ResponseBody {
-        val date = formattedDate()
-        val authorization = amazonAuthHelper
-            .getAmazonAuthForGet(date, PAYLOAD_GET, "$IMAGES_FOLDER/$fileName")
-        return createRetrofitService().downloadImageNew(IMAGES_FOLDER, fileName, date, authorization)
+        return createRetrofitService().downloadImage(instanceId, IMAGES_FOLDER, fileName)
     }
 
-    private fun uploadPublicFile(date: String, s3File: S3File): Observable<Response<ResponseBody>> {
-        val authorization = amazonAuthHelper.getAmazonAuthForPut(date, PAYLOAD_PUT_PUBLIC, s3File)
-        return createRetrofitService()
-            .uploadPublic(
-                s3File.dir,
-                s3File.filename,
-                s3File.md5Base64,
-                s3File.contentType,
-                date,
-                authorization,
-                bodyCreator.createBody(s3File)
-            )
-            .concatMap { response -> verifyResponse(response, s3File) }
-    }
-
-    private fun createRetrofitService(): AwsS3 {
-        return serviceFactory.createRetrofitService(AwsS3::class.java, baseUrl)
-    }
-
-    private fun uploadPrivateFile(
-        date: String,
-        s3File: S3File
-    ): Observable<Response<ResponseBody>> {
-        val authorization = amazonAuthHelper
-            .getAmazonAuthForPut(date, PAYLOAD_PUT_PRIVATE, s3File)
-        val body = bodyCreator.createBody(s3File)
-        return createRetrofitService()
-            .upload(
-                s3File.dir,
-                s3File.filename,
-                s3File.md5Base64,
-                s3File.contentType,
-                date,
-                authorization,
-                body
-            )
-            .concatMap { response -> verifyResponse(response, s3File) }
+    private fun createRetrofitService(): S3Proxy {
+        return serviceFactory.createRetrofitService(S3Proxy::class.java, baseUrl)
     }
 
     private fun verifyResponse(
-        response: Response<ResponseBody>,
-        s3File: S3File
+        response: Response<ResponseBody>
     ): Observable<Response<ResponseBody>> {
         when {
             response.isSuccessful -> {
-                val etag = getEtag(response)
-                if (TextUtils.isEmpty(etag) || etag != s3File.md5Hex) {
-                    return Observable.error(Exception("File ${s3File.filename} upload to S3 Failed"))
-                }
             }
             else -> {
                 return Observable.error(HttpException(response))
@@ -139,24 +84,7 @@ open class S3RestApi(
         return Observable.just(response)
     }
 
-    private fun getEtag(response: Response<ResponseBody>): String? {
-        var eTag = response.headers()["ETag"]
-        if (!TextUtils.isEmpty(eTag)) {
-            eTag = eTag!!.replace("\"".toRegex(), "")
-        }
-        return eTag
-    }
-
-    open fun formattedDate(): String {
-        return "${dateFormat.format(Date())}GMT"
-    }
-
     companion object {
-        private const val PAYLOAD_PUT_PUBLIC =
-            "PUT\n%s\n%s\n%s\nx-amz-acl:public-read\n/%s/%s" // md5, type, date, bucket, obj
-        private const val PAYLOAD_PUT_PRIVATE =
-            "PUT\n%s\n%s\n%s\n/%s/%s" // md5, type, date, bucket, obj
-        private const val PAYLOAD_GET = "GET\n\n\n%s\n/%s/%s" // date, bucket, obj
         private const val SURVEYS_FOLDER = "surveys"
         private const val IMAGES_FOLDER = "images"
     }

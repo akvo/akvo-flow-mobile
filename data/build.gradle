@@ -52,6 +52,7 @@ android {
     buildTypes {
         debug {
             testCoverageEnabled true
+            multiDexEnabled true
         }
         release {
             minifyEnabled true
@@ -91,6 +92,7 @@ dependencies {
 
     androidTestImplementation "androidx.test.ext:junit:${rootProject.ext.androidXJunit}"
     androidTestImplementation "androidx.test:core:${rootProject.ext.androidXCore}"
+    androidTestImplementation "org.mockito:mockito-core:${rootProject.ext.mockitoCoreVersion}"
     androidTestImplementation "com.github.fabioCollini.daggermock:daggermock:${rootProject.ext.daggermockVersion}"
     androidTestImplementation "com.github.fabioCollini.daggermock:daggermock-kotlin:${rootProject.ext.daggermockVersion}"
     androidTestImplementation "com.google.dexmaker:dexmaker:${rootProject.ext.dexMakerVersion}"

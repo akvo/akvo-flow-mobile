@@ -29,7 +29,6 @@ import org.akvo.flow.data.entity.Transmission;
 import org.akvo.flow.data.entity.TransmissionMapper;
 import org.akvo.flow.data.entity.UploadError;
 import org.akvo.flow.data.entity.UploadErrorWithMessage;
-import org.akvo.flow.data.entity.UploadFormDeletedError;
 import org.akvo.flow.data.entity.UploadResult;
 import org.akvo.flow.data.entity.UploadSuccess;
 import org.akvo.flow.data.entity.form.FormIdMapper;
@@ -124,8 +123,7 @@ public class SurveyDataRepositoryTest {
 
         RestApi restApi = new RestApi(mockDeviceHelper, new TestRestServiceFactory(), "1.2.3", "");
 
-        S3RestApi s3RestApi = new S3RestApi(new TestRestServiceFactory(),
-                mockAmazonAuth, mockDateFormat, mockBodyCreator, "");
+        S3RestApi s3RestApi = new S3RestApi(new TestRestServiceFactory(), "", "");
 
         when(mockAmazonAuth.getAmazonAuthForPut(anyString(), anyString(), any(S3File.class)))
                 .thenReturn("123");

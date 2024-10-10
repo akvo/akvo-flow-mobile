@@ -32,7 +32,6 @@ import org.akvo.flow.data.entity.form.FormIdMapper;
 import org.akvo.flow.data.entity.form.XmlFormParser;
 import org.akvo.flow.data.net.RestApi;
 import org.akvo.flow.data.net.s3.AmazonAuthHelper;
-import org.akvo.flow.data.net.s3.BodyCreator;
 import org.akvo.flow.data.net.s3.S3RestApi;
 import org.akvo.flow.domain.util.DeviceHelper;
 import org.junit.After;
@@ -58,7 +57,6 @@ import okhttp3.mockwebserver.MockWebServer;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -114,9 +112,7 @@ public class FormDataRepositoryTest {
         mockWebServer.start(8080);
 
         restApi = spy(new RestApi(mockDeviceHelper, new TestRestServiceFactory(), "1.2.3", ""));
-        s3RestApi = spy(new S3RestApi(new TestRestServiceFactory(), mockAmazonAuth, mockDateFormat,
-                new BodyCreator(), ""));
-        doReturn("12-12-2012GMT").when(s3RestApi).formattedDate();
+        s3RestApi = spy(new S3RestApi(new TestRestServiceFactory(), "", ""));
         DataSourceFactory dataSourceFactory = new DataSourceFactory(null, null,
                 mockDatabaseDataSource, null, mockFileDataSource, null);
         formDataRepository = new FormDataRepository(mockFormHeaderParser, mockXmlParser,

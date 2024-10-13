@@ -22,7 +22,7 @@ package org.akvo.flow.app;
 import androidx.annotation.VisibleForTesting;
 import androidx.multidex.MultiDexApplication;
 
-import com.mapbox.mapboxsdk.Mapbox;
+//import com.mapbox.mapboxsdk.Mapbox;
 
 import org.akvo.flow.BuildConfig;
 import org.akvo.flow.R;
@@ -65,7 +65,7 @@ public class FlowApp extends MultiDexApplication {
     public void onCreate() {
         super.onCreate();
 
-        Mapbox.getInstance(this, getString(R.string.mapbox_token));
+//        Mapbox.getInstance(this, getString(R.string.mapbox_token));
 
         initializeInjector();
         initLogging();

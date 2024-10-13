@@ -19,9 +19,9 @@
 
 package org.akvo.flow.offlinemaps.domain.entity;
 
-import com.mapbox.mapboxsdk.geometry.LatLng;
-import com.mapbox.mapboxsdk.offline.OfflineRegion;
-import com.mapbox.mapboxsdk.offline.OfflineRegionDefinition;
+//import com.mapbox.mapboxsdk.geometry.LatLng;
+//import com.mapbox.mapboxsdk.offline.OfflineRegion;
+//import com.mapbox.mapboxsdk.offline.OfflineRegionDefinition;
 
 import javax.inject.Inject;
 
@@ -33,17 +33,17 @@ public class MapInfoMapper {
     public MapInfoMapper() {
     }
 
-    @Nullable
-    public MapInfo getMapInfo(@Nullable OfflineRegion region) {
-        if (region == null) {
-            return null;
-        }
-        OfflineRegionDefinition definition = region.getDefinition();
-        LatLng center = definition.getBounds().getCenter();
-        return new MapInfo(center.getLatitude(), center.getLongitude(), getZoom(definition));
-    }
+//    @Nullable
+//    public MapInfo getMapInfo(@Nullable OfflineRegion region) {
+//        if (region == null) {
+//            return null;
+//        }
+//        OfflineRegionDefinition definition = region.getDefinition();
+//        LatLng center = definition.getBounds().getCenter();
+//        return new MapInfo(center.getLatitude(), center.getLongitude(), getZoom(definition));
+//    }
 
-    private double getZoom(OfflineRegionDefinition definition) {
-        return definition.getMinZoom() + MapInfo.ZOOM_MAX;
-    }
+//    private double getZoom(OfflineRegionDefinition definition) {
+//        return definition.getMinZoom() + MapInfo.ZOOM_MAX;
+//    }
 }

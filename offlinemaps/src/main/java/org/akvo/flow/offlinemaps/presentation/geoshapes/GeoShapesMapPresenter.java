@@ -19,7 +19,8 @@
 
 package org.akvo.flow.offlinemaps.presentation.geoshapes;
 
-import com.mapbox.mapboxsdk.geometry.LatLng;
+import com.mapbox.geojson.Point;
+//import com.mapbox.mapboxsdk.geometry.LatLng;
 
 import org.akvo.flow.offlinemaps.domain.entity.MapInfo;
 import org.akvo.flow.offlinemaps.domain.interactor.GetSelectedOfflineMapInfo;
@@ -46,7 +47,7 @@ public class GeoShapesMapPresenter {
         this.view = view;
     }
 
-    public void loadOfflineSettings(List<LatLng> listOfCoordinates) {
+    public void loadOfflineSettings(List<Point> listOfCoordinates) {
         getSelectedOfflineMapInfo.execute(new DisposableMaybeObserver<MapInfo>() {
             @Override
             public void onSuccess(MapInfo mapInfo) {

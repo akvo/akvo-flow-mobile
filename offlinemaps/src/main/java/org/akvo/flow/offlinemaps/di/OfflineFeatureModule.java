@@ -23,13 +23,13 @@ import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import com.mapbox.mapboxsdk.offline.OfflineManager;
+//import com.mapbox.mapboxsdk.offline.OfflineManager;
 
-import org.akvo.flow.mapbox.offline.reactive.DeleteOfflineRegion;
-import org.akvo.flow.mapbox.offline.reactive.GetOfflineRegion;
-import org.akvo.flow.mapbox.offline.reactive.GetOfflineRegions;
-import org.akvo.flow.mapbox.offline.reactive.RegionNameMapper;
-import org.akvo.flow.mapbox.offline.reactive.RenameOfflineRegion;
+//import org.akvo.flow.mapbox.offline.reactive.DeleteOfflineRegion;
+//import org.akvo.flow.mapbox.offline.reactive.GetOfflineRegion;
+//import org.akvo.flow.mapbox.offline.reactive.GetOfflineRegions;
+//import org.akvo.flow.mapbox.offline.reactive.RegionNameMapper;
+//import org.akvo.flow.mapbox.offline.reactive.RenameOfflineRegion;
 import org.akvo.flow.offlinemaps.data.DataPreferencesRepository;
 import org.akvo.flow.offlinemaps.data.DataRegionRepository;
 import org.akvo.flow.offlinemaps.data.OfflineSharedPreferenceDataSource;
@@ -59,11 +59,11 @@ public class OfflineFeatureModule {
         return application;
     }
 
-    @Singleton
-    @Provides
-    RegionNameMapper regionNameMapper() {
-        return new RegionNameMapper();
-    }
+//    @Singleton
+//    @Provides
+//    RegionNameMapper regionNameMapper() {
+//        return new RegionNameMapper();
+//    }
 
     @Singleton
     @Provides
@@ -79,45 +79,45 @@ public class OfflineFeatureModule {
         return new DataPreferencesRepository(dataSource);
     }
 
-    @Singleton
-    @Provides
-    GetOfflineRegion provideGetOfflineRegion(Context context) {
-        return new GetOfflineRegion(context);
-    }
+//    @Singleton
+//    @Provides
+//    GetOfflineRegion provideGetOfflineRegion(Context context) {
+//        return new GetOfflineRegion(context);
+//    }
 
-    @Singleton
-    @Provides
-    GetOfflineRegions provideGetOfflineRegions(Context context) {
-        return new GetOfflineRegions(context);
-    }
+//    @Singleton
+//    @Provides
+//    GetOfflineRegions provideGetOfflineRegions(Context context) {
+//        return new GetOfflineRegions(context);
+//    }
 
     @Singleton
     @Provides
     RegionRepository providesRegionRepository(MapInfoMapper mapInfoMapper,
-            DomainOfflineAreaMapper domainOfflineAreaMapper, GetOfflineRegion getOfflineRegion,
-            GetOfflineRegions getOfflineRegions) {
-        return new DataRegionRepository(getOfflineRegions, domainOfflineAreaMapper,
-                getOfflineRegion, mapInfoMapper);
+            DomainOfflineAreaMapper domainOfflineAreaMapper/*, GetOfflineRegion getOfflineRegion,
+            GetOfflineRegions getOfflineRegions*/) {
+        return new DataRegionRepository(/*getOfflineRegions,*/ domainOfflineAreaMapper,
+                /*getOfflineRegion,*/ mapInfoMapper);
     }
 
-    @Singleton
-    @Provides
-    RenameOfflineRegion providesRenameOfflineRegion(Context context,
-            RegionNameMapper regionNameMapper) {
-        return new RenameOfflineRegion(context, regionNameMapper);
-    }
+//    @Singleton
+//    @Provides
+//    RenameOfflineRegion providesRenameOfflineRegion(Context context,
+//            RegionNameMapper regionNameMapper) {
+//        return new RenameOfflineRegion(context, regionNameMapper);
+//    }
 
-    @Singleton
-    @Provides
-    DeleteOfflineRegion providesDeleteOfflineRegion(Context context) {
-        return new DeleteOfflineRegion(context);
-    }
+//    @Singleton
+//    @Provides
+//    DeleteOfflineRegion providesDeleteOfflineRegion(Context context) {
+//        return new DeleteOfflineRegion(context);
+//    }
 
-    @Singleton
-    @Provides
-    OfflineManager providesOfflineManager(Context context) {
-        return OfflineManager.getInstance(context);
-    }
+//    @Singleton
+//    @Provides
+//    OfflineManager providesOfflineManager(Context context) {
+//        return OfflineManager.getInstance(context);
+//    }
 
     @Provides
     GetSelectedOfflineMapInfo provideGetSelectedOfflineMapInfo(

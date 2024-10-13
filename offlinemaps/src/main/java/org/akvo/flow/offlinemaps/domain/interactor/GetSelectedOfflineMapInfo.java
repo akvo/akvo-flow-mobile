@@ -47,10 +47,10 @@ public class GetSelectedOfflineMapInfo {
     }
 
     public void execute(DisposableMaybeObserver<MapInfo> observer) {
-        addDisposable(buildUseCaseObservable()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeWith(observer));
+//        addDisposable(buildUseCaseObservable()
+//                .subscribeOn(Schedulers.io())
+//                .observeOn(AndroidSchedulers.mainThread())
+//                .subscribeWith(observer));
     }
 
     public void dispose() {
@@ -59,12 +59,12 @@ public class GetSelectedOfflineMapInfo {
         }
     }
 
-    private Maybe<MapInfo> buildUseCaseObservable() {
-        return userRepository.getSelectedOfflineArea()
-                .concatMap(regionRepository::getOfflineRegion);
-    }
+//    private Maybe<MapInfo> buildUseCaseObservable() {
+//        return userRepository.getSelectedOfflineArea()
+//                .concatMap(regionRepository::getOfflineRegion);
+//    }
 
-    private void addDisposable(Disposable disposable) {
-        disposables.add(disposable);
-    }
+//    private void addDisposable(Disposable disposable) {
+//        disposables.add(disposable);
+//    }
 }

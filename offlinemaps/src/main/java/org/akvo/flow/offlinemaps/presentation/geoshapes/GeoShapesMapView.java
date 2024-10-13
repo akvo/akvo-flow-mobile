@@ -19,7 +19,8 @@
 
 package org.akvo.flow.offlinemaps.presentation.geoshapes;
 
-import com.mapbox.mapboxsdk.geometry.LatLng;
+import com.mapbox.geojson.Point;
+//import com.mapbox.mapboxsdk.geometry.LatLng;
 
 import org.akvo.flow.offlinemaps.domain.entity.MapInfo;
 
@@ -27,7 +28,7 @@ import java.util.List;
 
 public interface GeoShapesMapView {
 
-    void centerOnCoordinates(List<LatLng> listOfCoordinates);
+    void centerOnCoordinates(List<Point> listOfCoordinates);
 
     void centerOnOfflineArea(MapInfo mapInfo);
 }

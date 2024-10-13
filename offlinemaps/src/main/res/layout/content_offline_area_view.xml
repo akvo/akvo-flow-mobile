@@ -9,8 +9,8 @@
     tools:context=".presentation.view.OfflineAreaViewActivity"
     tools:showIn="@layout/activity_offline_area_view">
 
-    <com.mapbox.mapboxsdk.maps.MapView
+    <!--com.mapbox.mapboxsdk.maps.MapView
         android:id="@+id/mapView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent" /-->
 </androidx.constraintlayout.widget.ConstraintLayout>

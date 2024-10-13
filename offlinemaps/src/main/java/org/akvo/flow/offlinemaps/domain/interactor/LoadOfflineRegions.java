@@ -45,10 +45,10 @@ public class LoadOfflineRegions {
     }
 
     public void execute(DisposableSingleObserver<List<DomainOfflineArea>> observer) {
-        addDisposable(buildUseCaseObservable()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeWith(observer));
+//        addDisposable(buildUseCaseObservable()
+//                .subscribeOn(Schedulers.io())
+//                .observeOn(AndroidSchedulers.mainThread())
+//                .subscribeWith(observer));
     }
 
     public void dispose() {
@@ -57,11 +57,11 @@ public class LoadOfflineRegions {
         }
     }
 
-    private Single<List<DomainOfflineArea>> buildUseCaseObservable() {
-        return regionRepository.getOfflineRegions();
-    }
+//    private Single<List<DomainOfflineArea>> buildUseCaseObservable() {
+//        return regionRepository.getOfflineRegions();
+//    }
 
-    private void addDisposable(Disposable disposable) {
-        disposables.add(disposable);
-    }
+//    private void addDisposable(Disposable disposable) {
+//        disposables.add(disposable);
+//    }
 }

@@ -22,7 +22,7 @@ package org.akvo.flow.presentation.geoshape.entities;
 import androidx.annotation.NonNull;
 
 import com.mapbox.geojson.Point;
-import com.mapbox.mapboxsdk.geometry.LatLng;
+//import com.mapbox.mapboxsdk.geometry.LatLng;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,34 +31,34 @@ import javax.inject.Inject;
 
 public class CoordinatesMapper {
 
-    @Inject
-    public CoordinatesMapper() {
-    }
+//    @Inject
+//    public CoordinatesMapper() {
+//    }
 
-    @NonNull
-    List<LatLng> toLatLng(List<Point> coordinates) {
-        List<LatLng> latLngs = new ArrayList<>();
-        for (Point p : coordinates) {
-            latLngs.add(toLatLng(p));
-        }
-        return latLngs;
-    }
+//    @NonNull
+//    List<LatLng> toLatLng(List<Point> coordinates) {
+//        List<LatLng> latLngs = new ArrayList<>();
+//        for (Point p : coordinates) {
+//            latLngs.add(toLatLng(p));
+//        }
+//        return latLngs;
+//    }
 
-    List<Point> toPointList(List<LatLng> latLngs) {
-        List<Point> points = new ArrayList<>(latLngs.size());
-        for (LatLng latLng : latLngs) {
-            points.add(toPoint(latLng));
-        }
-        return points;
-    }
+//    List<Point> toPointList(List<LatLng> latLngs) {
+//        List<Point> points = new ArrayList<>(latLngs.size());
+//        for (LatLng latLng : latLngs) {
+//            points.add(toPoint(latLng));
+//        }
+//        return points;
+//    }
 
-    @NonNull
-    public Point toPoint(LatLng latLng) {
-        return Point.fromLngLat(latLng.getLongitude(), latLng.getLatitude());
-    }
+//    @NonNull
+//    public Point toPoint(LatLng latLng) {
+//        return Point.fromLngLat(latLng.getLongitude(), latLng.getLatitude());
+//    }
 
-    @NonNull
-    private LatLng toLatLng(Point p) {
-        return new LatLng(p.latitude(), p.longitude());
-    }
+//    @NonNull
+//    private LatLng toLatLng(Point p) {
+//        return new LatLng(p.latitude(), p.longitude());
+//    }
 }

@@ -30,7 +30,7 @@ import org.akvo.flow.injector.component.ApplicationComponent;
 import org.akvo.flow.uicomponents.BackActivity;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
-import org.akvo.flow.offlinemaps.presentation.MapBoxMapItemView;
+//import org.akvo.flow.offlinemaps.presentation.MapBoxMapItemView;
 import org.akvo.flow.offlinemaps.presentation.MapReadyCallback;
 import org.akvo.flow.util.ConstantUtil;
 
@@ -42,7 +42,7 @@ public class DataPointMapActivity extends BackActivity implements DataPointMapVi
     @Inject
     DataPointMapPresenter presenter;
 
-    private MapBoxMapItemView mapView;
+//    private MapBoxMapItemView mapView;
     private String dataPointId;
 
     @Override
@@ -52,10 +52,10 @@ public class DataPointMapActivity extends BackActivity implements DataPointMapVi
         setupToolBar();
         initializeInjector();
         presenter.setView(this);
-        mapView = findViewById(R.id.mapView);
-        mapView.onCreate(savedInstanceState);
+//        mapView = findViewById(R.id.mapView);
+//        mapView.onCreate(savedInstanceState);
         dataPointId = getIntent().getStringExtra(ConstantUtil.DATA_POINT_ID_EXTRA);
-        mapView.getMapAsyncWithCallback(this);
+//        mapView.getMapAsyncWithCallback(this);
     }
 
     private void initializeInjector() {
@@ -76,50 +76,50 @@ public class DataPointMapActivity extends BackActivity implements DataPointMapVi
     @Override
     public void onResume() {
         super.onResume();
-        mapView.onResume();
+//        mapView.onResume();
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        mapView.onStart();
+//        mapView.onStart();
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        mapView.onStop();
+//        mapView.onStop();
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        mapView.onPause();
+//        mapView.onPause();
     }
 
     @Override
     public void onLowMemory() {
         super.onLowMemory();
-        mapView.onLowMemory();
+//        mapView.onLowMemory();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        mapView.onDestroy();
+//        mapView.onDestroy();
         presenter.destroy();
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        mapView.onSaveInstanceState(outState);
+//        mapView.onSaveInstanceState(outState);
     }
 
     @Override
     public void showDataPoint(String displayName, Feature feature) {
         setTitle(displayName);
-        mapView.displayFeature(feature);
+//        mapView.displayFeature(feature);
     }
 
     @Override

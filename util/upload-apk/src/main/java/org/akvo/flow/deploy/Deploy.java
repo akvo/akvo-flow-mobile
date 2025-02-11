@@ -78,8 +78,8 @@ public class Deploy {
         final String version = args[VERSION];
 
         final String s3Path = "apk/" + instance + "/" + file.getName();
-        final String s3Url = "https://akvoflow.s3.amazonaws.com/apk/" + instance + '/'
-                + file.getName();
+        final String s3Url = "https://app.akvoflow.org/" + instance + '/'
+                + file.getName().replaceAll(".apk$", "");
         final String host = instance + ".appspot.com";
 
         try {

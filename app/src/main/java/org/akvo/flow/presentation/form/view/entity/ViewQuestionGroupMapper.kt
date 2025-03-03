@@ -133,10 +133,11 @@ class ViewQuestionGroupMapper @Inject constructor() {
         repetition: Int
     ): ArrayList<ViewQuestionAnswer> {
         val answers = arrayListOf<ViewQuestionAnswer>()
-        questions.forEach { question ->
+        questions.forEach loop@ { question ->
             val listOfResponses: List<Response> = getResponsesForQuestion(
                 question.questionId, responses
             )
+            if (listOfResponses.isEmpty()) { return@loop }
             answers.add(createQuestionAnswer(question, listOfResponses, repetition))
         }
         return answers

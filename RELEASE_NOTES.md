@@ -1,7 +1,12 @@
 Akvo FLOW app release notes
 ===========================
+# ver 2.10.8
+Date: 03 March 2025
+
+* **Hide questions without answers as they can cause confusion**
+
 # ver 2.10.7
-DAte: 24 September 2024
+Date: 24 September 2024
 
 * **Use Flow S3 Proxy**
 

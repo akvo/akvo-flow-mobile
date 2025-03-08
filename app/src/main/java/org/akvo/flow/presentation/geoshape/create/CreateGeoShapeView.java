@@ -19,7 +19,8 @@
 
 package org.akvo.flow.presentation.geoshape.create;
 
-import com.mapbox.mapboxsdk.geometry.LatLng;
+import com.mapbox.geojson.Point;
+//import com.mapbox.mapboxsdk.geometry.LatLng;
 
 import org.akvo.flow.presentation.geoshape.entities.Shape;
 import org.akvo.flow.presentation.geoshape.entities.ViewFeatures;
@@ -50,7 +51,7 @@ public interface CreateGeoShapeView {
 
     void setCanceledResult();
 
-    void updateSelected(LatLng transform);
+    void updateSelected(Point transform);
 
     void clearSelected();
 

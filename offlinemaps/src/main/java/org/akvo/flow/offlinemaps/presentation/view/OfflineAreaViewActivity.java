@@ -21,12 +21,12 @@ package org.akvo.flow.offlinemaps.presentation.view;
 
 import android.os.Bundle;
 
-import com.mapbox.mapboxsdk.camera.CameraPosition;
-import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
-import com.mapbox.mapboxsdk.geometry.LatLng;
-import com.mapbox.mapboxsdk.maps.MapView;
+//import com.mapbox.mapboxsdk.camera.CameraPosition;
+//import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
+//import com.mapbox.mapboxsdk.geometry.LatLng;
+//import com.mapbox.mapboxsdk.maps.MapView;
 
-import org.akvo.flow.offlinemaps.Constants;
+//import org.akvo.flow.offlinemaps.Constants;
 import org.akvo.flow.offlinemaps.R;
 import org.akvo.flow.offlinemaps.domain.entity.MapInfo;
 import org.akvo.flow.uicomponents.BackActivity;
@@ -38,7 +38,7 @@ public class OfflineAreaViewActivity extends BackActivity {
     public static final String NAME_EXTRA = "name";
     public static final String MAP_INFO_EXTRA = "map-info";
 
-    private MapView mapView;
+//    private MapView mapView;
     private String mapName;
     private MapInfo mapInfo;
 
@@ -47,65 +47,65 @@ public class OfflineAreaViewActivity extends BackActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_offline_area_view);
         setupToolBar();
-        mapView = findViewById(R.id.mapView);
-        mapView.onCreate(savedInstanceState);
+//        mapView = findViewById(R.id.mapView);
+//        mapView.onCreate(savedInstanceState);
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
             mapInfo = extras.getParcelable(MAP_INFO_EXTRA);
             mapName = extras.getString(NAME_EXTRA);
         }
         setTitle(mapName);
-        mapView.getMapAsync(mapboxMap -> mapboxMap.setStyle(Constants.MAPBOX_MAP_STYLE, style -> {
-            double zoom = mapInfo.getZoom();
-            CameraPosition cameraPosition = new CameraPosition.Builder()
-                    .target(new LatLng(mapInfo.getLatitude(), mapInfo.getLongitude()))
-                    .zoom(zoom)
-                    .build();
-            mapboxMap.setMaxZoomPreference(zoom + Constants.MAP_BOX_ZOOM_MAX);
-            mapboxMap.setMinZoomPreference(zoom - Constants.MAP_BOX_ZOOM_MAX);
-            mapboxMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-        }));
+//        mapView.getMapAsync(mapboxMap -> mapboxMap.setStyle(Constants.MAPBOX_MAP_STYLE, style -> {
+//            double zoom = mapInfo.getZoom();
+//            CameraPosition cameraPosition = new CameraPosition.Builder()
+//                    .target(new LatLng(mapInfo.getLatitude(), mapInfo.getLongitude()))
+//                    .zoom(zoom)
+//                    .build();
+//            mapboxMap.setMaxZoomPreference(zoom + Constants.MAP_BOX_ZOOM_MAX);
+//            mapboxMap.setMinZoomPreference(zoom - Constants.MAP_BOX_ZOOM_MAX);
+//            mapboxMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+//        }));
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        mapView.onResume();
+//        mapView.onResume();
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        mapView.onStart();
+//        mapView.onStart();
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        mapView.onStop();
+//        mapView.onStop();
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        mapView.onPause();
+//        mapView.onPause();
     }
 
     @Override
     public void onLowMemory() {
         super.onLowMemory();
-        mapView.onLowMemory();
+//        mapView.onLowMemory();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        mapView.onDestroy();
+//        mapView.onDestroy();
     }
 
     @Override
     protected void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
-        mapView.onSaveInstanceState(outState);
+//        mapView.onSaveInstanceState(outState);
     }
 }

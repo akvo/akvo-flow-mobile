@@ -30,10 +30,10 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 
-import com.mapbox.mapboxsdk.geometry.LatLngBounds;
-import com.mapbox.mapboxsdk.maps.MapView;
-import com.mapbox.mapboxsdk.maps.MapboxMap;
-import com.mapbox.mapboxsdk.maps.Style;
+//import com.mapbox.mapboxsdk.geometry.LatLngBounds;
+//import com.mapbox.mapboxsdk.maps.MapView;
+//import com.mapbox.mapboxsdk.maps.MapboxMap;
+//import com.mapbox.mapboxsdk.maps.Style;
 
 import org.akvo.flow.offlinemaps.Constants;
 import org.akvo.flow.offlinemaps.R;
@@ -51,11 +51,11 @@ import androidx.annotation.NonNull;
 public class OfflineMapDownloadActivity extends BackActivity
         implements OfflineMapDownloadView {
 
-    private MapView mapView;
+//    private MapView mapView;
     private Button saveBt;
     private EditText mapNameEt;
     private ProgressBar downloadProgress;
-    private MapboxMap mapboxMap;
+//    private MapboxMap mapboxMap;
     private int callingScreen;
     private TrackingHelper trackingHelper;
 
@@ -79,7 +79,7 @@ public class OfflineMapDownloadActivity extends BackActivity
         initialiseInjector();
         setupToolBar();
         setUpViews();
-        setupMap(savedInstanceState);
+//        setupMap(savedInstanceState);
         callingScreen = getIntent()
                 .getIntExtra(Constants.CALLING_SCREEN_EXTRA, Constants.CALLING_SCREEN_EXTRA_LIST);
         presenter.setView(this);
@@ -94,23 +94,23 @@ public class OfflineMapDownloadActivity extends BackActivity
                 .inject(this);
     }
 
-    private void setupMap(Bundle savedInstanceState) {
-        mapView = findViewById(R.id.mapView);
-        mapView.onCreate(savedInstanceState);
-        mapView.getMapAsync(this::setUpMapBox);
-    }
+//    private void setupMap(Bundle savedInstanceState) {
+//        mapView = findViewById(R.id.mapView);
+//        mapView.onCreate(savedInstanceState);
+//        mapView.getMapAsync(this::setUpMapBox);
+//    }
 
     private void setUpViews() {
         saveBt = findViewById(R.id.offline_map_save_button);
         saveBt.setOnClickListener(v -> {
-            if (mapboxMap != null && mapboxMap.getStyle() != null) {
-                float pixelRatio = getResources().getDisplayMetrics().density;
-                String styleUrl = mapboxMap.getStyle().getUri();
-                LatLngBounds bounds = mapboxMap.getProjection().getVisibleRegion().latLngBounds;
-                double zoom = mapboxMap.getCameraPosition().zoom;
-                presenter.downloadArea(styleUrl, bounds, pixelRatio, zoom,
-                        mapNameEt.getText().toString());
-            }
+//            if (mapboxMap != null && mapboxMap.getStyle() != null) {
+//                float pixelRatio = getResources().getDisplayMetrics().density;
+//                String styleUrl = mapboxMap.getStyle().getUri();
+//                LatLngBounds bounds = mapboxMap.getProjection().getVisibleRegion().latLngBounds;
+//                double zoom = mapboxMap.getCameraPosition().zoom;
+//                presenter.downloadArea(styleUrl, /*bounds,*/ pixelRatio, zoom,
+//                        mapNameEt.getText().toString());
+//            }
             if (trackingHelper != null) {
                 trackingHelper.logOfflineAreaDownloadPressed();
             }
@@ -140,54 +140,54 @@ public class OfflineMapDownloadActivity extends BackActivity
         downloadProgress = findViewById(R.id.offline_map_download_progress);
     }
 
-    private void setUpMapBox(MapboxMap mapboxMap) {
-        this.mapboxMap = mapboxMap;
-        mapboxMap.setStyle(Style.MAPBOX_STREETS, style -> {
-            //EMPTY
-        });
-    }
+//    private void setUpMapBox(MapboxMap mapboxMap) {
+//        this.mapboxMap = mapboxMap;
+//        mapboxMap.setStyle(Style.MAPBOX_STREETS, style -> {
+//            //EMPTY
+//        });
+//    }
 
     @Override
     protected void onStart() {
         super.onStart();
-        mapView.onStart();
+//        mapView.onStart();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        mapView.onResume();
+//        mapView.onResume();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        mapView.onPause();
+//        mapView.onPause();
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        mapView.onStop();
+//        mapView.onStop();
     }
 
     @Override
     protected void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
-        mapView.onSaveInstanceState(outState);
+//        mapView.onSaveInstanceState(outState);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        mapView.onDestroy();
+//        mapView.onDestroy();
         presenter.destroy();
     }
 
     @Override
     public void onLowMemory() {
         super.onLowMemory();
-        mapView.onLowMemory();
+//        mapView.onLowMemory();
     }
 
     @Override

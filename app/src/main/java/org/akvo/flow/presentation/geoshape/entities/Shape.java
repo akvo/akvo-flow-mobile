@@ -25,7 +25,8 @@ import android.os.Parcelable;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.mapbox.mapboxsdk.geometry.LatLng;
+import com.mapbox.geojson.Point;
+//import com.mapbox.mapboxsdk.geometry.LatLng;
 
 import java.util.List;
 import java.util.UUID;
@@ -107,16 +108,16 @@ public abstract class Shape implements Parcelable {
         }
     }
 
-    public void addPoint(LatLng latLng) {
+    public void addPoint(Point latLng) {
         unSelectAllPoints();
         ShapePoint shapePoint = createSelectedShapePoint(latLng, getFeatureId());
         points.add(shapePoint);
     }
 
     @NonNull
-    ShapePoint createSelectedShapePoint(LatLng latLng, String featureId) {
+    ShapePoint createSelectedShapePoint(Point latLng, String featureId) {
         ShapePoint shapePoint = new ShapePoint(UUID.randomUUID().toString(),
-                featureId, latLng.getLatitude(), latLng.getLongitude());
+                featureId, latLng.latitude(), latLng.longitude());
         shapePoint.setSelected(true);
         return shapePoint;
     }

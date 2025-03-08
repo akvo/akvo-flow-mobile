@@ -23,7 +23,7 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.mapbox.mapboxsdk.maps.Style;
+//import com.mapbox.mapboxsdk.maps.Style;
 
 import org.akvo.flow.R;
 import org.akvo.flow.app.FlowApp;
@@ -31,7 +31,7 @@ import org.akvo.flow.injector.component.ApplicationComponent;
 import org.akvo.flow.uicomponents.BackActivity;
 import org.akvo.flow.injector.component.DaggerViewComponent;
 import org.akvo.flow.injector.component.ViewComponent;
-import org.akvo.flow.offlinemaps.presentation.geoshapes.GeoShapesMapViewImpl;
+//import org.akvo.flow.offlinemaps.presentation.geoshapes.GeoShapesMapViewImpl;
 import org.akvo.flow.presentation.geoshape.entities.FeatureMapper;
 import org.akvo.flow.presentation.geoshape.entities.Shape;
 import org.akvo.flow.presentation.geoshape.entities.ViewFeatures;
@@ -44,7 +44,7 @@ import javax.inject.Inject;
 
 public class ViewGeoShapeActivity extends BackActivity {
 
-    private GeoShapesMapViewImpl mapView;
+//    private GeoShapesMapViewImpl mapView;
 
     private ViewFeatures viewFeatures = new ViewFeatures(new ArrayList<>(), new ArrayList<>(),
             new ArrayList<>());
@@ -59,7 +59,7 @@ public class ViewGeoShapeActivity extends BackActivity {
         initializeInjector();
         setupToolBar();
         setUpFeatures();
-        setUpMapView(savedInstanceState);
+//        setUpMapView(savedInstanceState);
     }
 
     private void initializeInjector() {
@@ -79,14 +79,14 @@ public class ViewGeoShapeActivity extends BackActivity {
         return ((FlowApp) getApplication()).getApplicationComponent();
     }
 
-    private void setUpMapView(Bundle savedInstanceState) {
-        mapView = findViewById(R.id.mapView);
-        mapView.onCreate(savedInstanceState);
-        mapView.getMapAsyncWithCallback(() -> {
-            mapView.initSources(viewFeatures.getFeatures(), viewFeatures.getPointFeatures());
-            mapView.centerMap(viewFeatures.getListOfCoordinates());
-        });
-    }
+//    private void setUpMapView(Bundle savedInstanceState) {
+//        mapView = findViewById(R.id.mapView);
+//        mapView.onCreate(savedInstanceState);
+//        mapView.getMapAsyncWithCallback(() -> {
+//            mapView.initSources(viewFeatures.getFeatures(), viewFeatures.getPointFeatures());
+//            mapView.centerMap(viewFeatures.getListOfCoordinates());
+//        });
+//    }
 
     private void setUpFeatures() {
         String geoJSON = getIntent().getStringExtra(ConstantUtil.GEOSHAPE_RESULT);
@@ -104,13 +104,13 @@ public class ViewGeoShapeActivity extends BackActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.map_normal:
-                updateMapStyle(Style.LIGHT);
+//                updateMapStyle(Style.LIGHT);
                 break;
             case R.id.map_satellite:
-                updateMapStyle(Style.SATELLITE_STREETS);
+//                updateMapStyle(Style.SATELLITE_STREETS);
                 break;
             case R.id.map_terrain:
-                updateMapStyle(Style.OUTDOORS);
+//                updateMapStyle(Style.OUTDOORS);
                 break;
             case android.R.id.home:
                 onBackPressed();
@@ -121,52 +121,52 @@ public class ViewGeoShapeActivity extends BackActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private void updateMapStyle(String style) {
-        mapView.updateMapStyle(style, callback -> {
-            mapView.initSources(viewFeatures.getFeatures(), viewFeatures.getFeatures());
-            mapView.centerMap(viewFeatures.getListOfCoordinates());
-        });
-    }
+//    private void updateMapStyle(String style) {
+//        mapView.updateMapStyle(style, callback -> {
+//            mapView.initSources(viewFeatures.getFeatures(), viewFeatures.getFeatures());
+//            mapView.centerMap(viewFeatures.getListOfCoordinates());
+//        });
+//    }
 
     @Override
     public void onResume() {
         super.onResume();
-        mapView.onResume();
+//        mapView.onResume();
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        mapView.onStart();
+//        mapView.onStart();
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        mapView.onStop();
+//        mapView.onStop();
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        mapView.onPause();
+//        mapView.onPause();
     }
 
     @Override
     public void onLowMemory() {
         super.onLowMemory();
-        mapView.onLowMemory();
+//        mapView.onLowMemory();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        mapView.onDestroy();
+//        mapView.onDestroy();
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        mapView.onSaveInstanceState(outState);
+//        mapView.onSaveInstanceState(outState);
     }
 }

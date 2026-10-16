@@ -78,7 +78,7 @@ open class S3RestApi(
             response.isSuccessful -> {
             }
             else -> {
-                return Observable.error(HttpException(response))
+                return Observable.error(FileStoreException(HttpException(response)))
             }
         }
         return Observable.just(response)

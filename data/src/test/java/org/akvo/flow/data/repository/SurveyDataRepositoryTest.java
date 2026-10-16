@@ -225,6 +225,26 @@ public class SurveyDataRepositoryTest {
     }
 
     @Test
+    public void shouldReturnFileTransmissionFailedWhenFileStoreReturns404() {
+        TestObserver observer = new TestObserver<Set<UploadResult>>();
+
+        mockWebServer.enqueue(new MockResponse().setResponseCode(404));
+
+        Transmission transmission = new Transmission(1L, 2L, "123", mockS3File);
+
+        surveyDataRepository.syncTransmission(transmission, "123").subscribe(observer);
+
+        observer.awaitTerminalEvent(2, TimeUnit.SECONDS);
+
+        observer.assertNoErrors();
+        observer.assertValueCount(1);
+        assertTrue(observer.values().get(0) instanceof UploadError);
+        verify(mockDataBaseDataSource, times(0)).setFileTransmissionSucceeded(anyLong());
+        verify(mockDataBaseDataSource, times(0)).setFileTransmissionFormDeleted(anyLong());
+        verify(mockDataBaseDataSource, times(1)).setFileTransmissionFailed(anyLong());
+    }
+
+    @Test
     public void shouldReturnFileTransmissionFailedIfError() {
         TestObserver observer = new TestObserver<Set<String>>();
         MockResponse s3Response = new MockResponse().setResponseCode(200);

@@ -49,6 +49,8 @@ public class UpgraderFactory {
                 databaseUpgrader.addUpgrader(new SurveyViewedUpgrader(helper, db));
             case DatabaseHelper.VER_DATAPOINT_STATUS:
                 databaseUpgrader.addUpgrader(new StatusUpgrader(db, new FormUpdateNotifiedTable()));
+            case DatabaseHelper.VER_FORM_VERSION_UPDATE:
+                databaseUpgrader.addUpgrader(new RequeueFormDeletedUpgrader(db));
             default:
                 break;
         }

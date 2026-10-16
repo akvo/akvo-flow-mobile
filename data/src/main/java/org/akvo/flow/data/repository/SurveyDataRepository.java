@@ -43,6 +43,7 @@ import org.akvo.flow.data.entity.UploadWarning;
 import org.akvo.flow.data.entity.UserMapper;
 import org.akvo.flow.data.entity.form.FormIdMapper;
 import org.akvo.flow.data.net.RestApi;
+import org.akvo.flow.data.net.s3.FileStoreException;
 import org.akvo.flow.data.net.s3.S3RestApi;
 import org.akvo.flow.domain.entity.DataPoint;
 import org.akvo.flow.domain.entity.FormInstanceMetadata;
@@ -460,12 +461,18 @@ public class SurveyDataRepository implements SurveyRepository {
                 .onErrorReturn(new Function<Throwable, UploadResult>() {
                     @Override
                     public UploadResult apply(Throwable throwable) {
-                        if (throwable instanceof HttpException) {
-                            String responseBody = getErrorResponseBody((HttpException) throwable);
+                        // Only the processor is asked for the form by id, so only its
+                        // 404 means the form is gone. The file store knows nothing about
+                        // forms, and marking FORM_DELETED on its 404 writes the survey
+                        // off for good: no query retries or exports that status.
+                        boolean fromFileStore = throwable instanceof FileStoreException;
+                        Throwable cause = fromFileStore ? throwable.getCause() : throwable;
+                        if (cause instanceof HttpException) {
+                            String responseBody = getErrorResponseBody((HttpException) cause);
                             String error = findByRegex(makePattern("error"), responseBody);
                             String message = findByRegex(makePattern("message"), responseBody);
-                            int code = ((HttpException) throwable).code();
-                            if (code == 404) {
+                            int code = ((HttpException) cause).code();
+                            if (code == 404 && !fromFileStore) {
                                 dataBaseDataSource.setFileTransmissionFormDeleted(transmissionId);
                             } else {
                                 dataBaseDataSource.setFileTransmissionFailed(transmissionId);

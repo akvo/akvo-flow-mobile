@@ -1,5 +1,10 @@
 Akvo FLOW app release notes
 ===========================
+# ver 2.10.9
+Date: 21 October 2026
+
+* **Do not mark surveys FORM_DELETED on a file-store 404; re-queue those written off during the s3-proxy outage**
+
 # ver 2.10.8
 Date: 03 March 2025
 

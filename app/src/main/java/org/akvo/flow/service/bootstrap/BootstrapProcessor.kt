@@ -90,7 +90,10 @@ class BootstrapProcessor @Inject constructor(
                     return ProcessingResult.ProcessingErrorWrongDashboard
                 }
             } else if (surveyMetadata.app.isNotEmpty()) {
-                if (!BuildConfig.AWS_BUCKET.contains(surveyMetadata.app)) {
+                // The app id used to be matched against the S3 bucket name, but routing
+                // uploads through the Flow S3 proxy left AWS_BUCKET empty, which rejected
+                // every app-tagged survey. The instance lives in the server url now.
+                if (!BuildConfig.SERVER_BASE.contains(surveyMetadata.app)) {
                     return ProcessingResult.ProcessingErrorWrongDashboard
                 }
             } else {

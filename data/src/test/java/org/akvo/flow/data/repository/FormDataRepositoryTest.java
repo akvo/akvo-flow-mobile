@@ -31,7 +31,6 @@ import org.akvo.flow.data.entity.form.FormHeaderParser;
 import org.akvo.flow.data.entity.form.FormIdMapper;
 import org.akvo.flow.data.entity.form.XmlFormParser;
 import org.akvo.flow.data.net.RestApi;
-import org.akvo.flow.data.net.s3.AmazonAuthHelper;
 import org.akvo.flow.data.net.s3.S3RestApi;
 import org.akvo.flow.domain.util.DeviceHelper;
 import org.junit.After;
@@ -45,6 +44,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -90,9 +90,6 @@ public class FormDataRepositoryTest {
     DateFormat mockDateFormat;
 
     @Mock
-    AmazonAuthHelper mockAmazonAuth;
-
-    @Mock
     Cursor mockCursor;
 
     @Mock
@@ -112,15 +109,13 @@ public class FormDataRepositoryTest {
         mockWebServer.start(8080);
 
         restApi = spy(new RestApi(mockDeviceHelper, new TestRestServiceFactory(), "1.2.3", ""));
-        s3RestApi = spy(new S3RestApi(new TestRestServiceFactory(), "", ""));
+        s3RestApi = spy(new S3RestApi(new TestRestServiceFactory(), "", "myinstance"));
         DataSourceFactory dataSourceFactory = new DataSourceFactory(null, null,
                 mockDatabaseDataSource, null, mockFileDataSource, null);
         formDataRepository = new FormDataRepository(mockFormHeaderParser, mockXmlParser,
                 restApi, dataSourceFactory, mockFormIdMapper, s3RestApi, mockDomainFormMapper);
         ApiFormHeader apiFormHeader = new ApiFormHeader("123456", "", "", "", 1.0, "", true, "");
         when(mockFormHeaderParser.parseOne(anyString())).thenReturn(apiFormHeader);
-        when(mockAmazonAuth.getAmazonAuthForGet(anyString(), anyString(), anyString()))
-                .thenReturn("123");
         when(mockDatabaseDataSource.insertSurveyGroup(any(ApiFormHeader.class)))
                 .thenReturn(Observable.just(true));
         when(mockDatabaseDataSource
@@ -130,6 +125,7 @@ public class FormDataRepositoryTest {
                 .thenReturn(Observable.just(true));
         when(mockFileDataSource.getFormFile(anyString()))
                 .thenReturn(mockInputStream);
+        when(mockForm.getResources()).thenReturn(Collections.<String>emptyList());
     }
 
     @Test

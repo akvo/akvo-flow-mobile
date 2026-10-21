@@ -79,6 +79,12 @@ ext {
 allprojects {
     repositories {
         google()
+        // Vendored artifacts that have dropped out of the sunset jcenter CDN.
+        // mapbox-android-accounts-0.7.0 (a transitive dep of mapbox 9.2.0) is no
+        // longer served by jcenter and was never on Maven Central. The .aar here
+        // is the genuine jcenter byte (sha256 07b39c8…, matching its published
+        // .sha1 and three independent mirrors). See vendor-repo/README.md.
+        maven { url "${rootProject.projectDir}/vendor-repo" }
         jcenter()
         maven { url "https://jitpack.io" }
     }

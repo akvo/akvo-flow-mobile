@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.mapbox.mapboxsdk</groupId>
+  <artifactId>mapbox-android-accounts</artifactId>
+  <version>0.7.0</version>
+  <packaging>aar</packaging>
+  <dependencies>
+    <dependency>
+      <groupId>androidx.annotation</groupId>
+      <artifactId>annotation</artifactId>
+      <version>1.0.0</version>
+      <scope>runtime</scope>
+    </dependency>
+  </dependencies>
+  <name>Mapbox Accounts SDK for Android</name>
+  <description>Mapbox Accounts SDK for Android</description>
+  <url>https://github.com/mapbox/mapbox-accounts-android</url>
+  <licenses>
+    <license>
+      <name>Mapbox Terms of Service</name>
+      <url>https://www.mapbox.com/tos/</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+  <developers>
+    <developer>
+      <id>mapbox</id>
+      <name>Mapbox</name>
+    </developer>
+  </developers>
+  <scm>
+    <connection>scm:git@github.com:mapbox/mapbox-accounts-android.git</connection>
+    <developerConnection>scm:git@github.com:mapbox/mapbox-accounts-android.git</developerConnection>
+    <url>https://github.com/mapbox/mapbox-accounts-android</url>
+  </scm>
+</project>

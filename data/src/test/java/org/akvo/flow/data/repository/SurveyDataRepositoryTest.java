@@ -33,8 +33,6 @@ import org.akvo.flow.data.entity.UploadResult;
 import org.akvo.flow.data.entity.UploadSuccess;
 import org.akvo.flow.data.entity.form.FormIdMapper;
 import org.akvo.flow.data.net.RestApi;
-import org.akvo.flow.data.net.s3.AmazonAuthHelper;
-import org.akvo.flow.data.net.s3.BodyCreator;
 import org.akvo.flow.data.net.s3.S3RestApi;
 import org.akvo.flow.domain.util.DeviceHelper;
 import org.junit.After;
@@ -55,7 +53,6 @@ import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Observable;
 import io.reactivex.observers.TestObserver;
-import okhttp3.RequestBody;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 
@@ -93,19 +90,7 @@ public class SurveyDataRepositoryTest {
     S3File mockS3File;
 
     @Mock
-    File mockFile;
-
-    @Mock
     SimpleDateFormat mockDateFormat;
-
-    @Mock
-    AmazonAuthHelper mockAmazonAuth;
-
-    @Mock
-    BodyCreator mockBodyCreator;
-
-    @Mock
-    RequestBody mockBody;
 
     private SurveyDataRepository surveyDataRepository;
     private MockWebServer mockWebServer;
@@ -123,24 +108,21 @@ public class SurveyDataRepositoryTest {
 
         RestApi restApi = new RestApi(mockDeviceHelper, new TestRestServiceFactory(), "1.2.3", "");
 
-        S3RestApi s3RestApi = new S3RestApi(new TestRestServiceFactory(), "", "");
-
-        when(mockAmazonAuth.getAmazonAuthForPut(anyString(), anyString(), any(S3File.class)))
-                .thenReturn("123");
+        S3RestApi s3RestApi = new S3RestApi(new TestRestServiceFactory(), "", "myinstance");
 
         surveyDataRepository = new SurveyDataRepository(mockDataSourceFactory, null, restApi,
                 null, null, null, mockTransmissionMapper, null, mockFormIdMapper, null, s3RestApi);
 
-        when(mockBodyCreator.createBody(any(S3File.class))).thenReturn(mockBody);
-
         when(mockS3File.getAction()).thenReturn("submit");
         when(mockS3File.getContentType()).thenReturn("application/zip");
         when(mockS3File.getDir()).thenReturn("devicezip");
-        when(mockS3File.getFile()).thenReturn(mockFile);
-        when(mockS3File.isPublic()).thenReturn(false);
         when(mockS3File.getFilename()).thenReturn("abc.zip");
-        when(mockS3File.getMd5Hex()).thenReturn("123");
-        when(mockS3File.getMd5Base64()).thenReturn("123");
+
+        // The upload builds a multipart body straight from this file, so it must be
+        // a real readable file: a mock one leaves the request unsendable.
+        File uploadFile = File.createTempFile("flow-upload-test", ".zip");
+        uploadFile.deleteOnExit();
+        when(mockS3File.getFile()).thenReturn(uploadFile);
     }
 
     @Test
@@ -252,31 +234,6 @@ public class SurveyDataRepositoryTest {
         s3Response.setBody("{}");
 
         MockResponse gaeResponse = new MockResponse().setResponseCode(500);
-        mockWebServer.enqueue(s3Response);
-        mockWebServer.enqueue(gaeResponse);
-
-        Transmission transmission = new Transmission(1L, 2L, "123", mockS3File);
-
-        surveyDataRepository.syncTransmission(transmission, "123").subscribe(observer);
-
-        observer.awaitTerminalEvent(2, TimeUnit.SECONDS);
-
-        observer.assertNoErrors();
-        observer.assertValueCount(1);
-        assertTrue(observer.values().get(0) instanceof UploadError);
-        verify(mockDataBaseDataSource, times(0)).setFileTransmissionSucceeded(anyLong());
-        verify(mockDataBaseDataSource, times(0)).setFileTransmissionFormDeleted(anyLong());
-        verify(mockDataBaseDataSource, times(1)).setFileTransmissionFailed(anyLong());
-    }
-
-    @Test
-    public void shouldReturnFileTransmissionFailedIfWrongEtag() {
-        TestObserver observer = new TestObserver<Set<String>>();
-        MockResponse s3Response = new MockResponse().setResponseCode(200);
-        s3Response.addHeader("ETag", "\"1234\"");
-        s3Response.setBody("{}");
-
-        MockResponse gaeResponse = new MockResponse().setResponseCode(200);
         mockWebServer.enqueue(s3Response);
         mockWebServer.enqueue(gaeResponse);
 
